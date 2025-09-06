@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project>
+  <!-- Copy Unity game assemblies into local References folder -->
+  <Target Name="UpdateGameReferences" BeforeTargets="BeforeBuild" Condition="Exists('$(GameAssemblyPath)')">
+    <ItemGroup>
+      <GameAssemblyFiles Include="$(GameAssemblyPath)\**\*" />
+    </ItemGroup>
+    <Copy
+      SourceFiles="@(GameAssemblyFiles)"
+      DestinationFolder="$(ProjectDir)References\Managed\%(RecursiveDir)"
+      SkipUnchangedFiles="true" />
+  </Target>
+
+  <!-- Copy BepInEx core assemblies into local References folder -->
+  <Target Name="UpdateBepInExReferences" BeforeTargets="BeforeBuild" Condition="Exists('$(BepInExAssemblyPath)')">
+    <ItemGroup>
+      <BepInExAssemblyFiles Include="$(BepInExAssemblyPath)\**\*" />
+    </ItemGroup>
+    <Copy
+      SourceFiles="@(BepInExAssemblyFiles)"
+      DestinationFolder="$(ProjectDir)References\core\%(RecursiveDir)"
+      SkipUnchangedFiles="true" />
+  </Target>
+
+  <!-- Copy built plugin to BepInEx plugins folder -->
+  <Target Name="CopyToPlugins" AfterTargets="Build">
+    <Copy SourceFiles="$(TargetPath)" DestinationFiles="$(PluginsPath)\$(TargetFileName)" />
+    <Message Text="Copied to Plugins: $(TargetFileName)" Importance="high"/>
+  </Target>
+</Project>
