@@ -416,16 +416,23 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="GUIComponents\GUIAlertComponents.cs" />
     <Compile Include="GUIComponents\GUIAnimationManager.cs" />
+    <Compile Include="GUIComponents\GUIAvatarComponents.cs" />
+    <Compile Include="GUIComponents\GUIBadgeComponents.cs" />
     <Compile Include="GUIComponents\GUIButtonComponents.cs" />
     <Compile Include="GUIComponents\GUICardComponents.cs" />
+    <Compile Include="GUIComponents\GUICheckboxComponents.cs" />
     <Compile Include="GUIComponents\GUIInputComponents.cs" />
     <Compile Include="GUIComponents\GUILabelComponents.cs" />
     <Compile Include="GUIComponents\GUILayoutComponents.cs" />
     <Compile Include="GUIComponents\GUIProgressComponents.cs" />
     <Compile Include="GUIComponents\GUISeparatorComponents.cs" />
+    <Compile Include="GUIComponents\GUISkeletonComponents.cs" />
     <Compile Include="GUIComponents\GUISliderComponents.cs" />
     <Compile Include="GUIComponents\GUIStyleManager.cs" />
+    <Compile Include="GUIComponents\GUISwitchComponents.cs" />
+    <Compile Include="GUIComponents\GUITableComponents.cs" />
     <Compile Include="GUIComponents\GUITabsComponents.cs" />
     <Compile Include="GUIComponents\GUITextAreaComponents.cs" />
     <Compile Include="GUIComponents\GUIToggleComponents.cs" />

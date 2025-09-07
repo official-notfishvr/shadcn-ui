@@ -76,6 +76,122 @@ namespace shadcnui.GUIComponents
         Default
     }
 
+    // New component enums
+    public enum CheckboxVariant
+    {
+        Default,
+        Outline,
+        Ghost
+    }
+
+    public enum CheckboxSize
+    {
+        Default,
+        Small,
+        Large
+    }
+
+    public enum SwitchVariant
+    {
+        Default,
+        Outline,
+        Ghost
+    }
+
+    public enum SwitchSize
+    {
+        Default,
+        Small,
+        Large
+    }
+
+    public enum BadgeVariant
+    {
+        Default,
+        Secondary,
+        Destructive,
+        Outline
+    }
+
+    public enum BadgeSize
+    {
+        Default,
+        Small,
+        Large
+    }
+
+    public enum AlertVariant
+    {
+        Default,
+        Destructive
+    }
+
+    public enum AlertType
+    {
+        Info,
+        Warning,
+        Error,
+        Success
+    }
+
+    public enum AvatarSize
+    {
+        Small,
+        Default,
+        Large
+    }
+
+    public enum AvatarShape
+    {
+        Circle,
+        Square,
+        Rounded
+    }
+
+    public enum SkeletonVariant
+    {
+        Default,
+        Rounded,
+        Circular
+    }
+
+    public enum SkeletonSize
+    {
+        Small,
+        Default,
+        Large
+    }
+
+    public enum TableVariant
+    {
+        Default,
+        Striped,
+        Bordered,
+        Hover
+    }
+
+    public enum TableSize
+    {
+        Small,
+        Default,
+        Large
+    }
+
+    public enum SliderVariant
+    {
+        Default,
+        Range,
+        Vertical,
+        Disabled
+    }
+
+    public enum SliderSize
+    {
+        Small,
+        Default,
+        Large
+    }
+
     public class GUIStyleManager
     {
         private GUIHelper guiHelper;
@@ -155,6 +271,59 @@ namespace shadcnui.GUIComponents
         public GUIStyle tabsTriggerActiveStyle;
         public GUIStyle tabsContentStyle;
 
+        // New component styles
+        public GUIStyle checkboxDefaultStyle;
+        public GUIStyle checkboxOutlineStyle;
+        public GUIStyle checkboxGhostStyle;
+        public GUIStyle checkboxSmallStyle;
+        public GUIStyle checkboxLargeStyle;
+
+        public GUIStyle switchDefaultStyle;
+        public GUIStyle switchOutlineStyle;
+        public GUIStyle switchGhostStyle;
+        public GUIStyle switchSmallStyle;
+        public GUIStyle switchLargeStyle;
+
+        public GUIStyle badgeDefaultStyle;
+        public GUIStyle badgeSecondaryStyle;
+        public GUIStyle badgeDestructiveStyle;
+        public GUIStyle badgeOutlineStyle;
+        public GUIStyle badgeSmallStyle;
+        public GUIStyle badgeLargeStyle;
+
+        public GUIStyle alertDefaultStyle;
+        public GUIStyle alertDestructiveStyle;
+        public GUIStyle alertTitleStyle;
+        public GUIStyle alertDescriptionStyle;
+
+        public GUIStyle avatarStyle;
+        public GUIStyle avatarFallbackStyle;
+        public GUIStyle avatarSmallStyle;
+        public GUIStyle avatarLargeStyle;
+
+        public GUIStyle skeletonStyle;
+        public GUIStyle skeletonRoundedStyle;
+        public GUIStyle skeletonCircularStyle;
+        public GUIStyle skeletonSmallStyle;
+        public GUIStyle skeletonLargeStyle;
+
+        public GUIStyle tableStyle;
+        public GUIStyle tableHeaderStyle;
+        public GUIStyle tableCellStyle;
+        public GUIStyle tableStripedStyle;
+        public GUIStyle tableBorderedStyle;
+        public GUIStyle tableHoverStyle;
+
+        // Slider styles
+        public GUIStyle sliderDefaultStyle;
+        public GUIStyle sliderRangeStyle;
+        public GUIStyle sliderVerticalStyle;
+        public GUIStyle sliderDisabledStyle;
+        public GUIStyle sliderSmallStyle;
+        public GUIStyle sliderLargeStyle;
+        public GUIStyle sliderLabelStyle;
+        public GUIStyle sliderValueStyle;
+
        
         public GUIStyle labelSmallScaledStyle;
         public GUIStyle labelMediumScaledStyle;
@@ -175,6 +344,20 @@ namespace shadcnui.GUIComponents
         private Texture2D tabsBackgroundTexture;
         private Texture2D tabsActiveTexture;
 
+        // New component textures
+        private Texture2D checkboxTexture;
+        private Texture2D checkboxCheckedTexture;
+        private Texture2D switchTexture;
+        private Texture2D switchOnTexture;
+        private Texture2D switchOffTexture;
+        private Texture2D badgeTexture;
+        private Texture2D alertTexture;
+        private Texture2D avatarTexture;
+        private Texture2D skeletonTexture;
+        private Texture2D tableTexture;
+        private Texture2D tableHeaderTexture;
+        private Texture2D tableCellTexture;
+
         public GUIStyleManager(GUIHelper helper)
         {
             guiHelper = helper;
@@ -193,6 +376,13 @@ namespace shadcnui.GUIComponents
             SetupSeparatorStyles();
             SetupTabsStyles();
             SetupTextAreaVariantStyles();
+            SetupCheckboxStyles();
+            SetupSwitchStyles();
+            SetupBadgeStyles();
+            SetupAlertStyles();
+            SetupAvatarStyles();
+            SetupSkeletonStyles();
+            SetupTableStyles();
         }
 
         private void CreateCustomTextures()
@@ -320,6 +510,67 @@ namespace shadcnui.GUIComponents
             Color tabsActiveColor = new Color(0.02f, 0.02f, 0.04f);
             tabsActiveTexture.SetPixel(0, 0, tabsActiveColor);
             tabsActiveTexture.Apply();
+
+            // New component textures
+            checkboxTexture = new Texture2D(1, 1);
+            Color checkboxColor = new Color(0.1f, 0.1f, 0.15f);
+            checkboxTexture.SetPixel(0, 0, checkboxColor);
+            checkboxTexture.Apply();
+
+            checkboxCheckedTexture = new Texture2D(1, 1);
+            Color checkboxCheckedColor = guiHelper.customColorsEnabled ? guiHelper.primaryColor : new Color(0.09f, 0.09f, 0.11f);
+            checkboxCheckedTexture.SetPixel(0, 0, checkboxCheckedColor);
+            checkboxCheckedTexture.Apply();
+
+            switchTexture = new Texture2D(1, 1);
+            Color switchColor = new Color(0.16f, 0.16f, 0.18f);
+            switchTexture.SetPixel(0, 0, switchColor);
+            switchTexture.Apply();
+
+            switchOnTexture = new Texture2D(1, 1);
+            Color switchOnColor = guiHelper.customColorsEnabled ? guiHelper.primaryColor : new Color(0.09f, 0.09f, 0.11f);
+            switchOnTexture.SetPixel(0, 0, switchOnColor);
+            switchOnTexture.Apply();
+
+            switchOffTexture = new Texture2D(1, 1);
+            Color switchOffColor = new Color(0.16f, 0.16f, 0.18f);
+            switchOffTexture.SetPixel(0, 0, switchOffColor);
+            switchOffTexture.Apply();
+
+            badgeTexture = new Texture2D(1, 1);
+            Color badgeColor = guiHelper.customColorsEnabled ? guiHelper.primaryColor : new Color(0.09f, 0.09f, 0.11f);
+            badgeTexture.SetPixel(0, 0, badgeColor);
+            badgeTexture.Apply();
+
+            alertTexture = new Texture2D(1, 1);
+            Color alertColor = new Color(0.15f, 0.15f, 0.25f);
+            alertTexture.SetPixel(0, 0, alertColor);
+            alertTexture.Apply();
+
+            avatarTexture = new Texture2D(1, 1);
+            Color avatarColor = new Color(0.16f, 0.16f, 0.18f);
+            avatarTexture.SetPixel(0, 0, avatarColor);
+            avatarTexture.Apply();
+
+            skeletonTexture = new Texture2D(1, 1);
+            Color skeletonColor = new Color(0.09f, 0.09f, 0.11f, 0.1f);
+            skeletonTexture.SetPixel(0, 0, skeletonColor);
+            skeletonTexture.Apply();
+
+            tableTexture = new Texture2D(1, 1);
+            Color tableColor = new Color(0.02f, 0.02f, 0.04f);
+            tableTexture.SetPixel(0, 0, tableColor);
+            tableTexture.Apply();
+
+            tableHeaderTexture = new Texture2D(1, 1);
+            Color tableHeaderColor = new Color(0.16f, 0.16f, 0.18f);
+            tableHeaderTexture.SetPixel(0, 0, tableHeaderColor);
+            tableHeaderTexture.Apply();
+
+            tableCellTexture = new Texture2D(1, 1);
+            Color tableCellColor = new Color(0.02f, 0.02f, 0.04f);
+            tableCellTexture.SetPixel(0, 0, tableCellColor);
+            tableCellTexture.Apply();
         }
 
         private void SetupAnimatedStyles()
@@ -1077,6 +1328,422 @@ namespace shadcnui.GUIComponents
         public Texture2D GetProgressBarBackgroundTexture() => progressBarBackgroundTexture;
         public Texture2D GetProgressBarFillTexture() => progressBarFillTexture;
 
+        // New component style setup methods
+        private void SetupCheckboxStyles()
+        {
+            float scaledFontSize = guiHelper.fontSize * guiHelper.uiScale;
+            int borderRadius = Mathf.RoundToInt(guiHelper.cornerRadius * guiHelper.uiScale);
+
+            checkboxDefaultStyle = new GUIStyle(GUI.skin.toggle);
+            checkboxDefaultStyle.fontSize = Mathf.RoundToInt(scaledFontSize);
+            checkboxDefaultStyle.normal.background = checkboxTexture;
+            checkboxDefaultStyle.active.background = checkboxCheckedTexture;
+            checkboxDefaultStyle.border = new RectOffset(borderRadius, borderRadius, borderRadius, borderRadius);
+
+            checkboxOutlineStyle = new GUIStyle(checkboxDefaultStyle);
+            checkboxOutlineStyle.normal.background = CreateOutlineTexture();
+
+            checkboxGhostStyle = new GUIStyle(checkboxDefaultStyle);
+            checkboxGhostStyle.normal.background = transparentTexture;
+
+            checkboxSmallStyle = new GUIStyle(checkboxDefaultStyle);
+            checkboxSmallStyle.fontSize = Mathf.RoundToInt((scaledFontSize - 2));
+
+            checkboxLargeStyle = new GUIStyle(checkboxDefaultStyle);
+            checkboxLargeStyle.fontSize = Mathf.RoundToInt((scaledFontSize + 2));
+        }
+
+        private void SetupSwitchStyles()
+        {
+            float scaledFontSize = guiHelper.fontSize * guiHelper.uiScale;
+            int borderRadius = Mathf.RoundToInt(guiHelper.cornerRadius * guiHelper.uiScale);
+
+            switchDefaultStyle = new GUIStyle(GUI.skin.toggle);
+            switchDefaultStyle.fontSize = Mathf.RoundToInt(scaledFontSize);
+            switchDefaultStyle.normal.background = switchOffTexture;
+            switchDefaultStyle.active.background = switchOnTexture;
+            switchDefaultStyle.border = new RectOffset(borderRadius, borderRadius, borderRadius, borderRadius);
+
+            switchOutlineStyle = new GUIStyle(switchDefaultStyle);
+            switchOutlineStyle.normal.background = CreateOutlineTexture();
+
+            switchGhostStyle = new GUIStyle(switchDefaultStyle);
+            switchGhostStyle.normal.background = transparentTexture;
+
+            switchSmallStyle = new GUIStyle(switchDefaultStyle);
+            switchSmallStyle.fontSize = Mathf.RoundToInt((scaledFontSize - 2));
+
+            switchLargeStyle = new GUIStyle(switchDefaultStyle);
+            switchLargeStyle.fontSize = Mathf.RoundToInt((scaledFontSize + 2));
+        }
+
+        private void SetupBadgeStyles()
+        {
+            float scaledFontSize = guiHelper.fontSize * guiHelper.uiScale;
+            int borderRadius = Mathf.RoundToInt(guiHelper.cornerRadius * guiHelper.uiScale);
+
+            badgeDefaultStyle = new GUIStyle(GUI.skin.box);
+            badgeDefaultStyle.fontSize = Mathf.RoundToInt(scaledFontSize);
+            badgeDefaultStyle.normal.background = badgeTexture;
+            badgeDefaultStyle.normal.textColor = new Color(0.98f, 0.98f, 0.98f);
+            badgeDefaultStyle.border = new RectOffset(borderRadius, borderRadius, borderRadius, borderRadius);
+            badgeDefaultStyle.padding = new RectOffset(8, 8, 3, 3);
+            badgeDefaultStyle.alignment = TextAnchor.MiddleCenter;
+
+            badgeSecondaryStyle = new GUIStyle(badgeDefaultStyle);
+            badgeSecondaryStyle.normal.background = CreateSolidTexture(new Color(0.16f, 0.16f, 0.18f));
+
+            badgeDestructiveStyle = new GUIStyle(badgeDefaultStyle);
+            badgeDestructiveStyle.normal.background = CreateSolidTexture(new Color(0.86f, 0.24f, 0.24f));
+
+            badgeOutlineStyle = new GUIStyle(badgeDefaultStyle);
+            badgeOutlineStyle.normal.background = CreateOutlineTexture();
+
+            badgeSmallStyle = new GUIStyle(badgeDefaultStyle);
+            badgeSmallStyle.fontSize = Mathf.RoundToInt((scaledFontSize - 2));
+
+            badgeLargeStyle = new GUIStyle(badgeDefaultStyle);
+            badgeLargeStyle.fontSize = Mathf.RoundToInt((scaledFontSize + 2));
+        }
+
+        private void SetupAlertStyles()
+        {
+            float scaledFontSize = guiHelper.fontSize * guiHelper.uiScale;
+            int borderRadius = Mathf.RoundToInt(guiHelper.cornerRadius * guiHelper.uiScale);
+
+            alertDefaultStyle = new GUIStyle(GUI.skin.box);
+            alertDefaultStyle.normal.background = alertTexture;
+            alertDefaultStyle.border = new RectOffset(borderRadius, borderRadius, borderRadius, borderRadius);
+            alertDefaultStyle.padding = new RectOffset(16, 16, 12, 12);
+
+            alertDestructiveStyle = new GUIStyle(alertDefaultStyle);
+            alertDestructiveStyle.normal.background = CreateSolidTexture(new Color(0.86f, 0.24f, 0.24f, 0.1f));
+
+            alertTitleStyle = new GUIStyle(GUI.skin.label);
+            alertTitleStyle.fontSize = Mathf.RoundToInt(scaledFontSize + 2);
+            alertTitleStyle.fontStyle = FontStyle.Bold;
+            alertTitleStyle.normal.textColor = new Color(0.98f, 0.98f, 0.98f);
+
+            alertDescriptionStyle = new GUIStyle(GUI.skin.label);
+            alertDescriptionStyle.fontSize = Mathf.RoundToInt(scaledFontSize);
+            alertDescriptionStyle.normal.textColor = new Color(0.7f, 0.7f, 0.8f);
+        }
+
+        private void SetupAvatarStyles()
+        {
+            avatarStyle = new GUIStyle(GUI.skin.box);
+            avatarStyle.normal.background = avatarTexture;
+            avatarStyle.border = new RectOffset(0, 0, 0, 0);
+            avatarStyle.padding = new RectOffset(0, 0, 0, 0);
+            avatarStyle.alignment = TextAnchor.MiddleCenter;
+
+            avatarFallbackStyle = new GUIStyle(GUI.skin.box);
+            avatarFallbackStyle.normal.background = avatarTexture;
+            avatarFallbackStyle.normal.textColor = new Color(0.98f, 0.98f, 0.98f);
+            avatarFallbackStyle.fontSize = guiHelper.fontSize;
+            avatarFallbackStyle.fontStyle = FontStyle.Bold;
+            avatarFallbackStyle.alignment = TextAnchor.MiddleCenter;
+            avatarFallbackStyle.border = new RectOffset(0, 0, 0, 0);
+            avatarFallbackStyle.padding = new RectOffset(0, 0, 0, 0);
+
+            avatarSmallStyle = new GUIStyle(avatarFallbackStyle);
+            avatarSmallStyle.fontSize = guiHelper.fontSize - 2;
+
+            avatarLargeStyle = new GUIStyle(avatarFallbackStyle);
+            avatarLargeStyle.fontSize = guiHelper.fontSize + 4;
+        }
+
+        private void SetupSkeletonStyles()
+        {
+            skeletonStyle = new GUIStyle(GUI.skin.box);
+            skeletonStyle.normal.background = skeletonTexture;
+            skeletonStyle.border = new RectOffset(4, 4, 4, 4);
+            skeletonStyle.padding = new RectOffset(0, 0, 0, 0);
+
+            skeletonRoundedStyle = new GUIStyle(skeletonStyle);
+            skeletonRoundedStyle.border = new RectOffset(8, 8, 8, 8);
+
+            skeletonCircularStyle = new GUIStyle(skeletonStyle);
+            skeletonCircularStyle.border = new RectOffset(50, 50, 50, 50);
+
+            skeletonSmallStyle = new GUIStyle(skeletonStyle);
+            skeletonSmallStyle.border = new RectOffset(2, 2, 2, 2);
+
+            skeletonLargeStyle = new GUIStyle(skeletonStyle);
+            skeletonLargeStyle.border = new RectOffset(6, 6, 6, 6);
+        }
+
+        private void SetupTableStyles()
+        {
+            float scaledFontSize = guiHelper.fontSize * guiHelper.uiScale;
+            int borderRadius = Mathf.RoundToInt(guiHelper.cornerRadius * guiHelper.uiScale);
+
+            tableStyle = new GUIStyle(GUI.skin.box);
+            tableStyle.normal.background = tableTexture;
+            tableStyle.border = new RectOffset(borderRadius, borderRadius, borderRadius, borderRadius);
+            tableStyle.padding = new RectOffset(8, 8, 8, 8);
+
+            tableHeaderStyle = new GUIStyle(GUI.skin.label);
+            tableHeaderStyle.fontSize = Mathf.RoundToInt(scaledFontSize);
+            tableHeaderStyle.fontStyle = FontStyle.Bold;
+            tableHeaderStyle.normal.textColor = new Color(0.98f, 0.98f, 0.98f);
+            tableHeaderStyle.normal.background = tableHeaderTexture;
+            tableHeaderStyle.padding = new RectOffset(8, 8, 4, 4);
+            tableHeaderStyle.alignment = TextAnchor.MiddleLeft;
+
+            tableCellStyle = new GUIStyle(GUI.skin.label);
+            tableCellStyle.fontSize = Mathf.RoundToInt(scaledFontSize);
+            tableCellStyle.normal.textColor = new Color(0.9f, 0.9f, 0.9f);
+            tableCellStyle.normal.background = tableCellTexture;
+            tableCellStyle.padding = new RectOffset(8, 8, 4, 4);
+            tableCellStyle.alignment = TextAnchor.MiddleLeft;
+
+            tableStripedStyle = new GUIStyle(tableStyle);
+            tableStripedStyle.normal.background = CreateSolidTexture(new Color(0.05f, 0.05f, 0.08f));
+
+            tableBorderedStyle = new GUIStyle(tableStyle);
+            tableBorderedStyle.normal.background = CreateOutlineTexture();
+
+            tableHoverStyle = new GUIStyle(tableStyle);
+            tableHoverStyle.hover.background = CreateSolidTexture(new Color(0.1f, 0.1f, 0.15f));
+        }
+
+        // New style getter methods
+        public GUIStyle GetCheckboxStyle(CheckboxVariant variant, CheckboxSize size)
+        {
+            GUIStyle baseStyle;
+            switch (variant)
+            {
+                case CheckboxVariant.Outline:
+                    baseStyle = checkboxOutlineStyle;
+                    break;
+                case CheckboxVariant.Ghost:
+                    baseStyle = checkboxGhostStyle;
+                    break;
+                default:
+                    baseStyle = checkboxDefaultStyle;
+                    break;
+            }
+
+            if (baseStyle == null) return GUI.skin.toggle;
+
+            switch (size)
+            {
+                case CheckboxSize.Small:
+                    return checkboxSmallStyle ?? baseStyle;
+                case CheckboxSize.Large:
+                    return checkboxLargeStyle ?? baseStyle;
+                default:
+                    return baseStyle;
+            }
+        }
+
+        public GUIStyle GetSwitchStyle(SwitchVariant variant, SwitchSize size)
+        {
+            GUIStyle baseStyle;
+            switch (variant)
+            {
+                case SwitchVariant.Outline:
+                    baseStyle = switchOutlineStyle;
+                    break;
+                case SwitchVariant.Ghost:
+                    baseStyle = switchGhostStyle;
+                    break;
+                default:
+                    baseStyle = switchDefaultStyle;
+                    break;
+            }
+
+            if (baseStyle == null) return GUI.skin.toggle;
+
+            switch (size)
+            {
+                case SwitchSize.Small:
+                    return switchSmallStyle ?? baseStyle;
+                case SwitchSize.Large:
+                    return switchLargeStyle ?? baseStyle;
+                default:
+                    return baseStyle;
+            }
+        }
+
+        public GUIStyle GetBadgeStyle(BadgeVariant variant, BadgeSize size)
+        {
+            GUIStyle baseStyle;
+            switch (variant)
+            {
+                case BadgeVariant.Secondary:
+                    baseStyle = badgeSecondaryStyle;
+                    break;
+                case BadgeVariant.Destructive:
+                    baseStyle = badgeDestructiveStyle;
+                    break;
+                case BadgeVariant.Outline:
+                    baseStyle = badgeOutlineStyle;
+                    break;
+                default:
+                    baseStyle = badgeDefaultStyle;
+                    break;
+            }
+
+            if (baseStyle == null) return GUI.skin.box;
+
+            switch (size)
+            {
+                case BadgeSize.Small:
+                    return badgeSmallStyle ?? baseStyle;
+                case BadgeSize.Large:
+                    return badgeLargeStyle ?? baseStyle;
+                default:
+                    return baseStyle;
+            }
+        }
+
+        public GUIStyle GetAlertStyle(AlertVariant variant, AlertType type)
+        {
+            GUIStyle baseStyle = variant == AlertVariant.Destructive ? alertDestructiveStyle : alertDefaultStyle;
+            return baseStyle ?? GUI.skin.box;
+        }
+
+        public GUIStyle GetAlertTitleStyle(AlertType type)
+        {
+            return alertTitleStyle ?? GUI.skin.label;
+        }
+
+        public GUIStyle GetAlertDescriptionStyle(AlertType type)
+        {
+            return alertDescriptionStyle ?? GUI.skin.label;
+        }
+
+        public GUIStyle GetAvatarStyle(AvatarSize size, AvatarShape shape)
+        {
+            GUIStyle baseStyle = avatarStyle;
+            if (baseStyle == null) return GUI.skin.box;
+
+            GUIStyle sizedStyle = new GUIStyle(baseStyle);
+            switch (size)
+            {
+                case AvatarSize.Small:
+                    sizedStyle = avatarSmallStyle ?? baseStyle;
+                    break;
+                case AvatarSize.Large:
+                    sizedStyle = avatarLargeStyle ?? baseStyle;
+                    break;
+            }
+
+            // Apply shape
+            switch (shape)
+            {
+                case AvatarShape.Circle:
+                    sizedStyle.border = new RectOffset(50, 50, 50, 50);
+                    break;
+                case AvatarShape.Rounded:
+                    sizedStyle.border = new RectOffset(8, 8, 8, 8);
+                    break;
+                case AvatarShape.Square:
+                    sizedStyle.border = new RectOffset(0, 0, 0, 0);
+                    break;
+            }
+
+            return sizedStyle;
+        }
+
+        public GUIStyle GetAvatarFallbackStyle(AvatarSize size, AvatarShape shape)
+        {
+            GUIStyle baseStyle = avatarFallbackStyle;
+            if (baseStyle == null) return GUI.skin.box;
+
+            GUIStyle sizedStyle = new GUIStyle(baseStyle);
+            switch (size)
+            {
+                case AvatarSize.Small:
+                    sizedStyle = avatarSmallStyle ?? baseStyle;
+                    break;
+                case AvatarSize.Large:
+                    sizedStyle = avatarLargeStyle ?? baseStyle;
+                    break;
+            }
+
+            // Apply shape
+            switch (shape)
+            {
+                case AvatarShape.Circle:
+                    sizedStyle.border = new RectOffset(50, 50, 50, 50);
+                    break;
+                case AvatarShape.Rounded:
+                    sizedStyle.border = new RectOffset(8, 8, 8, 8);
+                    break;
+                case AvatarShape.Square:
+                    sizedStyle.border = new RectOffset(0, 0, 0, 0);
+                    break;
+            }
+
+            return sizedStyle;
+        }
+
+        public GUIStyle GetSkeletonStyle(SkeletonVariant variant, SkeletonSize size)
+        {
+            GUIStyle baseStyle;
+            switch (variant)
+            {
+                case SkeletonVariant.Rounded:
+                    baseStyle = skeletonRoundedStyle;
+                    break;
+                case SkeletonVariant.Circular:
+                    baseStyle = skeletonCircularStyle;
+                    break;
+                default:
+                    baseStyle = skeletonStyle;
+                    break;
+            }
+
+            if (baseStyle == null) return GUI.skin.box;
+
+            switch (size)
+            {
+                case SkeletonSize.Small:
+                    return skeletonSmallStyle ?? baseStyle;
+                case SkeletonSize.Large:
+                    return skeletonLargeStyle ?? baseStyle;
+                default:
+                    return baseStyle;
+            }
+        }
+
+        public GUIStyle GetTableStyle(TableVariant variant, TableSize size)
+        {
+            GUIStyle baseStyle;
+            switch (variant)
+            {
+                case TableVariant.Striped:
+                    baseStyle = tableStripedStyle;
+                    break;
+                case TableVariant.Bordered:
+                    baseStyle = tableBorderedStyle;
+                    break;
+                case TableVariant.Hover:
+                    baseStyle = tableHoverStyle;
+                    break;
+                default:
+                    baseStyle = tableStyle;
+                    break;
+            }
+
+            return baseStyle ?? GUI.skin.box;
+        }
+
+        public GUIStyle GetTableHeaderStyle(TableVariant variant, TableSize size)
+        {
+            return tableHeaderStyle ?? GUI.skin.label;
+        }
+
+        public GUIStyle GetTableCellStyle(TableVariant variant, TableSize size)
+        {
+            return tableCellStyle ?? GUI.skin.label;
+        }
+
+    
+
         public void Cleanup()
         {
             if (gradientTexture) Object.Destroy(gradientTexture);
@@ -1092,6 +1759,20 @@ namespace shadcnui.GUIComponents
             if (separatorTexture) Object.Destroy(separatorTexture);
             if (tabsBackgroundTexture) Object.Destroy(tabsBackgroundTexture);
             if (tabsActiveTexture) Object.Destroy(tabsActiveTexture);
+            
+            // Cleanup new textures
+            if (checkboxTexture) Object.Destroy(checkboxTexture);
+            if (checkboxCheckedTexture) Object.Destroy(checkboxCheckedTexture);
+            if (switchTexture) Object.Destroy(switchTexture);
+            if (switchOnTexture) Object.Destroy(switchOnTexture);
+            if (switchOffTexture) Object.Destroy(switchOffTexture);
+            if (badgeTexture) Object.Destroy(badgeTexture);
+            if (alertTexture) Object.Destroy(alertTexture);
+            if (avatarTexture) Object.Destroy(avatarTexture);
+            if (skeletonTexture) Object.Destroy(skeletonTexture);
+            if (tableTexture) Object.Destroy(tableTexture);
+            if (tableHeaderTexture) Object.Destroy(tableHeaderTexture);
+            if (tableCellTexture) Object.Destroy(tableCellTexture);
         }
     }
 }

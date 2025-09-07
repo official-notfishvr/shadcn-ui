@@ -1,8 +1,9 @@
-using shadcnui.GUIComponents;
+﻿using shadcnui.GUIComponents;
 using System;
 using System.Collections.Generic;
 using System.Text;
 using UnityEngine;
+using static shadcnui.GUIComponents.GUIAvatarComponents;
 
 namespace shadcnui
 {
@@ -66,24 +67,29 @@ namespace shadcnui
         private GUICardComponents cardComponents;
         private GUIStyleManager styleManager;
         private GUIAnimationManager animationManager;
-        
-        // New enhanced components
         private GUILabelComponents labelComponents;
         private GUIProgressComponents progressComponents;
         private GUISeparatorComponents separatorComponents;
         private GUITabsComponents tabsComponents;
         private GUITextAreaComponents textAreaComponents;
+        private GUICheckboxComponents checkboxComponents;
+        private GUISwitchComponents switchComponents;
+        private GUIBadgeComponents badgeComponents;
+        private GUIAlertComponents alertComponents;
+        private GUIAvatarComponents avatarComponents;
+        private GUISkeletonComponents skeletonComponents;
+        private GUITableComponents tableComponents;
         #endregion
 
         #region Public Style Access
         public GUIStyle labelStyle2 => styleManager?.glowLabelStyle ?? GUI.skin.label;
         public GUIStyle buttonStylePublic => styleManager?.animatedButtonStyle ?? GUI.skin.button;
-        
+
         /// <summary>
         /// Get the style manager for advanced styling operations
         /// </summary>
         public GUIStyleManager GetStyleManager() => styleManager;
-        
+
         #endregion
 
         #region Static Compatibility
@@ -114,13 +120,18 @@ namespace shadcnui
                 layoutComponents = new GUILayoutComponents(this);
                 utilityComponents = new GUIUtilityComponents(this);
                 cardComponents = new GUICardComponents(this);
-                
-                // Initialize new enhanced components
                 labelComponents = new GUILabelComponents(this);
                 progressComponents = new GUIProgressComponents(this);
                 separatorComponents = new GUISeparatorComponents(this);
                 tabsComponents = new GUITabsComponents(this);
                 textAreaComponents = new GUITextAreaComponents(this);
+                checkboxComponents = new GUICheckboxComponents(this);
+                switchComponents = new GUISwitchComponents(this);
+                badgeComponents = new GUIBadgeComponents(this);
+                alertComponents = new GUIAlertComponents(this);
+                avatarComponents = new GUIAvatarComponents(this);
+                skeletonComponents = new GUISkeletonComponents(this);
+                tableComponents = new GUITableComponents(this);
             }
             catch (Exception ex)
             {
@@ -210,7 +221,6 @@ namespace shadcnui
             catch (Exception ex)
             {
                 Debug.LogError("Error drawing section header: " + ex.Message);
-                GUILayout.Label(title, GUI.skin.label);
             }
         }
 
@@ -223,10 +233,6 @@ namespace shadcnui
             catch (Exception ex)
             {
                 Debug.LogError("Error rendering label: " + ex.Message);
-                if (width > 0)
-                    GUILayout.Label(text, GUILayout.Width(width));
-                else
-                    GUILayout.Label(text);
             }
         }
 
@@ -236,8 +242,8 @@ namespace shadcnui
             {
                 if (fieldIndex < 0 || fieldIndex >= inputFieldGlow.Length)
                 {
-                    Debug.LogWarning($"Input field index {fieldIndex} out of bounds, using fallback");
-                    return GUILayout.TextField(text ?? placeholder ?? "", GUILayout.Width(width));
+                    Debug.LogWarning($"Input field index {fieldIndex} out of bounds");
+                    return "Input field index {fieldIndex} out of bounds";
                 }
 
                 return inputComponents?.RenderGlowInputField(text, fieldIndex, placeholder, width, inputFieldGlow, focusedField, menuAlpha) ??
@@ -246,7 +252,7 @@ namespace shadcnui
             catch (Exception ex)
             {
                 Debug.LogError("Error rendering glow input field: " + ex.Message);
-                return GUILayout.TextField(text ?? placeholder ?? "", GUILayout.Width(width));
+                return "Error: " + ex.Message;
             }
         }
 
@@ -259,11 +265,7 @@ namespace shadcnui
             catch (Exception ex)
             {
                 Debug.LogError("Error drawing password field: " + ex.Message);
-                GUILayout.BeginHorizontal();
-                GUILayout.Label(label, GUILayout.Width(120));
-                password = GUILayout.PasswordField(password, maskChar, GUILayout.Width(windowWidth - 130));
-                GUILayout.EndHorizontal();
-                return password;
+                return "Error: " + ex.Message;
             }
         }
 
@@ -276,12 +278,6 @@ namespace shadcnui
             catch (Exception ex)
             {
                 Debug.LogError("Error drawing text area: " + ex.Message);
-                GUILayout.BeginVertical();
-                GUILayout.Label(label);
-                text = GUILayout.TextArea(text ?? "", GUILayout.Width(windowWidth), GUILayout.Height(height));
-                if (text.Length > maxLength)
-                    text = text.Substring(0, maxLength);
-                GUILayout.EndVertical();
             }
         }
         #endregion
@@ -293,8 +289,8 @@ namespace shadcnui
             {
                 if (buttonIndex < 0 || buttonIndex >= buttonGlowEffects.Length)
                 {
-                    Debug.LogWarning($"Button index {buttonIndex} out of bounds, using fallback");
-                    return GUILayout.Button(text ?? "Button");
+                    Debug.LogWarning($"Button index {buttonIndex} out of bounds");
+                    return false;
                 }
 
                 return buttonComponents?.RenderGlowButton(text, buttonIndex, hoveredButton, buttonGlowEffects, mousePos, menuAlpha) ??
@@ -303,7 +299,7 @@ namespace shadcnui
             catch (Exception ex)
             {
                 Debug.LogError("Error rendering glow button: " + ex.Message);
-                return GUILayout.Button(text ?? "Button");
+                return false;
             }
         }
 
@@ -317,7 +313,7 @@ namespace shadcnui
             catch (Exception ex)
             {
                 Debug.LogError("Error rendering color preset button: " + ex.Message);
-                return GUILayout.Button(colorName ?? "Color");
+                return false;
             }
         }
 
@@ -371,7 +367,7 @@ namespace shadcnui
             catch (Exception ex)
             {
                 Debug.LogError("Error drawing button variant: " + ex.Message);
-                return GUILayout.Button(text ?? "Button");
+                return false;
             }
         }
 
@@ -385,7 +381,7 @@ namespace shadcnui
             catch (Exception ex)
             {
                 Debug.LogError("Error drawing button variant in rect: " + ex.Message);
-                return GUI.Button(rect, text ?? "Button");
+                return false;
             }
         }
 
@@ -446,7 +442,6 @@ namespace shadcnui
             catch (Exception ex)
             {
                 Debug.LogError("Error drawing button group: " + ex.Message);
-                drawButtons?.Invoke();
             }
         }
 
@@ -508,7 +503,7 @@ namespace shadcnui
             catch (Exception ex)
             {
                 Debug.LogError("Error drawing button variant: " + ex.Message);
-                return GUILayout.Button(text ?? "Button");
+                return false;
             }
         }
         #endregion
@@ -523,14 +518,6 @@ namespace shadcnui
             catch (Exception ex)
             {
                 Debug.LogError("Error drawing toggle: " + ex.Message);
-                GUILayout.BeginHorizontal();
-                bool newValue = GUILayout.Toggle(value, label ?? "Toggle");
-                if (newValue != value)
-                {
-                    value = newValue;
-                    onToggle?.Invoke(value);
-                }
-                GUILayout.EndHorizontal();
             }
         }
 
@@ -543,9 +530,6 @@ namespace shadcnui
             catch (Exception ex)
             {
                 Debug.LogError("Error drawing checkbox: " + ex.Message);
-                GUILayout.BeginHorizontal();
-                value = GUILayout.Toggle(value, label ?? "Checkbox");
-                GUILayout.EndHorizontal();
                 return false;
             }
         }
@@ -571,16 +555,7 @@ namespace shadcnui
             catch (Exception ex)
             {
                 Debug.LogError("Error drawing selection grid: " + ex.Message);
-                GUILayout.BeginVertical();
-                GUILayout.Label(label ?? "Selection");
-                if (texts != null && texts.Length > 0)
-                {
-                    int newSelected = GUILayout.SelectionGrid(selected, texts, xCount);
-                    if (newSelected >= 0 && newSelected < texts.Length)
-                        return newSelected;
-                }
-                GUILayout.EndVertical();
-                return selected;
+                return -1;
             }
         }
 
@@ -595,7 +570,7 @@ namespace shadcnui
             catch (Exception ex)
             {
                 Debug.LogError("Error drawing toggle variant: " + ex.Message);
-                return GUILayout.Toggle(value, text ?? "Toggle");
+                return false;
             }
         }
 
@@ -609,7 +584,7 @@ namespace shadcnui
             catch (Exception ex)
             {
                 Debug.LogError("Error drawing toggle variant in rect: " + ex.Message);
-                return GUI.Toggle(rect, value, text ?? "Toggle");
+                return false;
             }
         }
 
@@ -672,7 +647,6 @@ namespace shadcnui
             catch (Exception ex)
             {
                 Debug.LogError("Error beginning card: " + ex.Message);
-                GUILayout.BeginVertical(GUI.skin.box);
             }
         }
 
@@ -685,7 +659,6 @@ namespace shadcnui
             catch (Exception ex)
             {
                 Debug.LogError("Error ending card: " + ex.Message);
-                GUILayout.EndVertical();
             }
         }
 
@@ -707,12 +680,6 @@ namespace shadcnui
             catch (Exception ex)
             {
                 Debug.LogError("Error drawing card: " + ex.Message);
-                GUILayout.BeginVertical(GUI.skin.box);
-                GUILayout.Label(title ?? "Card Title");
-                GUILayout.Label(description ?? "");
-                GUILayout.Label(content ?? "");
-                footerContent?.Invoke();
-                GUILayout.EndVertical();
             }
         }
 
@@ -725,9 +692,6 @@ namespace shadcnui
             catch (Exception ex)
             {
                 Debug.LogError("Error drawing simple card: " + ex.Message);
-                GUILayout.BeginVertical(GUI.skin.box);
-                GUILayout.Label(content ?? "Card Content");
-                GUILayout.EndVertical();
             }
         }
         #endregion
@@ -742,11 +706,6 @@ namespace shadcnui
             catch (Exception ex)
             {
                 Debug.LogError("Error drawing slider: " + ex.Message);
-                GUILayout.BeginHorizontal();
-                GUILayout.Label(label ?? "Slider", GUILayout.Width(120));
-                value = GUILayout.HorizontalSlider(value, minValue, maxValue, GUILayout.Width(windowWidth - 180));
-                GUILayout.Label(value.ToString("F1"), GUILayout.Width(50));
-                GUILayout.EndHorizontal();
             }
         }
 
@@ -759,11 +718,6 @@ namespace shadcnui
             catch (Exception ex)
             {
                 Debug.LogError("Error drawing int slider: " + ex.Message);
-                GUILayout.BeginHorizontal();
-                GUILayout.Label(label ?? "Int Slider", GUILayout.Width(120));
-                value = (int)GUILayout.HorizontalSlider(value, minValue, maxValue, GUILayout.Width(windowWidth - 180));
-                GUILayout.Label(value.ToString(), GUILayout.Width(50));
-                GUILayout.EndHorizontal();
             }
         }
         #endregion
@@ -778,15 +732,6 @@ namespace shadcnui
             catch (Exception ex)
             {
                 Debug.LogError("Error drawing progress bar: " + ex.Message);
-                GUILayout.BeginHorizontal();
-                GUILayout.Label(label ?? "Progress", GUILayout.Width(80));
-                Rect rect = GUILayoutUtility.GetRect(windowWidth - 100, 20);
-                GUI.Box(rect, "");
-                Rect fillRect = new Rect(rect.x, rect.y, rect.width * Mathf.Clamp01(progress), rect.height);
-                GUI.color = barColor;
-                GUI.Box(fillRect, "");
-                GUI.color = Color.white;
-                GUILayout.EndHorizontal();
             }
         }
 
@@ -799,7 +744,6 @@ namespace shadcnui
             catch (Exception ex)
             {
                 Debug.LogError("Error drawing box: " + ex.Message);
-                GUILayout.Box(content ?? "Box Content", GUILayout.Width(windowWidth), GUILayout.Height(height));
             }
         }
 
@@ -812,7 +756,6 @@ namespace shadcnui
             catch (Exception ex)
             {
                 Debug.LogError("Error drawing separator: " + ex.Message);
-                GUILayout.Box("", GUILayout.Width(windowWidth), GUILayout.Height(height));
             }
         }
 
@@ -825,7 +768,6 @@ namespace shadcnui
             catch (Exception ex)
             {
                 Debug.LogError("Error rendering instructions: " + ex.Message);
-                GUILayout.Label(text ?? "Instructions", GUI.skin.label);
             }
         }
         #endregion
@@ -840,17 +782,7 @@ namespace shadcnui
             catch (Exception ex)
             {
                 Debug.LogError("Error drawing scroll view: " + ex.Message);
-                Vector2 newScrollPos = GUILayout.BeginScrollView(scrollPosition, GUILayout.Width(width), GUILayout.Height(height));
-                try
-                {
-                    drawContent?.Invoke();
-                }
-                catch (Exception contentEx)
-                {
-                    Debug.LogError("Error in scroll view content: " + contentEx.Message);
-                }
-                GUILayout.EndScrollView();
-                return newScrollPos;
+                return new Vector3(0, 0, 0);
             }
         }
 
@@ -863,7 +795,6 @@ namespace shadcnui
             catch (Exception ex)
             {
                 Debug.LogError("Error beginning horizontal group: " + ex.Message);
-                GUILayout.BeginHorizontal();
             }
         }
 
@@ -876,7 +807,6 @@ namespace shadcnui
             catch (Exception ex)
             {
                 Debug.LogError("Error ending horizontal group: " + ex.Message);
-                GUILayout.EndHorizontal();
             }
         }
 
@@ -889,7 +819,6 @@ namespace shadcnui
             catch (Exception ex)
             {
                 Debug.LogError("Error beginning vertical group: " + ex.Message);
-                GUILayout.BeginVertical();
             }
         }
 
@@ -902,7 +831,6 @@ namespace shadcnui
             catch (Exception ex)
             {
                 Debug.LogError("Error ending vertical group: " + ex.Message);
-                GUILayout.EndVertical();
             }
         }
 
@@ -915,7 +843,6 @@ namespace shadcnui
             catch (Exception ex)
             {
                 Debug.LogError("Error adding space: " + ex.Message);
-                GUILayout.Space(pixels);
             }
         }
         #endregion
@@ -971,8 +898,6 @@ namespace shadcnui
             catch (Exception ex)
             {
                 Debug.LogError("Error setting random color: " + ex.Message);
-                System.Random rand = new System.Random();
-                SetRGBValues(rand.Next(0, 256), rand.Next(0, 256), rand.Next(0, 256));
             }
         }
 
@@ -1010,7 +935,7 @@ namespace shadcnui
             catch (Exception ex)
             {
                 Debug.LogError("Error resetting all settings: " + ex.Message);
-               
+
                 animationsEnabled = true;
                 glowEffectsEnabled = true;
                 customColorsEnabled = true;
@@ -1020,9 +945,1397 @@ namespace shadcnui
         internal float GetMenuAlpha() => menuAlpha;
         internal Vector2 GetMousePos() => mousePos;
         internal float GetParticleTime() => particleTime;
-
         #endregion
 
-    }
+        #region Label Components
+        public void Label(string text, LabelVariant variant = LabelVariant.Default, bool disabled = false,
+            params GUILayoutOption[] options)
+        {
+            try
+            {
+                labelComponents?.Label(text, variant, disabled, options);
+            }
+            catch (Exception ex)
+            {
+                Debug.LogError("Error drawing label: " + ex.Message);
+            }
+        }
 
+        public void Label(Rect rect, string text, LabelVariant variant = LabelVariant.Default, bool disabled = false)
+        {
+            try
+            {
+                labelComponents?.Label(rect, text, variant, disabled);
+            }
+            catch (Exception ex)
+            {
+                Debug.LogError("Error drawing label in rect: " + ex.Message);
+            }
+        }
+
+        public void SecondaryLabel(string text, params GUILayoutOption[] options)
+        {
+            try
+            {
+                labelComponents?.SecondaryLabel(text, options);
+            }
+            catch (Exception ex)
+            {
+                Debug.LogError("Error drawing secondary label: " + ex.Message);
+            }
+        }
+
+        public void MutedLabel(string text, params GUILayoutOption[] options)
+        {
+            try
+            {
+                labelComponents?.MutedLabel(text, options);
+            }
+            catch (Exception ex)
+            {
+                Debug.LogError("Error drawing muted label: " + ex.Message);
+            }
+        }
+
+        public void DestructiveLabel(string text, params GUILayoutOption[] options)
+        {
+            try
+            {
+                labelComponents?.DestructiveLabel(text, options);
+            }
+            catch (Exception ex)
+            {
+                Debug.LogError("Error drawing destructive label: " + ex.Message);
+            }
+        }
+        #endregion
+
+        #region Progress Components
+        public void Progress(float value, float width = -1, float height = -1, params GUILayoutOption[] options)
+        {
+            try
+            {
+                progressComponents?.Progress(value, width, height, options);
+            }
+            catch (Exception ex)
+            {
+                Debug.LogError("Error drawing progress: " + ex.Message);
+            }
+        }
+
+        public void Progress(Rect rect, float value)
+        {
+            try
+            {
+                progressComponents?.Progress(rect, value);
+            }
+            catch (Exception ex)
+            {
+                Debug.LogError("Error drawing progress in rect: " + ex.Message);
+            }
+        }
+
+        public void LabeledProgress(string label, float value, float width = -1, float height = -1,
+            bool showPercentage = true, params GUILayoutOption[] options)
+        {
+            try
+            {
+                progressComponents?.LabeledProgress(label, value, width, height, showPercentage, options);
+            }
+            catch (Exception ex)
+            {
+                Debug.LogError("Error drawing labeled progress: " + ex.Message);
+            }
+        }
+
+        public void CircularProgress(float value, float size = 32f, params GUILayoutOption[] options)
+        {
+            try
+            {
+                progressComponents?.CircularProgress(value, size, options);
+            }
+            catch (Exception ex)
+            {
+                Debug.LogError("Error drawing circular progress: " + ex.Message);
+            }
+        }
+        #endregion
+
+        #region Separator Components
+        public void Separator(SeparatorOrientation orientation = SeparatorOrientation.Horizontal,
+            bool decorative = true, params GUILayoutOption[] options)
+        {
+            try
+            {
+                separatorComponents?.Separator(orientation, decorative, options);
+            }
+            catch (Exception ex)
+            {
+                Debug.LogError("Error drawing separator: " + ex.Message);
+            }
+        }
+
+        public void HorizontalSeparator(params GUILayoutOption[] options)
+        {
+            try
+            {
+                separatorComponents?.HorizontalSeparator(options);
+            }
+            catch (Exception ex)
+            {
+                Debug.LogError("Error drawing horizontal separator: " + ex.Message);
+            }
+        }
+
+        public void VerticalSeparator(params GUILayoutOption[] options)
+        {
+            try
+            {
+                separatorComponents?.VerticalSeparator(options);
+            }
+            catch (Exception ex)
+            {
+                Debug.LogError("Error drawing vertical separator: " + ex.Message);
+            }
+        }
+
+        public void Separator(Rect rect, SeparatorOrientation orientation = SeparatorOrientation.Horizontal)
+        {
+            try
+            {
+                separatorComponents?.Separator(rect, orientation);
+            }
+            catch (Exception ex)
+            {
+                Debug.LogError("Error drawing separator in rect: " + ex.Message);
+            }
+        }
+
+        public void SeparatorWithSpacing(SeparatorOrientation orientation = SeparatorOrientation.Horizontal,
+            float spacingBefore = 8f, float spacingAfter = 8f, params GUILayoutOption[] options)
+        {
+            try
+            {
+                separatorComponents?.SeparatorWithSpacing(orientation, spacingBefore, spacingAfter, options);
+            }
+            catch (Exception ex)
+            {
+                Debug.LogError("Error drawing separator with spacing: " + ex.Message);
+            }
+        }
+
+        public void LabeledSeparator(string text, params GUILayoutOption[] options)
+        {
+            try
+            {
+                separatorComponents?.LabeledSeparator(text, options);
+            }
+            catch (Exception ex)
+            {
+                Debug.LogError("Error drawing labeled separator: " + ex.Message);
+            }
+        }
+        #endregion
+
+        #region Tabs Components
+        public int Tabs(string[] tabNames, int selectedIndex, Action<int> onTabChange = null,
+            params GUILayoutOption[] options)
+        {
+            try
+            {
+                return tabsComponents?.Tabs(tabNames, selectedIndex, onTabChange, options) ?? selectedIndex;
+            }
+            catch (Exception ex)
+            {
+                Debug.LogError("Error drawing tabs: " + ex.Message);
+                return -1;
+            }
+        }
+
+        public void BeginTabContent()
+        {
+            try
+            {
+                tabsComponents?.BeginTabContent();
+            }
+            catch (Exception ex)
+            {
+                Debug.LogError("Error beginning tab content: " + ex.Message);
+            }
+        }
+
+        public void EndTabContent()
+        {
+            try
+            {
+                tabsComponents?.EndTabContent();
+            }
+            catch (Exception ex)
+            {
+                Debug.LogError("Error ending tab content: " + ex.Message);
+            }
+        }
+
+        public int TabsWithContent(GUITabsComponents.TabConfig[] tabConfigs, int selectedIndex, Action<int> onTabChange = null)
+        {
+            try
+            {
+                return tabsComponents?.TabsWithContent(tabConfigs, selectedIndex, onTabChange) ?? selectedIndex;
+            }
+            catch (Exception ex)
+            {
+                Debug.LogError("Error drawing tabs with content: " + ex.Message);
+                return -1;
+            }
+        }
+
+        public int VerticalTabs(string[] tabNames, int selectedIndex, Action<int> onTabChange = null,
+            float tabWidth = 120f, params GUILayoutOption[] options)
+        {
+            try
+            {
+                return tabsComponents?.VerticalTabs(tabNames, selectedIndex, onTabChange, tabWidth, options) ?? selectedIndex;
+            }
+            catch (Exception ex)
+            {
+                Debug.LogError("Error drawing vertical tabs: " + ex.Message);
+                return -1;
+            }
+        }
+        #endregion
+
+        #region TextArea Components
+        public string TextArea(string text, TextAreaVariant variant = TextAreaVariant.Default,
+            string placeholder = "", bool disabled = false, float minHeight = 60f, int maxLength = -1,
+            params GUILayoutOption[] options)
+        {
+            try
+            {
+                return textAreaComponents?.TextArea(text, variant, placeholder, disabled, minHeight, maxLength, options)
+                    ?? text;
+            }
+            catch (Exception ex)
+            {
+                Debug.LogError("Error drawing text area: " + ex.Message);
+                return "Error: " + ex.Message;
+            }
+        }
+
+        public string TextArea(Rect rect, string text, TextAreaVariant variant = TextAreaVariant.Default,
+            string placeholder = "", bool disabled = false, int maxLength = -1)
+        {
+            try
+            {
+                return textAreaComponents?.TextArea(rect, text, variant, placeholder, disabled, maxLength) ?? text;
+            }
+            catch (Exception ex)
+            {
+                Debug.LogError("Error drawing text area in rect: " + ex.Message);
+                return "Error: " + ex.Message;
+            }
+        }
+
+        public string OutlineTextArea(string text, string placeholder = "", bool disabled = false,
+            float minHeight = 60f, int maxLength = -1, params GUILayoutOption[] options)
+        {
+            try
+            {
+                return textAreaComponents?.OutlineTextArea(text, placeholder, disabled, minHeight, maxLength, options)
+                    ?? text;
+            }
+            catch (Exception ex)
+            {
+                Debug.LogError("Error drawing outline text area: " + ex.Message);
+                return "Error: " + ex.Message;
+            }
+        }
+
+        public string GhostTextArea(string text, string placeholder = "", bool disabled = false,
+            float minHeight = 60f, int maxLength = -1, params GUILayoutOption[] options)
+        {
+            try
+            {
+                return textAreaComponents?.GhostTextArea(text, placeholder, disabled, minHeight, maxLength, options)
+                    ?? text;
+            }
+            catch (Exception ex)
+            {
+                Debug.LogError("Error drawing ghost text area: " + ex.Message);
+                return "Error: " + ex.Message;
+            }
+        }
+
+        public string LabeledTextArea(string label, string text, TextAreaVariant variant = TextAreaVariant.Default,
+            string placeholder = "", bool disabled = false, float minHeight = 60f, int maxLength = -1,
+            bool showCharCount = true, params GUILayoutOption[] options)
+        {
+            try
+            {
+                return textAreaComponents?.LabeledTextArea(label, text, variant, placeholder, disabled, minHeight,
+                    maxLength, showCharCount, options) ?? text;
+            }
+            catch (Exception ex)
+            {
+                Debug.LogError("Error drawing labeled text area: " + ex.Message);
+                return "Error: " + ex.Message;
+            }
+        }
+
+        public string ResizableTextArea(string text, ref float height, TextAreaVariant variant = TextAreaVariant.Default,
+            string placeholder = "", bool disabled = false, float minHeight = 60f, float maxHeight = 300f,
+            int maxLength = -1, params GUILayoutOption[] options)
+        {
+            try
+            {
+                return textAreaComponents?.ResizableTextArea(text, ref height, variant, placeholder, disabled,
+                    minHeight, maxHeight, maxLength, options) ?? text;
+            }
+            catch (Exception ex)
+            {
+                Debug.LogError("Error drawing resizable text area: " + ex.Message);
+                return "Error: " + ex.Message;
+            }
+        }
+        #endregion
+
+        #region Checkbox Components
+        public bool Checkbox(string text, bool value, CheckboxVariant variant = CheckboxVariant.Default,
+            CheckboxSize size = CheckboxSize.Default, Action<bool> onToggle = null, bool disabled = false,
+            params GUILayoutOption[] options)
+        {
+            try
+            {
+                return checkboxComponents?.Checkbox(text, value, variant, size, onToggle, disabled, options) ?? value;
+            }
+            catch (Exception ex)
+            {
+                Debug.LogError("Error drawing checkbox: " + ex.Message);
+                return false;
+            }
+        }
+
+        public bool Checkbox(Rect rect, string text, bool value, CheckboxVariant variant = CheckboxVariant.Default,
+            CheckboxSize size = CheckboxSize.Default, Action<bool> onToggle = null, bool disabled = false)
+        {
+            try
+            {
+                return checkboxComponents?.Checkbox(rect, text, value, variant, size, onToggle, disabled) ?? value;
+            }
+            catch (Exception ex)
+            {
+                Debug.LogError("Error drawing checkbox in rect: " + ex.Message);
+                return false;
+            }
+        }
+
+        public bool CheckboxWithLabel(string label, bool value, CheckboxVariant variant = CheckboxVariant.Default,
+            CheckboxSize size = CheckboxSize.Default, Action<bool> onToggle = null, bool disabled = false)
+        {
+            try
+            {
+                return checkboxComponents?.CheckboxWithLabel(label, value, variant, size, onToggle, disabled) ?? value;
+            }
+            catch (Exception ex)
+            {
+                Debug.LogError("Error drawing checkbox with label: " + ex.Message);
+                return false;
+            }
+        }
+
+        public bool[] CheckboxGroup(string[] labels, bool[] values, CheckboxVariant variant = CheckboxVariant.Default,
+            CheckboxSize size = CheckboxSize.Default, Action<int, bool> onToggleChange = null,
+            bool disabled = false, bool horizontal = false, float spacing = 5f)
+        {
+            try
+            {
+                return checkboxComponents?.CheckboxGroup(labels, values, variant, size, onToggleChange,
+                    disabled, horizontal, spacing) ?? values;
+            }
+            catch (Exception ex)
+            {
+                Debug.LogError("Error drawing checkbox group: " + ex.Message);
+                return values ?? new bool[0];
+            }
+        }
+
+        public bool CustomCheckbox(string text, bool value, Color checkColor, Color backgroundColor,
+            Action<bool> onToggle = null, bool disabled = false, params GUILayoutOption[] options)
+        {
+            try
+            {
+                return checkboxComponents?.CustomCheckbox(text, value, checkColor, backgroundColor, onToggle,
+                    disabled, options) ?? value;
+            }
+            catch (Exception ex)
+            {
+                Debug.LogError("Error drawing custom checkbox: " + ex.Message);
+                return false;
+            }
+        }
+
+        public bool CheckboxWithIcon(string text, bool value, Texture2D icon, CheckboxVariant variant = CheckboxVariant.Default,
+            CheckboxSize size = CheckboxSize.Default, Action<bool> onToggle = null, bool disabled = false)
+        {
+            try
+            {
+                return checkboxComponents?.CheckboxWithIcon(text, value, icon, variant, size, onToggle, disabled) ?? value;
+            }
+            catch (Exception ex)
+            {
+                Debug.LogError("Error drawing checkbox with icon: " + ex.Message);
+                return false;
+            }
+        }
+
+        public bool CheckboxWithDescription(string label, string description, bool value,
+            CheckboxVariant variant = CheckboxVariant.Default, CheckboxSize size = CheckboxSize.Default,
+            Action<bool> onToggle = null, bool disabled = false)
+        {
+            try
+            {
+                return checkboxComponents?.CheckboxWithDescription(label, description, value, variant, size,
+                    onToggle, disabled) ?? value;
+            }
+            catch (Exception ex)
+            {
+                Debug.LogError("Error drawing checkbox with description: " + ex.Message);
+                return false;
+            }
+        }
+
+        public bool ValidatedCheckbox(string text, bool value, bool isValid, string validationMessage,
+            CheckboxVariant variant = CheckboxVariant.Default, CheckboxSize size = CheckboxSize.Default,
+            Action<bool> onToggle = null, bool disabled = false)
+        {
+            try
+            {
+                return checkboxComponents?.ValidatedCheckbox(text, value, isValid, validationMessage, variant,
+                    size, onToggle, disabled) ?? value;
+            }
+            catch (Exception ex)
+            {
+                Debug.LogError("Error drawing validated checkbox: " + ex.Message);
+                return false;
+            }
+        }
+
+        public bool CheckboxWithTooltip(string text, bool value, string tooltip, CheckboxVariant variant = CheckboxVariant.Default,
+            CheckboxSize size = CheckboxSize.Default, Action<bool> onToggle = null, bool disabled = false)
+        {
+            try
+            {
+                return checkboxComponents?.CheckboxWithTooltip(text, value, tooltip, variant, size, onToggle, disabled) ?? value;
+            }
+            catch (Exception ex)
+            {
+                Debug.LogError("Error drawing checkbox with tooltip: " + ex.Message);
+                return false;
+            }
+        }
+        #endregion
+
+        #region Switch Components
+        public bool Switch(string text, bool value, SwitchVariant variant = SwitchVariant.Default,
+            SwitchSize size = SwitchSize.Default, Action<bool> onToggle = null, bool disabled = false,
+            params GUILayoutOption[] options)
+        {
+            try
+            {
+                return switchComponents?.Switch(text, value, variant, size, onToggle, disabled, options) ?? value;
+            }
+            catch (Exception ex)
+            {
+                Debug.LogError("Error drawing switch: " + ex.Message);
+                return false;
+            }
+        }
+
+        public bool Switch(Rect rect, string text, bool value, SwitchVariant variant = SwitchVariant.Default,
+            SwitchSize size = SwitchSize.Default, Action<bool> onToggle = null, bool disabled = false)
+        {
+            try
+            {
+                return switchComponents?.Switch(rect, text, value, variant, size, onToggle, disabled) ?? value;
+            }
+            catch (Exception ex)
+            {
+                Debug.LogError("Error drawing switch in rect: " + ex.Message);
+                return false;
+            }
+        }
+
+        public bool SwitchWithLabel(string label, bool value, SwitchVariant variant = SwitchVariant.Default,
+            SwitchSize size = SwitchSize.Default, Action<bool> onToggle = null, bool disabled = false)
+        {
+            try
+            {
+                return switchComponents?.SwitchWithLabel(label, value, variant, size, onToggle, disabled) ?? value;
+            }
+            catch (Exception ex)
+            {
+                Debug.LogError("Error drawing switch with label: " + ex.Message);
+                return false;
+            }
+        }
+
+        public bool SwitchWithDescription(string label, string description, bool value,
+            SwitchVariant variant = SwitchVariant.Default, SwitchSize size = SwitchSize.Default,
+            Action<bool> onToggle = null, bool disabled = false)
+        {
+            try
+            {
+                return switchComponents?.SwitchWithDescription(label, description, value, variant, size,
+                    onToggle, disabled) ?? value;
+            }
+            catch (Exception ex)
+            {
+                Debug.LogError("Error drawing switch with description: " + ex.Message);
+                return false;
+            }
+        }
+
+        public bool CustomSwitch(string text, bool value, Color onColor, Color offColor, Color thumbColor,
+            Action<bool> onToggle = null, bool disabled = false, params GUILayoutOption[] options)
+        {
+            try
+            {
+                return switchComponents?.CustomSwitch(text, value, onColor, offColor, thumbColor, onToggle,
+                    disabled, options) ?? value;
+            }
+            catch (Exception ex)
+            {
+                Debug.LogError("Error drawing custom switch: " + ex.Message);
+                return false;
+            }
+        }
+
+        public bool SwitchWithIcon(string text, bool value, Texture2D onIcon, Texture2D offIcon,
+            SwitchVariant variant = SwitchVariant.Default, SwitchSize size = SwitchSize.Default,
+            Action<bool> onToggle = null, bool disabled = false)
+        {
+            try
+            {
+                return switchComponents?.SwitchWithIcon(text, value, onIcon, offIcon, variant, size, onToggle, disabled) ?? value;
+            }
+            catch (Exception ex)
+            {
+                Debug.LogError("Error drawing switch with icon: " + ex.Message);
+                return false;
+            }
+        }
+
+        public bool ValidatedSwitch(string text, bool value, bool isValid, string validationMessage,
+            SwitchVariant variant = SwitchVariant.Default, SwitchSize size = SwitchSize.Default,
+            Action<bool> onToggle = null, bool disabled = false)
+        {
+            try
+            {
+                return switchComponents?.ValidatedSwitch(text, value, isValid, validationMessage, variant,
+                    size, onToggle, disabled) ?? value;
+            }
+            catch (Exception ex)
+            {
+                Debug.LogError("Error drawing validated switch: " + ex.Message);
+                return false;
+            }
+        }
+
+        public bool SwitchWithTooltip(string text, bool value, string tooltip,
+            SwitchVariant variant = SwitchVariant.Default, SwitchSize size = SwitchSize.Default,
+            Action<bool> onToggle = null, bool disabled = false)
+        {
+            try
+            {
+                return switchComponents?.SwitchWithTooltip(text, value, tooltip, variant, size, onToggle, disabled) ?? value;
+            }
+            catch (Exception ex)
+            {
+                Debug.LogError("Error drawing switch with tooltip: " + ex.Message);
+                return false;
+            }
+        }
+
+        public bool[] SwitchGroup(string[] labels, bool[] values, SwitchVariant variant = SwitchVariant.Default,
+            SwitchSize size = SwitchSize.Default, Action<int, bool> onToggleChange = null,
+            bool disabled = false, bool horizontal = false, float spacing = 5f)
+        {
+            try
+            {
+                return switchComponents?.SwitchGroup(labels, values, variant, size, onToggleChange,
+                    disabled, horizontal, spacing) ?? values;
+            }
+            catch (Exception ex)
+            {
+                Debug.LogError("Error drawing switch group: " + ex.Message);
+                return values ?? new bool[0];
+            }
+        }
+
+        public bool SwitchWithLoading(string text, bool value, bool isLoading,
+            SwitchVariant variant = SwitchVariant.Default, SwitchSize size = SwitchSize.Default,
+            Action<bool> onToggle = null, bool disabled = false)
+        {
+            try
+            {
+                return switchComponents?.SwitchWithLoading(text, value, isLoading, variant, size, onToggle, disabled) ?? value;
+            }
+            catch (Exception ex)
+            {
+                Debug.LogError("Error drawing switch with loading: " + ex.Message);
+                return false;
+            }
+        }
+        #endregion
+
+        #region Badge Components
+        public void Badge(string text, BadgeVariant variant = BadgeVariant.Default, BadgeSize size = BadgeSize.Default,
+            params GUILayoutOption[] options)
+        {
+            try
+            {
+                badgeComponents?.Badge(text, variant, size, options);
+            }
+            catch (Exception ex)
+            {
+                Debug.LogError("Error drawing badge: " + ex.Message);
+            }
+        }
+
+        public void Badge(Rect rect, string text, BadgeVariant variant = BadgeVariant.Default, BadgeSize size = BadgeSize.Default)
+        {
+            try
+            {
+                badgeComponents?.Badge(rect, text, variant, size);
+            }
+            catch (Exception ex)
+            {
+                Debug.LogError("Error drawing badge in rect: " + ex.Message);
+            }
+        }
+
+        public void BadgeWithIcon(string text, Texture2D icon, BadgeVariant variant = BadgeVariant.Default,
+            BadgeSize size = BadgeSize.Default, params GUILayoutOption[] options)
+        {
+            try
+            {
+                badgeComponents?.BadgeWithIcon(text, icon, variant, size, options);
+            }
+            catch (Exception ex)
+            {
+                Debug.LogError("Error drawing badge with icon: " + ex.Message);
+            }
+        }
+
+        public void CustomBadge(string text, Color backgroundColor, Color textColor, BadgeSize size = BadgeSize.Default,
+            params GUILayoutOption[] options)
+        {
+            try
+            {
+                badgeComponents?.CustomBadge(text, backgroundColor, textColor, size, options);
+            }
+            catch (Exception ex)
+            {
+                Debug.LogError("Error drawing custom badge: " + ex.Message);
+            }
+        }
+
+        public void CountBadge(int count, BadgeVariant variant = BadgeVariant.Default, BadgeSize size = BadgeSize.Default,
+            int maxCount = 99, params GUILayoutOption[] options)
+        {
+            try
+            {
+                badgeComponents?.CountBadge(count, variant, size, maxCount, options);
+            }
+            catch (Exception ex)
+            {
+                Debug.LogError("Error drawing count badge: " + ex.Message);
+            }
+        }
+
+        public void StatusBadge(string text, bool isActive, BadgeVariant variant = BadgeVariant.Default,
+            BadgeSize size = BadgeSize.Default, params GUILayoutOption[] options)
+        {
+            try
+            {
+                badgeComponents?.StatusBadge(text, isActive, variant, size, options);
+            }
+            catch (Exception ex)
+            {
+                Debug.LogError("Error drawing status badge: " + ex.Message);
+            }
+        }
+
+        public bool DismissibleBadge(string text, BadgeVariant variant = BadgeVariant.Default,
+            BadgeSize size = BadgeSize.Default, Action onDismiss = null, params GUILayoutOption[] options)
+        {
+            try
+            {
+                return badgeComponents?.DismissibleBadge(text, variant, size, onDismiss, options) ?? false;
+            }
+            catch (Exception ex)
+            {
+                Debug.LogError("Error drawing dismissible badge: " + ex.Message);
+                return false;
+            }
+        }
+
+        public void ProgressBadge(string text, float progress, BadgeVariant variant = BadgeVariant.Default,
+            BadgeSize size = BadgeSize.Default, params GUILayoutOption[] options)
+        {
+            try
+            {
+                badgeComponents?.ProgressBadge(text, progress, variant, size, options);
+            }
+            catch (Exception ex)
+            {
+                Debug.LogError("Error drawing progress badge: " + ex.Message);
+            }
+        }
+
+        public void AnimatedBadge(string text, BadgeVariant variant = BadgeVariant.Default,
+            BadgeSize size = BadgeSize.Default, params GUILayoutOption[] options)
+        {
+            try
+            {
+                badgeComponents?.AnimatedBadge(text, variant, size, options);
+            }
+            catch (Exception ex)
+            {
+                Debug.LogError("Error drawing animated badge: " + ex.Message);
+            }
+        }
+
+        public void BadgeWithTooltip(string text, string tooltip, BadgeVariant variant = BadgeVariant.Default,
+            BadgeSize size = BadgeSize.Default, params GUILayoutOption[] options)
+        {
+            try
+            {
+                badgeComponents?.BadgeWithTooltip(text, tooltip, variant, size, options);
+            }
+            catch (Exception ex)
+            {
+                Debug.LogError("Error drawing badge with tooltip: " + ex.Message);
+            }
+        }
+
+        public void BadgeGroup(string[] texts, BadgeVariant[] variants, BadgeSize size = BadgeSize.Default,
+            bool horizontal = true, float spacing = 5f)
+        {
+            try
+            {
+                badgeComponents?.BadgeGroup(texts, variants, size, horizontal, spacing);
+            }
+            catch (Exception ex)
+            {
+                Debug.LogError("Error drawing badge group: " + ex.Message);
+            }
+        }
+
+        public void RoundedBadge(string text, BadgeVariant variant = BadgeVariant.Default,
+            BadgeSize size = BadgeSize.Default, float cornerRadius = 12f, params GUILayoutOption[] options)
+        {
+            try
+            {
+                badgeComponents?.RoundedBadge(text, variant, size, cornerRadius, options);
+            }
+            catch (Exception ex)
+            {
+                Debug.LogError("Error drawing rounded badge: " + ex.Message);
+            }
+        }
+        #endregion
+
+        #region Alert Components
+        public void Alert(string title, string description, AlertVariant variant = AlertVariant.Default,
+            AlertType type = AlertType.Info, params GUILayoutOption[] options)
+        {
+            try
+            {
+                alertComponents?.Alert(title, description, variant, type, options);
+            }
+            catch (Exception ex)
+            {
+                Debug.LogError("Error drawing alert: " + ex.Message);
+            }
+        }
+
+        public void Alert(Rect rect, string title, string description, AlertVariant variant = AlertVariant.Default,
+            AlertType type = AlertType.Info)
+        {
+            try
+            {
+                alertComponents?.Alert(rect, title, description, variant, type);
+            }
+            catch (Exception ex)
+            {
+                Debug.LogError("Error drawing alert in rect: " + ex.Message);
+            }
+        }
+
+        public void AlertWithIcon(string title, string description, Texture2D icon, AlertVariant variant = AlertVariant.Default,
+            AlertType type = AlertType.Info, params GUILayoutOption[] options)
+        {
+            try
+            {
+                alertComponents?.AlertWithIcon(title, description, icon, variant, type, options);
+            }
+            catch (Exception ex)
+            {
+                Debug.LogError("Error drawing alert with icon: " + ex.Message);
+            }
+        }
+
+        public bool DismissibleAlert(string title, string description, AlertVariant variant = AlertVariant.Default,
+            AlertType type = AlertType.Info, Action onDismiss = null, params GUILayoutOption[] options)
+        {
+            try
+            {
+                return alertComponents?.DismissibleAlert(title, description, variant, type, onDismiss, options) ?? false;
+            }
+            catch (Exception ex)
+            {
+                Debug.LogError("Error drawing dismissible alert: " + ex.Message);
+                return false;
+            }
+        }
+
+        public void AlertWithActions(string title, string description, string[] buttonTexts, Action<int> onButtonClick,
+            AlertVariant variant = AlertVariant.Default, AlertType type = AlertType.Info, params GUILayoutOption[] options)
+        {
+            try
+            {
+                alertComponents?.AlertWithActions(title, description, buttonTexts, onButtonClick, variant, type, options);
+            }
+            catch (Exception ex)
+            {
+                Debug.LogError("Error drawing alert with actions: " + ex.Message);
+            }
+        }
+
+        public void CustomAlert(string title, string description, Color backgroundColor, Color textColor,
+            Color borderColor, params GUILayoutOption[] options)
+        {
+            try
+            {
+                alertComponents?.CustomAlert(title, description, backgroundColor, textColor, borderColor, options);
+            }
+            catch (Exception ex)
+            {
+                Debug.LogError("Error drawing custom alert: " + ex.Message);
+            }
+        }
+
+        public void AlertWithProgress(string title, string description, float progress, AlertVariant variant = AlertVariant.Default,
+            AlertType type = AlertType.Info, params GUILayoutOption[] options)
+        {
+            try
+            {
+                alertComponents?.AlertWithProgress(title, description, progress, variant, type, options);
+            }
+            catch (Exception ex)
+            {
+                Debug.LogError("Error drawing alert with progress: " + ex.Message);
+            }
+        }
+
+        public void AnimatedAlert(string title, string description, AlertVariant variant = AlertVariant.Default,
+            AlertType type = AlertType.Info, params GUILayoutOption[] options)
+        {
+            try
+            {
+                alertComponents?.AnimatedAlert(title, description, variant, type, options);
+            }
+            catch (Exception ex)
+            {
+                Debug.LogError("Error drawing animated alert: " + ex.Message);
+            }
+        }
+
+        public void AlertWithCountdown(string title, string description, float countdownTime, Action onTimeout,
+            AlertVariant variant = AlertVariant.Default, AlertType type = AlertType.Info, params GUILayoutOption[] options)
+        {
+            try
+            {
+                alertComponents?.AlertWithCountdown(title, description, countdownTime, onTimeout, variant, type, options);
+            }
+            catch (Exception ex)
+            {
+                Debug.LogError("Error drawing alert with countdown: " + ex.Message);
+            }
+        }
+
+        public bool ExpandableAlert(string title, string description, string expandedContent, ref bool isExpanded,
+            AlertVariant variant = AlertVariant.Default, AlertType type = AlertType.Info, params GUILayoutOption[] options)
+        {
+            try
+            {
+                return alertComponents?.ExpandableAlert(title, description, expandedContent, ref isExpanded, variant, type, options) ?? false;
+            }
+            catch (Exception ex)
+            {
+                Debug.LogError("Error drawing expandable alert: " + ex.Message);
+                return false;
+            }
+        }
+
+        public void AlertWithStatus(string title, string description, bool isActive, AlertVariant variant = AlertVariant.Default,
+            AlertType type = AlertType.Info, params GUILayoutOption[] options)
+        {
+            try
+            {
+                alertComponents?.AlertWithStatus(title, description, isActive, variant, type, options);
+            }
+            catch (Exception ex)
+            {
+                Debug.LogError("Error drawing alert with status: " + ex.Message);
+            }
+        }
+
+        public void AlertWithCustomIcon(string title, string description, Texture2D icon, Color iconColor,
+            AlertVariant variant = AlertVariant.Default, AlertType type = AlertType.Info, params GUILayoutOption[] options)
+        {
+            try
+            {
+                alertComponents?.AlertWithCustomIcon(title, description, icon, iconColor, variant, type, options);
+            }
+            catch (Exception ex)
+            {
+                Debug.LogError("Error drawing alert with custom icon: " + ex.Message);
+            }
+        }
+        #endregion
+
+        #region Avatar Components
+        public void Avatar(Texture2D image, string fallbackText, AvatarSize size = AvatarSize.Default,
+            AvatarShape shape = AvatarShape.Circle, params GUILayoutOption[] options)
+        {
+            try
+            {
+                avatarComponents?.Avatar(image, fallbackText, size, shape, options);
+            }
+            catch (Exception ex)
+            {
+                Debug.LogError("Error drawing avatar: " + ex.Message);
+            }
+        }
+
+        public void Avatar(Rect rect, Texture2D image, string fallbackText, AvatarSize size = AvatarSize.Default,
+            AvatarShape shape = AvatarShape.Circle)
+        {
+            try
+            {
+                avatarComponents?.Avatar(rect, image, fallbackText, size, shape);
+            }
+            catch (Exception ex)
+            {
+                Debug.LogError("Error drawing avatar in rect: " + ex.Message);
+            }
+        }
+
+        public void AvatarWithStatus(Texture2D image, string fallbackText, bool isOnline, AvatarSize size = AvatarSize.Default,
+            AvatarShape shape = AvatarShape.Circle, params GUILayoutOption[] options)
+        {
+            try
+            {
+                avatarComponents?.AvatarWithStatus(image, fallbackText, isOnline, size, shape, options);
+            }
+            catch (Exception ex)
+            {
+                Debug.LogError("Error drawing avatar with status: " + ex.Message);
+            }
+        }
+
+        public void AvatarWithName(Texture2D image, string fallbackText, string name, AvatarSize size = AvatarSize.Default,
+            AvatarShape shape = AvatarShape.Circle, bool showNameBelow = false, params GUILayoutOption[] options)
+        {
+            try
+            {
+                avatarComponents?.AvatarWithName(image, fallbackText, name, size, shape, showNameBelow, options);
+            }
+            catch (Exception ex)
+            {
+                Debug.LogError("Error drawing avatar with name: " + ex.Message);
+            }
+        }
+
+        public void CustomAvatar(Texture2D image, string fallbackText, Color backgroundColor, Color textColor,
+            AvatarSize size = AvatarSize.Default, AvatarShape shape = AvatarShape.Circle, params GUILayoutOption[] options)
+        {
+            try
+            {
+                avatarComponents?.CustomAvatar(image, fallbackText, backgroundColor, textColor, size, shape, options);
+            }
+            catch (Exception ex)
+            {
+                Debug.LogError("Error drawing custom avatar: " + ex.Message);
+            }
+        }
+
+        public void AvatarWithBorder(Texture2D image, string fallbackText, Color borderColor, float borderWidth = 2f,
+            AvatarSize size = AvatarSize.Default, AvatarShape shape = AvatarShape.Circle, params GUILayoutOption[] options)
+        {
+            try
+            {
+                avatarComponents?.AvatarWithBorder(image, fallbackText, borderColor, borderWidth, size, shape, options);
+            }
+            catch (Exception ex)
+            {
+                Debug.LogError("Error drawing avatar with border: " + ex.Message);
+            }
+        }
+
+        public void AvatarWithHover(Texture2D image, string fallbackText, AvatarSize size = AvatarSize.Default,
+            AvatarShape shape = AvatarShape.Circle, Action onClick = null, params GUILayoutOption[] options)
+        {
+            try
+            {
+                avatarComponents?.AvatarWithHover(image, fallbackText, size, shape, onClick, options);
+            }
+            catch (Exception ex)
+            {
+                Debug.LogError("Error drawing avatar with hover: " + ex.Message);
+            }
+        }
+
+        public void AvatarWithLoading(Texture2D image, string fallbackText, bool isLoading, AvatarSize size = AvatarSize.Default,
+            AvatarShape shape = AvatarShape.Circle, params GUILayoutOption[] options)
+        {
+            try
+            {
+                avatarComponents?.AvatarWithLoading(image, fallbackText, isLoading, size, shape, options);
+            }
+            catch (Exception ex)
+            {
+                Debug.LogError("Error drawing avatar with loading: " + ex.Message);
+            }
+        }
+
+        public void AvatarWithTooltip(Texture2D image, string fallbackText, string tooltip, AvatarSize size = AvatarSize.Default,
+            AvatarShape shape = AvatarShape.Circle, params GUILayoutOption[] options)
+        {
+            try
+            {
+                avatarComponents?.AvatarWithTooltip(image, fallbackText, tooltip, size, shape, options);
+            }
+            catch (Exception ex)
+            {
+                Debug.LogError("Error drawing avatar with tooltip: " + ex.Message);
+            }
+        }
+
+        public void AvatarGroup(AvatarData[] avatars, AvatarSize size = AvatarSize.Default, AvatarShape shape = AvatarShape.Circle,
+            int maxVisible = 3, float overlap = -8f, params GUILayoutOption[] options)
+        {
+            try
+            {
+                avatarComponents?.AvatarGroup(avatars, size, shape, maxVisible, overlap, options);
+            }
+            catch (Exception ex)
+            {
+                Debug.LogError("Error drawing avatar group: " + ex.Message);
+            }
+        }
+        #endregion
+
+        #region Skeleton Components
+        public void Skeleton(float width, float height, SkeletonVariant variant = SkeletonVariant.Default,
+            SkeletonSize size = SkeletonSize.Default, params GUILayoutOption[] options)
+        {
+            try
+            {
+                skeletonComponents?.Skeleton(width, height, variant, size, options);
+            }
+            catch (Exception ex)
+            {
+                Debug.LogError("Error drawing skeleton: " + ex.Message);
+            }
+        }
+
+        public void Skeleton(Rect rect, SkeletonVariant variant = SkeletonVariant.Default,
+            SkeletonSize size = SkeletonSize.Default)
+        {
+            try
+            {
+                skeletonComponents?.Skeleton(rect, variant, size);
+            }
+            catch (Exception ex)
+            {
+                Debug.LogError("Error drawing skeleton in rect: " + ex.Message);
+            }
+        }
+
+        public void AnimatedSkeleton(float width, float height, SkeletonVariant variant = SkeletonVariant.Default,
+            SkeletonSize size = SkeletonSize.Default, params GUILayoutOption[] options)
+        {
+            try
+            {
+                skeletonComponents?.AnimatedSkeleton(width, height, variant, size, options);
+            }
+            catch (Exception ex)
+            {
+                Debug.LogError("Error drawing animated skeleton: " + ex.Message);
+            }
+        }
+
+        public void ShimmerSkeleton(float width, float height, SkeletonVariant variant = SkeletonVariant.Default,
+            SkeletonSize size = SkeletonSize.Default, params GUILayoutOption[] options)
+        {
+            try
+            {
+                skeletonComponents?.ShimmerSkeleton(width, height, variant, size, options);
+            }
+            catch (Exception ex)
+            {
+                Debug.LogError("Error drawing shimmer skeleton: " + ex.Message);
+            }
+        }
+
+        public void CustomSkeleton(float width, float height, Color backgroundColor, Color shimmerColor,
+            SkeletonVariant variant = SkeletonVariant.Default, SkeletonSize size = SkeletonSize.Default,
+            params GUILayoutOption[] options)
+        {
+            try
+            {
+                skeletonComponents?.CustomSkeleton(width, height, backgroundColor, shimmerColor, variant, size, options);
+            }
+            catch (Exception ex)
+            {
+                Debug.LogError("Error drawing custom skeleton: " + ex.Message);
+            }
+        }
+
+        public void SkeletonText(int lineCount, float lineHeight = 20f, SkeletonVariant variant = SkeletonVariant.Default,
+            SkeletonSize size = SkeletonSize.Default, params GUILayoutOption[] options)
+        {
+            try
+            {
+                skeletonComponents?.SkeletonText(lineCount, lineHeight, variant, size, options);
+            }
+            catch (Exception ex)
+            {
+                Debug.LogError("Error drawing skeleton text: " + ex.Message);
+            }
+        }
+
+        public void SkeletonAvatar(float size, SkeletonVariant variant = SkeletonVariant.Circular,
+            params GUILayoutOption[] options)
+        {
+            try
+            {
+                skeletonComponents?.SkeletonAvatar(size, variant, options);
+            }
+            catch (Exception ex)
+            {
+                Debug.LogError("Error drawing skeleton avatar: " + ex.Message);
+            }
+        }
+
+        public void SkeletonButton(float width = 120f, float height = 36f, SkeletonVariant variant = SkeletonVariant.Rounded,
+            SkeletonSize size = SkeletonSize.Default, params GUILayoutOption[] options)
+        {
+            try
+            {
+                skeletonComponents?.SkeletonButton(width, height, variant, size, options);
+            }
+            catch (Exception ex)
+            {
+                Debug.LogError("Error drawing skeleton button: " + ex.Message);
+            }
+        }
+
+        public void SkeletonCard(float width = 300f, float height = 200f, SkeletonVariant variant = SkeletonVariant.Rounded,
+            SkeletonSize size = SkeletonSize.Default, params GUILayoutOption[] options)
+        {
+            try
+            {
+                skeletonComponents?.SkeletonCard(width, height, variant, size, options);
+            }
+            catch (Exception ex)
+            {
+                Debug.LogError("Error drawing skeleton card: " + ex.Message);
+            }
+        }
+
+        public void SkeletonTable(int rowCount, int columnCount, float cellWidth = 100f, float cellHeight = 30f,
+            SkeletonVariant variant = SkeletonVariant.Default, SkeletonSize size = SkeletonSize.Default,
+            params GUILayoutOption[] options)
+        {
+            try
+            {
+                skeletonComponents?.SkeletonTable(rowCount, columnCount, cellWidth, cellHeight, variant, size, options);
+            }
+            catch (Exception ex)
+            {
+                Debug.LogError("Error drawing skeleton table: " + ex.Message);
+            }
+        }
+
+        public void SkeletonList(int itemCount, float itemHeight = 60f, SkeletonVariant variant = SkeletonVariant.Rounded,
+            SkeletonSize size = SkeletonSize.Default, params GUILayoutOption[] options)
+        {
+            try
+            {
+                skeletonComponents?.SkeletonList(itemCount, itemHeight, variant, size, options);
+            }
+            catch (Exception ex)
+            {
+                Debug.LogError("Error drawing skeleton list: " + ex.Message);
+            }
+        }
+
+        public void CustomShapeSkeleton(float width, float height, float cornerRadius, Color backgroundColor,
+            params GUILayoutOption[] options)
+        {
+            try
+            {
+                skeletonComponents?.CustomShapeSkeleton(width, height, cornerRadius, backgroundColor, options);
+            }
+            catch (Exception ex)
+            {
+                Debug.LogError("Error drawing custom shape skeleton: " + ex.Message);
+            }
+        }
+
+        public void SkeletonWithProgress(float width, float height, float progress, SkeletonVariant variant = SkeletonVariant.Default,
+            SkeletonSize size = SkeletonSize.Default, params GUILayoutOption[] options)
+        {
+            try
+            {
+                skeletonComponents?.SkeletonWithProgress(width, height, progress, variant, size, options);
+            }
+            catch (Exception ex)
+            {
+                Debug.LogError("Error drawing skeleton with progress: " + ex.Message);
+            }
+        }
+
+        public void FadeSkeleton(float width, float height, float fadeTime, SkeletonVariant variant = SkeletonVariant.Default,
+            SkeletonSize size = SkeletonSize.Default, params GUILayoutOption[] options)
+        {
+            try
+            {
+                skeletonComponents?.FadeSkeleton(width, height, fadeTime, variant, size, options);
+            }
+            catch (Exception ex)
+            {
+                Debug.LogError("Error drawing fade skeleton: " + ex.Message);
+            }
+        }
+        #endregion
+
+        #region Table Components
+        public void Table(string[] headers, string[,] data,
+            TableVariant variant = TableVariant.Default, TableSize size = TableSize.Default,
+            params GUILayoutOption[] options)
+        {
+            try
+            {
+                tableComponents?.Table(headers, data, variant, size, options);
+            }
+            catch (Exception ex)
+            {
+                Debug.LogError("Error drawing table: " + ex.Message);
+            }
+        }
+
+        public void Table(Rect rect, string[] headers, string[,] data,
+            TableVariant variant = TableVariant.Default, TableSize size = TableSize.Default)
+        {
+            try
+            {
+                tableComponents?.Table(rect, headers, data, variant, size);
+            }
+            catch (Exception ex)
+            {
+                Debug.LogError("Error drawing table in rect: " + ex.Message);
+            }
+        }
+
+        public void SortableTable(string[] headers, string[,] data, ref int[] sortColumns,
+            ref bool[] sortAscending, TableVariant variant = TableVariant.Default,
+            TableSize size = TableSize.Default, Action<int, bool> onSort = null,
+            params GUILayoutOption[] options)
+        {
+            try
+            {
+                tableComponents?.SortableTable(headers, data, ref sortColumns, ref sortAscending, variant, size, onSort, options);
+            }
+            catch (Exception ex)
+            {
+                Debug.LogError("Error drawing sortable table: " + ex.Message);
+            }
+        }
+
+        public void SelectableTable(string[] headers, string[,] data, ref bool[] selectedRows,
+            TableVariant variant = TableVariant.Default, TableSize size = TableSize.Default,
+            Action<int, bool> onSelectionChange = null, params GUILayoutOption[] options)
+        {
+            try
+            {
+                tableComponents?.SelectableTable(headers, data, ref selectedRows, variant, size, onSelectionChange, options);
+            }
+            catch (Exception ex)
+            {
+                Debug.LogError("Error drawing selectable table: " + ex.Message);
+            }
+        }
+
+        public void CustomTable(string[] headers, object[,] data,
+            Action<object, int, int> cellRenderer, TableVariant variant = TableVariant.Default,
+            TableSize size = TableSize.Default, params GUILayoutOption[] options)
+        {
+            try
+            {
+                tableComponents?.CustomTable(headers, data, cellRenderer, variant, size, options);
+            }
+            catch (Exception ex)
+            {
+                Debug.LogError("Error drawing custom table: " + ex.Message);
+            }
+        }
+
+        public void PaginatedTable(string[] headers, string[,] data, ref int currentPage, int pageSize,
+            TableVariant variant = TableVariant.Default, TableSize size = TableSize.Default,
+            Action<int> onPageChange = null, params GUILayoutOption[] options)
+        {
+            try
+            {
+                tableComponents?.PaginatedTable(headers, data, ref currentPage, pageSize, variant, size, onPageChange, options);
+            }
+            catch (Exception ex)
+            {
+                Debug.LogError("Error drawing paginated table: " + ex.Message);
+            }
+        }
+
+        public void SearchableTable(string[] headers, string[,] data, ref string searchQuery,
+            ref string[,] filteredData, TableVariant variant = TableVariant.Default,
+            TableSize size = TableSize.Default, Action<string> onSearch = null,
+            params GUILayoutOption[] options)
+        {
+            try
+            {
+                tableComponents?.SearchableTable(headers, data, ref searchQuery, ref filteredData, variant, size, onSearch, options);
+            }
+            catch (Exception ex)
+            {
+                Debug.LogError("Error drawing searchable table: " + ex.Message);
+            }
+        }
+
+        public void ResizableTable(string[] headers, string[,] data, ref float[] columnWidths,
+            TableVariant variant = TableVariant.Default, TableSize size = TableSize.Default,
+            params GUILayoutOption[] options)
+        {
+            try
+            {
+                tableComponents?.ResizableTable(headers, data, ref columnWidths, variant, size, options);
+            }
+            catch (Exception ex)
+            {
+                Debug.LogError("Error drawing resizable table: " + ex.Message);
+            }
+        }
+        #endregion
+    }
 }
