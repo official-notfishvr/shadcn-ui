@@ -66,11 +66,24 @@ namespace shadcnui
         private GUICardComponents cardComponents;
         private GUIStyleManager styleManager;
         private GUIAnimationManager animationManager;
+        
+        // New enhanced components
+        private GUILabelComponents labelComponents;
+        private GUIProgressComponents progressComponents;
+        private GUISeparatorComponents separatorComponents;
+        private GUITabsComponents tabsComponents;
+        private GUITextAreaComponents textAreaComponents;
         #endregion
 
         #region Public Style Access
         public GUIStyle labelStyle2 => styleManager?.glowLabelStyle ?? GUI.skin.label;
         public GUIStyle buttonStylePublic => styleManager?.animatedButtonStyle ?? GUI.skin.button;
+        
+        /// <summary>
+        /// Get the style manager for advanced styling operations
+        /// </summary>
+        public GUIStyleManager GetStyleManager() => styleManager;
+        
         #endregion
 
         #region Static Compatibility
@@ -101,6 +114,13 @@ namespace shadcnui
                 layoutComponents = new GUILayoutComponents(this);
                 utilityComponents = new GUIUtilityComponents(this);
                 cardComponents = new GUICardComponents(this);
+                
+                // Initialize new enhanced components
+                labelComponents = new GUILabelComponents(this);
+                progressComponents = new GUIProgressComponents(this);
+                separatorComponents = new GUISeparatorComponents(this);
+                tabsComponents = new GUITabsComponents(this);
+                textAreaComponents = new GUITextAreaComponents(this);
             }
             catch (Exception ex)
             {
@@ -266,7 +286,7 @@ namespace shadcnui
         }
         #endregion
 
-        #region Button Components - Original Methods
+        #region Button Components
         public bool RenderGlowButton(string text, int buttonIndex)
         {
             try
@@ -339,9 +359,7 @@ namespace shadcnui
                 return false;
             }
         }
-        #endregion
 
-        #region Button Components - New Variant Methods
         public bool Button(string text, ButtonVariant variant = ButtonVariant.Default,
             ButtonSize size = ButtonSize.Default, Action onClick = null, bool disabled = false,
             params GUILayoutOption[] options)
@@ -495,7 +513,7 @@ namespace shadcnui
         }
         #endregion
 
-        #region Toggle Components - Original Methods
+        #region Toggle Components
         public void DrawToggle(float windowWidth, string label, ref bool value, Action<bool> onToggle)
         {
             try
@@ -565,9 +583,7 @@ namespace shadcnui
                 return selected;
             }
         }
-        #endregion
 
-        #region Toggle Components - New Variant Methods
         public bool Toggle(string text, bool value, ToggleVariant variant = ToggleVariant.Default,
             ToggleSize size = ToggleSize.Default, Action<bool> onToggle = null, bool disabled = false,
             params GUILayoutOption[] options)
@@ -1001,7 +1017,6 @@ namespace shadcnui
             }
         }
 
-        internal GUIStyleManager GetStyleManager() => styleManager;
         internal float GetMenuAlpha() => menuAlpha;
         internal Vector2 GetMousePos() => mousePos;
         internal float GetParticleTime() => particleTime;

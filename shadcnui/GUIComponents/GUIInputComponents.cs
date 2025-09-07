@@ -16,7 +16,7 @@ namespace shadcnui.GUIComponents
             guiHelper = helper;
         }
 
-       
+
         public void DrawLabel(string text, LabelVariant variant = LabelVariant.Default, int width = -1, bool disabled = false)
         {
             var styleManager = guiHelper.GetStyleManager();
@@ -31,7 +31,7 @@ namespace shadcnui.GUIComponents
 
             GUIStyle labelStyle = styleManager.GetLabelStyle(variant);
 
-           
+
             Color originalColor = GUI.color;
             if (disabled)
             {
@@ -59,7 +59,7 @@ namespace shadcnui.GUIComponents
             GUI.color = originalColor;
         }
 
-       
+
         public string DrawInput(string value, string placeholder = "", InputVariant variant = InputVariant.Default,
             bool disabled = false, bool focused = false, int width = -1, Action<string> onChange = null)
         {
@@ -74,7 +74,7 @@ namespace shadcnui.GUIComponents
 
             GUIStyle inputStyle = styleManager.GetInputStyle(variant, focused, disabled);
 
-           
+
             Color originalColor = GUI.color;
             if (disabled)
             {
@@ -111,7 +111,7 @@ namespace shadcnui.GUIComponents
 
             GUI.color = originalColor;
 
-           
+
             if (newValue != value && !disabled && onChange != null)
             {
                 onChange.Invoke(newValue);
@@ -120,7 +120,7 @@ namespace shadcnui.GUIComponents
             return disabled ? value : newValue;
         }
 
-       
+
         public string DrawLabeledInput(string label, string value, string placeholder = "",
             InputVariant inputVariant = InputVariant.Default, LabelVariant labelVariant = LabelVariant.Default,
             bool disabled = false, int inputWidth = -1, Action<string> onChange = null)
@@ -130,7 +130,7 @@ namespace shadcnui.GUIComponents
             return DrawInput(value, placeholder, inputVariant, disabled, false, inputWidth, onChange);
         }
 
-       
+
         public string DrawPasswordField(string value, string label = "", char maskChar = '*',
             InputVariant variant = InputVariant.Default, bool disabled = false, Action<string> onChange = null)
         {
@@ -150,7 +150,7 @@ namespace shadcnui.GUIComponents
 
             GUIStyle passwordStyle = styleManager.GetPasswordFieldStyle();
 
-           
+
             Color originalColor = GUI.color;
             if (disabled)
             {
@@ -170,7 +170,7 @@ namespace shadcnui.GUIComponents
             GUI.color = originalColor;
             GUILayout.Space(guiHelper.controlSpacing);
 
-           
+
             if (newValue != value && !disabled && onChange != null)
             {
                 onChange.Invoke(newValue);
@@ -179,7 +179,7 @@ namespace shadcnui.GUIComponents
             return disabled ? value : newValue;
         }
 
-       
+
         public string DrawTextArea(string value, string label = "", string placeholder = "", int maxLength = 1000,
             float height = 60f, bool disabled = false, bool focused = false, Action<string> onChange = null)
         {
@@ -200,9 +200,9 @@ namespace shadcnui.GUIComponents
                 GUILayout.Space(4);
             }
 
-            GUIStyle textAreaStyle = styleManager.GetTextAreaStyle(focused);
+            GUIStyle textAreaStyle = styleManager.GetTextAreaStyle(TextAreaVariant.Default, focused);
 
-           
+
             Color originalColor = GUI.color;
             if (disabled)
             {
@@ -222,7 +222,7 @@ namespace shadcnui.GUIComponents
             GUI.color = originalColor;
             GUILayout.Space(guiHelper.controlSpacing);
 
-           
+
             if (newValue != value && !disabled && onChange != null)
             {
                 onChange.Invoke(newValue);
@@ -231,7 +231,7 @@ namespace shadcnui.GUIComponents
             return disabled ? value : newValue;
         }
 
-       
+
         public void DrawSectionHeader(string title)
         {
             var styleManager = guiHelper.GetStyleManager();
@@ -279,7 +279,7 @@ namespace shadcnui.GUIComponents
             GUI.SetNextControlName("input" + fieldIndex);
             string newText = GUI.TextField(fieldRect, text, styleManager.animatedInputStyle);
 
-           
+
             if (fieldIndex > 0)
             {
                 if (int.TryParse(newText, out int value))
@@ -308,7 +308,7 @@ namespace shadcnui.GUIComponents
             text = DrawTextArea(text, label, "", maxLength, height, false, false, null);
         }
 
-       
+
         public string DrawEmailInput(string value, string label = "Email", bool disabled = false, Action<string> onChange = null)
         {
             return DrawLabeledInput(label, value, "Enter email address...", InputVariant.Default, LabelVariant.Default, disabled, -1, onChange);
@@ -324,7 +324,7 @@ namespace shadcnui.GUIComponents
             return DrawLabeledInput(label, value, "https://example.com", InputVariant.Default, LabelVariant.Default, disabled, -1, onChange);
         }
 
-       
+
         public int DrawNumberInput(int value, string label = "", int minValue = int.MinValue, int maxValue = int.MaxValue,
             bool disabled = false, Action<int> onChange = null)
         {
@@ -344,7 +344,7 @@ namespace shadcnui.GUIComponents
             return value;
         }
 
-       
+
         public float DrawFloatInput(float value, string label = "", float minValue = float.MinValue, float maxValue = float.MaxValue,
             bool disabled = false, Action<float> onChange = null)
         {

@@ -114,7 +114,7 @@ namespace shadcnui.GUIComponents
             GUILayout.EndHorizontal();
         }
 
-       
+
         public void DrawCard(string title, string description, string content, System.Action footerContent = null, float width = -1, float height = -1)
         {
             BeginCard(width, height);

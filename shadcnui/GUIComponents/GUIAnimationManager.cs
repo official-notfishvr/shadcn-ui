@@ -23,21 +23,21 @@ namespace shadcnui.GUIComponents
 
             float speed = guiHelper.smoothAnimationsEnabled ? guiHelper.animationSpeed : guiHelper.animationSpeed * 0.5f;
 
-           
+
             float targetAlpha = isOpen ? 1f : 0f;
             menuAlpha = Mathf.Lerp(menuAlpha, targetAlpha, Time.deltaTime * speed * 0.67f);
 
-           
+
             float targetScale = isOpen ? guiHelper.uiScale : (guiHelper.uiScale * 0.8f);
             menuScale = Mathf.Lerp(menuScale, targetScale, Time.deltaTime * speed * 0.83f);
 
-           
+
             titleGlow = Mathf.Sin(Time.time * 2f) * 0.5f + 0.5f;
 
-           
+
             backgroundPulse = Mathf.Sin(Time.time * 1.5f) * 0.1f + guiHelper.backgroundAlpha;
 
-           
+
             if (guiHelper.hoverEffectsEnabled)
             {
                 for (int i = 0; i < buttonGlowEffects.Length; i++)
@@ -47,7 +47,7 @@ namespace shadcnui.GUIComponents
                 }
             }
 
-           
+
             if (guiHelper.glowEffectsEnabled)
             {
                 for (int i = 0; i < inputFieldGlow.Length; i++)
@@ -57,14 +57,14 @@ namespace shadcnui.GUIComponents
                 }
             }
 
-           
+
             if (guiHelper.particleEffectsEnabled)
                 particleTime += Time.deltaTime;
 
-           
+
             mousePos = Event.current.mousePosition;
 
-           
+
             if (guiHelper.debugModeEnabled && Time.frameCount % 60 == 0)
             {
                 Debug.Log($"GUI Debug - Alpha: {menuAlpha:F2}, Scale: {menuScale:F2}, Hover: {hoveredButton}");
@@ -75,15 +75,15 @@ namespace shadcnui.GUIComponents
         {
             if (guiHelper.fadeTransitionsEnabled && menuAlpha < 0.01f) return false;
 
-           
+
             float currentAlpha = guiHelper.fadeTransitionsEnabled ? menuAlpha : 1f;
             GUI.color = new Color(1f, 1f, 1f, currentAlpha);
 
-           
+
             if (guiHelper.particleEffectsEnabled)
                 RenderBackgroundParticles(currentAlpha);
 
-           
+
             float pulseAlpha = guiHelper.animationsEnabled ? backgroundPulse : guiHelper.backgroundAlpha;
             GUI.color = new Color(1f, 1f, 1f, currentAlpha * pulseAlpha);
 
@@ -131,7 +131,7 @@ namespace shadcnui.GUIComponents
 
         public void Cleanup()
         {
-           
+
         }
     }
 }

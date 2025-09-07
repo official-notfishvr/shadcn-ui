@@ -1,6 +1,7 @@
 using shadcnui;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using UnityEngine;
 
@@ -124,16 +125,7 @@ namespace shadcnui.GUIComponents
             return clicked;
         }
 
-        /// <summary>
-        /// Draw a button with specified variant and size using GUIStyleManager
-        /// </summary>
-        /// <param name="text">Button text</param>
-        /// <param name="variant">Button style variant</param>
-        /// <param name="size">Button size</param>
-        /// <param name="onClick">Click callback</param>
-        /// <param name="disabled">Whether button is disabled</param>
-        /// <param name="options">Additional GUILayout options</param>
-        /// <returns>True if button was clicked</returns>
+
         public bool Button(string text, ButtonVariant variant = ButtonVariant.Default,
             ButtonSize size = ButtonSize.Default, Action onClick = null, bool disabled = false,
             params GUILayoutOption[] options)
@@ -141,19 +133,18 @@ namespace shadcnui.GUIComponents
             var styleManager = guiHelper.GetStyleManager();
             GUIStyle buttonStyle = styleManager.GetButtonStyle(variant, size);
 
+           
+            GUILayoutOption[] autoScaledOptions = GetAutoScaledOptions(size, options);
+
             bool wasEnabled = GUI.enabled;
             if (disabled) GUI.enabled = false;
 
             bool clicked;
 #if IL2CPP
-            if (options != null && options.Length > 0)
-                clicked = GUILayout.Button(text, buttonStyle, (Il2CppReferenceArray<GUILayoutOption>)options);
-            else
-                clicked = GUILayout.Button(text, buttonStyle, (Il2CppReferenceArray<GUILayoutOption>)null);
+            clicked = GUILayout.Button(text ?? "Button", buttonStyle, 
+                (Il2CppReferenceArray<GUILayoutOption>)autoScaledOptions);
 #else
-            clicked = options != null && options.Length > 0 ?
-                GUILayout.Button(text, buttonStyle, options) :
-                GUILayout.Button(text, buttonStyle);
+            clicked = GUILayout.Button(text ?? "Button", buttonStyle, autoScaledOptions);
 #endif
 
             GUI.enabled = wasEnabled;
@@ -164,19 +155,62 @@ namespace shadcnui.GUIComponents
             return clicked && !disabled;
         }
 
-        /// <summary>
-        /// Draw a button in a specific rect with variant and size
-        /// </summary>
+
+        private GUILayoutOption[] GetAutoScaledOptions(ButtonSize size, GUILayoutOption[] userOptions)
+        {
+            var autoOptions = new List<GUILayoutOption>();
+
+           
+            switch (size)
+            {
+                case ButtonSize.Small:
+                   
+                    autoOptions.Add(GUILayout.Height(Mathf.RoundToInt(32 * guiHelper.uiScale)));
+                    break;
+                case ButtonSize.Large:
+                   
+                    autoOptions.Add(GUILayout.Height(Mathf.RoundToInt(40 * guiHelper.uiScale)));
+                    break;
+                case ButtonSize.Icon:
+                   
+                    int iconSize = Mathf.RoundToInt(36 * guiHelper.uiScale);
+                    autoOptions.Add(GUILayout.Width(iconSize));
+                    autoOptions.Add(GUILayout.Height(iconSize));
+                    break;
+                default:
+                   
+                    autoOptions.Add(GUILayout.Height(Mathf.RoundToInt(36 * guiHelper.uiScale)));
+                    break;
+            }
+
+           
+            if (userOptions != null && userOptions.Length > 0)
+            {
+                autoOptions.AddRange(userOptions);
+            }
+
+            return autoOptions.ToArray();
+        }
+
+
         public bool Button(Rect rect, string text, ButtonVariant variant = ButtonVariant.Default,
             ButtonSize size = ButtonSize.Default, Action onClick = null, bool disabled = false)
         {
             var styleManager = guiHelper.GetStyleManager();
             GUIStyle buttonStyle = styleManager.GetButtonStyle(variant, size);
 
+           
+            Rect scaledRect = new Rect(
+                rect.x * guiHelper.uiScale,
+                rect.y * guiHelper.uiScale,
+                rect.width * guiHelper.uiScale,
+                rect.height * guiHelper.uiScale
+            );
+
             bool wasEnabled = GUI.enabled;
             if (disabled) GUI.enabled = false;
 
-            bool clicked = GUI.Button(rect, text, buttonStyle);
+            bool clicked = GUI.Button(scaledRect, text ?? "Button", buttonStyle);
 
             GUI.enabled = wasEnabled;
 
@@ -186,83 +220,58 @@ namespace shadcnui.GUIComponents
             return clicked && !disabled;
         }
 
-        /// <summary>
-        /// Draw a destructive action button (e.g., Delete, Remove)
-        /// </summary>
         public bool DestructiveButton(string text, Action onClick, ButtonSize size = ButtonSize.Default,
             params GUILayoutOption[] options)
         {
             return Button(text, ButtonVariant.Destructive, size, onClick, false, options);
         }
 
-        /// <summary>
-        /// Draw an outline button
-        /// </summary>
         public bool OutlineButton(string text, Action onClick, ButtonSize size = ButtonSize.Default,
             params GUILayoutOption[] options)
         {
             return Button(text, ButtonVariant.Outline, size, onClick, false, options);
         }
 
-        /// <summary>
-        /// Draw a secondary button
-        /// </summary>
         public bool SecondaryButton(string text, Action onClick, ButtonSize size = ButtonSize.Default,
             params GUILayoutOption[] options)
         {
             return Button(text, ButtonVariant.Secondary, size, onClick, false, options);
         }
 
-        /// <summary>
-        /// Draw a ghost button (transparent background)
-        /// </summary>
         public bool GhostButton(string text, Action onClick, ButtonSize size = ButtonSize.Default,
             params GUILayoutOption[] options)
         {
             return Button(text, ButtonVariant.Ghost, size, onClick, false, options);
         }
 
-        /// <summary>
-        /// Draw a link-style button
-        /// </summary>
         public bool LinkButton(string text, Action onClick, ButtonSize size = ButtonSize.Default,
             params GUILayoutOption[] options)
         {
             return Button(text, ButtonVariant.Link, size, onClick, false, options);
         }
 
-        /// <summary>
-        /// Draw a small button
-        /// </summary>
         public bool SmallButton(string text, Action onClick, ButtonVariant variant = ButtonVariant.Default,
             params GUILayoutOption[] options)
         {
             return Button(text, variant, ButtonSize.Small, onClick, false, options);
         }
 
-        /// <summary>
-        /// Draw a large button
-        /// </summary>
         public bool LargeButton(string text, Action onClick, ButtonVariant variant = ButtonVariant.Default,
             params GUILayoutOption[] options)
         {
             return Button(text, variant, ButtonSize.Large, onClick, false, options);
         }
-
-        /// <summary>
-        /// Draw an icon-sized button
-        /// </summary>
         public bool IconButton(string text, Action onClick, ButtonVariant variant = ButtonVariant.Default,
             params GUILayoutOption[] options)
         {
             return Button(text, variant, ButtonSize.Icon, onClick, false, options);
         }
 
-        /// <summary>
-        /// Draw a button group with consistent spacing
-        /// </summary>
+
         public void ButtonGroup(Action drawButtons, bool horizontal = true, float spacing = 5f)
         {
+            float scaledSpacing = spacing * guiHelper.uiScale;
+
             if (horizontal)
             {
 #if IL2CPP
@@ -287,8 +296,61 @@ namespace shadcnui.GUIComponents
             else
                 GUILayout.EndVertical();
 
-            GUILayout.Space(spacing);
+            GUILayout.Space(scaledSpacing);
         }
 
+
+        public bool CreateButton(string text, ButtonVariant variant = ButtonVariant.Default,
+            ButtonSize size = ButtonSize.Default, Action onClick = null, bool disabled = false,
+            params GUILayoutOption[] className)
+        {
+            return Button(text, variant, size, onClick, disabled, className);
+        }
+
+
+        public void RenderButtonSet(ButtonConfig[] buttons, bool horizontal = true, float spacing = 8f)
+        {
+            if (buttons == null || buttons.Length == 0) return;
+
+            ButtonGroup(() =>
+            {
+                for (int i = 0; i < buttons.Length; i++)
+                {
+                    var config = buttons[i];
+                    Button(config.Text, config.Variant, config.Size, config.OnClick, config.Disabled, config.Options);
+
+                   
+                    if (i < buttons.Length - 1)
+                    {
+                        if (horizontal)
+                            GUILayout.Space(spacing * guiHelper.uiScale);
+                        else
+                            GUILayout.Space(spacing * guiHelper.uiScale);
+                    }
+                }
+            }, horizontal, 0f);
+        }
+
+        public struct ButtonConfig
+        {
+            public string Text;
+            public ButtonVariant Variant;
+            public ButtonSize Size;
+            public Action OnClick;
+            public bool Disabled;
+            public GUILayoutOption[] Options;
+
+            public ButtonConfig(string text, ButtonVariant variant = ButtonVariant.Default,
+                ButtonSize size = ButtonSize.Default, Action onClick = null, bool disabled = false,
+                params GUILayoutOption[] options)
+            {
+                Text = text;
+                Variant = variant;
+                Size = size;
+                OnClick = onClick;
+                Disabled = disabled;
+                Options = options;
+            }
+        }
     }
 }

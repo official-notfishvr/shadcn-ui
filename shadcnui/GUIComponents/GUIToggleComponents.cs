@@ -73,20 +73,6 @@ namespace shadcnui.GUIComponents
             GUILayout.Space(guiHelper.controlSpacing);
             return selected;
         }
-
-
-        /// <summary>
-        /// Draw a toggle with specified variant and size using GUIStyleManager
-        /// Mimics React Toggle component behavior
-        /// </summary>
-        /// <param name="text">Toggle text</param>
-        /// <param name="value">Current toggle state</param>
-        /// <param name="variant">Toggle style variant</param>
-        /// <param name="size">Toggle size</param>
-        /// <param name="onToggle">Toggle state change callback</param>
-        /// <param name="disabled">Whether toggle is disabled</param>
-        /// <param name="options">Additional GUILayout options</param>
-        /// <returns>New toggle state</returns>
         public bool Toggle(string text, bool value, ToggleVariant variant = ToggleVariant.Default,
             ToggleSize size = ToggleSize.Default, Action<bool> onToggle = null, bool disabled = false,
             params GUILayoutOption[] options)
@@ -94,13 +80,13 @@ namespace shadcnui.GUIComponents
             var styleManager = guiHelper.GetStyleManager();
             GUIStyle toggleStyle = styleManager.GetToggleStyle(variant, size);
 
-           
+
             GUIStyle currentStyle = new GUIStyle(toggleStyle);
 
-           
+
             if (value)
             {
-               
+
                 Color accentColor = guiHelper.customColorsEnabled ? guiHelper.accentColor : new Color(0.2f, 0.4f, 0.8f);
                 currentStyle.normal.textColor = Color.white;
 
@@ -135,20 +121,16 @@ namespace shadcnui.GUIComponents
 
             return value;
         }
-
-        /// <summary>
-        /// Draw a toggle in a specific rect with variant and size
-        /// </summary>
         public bool Toggle(Rect rect, string text, bool value, ToggleVariant variant = ToggleVariant.Default,
             ToggleSize size = ToggleSize.Default, Action<bool> onToggle = null, bool disabled = false)
         {
             var styleManager = guiHelper.GetStyleManager();
             GUIStyle toggleStyle = styleManager.GetToggleStyle(variant, size);
 
-           
+
             GUIStyle currentStyle = new GUIStyle(toggleStyle);
 
-           
+
             if (value)
             {
                 Color accentColor = guiHelper.customColorsEnabled ? guiHelper.accentColor : new Color(0.2f, 0.4f, 0.8f);
@@ -175,37 +157,21 @@ namespace shadcnui.GUIComponents
 
             return value;
         }
-
-        /// <summary>
-        /// Draw an outline toggle
-        /// </summary>
         public bool OutlineToggle(string text, bool value, Action<bool> onToggle = null,
             ToggleSize size = ToggleSize.Default, params GUILayoutOption[] options)
         {
             return Toggle(text, value, ToggleVariant.Outline, size, onToggle, false, options);
         }
-
-        /// <summary>
-        /// Draw a small toggle
-        /// </summary>
         public bool SmallToggle(string text, bool value, Action<bool> onToggle = null,
             ToggleVariant variant = ToggleVariant.Default, params GUILayoutOption[] options)
         {
             return Toggle(text, value, variant, ToggleSize.Small, onToggle, false, options);
         }
-
-        /// <summary>
-        /// Draw a large toggle
-        /// </summary>
         public bool LargeToggle(string text, bool value, Action<bool> onToggle = null,
             ToggleVariant variant = ToggleVariant.Default, params GUILayoutOption[] options)
         {
             return Toggle(text, value, variant, ToggleSize.Large, onToggle, false, options);
         }
-
-        /// <summary>
-        /// Draw a toggle group with consistent spacing and mutual exclusion
-        /// </summary>
         public int ToggleGroup(string[] texts, int selectedIndex, Action<int> onSelectionChange = null,
             ToggleVariant variant = ToggleVariant.Default, ToggleSize size = ToggleSize.Default,
             bool horizontal = true, float spacing = 5f)
@@ -253,10 +219,6 @@ namespace shadcnui.GUIComponents
 
             return newSelectedIndex;
         }
-
-        /// <summary>
-        /// Draw a multi-select toggle group where multiple items can be selected
-        /// </summary>
         public bool[] MultiToggleGroup(string[] texts, bool[] selectedStates, Action<int, bool> onToggleChange = null,
             ToggleVariant variant = ToggleVariant.Default, ToggleSize size = ToggleSize.Default,
             bool horizontal = true, float spacing = 5f)
