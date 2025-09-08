@@ -310,7 +310,7 @@ namespace shadcnui.GUIComponents
 
             for (int i = 0; i < labels.Length; i++)
             {
-                int index = i; // Capture for closure
+                int index = i;
                 bool newValue = SwitchWithLabel(labels[i], values[i], variant, size, 
                     (val) => {
                         newValues[index] = val;

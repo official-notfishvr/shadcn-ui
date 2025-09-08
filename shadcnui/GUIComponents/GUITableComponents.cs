@@ -116,7 +116,7 @@ namespace shadcnui.GUIComponents
             GUILayout.BeginHorizontal();
             for (int i = 0; i < headers.Length; i++)
             {
-                int columnIndex = i; // Capture for closure
+                int columnIndex = i;
                 string headerText = headers[i];
                 
                 if (sortColumns != null && sortAscending != null && i < sortColumns.Length)
@@ -375,7 +375,7 @@ namespace shadcnui.GUIComponents
                 columnWidths = new float[headers.Length];
                 for (int i = 0; i < columnWidths.Length; i++)
                 {
-                    columnWidths[i] = 100f; // Default width
+                    columnWidths[i] = 100f;
                 }
             }
             
@@ -395,7 +395,7 @@ namespace shadcnui.GUIComponents
             GUILayout.BeginHorizontal();
             for (int i = 0; i < headers.Length; i++)
             {
-                int columnIndex = i; // Capture for closure
+                int columnIndex = i;
                 float width = columnWidths[i] * guiHelper.uiScale;
                 
 #if IL2CPP

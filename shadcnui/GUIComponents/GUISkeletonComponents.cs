@@ -148,11 +148,11 @@ namespace shadcnui.GUIComponents
                 float lineWidth = 200f;
                 if (i == lineCount - 1 && lineCount > 1)
                 {
-                    lineWidth = 120f; // Shorter last line
+                    lineWidth = 120f;
                 }
                 else if (i % 3 == 0)
                 {
-                    lineWidth = 180f; // Some variation
+                    lineWidth = 180f;
                 }
                 
                 Skeleton(lineWidth, lineHeight, variant, size, options);

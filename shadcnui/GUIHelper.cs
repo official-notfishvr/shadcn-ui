@@ -27,7 +27,7 @@ namespace shadcnui
         internal bool customColorsEnabled = true;
         internal float backgroundAlpha = 0.9f;
         internal int fontSize = 12;
-        internal int cornerRadius = 8;
+        internal int cornerRadius =14;
         internal bool shadowEffectsEnabled = false;
         internal bool hoverEffectsEnabled = true;
         internal bool fadeTransitionsEnabled = true;
@@ -39,7 +39,7 @@ namespace shadcnui
         internal bool borderEffectsEnabled = false;
         internal float glowIntensity = 16.5f;
         internal bool smoothAnimationsEnabled = true;
-        internal float uiScale = 1f;
+        public float uiScale = 1f;
         internal bool debugModeEnabled = false;
         #endregion
 
@@ -293,8 +293,21 @@ namespace shadcnui
                     return false;
                 }
 
-                return buttonComponents?.RenderGlowButton(text, buttonIndex, hoveredButton, buttonGlowEffects, mousePos, menuAlpha) ??
-                       GUILayout.Button(text ?? "Button");
+                GUIStyle glowButtonStyle = styleManager?.animatedButtonStyle ?? GUI.skin.button;
+
+                bool clicked = GUILayout.Button(text ?? "Button", glowButtonStyle);
+
+                Rect lastRect = GUILayoutUtility.GetLastRect();
+                if (lastRect.Contains(Event.current.mousePosition))
+                {
+                    hoveredButton = buttonIndex;
+                }
+                else if (hoveredButton == buttonIndex && !lastRect.Contains(Event.current.mousePosition))
+                {
+                    hoveredButton = -1;
+                }
+
+                return clicked;
             }
             catch (Exception ex)
             {
@@ -307,8 +320,22 @@ namespace shadcnui
         {
             try
             {
-                return buttonComponents?.RenderColorPresetButton(colorName, presetColor) ??
-                       GUILayout.Button(colorName ?? "Color");
+                var styleManager = GetStyleManager();
+                if (styleManager == null)
+                {
+                    return GUILayout.Button(colorName ?? "Color");
+                }
+
+                GUIStyle customButtonStyle = new GUIStyle(GUI.skin.button);
+                customButtonStyle.normal.background = styleManager.CreateSolidTexture(presetColor);
+                customButtonStyle.hover.background = styleManager.CreateSolidTexture(presetColor * 1.2f);
+                customButtonStyle.active.background = styleManager.CreateSolidTexture(presetColor * 0.8f);
+                customButtonStyle.normal.textColor = Color.white;
+                customButtonStyle.alignment = TextAnchor.MiddleCenter;
+                customButtonStyle.fontSize = fontSize;
+                customButtonStyle.padding = new RectOffset(10, 10, 5, 5);
+
+                return GUILayout.Button(colorName ?? "Color", customButtonStyle);
             }
             catch (Exception ex)
             {
@@ -321,7 +348,7 @@ namespace shadcnui
         {
             try
             {
-                return buttonComponents?.DrawButton(windowWidth, text, onClick) ?? false;
+                return buttonComponents?.Button(text, ButtonVariant.Default, ButtonSize.Default, onClick, false, GUILayout.Width(windowWidth)) ?? false;
             }
             catch (Exception ex)
             {
@@ -334,7 +361,27 @@ namespace shadcnui
         {
             try
             {
-                return buttonComponents?.DrawColoredButton(windowWidth, text, color, onClick) ?? false;
+                var styleManager = GetStyleManager();
+                if (styleManager == null)
+                {
+                    return GUILayout.Button(text ?? "Button", GUILayout.Width(windowWidth));
+                }
+
+                GUIStyle customButtonStyle = new GUIStyle(GUI.skin.button);
+                customButtonStyle.normal.background = styleManager.CreateSolidTexture(color);
+                customButtonStyle.hover.background = styleManager.CreateSolidTexture(color * 1.2f);
+                customButtonStyle.active.background = styleManager.CreateSolidTexture(color * 0.8f);
+                customButtonStyle.normal.textColor = Color.white;
+                customButtonStyle.alignment = TextAnchor.MiddleCenter;
+                customButtonStyle.fontSize = fontSize;
+                customButtonStyle.padding = new RectOffset(10, 10, 5, 5);
+
+                bool clicked = GUILayout.Button(text ?? "Button", customButtonStyle, GUILayout.Width(windowWidth));
+                if (clicked)
+                {
+                    onClick?.Invoke();
+                }
+                return clicked;
             }
             catch (Exception ex)
             {
@@ -347,7 +394,7 @@ namespace shadcnui
         {
             try
             {
-                return buttonComponents?.DrawFixedButton(text, width, height, onClick) ?? false;
+                return buttonComponents?.Button(text, ButtonVariant.Default, ButtonSize.Default, onClick, false, GUILayout.Width(width), GUILayout.Height(height)) ?? false;
             }
             catch (Exception ex)
             {
@@ -1751,7 +1798,7 @@ namespace shadcnui
         {
             try
             {
-                alertComponents?.Alert(title, description, variant, type, options);
+                alertComponents?.Alert(title, description, variant, type, null, options);
             }
             catch (Exception ex)
             {
@@ -1759,25 +1806,14 @@ namespace shadcnui
             }
         }
 
-        public void Alert(Rect rect, string title, string description, AlertVariant variant = AlertVariant.Default,
-            AlertType type = AlertType.Info)
-        {
-            try
-            {
-                alertComponents?.Alert(rect, title, description, variant, type);
-            }
-            catch (Exception ex)
-            {
-                Debug.LogError("Error drawing alert in rect: " + ex.Message);
-            }
-        }
+        
 
         public void AlertWithIcon(string title, string description, Texture2D icon, AlertVariant variant = AlertVariant.Default,
             AlertType type = AlertType.Info, params GUILayoutOption[] options)
         {
             try
             {
-                alertComponents?.AlertWithIcon(title, description, icon, variant, type, options);
+                alertComponents?.Alert(title, description, variant, type, icon, options);
             }
             catch (Exception ex)
             {
@@ -1896,7 +1932,7 @@ namespace shadcnui
         {
             try
             {
-                alertComponents?.AlertWithCustomIcon(title, description, icon, iconColor, variant, type, options);
+                alertComponents?.Alert(title, description, variant, type, icon, options);
             }
             catch (Exception ex)
             {

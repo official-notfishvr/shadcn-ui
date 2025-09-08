@@ -15,7 +15,7 @@ namespace shadcnui.GUIComponents
         }
 
         public void Alert(string title, string description, AlertVariant variant = AlertVariant.Default, 
-            AlertType type = AlertType.Info, params GUILayoutOption[] options)
+            AlertType type = AlertType.Info, Texture2D icon = null, params GUILayoutOption[] options)
         {
             var styleManager = guiHelper.GetStyleManager();
             if (styleManager == null)
@@ -31,7 +31,15 @@ namespace shadcnui.GUIComponents
             GUIStyle alertStyle = styleManager.GetAlertStyle(variant, type);
 
             GUILayout.BeginVertical(alertStyle, options);
-            
+            GUILayout.BeginHorizontal();
+
+            if (icon != null)
+            {
+                GUILayout.Label(icon, GUILayout.Width(24 * guiHelper.uiScale), GUILayout.Height(24 * guiHelper.uiScale));
+                GUILayout.Space(8 * guiHelper.uiScale);
+            }
+
+            GUILayout.BeginVertical();
             if (!string.IsNullOrEmpty(title))
             {
                 GUIStyle titleStyle = styleManager.GetAlertTitleStyle(type);
@@ -51,65 +59,9 @@ namespace shadcnui.GUIComponents
                 GUILayout.Label(description, descStyle);
 #endif
             }
-            
             GUILayout.EndVertical();
-        }
-
-        public void Alert(Rect rect, string title, string description, AlertVariant variant = AlertVariant.Default, 
-            AlertType type = AlertType.Info)
-        {
-            var styleManager = guiHelper.GetStyleManager();
-            if (styleManager == null)
-            {
-                GUI.Box(rect, title ?? "Alert", GUI.skin.box);
-                return;
-            }
-
-            GUIStyle alertStyle = styleManager.GetAlertStyle(variant, type);
-
-            Rect scaledRect = new Rect(
-                rect.x * guiHelper.uiScale,
-                rect.y * guiHelper.uiScale,
-                rect.width * guiHelper.uiScale,
-                rect.height * guiHelper.uiScale
-            );
-
-            GUI.Box(scaledRect, "", alertStyle);
-            
-            Rect contentRect = new Rect(scaledRect.x + 16, scaledRect.y + 8, scaledRect.width - 32, scaledRect.height - 16);
-            GUILayout.BeginArea(contentRect);
-            
-            if (!string.IsNullOrEmpty(title))
-            {
-                GUIStyle titleStyle = styleManager.GetAlertTitleStyle(type);
-                GUILayout.Label(title, titleStyle);
-            }
-            
-            if (!string.IsNullOrEmpty(description))
-            {
-                GUIStyle descStyle = styleManager.GetAlertDescriptionStyle(type);
-                GUILayout.Label(description, descStyle);
-            }
-            
-            GUILayout.EndArea();
-        }
-
-        public void AlertWithIcon(string title, string description, Texture2D icon, AlertVariant variant = AlertVariant.Default, 
-            AlertType type = AlertType.Info, params GUILayoutOption[] options)
-        {
-            GUILayout.BeginHorizontal();
-            
-            if (icon != null)
-            {
-                GUILayout.Label(icon, GUILayout.Width(24 * guiHelper.uiScale), GUILayout.Height(24 * guiHelper.uiScale));
-                GUILayout.Space(8 * guiHelper.uiScale);
-            }
-            
-            GUILayout.BeginVertical();
-            Alert(title, description, variant, type, options);
-            GUILayout.EndVertical();
-            
             GUILayout.EndHorizontal();
+            GUILayout.EndVertical();
         }
 
         public bool DismissibleAlert(string title, string description, AlertVariant variant = AlertVariant.Default, 
@@ -117,20 +69,13 @@ namespace shadcnui.GUIComponents
         {
             GUILayout.BeginVertical();
             
-            Alert(title, description, variant, type, options);
+            Alert(title, description, variant, type, null, options);
             
             GUILayout.Space(4 * guiHelper.uiScale);
             GUILayout.BeginHorizontal();
             GUILayout.FlexibleSpace();
-            bool closeClicked = GUILayout.Button("×", GUILayout.Width(20 * guiHelper.uiScale), GUILayout.Height(20 * guiHelper.uiScale));
+            bool closeClicked = guiHelper.Button("X", ButtonVariant.Ghost, ButtonSize.Icon, onClick: onDismiss);
             GUILayout.EndHorizontal();
-            
-            if (closeClicked && onDismiss != null)
-            {
-                onDismiss.Invoke();
-            }
-            
-            GUILayout.EndVertical();
             
             return closeClicked;
         }
@@ -140,7 +85,7 @@ namespace shadcnui.GUIComponents
         {
             GUILayout.BeginVertical();
             
-            Alert(title, description, variant, type, options);
+            Alert(title, description, variant, type, null, options);
             
             if (buttonTexts != null && buttonTexts.Length > 0)
             {
@@ -150,7 +95,8 @@ namespace shadcnui.GUIComponents
                 for (int i = 0; i < buttonTexts.Length; i++)
                 {
                     int index = i;
-                    if (GUILayout.Button(buttonTexts[i]))
+                   
+                    if (guiHelper.Button(buttonTexts[i], ButtonVariant.Outline, ButtonSize.Small)) 
                     {
                         onButtonClick?.Invoke(index);
                     }
@@ -182,26 +128,23 @@ namespace shadcnui.GUIComponents
             }
 
             GUIStyle customStyle = new GUIStyle(GUI.skin.box);
-            customStyle.normal.background = styleManager.CreateSolidTexture(backgroundColor);
+            customStyle.normal.background = styleManager.CreateBorderedTexture(backgroundColor, borderColor, guiHelper.cornerRadius);
             customStyle.normal.textColor = textColor;
-            customStyle.border = new RectOffset(2, 2, 2, 2);
+            customStyle.border = new RectOffset(guiHelper.cornerRadius, guiHelper.cornerRadius, guiHelper.cornerRadius, guiHelper.cornerRadius);
             customStyle.padding = new RectOffset(16, 16, 12, 12);
 
             GUILayout.BeginVertical(customStyle, options);
             
             if (!string.IsNullOrEmpty(title))
             {
-                GUIStyle titleStyle = new GUIStyle(GUI.skin.label);
-                titleStyle.fontSize = guiHelper.fontSize + 2;
-                titleStyle.fontStyle = FontStyle.Bold;
+                GUIStyle titleStyle = styleManager.GetAlertTitleStyle(AlertType.Info);
                 titleStyle.normal.textColor = textColor;
                 GUILayout.Label(title, titleStyle);
             }
             
             if (!string.IsNullOrEmpty(description))
             {
-                GUIStyle descStyle = new GUIStyle(GUI.skin.label);
-                descStyle.fontSize = guiHelper.fontSize;
+                GUIStyle descStyle = styleManager.GetAlertDescriptionStyle(AlertType.Info);
                 descStyle.normal.textColor = textColor;
                 GUILayout.Label(description, descStyle);
             }
@@ -214,7 +157,7 @@ namespace shadcnui.GUIComponents
         {
             GUILayout.BeginVertical();
             
-            Alert(title, description, variant, type, options);
+            Alert(title, description, variant, type, null, options);
             
             GUILayout.Space(8 * guiHelper.uiScale);
             Rect progressRect = GUILayoutUtility.GetRect(200 * guiHelper.uiScale, 6 * guiHelper.uiScale);
@@ -226,7 +169,7 @@ namespace shadcnui.GUIComponents
                 bgStyle.normal.background = styleManager.CreateSolidTexture(Color.gray);
                 GUI.Box(progressRect, "", bgStyle);
                 
-                // Progress fill
+               
                 Rect fillRect = new Rect(progressRect.x, progressRect.y, progressRect.width * Mathf.Clamp01(progress), progressRect.height);
                 GUIStyle fillStyle = new GUIStyle(GUI.skin.box);
                 fillStyle.normal.background = styleManager.CreateSolidTexture(GetProgressColor(type));
@@ -245,7 +188,7 @@ namespace shadcnui.GUIComponents
             Color originalColor = GUI.color;
             GUI.color = new Color(originalColor.r, originalColor.g, originalColor.b, alpha);
             
-            Alert(title, description, variant, type, options);
+            Alert(title, description, variant, type, null, options);
             
             GUI.color = originalColor;
         }
@@ -256,7 +199,7 @@ namespace shadcnui.GUIComponents
         {
             GUILayout.BeginVertical();
             
-            Alert(title, description, variant, type, options);
+            Alert(title, description, variant, type, null, options);
             
             GUILayout.Space(4 * guiHelper.uiScale);
             int remainingSeconds = Mathf.CeilToInt(countdownTime);
@@ -280,11 +223,11 @@ namespace shadcnui.GUIComponents
         {
             GUILayout.BeginVertical();
             
-            Alert(title, description, variant, type, options);
+            Alert(title, description, variant, type, null, options);
             
             GUILayout.Space(4 * guiHelper.uiScale);
             string buttonText = isExpanded ? "Show Less" : "Show More";
-            bool buttonClicked = GUILayout.Button(buttonText, GUILayout.Width(80 * guiHelper.uiScale));
+            bool buttonClicked = guiHelper.Button(buttonText, ButtonVariant.Outline, ButtonSize.Small);
             
             if (buttonClicked)
             {
@@ -326,28 +269,7 @@ namespace shadcnui.GUIComponents
             }
             
             GUILayout.BeginVertical();
-            Alert(title, description, variant, type, options);
-            GUILayout.EndVertical();
-            
-            GUILayout.EndHorizontal();
-        }
-
-        public void AlertWithCustomIcon(string title, string description, Texture2D icon, Color iconColor,
-            AlertVariant variant = AlertVariant.Default, AlertType type = AlertType.Info, params GUILayoutOption[] options)
-        {
-            GUILayout.BeginHorizontal();
-            
-            if (icon != null)
-            {
-                Color originalColor = GUI.color;
-                GUI.color = iconColor;
-                GUILayout.Label(icon, GUILayout.Width(24 * guiHelper.uiScale), GUILayout.Height(24 * guiHelper.uiScale));
-                GUI.color = originalColor;
-                GUILayout.Space(8 * guiHelper.uiScale);
-            }
-            
-            GUILayout.BeginVertical();
-            Alert(title, description, variant, type, options);
+            Alert(title, description, variant, type, null, options);
             GUILayout.EndVertical();
             
             GUILayout.EndHorizontal();
