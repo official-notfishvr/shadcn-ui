@@ -7,6 +7,10 @@ using Object = UnityEngine.Object;
 
 namespace shadcnui.GUIComponents
 {
+    #region Enums
+    /// <summary>
+    /// Variants for the Button component.
+    /// </summary>
     public enum ButtonVariant
     {
         Default,
@@ -17,6 +21,9 @@ namespace shadcnui.GUIComponents
         Link
     }
 
+    /// <summary>
+    /// Sizes for the Button component.
+    /// </summary>
     public enum ButtonSize
     {
         Default,
@@ -25,12 +32,18 @@ namespace shadcnui.GUIComponents
         Icon
     }
 
+    /// <summary>
+    /// Variants for the Toggle component.
+    /// </summary>
     public enum ToggleVariant
     {
         Default,
         Outline
     }
 
+    /// <summary>
+    /// Sizes for the Toggle component.
+    /// </summary>
     public enum ToggleSize
     {
         Default,
@@ -38,6 +51,9 @@ namespace shadcnui.GUIComponents
         Large
     }
 
+    /// <summary>
+    /// Variants for the Input component.
+    /// </summary>
     public enum InputVariant
     {
         Default,
@@ -45,6 +61,9 @@ namespace shadcnui.GUIComponents
         Ghost
     }
 
+    /// <summary>
+    /// Variants for the Label component.
+    /// </summary>
     public enum LabelVariant
     {
         Default,
@@ -53,12 +72,18 @@ namespace shadcnui.GUIComponents
         Destructive
     }
 
+    /// <summary>
+    /// Orientations for the Separator component.
+    /// </summary>
     public enum SeparatorOrientation
     {
         Horizontal,
         Vertical
     }
 
+    /// <summary>
+    /// Variants for the TextArea component.
+    /// </summary>
     public enum TextAreaVariant
     {
         Default,
@@ -66,17 +91,25 @@ namespace shadcnui.GUIComponents
         Ghost
     }
 
+    /// <summary>
+    /// Variants for the Progress component.
+    /// </summary>
     public enum ProgressVariant
     {
         Default
     }
 
+    /// <summary>
+    /// Variants for the Tabs component.
+    /// </summary>
     public enum TabsVariant
     {
         Default
     }
 
-   
+    /// <summary>
+    /// Variants for the Checkbox component.
+    /// </summary>
     public enum CheckboxVariant
     {
         Default,
@@ -84,6 +117,9 @@ namespace shadcnui.GUIComponents
         Ghost
     }
 
+    /// <summary>
+    /// Sizes for the Checkbox component.
+    /// </summary>
     public enum CheckboxSize
     {
         Default,
@@ -91,6 +127,9 @@ namespace shadcnui.GUIComponents
         Large
     }
 
+    /// <summary>
+    /// Variants for the Switch component.
+    /// </summary>
     public enum SwitchVariant
     {
         Default,
@@ -98,6 +137,9 @@ namespace shadcnui.GUIComponents
         Ghost
     }
 
+    /// <summary>
+    /// Sizes for the Switch component.
+    /// </summary>
     public enum SwitchSize
     {
         Default,
@@ -105,6 +147,9 @@ namespace shadcnui.GUIComponents
         Large
     }
 
+    /// <summary>
+    /// Variants for the Badge component.
+    /// </summary>
     public enum BadgeVariant
     {
         Default,
@@ -113,6 +158,9 @@ namespace shadcnui.GUIComponents
         Outline
     }
 
+    /// <summary>
+    /// Sizes for the Badge component.
+    /// </summary>
     public enum BadgeSize
     {
         Default,
@@ -120,12 +168,18 @@ namespace shadcnui.GUIComponents
         Large
     }
 
+    /// <summary>
+    /// Variants for the Alert component.
+    /// </summary>
     public enum AlertVariant
     {
         Default,
         Destructive
     }
 
+    /// <summary>
+    /// Types for the Alert component.
+    /// </summary>
     public enum AlertType
     {
         Info,
@@ -134,6 +188,9 @@ namespace shadcnui.GUIComponents
         Success
     }
 
+    /// <summary>
+    /// Sizes for the Avatar component.
+    /// </summary>
     public enum AvatarSize
     {
         Small,
@@ -141,6 +198,9 @@ namespace shadcnui.GUIComponents
         Large
     }
 
+    /// <summary>
+    /// Shapes for the Avatar component.
+    /// </summary>
     public enum AvatarShape
     {
         Circle,
@@ -148,6 +208,9 @@ namespace shadcnui.GUIComponents
         Rounded
     }
 
+    /// <summary>
+    /// Variants for the Skeleton component.
+    /// </summary>
     public enum SkeletonVariant
     {
         Default,
@@ -155,6 +218,9 @@ namespace shadcnui.GUIComponents
         Circular
     }
 
+    /// <summary>
+    /// Sizes for the Skeleton component.
+    /// </summary>
     public enum SkeletonSize
     {
         Small,
@@ -162,6 +228,9 @@ namespace shadcnui.GUIComponents
         Large
     }
 
+    /// <summary>
+    /// Variants for the Table component.
+    /// </summary>
     public enum TableVariant
     {
         Default,
@@ -170,6 +239,9 @@ namespace shadcnui.GUIComponents
         Hover
     }
 
+    /// <summary>
+    /// Sizes for the Table component.
+    /// </summary>
     public enum TableSize
     {
         Small,
@@ -177,6 +249,9 @@ namespace shadcnui.GUIComponents
         Large
     }
 
+    /// <summary>
+    /// Variants for the Slider component.
+    /// </summary>
     public enum SliderVariant
     {
         Default,
@@ -185,18 +260,26 @@ namespace shadcnui.GUIComponents
         Disabled
     }
 
+    /// <summary>
+    /// Sizes for the Slider component.
+    /// </summary>
     public enum SliderSize
     {
         Small,
         Default,
         Large
     }
+    #endregion
 
+    /// <summary>
+    /// Manages the GUI styles for the shadcnui components.
+    /// </summary>
     public class GUIStyleManager
     {
         private GUIHelper guiHelper;
 
-
+        #region GUIStyle Fields
+        // Animated Styles
         public GUIStyle animatedBoxStyle;
         public GUIStyle animatedButtonStyle;
         public GUIStyle animatedInputStyle;
@@ -205,7 +288,7 @@ namespace shadcnui.GUIComponents
         public GUIStyle colorPresetStyle;
         public GUIStyle sectionHeaderStyle;
 
-
+        // Card Styles
         public GUIStyle cardStyle;
         public GUIStyle cardHeaderStyle;
         public GUIStyle cardTitleStyle;
@@ -213,33 +296,31 @@ namespace shadcnui.GUIComponents
         public GUIStyle cardContentStyle;
         public GUIStyle cardFooterStyle;
 
-
+        // Button Styles
         public GUIStyle buttonDefaultStyle;
         public GUIStyle buttonDestructiveStyle;
         public GUIStyle buttonOutlineStyle;
         public GUIStyle buttonSecondaryStyle;
         public GUIStyle buttonGhostStyle;
         public GUIStyle buttonLinkStyle;
-
-
         public GUIStyle buttonSmallStyle;
         public GUIStyle buttonLargeStyle;
         public GUIStyle buttonIconStyle;
 
-
+        // Toggle Styles
         public GUIStyle toggleDefaultStyle;
         public GUIStyle toggleOutlineStyle;
         public GUIStyle toggleSmallStyle;
         public GUIStyle toggleLargeStyle;
 
-
+        // Input Styles
         public GUIStyle inputDefaultStyle;
         public GUIStyle inputOutlineStyle;
         public GUIStyle inputGhostStyle;
         public GUIStyle inputFocusedStyle;
         public GUIStyle inputDisabledStyle;
 
-
+        // Label Styles
         public GUIStyle labelDefaultStyle;
         public GUIStyle labelSecondaryStyle;
         public GUIStyle labelMutedStyle;
@@ -247,43 +328,45 @@ namespace shadcnui.GUIComponents
         public GUIStyle labelSmallStyle;
         public GUIStyle labelLargeStyle;
 
-
+        // PasswordField Styles
         public GUIStyle passwordFieldStyle;
 
-
+        // TextArea Styles
         public GUIStyle textAreaStyle;
         public GUIStyle textAreaFocusedStyle;
         public GUIStyle textAreaOutlineStyle;
         public GUIStyle textAreaGhostStyle;
 
-       
+        // ProgressBar Styles
         public GUIStyle progressBarStyle;
         public GUIStyle progressBarBackgroundStyle;
         public GUIStyle progressBarFillStyle;
 
-       
+        // Separator Styles
         public GUIStyle separatorHorizontalStyle;
         public GUIStyle separatorVerticalStyle;
 
-       
+        // Tabs Styles
         public GUIStyle tabsListStyle;
         public GUIStyle tabsTriggerStyle;
         public GUIStyle tabsTriggerActiveStyle;
         public GUIStyle tabsContentStyle;
 
-       
+        // Checkbox Styles
         public GUIStyle checkboxDefaultStyle;
         public GUIStyle checkboxOutlineStyle;
         public GUIStyle checkboxGhostStyle;
         public GUIStyle checkboxSmallStyle;
         public GUIStyle checkboxLargeStyle;
 
+        // Switch Styles
         public GUIStyle switchDefaultStyle;
         public GUIStyle switchOutlineStyle;
         public GUIStyle switchGhostStyle;
         public GUIStyle switchSmallStyle;
         public GUIStyle switchLargeStyle;
 
+        // Badge Styles
         public GUIStyle badgeDefaultStyle;
         public GUIStyle badgeSecondaryStyle;
         public GUIStyle badgeDestructiveStyle;
@@ -291,22 +374,26 @@ namespace shadcnui.GUIComponents
         public GUIStyle badgeSmallStyle;
         public GUIStyle badgeLargeStyle;
 
+        // Alert Styles
         public GUIStyle alertDefaultStyle;
         public GUIStyle alertDestructiveStyle;
         public GUIStyle alertTitleStyle;
         public GUIStyle alertDescriptionStyle;
 
+        // Avatar Styles
         public GUIStyle avatarStyle;
         public GUIStyle avatarFallbackStyle;
         public GUIStyle avatarSmallStyle;
         public GUIStyle avatarLargeStyle;
 
+        // Skeleton Styles
         public GUIStyle skeletonStyle;
         public GUIStyle skeletonRoundedStyle;
         public GUIStyle skeletonCircularStyle;
         public GUIStyle skeletonSmallStyle;
         public GUIStyle skeletonLargeStyle;
 
+        // Table Styles
         public GUIStyle tableStyle;
         public GUIStyle tableHeaderStyle;
         public GUIStyle tableCellStyle;
@@ -314,7 +401,7 @@ namespace shadcnui.GUIComponents
         public GUIStyle tableBorderedStyle;
         public GUIStyle tableHoverStyle;
 
-       
+        // Slider Styles
         public GUIStyle sliderDefaultStyle;
         public GUIStyle sliderRangeStyle;
         public GUIStyle sliderVerticalStyle;
@@ -324,12 +411,13 @@ namespace shadcnui.GUIComponents
         public GUIStyle sliderLabelStyle;
         public GUIStyle sliderValueStyle;
 
-       
+        // Scaled Label Styles
         public GUIStyle labelSmallScaledStyle;
         public GUIStyle labelMediumScaledStyle;
         public GUIStyle labelLargeScaledStyle;
+        #endregion
 
-
+        #region Texture Fields
         private Texture2D gradientTexture;
         private Texture2D glowTexture;
         private Texture2D particleTexture;
@@ -344,7 +432,6 @@ namespace shadcnui.GUIComponents
         private Texture2D tabsBackgroundTexture;
         private Texture2D tabsActiveTexture;
 
-       
         private Texture2D checkboxTexture;
         private Texture2D checkboxCheckedTexture;
         private Texture2D switchTexture;
@@ -357,12 +444,17 @@ namespace shadcnui.GUIComponents
         private Texture2D tableTexture;
         private Texture2D tableHeaderTexture;
         private Texture2D tableCellTexture;
+        #endregion
 
         public GUIStyleManager(GUIHelper helper)
         {
             guiHelper = helper;
         }
 
+        #region Initialization
+        /// <summary>
+        /// Initializes the GUI styles.
+        /// </summary>
         public void InitializeGUI()
         {
             CreateCustomTextures();
@@ -384,7 +476,12 @@ namespace shadcnui.GUIComponents
             SetupSkeletonStyles();
             SetupTableStyles();
         }
+        #endregion
 
+        #region Texture Creation
+        /// <summary>
+        /// Creates the custom textures used by the GUI styles.
+        /// </summary>
         private void CreateCustomTextures()
         {
 
@@ -479,7 +576,7 @@ namespace shadcnui.GUIComponents
             }
             particleTexture.Apply();
 
-           
+
             progressBarBackgroundTexture = new Texture2D(1, 1);
             Color progressBgColor = guiHelper.customColorsEnabled ?
                 new Color(guiHelper.primaryColor.r * 0.2f, guiHelper.primaryColor.g * 0.2f, guiHelper.primaryColor.b * 0.2f, 0.2f) :
@@ -487,31 +584,31 @@ namespace shadcnui.GUIComponents
             progressBarBackgroundTexture.SetPixel(0, 0, progressBgColor);
             progressBarBackgroundTexture.Apply();
 
-           
+
             progressBarFillTexture = new Texture2D(1, 1);
             Color progressFillColor = guiHelper.customColorsEnabled ? guiHelper.primaryColor : new Color(0.09f, 0.09f, 0.11f);
             progressBarFillTexture.SetPixel(0, 0, progressFillColor);
             progressBarFillTexture.Apply();
 
-           
+
             separatorTexture = new Texture2D(1, 1);
             Color separatorColor = new Color(0.23f, 0.23f, 0.27f);
             separatorTexture.SetPixel(0, 0, separatorColor);
             separatorTexture.Apply();
 
-           
+
             tabsBackgroundTexture = new Texture2D(1, 1);
             Color tabsBgColor = new Color(0.16f, 0.16f, 0.18f);
             tabsBackgroundTexture.SetPixel(0, 0, tabsBgColor);
             tabsBackgroundTexture.Apply();
 
-           
+
             tabsActiveTexture = new Texture2D(1, 1);
             Color tabsActiveColor = new Color(0.02f, 0.02f, 0.04f);
             tabsActiveTexture.SetPixel(0, 0, tabsActiveColor);
             tabsActiveTexture.Apply();
 
-           
+
             checkboxTexture = new Texture2D(1, 1);
             Color checkboxColor = new Color(0.1f, 0.1f, 0.15f);
             checkboxTexture.SetPixel(0, 0, checkboxColor);
@@ -572,7 +669,12 @@ namespace shadcnui.GUIComponents
             tableCellTexture.SetPixel(0, 0, tableCellColor);
             tableCellTexture.Apply();
         }
+        #endregion
 
+        #region Style Setup Methods
+        /// <summary>
+        /// Sets up the animated styles.
+        /// </summary>
         private void SetupAnimatedStyles()
         {
 
@@ -633,6 +735,9 @@ namespace shadcnui.GUIComponents
             sectionHeaderStyle.normal.textColor = headerColor;
         }
 
+        /// <summary>
+        /// Sets up the card styles.
+        /// </summary>
         private void SetupCardStyles()
         {
 
@@ -672,12 +777,15 @@ namespace shadcnui.GUIComponents
             cardFooterStyle.padding = new RectOffset(16, 16, 8, 16);
         }
 
+        /// <summary>
+        /// Sets up the button styles.
+        /// </summary>
         private void SetupButtonVariantStyles()
         {
             float scaledFontSize = guiHelper.fontSize * guiHelper.uiScale;
             int borderRadius = Mathf.RoundToInt(guiHelper.cornerRadius * guiHelper.uiScale);
 
-           
+
             buttonDefaultStyle = CreateBaseButtonStyle();
             buttonDefaultStyle.fontSize = Mathf.RoundToInt(scaledFontSize);
             buttonDefaultStyle.fontStyle = FontStyle.Normal;
@@ -692,8 +800,10 @@ namespace shadcnui.GUIComponents
             buttonDefaultStyle.hover.background = CreateSolidTexture(Color.Lerp(primaryBg, Color.black, 0.1f));
             buttonDefaultStyle.normal.textColor = primaryFg;
             buttonDefaultStyle.hover.textColor = primaryFg;
+            buttonDefaultStyle.active.background = CreateSolidTexture(Color.Lerp(primaryBg, Color.black, 0.2f));
+            buttonDefaultStyle.active.textColor = primaryFg;
 
-           
+
             buttonDestructiveStyle = CreateBaseButtonStyle();
             buttonDestructiveStyle.fontSize = Mathf.RoundToInt(scaledFontSize);
             buttonDestructiveStyle.fontStyle = FontStyle.Normal;
@@ -707,8 +817,10 @@ namespace shadcnui.GUIComponents
             buttonDestructiveStyle.hover.background = CreateSolidTexture(Color.Lerp(destructiveBg, Color.black, 0.1f));
             buttonDestructiveStyle.normal.textColor = destructiveFg;
             buttonDestructiveStyle.hover.textColor = destructiveFg;
+            buttonDestructiveStyle.active.background = CreateSolidTexture(Color.Lerp(destructiveBg, Color.black, 0.2f));
+            buttonDestructiveStyle.active.textColor = destructiveFg;
 
-           
+
             buttonOutlineStyle = CreateBaseButtonStyle();
             buttonOutlineStyle.fontSize = Mathf.RoundToInt(scaledFontSize);
             buttonOutlineStyle.fontStyle = FontStyle.Normal;
@@ -726,8 +838,10 @@ namespace shadcnui.GUIComponents
             buttonOutlineStyle.hover.background = CreateSolidTexture(outlineHoverBg);
             buttonOutlineStyle.normal.textColor = outlineFg;
             buttonOutlineStyle.hover.textColor = outlineHoverFg;
+            buttonOutlineStyle.active.background = CreateSolidTexture(Color.Lerp(outlineHoverBg, Color.black, 0.2f));
+            buttonOutlineStyle.active.textColor = outlineHoverFg;
 
-           
+
             buttonSecondaryStyle = CreateBaseButtonStyle();
             buttonSecondaryStyle.fontSize = Mathf.RoundToInt(scaledFontSize);
             buttonSecondaryStyle.fontStyle = FontStyle.Normal;
@@ -741,8 +855,10 @@ namespace shadcnui.GUIComponents
             buttonSecondaryStyle.hover.background = CreateSolidTexture(Color.Lerp(secondaryBg, Color.white, 0.2f));
             buttonSecondaryStyle.normal.textColor = secondaryFg;
             buttonSecondaryStyle.hover.textColor = secondaryFg;
+            buttonSecondaryStyle.active.background = CreateSolidTexture(Color.Lerp(secondaryBg, Color.black, 0.2f));
+            buttonSecondaryStyle.active.textColor = secondaryFg;
 
-           
+
             buttonGhostStyle = CreateBaseButtonStyle();
             buttonGhostStyle.fontSize = Mathf.RoundToInt(scaledFontSize);
             buttonGhostStyle.fontStyle = FontStyle.Normal;
@@ -758,8 +874,10 @@ namespace shadcnui.GUIComponents
             buttonGhostStyle.hover.background = CreateSolidTexture(ghostHoverBg);
             buttonGhostStyle.normal.textColor = ghostFg;
             buttonGhostStyle.hover.textColor = ghostHoverFg;
+            buttonGhostStyle.active.background = CreateSolidTexture(Color.Lerp(ghostHoverBg, Color.black, 0.2f));
+            buttonGhostStyle.active.textColor = ghostHoverFg;
 
-           
+
             buttonLinkStyle = CreateBaseButtonStyle();
             buttonLinkStyle.fontSize = Mathf.RoundToInt(scaledFontSize);
             buttonLinkStyle.fontStyle = FontStyle.Normal;
@@ -774,6 +892,8 @@ namespace shadcnui.GUIComponents
             buttonLinkStyle.hover.background = transparentTexture;
             buttonLinkStyle.normal.textColor = linkColor;
             buttonLinkStyle.hover.textColor = linkHoverColor;
+            buttonLinkStyle.active.background = transparentTexture;
+            buttonLinkStyle.active.textColor = Color.Lerp(linkHoverColor, Color.black, 0.2f);
 
             SetupButtonSizeVariants(scaledFontSize, guiHelper.uiScale, borderRadius);
         }
@@ -798,10 +918,10 @@ namespace shadcnui.GUIComponents
 
         private void SetupButtonSizeVariants(float baseFontSize, float scale, int borderRadius)
         {
-           
+
             buttonDefaultStyle.fixedHeight = Mathf.RoundToInt(36 * scale);
 
-           
+
             buttonSmallStyle = CreateBaseButtonStyle();
             buttonSmallStyle.fontSize = Mathf.RoundToInt((baseFontSize - 2) * scale);
             buttonSmallStyle.fontStyle = FontStyle.Normal;
@@ -810,7 +930,7 @@ namespace shadcnui.GUIComponents
             buttonSmallStyle.fixedHeight = Mathf.RoundToInt(32 * scale);
             buttonSmallStyle.border = new RectOffset(borderRadius, borderRadius, borderRadius, borderRadius);
 
-           
+
             buttonLargeStyle = CreateBaseButtonStyle();
             buttonLargeStyle.fontSize = Mathf.RoundToInt(baseFontSize * scale);
             buttonLargeStyle.fontStyle = FontStyle.Normal;
@@ -819,7 +939,7 @@ namespace shadcnui.GUIComponents
             buttonLargeStyle.fixedHeight = Mathf.RoundToInt(40 * scale);
             buttonLargeStyle.border = new RectOffset(borderRadius, borderRadius, borderRadius, borderRadius);
 
-           
+
             buttonIconStyle = CreateBaseButtonStyle();
             buttonIconStyle.fontSize = Mathf.RoundToInt(baseFontSize * scale);
             buttonIconStyle.fontStyle = FontStyle.Normal;
@@ -847,6 +967,9 @@ namespace shadcnui.GUIComponents
             return texture;
         }
 
+        /// <summary>
+        /// Sets up the toggle styles.
+        /// </summary>
         private void SetupToggleVariantStyles()
         {
 
@@ -873,6 +996,9 @@ namespace shadcnui.GUIComponents
             toggleLargeStyle.padding = new RectOffset(10, 10, 8, 8);
         }
 
+        /// <summary>
+        /// Sets up the input styles.
+        /// </summary>
         private void SetupInputVariantStyles()
         {
 
@@ -883,6 +1009,7 @@ namespace shadcnui.GUIComponents
             inputDefaultStyle.border = new RectOffset(1, 1, 1, 1);
             inputDefaultStyle.normal.background = inputBackgroundTexture;
             inputDefaultStyle.normal.textColor = Color.white;
+            inputDefaultStyle.hover.background = inputBackgroundTexture;
             inputDefaultStyle.focused.background = inputFocusedTexture;
             inputDefaultStyle.focused.textColor = guiHelper.customColorsEnabled ? guiHelper.accentColor : new Color(0.9f, 0.9f, 1f);
 
@@ -923,6 +1050,9 @@ namespace shadcnui.GUIComponents
             textAreaFocusedStyle.normal.background = inputFocusedTexture;
         }
 
+        /// <summary>
+        /// Sets up the label styles.
+        /// </summary>
         private void SetupLabelVariantStyles()
         {
 
@@ -985,171 +1115,65 @@ namespace shadcnui.GUIComponents
             return texture;
         }
 
-
-        public GUIStyle GetButtonStyle(ButtonVariant variant, ButtonSize size)
-        {
-            GUIStyle baseStyle;
-            switch (variant)
-            {
-                case ButtonVariant.Default:
-                    baseStyle = buttonDefaultStyle;
-                    break;
-                case ButtonVariant.Destructive:
-                    baseStyle = buttonDestructiveStyle;
-                    break;
-                case ButtonVariant.Outline:
-                    baseStyle = buttonOutlineStyle;
-                    break;
-                case ButtonVariant.Secondary:
-                    baseStyle = buttonSecondaryStyle;
-                    break;
-                case ButtonVariant.Ghost:
-                    baseStyle = buttonGhostStyle;
-                    break;
-                case ButtonVariant.Link:
-                    baseStyle = buttonLinkStyle;
-                    break;
-                default:
-                    baseStyle = buttonDefaultStyle;
-                    break;
-            }
-
-            if (baseStyle == null) return GUI.skin.button;
-
-           
-            switch (size)
-            {
-                case ButtonSize.Small:
-                    return ApplyVariantToSizeStyle(buttonSmallStyle, variant);
-                case ButtonSize.Large:
-                    return ApplyVariantToSizeStyle(buttonLargeStyle, variant);
-                case ButtonSize.Icon:
-                    return ApplyVariantToSizeStyle(buttonIconStyle, variant);
-                default:
-                    return baseStyle;
-            }
-        }
-
-        private GUIStyle ApplyVariantToSizeStyle(GUIStyle sizeStyle, ButtonVariant variant)
-        {
-            if (sizeStyle == null) return GUI.skin.button;
-
-            GUIStyle style = new GUIStyle(sizeStyle);
-
-           
-            switch (variant)
-            {
-                case ButtonVariant.Default:
-                    Color primaryBg = guiHelper.customColorsEnabled ? guiHelper.primaryColor : new Color(0.09f, 0.09f, 0.11f);
-                    Color primaryFg = new Color(0.98f, 0.98f, 0.98f);
-                    style.normal.background = CreateSolidTexture(primaryBg);
-                    style.hover.background = CreateSolidTexture(Color.Lerp(primaryBg, Color.black, 0.1f));
-                    style.normal.textColor = primaryFg;
-                    style.hover.textColor = primaryFg;
-                    break;
-                case ButtonVariant.Destructive:
-                    Color destructiveBg = new Color(0.86f, 0.24f, 0.24f);
-                    Color destructiveFg = new Color(0.98f, 0.98f, 0.98f);
-                    style.normal.background = CreateSolidTexture(destructiveBg);
-                    style.hover.background = CreateSolidTexture(Color.Lerp(destructiveBg, Color.black, 0.1f));
-                    style.normal.textColor = destructiveFg;
-                    style.hover.textColor = destructiveFg;
-                    break;
-                case ButtonVariant.Outline:
-                    Color outlineBorder = new Color(0.23f, 0.23f, 0.27f);
-                    Color outlineBg = new Color(0.02f, 0.02f, 0.04f);
-                    Color outlineFg = new Color(0.98f, 0.98f, 0.98f);
-                    Color outlineHoverBg = new Color(0.16f, 0.16f, 0.18f);
-                    Color outlineHoverFg = new Color(0.98f, 0.98f, 0.98f);
-
-                    style.normal.background = CreateOutlineButtonTexture(outlineBg, outlineBorder);
-                    style.hover.background = CreateSolidTexture(outlineHoverBg);
-                    style.normal.textColor = outlineFg;
-                    style.hover.textColor = outlineHoverFg;
-                    break;
-                case ButtonVariant.Secondary:
-                    Color secondaryBg = new Color(0.16f, 0.16f, 0.18f);
-                    Color secondaryFg = new Color(0.98f, 0.98f, 0.98f);
-                    style.normal.background = CreateSolidTexture(secondaryBg);
-                    style.hover.background = CreateSolidTexture(Color.Lerp(secondaryBg, Color.white, 0.2f));
-                    style.normal.textColor = secondaryFg;
-                    style.hover.textColor = secondaryFg;
-                    break;
-                case ButtonVariant.Ghost:
-                    Color ghostFg = new Color(0.98f, 0.98f, 0.98f);
-                    Color ghostHoverBg = new Color(0.16f, 0.16f, 0.18f);
-                    Color ghostHoverFg = new Color(0.98f, 0.98f, 0.98f);
-
-                    style.normal.background = transparentTexture;
-                    style.hover.background = CreateSolidTexture(ghostHoverBg);
-                    style.normal.textColor = ghostFg;
-                    style.hover.textColor = ghostHoverFg;
-                    break;
-                case ButtonVariant.Link:
-                    Color linkColor = guiHelper.customColorsEnabled ? guiHelper.primaryColor : new Color(0.09f, 0.09f, 0.11f);
-                    Color linkHoverColor = Color.Lerp(linkColor, Color.white, 0.2f);
-
-                    style.normal.background = transparentTexture;
-                    style.hover.background = transparentTexture;
-                    style.normal.textColor = linkColor;
-                    style.hover.textColor = linkHoverColor;
-                    style.fontStyle = FontStyle.Normal;
-                    break;
-            }
-
-            return style;
-        }
-
+        /// <summary>
+        /// Sets up the progress bar styles.
+        /// </summary>
         private void SetupProgressBarStyles()
         {
             float scaledFontSize = guiHelper.fontSize * guiHelper.uiScale;
             int borderRadius = Mathf.RoundToInt(guiHelper.cornerRadius * guiHelper.uiScale);
 
-           
+
             progressBarStyle = new GUIStyle(GUI.skin.box);
             progressBarStyle.normal.background = progressBarBackgroundTexture;
             progressBarStyle.border = new RectOffset(borderRadius, borderRadius, borderRadius, borderRadius);
             progressBarStyle.padding = new RectOffset(0, 0, 0, 0);
             progressBarStyle.margin = new RectOffset(0, 0, 2, 2);
 
-           
+
             progressBarBackgroundStyle = new GUIStyle();
             progressBarBackgroundStyle.normal.background = progressBarBackgroundTexture;
 
-           
+
             progressBarFillStyle = new GUIStyle();
             progressBarFillStyle.normal.background = progressBarFillTexture;
         }
 
+        /// <summary>
+        /// Sets up the separator styles.
+        /// </summary>
         private void SetupSeparatorStyles()
         {
-           
+
             separatorHorizontalStyle = new GUIStyle();
             separatorHorizontalStyle.normal.background = separatorTexture;
             separatorHorizontalStyle.fixedHeight = Mathf.RoundToInt(1 * guiHelper.uiScale);
             separatorHorizontalStyle.stretchWidth = true;
 
-           
+
             separatorVerticalStyle = new GUIStyle();
             separatorVerticalStyle.normal.background = separatorTexture;
             separatorVerticalStyle.fixedWidth = Mathf.RoundToInt(1 * guiHelper.uiScale);
             separatorVerticalStyle.stretchHeight = true;
         }
 
+        /// <summary>
+        /// Sets up the tabs styles.
+        /// </summary>
         private void SetupTabsStyles()
         {
             float scaledFontSize = guiHelper.fontSize * guiHelper.uiScale;
             int borderRadius = Mathf.RoundToInt(guiHelper.cornerRadius * guiHelper.uiScale);
             int padding = Mathf.RoundToInt(4 * guiHelper.uiScale);
 
-           
+
             tabsListStyle = new GUIStyle();
             tabsListStyle.normal.background = tabsBackgroundTexture;
             tabsListStyle.border = new RectOffset(borderRadius, borderRadius, borderRadius, borderRadius);
             tabsListStyle.padding = new RectOffset(padding, padding, padding, padding);
             tabsListStyle.margin = new RectOffset(0, 0, 2, 2);
 
-           
+
             tabsTriggerStyle = new GUIStyle(GUI.skin.button);
             tabsTriggerStyle.fontSize = Mathf.RoundToInt(scaledFontSize);
             tabsTriggerStyle.fontStyle = FontStyle.Bold;
@@ -1163,19 +1187,24 @@ namespace shadcnui.GUIComponents
             tabsTriggerStyle.border = new RectOffset(borderRadius, borderRadius, borderRadius, borderRadius);
             tabsTriggerStyle.normal.background = transparentTexture;
             tabsTriggerStyle.normal.textColor = new Color(0.64f, 0.64f, 0.71f);
-            tabsTriggerStyle.hover.background = CreateSolidTexture(new Color(0.16f, 0.16f, 0.18f, 0.5f));
+            tabsTriggerStyle.hover.background = transparentTexture;
+            tabsTriggerStyle.active.background = transparentTexture;
 
-           
+
             tabsTriggerActiveStyle = new GUIStyle(tabsTriggerStyle);
             tabsTriggerActiveStyle.normal.background = tabsActiveTexture;
             tabsTriggerActiveStyle.normal.textColor = new Color(0.98f, 0.98f, 0.98f);
             tabsTriggerActiveStyle.hover.background = tabsActiveTexture;
+            tabsTriggerActiveStyle.active.background = tabsActiveTexture;
 
-           
+
             tabsContentStyle = new GUIStyle();
             tabsContentStyle.padding = new RectOffset(0, 0, Mathf.RoundToInt(8 * guiHelper.uiScale), 0);
         }
 
+        /// <summary>
+        /// Sets up the text area styles.
+        /// </summary>
         private void SetupTextAreaVariantStyles()
         {
             float scaledFontSize = guiHelper.fontSize * guiHelper.uiScale;
@@ -1183,7 +1212,7 @@ namespace shadcnui.GUIComponents
             int verticalPadding = Mathf.RoundToInt(8 * guiHelper.uiScale);
             int borderRadius = Mathf.RoundToInt(guiHelper.cornerRadius * guiHelper.uiScale);
 
-           
+
             textAreaStyle = new GUIStyle(GUI.skin.textArea);
             textAreaStyle.fontSize = Mathf.RoundToInt(scaledFontSize);
             textAreaStyle.padding = new RectOffset(padding, padding, verticalPadding, verticalPadding);
@@ -1192,154 +1221,31 @@ namespace shadcnui.GUIComponents
             textAreaStyle.normal.textColor = new Color(0.98f, 0.98f, 0.98f);
             textAreaStyle.focused.background = inputFocusedTexture;
             textAreaStyle.focused.textColor = guiHelper.customColorsEnabled ? guiHelper.accentColor : new Color(0.9f, 0.9f, 1f);
+            textAreaStyle.hover.background = inputBackgroundTexture;
             textAreaStyle.wordWrap = true;
             textAreaStyle.stretchHeight = true;
 
-           
+
             textAreaFocusedStyle = new GUIStyle(textAreaStyle);
             textAreaFocusedStyle.normal.background = inputFocusedTexture;
-            textAreaFocusedStyle.border = new RectOffset(2, 2, 2, 2);
+            textAreaFocusedStyle.border = new RectOffset(0, 0, 0, 0);
 
-           
+
             textAreaOutlineStyle = new GUIStyle(textAreaStyle);
             textAreaOutlineStyle.normal.background = CreateOutlineTexture();
             textAreaOutlineStyle.focused.background = CreateSolidTexture(guiHelper.customColorsEnabled ?
                 new Color(guiHelper.accentColor.r, guiHelper.accentColor.g, guiHelper.accentColor.b, 0.1f) :
                 new Color(0.3f, 0.4f, 0.6f, 0.1f));
 
-           
+
             textAreaGhostStyle = new GUIStyle(textAreaStyle);
             textAreaGhostStyle.normal.background = transparentTexture;
             textAreaGhostStyle.focused.background = CreateSolidTexture(new Color(0.1f, 0.1f, 0.2f, 0.3f));
         }
 
-        public GUIStyle GetToggleStyle(ToggleVariant variant, ToggleSize size)
-        {
-            GUIStyle baseStyle;
-            switch (variant)
-            {
-                case ToggleVariant.Outline:
-                    baseStyle = toggleOutlineStyle;
-                    break;
-                default:
-                    baseStyle = toggleDefaultStyle;
-                    break;
-            }
-
-            if (baseStyle == null) return GUI.skin.button;
-
-            GUIStyle sizedStyle = new GUIStyle(baseStyle);
-            switch (size)
-            {
-                case ToggleSize.Small:
-                    sizedStyle.fontSize = guiHelper.fontSize - 2;
-                    sizedStyle.padding = new RectOffset(6, 6, 4, 4);
-                    break;
-                case ToggleSize.Large:
-                    sizedStyle.fontSize = guiHelper.fontSize + 2;
-                    sizedStyle.padding = new RectOffset(10, 10, 8, 8);
-                    break;
-            }
-
-            return sizedStyle;
-        }
-
-        public GUIStyle GetInputStyle(InputVariant variant, bool focused = false, bool disabled = false)
-        {
-            if (disabled) return inputDisabledStyle ?? GUI.skin.textField;
-            if (focused) return inputFocusedStyle ?? GUI.skin.textField;
-
-            GUIStyle style;
-            switch (variant)
-            {
-                case InputVariant.Outline:
-                    style = inputOutlineStyle ?? GUI.skin.textField;
-                    break;
-                case InputVariant.Ghost:
-                    style = inputGhostStyle ?? GUI.skin.textField;
-                    break;
-                default:
-                    style = inputDefaultStyle ?? GUI.skin.textField;
-                    break;
-            }
-
-            return style;
-        }
-
-        public GUIStyle GetLabelStyle(LabelVariant variant)
-        {
-            GUIStyle style;
-            switch (variant)
-            {
-                case LabelVariant.Secondary:
-                    style = labelSecondaryStyle ?? GUI.skin.label;
-                    break;
-                case LabelVariant.Muted:
-                    style = labelMutedStyle ?? GUI.skin.label;
-                    break;
-                case LabelVariant.Destructive:
-                    style = labelDestructiveStyle ?? GUI.skin.label;
-                    break;
-                default:
-                    style = labelDefaultStyle ?? GUI.skin.label;
-                    break;
-            }
-
-            return style;
-        }
-
-        public GUIStyle GetPasswordFieldStyle()
-        {
-            return passwordFieldStyle ?? GUI.skin.textField;
-        }
-
-        public GUIStyle GetTextAreaStyle(TextAreaVariant variant = TextAreaVariant.Default, bool focused = false)
-        {
-            GUIStyle baseStyle;
-            switch (variant)
-            {
-                case TextAreaVariant.Outline:
-                    baseStyle = textAreaOutlineStyle ?? textAreaStyle ?? GUI.skin.textArea;
-                    break;
-                case TextAreaVariant.Ghost:
-                    baseStyle = textAreaGhostStyle ?? textAreaStyle ?? GUI.skin.textArea;
-                    break;
-                default:
-                    baseStyle = textAreaStyle ?? GUI.skin.textArea;
-                    break;
-            }
-
-            return focused ? (textAreaFocusedStyle ?? baseStyle) : baseStyle;
-        }
-
-        public GUIStyle GetProgressBarStyle() => progressBarStyle ?? GUI.skin.box;
-        public GUIStyle GetProgressBarBackgroundStyle() => progressBarBackgroundStyle ?? GUI.skin.box;
-        public GUIStyle GetProgressBarFillStyle() => progressBarFillStyle ?? GUI.skin.box;
-
-        public GUIStyle GetSeparatorStyle(SeparatorOrientation orientation)
-        {
-            return orientation == SeparatorOrientation.Horizontal ?
-                (separatorHorizontalStyle ?? GUI.skin.box) :
-                (separatorVerticalStyle ?? GUI.skin.box);
-        }
-
-        public GUIStyle GetTabsListStyle() => tabsListStyle ?? GUI.skin.box;
-        public GUIStyle GetTabsTriggerStyle(bool active = false)
-        {
-            return active ? (tabsTriggerActiveStyle ?? tabsTriggerStyle ?? GUI.skin.button) :
-                           (tabsTriggerStyle ?? GUI.skin.button);
-        }
-        public GUIStyle GetTabsContentStyle() => tabsContentStyle ?? GUIStyle.none;
-
-        public Texture2D GetGlowTexture() => glowTexture;
-        public Texture2D GetParticleTexture() => particleTexture;
-        public Texture2D GetInputBackgroundTexture() => inputBackgroundTexture;
-        public Texture2D GetInputFocusedTexture() => inputFocusedTexture;
-        public Texture2D GetTransparentTexture() => transparentTexture;
-        public Texture2D GetProgressBarBackgroundTexture() => progressBarBackgroundTexture;
-        public Texture2D GetProgressBarFillTexture() => progressBarFillTexture;
-
-       
+        /// <summary>
+        /// Sets up the checkbox styles.
+        /// </summary>
         private void SetupCheckboxStyles()
         {
             float scaledFontSize = guiHelper.fontSize * guiHelper.uiScale;
@@ -1348,14 +1254,21 @@ namespace shadcnui.GUIComponents
             checkboxDefaultStyle = new GUIStyle(GUI.skin.toggle);
             checkboxDefaultStyle.fontSize = Mathf.RoundToInt(scaledFontSize);
             checkboxDefaultStyle.normal.background = checkboxTexture;
-            checkboxDefaultStyle.active.background = checkboxCheckedTexture;
+            checkboxDefaultStyle.onNormal.background = checkboxCheckedTexture;
+            checkboxDefaultStyle.active.background = checkboxTexture;
+            checkboxDefaultStyle.hover.background = checkboxTexture;
+            checkboxDefaultStyle.onHover.background = checkboxCheckedTexture;
+            checkboxDefaultStyle.onActive.background = checkboxCheckedTexture;
             checkboxDefaultStyle.border = new RectOffset(borderRadius, borderRadius, borderRadius, borderRadius);
 
             checkboxOutlineStyle = new GUIStyle(checkboxDefaultStyle);
             checkboxOutlineStyle.normal.background = CreateOutlineTexture();
+            checkboxOutlineStyle.active.background = CreateOutlineTexture();
+            checkboxOutlineStyle.onActive.background = CreateOutlineTexture();
 
             checkboxGhostStyle = new GUIStyle(checkboxDefaultStyle);
             checkboxGhostStyle.normal.background = transparentTexture;
+            checkboxGhostStyle.active.background = transparentTexture;
 
             checkboxSmallStyle = new GUIStyle(checkboxDefaultStyle);
             checkboxSmallStyle.fontSize = Mathf.RoundToInt((scaledFontSize - 2));
@@ -1364,6 +1277,9 @@ namespace shadcnui.GUIComponents
             checkboxLargeStyle.fontSize = Mathf.RoundToInt((scaledFontSize + 2));
         }
 
+        /// <summary>
+        /// Sets up the switch styles.
+        /// </summary>
         private void SetupSwitchStyles()
         {
             float scaledFontSize = guiHelper.fontSize * guiHelper.uiScale;
@@ -1372,14 +1288,22 @@ namespace shadcnui.GUIComponents
             switchDefaultStyle = new GUIStyle(GUI.skin.toggle);
             switchDefaultStyle.fontSize = Mathf.RoundToInt(scaledFontSize);
             switchDefaultStyle.normal.background = switchOffTexture;
-            switchDefaultStyle.active.background = switchOnTexture;
+            switchDefaultStyle.onNormal.background = switchOnTexture;
+            switchDefaultStyle.active.background = CreateSolidTexture(Color.Lerp(switchOffTexture.GetPixel(0,0), Color.black, 0.1f));
+            switchDefaultStyle.onActive.background = CreateSolidTexture(Color.Lerp(switchOnTexture.GetPixel(0,0), Color.black, 0.1f));
             switchDefaultStyle.border = new RectOffset(borderRadius, borderRadius, borderRadius, borderRadius);
 
             switchOutlineStyle = new GUIStyle(switchDefaultStyle);
             switchOutlineStyle.normal.background = CreateOutlineTexture();
+            switchOutlineStyle.active.background = CreateSolidTexture(Color.Lerp(CreateOutlineTexture().GetPixel(0,0), Color.black, 0.1f));
+            switchOutlineStyle.onNormal.background = CreateOutlineTexture();
+            switchOutlineStyle.onActive.background = CreateSolidTexture(Color.Lerp(CreateOutlineTexture().GetPixel(0,0), Color.black, 0.1f));
 
             switchGhostStyle = new GUIStyle(switchDefaultStyle);
             switchGhostStyle.normal.background = transparentTexture;
+            switchGhostStyle.active.background = CreateSolidTexture(Color.Lerp(transparentTexture.GetPixel(0,0), Color.black, 0.1f));
+            switchGhostStyle.onNormal.background = transparentTexture;
+            switchGhostStyle.onActive.background = CreateSolidTexture(Color.Lerp(transparentTexture.GetPixel(0,0), Color.black, 0.1f));
 
             switchSmallStyle = new GUIStyle(switchDefaultStyle);
             switchSmallStyle.fontSize = Mathf.RoundToInt((scaledFontSize - 2));
@@ -1388,6 +1312,9 @@ namespace shadcnui.GUIComponents
             switchLargeStyle.fontSize = Mathf.RoundToInt((scaledFontSize + 2));
         }
 
+        /// <summary>
+        /// Sets up the badge styles.
+        /// </summary>
         private void SetupBadgeStyles()
         {
             float scaledFontSize = guiHelper.fontSize * guiHelper.uiScale;
@@ -1417,6 +1344,9 @@ namespace shadcnui.GUIComponents
             badgeLargeStyle.fontSize = Mathf.RoundToInt((scaledFontSize + 2));
         }
 
+        /// <summary>
+        /// Sets up the alert styles.
+        /// </summary>
         private void SetupAlertStyles()
         {
             float scaledFontSize = guiHelper.fontSize * guiHelper.uiScale;
@@ -1424,69 +1354,52 @@ namespace shadcnui.GUIComponents
             int horizontalPadding = Mathf.RoundToInt(16 * guiHelper.uiScale);
             int verticalPadding = Mathf.RoundToInt(12 * guiHelper.uiScale);
 
-           
+
             alertDefaultStyle = new GUIStyle(GUI.skin.box);
             Color defaultBg = new Color(0.02f, 0.02f, 0.04f);
             Color defaultFg = new Color(0.98f, 0.98f, 0.98f);
             Color defaultBorder = new Color(0.23f, 0.23f, 0.27f);
-            alertDefaultStyle.normal.background = CreateBorderedTexture(defaultBg, defaultBorder, borderRadius, 1f);
+            alertDefaultStyle.normal.background = CreateSolidTexture(defaultBg);
             alertDefaultStyle.normal.textColor = defaultFg;
+            alertDefaultStyle.hover.background = CreateSolidTexture(defaultBg);
             alertDefaultStyle.border = new RectOffset(borderRadius, borderRadius, borderRadius, borderRadius);
             alertDefaultStyle.padding = new RectOffset(horizontalPadding, horizontalPadding, verticalPadding, verticalPadding);
 
-           
+
             alertDestructiveStyle = new GUIStyle(GUI.skin.box);
             Color destructiveColor = new Color(0.86f, 0.24f, 0.24f);
             Color destructiveBorder = new Color(destructiveColor.r, destructiveColor.g, destructiveColor.b, 0.5f);
-            alertDestructiveStyle.normal.background = CreateBorderedTexture(defaultBg, destructiveBorder, borderRadius, 1f);
+            alertDestructiveStyle.normal.background = CreateSolidTexture(destructiveBorder);
             alertDestructiveStyle.normal.textColor = destructiveColor;
+            alertDestructiveStyle.hover.background = CreateSolidTexture(destructiveBorder);
             alertDestructiveStyle.border = new RectOffset(borderRadius, borderRadius, borderRadius, borderRadius);
             alertDestructiveStyle.padding = new RectOffset(horizontalPadding, horizontalPadding, verticalPadding, verticalPadding);
 
-           
+
             alertTitleStyle = new GUIStyle(GUI.skin.label);
             alertTitleStyle.fontSize = Mathf.RoundToInt(scaledFontSize + 2);
             alertTitleStyle.fontStyle = FontStyle.Normal;
             alertTitleStyle.normal.textColor = defaultFg;
             alertTitleStyle.margin = new RectOffset(0, 0, 0, Mathf.RoundToInt(4 * guiHelper.uiScale));
 
-           
+
             alertDescriptionStyle = new GUIStyle(GUI.skin.label);
             alertDescriptionStyle.fontSize = Mathf.RoundToInt(scaledFontSize);
             alertDescriptionStyle.normal.textColor = new Color(0.7f, 0.7f, 0.8f);
             alertDescriptionStyle.wordWrap = true;
         }
 
-        public Texture2D CreateBorderedTexture(Color backgroundColor, Color borderColor, int textureSize, float borderWidth = 1f)
-        {
-            Texture2D texture = new Texture2D(textureSize, textureSize);
-            for (int x = 0; x < texture.width; x++)
-            {
-                for (int y = 0; y < texture.height; y++)
-                {
-                    bool isBorder = x < borderWidth || x >= texture.width - borderWidth ||
-                                    y < borderWidth || y >= texture.height - borderWidth;
+        
 
-                    if (isBorder)
-                    {
-                        texture.SetPixel(x, y, borderColor);
-                    }
-                    else
-                    {
-                        texture.SetPixel(x, y, backgroundColor);
-                    }
-                }
-            }
-            texture.Apply();
-            return texture;
-        }
-
+        /// <summary>
+        /// Sets up the avatar styles.
+        /// </summary>
         private void SetupAvatarStyles()
         {
             float scaledFontSize = guiHelper.fontSize * guiHelper.uiScale;
             int defaultAvatarSize = Mathf.RoundToInt(40 * guiHelper.uiScale);
 
-           
+
             avatarStyle = new GUIStyle(GUI.skin.box);
             avatarStyle.normal.background = avatarTexture;
             avatarStyle.alignment = TextAnchor.MiddleCenter;
@@ -1494,7 +1407,7 @@ namespace shadcnui.GUIComponents
             avatarStyle.fixedHeight = defaultAvatarSize;
             avatarStyle.border = GetAvatarBorder(AvatarShape.Circle, AvatarSize.Default);
 
-           
+
             avatarFallbackStyle = new GUIStyle(GUI.skin.box);
             Color mutedBg = new Color(0.16f, 0.16f, 0.18f);
             avatarFallbackStyle.normal.background = CreateSolidTexture(mutedBg);
@@ -1505,7 +1418,7 @@ namespace shadcnui.GUIComponents
             avatarFallbackStyle.border = GetAvatarBorder(AvatarShape.Circle, AvatarSize.Default);
             avatarFallbackStyle.fontSize = GetAvatarFontSize(AvatarSize.Default);
 
-           
+
             avatarSmallStyle = new GUIStyle(avatarFallbackStyle);
             int smallAvatarSize = Mathf.RoundToInt(32 * guiHelper.uiScale);
             avatarSmallStyle.fixedWidth = smallAvatarSize;
@@ -1536,7 +1449,7 @@ namespace shadcnui.GUIComponents
         {
             float scale = guiHelper.uiScale;
             int borderRadius = 0;
-            
+
             switch (shape)
             {
                 case AvatarShape.Circle:
@@ -1549,7 +1462,7 @@ namespace shadcnui.GUIComponents
                     borderRadius = 0;
                     break;
             }
-            
+
             return new RectOffset(borderRadius, borderRadius, borderRadius, borderRadius);
         }
 
@@ -1566,6 +1479,9 @@ namespace shadcnui.GUIComponents
             }
         }
 
+        /// <summary>
+        /// Sets up the skeleton styles.
+        /// </summary>
         private void SetupSkeletonStyles()
         {
             skeletonStyle = new GUIStyle(GUI.skin.box);
@@ -1586,6 +1502,9 @@ namespace shadcnui.GUIComponents
             skeletonLargeStyle.border = new RectOffset(6, 6, 6, 6);
         }
 
+        /// <summary>
+        /// Sets up the table styles.
+        /// </summary>
         private void SetupTableStyles()
         {
             float scaledFontSize = guiHelper.fontSize * guiHelper.uiScale;
@@ -1620,8 +1539,324 @@ namespace shadcnui.GUIComponents
             tableHoverStyle = new GUIStyle(tableStyle);
             tableHoverStyle.hover.background = CreateSolidTexture(new Color(0.1f, 0.1f, 0.15f));
         }
+        #endregion
 
-       
+        #region Style Getters
+        /// <summary>
+        /// Gets the button style for the given variant and size.
+        /// </summary>
+        public GUIStyle GetButtonStyle(ButtonVariant variant, ButtonSize size)
+        {
+            GUIStyle baseStyle;
+            switch (variant)
+            {
+                case ButtonVariant.Default:
+                    baseStyle = buttonDefaultStyle;
+                    break;
+                case ButtonVariant.Destructive:
+                    baseStyle = buttonDestructiveStyle;
+                    break;
+                case ButtonVariant.Outline:
+                    baseStyle = buttonOutlineStyle;
+                    break;
+                case ButtonVariant.Secondary:
+                    baseStyle = buttonSecondaryStyle;
+                    break;
+                case ButtonVariant.Ghost:
+                    baseStyle = buttonGhostStyle;
+                    break;
+                case ButtonVariant.Link:
+                    baseStyle = buttonLinkStyle;
+                    break;
+                default:
+                    baseStyle = buttonDefaultStyle;
+                    break;
+            }
+
+            if (baseStyle == null) return GUI.skin.button;
+
+
+            switch (size)
+            {
+                case ButtonSize.Small:
+                    return ApplyVariantToSizeStyle(buttonSmallStyle, variant);
+                case ButtonSize.Large:
+                    return ApplyVariantToSizeStyle(buttonLargeStyle, variant);
+                case ButtonSize.Icon:
+                    return ApplyVariantToSizeStyle(buttonIconStyle, variant);
+                default:
+                    return baseStyle;
+            }
+        }
+
+        private GUIStyle ApplyVariantToSizeStyle(GUIStyle sizeStyle, ButtonVariant variant)
+        {
+            if (sizeStyle == null) return GUI.skin.button;
+
+            GUIStyle style = new GUIStyle(sizeStyle);
+
+
+            switch (variant)
+            {
+                case ButtonVariant.Default:
+                    Color primaryBg = guiHelper.customColorsEnabled ? guiHelper.primaryColor : new Color(0.09f, 0.09f, 0.11f);
+                    Color primaryFg = new Color(0.98f, 0.98f, 0.98f);
+                    style.normal.background = CreateSolidTexture(primaryBg);
+                    style.hover.background = CreateSolidTexture(Color.Lerp(primaryBg, Color.black, 0.1f));
+                    style.normal.textColor = primaryFg;
+                    style.hover.textColor = primaryFg;
+                    style.active.background = CreateSolidTexture(Color.Lerp(primaryBg, Color.black, 0.2f));
+                    style.active.textColor = primaryFg;
+                    break;
+                case ButtonVariant.Destructive:
+                    Color destructiveBg = new Color(0.86f, 0.24f, 0.24f);
+                    Color destructiveFg = new Color(0.98f, 0.98f, 0.98f);
+                    style.normal.background = CreateSolidTexture(destructiveBg);
+                    style.hover.background = CreateSolidTexture(Color.Lerp(destructiveBg, Color.black, 0.1f));
+                    style.normal.textColor = destructiveFg;
+                    style.hover.textColor = destructiveFg;
+                    style.active.background = CreateSolidTexture(Color.Lerp(destructiveBg, Color.black, 0.2f));
+                    style.active.textColor = destructiveFg;
+                    break;
+                case ButtonVariant.Outline:
+                    Color outlineBorder = new Color(0.23f, 0.23f, 0.27f);
+                    Color outlineBg = new Color(0.02f, 0.02f, 0.04f);
+                    Color outlineFg = new Color(0.98f, 0.98f, 0.98f);
+                    Color outlineHoverBg = new Color(0.16f, 0.16f, 0.18f);
+                    Color outlineHoverFg = new Color(0.98f, 0.98f, 0.98f);
+
+                    style.normal.background = CreateOutlineButtonTexture(outlineBg, outlineBorder);
+                    style.hover.background = CreateSolidTexture(outlineHoverBg);
+                    style.normal.textColor = outlineFg;
+                    style.hover.textColor = outlineHoverFg;
+                    style.active.background = CreateSolidTexture(Color.Lerp(outlineHoverBg, Color.black, 0.2f));
+                    style.active.textColor = outlineHoverFg;
+                    break;
+                case ButtonVariant.Secondary:
+                    Color secondaryBg = new Color(0.16f, 0.16f, 0.18f);
+                    Color secondaryFg = new Color(0.98f, 0.98f, 0.98f);
+                    style.normal.background = CreateSolidTexture(secondaryBg);
+                    style.hover.background = CreateSolidTexture(Color.Lerp(secondaryBg, Color.white, 0.2f));
+                    style.normal.textColor = secondaryFg;
+                    style.hover.textColor = secondaryFg;
+                    style.active.background = CreateSolidTexture(Color.Lerp(secondaryBg, Color.black, 0.2f));
+                    style.active.textColor = secondaryFg;
+                    break;
+                case ButtonVariant.Ghost:
+                    Color ghostFg = new Color(0.98f, 0.98f, 0.98f);
+                    Color ghostHoverBg = new Color(0.16f, 0.16f, 0.18f);
+                    Color ghostHoverFg = new Color(0.98f, 0.98f, 0.98f);
+
+                    style.normal.background = transparentTexture;
+                    style.hover.background = CreateSolidTexture(ghostHoverBg);
+                    style.normal.textColor = ghostFg;
+                    style.hover.textColor = ghostHoverFg;
+                    style.active.background = CreateSolidTexture(Color.Lerp(ghostHoverBg, Color.black, 0.2f));
+                    style.active.textColor = ghostHoverFg;
+                    break;
+                case ButtonVariant.Link:
+                    Color linkColor = guiHelper.customColorsEnabled ? guiHelper.primaryColor : new Color(0.09f, 0.09f, 0.11f);
+                    Color linkHoverColor = Color.Lerp(linkColor, Color.white, 0.2f);
+
+                    style.normal.background = transparentTexture;
+                    style.hover.background = transparentTexture;
+                    style.normal.textColor = linkColor;
+                    style.hover.textColor = linkHoverColor;
+                    style.active.background = transparentTexture;
+                    style.active.textColor = Color.Lerp(linkHoverColor, Color.black, 0.2f);
+                    style.fontStyle = FontStyle.Normal;
+                    break;
+            }
+
+            return style;
+        }
+
+        /// <summary>
+        /// Gets the toggle style for the given variant and size.
+        /// </summary>
+        public GUIStyle GetToggleStyle(ToggleVariant variant, ToggleSize size)
+        {
+            GUIStyle baseStyle;
+            switch (variant)
+            {
+                case ToggleVariant.Outline:
+                    baseStyle = toggleOutlineStyle;
+                    break;
+                default:
+                    baseStyle = toggleDefaultStyle;
+                    break;
+            }
+
+            if (baseStyle == null) return GUI.skin.button;
+
+            GUIStyle sizedStyle = new GUIStyle(baseStyle);
+            switch (size)
+            {
+                case ToggleSize.Small:
+                    sizedStyle.fontSize = guiHelper.fontSize - 2;
+                    sizedStyle.padding = new RectOffset(6, 6, 4, 4);
+                    break;
+                case ToggleSize.Large:
+                    sizedStyle.fontSize = guiHelper.fontSize + 2;
+                    sizedStyle.padding = new RectOffset(10, 10, 8, 8);
+                    break;
+            }
+
+            return sizedStyle;
+        }
+
+        /// <summary>
+        /// Gets the input style for the given variant, focus, and disabled state.
+        /// </summary>
+        public GUIStyle GetInputStyle(InputVariant variant, bool focused = false, bool disabled = false)
+        {
+            if (disabled) return inputDisabledStyle ?? GUI.skin.textField;
+            if (focused) return inputFocusedStyle ?? GUI.skin.textField;
+
+            GUIStyle style;
+            switch (variant)
+            {
+                case InputVariant.Outline:
+                    style = inputOutlineStyle ?? GUI.skin.textField;
+                    break;
+                case InputVariant.Ghost:
+                    style = inputGhostStyle ?? GUI.skin.textField;
+                    break;
+                default:
+                    style = inputDefaultStyle ?? GUI.skin.textField;
+                    break;
+            }
+
+            return style;
+        }
+
+        /// <summary>
+        /// Gets the label style for the given variant.
+        /// </summary>
+        public GUIStyle GetLabelStyle(LabelVariant variant)
+        {
+            GUIStyle style;
+            switch (variant)
+            {
+                case LabelVariant.Secondary:
+                    style = labelSecondaryStyle ?? GUI.skin.label;
+                    break;
+                case LabelVariant.Muted:
+                    style = labelMutedStyle ?? GUI.skin.label;
+                    break;
+                case LabelVariant.Destructive:
+                    style = labelDestructiveStyle ?? GUI.skin.label;
+                    break;
+                default:
+                    style = labelDefaultStyle ?? GUI.skin.label;
+                    break;
+            }
+
+            return style;
+        }
+
+        /// <summary>
+        /// Gets the password field style.
+        /// </summary>
+        public GUIStyle GetPasswordFieldStyle()
+        {
+            return passwordFieldStyle ?? GUI.skin.textField;
+        }
+
+        /// <summary>
+        /// Gets the text area style for the given variant and focus state.
+        /// </summary>
+        public GUIStyle GetTextAreaStyle(TextAreaVariant variant = TextAreaVariant.Default, bool focused = false)
+        {
+            GUIStyle baseStyle;
+            switch (variant)
+            {
+                case TextAreaVariant.Outline:
+                    baseStyle = textAreaOutlineStyle ?? textAreaStyle ?? GUI.skin.textArea;
+                    break;
+                case TextAreaVariant.Ghost:
+                    baseStyle = textAreaGhostStyle ?? textAreaStyle ?? GUI.skin.textArea;
+                    break;
+                default:
+                    baseStyle = textAreaStyle ?? GUI.skin.textArea;
+                    break;
+            }
+
+            return focused ? (textAreaFocusedStyle ?? baseStyle) : baseStyle;
+        }
+
+        /// <summary>
+        /// Gets the progress bar style.
+        /// </summary>
+        public GUIStyle GetProgressBarStyle() => progressBarStyle ?? GUI.skin.box;
+        /// <summary>
+        /// Gets the progress bar background style.
+        /// </summary>
+        public GUIStyle GetProgressBarBackgroundStyle() => progressBarBackgroundStyle ?? GUI.skin.box;
+        /// <summary>
+        /// Gets the progress bar fill style.
+        /// </summary>
+        public GUIStyle GetProgressBarFillStyle() => progressBarFillStyle ?? GUI.skin.box;
+
+        /// <summary>
+        /// Gets the separator style for the given orientation.
+        /// </summary>
+        public GUIStyle GetSeparatorStyle(SeparatorOrientation orientation)
+        {
+            return orientation == SeparatorOrientation.Horizontal ?
+                (separatorHorizontalStyle ?? GUI.skin.box) :
+                (separatorVerticalStyle ?? GUI.skin.box);
+        }
+
+        /// <summary>
+        /// Gets the tabs list style.
+        /// </summary>
+        public GUIStyle GetTabsListStyle() => tabsListStyle ?? GUI.skin.box;
+        /// <summary>
+        /// Gets the tabs trigger style for the given active state.
+        /// </summary>
+        public GUIStyle GetTabsTriggerStyle(bool active = false)
+        {
+            return active ? (tabsTriggerActiveStyle ?? tabsTriggerStyle ?? GUI.skin.button) :
+                           (tabsTriggerStyle ?? GUI.skin.button);
+        }
+        /// <summary>
+        /// Gets the tabs content style.
+        /// </summary>
+        public GUIStyle GetTabsContentStyle() => tabsContentStyle ?? GUIStyle.none;
+
+        /// <summary>
+        /// Gets the glow texture.
+        /// </summary>
+        public Texture2D GetGlowTexture() => glowTexture;
+        /// <summary>
+        /// Gets the particle texture.
+        /// </summary>
+        public Texture2D GetParticleTexture() => particleTexture;
+        /// <summary>
+        /// Gets the input background texture.
+        /// </summary>
+        public Texture2D GetInputBackgroundTexture() => inputBackgroundTexture;
+        /// <summary>
+        /// Gets the input focused texture.
+        /// </summary>
+        public Texture2D GetInputFocusedTexture() => inputFocusedTexture;
+        /// <summary>
+        /// Gets the transparent texture.
+        /// </summary>
+        public Texture2D GetTransparentTexture() => transparentTexture;
+        /// <summary>
+        /// Gets the progress bar background texture.
+        /// </summary>
+        public Texture2D GetProgressBarBackgroundTexture() => progressBarBackgroundTexture;
+        /// <summary>
+        /// Gets the progress bar fill texture.
+        /// </summary>
+        public Texture2D GetProgressBarFillTexture() => progressBarFillTexture;
+
+        /// <summary>
+        /// Gets the checkbox style for the given variant and size.
+        /// </summary>
         public GUIStyle GetCheckboxStyle(CheckboxVariant variant, CheckboxSize size)
         {
             GUIStyle baseStyle;
@@ -1651,6 +1886,9 @@ namespace shadcnui.GUIComponents
             }
         }
 
+        /// <summary>
+        /// Gets the switch style for the given variant and size.
+        /// </summary>
         public GUIStyle GetSwitchStyle(SwitchVariant variant, SwitchSize size)
         {
             GUIStyle baseStyle;
@@ -1680,6 +1918,9 @@ namespace shadcnui.GUIComponents
             }
         }
 
+        /// <summary>
+        /// Gets the badge style for the given variant and size.
+        /// </summary>
         public GUIStyle GetBadgeStyle(BadgeVariant variant, BadgeSize size)
         {
             GUIStyle baseStyle;
@@ -1712,22 +1953,34 @@ namespace shadcnui.GUIComponents
             }
         }
 
+        /// <summary>
+        /// Gets the alert style for the given variant and type.
+        /// </summary>
         public GUIStyle GetAlertStyle(AlertVariant variant, AlertType type)
         {
             GUIStyle baseStyle = variant == AlertVariant.Destructive ? alertDestructiveStyle : alertDefaultStyle;
             return baseStyle ?? GUI.skin.box;
         }
 
+        /// <summary>
+        /// Gets the alert title style for the given type.
+        /// </summary>
         public GUIStyle GetAlertTitleStyle(AlertType type)
         {
             return alertTitleStyle ?? GUI.skin.label;
         }
 
+        /// <summary>
+        /// Gets the alert description style for the given type.
+        /// </summary>
         public GUIStyle GetAlertDescriptionStyle(AlertType type)
         {
             return alertDescriptionStyle ?? GUI.skin.label;
         }
 
+        /// <summary>
+        /// Gets the avatar style for the given size and shape.
+        /// </summary>
         public GUIStyle GetAvatarStyle(AvatarSize size, AvatarShape shape)
         {
             GUIStyle baseStyle = avatarStyle;
@@ -1744,7 +1997,7 @@ namespace shadcnui.GUIComponents
                     break;
             }
 
-           
+
             switch (shape)
             {
                 case AvatarShape.Circle:
@@ -1761,6 +2014,9 @@ namespace shadcnui.GUIComponents
             return sizedStyle;
         }
 
+        /// <summary>
+        /// Gets the avatar fallback style for the given size and shape.
+        /// </summary>
         public GUIStyle GetAvatarFallbackStyle(AvatarSize size, AvatarShape shape)
         {
             GUIStyle baseStyle = avatarFallbackStyle;
@@ -1777,7 +2033,7 @@ namespace shadcnui.GUIComponents
                     break;
             }
 
-           
+
             switch (shape)
             {
                 case AvatarShape.Circle:
@@ -1794,6 +2050,9 @@ namespace shadcnui.GUIComponents
             return sizedStyle;
         }
 
+        /// <summary>
+        /// Gets the skeleton style for the given variant and size.
+        /// </summary>
         public GUIStyle GetSkeletonStyle(SkeletonVariant variant, SkeletonSize size)
         {
             GUIStyle baseStyle;
@@ -1823,6 +2082,9 @@ namespace shadcnui.GUIComponents
             }
         }
 
+        /// <summary>
+        /// Gets the table style for the given variant and size.
+        /// </summary>
         public GUIStyle GetTableStyle(TableVariant variant, TableSize size)
         {
             GUIStyle baseStyle;
@@ -1845,18 +2107,27 @@ namespace shadcnui.GUIComponents
             return baseStyle ?? GUI.skin.box;
         }
 
+        /// <summary>
+        /// Gets the table header style for the given variant and size.
+        /// </summary>
         public GUIStyle GetTableHeaderStyle(TableVariant variant, TableSize size)
         {
             return tableHeaderStyle ?? GUI.skin.label;
         }
 
+        /// <summary>
+        /// Gets the table cell style for the given variant and size.
+        /// </summary>
         public GUIStyle GetTableCellStyle(TableVariant variant, TableSize size)
         {
             return tableCellStyle ?? GUI.skin.label;
         }
+        #endregion
 
-    
-
+        #region Cleanup
+        /// <summary>
+        /// Cleans up the textures created by the style manager.
+        /// </summary>
         public void Cleanup()
         {
             if (gradientTexture) Object.Destroy(gradientTexture);
@@ -1872,8 +2143,8 @@ namespace shadcnui.GUIComponents
             if (separatorTexture) Object.Destroy(separatorTexture);
             if (tabsBackgroundTexture) Object.Destroy(tabsBackgroundTexture);
             if (tabsActiveTexture) Object.Destroy(tabsActiveTexture);
-            
-           
+
+
             if (checkboxTexture) Object.Destroy(checkboxTexture);
             if (checkboxCheckedTexture) Object.Destroy(checkboxCheckedTexture);
             if (switchTexture) Object.Destroy(switchTexture);
@@ -1887,5 +2158,6 @@ namespace shadcnui.GUIComponents
             if (tableHeaderTexture) Object.Destroy(tableHeaderTexture);
             if (tableCellTexture) Object.Destroy(tableCellTexture);
         }
+        #endregion
     }
 }

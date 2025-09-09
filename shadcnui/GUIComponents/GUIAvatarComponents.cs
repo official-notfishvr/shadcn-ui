@@ -196,7 +196,7 @@ namespace shadcnui.GUIComponents
             }
         }
 
-        public void AvatarWithBorder(Texture2D image, string fallbackText, Color borderColor, float borderWidth = 2f,
+        public void AvatarWithBorder(Texture2D image, string fallbackText, Color borderColor,
             AvatarSize size = AvatarSize.Default, AvatarShape shape = AvatarShape.Circle, params GUILayoutOption[] options)
         {
             var styleManager = guiHelper.GetStyleManager();
@@ -207,12 +207,9 @@ namespace shadcnui.GUIComponents
             }
 
             GUIStyle borderedStyle = new GUIStyle(GUI.skin.box);
-            borderedStyle.normal.background = styleManager.CreateBorderedTexture(Color.clear, borderColor, Mathf.RoundToInt(guiHelper.cornerRadius * 2 + borderWidth * 2 + 2), borderWidth);
+            borderedStyle.normal.background = styleManager.CreateSolidTexture(borderColor);
             borderedStyle.alignment = TextAnchor.MiddleCenter;
-            borderedStyle.padding = new RectOffset(
-                Mathf.RoundToInt(borderWidth), Mathf.RoundToInt(borderWidth),
-                Mathf.RoundToInt(borderWidth), Mathf.RoundToInt(borderWidth)
-            );
+            borderedStyle.padding = new RectOffset(2, 2, 2, 2);
 
             GUILayout.BeginVertical(borderedStyle, options);
             {

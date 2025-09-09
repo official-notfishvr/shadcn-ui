@@ -6,7 +6,7 @@ using System.Linq;
 public class UI : MonoBehaviour
 {
     private GUIHelper guiHelper;
-    private Rect windowRect = new Rect(20, 20, 800, 600);
+    private Rect windowRect = new Rect(20, 20, 1450, 600);
     private bool showDemoWindow = false;
 
     private Vector2 scrollPosition;
@@ -73,7 +73,7 @@ public class UI : MonoBehaviour
             guiHelper.BeginTabContent();
             scrollPosition = guiHelper.DrawScrollView(scrollPosition, windowRect.width - 20, windowRect.height - 40, () =>
             {
-                GUILayout.BeginVertical(GUILayout.Width(windowRect.width - 20), GUILayout.MinHeight(500));
+                GUILayout.BeginVertical(GUILayout.Width(windowRect.width - 20), GUILayout.ExpandHeight(true));
                 if (currentDemoTab >= 0 && currentDemoTab < demoTabs.Length)
                 {
                     demoTabs[currentDemoTab].Content?.Invoke();
@@ -206,13 +206,13 @@ public class UI : MonoBehaviour
         textAreaValue = guiHelper.TextArea(textAreaValue, placeholder: "Type your message here.", minHeight: 100);
         guiHelper.Label("Code: textAreaValue = guiHelper.TextArea(value, placeholder, minHeight);");
         guiHelper.HorizontalSeparator();
-
+        /*
         guiHelper.Label("Text Area in Rect");
         textAreaRectValue = guiHelper.TextArea(new Rect(10, 10, 300, 100), textAreaRectValue, placeholder: "Text in Rect");
         guiHelper.Label($"Text Area in Rect Value: {textAreaRectValue}");
         guiHelper.Label("Code: guiHelper.TextArea(Rect, text, placeholder);");
         guiHelper.HorizontalSeparator();
-
+        */
         outlineTextAreaValue = guiHelper.OutlineTextArea(outlineTextAreaValue, placeholder: "Outline Text Area");
         guiHelper.Label($"Outline Text Area Value: {outlineTextAreaValue}");
         guiHelper.Label("Code: guiHelper.OutlineTextArea(text, placeholder);");
@@ -263,7 +263,7 @@ public class UI : MonoBehaviour
         guiHelper.Label("Dismissible", LabelVariant.Default);
         if (!isAlertDismissed)
         {
-                        isAlertDismissed = guiHelper.DismissibleAlert("Warning", "This action cannot be undone.", AlertVariant.Default, AlertType.Warning, () => { isAlertDismissed = true; }, GUILayout.ExpandWidth(true), GUILayout.ExpandHeight(true));
+            //isAlertDismissed = guiHelper.DismissibleAlert("Warning", "This action cannot be undone.", AlertVariant.Default, AlertType.Warning, () => { isAlertDismissed = true; }, GUILayout.ExpandWidth(true), GUILayout.ExpandHeight(true));
         }
         else
         {
@@ -362,12 +362,12 @@ public class UI : MonoBehaviour
         guiHelper.DrawFixedButton("Fixed Button", 150, 40, () => Debug.Log("Fixed Button Clicked!"));
         guiHelper.Label("Code: guiHelper.DrawFixedButton(text, width, height, onClick);", LabelVariant.Muted);
         guiHelper.HorizontalSeparator();
-
+        /*
         guiHelper.Label("Button with Rect (not visible directly)");
         guiHelper.Button(new Rect(10, 10, 100, 30), "Button in Rect");
         guiHelper.Label("Code: guiHelper.Button(new Rect(10, 10, 100, 30), \"Button in Rect\");", LabelVariant.Muted);
         guiHelper.HorizontalSeparator();
-
+        */
         guiHelper.Label("Specific Variant Buttons");
         guiHelper.BeginHorizontalGroup();
         guiHelper.DestructiveButton("Destructive", () => Debug.Log("Destructive Button Clicked!"));
@@ -449,10 +449,11 @@ public class UI : MonoBehaviour
         guiHelper.DestructiveLabel("This is a destructive label.");
         guiHelper.Label("Code: guiHelper.Label(text, variant);");
         guiHelper.HorizontalSeparator();
-
+        /*
         guiHelper.Label(new Rect(10, 10, 200, 30), "Label in Rect");
         guiHelper.Label("Code: guiHelper.Label(Rect, text, variant, disabled);", LabelVariant.Muted);
         guiHelper.HorizontalSeparator();
+        */
         GUILayout.EndVertical();
     }
 
@@ -493,12 +494,12 @@ public class UI : MonoBehaviour
         guiHelper.DrawSlider(300, "Progress", ref progressValue, 0, 1);
         guiHelper.Label("Code: guiHelper.Progress(value, width);");
         guiHelper.HorizontalSeparator();
-
+        /*
         guiHelper.Progress(new Rect(10, 10, 200, 20), progressRectValue);
         guiHelper.Label($"Progress in Rect Value: {progressRectValue:F2}");
         guiHelper.Label("Code: guiHelper.Progress(Rect, value);", LabelVariant.Muted);
         guiHelper.HorizontalSeparator();
-
+        */
         guiHelper.LabeledProgress("Download", 0.75f, 300, showPercentage: true);
         guiHelper.Label("Code: guiHelper.LabeledProgress(label, value, width, showPercentage);", LabelVariant.Muted);
         guiHelper.HorizontalSeparator();
@@ -532,12 +533,12 @@ public class UI : MonoBehaviour
         guiHelper.EndHorizontalGroup();
         guiHelper.Label("Code: guiHelper.VerticalSeparator();", LabelVariant.Muted);
         guiHelper.HorizontalSeparator();
-
+        /*
         guiHelper.Label("Separator in Rect");
         guiHelper.Separator(new Rect(10, 10, 200, 2), SeparatorOrientation.Horizontal);
         guiHelper.Label("Code: guiHelper.Separator(Rect, Horizontal);");
         guiHelper.HorizontalSeparator();
-
+        */
         guiHelper.Label("Separator with Spacing");
         guiHelper.Label("Text above spaced separator.");
         guiHelper.SeparatorWithSpacing(SeparatorOrientation.Horizontal, 10, 10);

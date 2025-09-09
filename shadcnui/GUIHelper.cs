@@ -1848,12 +1848,11 @@ namespace shadcnui
             }
         }
 
-        public void CustomAlert(string title, string description, Color backgroundColor, Color textColor,
-            Color borderColor, params GUILayoutOption[] options)
+        public void CustomAlert(string title, string description, Color backgroundColor, Color textColor, params GUILayoutOption[] options)
         {
             try
             {
-                alertComponents?.CustomAlert(title, description, backgroundColor, textColor, borderColor, options);
+                alertComponents?.CustomAlert(title, description, backgroundColor, textColor, options);
             }
             catch (Exception ex)
             {
@@ -2007,12 +2006,12 @@ namespace shadcnui
             }
         }
 
-        public void AvatarWithBorder(Texture2D image, string fallbackText, Color borderColor, float borderWidth = 2f,
+        public void AvatarWithBorder(Texture2D image, string fallbackText, Color borderColor,
             AvatarSize size = AvatarSize.Default, AvatarShape shape = AvatarShape.Circle, params GUILayoutOption[] options)
         {
             try
             {
-                avatarComponents?.AvatarWithBorder(image, fallbackText, borderColor, borderWidth, size, shape, options);
+                avatarComponents?.AvatarWithBorder(image, fallbackText, borderColor, size, shape, options);
             }
             catch (Exception ex)
             {

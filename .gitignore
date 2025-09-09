@@ -46,6 +46,8 @@ shadcnui testing/References/
 shadcnui testing/References
 shadcnui/References
 shadcnui/References/
+.env
+.env/
 
 # MSTest test Results
 [Tt]est[Rr]esult*/

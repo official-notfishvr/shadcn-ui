@@ -81,12 +81,12 @@ namespace shadcnui.GUIComponents
             CheckboxSize size = CheckboxSize.Default, Action<bool> onToggle = null, bool disabled = false)
         {
             GUILayout.BeginHorizontal();
-            
+
             bool newValue = Checkbox("", value, variant, size, onToggle, disabled, GUILayout.Width(20 * guiHelper.uiScale));
-            
+
             var styleManager = guiHelper.GetStyleManager();
             GUIStyle labelStyle = styleManager?.GetLabelStyle(LabelVariant.Default) ?? GUI.skin.label;
-            
+
             Color originalColor = GUI.color;
             if (disabled)
             {
@@ -106,7 +106,7 @@ namespace shadcnui.GUIComponents
         }
 
         public bool[] CheckboxGroup(string[] labels, bool[] values, CheckboxVariant variant = CheckboxVariant.Default,
-            CheckboxSize size = CheckboxSize.Default, Action<int, bool> onToggleChange = null, 
+            CheckboxSize size = CheckboxSize.Default, Action<int, bool> onToggleChange = null,
             bool disabled = false, bool horizontal = false, float spacing = 5f)
         {
             if (labels == null || values == null || labels.Length != values.Length)
@@ -130,7 +130,7 @@ namespace shadcnui.GUIComponents
             for (int i = 0; i < labels.Length; i++)
             {
                 int index = i;
-                bool newValue = CheckboxWithLabel(labels[i], values[i], variant, size, 
+                bool newValue = CheckboxWithLabel(labels[i], values[i], variant, size,
                     (val) => {
                         newValues[index] = val;
                         onToggleChange?.Invoke(index, val);
@@ -190,18 +190,18 @@ namespace shadcnui.GUIComponents
             CheckboxSize size = CheckboxSize.Default, Action<bool> onToggle = null, bool disabled = false)
         {
             GUILayout.BeginHorizontal();
-            
+
             bool newValue = Checkbox("", value, variant, size, onToggle, disabled, GUILayout.Width(20 * guiHelper.uiScale));
-            
+
             if (icon != null)
             {
                 GUILayout.Label(icon, GUILayout.Width(16 * guiHelper.uiScale), GUILayout.Height(16 * guiHelper.uiScale));
                 GUILayout.Space(4 * guiHelper.uiScale);
             }
-            
+
             var styleManager = guiHelper.GetStyleManager();
             GUIStyle labelStyle = styleManager?.GetLabelStyle(LabelVariant.Default) ?? GUI.skin.label;
-            
+
             Color originalColor = GUI.color;
             if (disabled)
             {
@@ -221,19 +221,19 @@ namespace shadcnui.GUIComponents
         }
 
 
-        public bool CheckboxWithDescription(string label, string description, bool value, 
+        public bool CheckboxWithDescription(string label, string description, bool value,
             CheckboxVariant variant = CheckboxVariant.Default, CheckboxSize size = CheckboxSize.Default,
             Action<bool> onToggle = null, bool disabled = false)
         {
             GUILayout.BeginVertical();
-            
+
             bool newValue = CheckboxWithLabel(label, value, variant, size, onToggle, disabled);
-            
+
             if (!string.IsNullOrEmpty(description))
             {
                 var styleManager = guiHelper.GetStyleManager();
                 GUIStyle descStyle = styleManager?.GetLabelStyle(LabelVariant.Muted) ?? GUI.skin.label;
-                
+
                 Color originalColor = GUI.color;
                 if (disabled)
                 {
@@ -249,7 +249,7 @@ namespace shadcnui.GUIComponents
 
                 GUI.color = originalColor;
             }
-            
+
             GUILayout.EndVertical();
 
             return newValue;
@@ -260,14 +260,14 @@ namespace shadcnui.GUIComponents
             Action<bool> onToggle = null, bool disabled = false)
         {
             GUILayout.BeginVertical();
-            
+
             bool newValue = CheckboxWithLabel(text, value, variant, size, onToggle, disabled);
-            
+
             if (!isValid && !string.IsNullOrEmpty(validationMessage))
             {
                 var styleManager = guiHelper.GetStyleManager();
                 GUIStyle errorStyle = styleManager?.GetLabelStyle(LabelVariant.Destructive) ?? GUI.skin.label;
-                
+
                 GUILayout.Space(2 * guiHelper.uiScale);
 #if IL2CPP
                 GUILayout.Label(validationMessage, errorStyle, (Il2CppReferenceArray<GUILayoutOption>)null);
@@ -275,7 +275,7 @@ namespace shadcnui.GUIComponents
                 GUILayout.Label(validationMessage, errorStyle);
 #endif
             }
-            
+
             GUILayout.EndVertical();
 
             return newValue;
@@ -285,28 +285,28 @@ namespace shadcnui.GUIComponents
             CheckboxSize size = CheckboxSize.Default, Action<bool> onToggle = null, bool disabled = false)
         {
             GUILayout.BeginHorizontal();
-            
+
             bool newValue = CheckboxWithLabel(text, value, variant, size, onToggle, disabled);
-            
+
             if (!string.IsNullOrEmpty(tooltip))
             {
                 GUILayout.Space(4 * guiHelper.uiScale);
-                
+
                 var styleManager = guiHelper.GetStyleManager();
                 GUIStyle tooltipStyle = styleManager?.GetLabelStyle(LabelVariant.Muted) ?? GUI.skin.label;
-                
+
                 Color originalColor = GUI.color;
                 GUI.color = new Color(originalColor.r, originalColor.g, originalColor.b, 0.6f);
-                
+
 #if IL2CPP
                 GUILayout.Label("?", tooltipStyle, (Il2CppReferenceArray<GUILayoutOption>)null);
 #else
                 GUILayout.Label("?", tooltipStyle);
 #endif
-                
+
                 GUI.color = originalColor;
             }
-            
+
             GUILayout.EndHorizontal();
 
             return newValue;

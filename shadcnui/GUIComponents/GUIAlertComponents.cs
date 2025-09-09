@@ -113,8 +113,7 @@ namespace shadcnui.GUIComponents
             GUILayout.EndVertical();
         }
 
-        public void CustomAlert(string title, string description, Color backgroundColor, Color textColor, 
-            Color borderColor, params GUILayoutOption[] options)
+        public void CustomAlert(string title, string description, Color backgroundColor, Color textColor, params GUILayoutOption[] options)
         {
             var styleManager = guiHelper.GetStyleManager();
             if (styleManager == null)
@@ -128,7 +127,7 @@ namespace shadcnui.GUIComponents
             }
 
             GUIStyle customStyle = new GUIStyle(GUI.skin.box);
-            customStyle.normal.background = styleManager.CreateBorderedTexture(backgroundColor, borderColor, guiHelper.cornerRadius);
+            customStyle.normal.background = styleManager.CreateSolidTexture(backgroundColor);
             customStyle.normal.textColor = textColor;
             customStyle.border = new RectOffset(guiHelper.cornerRadius, guiHelper.cornerRadius, guiHelper.cornerRadius, guiHelper.cornerRadius);
             customStyle.padding = new RectOffset(16, 16, 12, 12);
