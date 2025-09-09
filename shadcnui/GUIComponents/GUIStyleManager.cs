@@ -974,17 +974,48 @@ namespace shadcnui.GUIComponents
         {
 
             toggleDefaultStyle = new GUIStyle(GUI.skin.button);
+            toggleDefaultStyle = new GUIStyle(GUI.skin.button);
             toggleDefaultStyle.fontSize = guiHelper.fontSize;
             toggleDefaultStyle.fontStyle = FontStyle.Normal;
             toggleDefaultStyle.alignment = TextAnchor.MiddleCenter;
             toggleDefaultStyle.normal.textColor = guiHelper.customColorsEnabled ?
                 Color.Lerp(Color.white, guiHelper.accentColor, 0.3f) : new Color(0.8f, 0.8f, 0.9f);
-            toggleDefaultStyle.normal.background = transparentTexture;
+            toggleDefaultStyle.normal.background = CreateSolidTexture(guiHelper.customColorsEnabled ? Color.Lerp(guiHelper.primaryColor, Color.black, 0.3f) : new Color(0.16f, 0.16f, 0.18f));
+            toggleDefaultStyle.hover.background = CreateSolidTexture(new Color(0.16f, 0.16f, 0.18f, 0.5f));
+            toggleDefaultStyle.hover.textColor = guiHelper.customColorsEnabled ? guiHelper.accentColor : Color.white;
+            toggleDefaultStyle.active.background = CreateSolidTexture(new Color(0.1f, 0.1f, 0.12f, 0.7f));
+            toggleDefaultStyle.active.textColor = guiHelper.customColorsEnabled ? Color.Lerp(guiHelper.accentColor, Color.white, 0.5f) : Color.white;
+            
+            Color onBgColor = guiHelper.customColorsEnabled ? Color.Lerp(guiHelper.accentColor, Color.white, 0.3f) : new Color(0.3f, 0.6f, 1.0f);
+            Color onHoverBgColor = Color.Lerp(onBgColor, Color.white, 0.1f);
+            Color onActiveBgColor = Color.Lerp(onBgColor, Color.black, 0.1f);
+
+            toggleDefaultStyle.onNormal.background = CreateSolidTexture(onBgColor);
+            toggleDefaultStyle.onNormal.textColor = Color.white;
+            toggleDefaultStyle.onHover.background = CreateSolidTexture(onHoverBgColor);
+            toggleDefaultStyle.onHover.textColor = Color.white;
+            toggleDefaultStyle.onActive.background = CreateSolidTexture(onActiveBgColor);
+            toggleDefaultStyle.onActive.textColor = Color.white;
 
 
             toggleOutlineStyle = new GUIStyle(toggleDefaultStyle);
-            toggleOutlineStyle.normal.background = CreateOutlineTexture();
+            toggleOutlineStyle.normal.background = CreateOutlineButtonTexture(guiHelper.customColorsEnabled ? new Color(guiHelper.primaryColor.r, guiHelper.primaryColor.g, guiHelper.primaryColor.b, 0.1f) : new Color(0.05f, 0.05f, 0.06f, 0.5f), guiHelper.customColorsEnabled ? guiHelper.accentColor : new Color(0.5f, 0.5f, 0.7f));
             toggleOutlineStyle.border = new RectOffset(2, 2, 2, 2);
+            toggleOutlineStyle.hover.background = CreateSolidTexture(new Color(0.16f, 0.16f, 0.18f, 0.5f));
+            toggleOutlineStyle.hover.textColor = guiHelper.customColorsEnabled ? guiHelper.accentColor : Color.white;
+            toggleOutlineStyle.active.background = CreateSolidTexture(new Color(0.1f, 0.1f, 0.12f, 0.7f));
+            toggleOutlineStyle.active.textColor = guiHelper.customColorsEnabled ? Color.Lerp(guiHelper.accentColor, Color.white, 0.5f) : Color.white;
+
+            Color onOutlineBgColor = guiHelper.customColorsEnabled ? Color.Lerp(guiHelper.accentColor, Color.white, 0.3f) : new Color(0.3f, 0.6f, 1.0f);
+            Color onOutlineHoverBgColor = Color.Lerp(onOutlineBgColor, Color.white, 0.1f);
+            Color onOutlineActiveBgColor = Color.Lerp(onOutlineBgColor, Color.black, 0.1f);
+
+            toggleOutlineStyle.onNormal.background = CreateOutlineButtonTexture(onOutlineBgColor, onOutlineBgColor);
+            toggleOutlineStyle.onNormal.textColor = Color.white;
+            toggleOutlineStyle.onHover.background = CreateSolidTexture(onOutlineHoverBgColor);
+            toggleOutlineStyle.onHover.textColor = Color.white;
+            toggleOutlineStyle.onActive.background = CreateSolidTexture(onOutlineActiveBgColor);
+            toggleOutlineStyle.onActive.textColor = Color.white;
 
 
             toggleSmallStyle = new GUIStyle(toggleDefaultStyle);
@@ -1255,20 +1286,27 @@ namespace shadcnui.GUIComponents
             checkboxDefaultStyle.fontSize = Mathf.RoundToInt(scaledFontSize);
             checkboxDefaultStyle.normal.background = checkboxTexture;
             checkboxDefaultStyle.onNormal.background = checkboxCheckedTexture;
-            checkboxDefaultStyle.active.background = checkboxTexture;
-            checkboxDefaultStyle.hover.background = checkboxTexture;
-            checkboxDefaultStyle.onHover.background = checkboxCheckedTexture;
-            checkboxDefaultStyle.onActive.background = checkboxCheckedTexture;
+            checkboxDefaultStyle.hover.background = CreateSolidTexture(Color.Lerp(checkboxTexture.GetPixel(0,0), Color.white, 0.1f));
+            checkboxDefaultStyle.active.background = CreateSolidTexture(Color.Lerp(checkboxTexture.GetPixel(0,0), Color.black, 0.1f));
+            checkboxDefaultStyle.onHover.background = CreateSolidTexture(Color.Lerp(checkboxCheckedTexture.GetPixel(0,0), Color.white, 0.1f));
+            checkboxDefaultStyle.onActive.background = CreateSolidTexture(Color.Lerp(checkboxCheckedTexture.GetPixel(0,0), Color.black, 0.1f));
             checkboxDefaultStyle.border = new RectOffset(borderRadius, borderRadius, borderRadius, borderRadius);
 
             checkboxOutlineStyle = new GUIStyle(checkboxDefaultStyle);
             checkboxOutlineStyle.normal.background = CreateOutlineTexture();
-            checkboxOutlineStyle.active.background = CreateOutlineTexture();
-            checkboxOutlineStyle.onActive.background = CreateOutlineTexture();
+            checkboxOutlineStyle.hover.background = CreateSolidTexture(Color.Lerp(CreateOutlineTexture().GetPixel(0,0), Color.white, 0.1f));
+            checkboxOutlineStyle.active.background = CreateSolidTexture(Color.Lerp(CreateOutlineTexture().GetPixel(0,0), Color.black, 0.1f));
+            checkboxOutlineStyle.onNormal.background = CreateOutlineButtonTexture(guiHelper.customColorsEnabled ? guiHelper.accentColor : new Color(0.2f, 0.4f, 0.8f), guiHelper.customColorsEnabled ? guiHelper.accentColor : new Color(0.2f, 0.4f, 0.8f));
+            checkboxOutlineStyle.onHover.background = CreateSolidTexture(Color.Lerp(checkboxCheckedTexture.GetPixel(0,0), Color.white, 0.1f));
+            checkboxOutlineStyle.onActive.background = CreateSolidTexture(Color.Lerp(checkboxCheckedTexture.GetPixel(0,0), Color.black, 0.1f));
 
             checkboxGhostStyle = new GUIStyle(checkboxDefaultStyle);
             checkboxGhostStyle.normal.background = transparentTexture;
-            checkboxGhostStyle.active.background = transparentTexture;
+            checkboxGhostStyle.hover.background = CreateSolidTexture(new Color(0.16f, 0.16f, 0.18f, 0.5f));
+            checkboxGhostStyle.active.background = CreateSolidTexture(new Color(0.1f, 0.1f, 0.12f, 0.7f));
+            checkboxGhostStyle.onNormal.background = CreateSolidTexture(guiHelper.customColorsEnabled ? guiHelper.accentColor : new Color(0.2f, 0.4f, 0.8f));
+            checkboxGhostStyle.onHover.background = CreateSolidTexture(Color.Lerp(guiHelper.customColorsEnabled ? guiHelper.accentColor : new Color(0.2f, 0.4f, 0.8f), Color.white, 0.1f));
+            checkboxGhostStyle.onActive.background = CreateSolidTexture(Color.Lerp(guiHelper.customColorsEnabled ? guiHelper.accentColor : new Color(0.2f, 0.4f, 0.8f), Color.black, 0.1f));
 
             checkboxSmallStyle = new GUIStyle(checkboxDefaultStyle);
             checkboxSmallStyle.fontSize = Mathf.RoundToInt((scaledFontSize - 2));
@@ -1289,21 +1327,27 @@ namespace shadcnui.GUIComponents
             switchDefaultStyle.fontSize = Mathf.RoundToInt(scaledFontSize);
             switchDefaultStyle.normal.background = switchOffTexture;
             switchDefaultStyle.onNormal.background = switchOnTexture;
+            switchDefaultStyle.hover.background = CreateSolidTexture(Color.Lerp(switchOffTexture.GetPixel(0,0), Color.white, 0.1f));
             switchDefaultStyle.active.background = CreateSolidTexture(Color.Lerp(switchOffTexture.GetPixel(0,0), Color.black, 0.1f));
+            switchDefaultStyle.onHover.background = CreateSolidTexture(Color.Lerp(switchOnTexture.GetPixel(0,0), Color.white, 0.1f));
             switchDefaultStyle.onActive.background = CreateSolidTexture(Color.Lerp(switchOnTexture.GetPixel(0,0), Color.black, 0.1f));
             switchDefaultStyle.border = new RectOffset(borderRadius, borderRadius, borderRadius, borderRadius);
 
             switchOutlineStyle = new GUIStyle(switchDefaultStyle);
             switchOutlineStyle.normal.background = CreateOutlineTexture();
+            switchOutlineStyle.hover.background = CreateSolidTexture(Color.Lerp(CreateOutlineTexture().GetPixel(0,0), Color.white, 0.1f));
             switchOutlineStyle.active.background = CreateSolidTexture(Color.Lerp(CreateOutlineTexture().GetPixel(0,0), Color.black, 0.1f));
-            switchOutlineStyle.onNormal.background = CreateOutlineTexture();
+            switchOutlineStyle.onNormal.background = CreateOutlineButtonTexture(guiHelper.customColorsEnabled ? guiHelper.accentColor : new Color(0.2f, 0.4f, 0.8f), guiHelper.customColorsEnabled ? guiHelper.accentColor : new Color(0.2f, 0.4f, 0.8f));
+            switchOutlineStyle.onHover.background = CreateSolidTexture(Color.Lerp(CreateOutlineTexture().GetPixel(0,0), Color.white, 0.1f));
             switchOutlineStyle.onActive.background = CreateSolidTexture(Color.Lerp(CreateOutlineTexture().GetPixel(0,0), Color.black, 0.1f));
 
             switchGhostStyle = new GUIStyle(switchDefaultStyle);
             switchGhostStyle.normal.background = transparentTexture;
+            switchGhostStyle.hover.background = CreateSolidTexture(Color.Lerp(transparentTexture.GetPixel(0,0), Color.white, 0.1f));
             switchGhostStyle.active.background = CreateSolidTexture(Color.Lerp(transparentTexture.GetPixel(0,0), Color.black, 0.1f));
-            switchGhostStyle.onNormal.background = transparentTexture;
-            switchGhostStyle.onActive.background = CreateSolidTexture(Color.Lerp(transparentTexture.GetPixel(0,0), Color.black, 0.1f));
+            switchGhostStyle.onNormal.background = CreateSolidTexture(guiHelper.customColorsEnabled ? guiHelper.accentColor : new Color(0.2f, 0.4f, 0.8f));
+            switchGhostStyle.onHover.background = CreateSolidTexture(Color.Lerp(guiHelper.customColorsEnabled ? guiHelper.accentColor : new Color(0.2f, 0.4f, 0.8f), Color.white, 0.1f));
+            switchGhostStyle.onActive.background = CreateSolidTexture(Color.Lerp(guiHelper.customColorsEnabled ? guiHelper.accentColor : new Color(0.2f, 0.4f, 0.8f), Color.black, 0.1f));
 
             switchSmallStyle = new GUIStyle(switchDefaultStyle);
             switchSmallStyle.fontSize = Mathf.RoundToInt((scaledFontSize - 2));

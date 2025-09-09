@@ -15,26 +15,6 @@ namespace shadcnui.GUIComponents
             guiHelper = helper;
         }
 
-        public Color GetCurrentColor(string r, string g, string b)
-        {
-            try
-            {
-                byte rVal = string.IsNullOrEmpty(r) ? (byte)0 : byte.Parse(r);
-                byte gVal = string.IsNullOrEmpty(g) ? (byte)0 : byte.Parse(g);
-                byte bVal = string.IsNullOrEmpty(b) ? (byte)0 : byte.Parse(b);
-                return new Color32(rVal, gVal, bVal, 255);
-            }
-            catch
-            {
-                return Color.white;
-            }
-        }
-
-        public string GetColorHex(string r, string g, string b)
-        {
-            Color color = GetCurrentColor(r, g, b);
-            return "#" + ColorUtility.ToHtmlStringRGB(color);
-        }
 
         public void SetRGBValues(int red, int green, int blue, ref string r, ref string g, ref string b,
             ref float rSlider, ref float gSlider, ref float bSlider)
@@ -46,19 +26,6 @@ namespace shadcnui.GUIComponents
             rSlider = red;
             gSlider = green;
             bSlider = blue;
-        }
-
-        public void SetRandomColor(ref string r, ref string g, ref string b,
-            ref float rSlider, ref float gSlider, ref float bSlider)
-        {
-            System.Random random = new System.Random();
-            SetRGBValues(random.Next(0, 256), random.Next(0, 256), random.Next(0, 256),
-                ref r, ref g, ref b, ref rSlider, ref gSlider, ref bSlider);
-        }
-
-        public void SetInputText(string text, ref string inputText)
-        {
-            inputText = text;
         }
 
         public void ApplyTheme(string themeName, GUIHelper helper)

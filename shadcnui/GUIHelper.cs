@@ -895,32 +895,6 @@ namespace shadcnui
         #endregion
 
         #region Utility Components
-        public Color GetCurrentColor()
-        {
-            try
-            {
-                return utilityComponents?.GetCurrentColor(r, g, b) ?? Color.white;
-            }
-            catch (Exception ex)
-            {
-                Debug.LogError("Error getting current color: " + ex.Message);
-                return Color.white;
-            }
-        }
-
-        public string GetColorHex()
-        {
-            try
-            {
-                return utilityComponents?.GetColorHex(r, g, b) ?? "#FFFFFF";
-            }
-            catch (Exception ex)
-            {
-                Debug.LogError("Error getting color hex: " + ex.Message);
-                return "#FFFFFF";
-            }
-        }
-
         public void SetRGBValues(int red, int green, int blue)
         {
             try
@@ -933,31 +907,6 @@ namespace shadcnui
                 r = Mathf.Clamp(red, 0, 255).ToString();
                 g = Mathf.Clamp(green, 0, 255).ToString();
                 b = Mathf.Clamp(blue, 0, 255).ToString();
-            }
-        }
-
-        public void SetRandomColor()
-        {
-            try
-            {
-                utilityComponents?.SetRandomColor(ref r, ref g, ref b, ref rSlider, ref gSlider, ref bSlider);
-            }
-            catch (Exception ex)
-            {
-                Debug.LogError("Error setting random color: " + ex.Message);
-            }
-        }
-
-        public void SetInputText(string text)
-        {
-            try
-            {
-                utilityComponents?.SetInputText(text, ref inputText);
-            }
-            catch (Exception ex)
-            {
-                Debug.LogError("Error setting input text: " + ex.Message);
-                inputText = text ?? "default";
             }
         }
 

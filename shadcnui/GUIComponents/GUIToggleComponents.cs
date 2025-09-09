@@ -84,17 +84,7 @@ namespace shadcnui.GUIComponents
             GUIStyle currentStyle = new GUIStyle(toggleStyle);
 
 
-            if (value)
-            {
-
-                Color accentColor = guiHelper.customColorsEnabled ? guiHelper.accentColor : new Color(0.2f, 0.4f, 0.8f);
-                currentStyle.normal.textColor = Color.white;
-
-                if (currentStyle.normal.background == null || currentStyle.normal.background == styleManager.GetInputBackgroundTexture())
-                {
-                    currentStyle.normal.background = CreateAccentBackground(accentColor);
-                }
-            }
+            
 
             bool wasEnabled = GUI.enabled;
             if (disabled) GUI.enabled = false;
@@ -131,16 +121,7 @@ namespace shadcnui.GUIComponents
             GUIStyle currentStyle = new GUIStyle(toggleStyle);
 
 
-            if (value)
-            {
-                Color accentColor = guiHelper.customColorsEnabled ? guiHelper.accentColor : new Color(0.2f, 0.4f, 0.8f);
-                currentStyle.normal.textColor = Color.white;
-
-                if (currentStyle.normal.background == null || currentStyle.normal.background == styleManager.GetInputBackgroundTexture())
-                {
-                    currentStyle.normal.background = CreateAccentBackground(accentColor);
-                }
-            }
+            
 
             bool wasEnabled = GUI.enabled;
             if (disabled) GUI.enabled = false;
@@ -156,21 +137,6 @@ namespace shadcnui.GUIComponents
             }
 
             return value;
-        }
-        public bool OutlineToggle(string text, bool value, Action<bool> onToggle = null,
-            ToggleSize size = ToggleSize.Default, params GUILayoutOption[] options)
-        {
-            return Toggle(text, value, ToggleVariant.Outline, size, onToggle, false, options);
-        }
-        public bool SmallToggle(string text, bool value, Action<bool> onToggle = null,
-            ToggleVariant variant = ToggleVariant.Default, params GUILayoutOption[] options)
-        {
-            return Toggle(text, value, variant, ToggleSize.Small, onToggle, false, options);
-        }
-        public bool LargeToggle(string text, bool value, Action<bool> onToggle = null,
-            ToggleVariant variant = ToggleVariant.Default, params GUILayoutOption[] options)
-        {
-            return Toggle(text, value, variant, ToggleSize.Large, onToggle, false, options);
         }
         public int ToggleGroup(string[] texts, int selectedIndex, Action<int> onSelectionChange = null,
             ToggleVariant variant = ToggleVariant.Default, ToggleSize size = ToggleSize.Default,
@@ -262,16 +228,6 @@ namespace shadcnui.GUIComponents
             return newStates;
         }
 
-        #region Helper Methods
-
-        private Texture2D CreateAccentBackground(Color accentColor)
-        {
-            Texture2D texture = new Texture2D(1, 1);
-            texture.SetPixel(0, 0, new Color(accentColor.r, accentColor.g, accentColor.b, 0.8f));
-            texture.Apply();
-            return texture;
-        }
-
-        #endregion
+        
     }
 }

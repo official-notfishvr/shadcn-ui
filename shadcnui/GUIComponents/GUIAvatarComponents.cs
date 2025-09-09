@@ -369,19 +369,6 @@ namespace shadcnui.GUIComponents
             return new RectOffset(borderRadius, borderRadius, borderRadius, borderRadius);
         }
 
-        private float GetStatusIndicatorSize(AvatarSize size)
-        {
-            switch (size)
-            {
-                case AvatarSize.Small:
-                    return 6f;
-                case AvatarSize.Large:
-                    return 12f;
-                default:
-                    return 8f;
-            }
-        }
-
         public struct AvatarData
         {
             public Texture2D Image;

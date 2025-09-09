@@ -89,9 +89,10 @@ public class MyUIExample : MonoBehaviour
 
 the `shadcnui testing/Menu/UI.cs` file has more examples.
 
-## Roadmap
+## Todo
 
-* Fix ALL Bugs
+* Fix Styles that are borken
+* Make Toggles and Checksbox have better way to see if its on or off
 
 ## Contribution Guidelines
 

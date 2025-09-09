@@ -308,23 +308,6 @@ namespace shadcnui.GUIComponents
             text = DrawTextArea(text, label, "", maxLength, height, false, false, null);
         }
 
-
-        public string DrawEmailInput(string value, string label = "Email", bool disabled = false, Action<string> onChange = null)
-        {
-            return DrawLabeledInput(label, value, "Enter email address...", InputVariant.Default, LabelVariant.Default, disabled, -1, onChange);
-        }
-
-        public string DrawSearchInput(string value, string placeholder = "Search...", bool disabled = false, Action<string> onChange = null)
-        {
-            return DrawInput(value, placeholder, InputVariant.Outline, disabled, false, -1, onChange);
-        }
-
-        public string DrawUrlInput(string value, string label = "URL", bool disabled = false, Action<string> onChange = null)
-        {
-            return DrawLabeledInput(label, value, "https://example.com", InputVariant.Default, LabelVariant.Default, disabled, -1, onChange);
-        }
-
-
         public int DrawNumberInput(int value, string label = "", int minValue = int.MinValue, int maxValue = int.MaxValue,
             bool disabled = false, Action<int> onChange = null)
         {
@@ -343,7 +326,6 @@ namespace shadcnui.GUIComponents
 
             return value;
         }
-
 
         public float DrawFloatInput(float value, string label = "", float minValue = float.MinValue, float maxValue = float.MaxValue,
             bool disabled = false, Action<float> onChange = null)

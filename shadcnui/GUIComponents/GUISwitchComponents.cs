@@ -152,22 +152,7 @@ namespace shadcnui.GUIComponents
 
             GUIStyle customStyle = new GUIStyle(GUI.skin.toggle);
             
-            if (value)
-            {
-                customStyle.normal.background = styleManager.CreateSolidTexture(onColor);
-                customStyle.active.background = styleManager.CreateSolidTexture(Color.Lerp(onColor, Color.white, 0.1f));
-                customStyle.hover.background = styleManager.CreateSolidTexture(Color.Lerp(onColor, Color.white, 0.05f));
-            }
-            else
-            {
-                customStyle.normal.background = styleManager.CreateSolidTexture(offColor);
-                customStyle.active.background = styleManager.CreateSolidTexture(Color.Lerp(offColor, Color.black, 0.1f));
-                customStyle.hover.background = styleManager.CreateSolidTexture(Color.Lerp(offColor, Color.black, 0.05f));
-            }
             
-            customStyle.normal.textColor = thumbColor;
-            customStyle.active.textColor = thumbColor;
-            customStyle.hover.textColor = thumbColor;
 
             bool wasEnabled = GUI.enabled;
             if (disabled) GUI.enabled = false;
