@@ -89,16 +89,9 @@ public class MyUIExample : MonoBehaviour
 
 the `shadcnui testing/Menu/UI.cs` file has more examples.
 
-## Dependencies
-
-This project targets .NET 6.0 or newer. Ensure you have the appropriate .NET SDK installed.
-
 ## Roadmap
 
-*   Expand component library with more UI elements.
-*   Improve customization options for existing components.
-*   Add comprehensive documentation and examples for each component.
-*   Explore cross-platform compatibility.
+* Fix ALL Bugs
 
 ## Contribution Guidelines
 
@@ -114,7 +107,3 @@ We welcome contributions to the `shadcnui` project! To contribute:
 8.  **Open a Pull Request** to the `main` branch of the original repository.
 
 Please ensure your pull requests are well-documented and address a specific issue or feature.
-
-## License
-
-This project is licensed under the [MIT License](LICENSE).
