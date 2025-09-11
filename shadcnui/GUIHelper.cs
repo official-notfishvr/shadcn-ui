@@ -612,12 +612,18 @@ namespace shadcnui
         {
             try
             {
-                return toggleComponents?.Toggle(text, value, variant, size, onToggle, disabled, options) ?? value;
+                bool newValue = toggleComponents?.Toggle(text, value, variant, size, onToggle, disabled, options) ?? value;
+                if (newValue != value)
+                {
+                    // Only invoke onToggle if the value actually changed
+                    onToggle?.Invoke(newValue);
+                }
+                return newValue;
             }
             catch (Exception ex)
             {
                 Debug.LogError("Error drawing toggle variant: " + ex.Message);
-                return false;
+                return value;
             }
         }
 
@@ -857,11 +863,11 @@ namespace shadcnui
             }
         }
 
-        public void BeginVerticalGroup()
+        public void BeginVerticalGroup(params GUILayoutOption[] options)
         {
             try
             {
-                layoutComponents?.BeginVerticalGroup();
+                layoutComponents?.BeginVerticalGroup(options);
             }
             catch (Exception ex)
             {
@@ -1324,12 +1330,12 @@ namespace shadcnui
             }
         }
 
-        public bool CheckboxWithLabel(string label, bool value, CheckboxVariant variant = CheckboxVariant.Default,
+        public bool CheckboxWithLabel(string label, ref bool value, CheckboxVariant variant = CheckboxVariant.Default,
             CheckboxSize size = CheckboxSize.Default, Action<bool> onToggle = null, bool disabled = false)
         {
             try
             {
-                return checkboxComponents?.CheckboxWithLabel(label, value, variant, size, onToggle, disabled) ?? value;
+                return checkboxComponents?.CheckboxWithLabel(label, ref value, variant, size, onToggle, disabled) ?? value;
             }
             catch (Exception ex)
             {
@@ -1369,12 +1375,12 @@ namespace shadcnui
             }
         }
 
-        public bool CheckboxWithIcon(string text, bool value, Texture2D icon, CheckboxVariant variant = CheckboxVariant.Default,
+        public bool CheckboxWithIcon(string text, ref bool value, Texture2D icon, CheckboxVariant variant = CheckboxVariant.Default,
             CheckboxSize size = CheckboxSize.Default, Action<bool> onToggle = null, bool disabled = false)
         {
             try
             {
-                return checkboxComponents?.CheckboxWithIcon(text, value, icon, variant, size, onToggle, disabled) ?? value;
+                return checkboxComponents?.CheckboxWithIcon(text, ref value, icon, variant, size, onToggle, disabled) ?? value;
             }
             catch (Exception ex)
             {
@@ -1383,13 +1389,13 @@ namespace shadcnui
             }
         }
 
-        public bool CheckboxWithDescription(string label, string description, bool value,
+        public bool CheckboxWithDescription(string label, string description, ref bool value,
             CheckboxVariant variant = CheckboxVariant.Default, CheckboxSize size = CheckboxSize.Default,
             Action<bool> onToggle = null, bool disabled = false)
         {
             try
             {
-                return checkboxComponents?.CheckboxWithDescription(label, description, value, variant, size,
+                return checkboxComponents?.CheckboxWithDescription(label, description, ref value, variant, size,
                     onToggle, disabled) ?? value;
             }
             catch (Exception ex)
@@ -1399,13 +1405,13 @@ namespace shadcnui
             }
         }
 
-        public bool ValidatedCheckbox(string text, bool value, bool isValid, string validationMessage,
+        public bool ValidatedCheckbox(string text, ref bool value, bool isValid, string validationMessage,
             CheckboxVariant variant = CheckboxVariant.Default, CheckboxSize size = CheckboxSize.Default,
             Action<bool> onToggle = null, bool disabled = false)
         {
             try
             {
-                return checkboxComponents?.ValidatedCheckbox(text, value, isValid, validationMessage, variant,
+                return checkboxComponents?.ValidatedCheckbox(text, ref value, isValid, validationMessage, variant,
                     size, onToggle, disabled) ?? value;
             }
             catch (Exception ex)
@@ -1415,12 +1421,12 @@ namespace shadcnui
             }
         }
 
-        public bool CheckboxWithTooltip(string text, bool value, string tooltip, CheckboxVariant variant = CheckboxVariant.Default,
+        public bool CheckboxWithTooltip(string text, ref bool value, string tooltip, CheckboxVariant variant = CheckboxVariant.Default,
             CheckboxSize size = CheckboxSize.Default, Action<bool> onToggle = null, bool disabled = false)
         {
             try
             {
-                return checkboxComponents?.CheckboxWithTooltip(text, value, tooltip, variant, size, onToggle, disabled) ?? value;
+                return checkboxComponents?.CheckboxWithTooltip(text, ref value, tooltip, variant, size, onToggle, disabled) ?? value;
             }
             catch (Exception ex)
             {

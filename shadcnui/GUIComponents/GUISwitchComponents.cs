@@ -151,8 +151,10 @@ namespace shadcnui.GUIComponents
             }
 
             GUIStyle customStyle = new GUIStyle(GUI.skin.toggle);
-            
-            
+            customStyle.normal.background = styleManager.CreateSolidTexture(offColor);
+            customStyle.onNormal.background = styleManager.CreateSolidTexture(onColor);
+            customStyle.normal.textColor = thumbColor;
+            customStyle.onNormal.textColor = thumbColor;
 
             bool wasEnabled = GUI.enabled;
             if (disabled) GUI.enabled = false;

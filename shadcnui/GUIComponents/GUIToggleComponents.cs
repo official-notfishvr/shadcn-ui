@@ -80,36 +80,29 @@ namespace shadcnui.GUIComponents
             var styleManager = guiHelper.GetStyleManager();
             GUIStyle toggleStyle = styleManager.GetToggleStyle(variant, size);
 
-
-            GUIStyle currentStyle = new GUIStyle(toggleStyle);
-
-
-            
-
             bool wasEnabled = GUI.enabled;
             if (disabled) GUI.enabled = false;
 
-            bool clicked;
+            bool newValue;
 #if IL2CPP
             if (options != null && options.Length > 0)
-                clicked = GUILayout.Button(text, currentStyle, (Il2CppReferenceArray<GUILayoutOption>)options);
+                newValue = GUILayout.Toggle(value, text, toggleStyle, (Il2CppReferenceArray<GUILayoutOption>)options);
             else
-                clicked = GUILayout.Button(text, currentStyle, (Il2CppReferenceArray<GUILayoutOption>)null);
+                newValue = GUILayout.Toggle(value, text, toggleStyle, (Il2CppReferenceArray<GUILayoutOption>)null);
 #else
-            clicked = options != null && options.Length > 0 ?
-                GUILayout.Button(text, currentStyle, options) :
-                GUILayout.Button(text, currentStyle);
+            newValue = options != null && options.Length > 0 ?
+                GUILayout.Toggle(value, text, toggleStyle, options) :
+                GUILayout.Toggle(value, text, toggleStyle);
 #endif
 
             GUI.enabled = wasEnabled;
 
-            if (clicked && !disabled)
+            if (newValue != value && !disabled)
             {
-                value = !value;
-                onToggle?.Invoke(value);
+                onToggle?.Invoke(newValue);
             }
 
-            return value;
+            return newValue;
         }
         public bool Toggle(Rect rect, string text, bool value, ToggleVariant variant = ToggleVariant.Default,
             ToggleSize size = ToggleSize.Default, Action<bool> onToggle = null, bool disabled = false)
@@ -117,26 +110,19 @@ namespace shadcnui.GUIComponents
             var styleManager = guiHelper.GetStyleManager();
             GUIStyle toggleStyle = styleManager.GetToggleStyle(variant, size);
 
-
-            GUIStyle currentStyle = new GUIStyle(toggleStyle);
-
-
-            
-
             bool wasEnabled = GUI.enabled;
             if (disabled) GUI.enabled = false;
 
-            bool clicked = GUI.Button(rect, text, currentStyle);
+            bool newValue = GUI.Toggle(rect, value, text, toggleStyle);
 
             GUI.enabled = wasEnabled;
 
-            if (clicked && !disabled)
+            if (newValue != value && !disabled)
             {
-                value = !value;
-                onToggle?.Invoke(value);
+                onToggle?.Invoke(newValue);
             }
 
-            return value;
+            return newValue;
         }
         public int ToggleGroup(string[] texts, int selectedIndex, Action<int> onSelectionChange = null,
             ToggleVariant variant = ToggleVariant.Default, ToggleSize size = ToggleSize.Default,
@@ -164,9 +150,7 @@ namespace shadcnui.GUIComponents
             for (int i = 0; i < texts.Length; i++)
             {
                 bool isSelected = (i == selectedIndex);
-                bool wasSelected = Toggle(texts[i], isSelected, variant, size);
-
-                if (wasSelected && !isSelected)
+                if (Toggle(texts[i], isSelected, variant, size) && !isSelected)
                 {
                     newSelectedIndex = i;
                     onSelectionChange?.Invoke(i);

@@ -77,12 +77,18 @@ namespace shadcnui.GUIComponents
             return newValue && !disabled;
         }
 
-        public bool CheckboxWithLabel(string label, bool value, CheckboxVariant variant = CheckboxVariant.Default,
+        public bool CheckboxWithLabel(string label, ref bool value, CheckboxVariant variant = CheckboxVariant.Default,
             CheckboxSize size = CheckboxSize.Default, Action<bool> onToggle = null, bool disabled = false)
         {
             GUILayout.BeginHorizontal();
 
             bool newValue = Checkbox("", value, variant, size, onToggle, disabled, GUILayout.Width(20 * guiHelper.uiScale));
+
+            if (newValue != value)
+            {
+                value = newValue;
+                onToggle?.Invoke(newValue);
+            }
 
             var styleManager = guiHelper.GetStyleManager();
             GUIStyle labelStyle = styleManager?.GetLabelStyle(LabelVariant.Default) ?? GUI.skin.label;
@@ -105,7 +111,7 @@ namespace shadcnui.GUIComponents
             return newValue;
         }
 
-        public bool[] CheckboxGroup(string[] labels, bool[] values, CheckboxVariant variant = CheckboxVariant.Default,
+                public bool[] CheckboxGroup(string[] labels, bool[] values, CheckboxVariant variant = CheckboxVariant.Default,
             CheckboxSize size = CheckboxSize.Default, Action<int, bool> onToggleChange = null,
             bool disabled = false, bool horizontal = false, float spacing = 5f)
         {
@@ -130,7 +136,8 @@ namespace shadcnui.GUIComponents
             for (int i = 0; i < labels.Length; i++)
             {
                 int index = i;
-                bool newValue = CheckboxWithLabel(labels[i], values[i], variant, size,
+                bool currentValue = newValues[i];
+                CheckboxWithLabel(labels[i], ref currentValue, variant, size,
                     (val) => {
                         newValues[index] = val;
                         onToggleChange?.Invoke(index, val);
@@ -163,9 +170,15 @@ namespace shadcnui.GUIComponents
             customStyle.normal.background = styleManager.CreateSolidTexture(backgroundColor);
             customStyle.active.background = styleManager.CreateSolidTexture(Color.Lerp(backgroundColor, checkColor, 0.3f));
             customStyle.hover.background = styleManager.CreateSolidTexture(Color.Lerp(backgroundColor, checkColor, 0.1f));
+            customStyle.onNormal.background = styleManager.CreateSolidTexture(checkColor);
+            customStyle.onActive.background = styleManager.CreateSolidTexture(Color.Lerp(checkColor, backgroundColor, 0.3f));
+            customStyle.onHover.background = styleManager.CreateSolidTexture(Color.Lerp(checkColor, backgroundColor, 0.1f));
             customStyle.normal.textColor = checkColor;
             customStyle.active.textColor = checkColor;
             customStyle.hover.textColor = checkColor;
+            customStyle.onNormal.textColor = backgroundColor;
+            customStyle.onActive.textColor = backgroundColor;
+            customStyle.onHover.textColor = backgroundColor;
 
             bool wasEnabled = GUI.enabled;
             if (disabled) GUI.enabled = false;
@@ -186,12 +199,17 @@ namespace shadcnui.GUIComponents
             return newValue && !disabled;
         }
 
-        public bool CheckboxWithIcon(string text, bool value, Texture2D icon, CheckboxVariant variant = CheckboxVariant.Default,
+        public bool CheckboxWithIcon(string text, ref bool value, Texture2D icon, CheckboxVariant variant = CheckboxVariant.Default,
             CheckboxSize size = CheckboxSize.Default, Action<bool> onToggle = null, bool disabled = false)
         {
             GUILayout.BeginHorizontal();
 
             bool newValue = Checkbox("", value, variant, size, onToggle, disabled, GUILayout.Width(20 * guiHelper.uiScale));
+            if (newValue != value)
+            {
+                value = newValue;
+                onToggle?.Invoke(newValue);
+            }
 
             if (icon != null)
             {
@@ -221,13 +239,13 @@ namespace shadcnui.GUIComponents
         }
 
 
-        public bool CheckboxWithDescription(string label, string description, bool value,
+        public bool CheckboxWithDescription(string label, string description, ref bool value,
             CheckboxVariant variant = CheckboxVariant.Default, CheckboxSize size = CheckboxSize.Default,
             Action<bool> onToggle = null, bool disabled = false)
         {
             GUILayout.BeginVertical();
 
-            bool newValue = CheckboxWithLabel(label, value, variant, size, onToggle, disabled);
+            bool newValue = CheckboxWithLabel(label, ref value, variant, size, onToggle, disabled);
 
             if (!string.IsNullOrEmpty(description))
             {
@@ -255,13 +273,13 @@ namespace shadcnui.GUIComponents
             return newValue;
         }
 
-        public bool ValidatedCheckbox(string text, bool value, bool isValid, string validationMessage,
+        public bool ValidatedCheckbox(string text, ref bool value, bool isValid, string validationMessage,
             CheckboxVariant variant = CheckboxVariant.Default, CheckboxSize size = CheckboxSize.Default,
             Action<bool> onToggle = null, bool disabled = false)
         {
             GUILayout.BeginVertical();
 
-            bool newValue = CheckboxWithLabel(text, value, variant, size, onToggle, disabled);
+            bool newValue = CheckboxWithLabel(text, ref value, variant, size, onToggle, disabled);
 
             if (!isValid && !string.IsNullOrEmpty(validationMessage))
             {
@@ -281,12 +299,12 @@ namespace shadcnui.GUIComponents
             return newValue;
         }
 
-        public bool CheckboxWithTooltip(string text, bool value, string tooltip, CheckboxVariant variant = CheckboxVariant.Default,
+        public bool CheckboxWithTooltip(string text, ref bool value, string tooltip, CheckboxVariant variant = CheckboxVariant.Default,
             CheckboxSize size = CheckboxSize.Default, Action<bool> onToggle = null, bool disabled = false)
         {
             GUILayout.BeginHorizontal();
 
-            bool newValue = CheckboxWithLabel(text, value, variant, size, onToggle, disabled);
+            bool newValue = CheckboxWithLabel(text, ref value, variant, size, onToggle, disabled);
 
             if (!string.IsNullOrEmpty(tooltip))
             {

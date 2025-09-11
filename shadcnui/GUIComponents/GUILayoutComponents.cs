@@ -46,13 +46,13 @@ namespace shadcnui.GUIComponents
             GUILayout.EndHorizontal();
         }
 
-        public void BeginVerticalGroup()
+        public void BeginVerticalGroup(params GUILayoutOption[] options)
         {
             GUIStyle boxStyle = guiHelper.borderEffectsEnabled ? GUI.skin.box : GUIStyle.none;
 #if IL2CPP
-            GUILayout.BeginVertical(boxStyle, (Il2CppReferenceArray<GUILayoutOption>)null);
+            GUILayout.BeginVertical(boxStyle, (Il2CppReferenceArray<GUILayoutOption>)options);
 #else
-            GUILayout.BeginVertical(boxStyle);
+            GUILayout.BeginVertical(boxStyle, options);
 #endif
         }
 

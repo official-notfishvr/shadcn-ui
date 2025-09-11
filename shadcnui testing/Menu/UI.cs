@@ -8,7 +8,6 @@ public class UI : MonoBehaviour
     private GUIHelper guiHelper;
     private Rect windowRect = new Rect(20, 20, 1450, 600);
     private bool showDemoWindow = false;
-
     private Vector2 scrollPosition;
 
     private bool checkboxValue = false;
@@ -22,6 +21,68 @@ public class UI : MonoBehaviour
     private int glowButtonIndex = 0;
     private GUITabsComponents.TabConfig[] demoTabs;
     private int currentDemoTab = 0;
+
+    private string passwordValue = "password123";
+    private string inputTextAreaValue = "This is a text area in Input Components.";
+    private string glowInputFieldText = "Glow Input";
+    private int glowInputFieldIdx = 0;
+    private bool drawToggleValue = false;
+    private bool drawCheckboxValue = false;
+    private int selectionGridValue = 0;
+
+    private bool defaultSwitchVariant = false;
+    private bool outlineSwitchVariant = false;
+    private bool ghostSwitchVariant = false;
+    private bool defaultSwitchSize = false;
+    private bool smallSwitchSize = false;
+    private bool largeSwitchSize = false;
+    private bool switchWithLabelValue = false;
+    private bool[] switchGroupValues = { false, true, false };
+    private bool switchWithDescriptionValue = false;
+    private bool validatedSwitchValue = false;
+    private bool switchWithTooltipValue = false;
+    private bool switchWithIconValue = false;
+    private bool switchWithLoadingValue = false;
+    private bool customSwitchValue = false;
+    private bool defaultVariant = false;
+    private bool largeSize = false;
+    private bool smallSize = false;
+    private bool defaultSize = false;
+    private bool ghostVariant = false;
+    private bool outlineVariant = false;
+
+    private bool defaultVariantToggle = false;
+    private bool outlineVariantToggle = false;
+    private bool defaultSizeToggle = false;
+    private bool smallSizeToggle = false;
+    private bool largeSizeToggle = false;
+    private bool defaultToggleValue = false;
+    private bool[] multiToggleGroupValues = { false, true, false };
+
+    private bool checkboxWithLabelValue = false;
+    private bool[] checkboxGroupValues = { false, true, false };
+    private bool checkboxWithIconValue = false;
+    private bool checkboxWithDescriptionValue = false;
+    private bool validatedCheckboxValue = false;
+    private bool checkboxWithTooltipValue = false;
+    private bool customCheckboxValue = false;
+
+    private bool optionAValue = false;
+    private bool optionBValue = true;
+
+    private bool expandableAlertExpanded = false;
+    private bool dismissibleBadgeDismissed = false;
+
+    private string outlineTextAreaValue = "Outline Text Area";
+    private string ghostTextAreaValue = "Ghost Text Area";
+    private string labeledTextAreaValue = "Labeled Text Area";
+    private float resizableTextAreaHeight = 100f;
+    private string resizableTextAreaValue = "Resizable Text Area";
+
+    private int intSliderValue = 50;
+    private float visualProgressBarValue = 0.7f;
+    private int selectedVerticalTab = 0;
+
 
     void Start()
     {
@@ -59,7 +120,7 @@ public class UI : MonoBehaviour
 
         if (showDemoWindow)
         {
-            windowRect = GUI.Window(101, windowRect, (id) => DrawDemoWindow(id), "shadcn/ui Demo");
+            windowRect = GUI.Window(101, windowRect, DrawDemoWindow, "shadcn/ui Demo");
         }
     }
 
@@ -85,31 +146,6 @@ public class UI : MonoBehaviour
         guiHelper.EndAnimatedGUI();
         GUI.DragWindow();
     }
-
-    private string passwordValue = "password123";
-    private string inputTextAreaValue = "This is a text area in Input Components.";
-    private string glowInputFieldText = "Glow Input";
-    private int glowInputFieldIdx = 0;
-    private bool drawToggleValue = false;
-    private bool drawCheckboxValue = false;
-    private int selectionGridValue = 0;
-
-    private bool outlineToggleValue = false;
-    private bool smallToggleValue = false;
-    private bool largeToggleValue = false;
-    private bool[] multiToggleGroupValues = { false, true, false };
-    private int intSliderValue = 50;
-    private float visualProgressBarValue = 0.7f;
-    private bool labelRectValue = false;
-    private float progressRectValue = 0.5f;
-    private bool separatorRectValue = false;
-    private int selectedVerticalTab = 0;
-    private string textAreaRectValue = "Text in Rect";
-    private string outlineTextAreaValue = "Outline Text Area";
-    private string ghostTextAreaValue = "Ghost Text Area";
-    private string labeledTextAreaValue = "Labeled Text Area";
-    private float resizableTextAreaHeight = 100f;
-    private string resizableTextAreaValue = "Resizable Text Area";
 
     void DrawInputDemos()
     {
@@ -156,18 +192,11 @@ public class UI : MonoBehaviour
         string[] tabNames = { "Account", "Password", "Notifications" };
         selectedTab = guiHelper.Tabs(tabNames, selectedTab);
         guiHelper.BeginTabContent();
-        switch (selectedTab)
-        {
-            case 0:
-                guiHelper.Label("Make changes to your account here.");
-                break;
-            case 1:
-                guiHelper.Label("Change your password here.");
-                break;
-            case 2:
-                guiHelper.Label("Manage your notification settings here.");
-                break;
-        }
+
+        if (selectedTab == 0) guiHelper.Label("Make changes to your account here.");
+        else if (selectedTab == 1) guiHelper.Label("Change your password here.");
+        else guiHelper.Label("Manage your notification settings here.");
+
         guiHelper.EndTabContent();
         guiHelper.Label("Code: selectedTab = guiHelper.Tabs(tabNames, selectedTab); ... guiHelper.BeginTabContent(); ... guiHelper.EndTabContent();", LabelVariant.Muted);
         guiHelper.HorizontalSeparator();
@@ -187,18 +216,11 @@ public class UI : MonoBehaviour
         string[] verticalTabNames = { "Profile", "Settings", "Privacy" };
         selectedVerticalTab = guiHelper.VerticalTabs(verticalTabNames, selectedVerticalTab, tabWidth: 100);
         guiHelper.BeginTabContent();
-        switch (selectedVerticalTab)
-        {
-            case 0:
-                guiHelper.Label("Profile content.");
-                break;
-            case 1:
-                guiHelper.Label("Settings content.");
-                break;
-            case 2:
-                guiHelper.Label("Privacy content.");
-                break;
-        }
+
+        if (selectedVerticalTab == 0) guiHelper.Label("Profile content.");
+        else if (selectedVerticalTab == 1) guiHelper.Label("Settings content.");
+        else guiHelper.Label("Privacy content.");
+
         guiHelper.EndTabContent();
         guiHelper.Label("Code: guiHelper.VerticalTabs(names, selected, tabWidth);", LabelVariant.Muted);
         guiHelper.HorizontalSeparator();
@@ -234,9 +256,6 @@ public class UI : MonoBehaviour
         guiHelper.HorizontalSeparator();
         GUILayout.EndVertical();
     }
-
-
-
 
     void DrawAlertDemos()
     {
@@ -301,7 +320,6 @@ public class UI : MonoBehaviour
         guiHelper.Label("Code: guiHelper.AlertWithCountdown(title, description, countdownTime, onTimeout);", LabelVariant.Muted);
         guiHelper.HorizontalSeparator();
 
-        bool expandableAlertExpanded = false;
         guiHelper.Label("Expandable Alert", LabelVariant.Default);
         expandableAlertExpanded = guiHelper.ExpandableAlert("Details", "Click to see more information.", "This is the expanded content with more details about the alert.", ref expandableAlertExpanded);
         guiHelper.Label($"Expandable Alert Expanded: {expandableAlertExpanded}");
@@ -438,7 +456,6 @@ public class UI : MonoBehaviour
         guiHelper.Label("Code: guiHelper.StatusBadge(text, isActive);", LabelVariant.Muted);
         guiHelper.HorizontalSeparator();
 
-        bool dismissibleBadgeDismissed = false;
         guiHelper.Label("Dismissible Badge", LabelVariant.Default);
         if (!dismissibleBadgeDismissed)
         {
@@ -629,11 +646,9 @@ public class UI : MonoBehaviour
 
         guiHelper.Label("Checkbox Variants");
         GUILayout.BeginHorizontal();
-        bool defaultVariant = false;
+
         defaultVariant = guiHelper.Checkbox("Default", defaultVariant, CheckboxVariant.Default);
-        bool outlineVariant = false;
         outlineVariant = guiHelper.Checkbox("Outline", outlineVariant, CheckboxVariant.Outline);
-        bool ghostVariant = false;
         ghostVariant = guiHelper.Checkbox("Ghost", ghostVariant, CheckboxVariant.Ghost);
         GUILayout.EndHorizontal();
         guiHelper.Label("Code: guiHelper.Checkbox(label, value, variant);", LabelVariant.Muted);
@@ -641,60 +656,50 @@ public class UI : MonoBehaviour
 
         guiHelper.Label("Checkbox Sizes");
         GUILayout.BeginHorizontal();
-        bool defaultSize = false;
         defaultSize = guiHelper.Checkbox("Default", defaultSize, size: CheckboxSize.Default);
-        bool smallSize = false;
         smallSize = guiHelper.Checkbox("Small", smallSize, size: CheckboxSize.Small);
-        bool largeSize = false;
         largeSize = guiHelper.Checkbox("Large", largeSize, size: CheckboxSize.Large);
         GUILayout.EndHorizontal();
         guiHelper.Label("Code: guiHelper.Checkbox(label, value, size);", LabelVariant.Muted);
         guiHelper.HorizontalSeparator();
 
         guiHelper.Label("Checkbox with Label");
-        bool checkboxWithLabelValue = false;
-        checkboxWithLabelValue = guiHelper.CheckboxWithLabel("Remember me", checkboxWithLabelValue);
+        guiHelper.CheckboxWithLabel("Remember me", ref checkboxWithLabelValue);
         guiHelper.Label($"Checkbox with Label: {checkboxWithLabelValue}");
-        guiHelper.Label("Code: guiHelper.CheckboxWithLabel(label, value);", LabelVariant.Muted);
+        guiHelper.Label("Code: guiHelper.CheckboxWithLabel(label, ref value);", LabelVariant.Muted);
         guiHelper.HorizontalSeparator();
 
         guiHelper.Label("Checkbox Group");
-        bool[] checkboxGroupValues = { false, true, false };
         checkboxGroupValues = guiHelper.CheckboxGroup(new string[] { "Option 1", "Option 2", "Option 3" }, checkboxGroupValues);
         guiHelper.Label($"Checkbox Group Values: {string.Join(", ", checkboxGroupValues)}");
         guiHelper.Label("Code: guiHelper.CheckboxGroup(labels, values);", LabelVariant.Muted);
         guiHelper.HorizontalSeparator();
 
         guiHelper.Label("Checkbox with Icon");
-        bool checkboxWithIconValue = false;
-        checkboxWithIconValue = guiHelper.CheckboxWithIcon("Enable notifications", checkboxWithIconValue, null);
+        guiHelper.CheckboxWithIcon("Enable notifications", ref checkboxWithIconValue, null);
         guiHelper.Label($"Checkbox with Icon: {checkboxWithIconValue}");
-        guiHelper.Label("Code: guiHelper.CheckboxWithIcon(label, value, icon);", LabelVariant.Muted);
+        guiHelper.Label("Code: guiHelper.CheckboxWithIcon(label, ref value, icon);", LabelVariant.Muted);
         guiHelper.HorizontalSeparator();
 
         guiHelper.Label("Checkbox with Description");
-        bool checkboxWithDescriptionValue = false;
-        checkboxWithDescriptionValue = guiHelper.CheckboxWithDescription("Email marketing", "Send me marketing emails about new products and features.", checkboxWithDescriptionValue);
+        guiHelper.CheckboxWithDescription("Email marketing", "Send me marketing emails about new products and features.", ref checkboxWithDescriptionValue);
         guiHelper.Label($"Checkbox with Description: {checkboxWithDescriptionValue}");
-        guiHelper.Label("Code: guiHelper.CheckboxWithDescription(label, description, value);", LabelVariant.Muted);
+        guiHelper.Label("Code: guiHelper.CheckboxWithDescription(label, description, ref value);", LabelVariant.Muted);
         guiHelper.HorizontalSeparator();
 
         guiHelper.Label("Validated Checkbox");
-        bool validatedCheckboxValue = false;
-        validatedCheckboxValue = guiHelper.ValidatedCheckbox("I agree to the terms", validatedCheckboxValue, false, "You must agree to the terms.");
+        guiHelper.ValidatedCheckbox("I agree to the terms", ref validatedCheckboxValue, false, "You must agree to the terms.");
         guiHelper.Label($"Validated Checkbox: {validatedCheckboxValue}");
-        guiHelper.Label("Code: guiHelper.ValidatedCheckbox(label, value, isValid, validationMessage);", LabelVariant.Muted);
+        guiHelper.Label("Code: guiHelper.ValidatedCheckbox(label, ref value, isValid, validationMessage);", LabelVariant.Muted);
         guiHelper.HorizontalSeparator();
 
         guiHelper.Label("Checkbox with Tooltip");
-        bool checkboxWithTooltipValue = false;
-        checkboxWithTooltipValue = guiHelper.CheckboxWithTooltip("Show advanced settings", checkboxWithTooltipValue, "This will reveal additional configuration options.");
+        guiHelper.CheckboxWithTooltip("Show advanced settings", ref checkboxWithTooltipValue, "This will reveal additional configuration options.");
         guiHelper.Label($"Checkbox with Tooltip: {checkboxWithTooltipValue}");
-        guiHelper.Label("Code: guiHelper.CheckboxWithTooltip(label, value, tooltip);", LabelVariant.Muted);
+        guiHelper.Label("Code: guiHelper.CheckboxWithTooltip(label, ref value, tooltip);", LabelVariant.Muted);
         guiHelper.HorizontalSeparator();
 
         guiHelper.Label("Custom Checkbox");
-        bool customCheckboxValue = false;
         customCheckboxValue = guiHelper.CustomCheckbox("Custom Checkbox", customCheckboxValue, Color.cyan, Color.black);
         guiHelper.Label($"Custom Checkbox: {customCheckboxValue}");
         guiHelper.Label("Code: guiHelper.CustomCheckbox(label, value, checkColor, backgroundColor);", LabelVariant.Muted);
@@ -742,9 +747,9 @@ public class UI : MonoBehaviour
         guiHelper.HorizontalSeparator();
 
         guiHelper.Label("Vertical Group", LabelVariant.Default);
-        guiHelper.BeginVerticalGroup();
-        guiHelper.Checkbox("Option A", false);
-        guiHelper.Checkbox("Option B", true);
+        guiHelper.BeginVerticalGroup(GUILayout.ExpandWidth(true), GUILayout.ExpandHeight(true));
+        optionAValue = guiHelper.Checkbox("Option A", optionAValue);
+        optionBValue = guiHelper.Checkbox("Option B", optionBValue);
         guiHelper.EndVerticalGroup();
         guiHelper.Label("Code: guiHelper.BeginVerticalGroup(); ... guiHelper.EndVerticalGroup();", LabelVariant.Muted);
         guiHelper.HorizontalSeparator();
@@ -904,11 +909,8 @@ public class UI : MonoBehaviour
 
         guiHelper.Label("Switch Variants");
         GUILayout.BeginHorizontal();
-        bool defaultSwitchVariant = false;
         defaultSwitchVariant = guiHelper.Switch("Default", defaultSwitchVariant, SwitchVariant.Default);
-        bool outlineSwitchVariant = false;
         outlineSwitchVariant = guiHelper.Switch("Outline", outlineSwitchVariant, SwitchVariant.Outline);
-        bool ghostSwitchVariant = false;
         ghostSwitchVariant = guiHelper.Switch("Ghost", ghostSwitchVariant, SwitchVariant.Ghost);
         GUILayout.EndHorizontal();
         guiHelper.Label("Code: guiHelper.Switch(label, value, variant);", LabelVariant.Muted);
@@ -916,67 +918,56 @@ public class UI : MonoBehaviour
 
         guiHelper.Label("Switch Sizes");
         GUILayout.BeginHorizontal();
-        bool defaultSwitchSize = false;
         defaultSwitchSize = guiHelper.Switch("Default", defaultSwitchSize, size: SwitchSize.Default);
-        bool smallSwitchSize = false;
         smallSwitchSize = guiHelper.Switch("Small", smallSwitchSize, size: SwitchSize.Small);
-        bool largeSwitchSize = false;
         largeSwitchSize = guiHelper.Switch("Large", largeSwitchSize, size: SwitchSize.Large);
         GUILayout.EndHorizontal();
         guiHelper.Label("Code: guiHelper.Switch(label, value, size);", LabelVariant.Muted);
         guiHelper.HorizontalSeparator();
 
         guiHelper.Label("Switch with Label");
-        bool switchWithLabelValue = false;
         switchWithLabelValue = guiHelper.SwitchWithLabel("Enable notifications", switchWithLabelValue);
         guiHelper.Label($"Switch with Label: {switchWithLabelValue}");
         guiHelper.Label("Code: guiHelper.SwitchWithLabel(label, value);", LabelVariant.Muted);
         guiHelper.HorizontalSeparator();
 
         guiHelper.Label("Switch Group");
-        bool[] switchGroupValues = { false, true, false };
         switchGroupValues = guiHelper.SwitchGroup(new string[] { "Option A", "Option B", "Option C" }, switchGroupValues);
         guiHelper.Label($"Switch Group Values: {string.Join(", ", switchGroupValues)}");
         guiHelper.Label("Code: guiHelper.SwitchGroup(labels, values);", LabelVariant.Muted);
         guiHelper.HorizontalSeparator();
 
         guiHelper.Label("Switch with Description");
-        bool switchWithDescriptionValue = false;
         switchWithDescriptionValue = guiHelper.SwitchWithDescription("Auto-update", "Automatically download and install updates.", switchWithDescriptionValue);
         guiHelper.Label($"Switch with Description: {switchWithDescriptionValue}");
         guiHelper.Label("Code: guiHelper.SwitchWithDescription(label, description, value);", LabelVariant.Muted);
         guiHelper.HorizontalSeparator();
 
         guiHelper.Label("Validated Switch");
-        bool validatedSwitchValue = false;
         validatedSwitchValue = guiHelper.ValidatedSwitch("Accept privacy policy", validatedSwitchValue, false, "You must accept the privacy policy.");
         guiHelper.Label($"Validated Switch: {validatedSwitchValue}");
         guiHelper.Label("Code: guiHelper.ValidatedSwitch(label, value, isValid, validationMessage);", LabelVariant.Muted);
         guiHelper.HorizontalSeparator();
 
         guiHelper.Label("Switch with Tooltip");
-        bool switchWithTooltipValue = false;
         switchWithTooltipValue = guiHelper.SwitchWithTooltip("Show advanced options", switchWithTooltipValue, "Toggle to reveal more settings.");
         guiHelper.Label($"Switch with Tooltip: {switchWithTooltipValue}");
         guiHelper.Label("Code: guiHelper.SwitchWithTooltip(label, value, tooltip);", LabelVariant.Muted);
         guiHelper.HorizontalSeparator();
 
         guiHelper.Label("Switch with Icon");
-        bool switchWithIconValue = false;
         switchWithIconValue = guiHelper.SwitchWithIcon("Enable sound", switchWithIconValue, null, null);
         guiHelper.Label($"Switch with Icon: {switchWithIconValue}");
         guiHelper.Label("Code: guiHelper.SwitchWithIcon(label, value, onIcon, offIcon);", LabelVariant.Muted);
         guiHelper.HorizontalSeparator();
 
         guiHelper.Label("Switch with Loading");
-        bool switchWithLoadingValue = false;
         switchWithLoadingValue = guiHelper.SwitchWithLoading("Syncing data", switchWithLoadingValue, true);
         guiHelper.Label($"Switch with Loading: {switchWithLoadingValue}");
         guiHelper.Label("Code: guiHelper.SwitchWithLoading(label, value, isLoading);", LabelVariant.Muted);
         guiHelper.HorizontalSeparator();
 
         guiHelper.Label("Custom Switch");
-        bool customSwitchValue = false;
         customSwitchValue = guiHelper.CustomSwitch("Custom Switch", customSwitchValue, Color.green, Color.red, Color.white);
         guiHelper.Label($"Custom Switch: {customSwitchValue}");
         guiHelper.Label("Code: guiHelper.CustomSwitch(label, value, onColor, offColor, thumbColor);", LabelVariant.Muted);
@@ -1031,8 +1022,6 @@ public class UI : MonoBehaviour
         GUILayout.EndVertical();
     }
 
-
-
     void DrawToggleDemos()
     {
         GUILayout.BeginVertical(GUILayout.ExpandWidth(true), GUILayout.ExpandHeight(true));
@@ -1041,7 +1030,6 @@ public class UI : MonoBehaviour
         guiHelper.HorizontalSeparator();
 
         guiHelper.Label("Default Toggle", LabelVariant.Default);
-        bool defaultToggleValue = false;
         defaultToggleValue = guiHelper.Toggle("Enable Feature", defaultToggleValue);
         guiHelper.Label($"Default Toggle Value: {defaultToggleValue}");
         guiHelper.Label("Code: guiHelper.Toggle(text, value);", LabelVariant.Muted);
@@ -1049,9 +1037,7 @@ public class UI : MonoBehaviour
 
         guiHelper.Label("Toggle Variants", LabelVariant.Default);
         GUILayout.BeginHorizontal();
-        bool defaultVariantToggle = false;
         defaultVariantToggle = guiHelper.Toggle("Default", defaultVariantToggle, ToggleVariant.Default);
-        bool outlineVariantToggle = false;
         outlineVariantToggle = guiHelper.Toggle("Outline", outlineVariantToggle, ToggleVariant.Outline);
         GUILayout.EndHorizontal();
         guiHelper.Label("Code: guiHelper.Toggle(text, value, variant);", LabelVariant.Muted);
@@ -1059,11 +1045,8 @@ public class UI : MonoBehaviour
 
         guiHelper.Label("Toggle Sizes", LabelVariant.Default);
         GUILayout.BeginHorizontal();
-        bool defaultSizeToggle = false;
         defaultSizeToggle = guiHelper.Toggle("Default", defaultSizeToggle, size: ToggleSize.Default);
-        bool smallSizeToggle = false;
         smallSizeToggle = guiHelper.Toggle("Small", smallSizeToggle, size: ToggleSize.Small);
-        bool largeSizeToggle = false;
         largeSizeToggle = guiHelper.Toggle("Large", largeSizeToggle, size: ToggleSize.Large);
         GUILayout.EndHorizontal();
         guiHelper.Label("Code: guiHelper.Toggle(text, value, size);", LabelVariant.Muted);

@@ -38,7 +38,7 @@ namespace shadcnui.GUIComponents
     public enum ToggleVariant
     {
         Default,
-        Outline
+        Outline,
     }
 
     /// <summary>
@@ -974,7 +974,6 @@ namespace shadcnui.GUIComponents
         {
 
             toggleDefaultStyle = new GUIStyle(GUI.skin.button);
-            toggleDefaultStyle = new GUIStyle(GUI.skin.button);
             toggleDefaultStyle.fontSize = guiHelper.fontSize;
             toggleDefaultStyle.fontStyle = FontStyle.Normal;
             toggleDefaultStyle.alignment = TextAnchor.MiddleCenter;
@@ -1286,19 +1285,30 @@ namespace shadcnui.GUIComponents
             checkboxDefaultStyle.fontSize = Mathf.RoundToInt(scaledFontSize);
             checkboxDefaultStyle.normal.background = checkboxTexture;
             checkboxDefaultStyle.onNormal.background = checkboxCheckedTexture;
-            checkboxDefaultStyle.hover.background = CreateSolidTexture(Color.Lerp(checkboxTexture.GetPixel(0,0), Color.white, 0.1f));
-            checkboxDefaultStyle.active.background = CreateSolidTexture(Color.Lerp(checkboxTexture.GetPixel(0,0), Color.black, 0.1f));
-            checkboxDefaultStyle.onHover.background = CreateSolidTexture(Color.Lerp(checkboxCheckedTexture.GetPixel(0,0), Color.white, 0.1f));
-            checkboxDefaultStyle.onActive.background = CreateSolidTexture(Color.Lerp(checkboxCheckedTexture.GetPixel(0,0), Color.black, 0.1f));
+            checkboxDefaultStyle.hover.background = CreateSolidTexture(Color.Lerp(checkboxTexture.GetPixel(0, 0), Color.white, 0.1f));
+            checkboxDefaultStyle.active.background = CreateSolidTexture(Color.Lerp(checkboxTexture.GetPixel(0, 0), Color.black, 0.1f));
+            checkboxDefaultStyle.onHover.background = CreateSolidTexture(Color.Lerp(checkboxCheckedTexture.GetPixel(0, 0), Color.white, 0.1f));
+            checkboxDefaultStyle.onActive.background = CreateSolidTexture(Color.Lerp(checkboxCheckedTexture.GetPixel(0, 0), Color.black, 0.1f));
             checkboxDefaultStyle.border = new RectOffset(borderRadius, borderRadius, borderRadius, borderRadius);
+
+            Color onBgColor = guiHelper.customColorsEnabled ? Color.Lerp(guiHelper.accentColor, Color.white, 0.3f) : new Color(0.3f, 0.6f, 1.0f);
+            Color onHoverBgColor = Color.Lerp(onBgColor, Color.white, 0.1f);
+            Color onActiveBgColor = Color.Lerp(onBgColor, Color.black, 0.1f);
+
+            checkboxDefaultStyle.onNormal.background = CreateSolidTexture(onBgColor);
+            checkboxDefaultStyle.onNormal.textColor = Color.white;
+            checkboxDefaultStyle.onHover.background = CreateSolidTexture(onHoverBgColor);
+            checkboxDefaultStyle.onHover.textColor = Color.white;
+            checkboxDefaultStyle.onActive.background = CreateSolidTexture(onActiveBgColor);
+            checkboxDefaultStyle.onActive.textColor = Color.white;
 
             checkboxOutlineStyle = new GUIStyle(checkboxDefaultStyle);
             checkboxOutlineStyle.normal.background = CreateOutlineTexture();
-            checkboxOutlineStyle.hover.background = CreateSolidTexture(Color.Lerp(CreateOutlineTexture().GetPixel(0,0), Color.white, 0.1f));
-            checkboxOutlineStyle.active.background = CreateSolidTexture(Color.Lerp(CreateOutlineTexture().GetPixel(0,0), Color.black, 0.1f));
+            checkboxOutlineStyle.hover.background = CreateSolidTexture(Color.Lerp(CreateOutlineTexture().GetPixel(0, 0), Color.white, 0.1f));
+            checkboxOutlineStyle.active.background = CreateSolidTexture(Color.Lerp(CreateOutlineTexture().GetPixel(0, 0), Color.black, 0.1f));
             checkboxOutlineStyle.onNormal.background = CreateOutlineButtonTexture(guiHelper.customColorsEnabled ? guiHelper.accentColor : new Color(0.2f, 0.4f, 0.8f), guiHelper.customColorsEnabled ? guiHelper.accentColor : new Color(0.2f, 0.4f, 0.8f));
-            checkboxOutlineStyle.onHover.background = CreateSolidTexture(Color.Lerp(checkboxCheckedTexture.GetPixel(0,0), Color.white, 0.1f));
-            checkboxOutlineStyle.onActive.background = CreateSolidTexture(Color.Lerp(checkboxCheckedTexture.GetPixel(0,0), Color.black, 0.1f));
+            checkboxOutlineStyle.onHover.background = CreateSolidTexture(Color.Lerp(checkboxCheckedTexture.GetPixel(0, 0), Color.white, 0.1f));
+            checkboxOutlineStyle.onActive.background = CreateSolidTexture(Color.Lerp(checkboxCheckedTexture.GetPixel(0, 0), Color.black, 0.1f));
 
             checkboxGhostStyle = new GUIStyle(checkboxDefaultStyle);
             checkboxGhostStyle.normal.background = transparentTexture;
