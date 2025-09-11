@@ -615,7 +615,6 @@ namespace shadcnui
                 bool newValue = toggleComponents?.Toggle(text, value, variant, size, onToggle, disabled, options) ?? value;
                 if (newValue != value)
                 {
-                    // Only invoke onToggle if the value actually changed
                     onToggle?.Invoke(newValue);
                 }
                 return newValue;

@@ -16,7 +16,7 @@ public class UI : MonoBehaviour
     private string textAreaValue = "";
     private int selectedTab = 0;
     private int selectedToggle = 0;
-    private bool isAlertDismissed = false;
+    private bool isAlertDismissed = true;
     private float progressValue = 0.3f;
     private int glowButtonIndex = 0;
     private GUITabsComponents.TabConfig[] demoTabs;
