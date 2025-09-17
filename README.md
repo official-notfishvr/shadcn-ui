@@ -91,8 +91,7 @@ the `shadcnui testing/Menu/UI.cs` file has more examples.
 
 ## Todo
 
-* Fix Styles that are borken
-* Make Toggles and Checksbox have better way to see if its on or off
+* Fix Styles that are borken if there is any
 
 ## Contribution Guidelines
 
