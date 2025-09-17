@@ -1,6 +1,6 @@
-using shadcnui;
 using System;
 using System.Collections.Generic;
+using shadcnui;
 using UnityEngine;
 #if IL2CPP
 using UnhollowerBaseLib;
@@ -19,29 +19,50 @@ namespace shadcnui.GUIComponents
             layoutComponents = new GUILayoutComponents(helper);
         }
 
-        public bool Switch(string text, bool value, SwitchVariant variant = SwitchVariant.Default,
-            SwitchSize size = SwitchSize.Default, Action<bool> onToggle = null, bool disabled = false,
-            params GUILayoutOption[] options)
+        public bool Switch(
+            string text,
+            bool value,
+            SwitchVariant variant = SwitchVariant.Default,
+            SwitchSize size = SwitchSize.Default,
+            Action<bool> onToggle = null,
+            bool disabled = false,
+            params GUILayoutOption[] options
+        )
         {
             var styleManager = guiHelper.GetStyleManager();
             if (styleManager == null)
             {
 #if IL2CPP
-                return GUILayout.Toggle(value, text ?? "Switch", GUI.skin.toggle, new Il2CppReferenceArray<GUILayoutOption>(0));
+                return GUILayout.Toggle(
+                    value,
+                    text ?? "Switch",
+                    GUI.skin.toggle,
+                    new Il2CppReferenceArray<GUILayoutOption>(0)
+                );
 #else
-                return GUILayout.Toggle(value, text ?? "Switch", GUI.skin.toggle, new GUILayoutOption[0]);
+                return GUILayout.Toggle(
+                    value,
+                    text ?? "Switch",
+                    GUI.skin.toggle,
+                    new GUILayoutOption[0]
+                );
 #endif
             }
 
             GUIStyle switchStyle = styleManager.GetSwitchStyle(variant, size);
 
             bool wasEnabled = GUI.enabled;
-            if (disabled) GUI.enabled = false;
+            if (disabled)
+                GUI.enabled = false;
 
             bool newValue;
 #if IL2CPP
-            newValue = GUILayout.Toggle(value, text ?? "Switch", switchStyle, 
-                (Il2CppReferenceArray<GUILayoutOption>)options);
+            newValue = GUILayout.Toggle(
+                value,
+                text ?? "Switch",
+                switchStyle,
+                (Il2CppReferenceArray<GUILayoutOption>)options
+            );
 #else
             newValue = GUILayout.Toggle(value, text ?? "Switch", switchStyle, options);
 #endif
@@ -54,8 +75,15 @@ namespace shadcnui.GUIComponents
             return newValue && !disabled;
         }
 
-        public bool Switch(Rect rect, string text, bool value, SwitchVariant variant = SwitchVariant.Default,
-            SwitchSize size = SwitchSize.Default, Action<bool> onToggle = null, bool disabled = false)
+        public bool Switch(
+            Rect rect,
+            string text,
+            bool value,
+            SwitchVariant variant = SwitchVariant.Default,
+            SwitchSize size = SwitchSize.Default,
+            Action<bool> onToggle = null,
+            bool disabled = false
+        )
         {
             var styleManager = guiHelper.GetStyleManager();
             if (styleManager == null)
@@ -73,7 +101,8 @@ namespace shadcnui.GUIComponents
             );
 
             bool wasEnabled = GUI.enabled;
-            if (disabled) GUI.enabled = false;
+            if (disabled)
+                GUI.enabled = false;
 
             bool newValue = GUI.Toggle(scaledRect, value, text ?? "Switch", switchStyle);
 
@@ -85,12 +114,26 @@ namespace shadcnui.GUIComponents
             return newValue && !disabled;
         }
 
-        public bool SwitchWithLabel(string label, ref bool value, SwitchVariant variant = SwitchVariant.Default,
-            SwitchSize size = SwitchSize.Default, Action<bool> onToggle = null, bool disabled = false)
+        public bool SwitchWithLabel(
+            string label,
+            ref bool value,
+            SwitchVariant variant = SwitchVariant.Default,
+            SwitchSize size = SwitchSize.Default,
+            Action<bool> onToggle = null,
+            bool disabled = false
+        )
         {
             layoutComponents.BeginHorizontalGroup();
 
-            bool newValue = Switch("", value, variant, size, onToggle, disabled, GUILayout.Width(40 * guiHelper.uiScale));
+            bool newValue = Switch(
+                "",
+                value,
+                variant,
+                size,
+                onToggle,
+                disabled,
+                GUILayout.Width(40 * guiHelper.uiScale)
+            );
 
             if (newValue != value)
             {
@@ -99,7 +142,8 @@ namespace shadcnui.GUIComponents
             }
 
             var styleManager = guiHelper.GetStyleManager();
-            GUIStyle labelStyle = styleManager?.GetLabelStyle(LabelVariant.Default) ?? GUI.skin.label;
+            GUIStyle labelStyle =
+                styleManager?.GetLabelStyle(LabelVariant.Default) ?? GUI.skin.label;
 
             Color originalColor = GUI.color;
             if (disabled)
@@ -119,19 +163,26 @@ namespace shadcnui.GUIComponents
             return newValue;
         }
 
-        public bool SwitchWithDescription(string label, string description, ref bool value, 
-            SwitchVariant variant = SwitchVariant.Default, SwitchSize size = SwitchSize.Default,
-            Action<bool> onToggle = null, bool disabled = false)
+        public bool SwitchWithDescription(
+            string label,
+            string description,
+            ref bool value,
+            SwitchVariant variant = SwitchVariant.Default,
+            SwitchSize size = SwitchSize.Default,
+            Action<bool> onToggle = null,
+            bool disabled = false
+        )
         {
             layoutComponents.BeginVerticalGroup();
-            
+
             bool newValue = SwitchWithLabel(label, ref value, variant, size, onToggle, disabled);
-            
+
             if (!string.IsNullOrEmpty(description))
             {
                 var styleManager = guiHelper.GetStyleManager();
-                GUIStyle descStyle = styleManager?.GetLabelStyle(LabelVariant.Muted) ?? GUI.skin.label;
-                
+                GUIStyle descStyle =
+                    styleManager?.GetLabelStyle(LabelVariant.Muted) ?? GUI.skin.label;
+
                 Color originalColor = GUI.color;
                 if (disabled)
                 {
@@ -140,21 +191,33 @@ namespace shadcnui.GUIComponents
 
                 layoutComponents.AddSpace(2);
 #if IL2CPP
-                GUILayout.Label(description, descStyle, (Il2CppReferenceArray<GUILayoutOption>)null);
+                GUILayout.Label(
+                    description,
+                    descStyle,
+                    (Il2CppReferenceArray<GUILayoutOption>)null
+                );
 #else
                 GUILayout.Label(description, descStyle);
 #endif
 
                 GUI.color = originalColor;
             }
-            
+
             layoutComponents.EndVerticalGroup();
 
             return newValue;
         }
 
-        public bool CustomSwitch(string text, bool value, Color onColor, Color offColor, Color thumbColor,
-            Action<bool> onToggle = null, bool disabled = false, params GUILayoutOption[] options)
+        public bool CustomSwitch(
+            string text,
+            bool value,
+            Color onColor,
+            Color offColor,
+            Color thumbColor,
+            Action<bool> onToggle = null,
+            bool disabled = false,
+            params GUILayoutOption[] options
+        )
         {
             var styleManager = guiHelper.GetStyleManager();
 
@@ -165,12 +228,19 @@ namespace shadcnui.GUIComponents
             customStyle.onNormal.textColor = thumbColor;
 
             bool wasEnabled = GUI.enabled;
-            if (disabled) GUI.enabled = false;
+            if (disabled)
+                GUI.enabled = false;
 
             bool newValue;
 #if IL2CPP
-            newValue = GUILayout.Toggle(value, text ?? "Switch", customStyle, 
-                options != null && options.Length > 0 ? new Il2CppReferenceArray<GUILayoutOption>(options) : new Il2CppReferenceArray<GUILayoutOption>(0));
+            newValue = GUILayout.Toggle(
+                value,
+                text ?? "Switch",
+                customStyle,
+                options != null && options.Length > 0
+                    ? new Il2CppReferenceArray<GUILayoutOption>(options)
+                    : new Il2CppReferenceArray<GUILayoutOption>(0)
+            );
 #else
             newValue = GUILayout.Toggle(value, text ?? "Switch", customStyle, options);
 #endif
@@ -183,29 +253,54 @@ namespace shadcnui.GUIComponents
             return newValue && !disabled;
         }
 
-        public bool SwitchWithIcon(string text, bool value, Texture2D onIcon, Texture2D offIcon, 
-            SwitchVariant variant = SwitchVariant.Default, SwitchSize size = SwitchSize.Default,
-            Action<bool> onToggle = null, bool disabled = false)
+        public bool SwitchWithIcon(
+            string text,
+            bool value,
+            Texture2D onIcon,
+            Texture2D offIcon,
+            SwitchVariant variant = SwitchVariant.Default,
+            SwitchSize size = SwitchSize.Default,
+            Action<bool> onToggle = null,
+            bool disabled = false
+        )
         {
 #if IL2CPP
             GUILayout.BeginHorizontal(new Il2CppReferenceArray<GUILayoutOption>(0));
 #else
             GUILayout.BeginHorizontal(new GUILayoutOption[0]);
 #endif
-            
-            bool newValue = Switch("", value, variant, size, onToggle, disabled, GUILayout.Width(50 * guiHelper.uiScale));
-            
+            bool newValue = Switch(
+                "",
+                value,
+                variant,
+                size,
+                onToggle,
+                disabled,
+                GUILayout.Width(50 * guiHelper.uiScale)
+            );
+
             Texture2D iconToShow = value ? onIcon : offIcon;
             if (iconToShow != null)
             {
                 GUILayout.Space(4 * guiHelper.uiScale);
 #if IL2CPP
-                GUILayout.Label(iconToShow, GUI.skin.label, new Il2CppReferenceArray<GUILayoutOption>(new GUILayoutOption[] {
-    GUILayout.Width(16 * guiHelper.uiScale),
-    GUILayout.Height(16 * guiHelper.uiScale)
-}));
+                GUILayout.Label(
+                    iconToShow,
+                    GUI.skin.label,
+                    new Il2CppReferenceArray<GUILayoutOption>(
+                        new GUILayoutOption[]
+                        {
+                            GUILayout.Width(16 * guiHelper.uiScale),
+                            GUILayout.Height(16 * guiHelper.uiScale),
+                        }
+                    )
+                );
 #else
-GUILayout.Label(iconToShow, GUILayout.Width(16 * guiHelper.uiScale), GUILayout.Height(16 * guiHelper.uiScale));
+                GUILayout.Label(
+                    iconToShow,
+                    GUILayout.Width(16 * guiHelper.uiScale),
+                    GUILayout.Height(16 * guiHelper.uiScale)
+                );
 #endif
             }
 
@@ -213,8 +308,9 @@ GUILayout.Label(iconToShow, GUILayout.Width(16 * guiHelper.uiScale), GUILayout.H
             {
                 GUILayout.Space(4 * guiHelper.uiScale);
                 var styleManager = guiHelper.GetStyleManager();
-                GUIStyle labelStyle = styleManager?.GetLabelStyle(LabelVariant.Default) ?? GUI.skin.label;
-                
+                GUIStyle labelStyle =
+                    styleManager?.GetLabelStyle(LabelVariant.Default) ?? GUI.skin.label;
+
                 Color originalColor = GUI.color;
                 if (disabled)
                 {
@@ -229,76 +325,104 @@ GUILayout.Label(iconToShow, GUILayout.Width(16 * guiHelper.uiScale), GUILayout.H
 
                 GUI.color = originalColor;
             }
-            
+
             GUILayout.EndHorizontal();
 
             return newValue;
         }
 
-        public bool ValidatedSwitch(string text, ref bool value, bool isValid, string validationMessage,
-            SwitchVariant variant = SwitchVariant.Default, SwitchSize size = SwitchSize.Default,
-            Action<bool> onToggle = null, bool disabled = false)
+        public bool ValidatedSwitch(
+            string text,
+            ref bool value,
+            bool isValid,
+            string validationMessage,
+            SwitchVariant variant = SwitchVariant.Default,
+            SwitchSize size = SwitchSize.Default,
+            Action<bool> onToggle = null,
+            bool disabled = false
+        )
         {
             layoutComponents.BeginVerticalGroup();
-            
+
             bool newValue = SwitchWithLabel(text, ref value, variant, size, onToggle, disabled);
-            
+
             if (!isValid && !string.IsNullOrEmpty(validationMessage))
             {
                 var styleManager = guiHelper.GetStyleManager();
-                GUIStyle errorStyle = styleManager?.GetLabelStyle(LabelVariant.Destructive) ?? GUI.skin.label;
-                
+                GUIStyle errorStyle =
+                    styleManager?.GetLabelStyle(LabelVariant.Destructive) ?? GUI.skin.label;
+
                 layoutComponents.AddSpace(2);
 #if IL2CPP
-                GUILayout.Label(validationMessage, errorStyle, (Il2CppReferenceArray<GUILayoutOption>)null);
+                GUILayout.Label(
+                    validationMessage,
+                    errorStyle,
+                    (Il2CppReferenceArray<GUILayoutOption>)null
+                );
 #else
                 GUILayout.Label(validationMessage, errorStyle);
 #endif
             }
-            
+
             layoutComponents.EndVerticalGroup();
 
             return newValue;
         }
 
-        public bool SwitchWithTooltip(string text, ref bool value, string tooltip, SwitchVariant variant = SwitchVariant.Default,
-            SwitchSize size = SwitchSize.Default, Action<bool> onToggle = null, bool disabled = false)
+        public bool SwitchWithTooltip(
+            string text,
+            ref bool value,
+            string tooltip,
+            SwitchVariant variant = SwitchVariant.Default,
+            SwitchSize size = SwitchSize.Default,
+            Action<bool> onToggle = null,
+            bool disabled = false
+        )
         {
             layoutComponents.BeginHorizontalGroup();
-            
+
             bool newValue = SwitchWithLabel(text, ref value, variant, size, onToggle, disabled);
-            
+
             if (!string.IsNullOrEmpty(tooltip))
             {
                 layoutComponents.AddSpace(4);
-                
+
                 var styleManager = guiHelper.GetStyleManager();
-                GUIStyle tooltipStyle = styleManager?.GetLabelStyle(LabelVariant.Muted) ?? GUI.skin.label;
-                
+                GUIStyle tooltipStyle =
+                    styleManager?.GetLabelStyle(LabelVariant.Muted) ?? GUI.skin.label;
+
                 Color originalColor = GUI.color;
                 GUI.color = new Color(originalColor.r, originalColor.g, originalColor.b, 0.6f);
-                
+
 #if IL2CPP
                 GUILayout.Label("?", tooltipStyle, (Il2CppReferenceArray<GUILayoutOption>)null);
 #else
                 GUILayout.Label("?", tooltipStyle);
 #endif
-                
                 GUI.color = originalColor;
             }
-            
+
             layoutComponents.EndHorizontalGroup();
 
             return newValue;
         }
 
-        public bool[] SwitchGroup(string[] labels, bool[] values, SwitchVariant variant = SwitchVariant.Default,
-            SwitchSize size = SwitchSize.Default, Action<int, bool> onToggleChange = null, 
-            bool disabled = false, bool horizontal = false, float spacing = 5f)
+        public bool[] SwitchGroup(
+            string[] labels,
+            bool[] values,
+            SwitchVariant variant = SwitchVariant.Default,
+            SwitchSize size = SwitchSize.Default,
+            Action<int, bool> onToggleChange = null,
+            bool disabled = false,
+            bool horizontal = false,
+            float spacing = 5f
+        )
         {
             if (labels == null || values == null || labels.Length != values.Length)
             {
-                Debug.LogError("SwitchGroup: labels and values arrays must be non-null and same length");
+                Debug.LogError(
+                    "SwitchGroup: labels and values arrays must be non-null and same length"
+                );
                 return values ?? new bool[0];
             }
 
@@ -317,11 +441,18 @@ GUILayout.Label(iconToShow, GUILayout.Width(16 * guiHelper.uiScale), GUILayout.H
             for (int i = 0; i < labels.Length; i++)
             {
                 int index = i;
-                bool newValue = SwitchWithLabel(labels[i], ref newValues[i], variant, size, 
-                    (val) => {
+                bool newValue = SwitchWithLabel(
+                    labels[i],
+                    ref newValues[i],
+                    variant,
+                    size,
+                    (val) =>
+                    {
                         newValues[index] = val;
                         onToggleChange?.Invoke(index, val);
-                    }, disabled);
+                    },
+                    disabled
+                );
 
                 if (i < labels.Length - 1)
                 {
@@ -337,35 +468,49 @@ GUILayout.Label(iconToShow, GUILayout.Width(16 * guiHelper.uiScale), GUILayout.H
             return newValues;
         }
 
-        public bool SwitchWithLoading(string text, bool value, bool isLoading, SwitchVariant variant = SwitchVariant.Default,
-            SwitchSize size = SwitchSize.Default, Action<bool> onToggle = null, bool disabled = false)
+        public bool SwitchWithLoading(
+            string text,
+            bool value,
+            bool isLoading,
+            SwitchVariant variant = SwitchVariant.Default,
+            SwitchSize size = SwitchSize.Default,
+            Action<bool> onToggle = null,
+            bool disabled = false
+        )
         {
             layoutComponents.BeginHorizontalGroup();
-            
-            bool newValue = SwitchWithLabel(text, ref value, variant, size, onToggle, disabled || isLoading);
-            
+
+            bool newValue = SwitchWithLabel(
+                text,
+                ref value,
+                variant,
+                size,
+                onToggle,
+                disabled || isLoading
+            );
+
             if (isLoading)
             {
                 layoutComponents.AddSpace(4);
-                
+
                 float time = Time.time * 2f;
                 float alpha = (Mathf.Sin(time) + 1f) * 0.5f;
-                
+
                 var styleManager = guiHelper.GetStyleManager();
-                GUIStyle loadingStyle = styleManager?.GetLabelStyle(LabelVariant.Muted) ?? GUI.skin.label;
-                
+                GUIStyle loadingStyle =
+                    styleManager?.GetLabelStyle(LabelVariant.Muted) ?? GUI.skin.label;
+
                 Color originalColor = GUI.color;
                 GUI.color = new Color(originalColor.r, originalColor.g, originalColor.b, alpha);
-                
+
 #if IL2CPP
                 GUILayout.Label("...", loadingStyle, (Il2CppReferenceArray<GUILayoutOption>)null);
 #else
                 GUILayout.Label("...", loadingStyle);
 #endif
-                
                 GUI.color = originalColor;
             }
-            
+
             layoutComponents.EndHorizontalGroup();
 
             return newValue;

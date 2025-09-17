@@ -1,7 +1,7 @@
-using shadcnui;
 using System;
 using System.Collections.Generic;
 using System.Text;
+using shadcnui;
 using UnityEngine;
 #if IL2CPP
 using UnhollowerBaseLib;
@@ -18,11 +18,17 @@ namespace shadcnui.GUIComponents
             guiHelper = helper;
         }
 
-        public Vector2 DrawScrollView(Vector2 scrollPosition, Action drawContent, params GUILayoutOption[] options)
+        public Vector2 DrawScrollView(
+            Vector2 scrollPosition,
+            Action drawContent,
+            params GUILayoutOption[] options
+        )
         {
 #if IL2CPP
-            scrollPosition = GUILayout.BeginScrollView(scrollPosition, 
-                (Il2CppReferenceArray<GUILayoutOption>)options);
+            scrollPosition = GUILayout.BeginScrollView(
+                scrollPosition,
+                (Il2CppReferenceArray<GUILayoutOption>)options
+            );
 #else
             scrollPosition = GUILayout.BeginScrollView(scrollPosition, options);
 #endif
@@ -82,6 +88,5 @@ namespace shadcnui.GUIComponents
         {
             GUILayout.Space(pixels * guiHelper.uiScale);
         }
-
     }
 }

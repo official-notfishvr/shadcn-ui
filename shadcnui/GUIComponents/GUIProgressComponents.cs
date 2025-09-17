@@ -1,5 +1,5 @@
-using shadcnui;
 using System;
+using shadcnui;
 using UnityEngine;
 #if IL2CPP
 using UnhollowerBaseLib;
@@ -17,18 +17,21 @@ namespace shadcnui.GUIComponents
             guiHelper = helper;
             layoutComponents = new GUILayoutComponents(helper);
         }
-        public void Progress(float value, float width = -1, float height = -1, params GUILayoutOption[] options)
+
+        public void Progress(
+            float value,
+            float width = -1,
+            float height = -1,
+            params GUILayoutOption[] options
+        )
         {
             var styleManager = guiHelper.GetStyleManager();
 
-           
             value = Mathf.Clamp01(value);
 
-           
             float scaledHeight = height > 0 ? height * guiHelper.uiScale : 8 * guiHelper.uiScale;
             float scaledWidth = width > 0 ? width * guiHelper.uiScale : -1;
 
-           
             var layoutOptions = new System.Collections.Generic.List<GUILayoutOption>();
             layoutOptions.Add(GUILayout.Height(scaledHeight));
             if (scaledWidth > 0)
@@ -39,19 +42,22 @@ namespace shadcnui.GUIComponents
             if (options != null && options.Length > 0)
                 layoutOptions.AddRange(options);
 
-           
 #if IL2CPP
-            Rect progressRect = GUILayoutUtility.GetRect(GUIContent.none, styleManager.GetProgressBarStyle(),
-                (Il2CppReferenceArray<GUILayoutOption>)layoutOptions.ToArray());
+            Rect progressRect = GUILayoutUtility.GetRect(
+                GUIContent.none,
+                styleManager.GetProgressBarStyle(),
+                (Il2CppReferenceArray<GUILayoutOption>)layoutOptions.ToArray()
+            );
 #else
-            Rect progressRect = GUILayoutUtility.GetRect(GUIContent.none, styleManager.GetProgressBarStyle(),
-                layoutOptions.ToArray());
+            Rect progressRect = GUILayoutUtility.GetRect(
+                GUIContent.none,
+                styleManager.GetProgressBarStyle(),
+                layoutOptions.ToArray()
+            );
 #endif
 
-           
             GUI.Box(progressRect, GUIContent.none, styleManager.GetProgressBarBackgroundStyle());
 
-           
             if (value > 0)
             {
                 Rect fillRect = new Rect(
@@ -64,14 +70,13 @@ namespace shadcnui.GUIComponents
                 GUI.Box(fillRect, GUIContent.none, styleManager.GetProgressBarFillStyle());
             }
         }
+
         public void Progress(Rect rect, float value)
         {
             var styleManager = guiHelper.GetStyleManager();
 
-           
             value = Mathf.Clamp01(value);
 
-           
             Rect scaledRect = new Rect(
                 rect.x * guiHelper.uiScale,
                 rect.y * guiHelper.uiScale,
@@ -79,10 +84,8 @@ namespace shadcnui.GUIComponents
                 rect.height * guiHelper.uiScale
             );
 
-           
             GUI.Box(scaledRect, GUIContent.none, styleManager.GetProgressBarBackgroundStyle());
 
-           
             if (value > 0)
             {
                 Rect fillRect = new Rect(
@@ -95,17 +98,27 @@ namespace shadcnui.GUIComponents
                 GUI.Box(fillRect, GUIContent.none, styleManager.GetProgressBarFillStyle());
             }
         }
-        public void LabeledProgress(string label, float value, float width = -1, float height = -1,
-            bool showPercentage = true, params GUILayoutOption[] options)
+
+        public void LabeledProgress(
+            string label,
+            float value,
+            float width = -1,
+            float height = -1,
+            bool showPercentage = true,
+            params GUILayoutOption[] options
+        )
         {
             var styleManager = guiHelper.GetStyleManager();
 
-           
             if (!string.IsNullOrEmpty(label))
             {
                 layoutComponents.BeginHorizontalGroup();
 #if IL2CPP
-                GUILayout.Label(new GUIContent(label), styleManager.GetLabelStyle(LabelVariant.Default), new Il2CppReferenceArray<UnityEngine.GUILayoutOption>(0));
+                GUILayout.Label(
+                    new GUIContent(label),
+                    styleManager.GetLabelStyle(LabelVariant.Default),
+                    new Il2CppReferenceArray<UnityEngine.GUILayoutOption>(0)
+                );
 #else
                 GUILayout.Label(label, styleManager.GetLabelStyle(LabelVariant.Default));
 #endif
@@ -115,7 +128,11 @@ namespace shadcnui.GUIComponents
                     GUILayout.FlexibleSpace();
                     string percentText = (value * 100f).ToString("F0") + "%";
 #if IL2CPP
-                    GUILayout.Label(new GUIContent(percentText), styleManager.GetLabelStyle(LabelVariant.Muted), new Il2CppReferenceArray<UnityEngine.GUILayoutOption>(0));
+                    GUILayout.Label(
+                        new GUIContent(percentText),
+                        styleManager.GetLabelStyle(LabelVariant.Muted),
+                        new Il2CppReferenceArray<UnityEngine.GUILayoutOption>(0)
+                    );
 #else
                     GUILayout.Label(percentText, styleManager.GetLabelStyle(LabelVariant.Muted));
 #endif
@@ -125,18 +142,19 @@ namespace shadcnui.GUIComponents
                 layoutComponents.AddSpace(4);
             }
 
-           
             Progress(value, width, height, options);
         }
-        public void CircularProgress(float value, float size = 32f, params GUILayoutOption[] options)
+
+        public void CircularProgress(
+            float value,
+            float size = 32f,
+            params GUILayoutOption[] options
+        )
         {
-           
             value = Mathf.Clamp01(value);
 
-           
             float scaledSize = size * guiHelper.uiScale;
 
-           
             var layoutOptions = new System.Collections.Generic.List<GUILayoutOption>();
             layoutOptions.Add(GUILayout.Width(scaledSize));
             layoutOptions.Add(GUILayout.Height(scaledSize));
@@ -144,31 +162,31 @@ namespace shadcnui.GUIComponents
             if (options != null && options.Length > 0)
                 layoutOptions.AddRange(options);
 
-           
 #if IL2CPP
-            Rect circleRect = GUILayoutUtility.GetRect(GUIContent.none, GUIStyle.none,
-                (Il2CppReferenceArray<GUILayoutOption>)layoutOptions.ToArray());
+            Rect circleRect = GUILayoutUtility.GetRect(
+                GUIContent.none,
+                GUIStyle.none,
+                (Il2CppReferenceArray<GUILayoutOption>)layoutOptions.ToArray()
+            );
 #else
-            Rect circleRect = GUILayoutUtility.GetRect(GUIContent.none, GUIStyle.none,
-                layoutOptions.ToArray());
+            Rect circleRect = GUILayoutUtility.GetRect(
+                GUIContent.none,
+                GUIStyle.none,
+                layoutOptions.ToArray()
+            );
 #endif
 
-           
-           
             var styleManager = guiHelper.GetStyleManager();
 
-           
             GUI.Box(circleRect, GUIContent.none, styleManager.GetProgressBarBackgroundStyle());
 
-           
             if (value > 0)
             {
-               
                 int segments = Mathf.RoundToInt(value * 8);
                 for (int i = 0; i < segments; i++)
                 {
                     float angle = (i / 8f) * 360f;
-                   
+
                     Rect segmentRect = new Rect(
                         circleRect.x + (circleRect.width * 0.1f),
                         circleRect.y + (circleRect.height * 0.1f),
@@ -178,7 +196,11 @@ namespace shadcnui.GUIComponents
 
                     if (i < segments)
                     {
-                        GUI.Box(segmentRect, GUIContent.none, styleManager.GetProgressBarFillStyle());
+                        GUI.Box(
+                            segmentRect,
+                            GUIContent.none,
+                            styleManager.GetProgressBarFillStyle()
+                        );
                     }
                 }
             }

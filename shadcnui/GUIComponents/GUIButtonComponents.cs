@@ -1,8 +1,8 @@
-using shadcnui;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using shadcnui;
 using UnityEngine;
 #if IL2CPP
 using UnhollowerBaseLib;
@@ -21,10 +21,14 @@ namespace shadcnui.GUIComponents
             layoutComponents = new GUILayoutComponents(helper);
         }
 
-
-        public bool Button(string text, ButtonVariant variant = ButtonVariant.Default,
-            ButtonSize size = ButtonSize.Default, Action onClick = null, bool disabled = false,
-            params GUILayoutOption[] options)
+        public bool Button(
+            string text,
+            ButtonVariant variant = ButtonVariant.Default,
+            ButtonSize size = ButtonSize.Default,
+            Action onClick = null,
+            bool disabled = false,
+            params GUILayoutOption[] options
+        )
         {
             var styleManager = guiHelper.GetStyleManager();
             GUIStyle buttonStyle = styleManager.GetButtonStyle(variant, size);
@@ -41,12 +45,16 @@ namespace shadcnui.GUIComponents
             }
 
             bool wasEnabled = GUI.enabled;
-            if (disabled) GUI.enabled = false;
+            if (disabled)
+                GUI.enabled = false;
 
             bool clicked;
 #if IL2CPP
-            clicked = GUILayout.Button(text ?? "Button", buttonStyle, 
-                (Il2CppReferenceArray<GUILayoutOption>)layoutOptions.ToArray());
+            clicked = GUILayout.Button(
+                text ?? "Button",
+                buttonStyle,
+                (Il2CppReferenceArray<GUILayoutOption>)layoutOptions.ToArray()
+            );
 #else
             clicked = GUILayout.Button(text ?? "Button", buttonStyle, layoutOptions.ToArray());
 #endif
@@ -59,8 +67,14 @@ namespace shadcnui.GUIComponents
             return clicked && !disabled;
         }
 
-        public bool Button(Rect rect, string text, ButtonVariant variant = ButtonVariant.Default,
-            ButtonSize size = ButtonSize.Default, Action onClick = null, bool disabled = false)
+        public bool Button(
+            Rect rect,
+            string text,
+            ButtonVariant variant = ButtonVariant.Default,
+            ButtonSize size = ButtonSize.Default,
+            Action onClick = null,
+            bool disabled = false
+        )
         {
             var styleManager = guiHelper.GetStyleManager();
             GUIStyle buttonStyle = styleManager.GetButtonStyle(variant, size);
@@ -73,7 +87,8 @@ namespace shadcnui.GUIComponents
             );
 
             bool wasEnabled = GUI.enabled;
-            if (disabled) GUI.enabled = false;
+            if (disabled)
+                GUI.enabled = false;
 
             bool clicked = GUI.Button(scaledRect, text ?? "Button", buttonStyle);
 
@@ -92,7 +107,10 @@ namespace shadcnui.GUIComponents
             if (horizontal)
             {
 #if IL2CPP
-                layoutComponents.BeginHorizontalGroup(GUIStyle.none, (Il2CppReferenceArray<GUILayoutOption>)null);
+                layoutComponents.BeginHorizontalGroup(
+                    GUIStyle.none,
+                    (Il2CppReferenceArray<GUILayoutOption>)null
+                );
 #else
                 layoutComponents.BeginHorizontalGroup();
 #endif
@@ -100,7 +118,10 @@ namespace shadcnui.GUIComponents
             else
             {
 #if IL2CPP
-                layoutComponents.BeginVerticalGroup(GUIStyle.none, (Il2CppReferenceArray<GUILayoutOption>)null);
+                layoutComponents.BeginVerticalGroup(
+                    GUIStyle.none,
+                    (Il2CppReferenceArray<GUILayoutOption>)null
+                );
 #else
                 layoutComponents.BeginVerticalGroup();
 #endif
@@ -116,26 +137,42 @@ namespace shadcnui.GUIComponents
             layoutComponents.AddSpace(scaledSpacing);
         }
 
-        public void RenderButtonSet(ButtonConfig[] buttons, bool horizontal = true, float spacing = 8f)
+        public void RenderButtonSet(
+            ButtonConfig[] buttons,
+            bool horizontal = true,
+            float spacing = 8f
+        )
         {
-            if (buttons == null || buttons.Length == 0) return;
+            if (buttons == null || buttons.Length == 0)
+                return;
 
-            ButtonGroup(() =>
-            {
-                for (int i = 0; i < buttons.Length; i++)
+            ButtonGroup(
+                () =>
                 {
-                    var config = buttons[i];
-                    Button(config.Text, config.Variant, config.Size, config.OnClick, config.Disabled, config.Options);
-
-                    if (i < buttons.Length - 1)
+                    for (int i = 0; i < buttons.Length; i++)
                     {
-                        if (horizontal)
-                            layoutComponents.AddSpace(spacing);
-                        else
-                            layoutComponents.AddSpace(spacing);
+                        var config = buttons[i];
+                        Button(
+                            config.Text,
+                            config.Variant,
+                            config.Size,
+                            config.OnClick,
+                            config.Disabled,
+                            config.Options
+                        );
+
+                        if (i < buttons.Length - 1)
+                        {
+                            if (horizontal)
+                                layoutComponents.AddSpace(spacing);
+                            else
+                                layoutComponents.AddSpace(spacing);
+                        }
                     }
-                }
-            }, horizontal, 0f);
+                },
+                horizontal,
+                0f
+            );
         }
 
         public struct ButtonConfig
@@ -147,9 +184,14 @@ namespace shadcnui.GUIComponents
             public bool Disabled;
             public GUILayoutOption[] Options;
 
-            public ButtonConfig(string text, ButtonVariant variant = ButtonVariant.Default,
-                ButtonSize size = ButtonSize.Default, Action onClick = null, bool disabled = false,
-                params GUILayoutOption[] options)
+            public ButtonConfig(
+                string text,
+                ButtonVariant variant = ButtonVariant.Default,
+                ButtonSize size = ButtonSize.Default,
+                Action onClick = null,
+                bool disabled = false,
+                params GUILayoutOption[] options
+            )
             {
                 Text = text;
                 Variant = variant;

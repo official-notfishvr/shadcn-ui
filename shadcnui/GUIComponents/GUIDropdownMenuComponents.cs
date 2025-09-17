@@ -34,26 +34,46 @@ namespace shadcnui.GUIComponents
 
         public void DropdownMenu(string[] items, Action<int> onItemSelected)
         {
-            if (!isOpen) return;
+            if (!isOpen)
+                return;
 
-            layoutComponents.BeginVerticalGroup(guiHelper.GetStyleManager().dropdownMenuContentStyle, GUILayout.ExpandWidth(true), GUILayout.MinHeight(0), GUILayout.MaxHeight(200));
-            scrollPosition = layoutComponents.DrawScrollView(scrollPosition, () =>
-            {
-                for (int i = 0; i < items.Length; i++)
+            layoutComponents.BeginVerticalGroup(
+                guiHelper.GetStyleManager().dropdownMenuContentStyle,
+                GUILayout.ExpandWidth(true),
+                GUILayout.MinHeight(0),
+                GUILayout.MaxHeight(200)
+            );
+            scrollPosition = layoutComponents.DrawScrollView(
+                scrollPosition,
+                () =>
                 {
-#if IL2CPP
-                    if (GUILayout.Button(items[i], guiHelper.GetStyleManager().dropdownMenuItemStyle,
-                        new Il2CppReferenceArray<GUILayoutOption>(new GUILayoutOption[0])))
-#else
-if (GUILayout.Button(items[i], guiHelper.GetStyleManager().dropdownMenuItemStyle))
-#endif
+                    for (int i = 0; i < items.Length; i++)
                     {
-                        onItemSelected?.Invoke(i);
-                        Close();
+#if IL2CPP
+                        if (
+                            GUILayout.Button(
+                                items[i],
+                                guiHelper.GetStyleManager().dropdownMenuItemStyle,
+                                new Il2CppReferenceArray<GUILayoutOption>(new GUILayoutOption[0])
+                            )
+                        )
+#else
+                        if (
+                            GUILayout.Button(
+                                items[i],
+                                guiHelper.GetStyleManager().dropdownMenuItemStyle
+                            )
+                        )
+#endif
+                        {
+                            onItemSelected?.Invoke(i);
+                            Close();
+                        }
                     }
-
-                }
-            }, GUILayout.ExpandWidth(true), GUILayout.ExpandHeight(true));
+                },
+                GUILayout.ExpandWidth(true),
+                GUILayout.ExpandHeight(true)
+            );
             layoutComponents.EndVerticalGroup();
         }
     }

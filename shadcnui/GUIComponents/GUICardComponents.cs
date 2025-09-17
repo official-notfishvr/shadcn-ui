@@ -1,12 +1,13 @@
-using shadcnui;
 using System;
 using System.Collections.Generic;
 using System.Text;
+using shadcnui;
+using UnityEngine;
 #if IL2CPP
 using UnhollowerBaseLib;
 #endif
 
-using UnityEngine;
+
 
 namespace shadcnui.GUIComponents
 {
@@ -28,30 +29,45 @@ namespace shadcnui.GUIComponents
             if (width > 0 && height > 0)
             {
 #if IL2CPP
-                layoutComponents.BeginVerticalGroup(styleManager.cardStyle, (Il2CppReferenceArray<GUILayoutOption>)new GUILayoutOption[] { 
-                    GUILayout.Width(width * guiHelper.uiScale), 
-                    GUILayout.Height(height * guiHelper.uiScale) 
-                });
+                layoutComponents.BeginVerticalGroup(
+                    styleManager.cardStyle,
+                    (Il2CppReferenceArray<GUILayoutOption>)
+                        new GUILayoutOption[]
+                        {
+                            GUILayout.Width(width * guiHelper.uiScale),
+                            GUILayout.Height(height * guiHelper.uiScale),
+                        }
+                );
 #else
-                layoutComponents.BeginVerticalGroup(styleManager.cardStyle,
+                layoutComponents.BeginVerticalGroup(
+                    styleManager.cardStyle,
                     GUILayout.Width(width * guiHelper.uiScale),
-                    GUILayout.Height(height * guiHelper.uiScale));
+                    GUILayout.Height(height * guiHelper.uiScale)
+                );
 #endif
             }
             else if (width > 0)
             {
 #if IL2CPP
-                layoutComponents.BeginVerticalGroup(styleManager.cardStyle, (Il2CppReferenceArray<GUILayoutOption>)new GUILayoutOption[] { 
-                    GUILayout.Width(width * guiHelper.uiScale) 
-                });
+                layoutComponents.BeginVerticalGroup(
+                    styleManager.cardStyle,
+                    (Il2CppReferenceArray<GUILayoutOption>)
+                        new GUILayoutOption[] { GUILayout.Width(width * guiHelper.uiScale) }
+                );
 #else
-                layoutComponents.BeginVerticalGroup(styleManager.cardStyle, GUILayout.Width(width * guiHelper.uiScale));
+                layoutComponents.BeginVerticalGroup(
+                    styleManager.cardStyle,
+                    GUILayout.Width(width * guiHelper.uiScale)
+                );
 #endif
             }
             else
             {
 #if IL2CPP
-                layoutComponents.BeginVerticalGroup(styleManager.cardStyle, (Il2CppReferenceArray<GUILayoutOption>)null);
+                layoutComponents.BeginVerticalGroup(
+                    styleManager.cardStyle,
+                    (Il2CppReferenceArray<GUILayoutOption>)null
+                );
 #else
                 layoutComponents.BeginVerticalGroup(styleManager.cardStyle);
 #endif
@@ -67,7 +83,10 @@ namespace shadcnui.GUIComponents
         {
             var styleManager = guiHelper.GetStyleManager();
 #if IL2CPP
-            layoutComponents.BeginVerticalGroup(styleManager.cardHeaderStyle, (Il2CppReferenceArray<GUILayoutOption>)null);
+            layoutComponents.BeginVerticalGroup(
+                styleManager.cardHeaderStyle,
+                (Il2CppReferenceArray<GUILayoutOption>)null
+            );
 #else
             layoutComponents.BeginVerticalGroup(styleManager.cardHeaderStyle);
 #endif
@@ -82,9 +101,13 @@ namespace shadcnui.GUIComponents
         {
             var styleManager = guiHelper.GetStyleManager();
 #if IL2CPP
-            GUILayout.Label(title, styleManager.cardTitleStyle, new Il2CppReferenceArray<GUILayoutOption>(new GUILayoutOption[0]));
+            GUILayout.Label(
+                title,
+                styleManager.cardTitleStyle,
+                new Il2CppReferenceArray<GUILayoutOption>(new GUILayoutOption[0])
+            );
 #else
-    GUILayout.Label(title, styleManager.cardTitleStyle);
+            GUILayout.Label(title, styleManager.cardTitleStyle);
 #endif
         }
 
@@ -92,9 +115,13 @@ namespace shadcnui.GUIComponents
         {
             var styleManager = guiHelper.GetStyleManager();
 #if IL2CPP
-            GUILayout.Label(description, styleManager.cardDescriptionStyle, new Il2CppReferenceArray<GUILayoutOption>(new GUILayoutOption[0]));
+            GUILayout.Label(
+                description,
+                styleManager.cardDescriptionStyle,
+                new Il2CppReferenceArray<GUILayoutOption>(new GUILayoutOption[0])
+            );
 #else
-    GUILayout.Label(description, styleManager.cardDescriptionStyle);
+            GUILayout.Label(description, styleManager.cardDescriptionStyle);
 #endif
         }
 
@@ -102,7 +129,10 @@ namespace shadcnui.GUIComponents
         {
             var styleManager = guiHelper.GetStyleManager();
 #if IL2CPP
-            layoutComponents.BeginVerticalGroup(styleManager.cardContentStyle, (Il2CppReferenceArray<GUILayoutOption>)null);
+            layoutComponents.BeginVerticalGroup(
+                styleManager.cardContentStyle,
+                (Il2CppReferenceArray<GUILayoutOption>)null
+            );
 #else
             layoutComponents.BeginVerticalGroup(styleManager.cardContentStyle);
 #endif
@@ -117,7 +147,10 @@ namespace shadcnui.GUIComponents
         {
             var styleManager = guiHelper.GetStyleManager();
 #if IL2CPP
-            layoutComponents.BeginHorizontalGroup(styleManager.cardFooterStyle, (Il2CppReferenceArray<GUILayoutOption>)null);
+            layoutComponents.BeginHorizontalGroup(
+                styleManager.cardFooterStyle,
+                (Il2CppReferenceArray<GUILayoutOption>)null
+            );
 #else
             layoutComponents.BeginHorizontalGroup(styleManager.cardFooterStyle);
 #endif
@@ -128,7 +161,14 @@ namespace shadcnui.GUIComponents
             layoutComponents.EndHorizontalGroup();
         }
 
-        public void DrawCard(string title, string description, string content, System.Action footerContent = null, float width = -1, float height = -1)
+        public void DrawCard(
+            string title,
+            string description,
+            string content,
+            System.Action footerContent = null,
+            float width = -1,
+            float height = -1
+        )
         {
             BeginCard(width, height);
 
@@ -146,9 +186,13 @@ namespace shadcnui.GUIComponents
             {
                 BeginCardContent();
 #if IL2CPP
-                GUILayout.Label(content, guiHelper.labelStyle2, new Il2CppReferenceArray<GUILayoutOption>(new GUILayoutOption[0]));
+                GUILayout.Label(
+                    content,
+                    guiHelper.labelStyle2,
+                    new Il2CppReferenceArray<GUILayoutOption>(new GUILayoutOption[0])
+                );
 #else
-        GUILayout.Label(content, guiHelper.labelStyle2);
+                GUILayout.Label(content, guiHelper.labelStyle2);
 #endif
                 EndCardContent();
             }
@@ -168,13 +212,16 @@ namespace shadcnui.GUIComponents
             BeginCard(width, height);
             BeginCardContent();
 #if IL2CPP
-            GUILayout.Label(content, guiHelper.labelStyle2, new Il2CppReferenceArray<GUILayoutOption>(new GUILayoutOption[0]));
+            GUILayout.Label(
+                content,
+                guiHelper.labelStyle2,
+                new Il2CppReferenceArray<GUILayoutOption>(new GUILayoutOption[0])
+            );
 #else
-    GUILayout.Label(content, guiHelper.labelStyle2);
+            GUILayout.Label(content, guiHelper.labelStyle2);
 #endif
             EndCardContent();
             EndCard();
         }
-
     }
 }
