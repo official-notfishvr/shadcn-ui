@@ -25,14 +25,13 @@ jobs:
     - name: Build
       run: msbuild shadcnui.sln /p:Configuration=Release /p:Platform="Any CPU"
 
-    - name: Upload shadcnui.dll
-      uses: actions/upload-artifact@v2
+    - uses: actions/upload-artifact@v4
       with:
-        name: shadcnui-dll
-        path: shadcnui/bin/Release/shadcnui.dll
+        name: shadcnui-build
+        path: shadcnui/bin/Release/net472/shadcnui.dll
 
     - name: Upload shadcnui testing.dll
-      uses: actions/upload-artifact@v2
+      uses: actions/upload-artifact@v4
       with:
         name: shadcnui-testing-dll
         path: "shadcnui testing/bin/Release/shadcnui testing.dll"
@@ -44,13 +43,13 @@ jobs:
 
     steps:
     - name: Download shadcnui.dll
-      uses: actions/download-artifact@v2
+      uses: actions/download-artifact@v4
       with:
         name: shadcnui-dll
         path: ./shadcnui-dll
 
     - name: Download shadcnui testing.dll
-      uses: actions/download-artifact@v2
+      uses: actions/download-artifact@v4
       with:
         name: shadcnui-testing-dll
         path: ./shadcnui-testing-dll
@@ -102,13 +101,13 @@ jobs:
       run: msbuild shadcnui.sln /p:Configuration=Release /p:Platform="Any CPU"
 
     - name: Upload shadcnui.dll (Nightly)
-      uses: actions/upload-artifact@v2
+      uses: actions/upload-artifact@v4
       with:
         name: shadcnui-nightly-${{ github.run_number }}
         path: shadcnui/bin/Release/shadcnui.dll
 
     - name: Upload shadcnui testing.dll (Nightly)
-      uses: actions/upload-artifact@v2
+      uses: actions/upload-artifact@v4
       with:
         name: shadcnui-testing-nightly-${{ github.run_number }}
         path: "shadcnui testing/bin/Release/shadcnui testing.dll"
