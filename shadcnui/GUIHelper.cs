@@ -4,6 +4,9 @@ using System.Collections.Generic;
 using System.Text;
 using UnityEngine;
 using static shadcnui.GUIComponents.GUIAvatarComponents;
+#if IL2CPP
+using UnhollowerBaseLib;
+#endif
 
 namespace shadcnui
 {
@@ -194,10 +197,12 @@ namespace shadcnui
 
                 Rect scaledBackgroundRect = new Rect(-offsetX, -offsetY, screenWidth, screenHeight);
 
-                Color backgroundColor = customColorsEnabled ?
-                    new Color(primaryColor.r, primaryColor.g, primaryColor.b,
-                             currentMenuAlpha * backgroundAlpha * currentBackgroundPulse) :
-                    new Color(0.1f, 0.1f, 0.2f, currentMenuAlpha * backgroundAlpha * currentBackgroundPulse);
+                float targetPulse = animationsEnabled ? currentBackgroundPulse : 1f;
+                float smoothPulse = Mathf.Lerp(targetPulse, currentBackgroundPulse, Time.deltaTime * animationSpeed);
+                float bgAlpha = Mathf.Clamp(currentMenuAlpha * backgroundAlpha * smoothPulse, 0.05f, 1f);
+
+                Color baseCol = customColorsEnabled ? primaryColor : new Color(0.1f, 0.1f, 0.2f);
+                Color backgroundColor = new Color(baseCol.r, baseCol.g, baseCol.b, bgAlpha);
 
                 GUI.color = backgroundColor;
                 GUI.DrawTexture(scaledBackgroundRect, Texture2D.whiteTexture);
@@ -273,8 +278,7 @@ namespace shadcnui
                     return "Input field index {fieldIndex} out of bounds";
                 }
 
-                return inputComponents?.RenderGlowInputField(text, fieldIndex, placeholder, width, inputFieldGlow, focusedField, menuAlpha) ??
-                       GUILayout.TextField(text ?? placeholder ?? "", GUILayout.Width(width));
+                return inputComponents?.RenderGlowInputField(text, fieldIndex, placeholder, width, inputFieldGlow, focusedField, menuAlpha);
             }
             catch (Exception ex)
             {
@@ -322,7 +326,11 @@ namespace shadcnui
 
                 GUIStyle glowButtonStyle = styleManager?.animatedButtonStyle ?? GUI.skin.button;
 
-                bool clicked = GUILayout.Button(text ?? "Button", glowButtonStyle);
+#if IL2CPP
+                bool clicked = GUILayout.Button(text ?? "Button", glowButtonStyle, new Il2CppReferenceArray<GUILayoutOption>(0));
+#else
+        bool clicked = GUILayout.Button(text ?? "Button", glowButtonStyle);
+#endif
 
                 Rect lastRect = GUILayoutUtility.GetLastRect();
                 if (lastRect.Contains(Event.current.mousePosition))
@@ -348,10 +356,6 @@ namespace shadcnui
             try
             {
                 var styleManager = GetStyleManager();
-                if (styleManager == null)
-                {
-                    return GUILayout.Button(colorName ?? "Color");
-                }
 
                 GUIStyle customButtonStyle = new GUIStyle(GUI.skin.button);
                 customButtonStyle.normal.background = styleManager.CreateSolidTexture(presetColor);
@@ -362,7 +366,11 @@ namespace shadcnui
                 customButtonStyle.fontSize = fontSize;
                 customButtonStyle.padding = new RectOffset(10, 10, 5, 5);
 
-                return GUILayout.Button(colorName ?? "Color", customButtonStyle);
+#if IL2CPP
+                return GUILayout.Button(colorName ?? "Color", customButtonStyle, new Il2CppReferenceArray<GUILayoutOption>(0));
+#else
+        return GUILayout.Button(colorName ?? "Color", customButtonStyle);
+#endif
             }
             catch (Exception ex)
             {
@@ -391,7 +399,11 @@ namespace shadcnui
                 var styleManager = GetStyleManager();
                 if (styleManager == null)
                 {
-                    return GUILayout.Button(text ?? "Button", GUILayout.Width(windowWidth));
+#if IL2CPP
+                    return GUILayout.Button(text ?? "Button", new Il2CppReferenceArray<GUILayoutOption>(new GUILayoutOption[] { GUILayout.Width(windowWidth) }));
+#else
+            return GUILayout.Button(text ?? "Button", GUILayout.Width(windowWidth));
+#endif
                 }
 
                 GUIStyle customButtonStyle = new GUIStyle(GUI.skin.button);
@@ -403,11 +415,16 @@ namespace shadcnui
                 customButtonStyle.fontSize = fontSize;
                 customButtonStyle.padding = new RectOffset(10, 10, 5, 5);
 
-                bool clicked = GUILayout.Button(text ?? "Button", customButtonStyle, GUILayout.Width(windowWidth));
+#if IL2CPP
+                bool clicked = GUILayout.Button(text ?? "Button", customButtonStyle,
+                    new Il2CppReferenceArray<GUILayoutOption>(new GUILayoutOption[] { GUILayout.Width(windowWidth) }));
+#else
+        bool clicked = GUILayout.Button(text ?? "Button", customButtonStyle, GUILayout.Width(windowWidth));
+#endif
+
                 if (clicked)
-                {
                     onClick?.Invoke();
-                }
+
                 return clicked;
             }
             catch (Exception ex)
@@ -416,6 +433,7 @@ namespace shadcnui
                 return false;
             }
         }
+
 
         public bool DrawFixedButton(string text, float width, float height, Action onClick = null)
         {
@@ -523,11 +541,6 @@ namespace shadcnui
         {
             try
             {
-                if (styleManager == null)
-                {
-                    return GUILayout.Button(text ?? "Button");
-                }
-
                 GUIStyle buttonStyle = styleManager.GetButtonStyle(variant, size);
 
                 GUILayoutOption[] options;

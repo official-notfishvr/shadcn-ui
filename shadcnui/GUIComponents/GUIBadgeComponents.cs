@@ -2,6 +2,9 @@ using shadcnui;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
+#if IL2CPP
+using UnhollowerBaseLib;
+#endif
 
 namespace shadcnui.GUIComponents
 {
@@ -21,11 +24,6 @@ namespace shadcnui.GUIComponents
             params GUILayoutOption[] options)
         {
             var styleManager = guiHelper.GetStyleManager();
-            if (styleManager == null)
-            {
-                GUILayout.Label(text ?? "Badge", GUI.skin.box);
-                return;
-            }
 
             GUIStyle badgeStyle = styleManager.GetBadgeStyle(variant, size);
 
@@ -39,11 +37,6 @@ namespace shadcnui.GUIComponents
         public void Badge(Rect rect, string text, BadgeVariant variant = BadgeVariant.Default, BadgeSize size = BadgeSize.Default)
         {
             var styleManager = guiHelper.GetStyleManager();
-            if (styleManager == null)
-            {
-                GUI.Label(rect, text ?? "Badge", GUI.skin.box);
-                return;
-            }
 
             GUIStyle badgeStyle = styleManager.GetBadgeStyle(variant, size);
 
@@ -57,31 +50,33 @@ namespace shadcnui.GUIComponents
             GUI.Label(scaledRect, text ?? "Badge", badgeStyle);
         }
 
-        public void BadgeWithIcon(string text, Texture2D icon, BadgeVariant variant = BadgeVariant.Default, 
-            BadgeSize size = BadgeSize.Default, params GUILayoutOption[] options)
+        public void BadgeWithIcon(string text, Texture2D icon, BadgeVariant variant = BadgeVariant.Default,
+                   BadgeSize size = BadgeSize.Default, params GUILayoutOption[] options)
         {
             layoutComponents.BeginHorizontalGroup();
-            
+
             if (icon != null)
             {
+#if IL2CPP
+                GUILayout.Label(icon, GUI.skin.label, (Il2CppReferenceArray<GUILayoutOption>)new GUILayoutOption[]
+                {
+                    GUILayout.Width(16 * guiHelper.uiScale),
+                    GUILayout.Height(16 * guiHelper.uiScale)
+                });
+#else
                 GUILayout.Label(icon, GUILayout.Width(16 * guiHelper.uiScale), GUILayout.Height(16 * guiHelper.uiScale));
+#endif
                 layoutComponents.AddSpace(4);
             }
-            
+
             Badge(text, variant, size, options);
-            
+
             layoutComponents.EndHorizontalGroup();
         }
-
         public void CustomBadge(string text, Color backgroundColor, Color textColor, BadgeSize size = BadgeSize.Default,
             params GUILayoutOption[] options)
         {
             var styleManager = guiHelper.GetStyleManager();
-            if (styleManager == null)
-            {
-                GUILayout.Label(text ?? "Badge", GUI.skin.box);
-                return;
-            }
 
             GUIStyle customStyle = new GUIStyle(GUI.skin.box);
             customStyle.normal.background = styleManager.CreateSolidTexture(backgroundColor);
@@ -105,29 +100,35 @@ namespace shadcnui.GUIComponents
             Badge(displayText, variant, size, options);
         }
 
-        public void StatusBadge(string text, bool isActive, BadgeVariant variant = BadgeVariant.Default, 
-            BadgeSize size = BadgeSize.Default, params GUILayoutOption[] options)
+        public void StatusBadge(string text, bool isActive, BadgeVariant variant = BadgeVariant.Default,
+                  BadgeSize size = BadgeSize.Default, params GUILayoutOption[] options)
         {
             layoutComponents.BeginHorizontalGroup();
-            
+
             Color dotColor = isActive ? Color.green : Color.gray;
             var styleManager = guiHelper.GetStyleManager();
             if (styleManager != null)
             {
-                GUIStyle dotStyle = new GUIStyle(GUI.skin.box);
-                dotStyle.normal.background = styleManager.CreateSolidTexture(dotColor);
-                dotStyle.fixedWidth = 8 * guiHelper.uiScale;
-                dotStyle.fixedHeight = 8 * guiHelper.uiScale;
-                dotStyle.border = new RectOffset(0, 0, 0, 0);
-                dotStyle.padding = new RectOffset(0, 0, 0, 0);
-                dotStyle.margin = new RectOffset(0, 0, 0, 0);
-                
+                GUIStyle dotStyle = new GUIStyle(GUI.skin.box)
+                {
+                    normal = { background = styleManager.CreateSolidTexture(dotColor) },
+                    fixedWidth = 8 * guiHelper.uiScale,
+                    fixedHeight = 8 * guiHelper.uiScale,
+                    border = new RectOffset(0, 0, 0, 0),
+                    padding = new RectOffset(0, 0, 0, 0),
+                    margin = new RectOffset(0, 0, 0, 0)
+                };
+
+#if IL2CPP
+                GUILayout.Label(GUIContent.none, dotStyle, (Il2CppReferenceArray<GUILayoutOption>)null);
+#else
                 GUILayout.Label("", dotStyle);
+#endif
                 layoutComponents.AddSpace(4);
             }
-            
+
             Badge(text, variant, size, options);
-            
+
             layoutComponents.EndHorizontalGroup();
         }
 
@@ -139,7 +140,11 @@ namespace shadcnui.GUIComponents
             Badge(text, variant, size, options);
             
             layoutComponents.AddSpace(4);
-            bool closeClicked = GUILayout.Button("×", GUILayout.Width(16 * guiHelper.uiScale), GUILayout.Height(16 * guiHelper.uiScale));
+#if IL2CPP
+            bool closeClicked = GUILayout.Button("×", GUI.skin.button, new Il2CppReferenceArray<GUILayoutOption>(new GUILayoutOption[] { GUILayout.Width(16 * guiHelper.uiScale), GUILayout.Height(16 * guiHelper.uiScale) }));
+#else
+            bool closeClicked = GUILayout.Button("×", GUI.skin.button, new GUILayoutOption[] { GUILayout.Width(16 * guiHelper.uiScale), GUILayout.Height(16 * guiHelper.uiScale) });
+#endif
             
             if (closeClicked && onDismiss != null)
             {
@@ -265,11 +270,6 @@ namespace shadcnui.GUIComponents
             BadgeSize size = BadgeSize.Default, float cornerRadius = 12f, params GUILayoutOption[] options)
         {
             var styleManager = guiHelper.GetStyleManager();
-            if (styleManager == null)
-            {
-                GUILayout.Label(text ?? "Badge", GUI.skin.box);
-                return;
-            }
 
             GUIStyle badgeStyle = styleManager.GetBadgeStyle(variant, size);
             

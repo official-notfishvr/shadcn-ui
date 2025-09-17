@@ -2,6 +2,10 @@ using shadcnui;
 using System;
 using System.Collections.Generic;
 using System.Text;
+#if IL2CPP
+using UnhollowerBaseLib;
+#endif
+
 using UnityEngine;
 
 namespace shadcnui.GUIComponents
@@ -22,17 +26,7 @@ namespace shadcnui.GUIComponents
         public void DrawLabel(string text, LabelVariant variant = LabelVariant.Default, int width = -1, bool disabled = false)
         {
             var styleManager = guiHelper.GetStyleManager();
-            if (styleManager == null)
-            {
-                if (width > 0)
-                    GUILayout.Label(text, GUILayout.Width(width));
-                else
-                    GUILayout.Label(text);
-                return;
-            }
-
-            GUIStyle labelStyle = styleManager.GetLabelStyle(variant);
-
+            GUIStyle labelStyle = styleManager?.GetLabelStyle(variant) ?? GUI.skin.label;
 
             Color originalColor = GUI.color;
             if (disabled)
@@ -40,42 +34,26 @@ namespace shadcnui.GUIComponents
                 GUI.color = new Color(originalColor.r, originalColor.g, originalColor.b, 0.7f);
             }
 
+#if IL2CPP
             if (width > 0)
-            {
-#if IL2CPP
-                GUILayout.Label(text ?? "", labelStyle, 
-                    (Il2CppReferenceArray<GUILayoutOption>)new GUILayoutOption[] { GUILayout.Width(width) });
-#else
-                GUILayout.Label(text ?? "", labelStyle, GUILayout.Width(width));
-#endif
-            }
+                GUILayout.Label(text ?? "", labelStyle, new Il2CppReferenceArray<GUILayoutOption>(new GUILayoutOption[] { GUILayout.Width(width) }));
             else
-            {
-#if IL2CPP
-                GUILayout.Label(text ?? "", labelStyle, (Il2CppReferenceArray<GUILayoutOption>)null);
+                GUILayout.Label(text ?? "", labelStyle, new Il2CppReferenceArray<GUILayoutOption>(0));
 #else
+            if (width > 0)
+                GUILayout.Label(text ?? "", labelStyle, GUILayout.Width(width));
+            else
                 GUILayout.Label(text ?? "", labelStyle);
 #endif
-            }
 
             GUI.color = originalColor;
         }
 
-
         public string DrawInput(string value, string placeholder = "", InputVariant variant = InputVariant.Default,
-            bool disabled = false, bool focused = false, int width = -1, Action<string> onChange = null)
+                    bool disabled = false, bool focused = false, int width = -1, Action<string> onChange = null)
         {
             var styleManager = guiHelper.GetStyleManager();
-            if (styleManager == null)
-            {
-                if (width > 0)
-                    return GUILayout.TextField(value ?? "", GUILayout.Width(width));
-                else
-                    return GUILayout.TextField(value ?? "");
-            }
-
-            GUIStyle inputStyle = styleManager.GetInputStyle(variant, focused, disabled);
-
+            GUIStyle inputStyle = styleManager?.GetInputStyle(variant, focused, disabled) ?? GUI.skin.textField;
 
             Color originalColor = GUI.color;
             if (disabled)
@@ -84,44 +62,34 @@ namespace shadcnui.GUIComponents
             }
 
             string newValue;
-            if (width > 0)
-            {
+
 #if IL2CPP
-                newValue = GUILayout.TextField(value ?? "", inputStyle, 
-                    (Il2CppReferenceArray<GUILayoutOption>)new GUILayoutOption[] { 
-                        GUILayout.Width(width * guiHelper.uiScale),
-                        GUILayout.Height(36 * guiHelper.uiScale) 
-                    });
+            if (width > 0)
+                newValue = GUILayout.TextField(value ?? "", inputStyle, new Il2CppReferenceArray<GUILayoutOption>(new GUILayoutOption[] {
+                    GUILayout.Width(width * guiHelper.uiScale),
+                    GUILayout.Height(36 * guiHelper.uiScale)
+                }));
+            else
+                newValue = GUILayout.TextField(value ?? "", inputStyle, new Il2CppReferenceArray<GUILayoutOption>(new GUILayoutOption[] {
+                    GUILayout.Height(36 * guiHelper.uiScale)
+                }));
 #else
+            if (width > 0)
                 newValue = GUILayout.TextField(value ?? "", inputStyle,
                     GUILayout.Width(width * guiHelper.uiScale),
                     GUILayout.Height(36 * guiHelper.uiScale));
-#endif
-            }
             else
-            {
-#if IL2CPP
-                newValue = GUILayout.TextField(value ?? "", inputStyle, 
-                    (Il2CppReferenceArray<GUILayoutOption>)new GUILayoutOption[] { 
-                        GUILayout.Height(36 * guiHelper.uiScale) 
-                    });
-#else
                 newValue = GUILayout.TextField(value ?? "", inputStyle,
                     GUILayout.Height(36 * guiHelper.uiScale));
 #endif
-            }
 
             GUI.color = originalColor;
 
-
-            if (newValue != value && !disabled && onChange != null)
-            {
+            if (!disabled && newValue != value && onChange != null)
                 onChange.Invoke(newValue);
-            }
 
             return disabled ? value : newValue;
         }
-
 
         public string DrawLabeledInput(string label, string value, string placeholder = "",
             InputVariant inputVariant = InputVariant.Default, LabelVariant labelVariant = LabelVariant.Default,
@@ -139,9 +107,19 @@ namespace shadcnui.GUIComponents
             var styleManager = guiHelper.GetStyleManager();
             if (styleManager == null)
             {
+#if IL2CPP
                 if (!string.IsNullOrEmpty(label))
-                    GUILayout.Label(label);
-                return GUILayout.PasswordField(value ?? "", maskChar);
+                    GUILayout.Label(label, GUI.skin.label, new Il2CppReferenceArray<GUILayoutOption>(0));
+#else
+                if (!string.IsNullOrEmpty(label))
+                    GUILayout.Label(label, GUI.skin.label, new GUILayoutOption[0]);
+#endif
+
+#if IL2CPP
+                return GUILayout.PasswordField(value ?? "", maskChar, GUI.skin.textField, new Il2CppReferenceArray<GUILayoutOption>(0));
+#else
+                return GUILayout.PasswordField(value ?? "", maskChar, GUI.skin.textField, new GUILayoutOption[0]);
+#endif
             }
 
             if (!string.IsNullOrEmpty(label))
@@ -161,9 +139,9 @@ namespace shadcnui.GUIComponents
 
 #if IL2CPP
             string newValue = GUILayout.PasswordField(value ?? "", maskChar, passwordStyle, 
-                (Il2CppReferenceArray<GUILayoutOption>)new GUILayoutOption[] { 
+                new Il2CppReferenceArray<GUILayoutOption>(new GUILayoutOption[] { 
                     GUILayout.Height(36 * guiHelper.uiScale) 
-                });
+                }));
 #else
             string newValue = GUILayout.PasswordField(value ?? "", maskChar, passwordStyle,
                 GUILayout.Height(36 * guiHelper.uiScale));
@@ -188,9 +166,18 @@ namespace shadcnui.GUIComponents
             var styleManager = guiHelper.GetStyleManager();
             if (styleManager == null)
             {
+#if IL2CPP
                 if (!string.IsNullOrEmpty(label))
-                    GUILayout.Label(label);
+                    GUILayout.Label(label, GUI.skin.label, new Il2CppReferenceArray<GUILayoutOption>(0));
+#else
+                if (!string.IsNullOrEmpty(label))
+                    GUILayout.Label(label, GUI.skin.label, new GUILayoutOption[0]);
+#endif
+#if IL2CPP
+                string result = GUILayout.TextArea(value ?? "", new Il2CppReferenceArray<GUILayoutOption>(new GUILayoutOption[] { GUILayout.Height(height) }));
+#else
                 string result = GUILayout.TextArea(value ?? "", GUILayout.Height(height));
+#endif
                 if (result.Length > maxLength)
                     result = result.Substring(0, maxLength);
                 return result;
@@ -213,10 +200,10 @@ namespace shadcnui.GUIComponents
 
 #if IL2CPP
             string newValue = GUILayout.TextArea(value ?? "", maxLength, textAreaStyle, 
-                (Il2CppReferenceArray<GUILayoutOption>)new GUILayoutOption[] { 
-                    GUILayout.Height(height * guiHelper.uiScale) 
-                });
-#else
+                                    new Il2CppReferenceArray<GUILayoutOption>(new GUILayoutOption[] { 
+                                        GUILayout.Height(height * guiHelper.uiScale) 
+                                    }));
+            #else
             string newValue = GUILayout.TextArea(value ?? "", maxLength, textAreaStyle,
                 GUILayout.Height(height * guiHelper.uiScale));
 #endif
@@ -239,7 +226,7 @@ namespace shadcnui.GUIComponents
             var styleManager = guiHelper.GetStyleManager();
             layoutComponents.AddSpace(guiHelper.controlSpacing * 0.5f);
 #if IL2CPP
-            GUILayout.Label(title, styleManager?.sectionHeaderStyle ?? GUI.skin.label, (Il2CppReferenceArray<GUILayoutOption>)null);
+            GUILayout.Label(title, styleManager?.sectionHeaderStyle ?? GUI.skin.label, new Il2CppReferenceArray<GUILayoutOption>(0));
 #else
             GUILayout.Label(title, styleManager?.sectionHeaderStyle ?? GUI.skin.label);
 #endif
@@ -255,14 +242,10 @@ namespace shadcnui.GUIComponents
             float[] inputFieldGlow, int focusedField, float menuAlpha)
         {
             var styleManager = guiHelper.GetStyleManager();
-            if (styleManager == null)
-            {
-                return GUILayout.TextField(text ?? placeholder ?? "", GUILayout.Width(width));
-            }
 
 #if IL2CPP
             Rect fieldRect = GUILayoutUtility.GetRect(width * guiHelper.uiScale, 25 * guiHelper.uiScale,
-                (Il2CppReferenceArray<GUILayoutOption>)new GUILayoutOption[] { GUILayout.Width(width * guiHelper.uiScale) });
+                new Il2CppReferenceArray<GUILayoutOption>(new GUILayoutOption[] { GUILayout.Width(width * guiHelper.uiScale) }));
 #else
             Rect fieldRect = GUILayoutUtility.GetRect(width * guiHelper.uiScale, 25 * guiHelper.uiScale,
                 GUILayout.Width(width * guiHelper.uiScale));

@@ -2,6 +2,9 @@ using shadcnui;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
+#if IL2CPP
+using UnhollowerBaseLib;
+#endif
 
 namespace shadcnui.GUIComponents
 {
@@ -24,7 +27,11 @@ namespace shadcnui.GUIComponents
             var styleManager = guiHelper.GetStyleManager();
             if (styleManager == null)
             {
-                return GUILayout.Toggle(value, text ?? "Checkbox");
+#if IL2CPP
+                return GUILayout.Toggle(value, text ?? "Checkbox", GUI.skin.toggle, new Il2CppReferenceArray<GUILayoutOption>(0));
+#else
+                return GUILayout.Toggle(value, text ?? "Checkbox", GUI.skin.toggle, new GUILayoutOption[0]);
+#endif
             }
 
             GUIStyle checkboxStyle = styleManager.GetCheckboxStyle(variant, size);
@@ -35,7 +42,7 @@ namespace shadcnui.GUIComponents
             bool newValue;
 #if IL2CPP
             newValue = GUILayout.Toggle(value, text ?? "Checkbox", checkboxStyle, 
-                (Il2CppReferenceArray<GUILayoutOption>)options);
+                options != null && options.Length > 0 ? new Il2CppReferenceArray<GUILayoutOption>(options) : new Il2CppReferenceArray<GUILayoutOption>(0));
 #else
             newValue = GUILayout.Toggle(value, text ?? "Checkbox", checkboxStyle, options);
 #endif
@@ -163,10 +170,6 @@ namespace shadcnui.GUIComponents
             Action<bool> onToggle = null, bool disabled = false, params GUILayoutOption[] options)
         {
             var styleManager = guiHelper.GetStyleManager();
-            if (styleManager == null)
-            {
-                return GUILayout.Toggle(value, text ?? "Checkbox");
-            }
 
             GUIStyle customStyle = new GUIStyle(GUI.skin.toggle);
             customStyle.normal.background = styleManager.CreateSolidTexture(backgroundColor);
@@ -215,7 +218,15 @@ namespace shadcnui.GUIComponents
 
             if (icon != null)
             {
-                GUILayout.Label(icon, GUILayout.Width(16 * guiHelper.uiScale), GUILayout.Height(16 * guiHelper.uiScale));
+#if IL2CPP
+                GUILayout.Label(icon, GUIStyle.none, new Il2CppReferenceArray<GUILayoutOption>(new GUILayoutOption[]
+                {
+        GUILayout.Width(16 * guiHelper.uiScale),
+        GUILayout.Height(16 * guiHelper.uiScale)
+                }));
+#else
+    GUILayout.Label(icon, GUILayout.Width(16 * guiHelper.uiScale), GUILayout.Height(16 * guiHelper.uiScale));
+#endif
                 layoutComponents.AddSpace(4);
             }
 

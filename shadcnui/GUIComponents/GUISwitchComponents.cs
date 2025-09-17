@@ -2,6 +2,9 @@ using shadcnui;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
+#if IL2CPP
+using UnhollowerBaseLib;
+#endif
 
 namespace shadcnui.GUIComponents
 {
@@ -23,7 +26,11 @@ namespace shadcnui.GUIComponents
             var styleManager = guiHelper.GetStyleManager();
             if (styleManager == null)
             {
-                return GUILayout.Toggle(value, text ?? "Switch");
+#if IL2CPP
+                return GUILayout.Toggle(value, text ?? "Switch", GUI.skin.toggle, new Il2CppReferenceArray<GUILayoutOption>(0));
+#else
+                return GUILayout.Toggle(value, text ?? "Switch", GUI.skin.toggle, new GUILayoutOption[0]);
+#endif
             }
 
             GUIStyle switchStyle = styleManager.GetSwitchStyle(variant, size);
@@ -150,10 +157,6 @@ namespace shadcnui.GUIComponents
             Action<bool> onToggle = null, bool disabled = false, params GUILayoutOption[] options)
         {
             var styleManager = guiHelper.GetStyleManager();
-            if (styleManager == null)
-            {
-                return GUILayout.Toggle(value, text ?? "Switch");
-            }
 
             GUIStyle customStyle = new GUIStyle(GUI.skin.toggle);
             customStyle.normal.background = styleManager.CreateSolidTexture(offColor);
@@ -167,7 +170,7 @@ namespace shadcnui.GUIComponents
             bool newValue;
 #if IL2CPP
             newValue = GUILayout.Toggle(value, text ?? "Switch", customStyle, 
-                (Il2CppReferenceArray<GUILayoutOption>)options);
+                options != null && options.Length > 0 ? new Il2CppReferenceArray<GUILayoutOption>(options) : new Il2CppReferenceArray<GUILayoutOption>(0));
 #else
             newValue = GUILayout.Toggle(value, text ?? "Switch", customStyle, options);
 #endif
@@ -184,7 +187,11 @@ namespace shadcnui.GUIComponents
             SwitchVariant variant = SwitchVariant.Default, SwitchSize size = SwitchSize.Default,
             Action<bool> onToggle = null, bool disabled = false)
         {
-            GUILayout.BeginHorizontal();
+#if IL2CPP
+            GUILayout.BeginHorizontal(new Il2CppReferenceArray<GUILayoutOption>(0));
+#else
+            GUILayout.BeginHorizontal(new GUILayoutOption[0]);
+#endif
             
             bool newValue = Switch("", value, variant, size, onToggle, disabled, GUILayout.Width(50 * guiHelper.uiScale));
             
@@ -192,9 +199,16 @@ namespace shadcnui.GUIComponents
             if (iconToShow != null)
             {
                 GUILayout.Space(4 * guiHelper.uiScale);
-                GUILayout.Label(iconToShow, GUILayout.Width(16 * guiHelper.uiScale), GUILayout.Height(16 * guiHelper.uiScale));
+#if IL2CPP
+                GUILayout.Label(iconToShow, GUI.skin.label, new Il2CppReferenceArray<GUILayoutOption>(new GUILayoutOption[] {
+    GUILayout.Width(16 * guiHelper.uiScale),
+    GUILayout.Height(16 * guiHelper.uiScale)
+}));
+#else
+GUILayout.Label(iconToShow, GUILayout.Width(16 * guiHelper.uiScale), GUILayout.Height(16 * guiHelper.uiScale));
+#endif
             }
-            
+
             if (!string.IsNullOrEmpty(text))
             {
                 GUILayout.Space(4 * guiHelper.uiScale);

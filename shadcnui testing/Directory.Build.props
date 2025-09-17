@@ -1,9 +1,30 @@
-<?xml version="1.0" encoding="utf-8" ?>
+<?xml version="1.0" encoding="utf-8"?>
 <Project>
-	<PropertyGroup>
-		<GamePath>C:\Program Files (x86)\Steam\steamapps\common\Gorilla Tag</GamePath>
-		<GameAssemblyPath>$(GamePath)\Gorilla Tag_Data\Managed</GameAssemblyPath>
-		<BepInExAssemblyPath>$(GamePath)\BepInEx\core</BepInExAssemblyPath>
-		<PluginsPath>$(GamePath)\BepInEx\plugins</PluginsPath>
-	</PropertyGroup>
+  <PropertyGroup>
+    <!-- Game paths -->
+    <GamePath>C:\Program Files (x86)\Steam\steamapps\common\Gorilla Tag</GamePath>
+    <GameAssemblyPath>$(GamePath)\Gorilla Tag_Data\Managed</GameAssemblyPath>
+    <BepInExAssemblyPath>$(GamePath)\BepInEx\core</BepInExAssemblyPath>
+    <PluginsPath>$(GamePath)\BepInEx\plugins</PluginsPath>
+  </PropertyGroup>
+
+    <PropertyGroup Condition="'$(Configuration)' == 'IL2CPP_Melonloader'">
+      <DefineConstants>IL2CPP;MELONLOADER</DefineConstants>
+      <ReferencePath>$(SolutionDir)References_Il2CPP\</ReferencePath>
+    </PropertyGroup>
+
+    <PropertyGroup Condition="'$(Configuration)' == 'IL2CPP_BepInEx'">
+      <DefineConstants>IL2CPP;BEPINEX</DefineConstants>
+      <ReferencePath>$(SolutionDir)References_Il2CPP\</ReferencePath>
+    </PropertyGroup>
+
+    <PropertyGroup Condition="'$(Configuration)' == 'Mono_Melonloader'">
+      <DefineConstants>MONO;MELONLOADER</DefineConstants>
+      <ReferencePath>$(SolutionDir)References\</ReferencePath>
+    </PropertyGroup>
+
+    <PropertyGroup Condition="'$(Configuration)' == 'Mono_BepInEx'">
+      <DefineConstants>MONO;BEPINEX</DefineConstants>
+      <ReferencePath>$(SolutionDir)References\</ReferencePath>
+    </PropertyGroup>
 </Project>
