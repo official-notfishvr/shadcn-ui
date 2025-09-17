@@ -8,14 +8,16 @@ namespace shadcnui.GUIComponents
     public class GUISkeletonComponents
     {
         private GUIHelper guiHelper;
+        private GUILayoutComponents layoutComponents;
 
         public GUISkeletonComponents(GUIHelper helper)
         {
             guiHelper = helper;
+            layoutComponents = new GUILayoutComponents(helper);
         }
 
-        public void Skeleton(float width, float height, SkeletonVariant variant = SkeletonVariant.Default, 
-            SkeletonSize size = SkeletonSize.Default, params GUILayoutOption[] options)
+        public void Skeleton(float width, float height, SkeletonVariant variant, 
+            SkeletonSize size, params GUILayoutOption[] options)
         {
             var styleManager = guiHelper.GetStyleManager();
             if (styleManager == null)
@@ -40,29 +42,10 @@ namespace shadcnui.GUIComponents
 #endif
         }
 
-        public void Skeleton(Rect rect, SkeletonVariant variant = SkeletonVariant.Default, SkeletonSize size = SkeletonSize.Default)
-        {
-            var styleManager = guiHelper.GetStyleManager();
-            if (styleManager == null)
-            {
-                GUI.Box(rect, "");
-                return;
-            }
+        
 
-            GUIStyle skeletonStyle = styleManager.GetSkeletonStyle(variant, size);
-
-            Rect scaledRect = new Rect(
-                rect.x * guiHelper.uiScale,
-                rect.y * guiHelper.uiScale,
-                rect.width * guiHelper.uiScale,
-                rect.height * guiHelper.uiScale
-            );
-
-            GUI.Box(scaledRect, "", skeletonStyle);
-        }
-
-        public void AnimatedSkeleton(float width, float height, SkeletonVariant variant = SkeletonVariant.Default, 
-            SkeletonSize size = SkeletonSize.Default, params GUILayoutOption[] options)
+        public void AnimatedSkeleton(float width, float height, SkeletonVariant variant, 
+            SkeletonSize size, params GUILayoutOption[] options)
         {
             float time = Time.time * 2f;
             float alpha = (Mathf.Sin(time) + 1f) * 0.5f * 0.3f + 0.7f;
@@ -75,8 +58,8 @@ namespace shadcnui.GUIComponents
             GUI.color = originalColor;
         }
 
-        public void ShimmerSkeleton(float width, float height, SkeletonVariant variant = SkeletonVariant.Default, 
-            SkeletonSize size = SkeletonSize.Default, params GUILayoutOption[] options)
+        public void ShimmerSkeleton(float width, float height, SkeletonVariant variant, 
+            SkeletonSize size, params GUILayoutOption[] options)
         {
             var styleManager = guiHelper.GetStyleManager();
             if (styleManager == null)
@@ -110,7 +93,7 @@ namespace shadcnui.GUIComponents
         }
 
         public void CustomSkeleton(float width, float height, Color backgroundColor, Color shimmerColor, 
-            SkeletonVariant variant = SkeletonVariant.Default, SkeletonSize size = SkeletonSize.Default, 
+            SkeletonVariant variant, SkeletonSize size, 
             params GUILayoutOption[] options)
         {
             var styleManager = guiHelper.GetStyleManager();
@@ -138,120 +121,99 @@ namespace shadcnui.GUIComponents
 #endif
         }
 
-        public void SkeletonText(int lineCount, float lineHeight = 20f, SkeletonVariant variant = SkeletonVariant.Default, 
-            SkeletonSize size = SkeletonSize.Default, params GUILayoutOption[] options)
+        public void SkeletonText(float width, int lines, params GUILayoutOption[] options)
         {
-            GUILayout.BeginVertical();
-            
-            for (int i = 0; i < lineCount; i++)
+            layoutComponents.BeginVerticalGroup();
+            for (int i = 0; i < lines; i++)
             {
-                float lineWidth = 200f;
-                if (i == lineCount - 1 && lineCount > 1)
+                float currentWidth = width * guiHelper.uiScale;
+                if (i == lines - 1 && lines > 1) currentWidth *= 0.7f;
+
+                Skeleton(currentWidth, guiHelper.fontSize * 1.2f, SkeletonVariant.Default, SkeletonSize.Default, options);
+                if (i < lines - 1)
                 {
-                    lineWidth = 120f;
-                }
-                else if (i % 3 == 0)
-                {
-                    lineWidth = 180f;
-                }
-                
-                Skeleton(lineWidth, lineHeight, variant, size, options);
-                
-                if (i < lineCount - 1)
-                {
-                    GUILayout.Space(4 * guiHelper.uiScale);
+                    layoutComponents.AddSpace(guiHelper.fontSize * 0.3f);
                 }
             }
-            
-            GUILayout.EndVertical();
+            layoutComponents.EndVerticalGroup();
         }
 
-        public void SkeletonAvatar(float size, SkeletonVariant variant = SkeletonVariant.Circular, 
+        public void SkeletonAvatar(float size, SkeletonVariant variant, 
             params GUILayoutOption[] options)
         {
-            Skeleton(size, size, variant, SkeletonSize.Default, options);
+            Skeleton((float)size, (float)size, variant, SkeletonSize.Default, options ?? new GUILayoutOption[0]);
         }
 
-        public void SkeletonButton(float width = 120f, float height = 36f, SkeletonVariant variant = SkeletonVariant.Rounded, 
-            SkeletonSize size = SkeletonSize.Default, params GUILayoutOption[] options)
+        public void SkeletonButton(float width, float height, SkeletonVariant variant, 
+            SkeletonSize size, params GUILayoutOption[] options)
         {
-            Skeleton(width, height, variant, size, options);
+            Skeleton((float)width, (float)height, variant, size, options ?? new GUILayoutOption[0]);
         }
 
-        public void SkeletonCard(float width = 300f, float height = 200f, SkeletonVariant variant = SkeletonVariant.Rounded, 
-            SkeletonSize size = SkeletonSize.Default, params GUILayoutOption[] options)
+        public void SkeletonCard(float width, float height, bool includeHeader, bool includeFooter, params GUILayoutOption[] options)
         {
-            GUILayout.BeginVertical();
-            
-            Skeleton(width, 40f, variant, size, options);
-            GUILayout.Space(8 * guiHelper.uiScale);
-            
-            SkeletonText(3, 16f, variant, size, options);
-            GUILayout.Space(8 * guiHelper.uiScale);
-            
-            Skeleton(width * 0.6f, 30f, variant, size, options);
-            
-            GUILayout.EndVertical();
-        }
+            layoutComponents.BeginVerticalGroup();
 
-        public void SkeletonTable(int rowCount, int columnCount, float cellWidth = 100f, float cellHeight = 30f, 
-            SkeletonVariant variant = SkeletonVariant.Default, SkeletonSize size = SkeletonSize.Default, 
-            params GUILayoutOption[] options)
-        {
-            GUILayout.BeginVertical();
-            
-            for (int row = 0; row < rowCount; row++)
+            if (includeHeader)
             {
-                GUILayout.BeginHorizontal();
-                
-                for (int col = 0; col < columnCount; col++)
+                layoutComponents.BeginVerticalGroup();
+                SkeletonText(width * 0.8f, 1);
+                layoutComponents.AddSpace(guiHelper.fontSize * 0.3f);
+                SkeletonText(width * 0.6f, 1);
+                layoutComponents.EndVerticalGroup();
+                layoutComponents.AddSpace(guiHelper.controlSpacing);
+            }
+
+            SkeletonText(width, 3);
+
+            if (includeFooter)
+            {
+                layoutComponents.AddSpace(guiHelper.controlSpacing);
+                layoutComponents.BeginHorizontalGroup();
+                Skeleton(width * 0.3f, guiHelper.fontSize * 1.5f, SkeletonVariant.Default, SkeletonSize.Default, options);
+                layoutComponents.AddSpace(guiHelper.controlSpacing);
+                Skeleton(width * 0.3f, guiHelper.fontSize * 1.5f, SkeletonVariant.Default, SkeletonSize.Default, options);
+                layoutComponents.EndHorizontalGroup();
+            }
+
+            layoutComponents.EndVerticalGroup();
+        }
+
+        public void SkeletonTable(float width, int rows, int columns, float cellHeight, float cellSpacing, params GUILayoutOption[] options)
+        {
+            layoutComponents.BeginVerticalGroup();
+            for (int r = 0; r < rows; r++)
+            {
+                layoutComponents.BeginHorizontalGroup();
+                for (int c = 0; c < columns; c++)
                 {
-                    Skeleton(cellWidth, cellHeight, variant, size, options);
-                    
-                    if (col < columnCount - 1)
+                    Skeleton(width / columns - cellSpacing, cellHeight, SkeletonVariant.Default, SkeletonSize.Default, options);
+                    if (c < columns - 1)
                     {
-                        GUILayout.Space(4 * guiHelper.uiScale);
+                        layoutComponents.AddSpace(cellSpacing);
                     }
                 }
-                
-                GUILayout.EndHorizontal();
-                
-                if (row < rowCount - 1)
+                layoutComponents.EndHorizontalGroup();
+                if (r < rows - 1)
                 {
-                    GUILayout.Space(4 * guiHelper.uiScale);
+                    layoutComponents.AddSpace(cellSpacing);
                 }
             }
-            
-            GUILayout.EndVertical();
+            layoutComponents.EndVerticalGroup();
         }
 
-        public void SkeletonList(int itemCount, float itemHeight = 60f, SkeletonVariant variant = SkeletonVariant.Rounded, 
-            SkeletonSize size = SkeletonSize.Default, params GUILayoutOption[] options)
+        public void SkeletonList(float itemWidth, float itemHeight, int itemCount, float spacing, params GUILayoutOption[] options)
         {
-            GUILayout.BeginVertical();
-            
+            layoutComponents.BeginVerticalGroup();
             for (int i = 0; i < itemCount; i++)
             {
-                GUILayout.BeginHorizontal();
-                
-                SkeletonAvatar(40f, variant, options);
-                GUILayout.Space(8 * guiHelper.uiScale);
-                
-                GUILayout.BeginVertical();
-                Skeleton(150f, 16f, variant, size, options);
-                GUILayout.Space(4 * guiHelper.uiScale);
-                Skeleton(100f, 12f, variant, size, options);
-                GUILayout.EndVertical();
-                
-                GUILayout.EndHorizontal();
-                
+                Skeleton(itemWidth, itemHeight, SkeletonVariant.Default, SkeletonSize.Default, options);
                 if (i < itemCount - 1)
                 {
-                    GUILayout.Space(8 * guiHelper.uiScale);
+                    layoutComponents.AddSpace(spacing);
                 }
             }
-            
-            GUILayout.EndVertical();
+            layoutComponents.EndVerticalGroup();
         }
 
         public void CustomShapeSkeleton(float width, float height, float cornerRadius, Color backgroundColor, 
@@ -287,8 +249,8 @@ namespace shadcnui.GUIComponents
 #endif
         }
 
-        public void SkeletonWithProgress(float width, float height, float progress, SkeletonVariant variant = SkeletonVariant.Default, 
-            SkeletonSize size = SkeletonSize.Default, params GUILayoutOption[] options)
+        public void SkeletonWithProgress(float width, float height, float progress, SkeletonVariant variant, 
+            SkeletonSize size, params GUILayoutOption[] options)
         {
             GUILayout.BeginVertical();
             
@@ -313,8 +275,8 @@ namespace shadcnui.GUIComponents
             GUILayout.EndVertical();
         }
 
-        public void FadeSkeleton(float width, float height, float fadeTime, SkeletonVariant variant = SkeletonVariant.Default, 
-            SkeletonSize size = SkeletonSize.Default, params GUILayoutOption[] options)
+        public void FadeSkeleton(float width, float height, float fadeTime, SkeletonVariant variant, 
+            SkeletonSize size, params GUILayoutOption[] options)
         {
             float time = Time.time;
             float alpha = Mathf.Clamp01(1f - (time / fadeTime));

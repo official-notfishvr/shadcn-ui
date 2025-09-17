@@ -269,6 +269,114 @@ namespace shadcnui.GUIComponents
         Default,
         Large
     }
+
+    /// <summary>
+    /// Variants for the Calendar component.
+    /// </summary>
+    public enum CalendarVariant
+    {
+        Default
+    }
+
+    /// <summary>
+    /// Sizes for the Calendar component.
+    /// </summary>
+    public enum CalendarSize
+    {
+        Default,
+        Small,
+        Large
+    }
+
+    /// <summary>
+    /// Variants for the Dialog component.
+    /// </summary>
+    public enum DialogVariant
+    {
+        Default
+    }
+
+    /// <summary>
+    /// Sizes for the Dialog component.
+    /// </summary>
+    public enum DialogSize
+    {
+        Default,
+        Small,
+        Large
+    }
+
+    /// <summary>
+    /// Variants for the DropdownMenu component.
+    /// </summary>
+    public enum DropdownMenuVariant
+    {
+        Default
+    }
+
+    /// <summary>
+    /// Sizes for the DropdownMenu component.
+    /// </summary>
+    public enum DropdownMenuSize
+    {
+        Default,
+        Small,
+        Large
+    }
+
+    /// <summary>
+    /// Variants for the Popover component.
+    /// </summary>
+    public enum PopoverVariant
+    {
+        Default
+    }
+
+    /// <summary>
+    /// Sizes for the Popover component.
+    /// </summary>
+    public enum PopoverSize
+    {
+        Default,
+        Small,
+        Large
+    }
+
+    /// <summary>
+    /// Variants for the ScrollArea component.
+    /// </summary>
+    public enum ScrollAreaVariant
+    {
+        Default
+    }
+
+    /// <summary>
+    /// Sizes for the ScrollArea component.
+    /// </summary>
+    public enum ScrollAreaSize
+    {
+        Default,
+        Small,
+        Large
+    }
+
+    /// <summary>
+    /// Variants for the Select component.
+    /// </summary>
+    public enum SelectVariant
+    {
+        Default
+    }
+
+    /// <summary>
+    /// Sizes for the Select component.
+    /// </summary>
+    public enum SelectSize
+    {
+        Default,
+        Small,
+        Large
+    }
     #endregion
 
     /// <summary>
@@ -415,6 +523,44 @@ namespace shadcnui.GUIComponents
         public GUIStyle labelSmallScaledStyle;
         public GUIStyle labelMediumScaledStyle;
         public GUIStyle labelLargeScaledStyle;
+
+        // Calendar Styles
+        public GUIStyle calendarStyle;
+        public GUIStyle calendarHeaderStyle;
+        public GUIStyle calendarTitleStyle;
+        public GUIStyle calendarWeekdayStyle;
+        public GUIStyle calendarDayStyle;
+        public GUIStyle calendarDaySelectedStyle;
+        public GUIStyle calendarDayOutsideMonthStyle;
+        public GUIStyle calendarDayTodayStyle;
+        public GUIStyle calendarSmallStyle;
+        public GUIStyle calendarLargeStyle;
+
+        // DropdownMenu Styles
+        public GUIStyle dropdownMenuContentStyle;
+        public GUIStyle dropdownMenuItemStyle;
+        public GUIStyle dropdownMenuSeparatorStyle;
+        public GUIStyle dropdownMenuSmallStyle;
+        public GUIStyle dropdownMenuLargeStyle;
+
+        // Popover Styles
+        public GUIStyle popoverContentStyle;
+        public GUIStyle popoverSmallStyle;
+        public GUIStyle popoverLargeStyle;
+
+        // ScrollArea Styles
+        public GUIStyle scrollAreaStyle;
+        public GUIStyle scrollAreaThumbStyle;
+        public GUIStyle scrollAreaTrackStyle;
+        public GUIStyle scrollAreaSmallStyle;
+        public GUIStyle scrollAreaLargeStyle;
+
+        // Select Styles
+        public GUIStyle selectTriggerStyle;
+        public GUIStyle selectContentStyle;
+        public GUIStyle selectItemStyle;
+        public GUIStyle selectSmallStyle;
+        public GUIStyle selectLargeStyle;
         #endregion
 
         #region Texture Fields
@@ -444,6 +590,26 @@ namespace shadcnui.GUIComponents
         private Texture2D tableTexture;
         private Texture2D tableHeaderTexture;
         private Texture2D tableCellTexture;
+
+        // Calendar Textures
+        private Texture2D calendarBackgroundTexture;
+        private Texture2D calendarHeaderTexture;
+        private Texture2D calendarDayTexture;
+        private Texture2D calendarDaySelectedTexture;
+
+        // DropdownMenu Textures
+        private Texture2D dropdownMenuContentTexture;
+
+        // Popover Textures
+        private Texture2D popoverContentTexture;
+
+        // ScrollArea Textures
+        private Texture2D scrollAreaThumbTexture;
+        private Texture2D scrollAreaTrackTexture;
+
+        // Select Textures
+        private Texture2D selectTriggerTexture;
+        private Texture2D selectContentTexture;
         #endregion
 
         public GUIStyleManager(GUIHelper helper)
@@ -475,6 +641,11 @@ namespace shadcnui.GUIComponents
             SetupAvatarStyles();
             SetupSkeletonStyles();
             SetupTableStyles();
+            SetupCalendarStyles();
+            SetupDropdownMenuStyles();
+            SetupPopoverStyles();
+            SetupScrollAreaStyles();
+            SetupSelectStyles();
         }
         #endregion
 
@@ -1593,6 +1764,191 @@ namespace shadcnui.GUIComponents
             tableHoverStyle = new GUIStyle(tableStyle);
             tableHoverStyle.hover.background = CreateSolidTexture(new Color(0.1f, 0.1f, 0.15f));
         }
+
+        private void SetupCalendarStyles()
+        {
+            float scaledFontSize = guiHelper.fontSize * guiHelper.uiScale;
+            int borderRadius = Mathf.RoundToInt(guiHelper.cornerRadius * guiHelper.uiScale);
+
+            calendarBackgroundTexture = new Texture2D(1, 1);
+            Color calendarBgColor = guiHelper.customColorsEnabled ?
+                new Color(guiHelper.primaryColor.r, guiHelper.primaryColor.g, guiHelper.primaryColor.b, guiHelper.backgroundAlpha) :
+                new Color(0.15f, 0.15f, 0.25f, guiHelper.backgroundAlpha);
+            calendarBackgroundTexture.SetPixel(0, 0, calendarBgColor);
+            calendarBackgroundTexture.Apply();
+
+            calendarHeaderTexture = new Texture2D(1, 1);
+            Color calendarHeaderBgColor = guiHelper.customColorsEnabled ?
+                new Color(guiHelper.primaryColor.r * 0.8f, guiHelper.primaryColor.g * 0.8f, guiHelper.primaryColor.b * 0.8f, guiHelper.backgroundAlpha) :
+                new Color(0.2f, 0.2f, 0.3f, guiHelper.backgroundAlpha);
+            calendarHeaderTexture.SetPixel(0, 0, calendarHeaderBgColor);
+            calendarHeaderTexture.Apply();
+
+            calendarDayTexture = new Texture2D(1, 1);
+            Color calendarDayBgColor = new Color(0, 0, 0, 0);
+            calendarDayTexture.SetPixel(0, 0, calendarDayBgColor);
+            calendarDayTexture.Apply();
+
+            calendarDaySelectedTexture = new Texture2D(1, 1);
+            Color calendarDaySelectedBgColor = guiHelper.customColorsEnabled ? guiHelper.accentColor : new Color(0.25f, 0.5f, 1f);
+            calendarDaySelectedTexture.SetPixel(0, 0, calendarDaySelectedBgColor);
+            calendarDaySelectedTexture.Apply();
+
+            calendarStyle = new GUIStyle(GUI.skin.box);
+            calendarStyle.normal.background = calendarBackgroundTexture;
+            calendarStyle.border = new RectOffset(borderRadius, borderRadius, borderRadius, borderRadius);
+            calendarStyle.padding = new RectOffset(10, 10, 10, 10);
+
+            calendarHeaderStyle = new GUIStyle(GUI.skin.box);
+            calendarHeaderStyle.normal.background = calendarHeaderTexture;
+            calendarHeaderStyle.padding = new RectOffset(5, 5, 5, 5);
+            calendarHeaderStyle.alignment = TextAnchor.MiddleCenter;
+
+            calendarTitleStyle = new GUIStyle(GUI.skin.label);
+            calendarTitleStyle.fontSize = Mathf.RoundToInt(scaledFontSize * 1.2f);
+            calendarTitleStyle.fontStyle = FontStyle.Bold;
+            calendarTitleStyle.normal.textColor = Color.white;
+            calendarTitleStyle.alignment = TextAnchor.MiddleCenter;
+
+            calendarWeekdayStyle = new GUIStyle(GUI.skin.label);
+            calendarWeekdayStyle.fontSize = Mathf.RoundToInt(scaledFontSize * 0.9f);
+            calendarWeekdayStyle.fontStyle = FontStyle.Normal;
+            calendarWeekdayStyle.normal.textColor = new Color(0.8f, 0.8f, 0.8f);
+            calendarWeekdayStyle.alignment = TextAnchor.MiddleCenter;
+
+            calendarDayStyle = new GUIStyle(GUI.skin.button);
+            calendarDayStyle.fontSize = Mathf.RoundToInt(scaledFontSize);
+            calendarDayStyle.fontStyle = FontStyle.Normal;
+            calendarDayStyle.alignment = TextAnchor.MiddleCenter;
+            calendarDayStyle.normal.background = calendarDayTexture;
+            calendarDayStyle.normal.textColor = Color.white;
+            calendarDayStyle.hover.background = CreateSolidTexture(new Color(0.25f, 0.25f, 0.35f));
+            calendarDayStyle.active.background = CreateSolidTexture(new Color(0.2f, 0.2f, 0.3f));
+
+            calendarDaySelectedStyle = new GUIStyle(calendarDayStyle);
+            calendarDaySelectedStyle.normal.background = calendarDaySelectedTexture;
+            calendarDaySelectedStyle.normal.textColor = Color.white;
+
+            calendarDayOutsideMonthStyle = new GUIStyle(calendarDayStyle);
+            calendarDayOutsideMonthStyle.normal.textColor = new Color(0.5f, 0.5f, 0.5f);
+
+            calendarDayTodayStyle = new GUIStyle(calendarDayStyle);
+            calendarDayTodayStyle.fontStyle = FontStyle.Bold;
+            calendarDayTodayStyle.normal.textColor = guiHelper.customColorsEnabled ? guiHelper.accentColor : new Color(0.25f, 0.5f, 1f);
+        }
+
+        private void SetupDropdownMenuStyles()
+        {
+            float scaledFontSize = guiHelper.fontSize * guiHelper.uiScale;
+            int borderRadius = Mathf.RoundToInt(guiHelper.cornerRadius * guiHelper.uiScale);
+
+            dropdownMenuContentTexture = new Texture2D(1, 1);
+            Color dropdownMenuContentBgColor = guiHelper.customColorsEnabled ?
+                new Color(guiHelper.primaryColor.r, guiHelper.primaryColor.g, guiHelper.primaryColor.b, 1f) :
+                new Color(0.1f, 0.1f, 0.15f, 1f);
+            dropdownMenuContentTexture.SetPixel(0, 0, dropdownMenuContentBgColor);
+            dropdownMenuContentTexture.Apply();
+
+            dropdownMenuContentStyle = new GUIStyle(GUI.skin.box);
+            dropdownMenuContentStyle.normal.background = dropdownMenuContentTexture;
+            dropdownMenuContentStyle.border = new RectOffset(borderRadius, borderRadius, borderRadius, borderRadius);
+            dropdownMenuContentStyle.padding = new RectOffset(5, 5, 5, 5);
+
+            dropdownMenuItemStyle = new GUIStyle(GUI.skin.button);
+            dropdownMenuItemStyle.fontSize = Mathf.RoundToInt(scaledFontSize);
+            dropdownMenuItemStyle.fontStyle = FontStyle.Normal;
+            dropdownMenuItemStyle.alignment = TextAnchor.MiddleLeft;
+            dropdownMenuItemStyle.normal.background = transparentTexture;
+            dropdownMenuItemStyle.normal.textColor = Color.white;
+            dropdownMenuItemStyle.hover.background = CreateSolidTexture(new Color(0.25f, 0.25f, 0.35f));
+            dropdownMenuItemStyle.active.background = CreateSolidTexture(new Color(0.2f, 0.2f, 0.3f));
+            dropdownMenuItemStyle.padding = new RectOffset(10, 10, 5, 5);
+
+            dropdownMenuSeparatorStyle = new GUIStyle();
+            dropdownMenuSeparatorStyle.normal.background = separatorTexture;
+            dropdownMenuSeparatorStyle.fixedHeight = 1;
+            dropdownMenuSeparatorStyle.margin = new RectOffset(5, 5, 5, 5);
+        }
+
+        private void SetupPopoverStyles()
+        {
+            float scaledFontSize = guiHelper.fontSize * guiHelper.uiScale;
+            int borderRadius = Mathf.RoundToInt(guiHelper.cornerRadius * guiHelper.uiScale);
+
+            popoverContentTexture = new Texture2D(1, 1);
+            Color popoverContentBgColor = guiHelper.customColorsEnabled ?
+                new Color(guiHelper.primaryColor.r, guiHelper.primaryColor.g, guiHelper.primaryColor.b, 1f) :
+                new Color(0.1f, 0.1f, 0.15f, 1f);
+            popoverContentTexture.SetPixel(0, 0, popoverContentBgColor);
+            popoverContentTexture.Apply();
+
+            popoverContentStyle = new GUIStyle(GUI.skin.box);
+            popoverContentStyle.normal.background = popoverContentTexture;
+            popoverContentStyle.border = new RectOffset(borderRadius, borderRadius, borderRadius, borderRadius);
+            popoverContentStyle.padding = new RectOffset(10, 10, 10, 10);
+        }
+
+        private void SetupScrollAreaStyles()
+        {
+            scrollAreaThumbTexture = new Texture2D(1, 1);
+            scrollAreaThumbTexture.SetPixel(0, 0, new Color(0.5f, 0.5f, 0.5f, 0.5f));
+            scrollAreaThumbTexture.Apply();
+
+            scrollAreaTrackTexture = new Texture2D(1, 1);
+            scrollAreaTrackTexture.SetPixel(0, 0, new Color(0.2f, 0.2f, 0.2f, 0.5f));
+            scrollAreaTrackTexture.Apply();
+
+            scrollAreaStyle = new GUIStyle(GUI.skin.scrollView);
+
+            scrollAreaThumbStyle = new GUIStyle(GUI.skin.verticalScrollbarThumb);
+            scrollAreaThumbStyle.normal.background = scrollAreaThumbTexture;
+
+            scrollAreaTrackStyle = new GUIStyle(GUI.skin.verticalScrollbar);
+            scrollAreaTrackStyle.normal.background = scrollAreaTrackTexture;
+        }
+
+        private void SetupSelectStyles()
+        {
+            float scaledFontSize = guiHelper.fontSize * guiHelper.uiScale;
+            int borderRadius = Mathf.RoundToInt(guiHelper.cornerRadius * guiHelper.uiScale);
+
+            selectTriggerTexture = new Texture2D(1, 1);
+            Color selectTriggerBgColor = guiHelper.customColorsEnabled ?
+                new Color(guiHelper.primaryColor.r, guiHelper.primaryColor.g, guiHelper.primaryColor.b, 1f) :
+                new Color(0.1f, 0.1f, 0.15f, 1f);
+            selectTriggerTexture.SetPixel(0, 0, selectTriggerBgColor);
+            selectTriggerTexture.Apply();
+
+            selectContentTexture = new Texture2D(1, 1);
+            Color selectContentBgColor = guiHelper.customColorsEnabled ?
+                new Color(guiHelper.primaryColor.r, guiHelper.primaryColor.g, guiHelper.primaryColor.b, 1f) :
+                new Color(0.1f, 0.1f, 0.15f, 1f);
+            selectContentTexture.SetPixel(0, 0, selectContentBgColor);
+            selectContentTexture.Apply();
+
+            selectTriggerStyle = new GUIStyle(GUI.skin.button);
+            selectTriggerStyle.normal.background = selectTriggerTexture;
+            selectTriggerStyle.border = new RectOffset(borderRadius, borderRadius, borderRadius, borderRadius);
+            selectTriggerStyle.padding = new RectOffset(10, 10, 5, 5);
+            selectTriggerStyle.alignment = TextAnchor.MiddleLeft;
+            selectTriggerStyle.normal.textColor = Color.white;
+            selectTriggerStyle.fontSize = Mathf.RoundToInt(scaledFontSize);
+
+            selectContentStyle = new GUIStyle(GUI.skin.box);
+            selectContentStyle.normal.background = selectContentTexture;
+            selectContentStyle.border = new RectOffset(borderRadius, borderRadius, borderRadius, borderRadius);
+            selectContentStyle.padding = new RectOffset(5, 5, 5, 5);
+
+            selectItemStyle = new GUIStyle(GUI.skin.button);
+            selectItemStyle.fontSize = Mathf.RoundToInt(scaledFontSize);
+            selectItemStyle.fontStyle = FontStyle.Normal;
+            selectItemStyle.alignment = TextAnchor.MiddleLeft;
+            selectItemStyle.normal.background = transparentTexture;
+            selectItemStyle.normal.textColor = Color.white;
+            selectItemStyle.hover.background = CreateSolidTexture(new Color(0.25f, 0.25f, 0.35f));
+            selectItemStyle.active.background = CreateSolidTexture(new Color(0.2f, 0.2f, 0.3f));
+            selectItemStyle.padding = new RectOffset(10, 10, 5, 5);
+        }
         #endregion
 
         #region Style Getters
@@ -2176,6 +2532,49 @@ namespace shadcnui.GUIComponents
         {
             return tableCellStyle ?? GUI.skin.label;
         }
+
+        /// <summary>
+        /// Gets the calendar style for the given variant and size.
+        /// </summary>
+        public GUIStyle GetCalendarStyle(CalendarVariant variant, CalendarSize size)
+        {
+            return calendarStyle;
+        }
+
+        /// <summary>
+        /// Gets the dropdown menu style for the given variant and size.
+        /// </summary>
+        public GUIStyle GetDropdownMenuStyle(DropdownMenuVariant variant, DropdownMenuSize size)
+        {
+            return dropdownMenuContentStyle;
+        }
+
+        /// <summary>
+        /// Gets the popover style for the given variant and size.
+        /// </summary>
+        public GUIStyle GetPopoverStyle(PopoverVariant variant, PopoverSize size)
+        {
+            return popoverContentStyle;
+        }
+
+        /// <summary>
+        /// Gets the scroll area style for the given variant and size.
+        /// </summary>
+        public GUIStyle GetScrollAreaStyle(ScrollAreaVariant variant, ScrollAreaSize size)
+        {
+            return scrollAreaStyle;
+        }
+
+        /// <summary>
+        /// Gets the select style for the given variant and size.
+        /// </summary>
+        public GUIStyle GetSelectStyle(SelectVariant variant, SelectSize size)
+        {
+            return selectContentStyle;
+        }
+
+        public GUIStyle GetSelectTriggerStyle() => selectTriggerStyle;
+        public GUIStyle GetSelectItemStyle() => selectItemStyle;
         #endregion
 
         #region Cleanup

@@ -10,10 +10,12 @@ namespace shadcnui.GUIComponents
     public class GUIButtonComponents
     {
         private GUIHelper guiHelper;
+        private GUILayoutComponents layoutComponents;
 
         public GUIButtonComponents(GUIHelper helper)
         {
             guiHelper = helper;
+            layoutComponents = new GUILayoutComponents(helper);
         }
 
 
@@ -87,28 +89,28 @@ namespace shadcnui.GUIComponents
             if (horizontal)
             {
 #if IL2CPP
-                GUILayout.BeginHorizontal(GUIStyle.none, (Il2CppReferenceArray<GUILayoutOption>)null);
+                layoutComponents.BeginHorizontalGroup(GUIStyle.none, (Il2CppReferenceArray<GUILayoutOption>)null);
 #else
-                GUILayout.BeginHorizontal();
+                layoutComponents.BeginHorizontalGroup();
 #endif
             }
             else
             {
 #if IL2CPP
-                GUILayout.BeginVertical(GUIStyle.none, (Il2CppReferenceArray<GUILayoutOption>)null);
+                layoutComponents.BeginVerticalGroup(GUIStyle.none, (Il2CppReferenceArray<GUILayoutOption>)null);
 #else
-                GUILayout.BeginVertical();
+                layoutComponents.BeginVerticalGroup();
 #endif
             }
 
             drawButtons?.Invoke();
 
             if (horizontal)
-                GUILayout.EndHorizontal();
+                layoutComponents.EndHorizontalGroup();
             else
-                GUILayout.EndVertical();
+                layoutComponents.EndVerticalGroup();
 
-            GUILayout.Space(scaledSpacing);
+            layoutComponents.AddSpace(scaledSpacing);
         }
 
         public void RenderButtonSet(ButtonConfig[] buttons, bool horizontal = true, float spacing = 8f)
@@ -125,9 +127,9 @@ namespace shadcnui.GUIComponents
                     if (i < buttons.Length - 1)
                     {
                         if (horizontal)
-                            GUILayout.Space(spacing * guiHelper.uiScale);
+                            layoutComponents.AddSpace(spacing);
                         else
-                            GUILayout.Space(spacing * guiHelper.uiScale);
+                            layoutComponents.AddSpace(spacing);
                     }
                 }
             }, horizontal, 0f);

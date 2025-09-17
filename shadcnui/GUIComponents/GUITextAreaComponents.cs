@@ -7,10 +7,12 @@ namespace shadcnui.GUIComponents
     public class GUITextAreaComponents
     {
         private GUIHelper guiHelper;
+        private GUILayoutComponents layoutComponents;
 
         public GUITextAreaComponents(GUIHelper helper)
         {
             guiHelper = helper;
+            layoutComponents = new GUILayoutComponents(helper);
         }
         public string TextArea(string text, TextAreaVariant variant = TextAreaVariant.Default,
             string placeholder = "", bool disabled = false, float minHeight = 60f, int maxLength = -1,
@@ -120,7 +122,7 @@ namespace shadcnui.GUIComponents
             if (!string.IsNullOrEmpty(label))
             {
                 GUILayout.Label(label, styleManager.GetLabelStyle(LabelVariant.Default));
-                GUILayout.Space(4 * guiHelper.uiScale);
+                layoutComponents.AddSpace(4);
             }
 
            
@@ -129,8 +131,8 @@ namespace shadcnui.GUIComponents
            
             if (showCharCount)
             {
-                GUILayout.Space(4 * guiHelper.uiScale);
-                GUILayout.BeginHorizontal();
+                layoutComponents.AddSpace(4);
+                layoutComponents.BeginHorizontalGroup();
                 GUILayout.FlexibleSpace();
 
                 string countText = maxLength > 0 ?
@@ -145,7 +147,7 @@ namespace shadcnui.GUIComponents
                 countStyle.normal.textColor = countColor;
 
                 GUILayout.Label(countText, countStyle);
-                GUILayout.EndHorizontal();
+                layoutComponents.EndHorizontalGroup();
             }
 
             return result;
@@ -169,7 +171,7 @@ namespace shadcnui.GUIComponents
             string result = TextArea(text, variant, placeholder, disabled, height, maxLength, layoutOptions.ToArray());
 
            
-            GUILayout.BeginHorizontal();
+            layoutComponents.BeginHorizontalGroup();
             GUILayout.FlexibleSpace();
 
             var styleManager = guiHelper.GetStyleManager();
@@ -181,7 +183,7 @@ namespace shadcnui.GUIComponents
                 height = height >= maxHeight ? minHeight : height + 20f;
             }
 
-            GUILayout.EndHorizontal();
+            layoutComponents.EndHorizontalGroup();
 
             return result;
         }

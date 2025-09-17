@@ -9,11 +9,13 @@ namespace shadcnui.GUIComponents
     public class GUIInputComponents
     {
         private GUIHelper guiHelper;
+        private GUILayoutComponents layoutComponents;
         private static float horizontalPadding = 10f;
 
         public GUIInputComponents(GUIHelper helper)
         {
             guiHelper = helper;
+            layoutComponents = new GUILayoutComponents(helper);
         }
 
 
@@ -126,7 +128,7 @@ namespace shadcnui.GUIComponents
             bool disabled = false, int inputWidth = -1, Action<string> onChange = null)
         {
             DrawLabel(label, labelVariant, -1, disabled);
-            GUILayout.Space(4);
+            layoutComponents.AddSpace(4);
             return DrawInput(value, placeholder, inputVariant, disabled, false, inputWidth, onChange);
         }
 
@@ -145,7 +147,7 @@ namespace shadcnui.GUIComponents
             if (!string.IsNullOrEmpty(label))
             {
                 DrawLabel(label, LabelVariant.Default, -1, disabled);
-                GUILayout.Space(4);
+                layoutComponents.AddSpace(4);
             }
 
             GUIStyle passwordStyle = styleManager.GetPasswordFieldStyle();
@@ -168,7 +170,7 @@ namespace shadcnui.GUIComponents
 #endif
 
             GUI.color = originalColor;
-            GUILayout.Space(guiHelper.controlSpacing);
+            layoutComponents.AddSpace(guiHelper.controlSpacing);
 
 
             if (newValue != value && !disabled && onChange != null)
@@ -197,7 +199,7 @@ namespace shadcnui.GUIComponents
             if (!string.IsNullOrEmpty(label))
             {
                 DrawLabel(label, LabelVariant.Default, -1, disabled);
-                GUILayout.Space(4);
+                layoutComponents.AddSpace(4);
             }
 
             GUIStyle textAreaStyle = styleManager.GetTextAreaStyle(TextAreaVariant.Default, focused);
@@ -220,7 +222,7 @@ namespace shadcnui.GUIComponents
 #endif
 
             GUI.color = originalColor;
-            GUILayout.Space(guiHelper.controlSpacing);
+            layoutComponents.AddSpace(guiHelper.controlSpacing);
 
 
             if (newValue != value && !disabled && onChange != null)
@@ -235,7 +237,7 @@ namespace shadcnui.GUIComponents
         public void DrawSectionHeader(string title)
         {
             var styleManager = guiHelper.GetStyleManager();
-            GUILayout.Space(guiHelper.controlSpacing * 0.5f);
+            layoutComponents.AddSpace(guiHelper.controlSpacing * 0.5f);
 #if IL2CPP
             GUILayout.Label(title, styleManager?.sectionHeaderStyle ?? GUI.skin.label, (Il2CppReferenceArray<GUILayoutOption>)null);
 #else

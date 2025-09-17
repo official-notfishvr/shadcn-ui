@@ -8,10 +8,12 @@ namespace shadcnui.GUIComponents
     public class GUITableComponents
     {
         private GUIHelper guiHelper;
+        private GUILayoutComponents layoutComponents;
 
         public GUITableComponents(GUIHelper helper)
         {
             guiHelper = helper;
+            layoutComponents = new GUILayoutComponents(helper);
         }
 
         public void Table(string[] headers, string[,] data, TableVariant variant = TableVariant.Default,
@@ -30,9 +32,9 @@ namespace shadcnui.GUIComponents
             GUIStyle headerStyle = styleManager.GetTableHeaderStyle(variant, size);
             GUIStyle cellStyle = styleManager.GetTableCellStyle(variant, size);
 
-            GUILayout.BeginVertical(tableStyle, options);
+            layoutComponents.BeginVerticalGroup(tableStyle, options);
 
-            GUILayout.BeginHorizontal();
+            layoutComponents.BeginHorizontalGroup();
             for (int i = 0; i < headers.Length; i++)
             {
 #if IL2CPP
@@ -41,14 +43,14 @@ namespace shadcnui.GUIComponents
                 GUILayout.Label(headers[i], headerStyle);
 #endif
             }
-            GUILayout.EndHorizontal();
+            layoutComponents.EndHorizontalGroup();
 
             int rowCount = data.GetLength(0);
             int colCount = data.GetLength(1);
 
             for (int row = 0; row < rowCount; row++)
             {
-                GUILayout.BeginHorizontal();
+                layoutComponents.BeginHorizontalGroup();
 
                 for (int col = 0; col < colCount; col++)
                 {
@@ -60,10 +62,10 @@ namespace shadcnui.GUIComponents
 #endif
                 }
 
-                GUILayout.EndHorizontal();
+                layoutComponents.EndHorizontalGroup();
             }
 
-            GUILayout.EndVertical();
+            layoutComponents.EndVerticalGroup();
         }
 
         public void Table(Rect rect, string[] headers, string[,] data, TableVariant variant = TableVariant.Default, 
@@ -95,11 +97,11 @@ namespace shadcnui.GUIComponents
         }
 
         public void SortableTable(string[] headers, string[,] data, ref int[] sortColumns, ref bool[] sortAscending,
-            TableVariant variant = TableVariant.Default, TableSize size = TableSize.Default, 
+            TableVariant variant = TableVariant.Default, TableSize size = TableSize.Default,
             Action<int, bool> onSort = null, params GUILayoutOption[] options)
         {
             if (headers == null || data == null) return;
-            
+
             var styleManager = guiHelper.GetStyleManager();
             if (styleManager == null)
             {
@@ -111,14 +113,14 @@ namespace shadcnui.GUIComponents
             GUIStyle headerStyle = styleManager.GetTableHeaderStyle(variant, size);
             GUIStyle cellStyle = styleManager.GetTableCellStyle(variant, size);
 
-            GUILayout.BeginVertical(tableStyle, options);
-            
-            GUILayout.BeginHorizontal();
+            layoutComponents.BeginVerticalGroup(tableStyle, options);
+
+            layoutComponents.BeginHorizontalGroup();
             for (int i = 0; i < headers.Length; i++)
             {
                 int columnIndex = i;
                 string headerText = headers[i];
-                
+
                 if (sortColumns != null && sortAscending != null && i < sortColumns.Length)
                 {
                     if (sortColumns[i] == i)
@@ -126,7 +128,7 @@ namespace shadcnui.GUIComponents
                         headerText += sortAscending[i] ? " ↑" : " ↓";
                     }
                 }
-                
+
                 if (GUILayout.Button(headerText, headerStyle))
                 {
                     if (onSort != null)
@@ -143,15 +145,15 @@ namespace shadcnui.GUIComponents
                     }
                 }
             }
-            GUILayout.EndHorizontal();
-            
+            layoutComponents.EndHorizontalGroup();
+
             int rowCount = data.GetLength(0);
             int colCount = data.GetLength(1);
-            
+
             for (int row = 0; row < rowCount; row++)
             {
-                GUILayout.BeginHorizontal();
-                
+                layoutComponents.BeginHorizontalGroup();
+
                 for (int col = 0; col < colCount; col++)
                 {
                     string cellValue = data[row, col] ?? "";
@@ -161,19 +163,19 @@ namespace shadcnui.GUIComponents
                     GUILayout.Label(cellValue, cellStyle);
 #endif
                 }
-                
-                GUILayout.EndHorizontal();
+
+                layoutComponents.EndHorizontalGroup();
             }
-            
-            GUILayout.EndVertical();
+
+            layoutComponents.EndVerticalGroup();
         }
 
         public void SelectableTable(string[] headers, string[,] data, ref bool[] selectedRows,
-            TableVariant variant = TableVariant.Default, TableSize size = TableSize.Default, 
+            TableVariant variant = TableVariant.Default, TableSize size = TableSize.Default,
             Action<int, bool> onSelectionChange = null, params GUILayoutOption[] options)
         {
             if (headers == null || data == null) return;
-            
+
             var styleManager = guiHelper.GetStyleManager();
             if (styleManager == null)
             {
@@ -185,9 +187,9 @@ namespace shadcnui.GUIComponents
             GUIStyle headerStyle = styleManager.GetTableHeaderStyle(variant, size);
             GUIStyle cellStyle = styleManager.GetTableCellStyle(variant, size);
 
-            GUILayout.BeginVertical(tableStyle, options);
-            
-            GUILayout.BeginHorizontal();
+            layoutComponents.BeginVerticalGroup(tableStyle, options);
+
+            layoutComponents.BeginHorizontalGroup();
             GUILayout.Label("", GUILayout.Width(20 * guiHelper.uiScale));
             for (int i = 0; i < headers.Length; i++)
             {
@@ -197,27 +199,27 @@ namespace shadcnui.GUIComponents
                 GUILayout.Label(headers[i], headerStyle);
 #endif
             }
-            GUILayout.EndHorizontal();
-            
+            layoutComponents.EndHorizontalGroup();
+
             int rowCount = data.GetLength(0);
             int colCount = data.GetLength(1);
-            
+
             if (selectedRows == null || selectedRows.Length != rowCount)
             {
                 selectedRows = new bool[rowCount];
             }
-            
+
             for (int row = 0; row < rowCount; row++)
             {
-                GUILayout.BeginHorizontal();
-                
+                layoutComponents.BeginHorizontalGroup();
+
                 bool newSelected = GUILayout.Toggle(selectedRows[row], "", GUILayout.Width(20 * guiHelper.uiScale));
                 if (newSelected != selectedRows[row])
                 {
                     selectedRows[row] = newSelected;
                     onSelectionChange?.Invoke(row, newSelected);
                 }
-                
+
                 for (int col = 0; col < colCount; col++)
                 {
                     string cellValue = data[row, col] ?? "";
@@ -227,11 +229,11 @@ namespace shadcnui.GUIComponents
                     GUILayout.Label(cellValue, cellStyle);
 #endif
                 }
-                
-                GUILayout.EndHorizontal();
+
+                layoutComponents.EndHorizontalGroup();
             }
-            
-            GUILayout.EndVertical();
+
+            layoutComponents.EndVerticalGroup();
         }
 
         public void CustomTable(string[] headers, object[,] data, Action<object, int, int> cellRenderer,
@@ -250,9 +252,9 @@ namespace shadcnui.GUIComponents
             GUIStyle tableStyle = styleManager.GetTableStyle(variant, size);
             GUIStyle headerStyle = styleManager.GetTableHeaderStyle(variant, size);
 
-            GUILayout.BeginVertical(tableStyle, options);
+            layoutComponents.BeginVerticalGroup(tableStyle, options);
             
-            GUILayout.BeginHorizontal();
+            layoutComponents.BeginHorizontalGroup();
             for (int i = 0; i < headers.Length; i++)
             {
 #if IL2CPP
@@ -261,14 +263,14 @@ namespace shadcnui.GUIComponents
                 GUILayout.Label(headers[i], headerStyle);
 #endif
             }
-            GUILayout.EndHorizontal();
+            layoutComponents.EndHorizontalGroup();
             
             int rowCount = data.GetLength(0);
             int colCount = data.GetLength(1);
             
             for (int row = 0; row < rowCount; row++)
             {
-                GUILayout.BeginHorizontal();
+                layoutComponents.BeginHorizontalGroup();
                 
                 for (int col = 0; col < colCount; col++)
                 {
@@ -276,10 +278,10 @@ namespace shadcnui.GUIComponents
                     cellRenderer.Invoke(cellValue, row, col);
                 }
                 
-                GUILayout.EndHorizontal();
+                layoutComponents.EndHorizontalGroup();
             }
             
-            GUILayout.EndVertical();
+            layoutComponents.EndVerticalGroup();
         }
 
         public void PaginatedTable(string[] headers, string[,] data, ref int currentPage, int pageSize,
@@ -310,8 +312,8 @@ namespace shadcnui.GUIComponents
             
             Table(headers, pageData, variant, size, options);
             
-            GUILayout.Space(8 * guiHelper.uiScale);
-            GUILayout.BeginHorizontal();
+            layoutComponents.AddSpace(8);
+            layoutComponents.BeginHorizontalGroup();
             
             bool prevClicked = GUILayout.Button("← Previous", GUILayout.Width(80 * guiHelper.uiScale));
             if (prevClicked && currentPage > 0)
@@ -336,7 +338,7 @@ namespace shadcnui.GUIComponents
                 onPageChange?.Invoke(currentPage);
             }
             
-            GUILayout.EndHorizontal();
+            layoutComponents.EndHorizontalGroup();
         }
 
         public void SearchableTable(string[] headers, string[,] data, ref string searchQuery, ref string[,] filteredData,
@@ -345,7 +347,7 @@ namespace shadcnui.GUIComponents
         {
             if (headers == null || data == null) return;
             
-            GUILayout.BeginHorizontal();
+            layoutComponents.BeginHorizontalGroup();
             GUILayout.Label("Search:", GUILayout.Width(60 * guiHelper.uiScale));
             string newSearchQuery = GUILayout.TextField(searchQuery ?? "", GUILayout.Width(200 * guiHelper.uiScale));
             if (newSearchQuery != searchQuery)
@@ -355,9 +357,9 @@ namespace shadcnui.GUIComponents
                 
                 filteredData = FilterTableData(data, searchQuery);
             }
-            GUILayout.EndHorizontal();
+            layoutComponents.EndHorizontalGroup();
             
-            GUILayout.Space(8 * guiHelper.uiScale);
+            layoutComponents.AddSpace(8);
             
             string[,] displayData = filteredData ?? data;
             Table(headers, displayData, variant, size, options);
@@ -390,9 +392,9 @@ namespace shadcnui.GUIComponents
             GUIStyle headerStyle = styleManager.GetTableHeaderStyle(variant, size);
             GUIStyle cellStyle = styleManager.GetTableCellStyle(variant, size);
 
-            GUILayout.BeginVertical(tableStyle, options);
+            layoutComponents.BeginVerticalGroup(tableStyle, options);
             
-            GUILayout.BeginHorizontal();
+            layoutComponents.BeginHorizontalGroup();
             for (int i = 0; i < headers.Length; i++)
             {
                 int columnIndex = i;
@@ -405,14 +407,14 @@ namespace shadcnui.GUIComponents
                 GUILayout.Label(headers[i], headerStyle, GUILayout.Width(width));
 #endif
             }
-            GUILayout.EndHorizontal();
+            layoutComponents.EndHorizontalGroup();
             
             int rowCount = data.GetLength(0);
             int colCount = data.GetLength(1);
             
             for (int row = 0; row < rowCount; row++)
             {
-                GUILayout.BeginHorizontal();
+                layoutComponents.BeginHorizontalGroup();
                 
                 for (int col = 0; col < colCount; col++)
                 {
@@ -427,29 +429,29 @@ namespace shadcnui.GUIComponents
 #endif
                 }
                 
-                GUILayout.EndHorizontal();
+                layoutComponents.EndHorizontalGroup();
             }
             
-            GUILayout.EndVertical();
+            layoutComponents.EndVerticalGroup();
         }
 
         private void DrawSimpleTable(string[] headers, string[,] data)
         {
-            GUILayout.BeginVertical(GUI.skin.box);
+            layoutComponents.BeginVerticalGroup(GUI.skin.box);
             
-            GUILayout.BeginHorizontal();
+            layoutComponents.BeginHorizontalGroup();
             for (int i = 0; i < headers.Length; i++)
             {
                 GUILayout.Label(headers[i], GUI.skin.label);
             }
-            GUILayout.EndHorizontal();
+            layoutComponents.EndHorizontalGroup();
             
             int rowCount = data.GetLength(0);
             int colCount = data.GetLength(1);
             
             for (int row = 0; row < rowCount; row++)
             {
-                GUILayout.BeginHorizontal();
+                layoutComponents.BeginHorizontalGroup();
                 
                 for (int col = 0; col < colCount; col++)
                 {
@@ -457,29 +459,29 @@ namespace shadcnui.GUIComponents
                     GUILayout.Label(cellValue, GUI.skin.label);
                 }
                 
-                GUILayout.EndHorizontal();
+                layoutComponents.EndHorizontalGroup();
             }
             
-            GUILayout.EndVertical();
+            layoutComponents.EndVerticalGroup();
         }
 
         private void DrawSimpleTable(string[] headers, object[,] data)
         {
-            GUILayout.BeginVertical(GUI.skin.box);
+            layoutComponents.BeginVerticalGroup(GUI.skin.box);
             
-            GUILayout.BeginHorizontal();
+            layoutComponents.BeginHorizontalGroup();
             for (int i = 0; i < headers.Length; i++)
             {
                 GUILayout.Label(headers[i], GUI.skin.label);
             }
-            GUILayout.EndHorizontal();
+            layoutComponents.EndHorizontalGroup();
             
             int rowCount = data.GetLength(0);
             int colCount = data.GetLength(1);
             
             for (int row = 0; row < rowCount; row++)
             {
-                GUILayout.BeginHorizontal();
+                layoutComponents.BeginHorizontalGroup();
                 
                 for (int col = 0; col < colCount; col++)
                 {
@@ -488,10 +490,10 @@ namespace shadcnui.GUIComponents
                     GUILayout.Label(cellText, GUI.skin.label);
                 }
                 
-                GUILayout.EndHorizontal();
+                layoutComponents.EndHorizontalGroup();
             }
             
-            GUILayout.EndVertical();
+            layoutComponents.EndVerticalGroup();
         }
 
         private string[,] FilterTableData(string[,] data, string searchQuery)

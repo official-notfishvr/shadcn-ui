@@ -9,10 +9,12 @@ namespace shadcnui.GUIComponents
     public class GUIAnimationManager
     {
         private GUIHelper guiHelper;
+        private GUILayoutComponents layoutComponents;
 
         public GUIAnimationManager(GUIHelper helper)
         {
             guiHelper = helper;
+            layoutComponents = new GUILayoutComponents(helper);
         }
 
         public void UpdateAnimations(bool isOpen, ref float menuAlpha, ref float menuScale, ref float titleGlow,
@@ -89,9 +91,9 @@ namespace shadcnui.GUIComponents
 
             var styleManager = guiHelper.GetStyleManager();
 #if IL2CPP
-            GUILayout.BeginVertical(styleManager.animatedBoxStyle, (Il2CppReferenceArray<GUILayoutOption>)null);
+            layoutComponents.BeginVerticalGroup(styleManager.animatedBoxStyle, (Il2CppReferenceArray<GUILayoutOption>)null);
 #else
-            GUILayout.BeginVertical(styleManager.animatedBoxStyle);
+            layoutComponents.BeginVerticalGroup(styleManager.animatedBoxStyle);
 #endif
             GUI.color = new Color(1f, 1f, 1f, currentAlpha);
 
@@ -100,7 +102,7 @@ namespace shadcnui.GUIComponents
 
         public void EndAnimatedGUI()
         {
-            GUILayout.EndVertical();
+            layoutComponents.EndVerticalGroup();
             GUI.color = Color.white;
         }
 

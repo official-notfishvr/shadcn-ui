@@ -15,17 +15,13 @@ namespace shadcnui.GUIComponents
             guiHelper = helper;
         }
 
-        public Vector2 DrawScrollView(Vector2 scrollPosition, float width, float height, Action drawContent)
+        public Vector2 DrawScrollView(Vector2 scrollPosition, Action drawContent, params GUILayoutOption[] options)
         {
 #if IL2CPP
             scrollPosition = GUILayout.BeginScrollView(scrollPosition, 
-                (Il2CppReferenceArray<GUILayoutOption>)new GUILayoutOption[] { 
-                    GUILayout.Width(width * guiHelper.uiScale), 
-                    GUILayout.Height(height * guiHelper.uiScale) 
-                });
+                (Il2CppReferenceArray<GUILayoutOption>)options);
 #else
-            scrollPosition = GUILayout.BeginScrollView(scrollPosition,
-                GUILayout.Width(width * guiHelper.uiScale), GUILayout.Height(height * guiHelper.uiScale));
+            scrollPosition = GUILayout.BeginScrollView(scrollPosition, options);
 #endif
             drawContent?.Invoke();
             GUILayout.EndScrollView();
@@ -38,6 +34,15 @@ namespace shadcnui.GUIComponents
             GUILayout.BeginHorizontal(GUIStyle.none, (Il2CppReferenceArray<GUILayoutOption>)null);
 #else
             GUILayout.BeginHorizontal();
+#endif
+        }
+
+        public void BeginHorizontalGroup(GUIStyle style, params GUILayoutOption[] options)
+        {
+#if IL2CPP
+            GUILayout.BeginHorizontal(style, (Il2CppReferenceArray<GUILayoutOption>)options);
+#else
+            GUILayout.BeginHorizontal(style, options);
 #endif
         }
 
@@ -56,6 +61,15 @@ namespace shadcnui.GUIComponents
 #endif
         }
 
+        public void BeginVerticalGroup(GUIStyle style, params GUILayoutOption[] options)
+        {
+#if IL2CPP
+            GUILayout.BeginVertical(style, (Il2CppReferenceArray<GUILayoutOption>)options);
+#else
+            GUILayout.BeginVertical(style, options);
+#endif
+        }
+
         public void EndVerticalGroup()
         {
             GUILayout.EndVertical();
@@ -65,5 +79,6 @@ namespace shadcnui.GUIComponents
         {
             GUILayout.Space(pixels * guiHelper.uiScale);
         }
+
     }
 }

@@ -79,6 +79,10 @@ namespace shadcnui
         private GUIAvatarComponents avatarComponents;
         private GUISkeletonComponents skeletonComponents;
         private GUITableComponents tableComponents;
+        private GUICalendarComponents calendarComponents;
+        private GUIDropdownMenuComponents dropdownMenuComponents;
+        private GUIPopoverComponents popoverComponents;
+        private GUISelectComponents selectComponents;
         #endregion
 
         #region Public Style Access
@@ -132,6 +136,10 @@ namespace shadcnui
                 avatarComponents = new GUIAvatarComponents(this);
                 skeletonComponents = new GUISkeletonComponents(this);
                 tableComponents = new GUITableComponents(this);
+                calendarComponents = new GUICalendarComponents(this);
+                dropdownMenuComponents = new GUIDropdownMenuComponents(this);
+                popoverComponents = new GUIPopoverComponents(this);
+                selectComponents = new GUISelectComponents(this);
             }
             catch (Exception ex)
             {
@@ -825,11 +833,11 @@ namespace shadcnui
         #endregion
 
         #region Layout Components
-        public Vector2 DrawScrollView(Vector2 scrollPosition, float width, float height, System.Action drawContent)
+        public Vector2 DrawScrollView(Vector2 scrollPosition, System.Action drawContent, params GUILayoutOption[] options)
         {
             try
             {
-                return layoutComponents?.DrawScrollView(scrollPosition, width, height, drawContent) ?? scrollPosition;
+                return layoutComponents?.DrawScrollView(scrollPosition, drawContent, options) ?? scrollPosition;
             }
             catch (Exception ex)
             {
@@ -1140,11 +1148,11 @@ namespace shadcnui
 
         #region Tabs Components
         public int Tabs(string[] tabNames, int selectedIndex, Action<int> onTabChange = null,
-            params GUILayoutOption[] options)
+            int maxLines = 1, params GUILayoutOption[] options)
         {
             try
             {
-                return tabsComponents?.Tabs(tabNames, selectedIndex, onTabChange, options) ?? selectedIndex;
+                return tabsComponents?.Tabs(tabNames, selectedIndex, onTabChange, maxLines, options) ?? selectedIndex;
             }
             catch (Exception ex)
             {
@@ -1470,7 +1478,7 @@ namespace shadcnui
         {
             try
             {
-                return switchComponents?.SwitchWithLabel(label, value, variant, size, onToggle, disabled) ?? value;
+                return switchComponents?.SwitchWithLabel(label, ref value, variant, size, onToggle, disabled) ?? value;
             }
             catch (Exception ex)
             {
@@ -1485,7 +1493,7 @@ namespace shadcnui
         {
             try
             {
-                return switchComponents?.SwitchWithDescription(label, description, value, variant, size,
+                return switchComponents?.SwitchWithDescription(label, description, ref value, variant, size,
                     onToggle, disabled) ?? value;
             }
             catch (Exception ex)
@@ -1531,7 +1539,7 @@ namespace shadcnui
         {
             try
             {
-                return switchComponents?.ValidatedSwitch(text, value, isValid, validationMessage, variant,
+                return switchComponents?.ValidatedSwitch(text, ref value, isValid, validationMessage, variant,
                     size, onToggle, disabled) ?? value;
             }
             catch (Exception ex)
@@ -1547,7 +1555,7 @@ namespace shadcnui
         {
             try
             {
-                return switchComponents?.SwitchWithTooltip(text, value, tooltip, variant, size, onToggle, disabled) ?? value;
+                return switchComponents?.SwitchWithTooltip(text, ref value, tooltip, variant, size, onToggle, disabled) ?? value;
             }
             catch (Exception ex)
             {
@@ -1759,8 +1767,6 @@ namespace shadcnui
                 Debug.LogError("Error drawing alert: " + ex.Message);
             }
         }
-
-        
 
         public void AlertWithIcon(string title, string description, Texture2D icon, AlertVariant variant = AlertVariant.Default,
             AlertType type = AlertType.Info, params GUILayoutOption[] options)
@@ -2040,19 +2046,6 @@ namespace shadcnui
             }
         }
 
-        public void Skeleton(Rect rect, SkeletonVariant variant = SkeletonVariant.Default,
-            SkeletonSize size = SkeletonSize.Default)
-        {
-            try
-            {
-                skeletonComponents?.Skeleton(rect, variant, size);
-            }
-            catch (Exception ex)
-            {
-                Debug.LogError("Error drawing skeleton in rect: " + ex.Message);
-            }
-        }
-
         public void AnimatedSkeleton(float width, float height, SkeletonVariant variant = SkeletonVariant.Default,
             SkeletonSize size = SkeletonSize.Default, params GUILayoutOption[] options)
         {
@@ -2093,12 +2086,12 @@ namespace shadcnui
             }
         }
 
-        public void SkeletonText(int lineCount, float lineHeight = 20f, SkeletonVariant variant = SkeletonVariant.Default,
+        public void SkeletonText(float width, int lineCount, float lineHeight = 20f, SkeletonVariant variant = SkeletonVariant.Default,
             SkeletonSize size = SkeletonSize.Default, params GUILayoutOption[] options)
         {
             try
             {
-                skeletonComponents?.SkeletonText(lineCount, lineHeight, variant, size, options);
+                skeletonComponents?.SkeletonText(width, lineCount, options);
             }
             catch (Exception ex)
             {
@@ -2132,12 +2125,12 @@ namespace shadcnui
             }
         }
 
-        public void SkeletonCard(float width = 300f, float height = 200f, SkeletonVariant variant = SkeletonVariant.Rounded,
-            SkeletonSize size = SkeletonSize.Default, params GUILayoutOption[] options)
+        public void SkeletonCard(float width = 300f, float height = 200f, bool includeHeader = true,
+            bool includeFooter = false, params GUILayoutOption[] options)
         {
             try
             {
-                skeletonComponents?.SkeletonCard(width, height, variant, size, options);
+                skeletonComponents?.SkeletonCard(width, height, includeHeader, includeFooter, options);
             }
             catch (Exception ex)
             {
@@ -2146,12 +2139,11 @@ namespace shadcnui
         }
 
         public void SkeletonTable(int rowCount, int columnCount, float cellWidth = 100f, float cellHeight = 30f,
-            SkeletonVariant variant = SkeletonVariant.Default, SkeletonSize size = SkeletonSize.Default,
             params GUILayoutOption[] options)
         {
             try
             {
-                skeletonComponents?.SkeletonTable(rowCount, columnCount, cellWidth, cellHeight, variant, size, options);
+                skeletonComponents?.SkeletonTable(cellWidth, rowCount, columnCount, cellHeight, 0f, options);
             }
             catch (Exception ex)
             {
@@ -2159,29 +2151,16 @@ namespace shadcnui
             }
         }
 
-        public void SkeletonList(int itemCount, float itemHeight = 60f, SkeletonVariant variant = SkeletonVariant.Rounded,
-            SkeletonSize size = SkeletonSize.Default, params GUILayoutOption[] options)
-        {
-            try
-            {
-                skeletonComponents?.SkeletonList(itemCount, itemHeight, variant, size, options);
-            }
-            catch (Exception ex)
-            {
-                Debug.LogError("Error drawing skeleton list: " + ex.Message);
-            }
-        }
-
-        public void CustomShapeSkeleton(float width, float height, float cornerRadius, Color backgroundColor,
+        public void SkeletonList(int itemCount, float itemHeight = 60f,
             params GUILayoutOption[] options)
         {
             try
             {
-                skeletonComponents?.CustomShapeSkeleton(width, height, cornerRadius, backgroundColor, options);
+                skeletonComponents?.SkeletonList(100f, itemHeight, itemCount, 0f, options);
             }
             catch (Exception ex)
             {
-                Debug.LogError("Error drawing custom shape skeleton: " + ex.Message);
+                Debug.LogError("Error drawing skeleton list: " + ex.Message);
             }
         }
 
@@ -2326,5 +2305,108 @@ namespace shadcnui
             }
         }
         #endregion
+
+        #region Calendar Components
+        public void Calendar()
+        {
+            try
+            {
+                calendarComponents?.Calendar();
+            }
+            catch (Exception ex)
+            {
+                Debug.LogError("Error drawing calendar: " + ex.Message);
+            }
+        }
+        #endregion
+
+        #region DropdownMenu Components
+        public void DropdownMenu(string[] items, Action<int> onItemSelected)
+        {
+            try
+            {
+                dropdownMenuComponents?.DropdownMenu(items, onItemSelected);
+            }
+            catch (Exception ex)
+            {
+                Debug.LogError("Error drawing dropdown menu: " + ex.Message);
+            }
+        }
+
+        public void OpenDropdownMenu()
+        {
+            dropdownMenuComponents?.Open();
+        }
+
+        public void CloseDropdownMenu()
+        {
+            dropdownMenuComponents?.Close();
+        }
+
+        public bool IsDropdownMenuOpen()
+        {
+            return dropdownMenuComponents?.IsOpen ?? false;
+        }
+        #endregion
+
+        #region Popover Components
+        public void Popover(Action content)
+        {
+            try
+            {
+                popoverComponents?.Popover(content);
+            }
+            catch (Exception ex)
+            {
+                Debug.LogError("Error drawing popover: " + ex.Message);
+            }
+        }
+
+        public void OpenPopover()
+        {
+            popoverComponents?.Open();
+        }
+
+        public void ClosePopover()
+        {
+            popoverComponents?.Close();
+        }
+
+        public bool IsPopoverOpen()
+        {
+            return popoverComponents?.IsOpen ?? false;
+        }
+        #endregion
+
+        #region Select Components
+        public int Select(string[] items, int selectedIndex)
+        {
+            try
+            {
+                return selectComponents?.Select(items, selectedIndex) ?? selectedIndex;
+            }
+            catch (Exception ex)
+            {
+                Debug.LogError("Error drawing select: " + ex.Message);
+                return selectedIndex;
+            }
+        }
+
+        public void OpenSelect()
+        {
+            selectComponents?.Open();
+        }
+
+        public void CloseSelect()
+        {
+            selectComponents?.Close();
+        }
+
+        public bool IsSelectOpen()
+        {
+            return selectComponents?.IsOpen ?? false;
+        }
+        #endregion
+
     }
 }

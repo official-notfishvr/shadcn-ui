@@ -8,10 +8,12 @@ namespace shadcnui.GUIComponents
     public class GUIAlertComponents
     {
         private GUIHelper guiHelper;
+        private GUILayoutComponents layoutComponents;
 
         public GUIAlertComponents(GUIHelper helper)
         {
             guiHelper = helper;
+            layoutComponents = new GUILayoutComponents(helper);
         }
 
         public void Alert(string title, string description, AlertVariant variant = AlertVariant.Default,
@@ -20,26 +22,26 @@ namespace shadcnui.GUIComponents
             var styleManager = guiHelper.GetStyleManager();
             if (styleManager == null)
             {
-                GUILayout.BeginVertical(GUI.skin.box);
+                layoutComponents.BeginVerticalGroup(GUI.skin.box);
                 GUILayout.Label(title ?? "Alert", GUI.skin.label);
                 if (!string.IsNullOrEmpty(description))
                     GUILayout.Label(description, GUI.skin.label);
-                GUILayout.EndVertical();
+                layoutComponents.EndVerticalGroup();
                 return;
             }
 
             GUIStyle alertStyle = styleManager.GetAlertStyle(variant, type);
 
-            GUILayout.BeginVertical(alertStyle, options);
-            GUILayout.BeginHorizontal();
+            layoutComponents.BeginVerticalGroup(alertStyle, options);
+            layoutComponents.BeginHorizontalGroup();
 
             if (icon != null)
             {
                 GUILayout.Label(icon, GUILayout.Width(24 * guiHelper.uiScale), GUILayout.Height(24 * guiHelper.uiScale));
-                GUILayout.Space(8 * guiHelper.uiScale);
+                layoutComponents.AddSpace(8);
             }
 
-            GUILayout.BeginVertical();
+            layoutComponents.BeginVerticalGroup();
             if (!string.IsNullOrEmpty(title))
             {
                 GUIStyle titleStyle = styleManager.GetAlertTitleStyle(type);
@@ -59,23 +61,23 @@ namespace shadcnui.GUIComponents
                 GUILayout.Label(description, descStyle);
 #endif
             }
-            GUILayout.EndVertical();
-            GUILayout.EndHorizontal();
-            GUILayout.EndVertical();
+            layoutComponents.EndVerticalGroup();
+            layoutComponents.EndHorizontalGroup();
+            layoutComponents.EndVerticalGroup();
         }
 
         public bool DismissibleAlert(string title, string description, AlertVariant variant = AlertVariant.Default,
             AlertType type = AlertType.Info, Action onDismiss = null, params GUILayoutOption[] options)
         {
-            GUILayout.BeginVertical();
+            layoutComponents.BeginVerticalGroup();
 
             Alert(title, description, variant, type, null, options);
 
-            GUILayout.Space(4 * guiHelper.uiScale);
-            GUILayout.BeginHorizontal();
+            layoutComponents.AddSpace(4);
+            layoutComponents.BeginHorizontalGroup();
             GUILayout.FlexibleSpace();
             bool closeClicked = guiHelper.Button("X", ButtonVariant.Ghost, ButtonSize.Icon, onClick: onDismiss);
-            GUILayout.EndHorizontal();
+            layoutComponents.EndHorizontalGroup();
 
             return closeClicked;
         }
@@ -83,14 +85,14 @@ namespace shadcnui.GUIComponents
         public void AlertWithActions(string title, string description, string[] buttonTexts, Action<int> onButtonClick,
             AlertVariant variant = AlertVariant.Default, AlertType type = AlertType.Info, params GUILayoutOption[] options)
         {
-            GUILayout.BeginVertical();
+            layoutComponents.BeginVerticalGroup();
 
             Alert(title, description, variant, type, null, options);
 
             if (buttonTexts != null && buttonTexts.Length > 0)
             {
-                GUILayout.Space(8 * guiHelper.uiScale);
-                GUILayout.BeginHorizontal();
+                layoutComponents.AddSpace(8);
+                layoutComponents.BeginHorizontalGroup();
 
                 for (int i = 0; i < buttonTexts.Length; i++)
                 {
@@ -103,14 +105,14 @@ namespace shadcnui.GUIComponents
 
                     if (i < buttonTexts.Length - 1)
                     {
-                        GUILayout.Space(4 * guiHelper.uiScale);
+                        layoutComponents.AddSpace(4);
                     }
                 }
 
-                GUILayout.EndHorizontal();
+                layoutComponents.EndHorizontalGroup();
             }
 
-            GUILayout.EndVertical();
+            layoutComponents.EndVerticalGroup();
         }
 
         public void CustomAlert(string title, string description, Color backgroundColor, Color textColor, params GUILayoutOption[] options)
@@ -118,11 +120,11 @@ namespace shadcnui.GUIComponents
             var styleManager = guiHelper.GetStyleManager();
             if (styleManager == null)
             {
-                GUILayout.BeginVertical(GUI.skin.box);
+                layoutComponents.BeginVerticalGroup(GUI.skin.box);
                 GUILayout.Label(title ?? "Alert", GUI.skin.label);
                 if (!string.IsNullOrEmpty(description))
                     GUILayout.Label(description, GUI.skin.label);
-                GUILayout.EndVertical();
+                layoutComponents.EndVerticalGroup();
                 return;
             }
 
@@ -132,7 +134,7 @@ namespace shadcnui.GUIComponents
             customStyle.border = new RectOffset(guiHelper.cornerRadius, guiHelper.cornerRadius, guiHelper.cornerRadius, guiHelper.cornerRadius);
             customStyle.padding = new RectOffset(16, 16, 12, 12);
 
-            GUILayout.BeginVertical(customStyle, options);
+            layoutComponents.BeginVerticalGroup(customStyle, options);
 
             if (!string.IsNullOrEmpty(title))
             {
@@ -148,17 +150,17 @@ namespace shadcnui.GUIComponents
                 GUILayout.Label(description, descStyle);
             }
 
-            GUILayout.EndVertical();
+            layoutComponents.EndVerticalGroup();
         }
 
         public void AlertWithProgress(string title, string description, float progress, AlertVariant variant = AlertVariant.Default,
             AlertType type = AlertType.Info, params GUILayoutOption[] options)
         {
-            GUILayout.BeginVertical();
+            layoutComponents.BeginVerticalGroup();
 
             Alert(title, description, variant, type, null, options);
 
-            GUILayout.Space(8 * guiHelper.uiScale);
+            layoutComponents.AddSpace(8);
             Rect progressRect = GUILayoutUtility.GetRect(200 * guiHelper.uiScale, 6 * guiHelper.uiScale);
 
             var styleManager = guiHelper.GetStyleManager();
@@ -175,7 +177,7 @@ namespace shadcnui.GUIComponents
                 GUI.Box(fillRect, "", fillStyle);
             }
 
-            GUILayout.EndVertical();
+            layoutComponents.EndVerticalGroup();
         }
 
         public void AnimatedAlert(string title, string description, AlertVariant variant = AlertVariant.Default,
@@ -192,15 +194,14 @@ namespace shadcnui.GUIComponents
             GUI.color = originalColor;
         }
 
-
         public void AlertWithCountdown(string title, string description, float countdownTime, Action onTimeout,
             AlertVariant variant = AlertVariant.Default, AlertType type = AlertType.Info, params GUILayoutOption[] options)
         {
-            GUILayout.BeginVertical();
+            layoutComponents.BeginVerticalGroup();
 
             Alert(title, description, variant, type, null, options);
 
-            GUILayout.Space(4 * guiHelper.uiScale);
+            layoutComponents.AddSpace(4);
             int remainingSeconds = Mathf.CeilToInt(countdownTime);
             string countdownText = $"Auto-dismiss in {remainingSeconds}s";
 
@@ -213,18 +214,17 @@ namespace shadcnui.GUIComponents
                 onTimeout.Invoke();
             }
 
-            GUILayout.EndVertical();
+            layoutComponents.EndVerticalGroup();
         }
-
 
         public bool ExpandableAlert(string title, string description, string expandedContent, ref bool isExpanded,
             AlertVariant variant = AlertVariant.Default, AlertType type = AlertType.Info, params GUILayoutOption[] options)
         {
-            GUILayout.BeginVertical();
+            layoutComponents.BeginVerticalGroup();
 
             Alert(title, description, variant, type, null, options);
 
-            GUILayout.Space(4 * guiHelper.uiScale);
+            layoutComponents.AddSpace(4);
             string buttonText = isExpanded ? "Show Less" : "Show More";
             bool buttonClicked = guiHelper.Button(buttonText, ButtonVariant.Outline, ButtonSize.Small);
 
@@ -235,13 +235,13 @@ namespace shadcnui.GUIComponents
 
             if (isExpanded && !string.IsNullOrEmpty(expandedContent))
             {
-                GUILayout.Space(4 * guiHelper.uiScale);
+                layoutComponents.AddSpace(4);
                 var styleManager = guiHelper.GetStyleManager();
                 GUIStyle expandedStyle = styleManager?.GetLabelStyle(LabelVariant.Muted) ?? GUI.skin.label;
                 GUILayout.Label(expandedContent, expandedStyle);
             }
 
-            GUILayout.EndVertical();
+            layoutComponents.EndVerticalGroup();
 
             return buttonClicked;
         }
@@ -249,7 +249,7 @@ namespace shadcnui.GUIComponents
         public void AlertWithStatus(string title, string description, bool isActive, AlertVariant variant = AlertVariant.Default,
             AlertType type = AlertType.Info, params GUILayoutOption[] options)
         {
-            GUILayout.BeginHorizontal();
+            layoutComponents.BeginHorizontalGroup();
 
             Color statusColor = isActive ? Color.green : Color.gray;
             var styleManager = guiHelper.GetStyleManager();
@@ -264,14 +264,14 @@ namespace shadcnui.GUIComponents
                 statusStyle.margin = new RectOffset(0, 0, 0, 0);
 
                 GUILayout.Label("", statusStyle);
-                GUILayout.Space(8 * guiHelper.uiScale);
+                layoutComponents.AddSpace(8);
             }
 
-            GUILayout.BeginVertical();
+            layoutComponents.BeginVerticalGroup();
             Alert(title, description, variant, type, null, options);
-            GUILayout.EndVertical();
+            layoutComponents.EndVerticalGroup();
 
-            GUILayout.EndHorizontal();
+            layoutComponents.EndHorizontalGroup();
         }
 
         private Color GetProgressColor(AlertType type)

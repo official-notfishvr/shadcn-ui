@@ -8,10 +8,12 @@ namespace shadcnui.GUIComponents
     public class GUIAvatarComponents
     {
         private GUIHelper guiHelper;
+        private GUILayoutComponents layoutComponents;
 
         public GUIAvatarComponents(GUIHelper helper)
         {
             guiHelper = helper;
+            layoutComponents = new GUILayoutComponents(helper);
         }
 
         public void Avatar(Texture2D image, string fallbackText, AvatarSize size = AvatarSize.Default, 
@@ -86,17 +88,17 @@ namespace shadcnui.GUIComponents
         public void AvatarWithStatus(Texture2D image, string fallbackText, bool isOnline, AvatarSize size = AvatarSize.Default, 
             AvatarShape shape = AvatarShape.Circle, params GUILayoutOption[] options)
         {
-            GUILayout.BeginHorizontal();
+            layoutComponents.BeginHorizontalGroup();
             
             Avatar(image, fallbackText, size, shape, options);
             
             if (isOnline)
             {
-                GUILayout.Space(-8 * guiHelper.uiScale);
+                layoutComponents.AddSpace(-8);
                 DrawStatusIndicator(isOnline, size);
             }
             
-            GUILayout.EndHorizontal();
+            layoutComponents.EndHorizontalGroup();
         }
 
         private void DrawStatusIndicator(bool isOnline, AvatarSize size)
@@ -123,37 +125,37 @@ namespace shadcnui.GUIComponents
         {
             if (showNameBelow)
             {
-                GUILayout.BeginVertical();
+                layoutComponents.BeginVerticalGroup();
                 
                 Avatar(image, fallbackText, size, shape, options);
                 
                 if (!string.IsNullOrEmpty(name))
                 {
-                    GUILayout.Space(4 * guiHelper.uiScale);
+                    layoutComponents.AddSpace(4);
                     var styleManager = guiHelper.GetStyleManager();
                     GUIStyle nameStyle = styleManager?.GetLabelStyle(LabelVariant.Default) ?? GUI.skin.label;
                     nameStyle.alignment = TextAnchor.MiddleCenter;
                     GUILayout.Label(name, nameStyle);
                 }
                 
-                GUILayout.EndVertical();
+                layoutComponents.EndVerticalGroup();
             }
             else
             {
-                GUILayout.BeginHorizontal();
+                layoutComponents.BeginHorizontalGroup();
                 
                 Avatar(image, fallbackText, size, shape, options);
                 
                 if (!string.IsNullOrEmpty(name))
                 {
-                    GUILayout.Space(8 * guiHelper.uiScale);
+                    layoutComponents.AddSpace(8);
                     var styleManager = guiHelper.GetStyleManager();
                     GUIStyle nameStyle = styleManager?.GetLabelStyle(LabelVariant.Default) ?? GUI.skin.label;
                     nameStyle.alignment = TextAnchor.MiddleLeft;
                     GUILayout.Label(name, nameStyle);
                 }
                 
-                GUILayout.EndHorizontal();
+                layoutComponents.EndHorizontalGroup();
             }
         }
 
@@ -211,11 +213,11 @@ namespace shadcnui.GUIComponents
             borderedStyle.alignment = TextAnchor.MiddleCenter;
             borderedStyle.padding = new RectOffset(2, 2, 2, 2);
 
-            GUILayout.BeginVertical(borderedStyle, options);
+            layoutComponents.BeginVerticalGroup(borderedStyle, options);
             {
                 Avatar(image, fallbackText, size, shape);
             }
-            GUILayout.EndVertical();
+            layoutComponents.EndVerticalGroup();
         }
 
         
@@ -273,13 +275,13 @@ namespace shadcnui.GUIComponents
         public void AvatarWithTooltip(Texture2D image, string fallbackText, string tooltip, AvatarSize size = AvatarSize.Default, 
             AvatarShape shape = AvatarShape.Circle, params GUILayoutOption[] options)
         {
-            GUILayout.BeginHorizontal();
+            layoutComponents.BeginHorizontalGroup();
             
             Avatar(image, fallbackText, size, shape, options);
             
             if (!string.IsNullOrEmpty(tooltip))
             {
-                GUILayout.Space(4 * guiHelper.uiScale);
+                layoutComponents.AddSpace(4);
                 
                 var styleManager = guiHelper.GetStyleManager();
                 GUIStyle tooltipStyle = styleManager?.GetLabelStyle(LabelVariant.Muted) ?? GUI.skin.label;
@@ -289,7 +291,7 @@ namespace shadcnui.GUIComponents
                 GUILayout.Label("?", tooltipStyle);
             }
             
-            GUILayout.EndHorizontal();
+            layoutComponents.EndHorizontalGroup();
         }
 
         public void AvatarGroup(AvatarData[] avatars, AvatarSize size = AvatarSize.Default, AvatarShape shape = AvatarShape.Circle, 
@@ -297,7 +299,7 @@ namespace shadcnui.GUIComponents
         {
             if (avatars == null || avatars.Length == 0) return;
             
-            GUILayout.BeginHorizontal();
+            layoutComponents.BeginHorizontalGroup();
             
             int visibleCount = Mathf.Min(avatars.Length, maxVisible);
             
@@ -307,7 +309,7 @@ namespace shadcnui.GUIComponents
                 
                 if (i > 0)
                 {
-                    GUILayout.Space(overlap * guiHelper.uiScale);
+                    layoutComponents.AddSpace(overlap);
                 }
                 
                 Avatar(avatar.Image, avatar.FallbackText, size, shape, options);
@@ -315,7 +317,7 @@ namespace shadcnui.GUIComponents
             
             if (avatars.Length > maxVisible)
             {
-                GUILayout.Space(overlap * guiHelper.uiScale);
+                layoutComponents.AddSpace(overlap);
                 int remainingCount = avatars.Length - maxVisible;
                 string countText = $"+{remainingCount}";
                 
@@ -331,7 +333,7 @@ namespace shadcnui.GUIComponents
 #endif
             }
             
-            GUILayout.EndHorizontal();
+            layoutComponents.EndHorizontalGroup();
         }
 
 

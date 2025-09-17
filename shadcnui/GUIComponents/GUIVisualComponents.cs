@@ -9,11 +9,13 @@ namespace shadcnui.GUIComponents
     public class GUIVisualComponents
     {
         private GUIHelper guiHelper;
+        private GUILayoutComponents layoutComponents;
         private static float horizontalPadding = 10f;
 
         public GUIVisualComponents(GUIHelper helper)
         {
             guiHelper = helper;
+            layoutComponents = new GUILayoutComponents(helper);
         }
 
         public void DrawProgressBar(float windowWidth, string label, float progress, Color barColor)
@@ -48,7 +50,7 @@ namespace shadcnui.GUIComponents
             }
             GUI.Box(progressRect, "", GUI.skin.box);
 
-            GUILayout.Space(guiHelper.controlSpacing);
+            layoutComponents.AddSpace(guiHelper.controlSpacing);
         }
 
         public void DrawBox(float windowWidth, string content, float height = 30f)
@@ -60,7 +62,7 @@ namespace shadcnui.GUIComponents
 #else
             GUILayout.Box(content, styleManager.animatedInputStyle, GUILayout.Height(height * guiHelper.uiScale));
 #endif
-            GUILayout.Space(guiHelper.controlSpacing);
+            layoutComponents.AddSpace(guiHelper.controlSpacing);
         }
 
         public void DrawSeparator(float windowWidth, float height = 2f)
@@ -83,7 +85,7 @@ namespace shadcnui.GUIComponents
             GUI.backgroundColor = separatorColor;
             GUI.Box(rect, "");
             GUI.backgroundColor = originalColor;
-            GUILayout.Space(guiHelper.controlSpacing);
+            layoutComponents.AddSpace(guiHelper.controlSpacing);
         }
 
         public void RenderInstructions(string text)
@@ -96,17 +98,17 @@ namespace shadcnui.GUIComponents
             instructionStyle.normal.textColor = instructionColor;
 
 #if IL2CPP
-            GUILayout.BeginHorizontal(GUIStyle.none, (Il2CppReferenceArray<GUILayoutOption>)null);
+            layoutComponents.BeginHorizontalGroup(GUIStyle.none, (Il2CppReferenceArray<GUILayoutOption>)null);
             GUILayout.FlexibleSpace();
             GUILayout.Label(text, instructionStyle, (Il2CppReferenceArray<GUILayoutOption>)null);
             GUILayout.FlexibleSpace();
-            GUILayout.EndHorizontal();
+            layoutComponents.EndHorizontalGroup();
 #else
-            GUILayout.BeginHorizontal();
+            layoutComponents.BeginHorizontalGroup();
             GUILayout.FlexibleSpace();
             GUILayout.Label(text, instructionStyle);
             GUILayout.FlexibleSpace();
-            GUILayout.EndHorizontal();
+            layoutComponents.EndHorizontalGroup();
 #endif
         }
     }

@@ -7,10 +7,12 @@ namespace shadcnui.GUIComponents
     public class GUIProgressComponents
     {
         private GUIHelper guiHelper;
+        private GUILayoutComponents layoutComponents;
 
         public GUIProgressComponents(GUIHelper helper)
         {
             guiHelper = helper;
+            layoutComponents = new GUILayoutComponents(helper);
         }
         public void Progress(float value, float width = -1, float height = -1, params GUILayoutOption[] options)
         {
@@ -98,7 +100,7 @@ namespace shadcnui.GUIComponents
            
             if (!string.IsNullOrEmpty(label))
             {
-                GUILayout.BeginHorizontal();
+                layoutComponents.BeginHorizontalGroup();
                 GUILayout.Label(label, styleManager.GetLabelStyle(LabelVariant.Default));
 
                 if (showPercentage)
@@ -108,8 +110,8 @@ namespace shadcnui.GUIComponents
                     GUILayout.Label(percentText, styleManager.GetLabelStyle(LabelVariant.Muted));
                 }
 
-                GUILayout.EndHorizontal();
-                GUILayout.Space(4 * guiHelper.uiScale);
+                layoutComponents.EndHorizontalGroup();
+                layoutComponents.AddSpace(4);
             }
 
            

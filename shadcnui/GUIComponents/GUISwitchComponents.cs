@@ -8,10 +8,12 @@ namespace shadcnui.GUIComponents
     public class GUISwitchComponents
     {
         private GUIHelper guiHelper;
+        private GUILayoutComponents layoutComponents;
 
         public GUISwitchComponents(GUIHelper helper)
         {
             guiHelper = helper;
+            layoutComponents = new GUILayoutComponents(helper);
         }
 
         public bool Switch(string text, bool value, SwitchVariant variant = SwitchVariant.Default,
@@ -76,14 +78,22 @@ namespace shadcnui.GUIComponents
             return newValue && !disabled;
         }
 
-        public bool SwitchWithLabel(string label, bool value, SwitchVariant variant = SwitchVariant.Default,
+        public bool SwitchWithLabel(string label, ref bool value, SwitchVariant variant = SwitchVariant.Default,
             SwitchSize size = SwitchSize.Default, Action<bool> onToggle = null, bool disabled = false)
         {
-            GUILayout.BeginHorizontal();
-            
+            layoutComponents.BeginHorizontalGroup();
+
+            bool newValue = Switch("", value, variant, size, onToggle, disabled, GUILayout.Width(40 * guiHelper.uiScale));
+
+            if (newValue != value)
+            {
+                value = newValue;
+                onToggle?.Invoke(newValue);
+            }
+
             var styleManager = guiHelper.GetStyleManager();
             GUIStyle labelStyle = styleManager?.GetLabelStyle(LabelVariant.Default) ?? GUI.skin.label;
-            
+
             Color originalColor = GUI.color;
             if (disabled)
             {
@@ -97,23 +107,18 @@ namespace shadcnui.GUIComponents
 #endif
 
             GUI.color = originalColor;
-            
-            GUILayout.FlexibleSpace();
-            
-            bool newValue = Switch("", value, variant, size, onToggle, disabled, GUILayout.Width(50 * guiHelper.uiScale));
-            
-            GUILayout.EndHorizontal();
+            layoutComponents.EndHorizontalGroup();
 
             return newValue;
         }
 
-        public bool SwitchWithDescription(string label, string description, bool value, 
+        public bool SwitchWithDescription(string label, string description, ref bool value, 
             SwitchVariant variant = SwitchVariant.Default, SwitchSize size = SwitchSize.Default,
             Action<bool> onToggle = null, bool disabled = false)
         {
-            GUILayout.BeginVertical();
+            layoutComponents.BeginVerticalGroup();
             
-            bool newValue = SwitchWithLabel(label, value, variant, size, onToggle, disabled);
+            bool newValue = SwitchWithLabel(label, ref value, variant, size, onToggle, disabled);
             
             if (!string.IsNullOrEmpty(description))
             {
@@ -126,7 +131,7 @@ namespace shadcnui.GUIComponents
                     GUI.color = new Color(originalColor.r, originalColor.g, originalColor.b, 0.7f);
                 }
 
-                GUILayout.Space(2 * guiHelper.uiScale);
+                layoutComponents.AddSpace(2);
 #if IL2CPP
                 GUILayout.Label(description, descStyle, (Il2CppReferenceArray<GUILayoutOption>)null);
 #else
@@ -136,7 +141,7 @@ namespace shadcnui.GUIComponents
                 GUI.color = originalColor;
             }
             
-            GUILayout.EndVertical();
+            layoutComponents.EndVerticalGroup();
 
             return newValue;
         }
@@ -216,20 +221,20 @@ namespace shadcnui.GUIComponents
             return newValue;
         }
 
-        public bool ValidatedSwitch(string text, bool value, bool isValid, string validationMessage,
+        public bool ValidatedSwitch(string text, ref bool value, bool isValid, string validationMessage,
             SwitchVariant variant = SwitchVariant.Default, SwitchSize size = SwitchSize.Default,
             Action<bool> onToggle = null, bool disabled = false)
         {
-            GUILayout.BeginVertical();
+            layoutComponents.BeginVerticalGroup();
             
-            bool newValue = SwitchWithLabel(text, value, variant, size, onToggle, disabled);
+            bool newValue = SwitchWithLabel(text, ref value, variant, size, onToggle, disabled);
             
             if (!isValid && !string.IsNullOrEmpty(validationMessage))
             {
                 var styleManager = guiHelper.GetStyleManager();
                 GUIStyle errorStyle = styleManager?.GetLabelStyle(LabelVariant.Destructive) ?? GUI.skin.label;
                 
-                GUILayout.Space(2 * guiHelper.uiScale);
+                layoutComponents.AddSpace(2);
 #if IL2CPP
                 GUILayout.Label(validationMessage, errorStyle, (Il2CppReferenceArray<GUILayoutOption>)null);
 #else
@@ -237,21 +242,21 @@ namespace shadcnui.GUIComponents
 #endif
             }
             
-            GUILayout.EndVertical();
+            layoutComponents.EndVerticalGroup();
 
             return newValue;
         }
 
-        public bool SwitchWithTooltip(string text, bool value, string tooltip, SwitchVariant variant = SwitchVariant.Default,
+        public bool SwitchWithTooltip(string text, ref bool value, string tooltip, SwitchVariant variant = SwitchVariant.Default,
             SwitchSize size = SwitchSize.Default, Action<bool> onToggle = null, bool disabled = false)
         {
-            GUILayout.BeginHorizontal();
+            layoutComponents.BeginHorizontalGroup();
             
-            bool newValue = SwitchWithLabel(text, value, variant, size, onToggle, disabled);
+            bool newValue = SwitchWithLabel(text, ref value, variant, size, onToggle, disabled);
             
             if (!string.IsNullOrEmpty(tooltip))
             {
-                GUILayout.Space(4 * guiHelper.uiScale);
+                layoutComponents.AddSpace(4);
                 
                 var styleManager = guiHelper.GetStyleManager();
                 GUIStyle tooltipStyle = styleManager?.GetLabelStyle(LabelVariant.Muted) ?? GUI.skin.label;
@@ -268,7 +273,7 @@ namespace shadcnui.GUIComponents
                 GUI.color = originalColor;
             }
             
-            GUILayout.EndHorizontal();
+            layoutComponents.EndHorizontalGroup();
 
             return newValue;
         }
@@ -288,17 +293,17 @@ namespace shadcnui.GUIComponents
 
             if (horizontal)
             {
-                GUILayout.BeginHorizontal();
+                layoutComponents.BeginHorizontalGroup();
             }
             else
             {
-                GUILayout.BeginVertical();
+                layoutComponents.BeginVerticalGroup();
             }
 
             for (int i = 0; i < labels.Length; i++)
             {
                 int index = i;
-                bool newValue = SwitchWithLabel(labels[i], values[i], variant, size, 
+                bool newValue = SwitchWithLabel(labels[i], ref newValues[i], variant, size, 
                     (val) => {
                         newValues[index] = val;
                         onToggleChange?.Invoke(index, val);
@@ -306,14 +311,14 @@ namespace shadcnui.GUIComponents
 
                 if (i < labels.Length - 1)
                 {
-                    GUILayout.Space(spacing * guiHelper.uiScale);
+                    layoutComponents.AddSpace(spacing);
                 }
             }
 
             if (horizontal)
-                GUILayout.EndHorizontal();
+                layoutComponents.EndHorizontalGroup();
             else
-                GUILayout.EndVertical();
+                layoutComponents.EndVerticalGroup();
 
             return newValues;
         }
@@ -321,13 +326,13 @@ namespace shadcnui.GUIComponents
         public bool SwitchWithLoading(string text, bool value, bool isLoading, SwitchVariant variant = SwitchVariant.Default,
             SwitchSize size = SwitchSize.Default, Action<bool> onToggle = null, bool disabled = false)
         {
-            GUILayout.BeginHorizontal();
+            layoutComponents.BeginHorizontalGroup();
             
-            bool newValue = SwitchWithLabel(text, value, variant, size, onToggle, disabled || isLoading);
+            bool newValue = SwitchWithLabel(text, ref value, variant, size, onToggle, disabled || isLoading);
             
             if (isLoading)
             {
-                GUILayout.Space(4 * guiHelper.uiScale);
+                layoutComponents.AddSpace(4);
                 
                 float time = Time.time * 2f;
                 float alpha = (Mathf.Sin(time) + 1f) * 0.5f;
@@ -347,7 +352,7 @@ namespace shadcnui.GUIComponents
                 GUI.color = originalColor;
             }
             
-            GUILayout.EndHorizontal();
+            layoutComponents.EndHorizontalGroup();
 
             return newValue;
         }

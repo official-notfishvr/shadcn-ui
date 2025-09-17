@@ -421,12 +421,16 @@
     <Compile Include="GUIComponents\GUIAvatarComponents.cs" />
     <Compile Include="GUIComponents\GUIBadgeComponents.cs" />
     <Compile Include="GUIComponents\GUIButtonComponents.cs" />
+    <Compile Include="GUIComponents\GUICalendarComponents.cs" />
     <Compile Include="GUIComponents\GUICardComponents.cs" />
     <Compile Include="GUIComponents\GUICheckboxComponents.cs" />
+    <Compile Include="GUIComponents\GUIDropdownMenuComponents.cs" />
     <Compile Include="GUIComponents\GUIInputComponents.cs" />
     <Compile Include="GUIComponents\GUILabelComponents.cs" />
     <Compile Include="GUIComponents\GUILayoutComponents.cs" />
+    <Compile Include="GUIComponents\GUIPopoverComponents.cs" />
     <Compile Include="GUIComponents\GUIProgressComponents.cs" />
+    <Compile Include="GUIComponents\GUISelectComponents.cs" />
     <Compile Include="GUIComponents\GUISeparatorComponents.cs" />
     <Compile Include="GUIComponents\GUISkeletonComponents.cs" />
     <Compile Include="GUIComponents\GUISliderComponents.cs" />

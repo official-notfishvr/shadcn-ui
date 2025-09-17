@@ -8,10 +8,12 @@ namespace shadcnui.GUIComponents
     public class GUICheckboxComponents
     {
         private GUIHelper guiHelper;
+        private GUILayoutComponents layoutComponents;
 
         public GUICheckboxComponents(GUIHelper helper)
         {
             guiHelper = helper;
+            layoutComponents = new GUILayoutComponents(helper);
         }
 
 
@@ -80,7 +82,7 @@ namespace shadcnui.GUIComponents
         public bool CheckboxWithLabel(string label, ref bool value, CheckboxVariant variant = CheckboxVariant.Default,
             CheckboxSize size = CheckboxSize.Default, Action<bool> onToggle = null, bool disabled = false)
         {
-            GUILayout.BeginHorizontal();
+            layoutComponents.BeginHorizontalGroup();
 
             bool newValue = Checkbox("", value, variant, size, onToggle, disabled, GUILayout.Width(20 * guiHelper.uiScale));
 
@@ -106,7 +108,7 @@ namespace shadcnui.GUIComponents
 #endif
 
             GUI.color = originalColor;
-            GUILayout.EndHorizontal();
+            layoutComponents.EndHorizontalGroup();
 
             return newValue;
         }
@@ -126,11 +128,11 @@ namespace shadcnui.GUIComponents
 
             if (horizontal)
             {
-                GUILayout.BeginHorizontal();
+                layoutComponents.BeginHorizontalGroup();
             }
             else
             {
-                GUILayout.BeginVertical();
+                layoutComponents.BeginVerticalGroup();
             }
 
             for (int i = 0; i < labels.Length; i++)
@@ -145,14 +147,14 @@ namespace shadcnui.GUIComponents
 
                 if (i < labels.Length - 1)
                 {
-                    GUILayout.Space(spacing * guiHelper.uiScale);
+                    layoutComponents.AddSpace(spacing);
                 }
             }
 
             if (horizontal)
-                GUILayout.EndHorizontal();
+                layoutComponents.EndHorizontalGroup();
             else
-                GUILayout.EndVertical();
+                layoutComponents.EndVerticalGroup();
 
             return newValues;
         }
@@ -202,7 +204,7 @@ namespace shadcnui.GUIComponents
         public bool CheckboxWithIcon(string text, ref bool value, Texture2D icon, CheckboxVariant variant = CheckboxVariant.Default,
             CheckboxSize size = CheckboxSize.Default, Action<bool> onToggle = null, bool disabled = false)
         {
-            GUILayout.BeginHorizontal();
+            layoutComponents.BeginHorizontalGroup();
 
             bool newValue = Checkbox("", value, variant, size, onToggle, disabled, GUILayout.Width(20 * guiHelper.uiScale));
             if (newValue != value)
@@ -214,7 +216,7 @@ namespace shadcnui.GUIComponents
             if (icon != null)
             {
                 GUILayout.Label(icon, GUILayout.Width(16 * guiHelper.uiScale), GUILayout.Height(16 * guiHelper.uiScale));
-                GUILayout.Space(4 * guiHelper.uiScale);
+                layoutComponents.AddSpace(4);
             }
 
             var styleManager = guiHelper.GetStyleManager();
@@ -233,7 +235,7 @@ namespace shadcnui.GUIComponents
 #endif
 
             GUI.color = originalColor;
-            GUILayout.EndHorizontal();
+            layoutComponents.EndHorizontalGroup();
 
             return newValue;
         }
@@ -243,7 +245,7 @@ namespace shadcnui.GUIComponents
             CheckboxVariant variant = CheckboxVariant.Default, CheckboxSize size = CheckboxSize.Default,
             Action<bool> onToggle = null, bool disabled = false)
         {
-            GUILayout.BeginVertical();
+            layoutComponents.BeginVerticalGroup();
 
             bool newValue = CheckboxWithLabel(label, ref value, variant, size, onToggle, disabled);
 
@@ -258,7 +260,7 @@ namespace shadcnui.GUIComponents
                     GUI.color = new Color(originalColor.r, originalColor.g, originalColor.b, 0.7f);
                 }
 
-                GUILayout.Space(2 * guiHelper.uiScale);
+                layoutComponents.AddSpace(2);
 #if IL2CPP
                 GUILayout.Label(description, descStyle, (Il2CppReferenceArray<GUILayoutOption>)null);
 #else
@@ -268,7 +270,7 @@ namespace shadcnui.GUIComponents
                 GUI.color = originalColor;
             }
 
-            GUILayout.EndVertical();
+            layoutComponents.EndVerticalGroup();
 
             return newValue;
         }
@@ -277,7 +279,7 @@ namespace shadcnui.GUIComponents
             CheckboxVariant variant = CheckboxVariant.Default, CheckboxSize size = CheckboxSize.Default,
             Action<bool> onToggle = null, bool disabled = false)
         {
-            GUILayout.BeginVertical();
+            layoutComponents.BeginVerticalGroup();
 
             bool newValue = CheckboxWithLabel(text, ref value, variant, size, onToggle, disabled);
 
@@ -286,7 +288,7 @@ namespace shadcnui.GUIComponents
                 var styleManager = guiHelper.GetStyleManager();
                 GUIStyle errorStyle = styleManager?.GetLabelStyle(LabelVariant.Destructive) ?? GUI.skin.label;
 
-                GUILayout.Space(2 * guiHelper.uiScale);
+                layoutComponents.AddSpace(2);
 #if IL2CPP
                 GUILayout.Label(validationMessage, errorStyle, (Il2CppReferenceArray<GUILayoutOption>)null);
 #else
@@ -294,7 +296,7 @@ namespace shadcnui.GUIComponents
 #endif
             }
 
-            GUILayout.EndVertical();
+            layoutComponents.EndVerticalGroup();
 
             return newValue;
         }
@@ -302,13 +304,13 @@ namespace shadcnui.GUIComponents
         public bool CheckboxWithTooltip(string text, ref bool value, string tooltip, CheckboxVariant variant = CheckboxVariant.Default,
             CheckboxSize size = CheckboxSize.Default, Action<bool> onToggle = null, bool disabled = false)
         {
-            GUILayout.BeginHorizontal();
+            layoutComponents.BeginHorizontalGroup();
 
             bool newValue = CheckboxWithLabel(text, ref value, variant, size, onToggle, disabled);
 
             if (!string.IsNullOrEmpty(tooltip))
             {
-                GUILayout.Space(4 * guiHelper.uiScale);
+                layoutComponents.AddSpace(4);
 
                 var styleManager = guiHelper.GetStyleManager();
                 GUIStyle tooltipStyle = styleManager?.GetLabelStyle(LabelVariant.Muted) ?? GUI.skin.label;
@@ -325,7 +327,7 @@ namespace shadcnui.GUIComponents
                 GUI.color = originalColor;
             }
 
-            GUILayout.EndHorizontal();
+            layoutComponents.EndHorizontalGroup();
 
             return newValue;
         }

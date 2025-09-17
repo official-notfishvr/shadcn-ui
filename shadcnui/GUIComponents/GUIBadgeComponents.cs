@@ -8,10 +8,12 @@ namespace shadcnui.GUIComponents
     public class GUIBadgeComponents
     {
         private GUIHelper guiHelper;
+        private GUILayoutComponents layoutComponents;
 
         public GUIBadgeComponents(GUIHelper helper)
         {
             guiHelper = helper;
+            layoutComponents = new GUILayoutComponents(helper);
         }
 
 
@@ -58,17 +60,17 @@ namespace shadcnui.GUIComponents
         public void BadgeWithIcon(string text, Texture2D icon, BadgeVariant variant = BadgeVariant.Default, 
             BadgeSize size = BadgeSize.Default, params GUILayoutOption[] options)
         {
-            GUILayout.BeginHorizontal();
+            layoutComponents.BeginHorizontalGroup();
             
             if (icon != null)
             {
                 GUILayout.Label(icon, GUILayout.Width(16 * guiHelper.uiScale), GUILayout.Height(16 * guiHelper.uiScale));
-                GUILayout.Space(4 * guiHelper.uiScale);
+                layoutComponents.AddSpace(4);
             }
             
             Badge(text, variant, size, options);
             
-            GUILayout.EndHorizontal();
+            layoutComponents.EndHorizontalGroup();
         }
 
         public void CustomBadge(string text, Color backgroundColor, Color textColor, BadgeSize size = BadgeSize.Default,
@@ -106,7 +108,7 @@ namespace shadcnui.GUIComponents
         public void StatusBadge(string text, bool isActive, BadgeVariant variant = BadgeVariant.Default, 
             BadgeSize size = BadgeSize.Default, params GUILayoutOption[] options)
         {
-            GUILayout.BeginHorizontal();
+            layoutComponents.BeginHorizontalGroup();
             
             Color dotColor = isActive ? Color.green : Color.gray;
             var styleManager = guiHelper.GetStyleManager();
@@ -121,22 +123,22 @@ namespace shadcnui.GUIComponents
                 dotStyle.margin = new RectOffset(0, 0, 0, 0);
                 
                 GUILayout.Label("", dotStyle);
-                GUILayout.Space(4 * guiHelper.uiScale);
+                layoutComponents.AddSpace(4);
             }
             
             Badge(text, variant, size, options);
             
-            GUILayout.EndHorizontal();
+            layoutComponents.EndHorizontalGroup();
         }
 
         public bool DismissibleBadge(string text, BadgeVariant variant = BadgeVariant.Default, 
             BadgeSize size = BadgeSize.Default, Action onDismiss = null, params GUILayoutOption[] options)
         {
-            GUILayout.BeginHorizontal();
+            layoutComponents.BeginHorizontalGroup();
             
             Badge(text, variant, size, options);
             
-            GUILayout.Space(4 * guiHelper.uiScale);
+            layoutComponents.AddSpace(4);
             bool closeClicked = GUILayout.Button("×", GUILayout.Width(16 * guiHelper.uiScale), GUILayout.Height(16 * guiHelper.uiScale));
             
             if (closeClicked && onDismiss != null)
@@ -144,7 +146,7 @@ namespace shadcnui.GUIComponents
                 onDismiss.Invoke();
             }
             
-            GUILayout.EndHorizontal();
+            layoutComponents.EndHorizontalGroup();
             
             return closeClicked;
         }
@@ -152,11 +154,11 @@ namespace shadcnui.GUIComponents
         public void ProgressBadge(string text, float progress, BadgeVariant variant = BadgeVariant.Default, 
             BadgeSize size = BadgeSize.Default, params GUILayoutOption[] options)
         {
-            GUILayout.BeginVertical();
+            layoutComponents.BeginVerticalGroup();
             
             Badge(text, variant, size, options);
             
-            GUILayout.Space(2 * guiHelper.uiScale);
+            layoutComponents.AddSpace(2);
             Rect progressRect = GUILayoutUtility.GetRect(60 * guiHelper.uiScale, 4 * guiHelper.uiScale);
             
             var styleManager = guiHelper.GetStyleManager();
@@ -172,7 +174,7 @@ namespace shadcnui.GUIComponents
                 GUI.Box(fillRect, "", fillStyle);
             }
             
-            GUILayout.EndVertical();
+            layoutComponents.EndVerticalGroup();
         }
 
         public void AnimatedBadge(string text, BadgeVariant variant = BadgeVariant.Default, 
@@ -192,13 +194,13 @@ namespace shadcnui.GUIComponents
         public void BadgeWithTooltip(string text, string tooltip, BadgeVariant variant = BadgeVariant.Default, 
             BadgeSize size = BadgeSize.Default, params GUILayoutOption[] options)
         {
-            GUILayout.BeginHorizontal();
+            layoutComponents.BeginHorizontalGroup();
             
             Badge(text, variant, size, options);
             
             if (!string.IsNullOrEmpty(tooltip))
             {
-                GUILayout.Space(4 * guiHelper.uiScale);
+                layoutComponents.AddSpace(4);
                 
                 var styleManager = guiHelper.GetStyleManager();
                 GUIStyle tooltipStyle = styleManager?.GetLabelStyle(LabelVariant.Muted) ?? GUI.skin.label;
@@ -215,7 +217,7 @@ namespace shadcnui.GUIComponents
                 GUI.color = originalColor;
             }
             
-            GUILayout.EndHorizontal();
+            layoutComponents.EndHorizontalGroup();
         }
 
 
@@ -235,11 +237,11 @@ namespace shadcnui.GUIComponents
 
             if (horizontal)
             {
-                GUILayout.BeginHorizontal();
+                layoutComponents.BeginHorizontalGroup();
             }
             else
             {
-                GUILayout.BeginVertical();
+                layoutComponents.BeginVerticalGroup();
             }
 
             for (int i = 0; i < texts.Length; i++)
@@ -248,14 +250,14 @@ namespace shadcnui.GUIComponents
                 
                 if (i < texts.Length - 1)
                 {
-                    GUILayout.Space(spacing * guiHelper.uiScale);
+                    layoutComponents.AddSpace(spacing);
                 }
             }
 
             if (horizontal)
-                GUILayout.EndHorizontal();
+                layoutComponents.EndHorizontalGroup();
             else
-                GUILayout.EndVertical();
+                layoutComponents.EndVerticalGroup();
         }
 
 

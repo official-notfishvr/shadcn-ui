@@ -9,10 +9,12 @@ namespace shadcnui.GUIComponents
     public class GUIToggleComponents
     {
         private GUIHelper guiHelper;
+        private GUILayoutComponents layoutComponents;
 
         public GUIToggleComponents(GUIHelper helper)
         {
             guiHelper = helper;
+            layoutComponents = new GUILayoutComponents(helper);
         }
 
         public void DrawToggle(float windowWidth, string label, ref bool value, Action<bool> onToggle)
@@ -37,24 +39,24 @@ namespace shadcnui.GUIComponents
                 value = !value;
                 onToggle?.Invoke(value);
             }
-            GUILayout.Space(guiHelper.controlSpacing);
+            layoutComponents.AddSpace(guiHelper.controlSpacing);
         }
 
         public bool DrawCheckbox(float windowWidth, string label, ref bool value)
         {
             var styleManager = guiHelper.GetStyleManager();
 #if IL2CPP
-            GUILayout.BeginHorizontal(GUIStyle.none, (Il2CppReferenceArray<GUILayoutOption>)null);
+            layoutComponents.BeginHorizontalGroup(GUIStyle.none, (Il2CppReferenceArray<GUILayoutOption>)null);
             value = GUILayout.Toggle(value, "", (Il2CppReferenceArray<GUILayoutOption>)new GUILayoutOption[] { GUILayout.Width(20) });
             GUILayout.Label(label, styleManager.glowLabelStyle, (Il2CppReferenceArray<GUILayoutOption>)null);
-            GUILayout.EndHorizontal();
+            layoutComponents.EndHorizontalGroup();
 #else
-            GUILayout.BeginHorizontal();
+            layoutComponents.BeginHorizontalGroup();
             value = GUILayout.Toggle(value, "", GUILayout.Width(20));
             GUILayout.Label(label, styleManager.glowLabelStyle);
-            GUILayout.EndHorizontal();
+            layoutComponents.EndHorizontalGroup();
 #endif
-            GUILayout.Space(guiHelper.controlSpacing);
+            layoutComponents.AddSpace(guiHelper.controlSpacing);
             return value;
         }
 
@@ -70,7 +72,7 @@ namespace shadcnui.GUIComponents
                 GUILayout.Label(label, styleManager.glowLabelStyle);
             selected = GUILayout.SelectionGrid(selected, texts, xCount, styleManager.animatedButtonStyle);
 #endif
-            GUILayout.Space(guiHelper.controlSpacing);
+            layoutComponents.AddSpace(guiHelper.controlSpacing);
             return selected;
         }
         public bool Toggle(string text, bool value, ToggleVariant variant = ToggleVariant.Default,
@@ -133,17 +135,17 @@ namespace shadcnui.GUIComponents
             if (horizontal)
             {
 #if IL2CPP
-                GUILayout.BeginHorizontal(GUIStyle.none, (Il2CppReferenceArray<GUILayoutOption>)null);
+                layoutComponents.BeginHorizontalGroup(GUIStyle.none, (Il2CppReferenceArray<GUILayoutOption>)null);
 #else
-                GUILayout.BeginHorizontal();
+                layoutComponents.BeginHorizontalGroup();
 #endif
             }
             else
             {
 #if IL2CPP
-                GUILayout.BeginVertical(GUIStyle.none, (Il2CppReferenceArray<GUILayoutOption>)null);
+                layoutComponents.BeginVerticalGroup(GUIStyle.none, (Il2CppReferenceArray<GUILayoutOption>)null);
 #else
-                GUILayout.BeginVertical();
+                layoutComponents.BeginVerticalGroup();
 #endif
             }
 
@@ -157,15 +159,15 @@ namespace shadcnui.GUIComponents
                 }
 
                 if (horizontal && i < texts.Length - 1)
-                    GUILayout.Space(spacing);
+                    layoutComponents.AddSpace(spacing);
             }
 
             if (horizontal)
-                GUILayout.EndHorizontal();
+                layoutComponents.EndHorizontalGroup();
             else
-                GUILayout.EndVertical();
+                layoutComponents.EndVerticalGroup();
 
-            GUILayout.Space(spacing);
+            layoutComponents.AddSpace(spacing);
 
             return newSelectedIndex;
         }
@@ -179,17 +181,17 @@ namespace shadcnui.GUIComponents
             if (horizontal)
             {
 #if IL2CPP
-                GUILayout.BeginHorizontal(GUIStyle.none, (Il2CppReferenceArray<GUILayoutOption>)null);
+                layoutComponents.BeginHorizontalGroup(GUIStyle.none, (Il2CppReferenceArray<GUILayoutOption>)null);
 #else
-                GUILayout.BeginHorizontal();
+                layoutComponents.BeginHorizontalGroup();
 #endif
             }
             else
             {
 #if IL2CPP
-                GUILayout.BeginVertical(GUIStyle.none, (Il2CppReferenceArray<GUILayoutOption>)null);
+                layoutComponents.BeginVerticalGroup(GUIStyle.none, (Il2CppReferenceArray<GUILayoutOption>)null);
 #else
-                GUILayout.BeginVertical();
+                layoutComponents.BeginVerticalGroup();
 #endif
             }
 
@@ -199,15 +201,15 @@ namespace shadcnui.GUIComponents
                     (value) => onToggleChange?.Invoke(i, value));
 
                 if (horizontal && i < texts.Length - 1)
-                    GUILayout.Space(spacing);
+                    layoutComponents.AddSpace(spacing);
             }
 
             if (horizontal)
-                GUILayout.EndHorizontal();
+                layoutComponents.EndHorizontalGroup();
             else
-                GUILayout.EndVertical();
+                layoutComponents.EndVerticalGroup();
 
-            GUILayout.Space(spacing);
+            layoutComponents.AddSpace(spacing);
 
             return newStates;
         }

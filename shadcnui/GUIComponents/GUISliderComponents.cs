@@ -9,10 +9,12 @@ namespace shadcnui.GUIComponents
     public class GUISliderComponents
     {
         private GUIHelper guiHelper;
+        private GUILayoutComponents layoutComponents;
 
         public GUISliderComponents(GUIHelper helper)
         {
             guiHelper = helper;
+            layoutComponents = new GUILayoutComponents(helper);
         }
 
         public void DrawSlider(float windowWidth, string label, ref float value, float minValue, float maxValue)
@@ -25,7 +27,7 @@ namespace shadcnui.GUIComponents
             GUILayout.Label(label + ": " + value.ToString("F2"), styleManager.glowLabelStyle);
             value = GUILayout.HorizontalSlider(value, minValue, maxValue);
 #endif
-            GUILayout.Space(guiHelper.controlSpacing);
+            layoutComponents.AddSpace(guiHelper.controlSpacing);
         }
 
         public void DrawIntSlider(float windowWidth, string label, ref int value, int minValue, int maxValue)
@@ -38,7 +40,7 @@ namespace shadcnui.GUIComponents
             GUILayout.Label(label + ": " + value.ToString(), styleManager.glowLabelStyle);
             value = (int)GUILayout.HorizontalSlider(value, minValue, maxValue);
 #endif
-            GUILayout.Space(guiHelper.controlSpacing);
+            layoutComponents.AddSpace(guiHelper.controlSpacing);
         }
 
     }

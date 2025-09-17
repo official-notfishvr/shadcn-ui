@@ -82,6 +82,9 @@ public class UI : MonoBehaviour
     private int intSliderValue = 50;
     private float visualProgressBarValue = 0.7f;
     private int selectedVerticalTab = 0;
+    private int selectDemoCurrentSelection = 0;
+    private string inputFieldValue = "Default Input";
+    private Vector2 scrollAreaScrollPosition = Vector2.zero;
 
 
     void Start()
@@ -107,6 +110,10 @@ public class UI : MonoBehaviour
             new GUITabsComponents.TabConfig("Tabs", DrawTabsDemos),
             new GUITabsComponents.TabConfig("Text Area", DrawTextAreaDemos),
             new GUITabsComponents.TabConfig("Toggle", DrawToggleDemos),
+            new GUITabsComponents.TabConfig("Calendar", DrawCalendarDemos),
+            new GUITabsComponents.TabConfig("DropdownMenu", DrawDropdownMenuDemos),
+            new GUITabsComponents.TabConfig("Popover", DrawPopoverDemos),
+            new GUITabsComponents.TabConfig("Select", DrawSelectDemos),
             new GUITabsComponents.TabConfig("Visual", DrawVisualDemos)
         };
     }
@@ -129,10 +136,10 @@ public class UI : MonoBehaviour
         guiHelper.UpdateAnimations(showDemoWindow);
         if (guiHelper.BeginAnimatedGUI())
         {
-            currentDemoTab = guiHelper.Tabs(demoTabs.Select(tab => tab.Name).ToArray(), currentDemoTab);
+            currentDemoTab = guiHelper.Tabs(demoTabs.Select(tab => tab.Name).ToArray(), currentDemoTab, maxLines: 2);
 
             guiHelper.BeginTabContent();
-            scrollPosition = guiHelper.DrawScrollView(scrollPosition, windowRect.width - 20, windowRect.height - 40, () =>
+            scrollPosition = guiHelper.DrawScrollView(scrollPosition, () =>
             {
                 GUILayout.BeginVertical(GUILayout.Width(windowRect.width - 20), GUILayout.ExpandHeight(true));
                 if (currentDemoTab >= 0 && currentDemoTab < demoTabs.Length)
@@ -140,7 +147,7 @@ public class UI : MonoBehaviour
                     demoTabs[currentDemoTab].Content?.Invoke();
                 }
                 GUILayout.EndVertical();
-            });
+            }, GUILayout.Width(windowRect.width - 20), GUILayout.Height(windowRect.height - 40));
             guiHelper.EndTabContent();
         }
         guiHelper.EndAnimatedGUI();
@@ -491,6 +498,97 @@ public class UI : MonoBehaviour
         guiHelper.Label("Rounded Badge", LabelVariant.Default);
         guiHelper.RoundedBadge("Rounded", cornerRadius: 8f);
         guiHelper.Label("Code: guiHelper.RoundedBadge(text, cornerRadius);", LabelVariant.Muted);
+        guiHelper.HorizontalSeparator();
+
+        GUILayout.EndVertical();
+    }
+
+    void DrawCalendarDemos()
+    {
+        GUILayout.BeginVertical(GUILayout.ExpandWidth(true), GUILayout.ExpandHeight(true));
+        guiHelper.Label("Calendar", LabelVariant.Default);
+        guiHelper.MutedLabel("A component for displaying a calendar and selecting dates.");
+        guiHelper.HorizontalSeparator();
+
+        guiHelper.Calendar();
+        guiHelper.Label("Code: guiHelper.Calendar();", LabelVariant.Muted);
+        guiHelper.HorizontalSeparator();
+
+        GUILayout.EndVertical();
+    }
+
+    void DrawDropdownMenuDemos()
+    {
+        GUILayout.BeginVertical(GUILayout.ExpandWidth(true), GUILayout.ExpandHeight(true));
+        guiHelper.Label("Dropdown Menu", LabelVariant.Default);
+        guiHelper.MutedLabel("A menu that appears when a trigger is clicked.");
+        guiHelper.HorizontalSeparator();
+
+        if (guiHelper.Button("Open Dropdown Menu"))
+        {
+            guiHelper.OpenDropdownMenu();
+        }
+
+        if (guiHelper.IsDropdownMenuOpen())
+        {
+            string[] items = { "Item 1", "Item 2", "Item 3", "Item 4", "Item 5", "Item 6", "Item 7", "Item 8", "Item 9", "Item 10" };
+            guiHelper.DropdownMenu(items, (index) => {
+                Debug.Log("Selected item: " + items[index]);
+            });
+        }
+
+        guiHelper.Label("Code: guiHelper.DropdownMenu(rect, items, onItemSelected);", LabelVariant.Muted);
+        guiHelper.HorizontalSeparator();
+
+        GUILayout.EndVertical();
+    }
+
+    void DrawPopoverDemos()
+    {
+        GUILayout.BeginVertical(GUILayout.ExpandWidth(true), GUILayout.ExpandHeight(true));
+        guiHelper.Label("Popover", LabelVariant.Default);
+        guiHelper.MutedLabel("A pop-up that displays information related to an element.");
+        guiHelper.HorizontalSeparator();
+
+        if (guiHelper.Button("Open Popover"))
+        {
+            guiHelper.OpenPopover();
+        }
+
+        if (guiHelper.IsPopoverOpen())
+        {
+            guiHelper.Popover(() => {
+                guiHelper.Label("This is a popover.");
+            });
+        }
+
+        guiHelper.Label("Code: guiHelper.Popover(rect, content);", LabelVariant.Muted);
+        guiHelper.HorizontalSeparator();
+
+        GUILayout.EndVertical();
+    }
+
+    void DrawSelectDemos()
+    {
+        GUILayout.BeginVertical(GUILayout.ExpandWidth(true), GUILayout.ExpandHeight(true));
+        guiHelper.Label("Select", LabelVariant.Default);
+        guiHelper.MutedLabel("A dropdown list for selecting a value.");
+        guiHelper.HorizontalSeparator();
+
+        string[] options = { "Option 1", "Option 2", "Option 3" };
+
+        if (guiHelper.Button("Open Select"))
+        {
+            guiHelper.OpenSelect();
+        }
+
+        if (guiHelper.IsSelectOpen())
+        {
+            selectDemoCurrentSelection = guiHelper.Select(options, selectDemoCurrentSelection);
+        }
+
+        guiHelper.Label($"Selected: {options[selectDemoCurrentSelection]}");
+        guiHelper.Label("Code: guiHelper.Select(rect, options, selectedIndex);", LabelVariant.Muted);
         guiHelper.HorizontalSeparator();
 
         GUILayout.EndVertical();
