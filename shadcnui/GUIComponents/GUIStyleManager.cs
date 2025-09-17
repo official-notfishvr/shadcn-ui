@@ -655,7 +655,6 @@ namespace shadcnui.GUIComponents
         /// </summary>
         private void CreateCustomTextures()
         {
-
             gradientTexture = new Texture2D(1, 100);
             for (int i = 0; i < 100; i++)
             {
@@ -851,8 +850,8 @@ namespace shadcnui.GUIComponents
 
             animatedBoxStyle = new GUIStyle(GUI.skin.box);
             animatedBoxStyle.normal.background = gradientTexture;
-            animatedBoxStyle.border = new RectOffset(guiHelper.cornerRadius, guiHelper.cornerRadius,
-                guiHelper.cornerRadius, guiHelper.cornerRadius);
+                        animatedBoxStyle.border = new RectOffset(guiHelper.cornerRadius, guiHelper.cornerRadius,
+                guiHelper.cornerRadius, 5);
             animatedBoxStyle.padding = new RectOffset(15, 15, 15, 15);
 
 
