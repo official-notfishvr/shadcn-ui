@@ -37,8 +37,8 @@ namespace shadcnui
         }
     }
 #elif MELONLOADER
-    [MelonInfo(typeof(Plugin), PluginInfo.Name, PluginInfo.Version, "shadcnui")]
-    [MelonGame("Another Axiom", "Gorilla Tag")]
+    //[MelonInfo(typeof(Plugin), PluginInfo.Name, PluginInfo.Version, "shadcnui")]
+    //[MelonGame("Another Axiom", "Gorilla Tag")]
     public class Plugin : MelonMod
     {
         public static bool FirstLaunch;
