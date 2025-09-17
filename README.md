@@ -92,6 +92,7 @@ the `shadcnui testing/Menu/UI.cs` file has more examples.
 ## Todo
 
 * Fix Styles that are borken if there is any
+* Fix the GUIComponents not ending of the end of the gui
 
 ## Contribution Guidelines
 

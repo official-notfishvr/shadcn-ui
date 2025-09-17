@@ -120,6 +120,9 @@ public class UI : MonoBehaviour
 
     void OnGUI()
     {
+        GUI.skin.horizontalScrollbar = GUIStyle.none;
+        GUI.skin.verticalScrollbar = GUIStyle.none;
+
         if (GUI.Button(new Rect(10, 10, 150, 30), "Open Demo Window"))
         {
             showDemoWindow = !showDemoWindow;
@@ -141,13 +144,14 @@ public class UI : MonoBehaviour
             guiHelper.BeginTabContent();
             scrollPosition = guiHelper.DrawScrollView(scrollPosition, () =>
             {
-                GUILayout.BeginVertical(GUILayout.Width(windowRect.width - 20), GUILayout.ExpandHeight(true));
+                GUILayout.BeginVertical(GUILayout.Width(windowRect.width - 20));
                 if (currentDemoTab >= 0 && currentDemoTab < demoTabs.Length)
                 {
                     demoTabs[currentDemoTab].Content?.Invoke();
                 }
+                
                 GUILayout.EndVertical();
-            }, GUILayout.Width(windowRect.width - 20), GUILayout.Height(windowRect.height - 40));
+            }, GUILayout.Width(windowRect.width - 20), GUILayout.ExpandHeight(true));
             guiHelper.EndTabContent();
         }
         guiHelper.EndAnimatedGUI();

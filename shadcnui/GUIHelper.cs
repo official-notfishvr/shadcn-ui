@@ -178,13 +178,32 @@ namespace shadcnui
                 {
                     styleManager.InitializeGUI();
                     initialized = true;
-
                     buttonStyle = styleManager.animatedButtonStyle ?? GUI.skin.button;
                     labelStyle = styleManager.glowLabelStyle ?? GUI.skin.label;
                     textFieldStyle = styleManager.animatedInputStyle ?? GUI.skin.textField;
                 }
 
-                return animationManager?.BeginAnimatedGUI(menuAlpha, backgroundPulse, mousePos) ?? true;
+                float currentMenuAlpha = menuAlpha;
+                float currentBackgroundPulse = backgroundPulse;
+                Vector2 currentMousePos = mousePos;
+
+                float screenWidth = Screen.width * 2f;
+                float screenHeight = Screen.height * 2f;
+                float offsetX = (screenWidth - Screen.width) / 2f;
+                float offsetY = (screenHeight - Screen.height) / 2f;
+
+                Rect scaledBackgroundRect = new Rect(-offsetX, -offsetY, screenWidth, screenHeight);
+
+                Color backgroundColor = customColorsEnabled ?
+                    new Color(primaryColor.r, primaryColor.g, primaryColor.b,
+                             currentMenuAlpha * backgroundAlpha * currentBackgroundPulse) :
+                    new Color(0.1f, 0.1f, 0.2f, currentMenuAlpha * backgroundAlpha * currentBackgroundPulse);
+
+                GUI.color = backgroundColor;
+                GUI.DrawTexture(scaledBackgroundRect, Texture2D.whiteTexture);
+                GUI.color = Color.white;
+
+                return animationManager?.BeginAnimatedGUI(currentMenuAlpha, currentBackgroundPulse, currentMousePos) ?? true;
             }
             catch (Exception ex)
             {
