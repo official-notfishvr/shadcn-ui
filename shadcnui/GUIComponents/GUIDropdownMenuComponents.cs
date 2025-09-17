@@ -1,7 +1,9 @@
-
 using System;
 using System.Collections.Generic;
 using UnityEngine;
+#if IL2CPP
+using UnhollowerBaseLib;
+#endif
 
 namespace shadcnui.GUIComponents
 {
@@ -39,11 +41,17 @@ namespace shadcnui.GUIComponents
             {
                 for (int i = 0; i < items.Length; i++)
                 {
-                    if (GUILayout.Button(items[i], guiHelper.GetStyleManager().dropdownMenuItemStyle))
+#if IL2CPP
+                    if (GUILayout.Button(items[i], guiHelper.GetStyleManager().dropdownMenuItemStyle,
+                        new Il2CppReferenceArray<GUILayoutOption>(new GUILayoutOption[0])))
+#else
+if (GUILayout.Button(items[i], guiHelper.GetStyleManager().dropdownMenuItemStyle))
+#endif
                     {
                         onItemSelected?.Invoke(i);
                         Close();
                     }
+
                 }
             }, GUILayout.ExpandWidth(true), GUILayout.ExpandHeight(true));
             layoutComponents.EndVerticalGroup();

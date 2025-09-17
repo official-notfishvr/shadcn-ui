@@ -2,6 +2,9 @@ using shadcnui;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
+#if IL2CPP
+using UnhollowerBaseLib;
+#endif
 
 namespace shadcnui.GUIComponents
 {
@@ -20,11 +23,6 @@ namespace shadcnui.GUIComponents
             SkeletonSize size, params GUILayoutOption[] options)
         {
             var styleManager = guiHelper.GetStyleManager();
-            if (styleManager == null)
-            {
-                GUILayout.Box("", GUILayout.Width(width), GUILayout.Height(height));
-                return;
-            }
 
             GUIStyle skeletonStyle = styleManager.GetSkeletonStyle(variant, size);
 
@@ -62,11 +60,6 @@ namespace shadcnui.GUIComponents
             SkeletonSize size, params GUILayoutOption[] options)
         {
             var styleManager = guiHelper.GetStyleManager();
-            if (styleManager == null)
-            {
-                GUILayout.Box("", GUILayout.Width(width), GUILayout.Height(height));
-                return;
-            }
 
             float time = Time.time * 3f;
             float shimmerPos = (Mathf.Sin(time) + 1f) * 0.5f;
@@ -97,11 +90,6 @@ namespace shadcnui.GUIComponents
             params GUILayoutOption[] options)
         {
             var styleManager = guiHelper.GetStyleManager();
-            if (styleManager == null)
-            {
-                GUILayout.Box("", GUILayout.Width(width), GUILayout.Height(height));
-                return;
-            }
 
             GUIStyle customStyle = new GUIStyle(GUI.skin.box);
             customStyle.normal.background = styleManager.CreateSolidTexture(backgroundColor);
@@ -220,11 +208,6 @@ namespace shadcnui.GUIComponents
             params GUILayoutOption[] options)
         {
             var styleManager = guiHelper.GetStyleManager();
-            if (styleManager == null)
-            {
-                GUILayout.Box("", GUILayout.Width(width), GUILayout.Height(height));
-                return;
-            }
 
             GUIStyle customStyle = new GUIStyle(GUI.skin.box);
             customStyle.normal.background = styleManager.CreateSolidTexture(backgroundColor);
@@ -252,7 +235,7 @@ namespace shadcnui.GUIComponents
         public void SkeletonWithProgress(float width, float height, float progress, SkeletonVariant variant, 
             SkeletonSize size, params GUILayoutOption[] options)
         {
-            GUILayout.BeginVertical();
+            layoutComponents.BeginVerticalGroup();
             
             Skeleton(width, height, variant, size, options);
             
@@ -271,8 +254,8 @@ namespace shadcnui.GUIComponents
                 fillStyle.normal.background = styleManager.CreateSolidTexture(Color.blue);
                 GUI.Box(fillRect, "", fillStyle);
             }
-            
-            GUILayout.EndVertical();
+
+            layoutComponents.EndVerticalGroup();
         }
 
         public void FadeSkeleton(float width, float height, float fadeTime, SkeletonVariant variant, 

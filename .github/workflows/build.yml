@@ -13,6 +13,9 @@ on:
 jobs:
   build:
     runs-on: windows-latest
+    strategy:
+      matrix:
+        configuration: [IL2CPP_Melonloader, IL2CPP_BepInEx, Mono_Melonloader, Mono_BepInEx]
 
     steps:
     - uses: actions/checkout@v4
@@ -22,37 +25,40 @@ jobs:
       uses: NuGet/setup-nuget@v1
     - name: Restore NuGet packages
       run: nuget restore shadcnui.sln
-    - name: Build
-      run: msbuild shadcnui.sln /p:Configuration=Debug /p:Platform="Any CPU"
+    - name: Build ${{ matrix.configuration }}
+      run: msbuild shadcnui.sln /p:Configuration=${{ matrix.configuration }} /p:Platform="Any CPU"
 
     - uses: actions/upload-artifact@v4
       with:
-        name: shadcnui-build
-        path: shadcnui/bin/Debug/shadcnui.dll
+        name: shadcnui-build-${{ matrix.configuration }}
+        path: shadcnui/bin/${{ matrix.configuration }}/shadcnui.dll
 
-    - name: Upload shadcnui testing.dll
+    - name: Upload shadcnui testing.dll (${{ matrix.configuration }})
       uses: actions/upload-artifact@v4
       with:
-        name: shadcnui-testing-dll
-        path: "shadcnui testing/bin/Debug/netstandard2.1/shadcnui testing.dll"
+        name: shadcnui-testing-build-${{ matrix.configuration }}
+        path: "shadcnui testing/bin/${{ matrix.configuration }}/netstandard2.1/shadcnui testing.dll"
 
   release:
     needs: build
     runs-on: windows-latest
     if: github.event_name == 'release' && github.event.action == 'published'
+    strategy:
+      matrix:
+        configuration: [IL2CPP_Melonloader, IL2CPP_BepInEx, Mono_Melonloader, Mono_BepInEx]
 
     steps:
-    - name: Download shadcnui.dll
+    - name: Download shadcnui.dll (${{ matrix.configuration }})
       uses: actions/download-artifact@v4
       with:
-        name: shadcnui-dll
-        path: ./shadcnui-dll
+        name: shadcnui-build-${{ matrix.configuration }}
+        path: ./shadcnui-dll-${{ matrix.configuration }}
 
-    - name: Download shadcnui testing.dll
+    - name: Download shadcnui testing.dll (${{ matrix.configuration }})
       uses: actions/download-artifact@v4
       with:
-        name: shadcnui-testing-dll
-        path: ./shadcnui-testing-dll
+        name: shadcnui-testing-build-${{ matrix.configuration }}
+        path: ./shadcnui-testing-dll-${{ matrix.configuration }}
 
     - name: Create Release
       id: create_release
@@ -65,29 +71,32 @@ jobs:
         draft: false
         prerelease: false
 
-    - name: Upload shadcnui.dll to Release
+    - name: Upload shadcnui.dll to Release (${{ matrix.configuration }})
       uses: actions/upload-release-asset@v1
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
         upload_url: ${{ steps.create_release.outputs.upload_url }}
-        asset_path: ./shadcnui-dll/shadcnui.dll
-        asset_name: shadcnui.dll
+        asset_path: ./shadcnui-dll-${{ matrix.configuration }}/shadcnui.dll
+        asset_name: shadcnui-${{ matrix.configuration }}.dll
         asset_content_type: application/octet-stream
 
-    - name: Upload shadcnui testing.dll to Release
+    - name: Upload shadcnui testing.dll to Release (${{ matrix.configuration }})
       uses: actions/upload-release-asset@v1
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
         upload_url: ${{ steps.create_release.outputs.upload_url }}
-        asset_path: ./shadcnui-testing-dll/shadcnui testing.dll
-        asset_name: shadcnui testing.dll
+        asset_path: ./shadcnui-testing-dll-${{ matrix.configuration }}/shadcnui testing.dll
+        asset_name: shadcnui-testing-${{ matrix.configuration }}.dll
         asset_content_type: application/octet-stream
 
   nightly_build:
     runs-on: windows-latest
     if: github.event_name == 'schedule'
+    strategy:
+      matrix:
+        configuration: [IL2CPP_Melonloader, IL2CPP_BepInEx, Mono_Melonloader, Mono_BepInEx]
 
     steps:
     - uses: actions/checkout@v4
@@ -97,17 +106,17 @@ jobs:
       uses: NuGet/setup-nuget@v1
     - name: Restore NuGet packages
       run: nuget restore shadcnui.sln
-    - name: Build
-      run: msbuild shadcnui.sln /p:Configuration=Debug /p:Platform="Any CPU"
+    - name: Build ${{ matrix.configuration }} (Nightly)
+      run: msbuild shadcnui.sln /p:Configuration=${{ matrix.configuration }} /p:Platform="Any CPU"
 
-    - name: Upload shadcnui.dll (Nightly)
+    - name: Upload shadcnui.dll (Nightly - ${{ matrix.configuration }})
       uses: actions/upload-artifact@v4
       with:
-        name: shadcnui-nightly-${{ github.run_number }}
-        path: shadcnui/bin/Debug/shadcnui.dll
+        name: shadcnui-nightly-${{ github.run_number }}-${{ matrix.configuration }}
+        path: shadcnui/bin/${{ matrix.configuration }}/shadcnui.dll
 
-    - name: Upload shadcnui testing.dll (Nightly)
+    - name: Upload shadcnui testing.dll (Nightly - ${{ matrix.configuration }})
       uses: actions/upload-artifact@v4
       with:
-        name: shadcnui-testing-nightly-${{ github.run_number }}
-        path: "shadcnui testing/bin/Debug/netstandard2.1/shadcnui testing.dll"
+        name: shadcnui-testing-nightly-${{ github.run_number }}-${{ matrix.configuration }}
+        path: "shadcnui testing/bin/${{ matrix.configuration }}/netstandard2.1/shadcnui testing.dll"

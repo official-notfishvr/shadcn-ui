@@ -1,6 +1,9 @@
 using shadcnui;
 using System;
 using UnityEngine;
+#if IL2CPP
+using UnhollowerBaseLib;
+#endif
 
 namespace shadcnui.GUIComponents
 {

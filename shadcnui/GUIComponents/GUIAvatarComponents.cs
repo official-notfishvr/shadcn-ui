@@ -2,6 +2,9 @@ using shadcnui;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
+#if IL2CPP
+using UnhollowerBaseLib;
+#endif
 
 namespace shadcnui.GUIComponents
 {
@@ -16,19 +19,10 @@ namespace shadcnui.GUIComponents
             layoutComponents = new GUILayoutComponents(helper);
         }
 
-        public void Avatar(Texture2D image, string fallbackText, AvatarSize size = AvatarSize.Default, 
+        public void Avatar(Texture2D image, string fallbackText, AvatarSize size = AvatarSize.Default,
             AvatarShape shape = AvatarShape.Circle, params GUILayoutOption[] options)
         {
             var styleManager = guiHelper.GetStyleManager();
-            if (styleManager == null)
-            {
-                if (image != null)
-                    GUILayout.Label(image, options);
-                else
-                    GUILayout.Label(fallbackText ?? "A", options);
-                return;
-            }
-
             GUIStyle avatarStyle = styleManager.GetAvatarStyle(size, shape);
             GUIStyle fallbackStyle = styleManager.GetAvatarFallbackStyle(size, shape);
 
@@ -45,34 +39,19 @@ namespace shadcnui.GUIComponents
             else
             {
 #if IL2CPP
-                GUILayout.Label(fallbackText ?? "A", fallbackStyle, (Il2CppReferenceArray<GUILayoutOption>)layoutOptions);
+                GUILayout.Label(new GUIContent(fallbackText ?? "A"), fallbackStyle, (Il2CppReferenceArray<GUILayoutOption>)layoutOptions);
 #else
                 GUILayout.Label(fallbackText ?? "A", fallbackStyle, layoutOptions);
 #endif
             }
         }
 
-        public void Avatar(Rect rect, Texture2D image, string fallbackText, AvatarSize size = AvatarSize.Default, 
+        public void Avatar(Rect rect, Texture2D image, string fallbackText, AvatarSize size = AvatarSize.Default,
             AvatarShape shape = AvatarShape.Circle)
         {
             var styleManager = guiHelper.GetStyleManager();
-            if (styleManager == null)
-            {
-                if (image != null)
-                    GUI.Label(rect, image);
-                else
-                    GUI.Label(rect, fallbackText ?? "A");
-                return;
-            }
-
             GUIStyle avatarStyle = styleManager.GetAvatarStyle(size, shape);
-
-            Rect scaledRect = new Rect(
-                rect.x * guiHelper.uiScale,
-                rect.y * guiHelper.uiScale,
-                rect.width * guiHelper.uiScale,
-                rect.height * guiHelper.uiScale
-            );
+            Rect scaledRect = new Rect(rect.x * guiHelper.uiScale, rect.y * guiHelper.uiScale, rect.width * guiHelper.uiScale, rect.height * guiHelper.uiScale);
 
             if (image != null)
             {
@@ -81,23 +60,22 @@ namespace shadcnui.GUIComponents
             else
             {
                 GUIStyle fallbackStyle = styleManager.GetAvatarFallbackStyle(size, shape);
-                GUI.Label(scaledRect, fallbackText ?? "A", fallbackStyle);
+                GUI.Label(scaledRect, new GUIContent(fallbackText ?? "A"), fallbackStyle);
             }
         }
 
-        public void AvatarWithStatus(Texture2D image, string fallbackText, bool isOnline, AvatarSize size = AvatarSize.Default, 
+        public void AvatarWithStatus(Texture2D image, string fallbackText, bool isOnline, AvatarSize size = AvatarSize.Default,
             AvatarShape shape = AvatarShape.Circle, params GUILayoutOption[] options)
         {
             layoutComponents.BeginHorizontalGroup();
-            
             Avatar(image, fallbackText, size, shape, options);
-            
+
             if (isOnline)
             {
                 layoutComponents.AddSpace(-8);
                 DrawStatusIndicator(isOnline, size);
             }
-            
+
             layoutComponents.EndHorizontalGroup();
         }
 
@@ -105,10 +83,10 @@ namespace shadcnui.GUIComponents
         {
             var styleManager = guiHelper.GetStyleManager();
             if (styleManager == null) return;
-            
+
             Color statusColor = isOnline ? Color.green : Color.gray;
             float indicatorSize = styleManager.GetStatusIndicatorSize(size);
-            
+
             GUIStyle statusStyle = new GUIStyle(GUI.skin.box);
             statusStyle.normal.background = styleManager.CreateSolidTexture(statusColor);
             statusStyle.fixedWidth = indicatorSize * guiHelper.uiScale;
@@ -116,61 +94,63 @@ namespace shadcnui.GUIComponents
             statusStyle.border = new RectOffset(0, 0, 0, 0);
             statusStyle.padding = new RectOffset(0, 0, 0, 0);
             statusStyle.margin = new RectOffset(0, 0, 0, 0);
-            
-            GUILayout.Label("", statusStyle);
+
+#if IL2CPP
+            GUILayout.Label(GUIContent.none, statusStyle, new Il2CppReferenceArray<GUILayoutOption>(new GUILayoutOption[0]));
+#else
+GUILayout.Label(GUIContent.none, statusStyle);
+#endif
+
         }
 
-        public void AvatarWithName(Texture2D image, string fallbackText, string name, AvatarSize size = AvatarSize.Default, 
+        public void AvatarWithName(Texture2D image, string fallbackText, string name, AvatarSize size = AvatarSize.Default,
             AvatarShape shape = AvatarShape.Circle, bool showNameBelow = false, params GUILayoutOption[] options)
         {
             if (showNameBelow)
             {
                 layoutComponents.BeginVerticalGroup();
-                
                 Avatar(image, fallbackText, size, shape, options);
-                
+
                 if (!string.IsNullOrEmpty(name))
                 {
                     layoutComponents.AddSpace(4);
                     var styleManager = guiHelper.GetStyleManager();
                     GUIStyle nameStyle = styleManager?.GetLabelStyle(LabelVariant.Default) ?? GUI.skin.label;
-                    nameStyle.alignment = TextAnchor.MiddleCenter;
+#if IL2CPP
+                    GUILayout.Label(new GUIContent(name), nameStyle, (Il2CppReferenceArray<GUILayoutOption>)null);
+#else
                     GUILayout.Label(name, nameStyle);
+#endif
                 }
-                
+
                 layoutComponents.EndVerticalGroup();
             }
             else
             {
                 layoutComponents.BeginHorizontalGroup();
-                
                 Avatar(image, fallbackText, size, shape, options);
-                
+
                 if (!string.IsNullOrEmpty(name))
                 {
                     layoutComponents.AddSpace(8);
                     var styleManager = guiHelper.GetStyleManager();
                     GUIStyle nameStyle = styleManager?.GetLabelStyle(LabelVariant.Default) ?? GUI.skin.label;
                     nameStyle.alignment = TextAnchor.MiddleLeft;
+#if IL2CPP
+                    GUILayout.Label(new GUIContent(name), nameStyle, (Il2CppReferenceArray<GUILayoutOption>)null);
+#else
                     GUILayout.Label(name, nameStyle);
+#endif
                 }
-                
+
                 layoutComponents.EndHorizontalGroup();
             }
         }
 
-        public void CustomAvatar(Texture2D image, string fallbackText, Color backgroundColor, Color textColor, 
+        public void CustomAvatar(Texture2D image, string fallbackText, Color backgroundColor, Color textColor,
             AvatarSize size = AvatarSize.Default, AvatarShape shape = AvatarShape.Circle, params GUILayoutOption[] options)
         {
             var styleManager = guiHelper.GetStyleManager();
-            if (styleManager == null)
-            {
-                if (image != null)
-                    GUILayout.Label(image, options);
-                else
-                    GUILayout.Label(fallbackText ?? "A", options);
-                return;
-            }
 
             GUIStyle customStyle = new GUIStyle(GUI.skin.box);
             customStyle.normal.background = styleManager.CreateSolidTexture(backgroundColor);
@@ -191,7 +171,7 @@ namespace shadcnui.GUIComponents
             else
             {
 #if IL2CPP
-                GUILayout.Label(fallbackText ?? "A", customStyle, (Il2CppReferenceArray<GUILayoutOption>)options);
+                GUILayout.Label(new GUIContent(fallbackText ?? "A"), customStyle, (Il2CppReferenceArray<GUILayoutOption>)options);
 #else
                 GUILayout.Label(fallbackText ?? "A", customStyle, options);
 #endif
@@ -202,11 +182,6 @@ namespace shadcnui.GUIComponents
             AvatarSize size = AvatarSize.Default, AvatarShape shape = AvatarShape.Circle, params GUILayoutOption[] options)
         {
             var styleManager = guiHelper.GetStyleManager();
-            if (styleManager == null)
-            {
-                Avatar(image, fallbackText, size, shape, options);
-                return;
-            }
 
             GUIStyle borderedStyle = new GUIStyle(GUI.skin.box);
             borderedStyle.normal.background = styleManager.CreateSolidTexture(borderColor);
@@ -214,31 +189,16 @@ namespace shadcnui.GUIComponents
             borderedStyle.padding = new RectOffset(2, 2, 2, 2);
 
             layoutComponents.BeginVerticalGroup(borderedStyle, options);
-            {
-                Avatar(image, fallbackText, size, shape);
-            }
+            Avatar(image, fallbackText, size, shape, options);
             layoutComponents.EndVerticalGroup();
         }
 
-        
-
-        public void AvatarWithHover(Texture2D image, string fallbackText, AvatarSize size = AvatarSize.Default, 
+        public void AvatarWithHover(Texture2D image, string fallbackText, AvatarSize size = AvatarSize.Default,
             AvatarShape shape = AvatarShape.Circle, Action onClick = null, params GUILayoutOption[] options)
         {
             var styleManager = guiHelper.GetStyleManager();
-            if (styleManager == null)
-            {
-                if (image != null)
-                    GUILayout.Label(image, options);
-                else
-                    GUILayout.Label(fallbackText ?? "A", options);
-                return;
-            }
-
-           
             bool clicked = guiHelper.Button("", ButtonVariant.Ghost, ButtonSize.Icon, onClick: onClick, options: options);
 
-           
             Rect lastRect = GUILayoutUtility.GetLastRect();
             if (image != null)
             {
@@ -246,24 +206,23 @@ namespace shadcnui.GUIComponents
             }
             else
             {
-                GUI.Label(lastRect, fallbackText ?? "A", styleManager.GetAvatarFallbackStyle(size, shape));
+                GUI.Label(lastRect, new GUIContent(fallbackText ?? "A"), styleManager.GetAvatarFallbackStyle(size, shape));
             }
         }
 
-
-        public void AvatarWithLoading(Texture2D image, string fallbackText, bool isLoading, AvatarSize size = AvatarSize.Default, 
+        public void AvatarWithLoading(Texture2D image, string fallbackText, bool isLoading, AvatarSize size = AvatarSize.Default,
             AvatarShape shape = AvatarShape.Circle, params GUILayoutOption[] options)
         {
             if (isLoading)
             {
                 float time = Time.time * 2f;
                 float alpha = (Mathf.Sin(time) + 1f) * 0.5f * 0.3f + 0.7f;
-                
+
                 Color originalColor = GUI.color;
                 GUI.color = new Color(originalColor.r, originalColor.g, originalColor.b, alpha);
-                
+
                 Avatar(image, fallbackText, size, shape, options);
-                
+
                 GUI.color = originalColor;
             }
             else
@@ -272,67 +231,67 @@ namespace shadcnui.GUIComponents
             }
         }
 
-        public void AvatarWithTooltip(Texture2D image, string fallbackText, string tooltip, AvatarSize size = AvatarSize.Default, 
+        public void AvatarWithTooltip(Texture2D image, string fallbackText, string tooltip, AvatarSize size = AvatarSize.Default,
             AvatarShape shape = AvatarShape.Circle, params GUILayoutOption[] options)
         {
             layoutComponents.BeginHorizontalGroup();
-            
+
             Avatar(image, fallbackText, size, shape, options);
-            
+
             if (!string.IsNullOrEmpty(tooltip))
             {
                 layoutComponents.AddSpace(4);
-                
+
                 var styleManager = guiHelper.GetStyleManager();
                 GUIStyle tooltipStyle = styleManager?.GetLabelStyle(LabelVariant.Muted) ?? GUI.skin.label;
-                
-               
-               
-                GUILayout.Label("?", tooltipStyle);
+
+#if IL2CPP
+                GUILayout.Label(new GUIContent("?"), tooltipStyle, (Il2CppReferenceArray<GUILayoutOption>)options);
+#else
+                GUILayout.Label("?", tooltipStyle, options);
+#endif
             }
-            
+
             layoutComponents.EndHorizontalGroup();
         }
 
-        public void AvatarGroup(AvatarData[] avatars, AvatarSize size = AvatarSize.Default, AvatarShape shape = AvatarShape.Circle, 
+        public void AvatarGroup(AvatarData[] avatars, AvatarSize size = AvatarSize.Default, AvatarShape shape = AvatarShape.Circle,
             int maxVisible = 3, float overlap = -8f, params GUILayoutOption[] options)
         {
             if (avatars == null || avatars.Length == 0) return;
-            
+
             layoutComponents.BeginHorizontalGroup();
-            
+
             int visibleCount = Mathf.Min(avatars.Length, maxVisible);
-            
+
             for (int i = 0; i < visibleCount; i++)
             {
                 var avatar = avatars[i];
-                
+
                 if (i > 0)
-                {
                     layoutComponents.AddSpace(overlap);
-                }
-                
+
                 Avatar(avatar.Image, avatar.FallbackText, size, shape, options);
             }
-            
+
             if (avatars.Length > maxVisible)
             {
                 layoutComponents.AddSpace(overlap);
                 int remainingCount = avatars.Length - maxVisible;
                 string countText = $"+{remainingCount}";
-                
+
                 var styleManager = guiHelper.GetStyleManager();
                 GUIStyle countStyle = styleManager?.GetAvatarFallbackStyle(size, shape) ?? GUI.skin.box;
                 countStyle.normal.textColor = Color.white;
                 countStyle.normal.background = styleManager?.CreateSolidTexture(Color.gray) ?? GUI.skin.box.normal.background;
-                
+
 #if IL2CPP
-                GUILayout.Label(countText, countStyle, (Il2CppReferenceArray<GUILayoutOption>)options);
+                GUILayout.Label(new GUIContent(countText), countStyle, (Il2CppReferenceArray<GUILayoutOption>)options);
 #else
                 GUILayout.Label(countText, countStyle, options);
 #endif
             }
-            
+
             layoutComponents.EndHorizontalGroup();
         }
 

@@ -1,6 +1,9 @@
 using shadcnui;
 using System;
 using UnityEngine;
+#if IL2CPP
+using UnhollowerBaseLib;
+#endif
 
 namespace shadcnui.GUIComponents
 {
@@ -95,7 +98,11 @@ namespace shadcnui.GUIComponents
         {
             var styleManager = guiHelper.GetStyleManager();
 
+#if IL2CPP
+            GUILayout.BeginHorizontal(new UnhollowerBaseLib.Il2CppReferenceArray<UnityEngine.GUILayoutOption>(0));
+#else
             GUILayout.BeginHorizontal();
+#endif
 
            
             Separator(SeparatorOrientation.Horizontal, true, GUILayout.ExpandWidth(true));
@@ -104,7 +111,11 @@ namespace shadcnui.GUIComponents
             if (!string.IsNullOrEmpty(text))
             {
                 GUILayout.Space(8 * guiHelper.uiScale);
+#if IL2CPP
+                GUILayout.Label(new GUIContent(text), styleManager.GetLabelStyle(LabelVariant.Muted), new UnhollowerBaseLib.Il2CppReferenceArray<UnityEngine.GUILayoutOption>(0));
+#else
                 GUILayout.Label(text, styleManager.GetLabelStyle(LabelVariant.Muted));
+#endif
                 GUILayout.Space(8 * guiHelper.uiScale);
             }
 

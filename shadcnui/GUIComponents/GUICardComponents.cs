@@ -2,6 +2,10 @@ using shadcnui;
 using System;
 using System.Collections.Generic;
 using System.Text;
+#if IL2CPP
+using UnhollowerBaseLib;
+#endif
+
 using UnityEngine;
 
 namespace shadcnui.GUIComponents
@@ -77,13 +81,21 @@ namespace shadcnui.GUIComponents
         public void DrawCardTitle(string title)
         {
             var styleManager = guiHelper.GetStyleManager();
-            GUILayout.Label(title, styleManager.cardTitleStyle);
+#if IL2CPP
+            GUILayout.Label(title, styleManager.cardTitleStyle, new Il2CppReferenceArray<GUILayoutOption>(new GUILayoutOption[0]));
+#else
+    GUILayout.Label(title, styleManager.cardTitleStyle);
+#endif
         }
 
         public void DrawCardDescription(string description)
         {
             var styleManager = guiHelper.GetStyleManager();
-            GUILayout.Label(description, styleManager.cardDescriptionStyle);
+#if IL2CPP
+            GUILayout.Label(description, styleManager.cardDescriptionStyle, new Il2CppReferenceArray<GUILayoutOption>(new GUILayoutOption[0]));
+#else
+    GUILayout.Label(description, styleManager.cardDescriptionStyle);
+#endif
         }
 
         public void BeginCardContent()
@@ -116,7 +128,6 @@ namespace shadcnui.GUIComponents
             layoutComponents.EndHorizontalGroup();
         }
 
-
         public void DrawCard(string title, string description, string content, System.Action footerContent = null, float width = -1, float height = -1)
         {
             BeginCard(width, height);
@@ -134,7 +145,11 @@ namespace shadcnui.GUIComponents
             if (!string.IsNullOrEmpty(content))
             {
                 BeginCardContent();
-                GUILayout.Label(content, guiHelper.labelStyle2);
+#if IL2CPP
+                GUILayout.Label(content, guiHelper.labelStyle2, new Il2CppReferenceArray<GUILayoutOption>(new GUILayoutOption[0]));
+#else
+        GUILayout.Label(content, guiHelper.labelStyle2);
+#endif
                 EndCardContent();
             }
 
@@ -152,9 +167,14 @@ namespace shadcnui.GUIComponents
         {
             BeginCard(width, height);
             BeginCardContent();
-            GUILayout.Label(content, guiHelper.labelStyle2);
+#if IL2CPP
+            GUILayout.Label(content, guiHelper.labelStyle2, new Il2CppReferenceArray<GUILayoutOption>(new GUILayoutOption[0]));
+#else
+    GUILayout.Label(content, guiHelper.labelStyle2);
+#endif
             EndCardContent();
             EndCard();
         }
+
     }
 }

@@ -1,7 +1,11 @@
-using UnityEngine;
 using shadcnui;
 using shadcnui.GUIComponents;
 using System.Linq;
+#if IL2CPP
+using UnhollowerBaseLib;
+#endif
+
+using UnityEngine;
 
 public class UI : MonoBehaviour
 {
@@ -130,7 +134,7 @@ public class UI : MonoBehaviour
 
         if (showDemoWindow)
         {
-            windowRect = GUI.Window(101, windowRect, DrawDemoWindow, "shadcn/ui Demo");
+            windowRect = GUI.Window(101, windowRect, (GUI.WindowFunction)DrawDemoWindow, "shadcn/ui Demo");
         }
     }
 
@@ -144,12 +148,18 @@ public class UI : MonoBehaviour
             guiHelper.BeginTabContent();
             scrollPosition = guiHelper.DrawScrollView(scrollPosition, () =>
             {
-                GUILayout.BeginVertical(GUILayout.Width(windowRect.width - 20));
+#if IL2CPP
+                GUILayout.BeginVertical(new Il2CppReferenceArray<GUILayoutOption>(new GUILayoutOption[] { GUILayout.Width(windowRect.width - 20) }));
+#else
+GUILayout.BeginVertical(GUILayout.Width(windowRect.width - 20));
+#endif
+
                 if (currentDemoTab >= 0 && currentDemoTab < demoTabs.Length)
                 {
                     demoTabs[currentDemoTab].Content?.Invoke();
                 }
-                
+
+                GUILayout.EndVertical();
                 GUILayout.EndVertical();
             }, GUILayout.Width(windowRect.width - 20), GUILayout.ExpandHeight(true));
             guiHelper.EndTabContent();
@@ -160,7 +170,7 @@ public class UI : MonoBehaviour
 
     void DrawInputDemos()
     {
-        GUILayout.BeginVertical(GUILayout.ExpandWidth(true), GUILayout.ExpandHeight(true));
+        guiHelper.BeginVerticalGroup(GUILayout.ExpandWidth(true), GUILayout.ExpandHeight(true));
         guiHelper.Label("Input", LabelVariant.Default);
         guiHelper.MutedLabel("Displays a form input field or a component that takes user input.");
         guiHelper.HorizontalSeparator();
@@ -198,7 +208,7 @@ public class UI : MonoBehaviour
 
     void DrawTabsDemos()
     {
-        GUILayout.BeginVertical(GUILayout.ExpandWidth(true), GUILayout.ExpandHeight(true));
+        guiHelper.BeginVerticalGroup(GUILayout.ExpandWidth(true), GUILayout.ExpandHeight(true));
 
         string[] tabNames = { "Account", "Password", "Notifications" };
         selectedTab = guiHelper.Tabs(tabNames, selectedTab);
@@ -240,7 +250,7 @@ public class UI : MonoBehaviour
 
     void DrawTextAreaDemos()
     {
-        GUILayout.BeginVertical(GUILayout.ExpandWidth(true), GUILayout.ExpandHeight(true));
+        guiHelper.BeginVerticalGroup(GUILayout.ExpandWidth(true), GUILayout.ExpandHeight(true));
 
         textAreaValue = guiHelper.TextArea(textAreaValue, placeholder: "Type your message here.", minHeight: 100);
         guiHelper.Label("Code: textAreaValue = guiHelper.TextArea(value, placeholder, minHeight);");
@@ -270,7 +280,7 @@ public class UI : MonoBehaviour
 
     void DrawAlertDemos()
     {
-        GUILayout.BeginVertical(GUILayout.ExpandWidth(true), GUILayout.ExpandHeight(true));
+        guiHelper.BeginVerticalGroup(GUILayout.ExpandWidth(true), GUILayout.ExpandHeight(true));
         guiHelper.Label("Alert", LabelVariant.Default);
         guiHelper.MutedLabel("Displays a callout for user attention.");
         guiHelper.HorizontalSeparator();
@@ -352,7 +362,7 @@ public class UI : MonoBehaviour
 
     void DrawAvatarDemos()
     {
-        GUILayout.BeginVertical(GUILayout.ExpandWidth(true), GUILayout.ExpandHeight(true));
+        guiHelper.BeginVerticalGroup(GUILayout.ExpandWidth(true), GUILayout.ExpandHeight(true));
         guiHelper.Label("Avatar", LabelVariant.Default);
         guiHelper.MutedLabel("An image element with a fallback for representing a user.");
         guiHelper.HorizontalSeparator();
@@ -421,7 +431,7 @@ public class UI : MonoBehaviour
 
     void DrawBadgeDemos()
     {
-        GUILayout.BeginVertical(GUILayout.ExpandWidth(true), GUILayout.ExpandHeight(true));
+        guiHelper.BeginVerticalGroup(GUILayout.ExpandWidth(true), GUILayout.ExpandHeight(true));
         guiHelper.Label("Badge", LabelVariant.Default);
         guiHelper.MutedLabel("Displays a badge or a tag.");
         guiHelper.HorizontalSeparator();
@@ -509,7 +519,7 @@ public class UI : MonoBehaviour
 
     void DrawCalendarDemos()
     {
-        GUILayout.BeginVertical(GUILayout.ExpandWidth(true), GUILayout.ExpandHeight(true));
+        guiHelper.BeginVerticalGroup(GUILayout.ExpandWidth(true), GUILayout.ExpandHeight(true));
         guiHelper.Label("Calendar", LabelVariant.Default);
         guiHelper.MutedLabel("A component for displaying a calendar and selecting dates.");
         guiHelper.HorizontalSeparator();
@@ -523,7 +533,7 @@ public class UI : MonoBehaviour
 
     void DrawDropdownMenuDemos()
     {
-        GUILayout.BeginVertical(GUILayout.ExpandWidth(true), GUILayout.ExpandHeight(true));
+        guiHelper.BeginVerticalGroup(GUILayout.ExpandWidth(true), GUILayout.ExpandHeight(true));
         guiHelper.Label("Dropdown Menu", LabelVariant.Default);
         guiHelper.MutedLabel("A menu that appears when a trigger is clicked.");
         guiHelper.HorizontalSeparator();
@@ -549,7 +559,7 @@ public class UI : MonoBehaviour
 
     void DrawPopoverDemos()
     {
-        GUILayout.BeginVertical(GUILayout.ExpandWidth(true), GUILayout.ExpandHeight(true));
+        guiHelper.BeginVerticalGroup(GUILayout.ExpandWidth(true), GUILayout.ExpandHeight(true));
         guiHelper.Label("Popover", LabelVariant.Default);
         guiHelper.MutedLabel("A pop-up that displays information related to an element.");
         guiHelper.HorizontalSeparator();
@@ -574,7 +584,7 @@ public class UI : MonoBehaviour
 
     void DrawSelectDemos()
     {
-        GUILayout.BeginVertical(GUILayout.ExpandWidth(true), GUILayout.ExpandHeight(true));
+        guiHelper.BeginVerticalGroup(GUILayout.ExpandWidth(true), GUILayout.ExpandHeight(true));
         guiHelper.Label("Select", LabelVariant.Default);
         guiHelper.MutedLabel("A dropdown list for selecting a value.");
         guiHelper.HorizontalSeparator();
@@ -600,7 +610,7 @@ public class UI : MonoBehaviour
 
     void DrawButtonDemos()
     {
-        GUILayout.BeginVertical(GUILayout.ExpandWidth(true), GUILayout.ExpandHeight(true));
+        guiHelper.BeginVerticalGroup(GUILayout.ExpandWidth(true), GUILayout.ExpandHeight(true));
         guiHelper.Label("Button", LabelVariant.Default);
         guiHelper.MutedLabel("Displays a button or a clickable element that activates an event.");
         guiHelper.HorizontalSeparator();
@@ -697,7 +707,7 @@ public class UI : MonoBehaviour
 
     void DrawCardDemos()
     {
-        GUILayout.BeginVertical(GUILayout.ExpandWidth(true), GUILayout.ExpandHeight(true));
+        guiHelper.BeginVerticalGroup(GUILayout.ExpandWidth(true), GUILayout.ExpandHeight(true));
         guiHelper.Label("Card", LabelVariant.Default);
         guiHelper.MutedLabel("A flexible content container.");
         guiHelper.HorizontalSeparator();
@@ -735,7 +745,7 @@ public class UI : MonoBehaviour
 
     void DrawCheckboxDemos()
     {
-        GUILayout.BeginVertical(GUILayout.ExpandWidth(true), GUILayout.ExpandHeight(true));
+        guiHelper.BeginVerticalGroup(GUILayout.ExpandWidth(true), GUILayout.ExpandHeight(true));
         guiHelper.Label("Checkbox", LabelVariant.Default);
         guiHelper.MutedLabel("A control that allows the user to toggle between checked and unchecked states.");
         guiHelper.HorizontalSeparator();
@@ -747,7 +757,7 @@ public class UI : MonoBehaviour
         guiHelper.HorizontalSeparator();
 
         guiHelper.Label("Checkbox Variants");
-        GUILayout.BeginHorizontal();
+        guiHelper.BeginHorizontalGroup();
 
         defaultVariant = guiHelper.Checkbox("Default", defaultVariant, CheckboxVariant.Default);
         outlineVariant = guiHelper.Checkbox("Outline", outlineVariant, CheckboxVariant.Outline);
@@ -757,7 +767,7 @@ public class UI : MonoBehaviour
         guiHelper.HorizontalSeparator();
 
         guiHelper.Label("Checkbox Sizes");
-        GUILayout.BeginHorizontal();
+        guiHelper.BeginHorizontalGroup();
         defaultSize = guiHelper.Checkbox("Default", defaultSize, size: CheckboxSize.Default);
         smallSize = guiHelper.Checkbox("Small", smallSize, size: CheckboxSize.Small);
         largeSize = guiHelper.Checkbox("Large", largeSize, size: CheckboxSize.Large);
@@ -812,7 +822,7 @@ public class UI : MonoBehaviour
 
     void DrawLabelDemos()
     {
-        GUILayout.BeginVertical(GUILayout.ExpandWidth(true), GUILayout.ExpandHeight(true));
+        guiHelper.BeginVerticalGroup(GUILayout.ExpandWidth(true), GUILayout.ExpandHeight(true));
         guiHelper.Label("Label", LabelVariant.Default);
         guiHelper.MutedLabel("Displays a non-interactive text element.");
         guiHelper.HorizontalSeparator();
@@ -834,7 +844,7 @@ public class UI : MonoBehaviour
 
     void DrawLayoutDemos()
     {
-        GUILayout.BeginVertical(GUILayout.ExpandWidth(true), GUILayout.ExpandHeight(true));
+        guiHelper.BeginVerticalGroup(GUILayout.ExpandWidth(true), GUILayout.ExpandHeight(true));
         guiHelper.Label("Layout", LabelVariant.Default);
         guiHelper.MutedLabel("Components for organizing and spacing UI elements.");
         guiHelper.HorizontalSeparator();
@@ -868,7 +878,7 @@ public class UI : MonoBehaviour
 
     void DrawProgressDemos()
     {
-        GUILayout.BeginVertical(GUILayout.ExpandWidth(true), GUILayout.ExpandHeight(true));
+        guiHelper.BeginVerticalGroup(GUILayout.ExpandWidth(true), GUILayout.ExpandHeight(true));
         guiHelper.Label("Progress", LabelVariant.Default);
         guiHelper.MutedLabel("Displays an indicator showing the completion progress of a task.");
         guiHelper.HorizontalSeparator();
@@ -894,7 +904,7 @@ public class UI : MonoBehaviour
 
     void DrawSeparatorDemos()
     {
-        GUILayout.BeginVertical(GUILayout.ExpandWidth(true), GUILayout.ExpandHeight(true));
+        guiHelper.BeginVerticalGroup(GUILayout.ExpandWidth(true), GUILayout.ExpandHeight(true));
         guiHelper.Label("Separator", LabelVariant.Default);
         guiHelper.MutedLabel("A visual separator between sections.");
         guiHelper.HorizontalSeparator();
@@ -937,7 +947,7 @@ public class UI : MonoBehaviour
 
     void DrawSkeletonDemos()
     {
-        GUILayout.BeginVertical(GUILayout.ExpandWidth(true), GUILayout.ExpandHeight(true));
+        guiHelper.BeginVerticalGroup(GUILayout.ExpandWidth(true), GUILayout.ExpandHeight(true));
         guiHelper.Label("Skeleton", LabelVariant.Default);
         guiHelper.MutedLabel("Displays a loading skeleton.");
         guiHelper.HorizontalSeparator();
@@ -976,7 +986,7 @@ public class UI : MonoBehaviour
 
     void DrawSliderDemos()
     {
-        GUILayout.BeginVertical(GUILayout.ExpandWidth(true), GUILayout.ExpandHeight(true));
+        guiHelper.BeginVerticalGroup(GUILayout.ExpandWidth(true), GUILayout.ExpandHeight(true));
         guiHelper.Label("Slider", LabelVariant.Default);
         guiHelper.MutedLabel("A control that allows the user to select a value from a range.");
         guiHelper.HorizontalSeparator();
@@ -998,7 +1008,7 @@ public class UI : MonoBehaviour
 
     void DrawSwitchDemos()
     {
-        GUILayout.BeginVertical(GUILayout.ExpandWidth(true), GUILayout.ExpandHeight(true));
+        guiHelper.BeginVerticalGroup(GUILayout.ExpandWidth(true), GUILayout.ExpandHeight(true));
         guiHelper.Label("Switch", LabelVariant.Default);
         guiHelper.MutedLabel("A control that allows the user to toggle between on and off states.");
         guiHelper.HorizontalSeparator();
@@ -1010,7 +1020,7 @@ public class UI : MonoBehaviour
         guiHelper.HorizontalSeparator();
 
         guiHelper.Label("Switch Variants");
-        GUILayout.BeginHorizontal();
+        guiHelper.BeginHorizontalGroup();
         defaultSwitchVariant = guiHelper.Switch("Default", defaultSwitchVariant, SwitchVariant.Default);
         outlineSwitchVariant = guiHelper.Switch("Outline", outlineSwitchVariant, SwitchVariant.Outline);
         ghostSwitchVariant = guiHelper.Switch("Ghost", ghostSwitchVariant, SwitchVariant.Ghost);
@@ -1019,7 +1029,7 @@ public class UI : MonoBehaviour
         guiHelper.HorizontalSeparator();
 
         guiHelper.Label("Switch Sizes");
-        GUILayout.BeginHorizontal();
+        guiHelper.BeginHorizontalGroup();
         defaultSwitchSize = guiHelper.Switch("Default", defaultSwitchSize, size: SwitchSize.Default);
         smallSwitchSize = guiHelper.Switch("Small", smallSwitchSize, size: SwitchSize.Small);
         largeSwitchSize = guiHelper.Switch("Large", largeSwitchSize, size: SwitchSize.Large);
@@ -1080,7 +1090,7 @@ public class UI : MonoBehaviour
 
     void DrawTableDemos()
     {
-        GUILayout.BeginVertical(GUILayout.ExpandWidth(true), GUILayout.ExpandHeight(true));
+        guiHelper.BeginVerticalGroup(GUILayout.ExpandWidth(true), GUILayout.ExpandHeight(true));
         guiHelper.Label("Table", LabelVariant.Default);
         guiHelper.MutedLabel("A component for displaying tabular data.");
         guiHelper.HorizontalSeparator();
@@ -1126,7 +1136,7 @@ public class UI : MonoBehaviour
 
     void DrawToggleDemos()
     {
-        GUILayout.BeginVertical(GUILayout.ExpandWidth(true), GUILayout.ExpandHeight(true));
+        guiHelper.BeginVerticalGroup(GUILayout.ExpandWidth(true), GUILayout.ExpandHeight(true));
         guiHelper.Label("Toggle", LabelVariant.Default);
         guiHelper.MutedLabel("A two-state button that can be either on or off.");
         guiHelper.HorizontalSeparator();
@@ -1138,7 +1148,7 @@ public class UI : MonoBehaviour
         guiHelper.HorizontalSeparator();
 
         guiHelper.Label("Toggle Variants", LabelVariant.Default);
-        GUILayout.BeginHorizontal();
+        guiHelper.BeginHorizontalGroup();
         defaultVariantToggle = guiHelper.Toggle("Default", defaultVariantToggle, ToggleVariant.Default);
         outlineVariantToggle = guiHelper.Toggle("Outline", outlineVariantToggle, ToggleVariant.Outline);
         GUILayout.EndHorizontal();
@@ -1146,7 +1156,7 @@ public class UI : MonoBehaviour
         guiHelper.HorizontalSeparator();
 
         guiHelper.Label("Toggle Sizes", LabelVariant.Default);
-        GUILayout.BeginHorizontal();
+        guiHelper.BeginHorizontalGroup();
         defaultSizeToggle = guiHelper.Toggle("Default", defaultSizeToggle, size: ToggleSize.Default);
         smallSizeToggle = guiHelper.Toggle("Small", smallSizeToggle, size: ToggleSize.Small);
         largeSizeToggle = guiHelper.Toggle("Large", largeSizeToggle, size: ToggleSize.Large);
@@ -1191,7 +1201,7 @@ public class UI : MonoBehaviour
 
     void DrawVisualDemos()
     {
-        GUILayout.BeginVertical(GUILayout.ExpandWidth(true), GUILayout.ExpandHeight(true));
+        guiHelper.BeginVerticalGroup(GUILayout.ExpandWidth(true), GUILayout.ExpandHeight(true));
         guiHelper.Label("Visual", LabelVariant.Default);
         guiHelper.MutedLabel("Components for visual feedback and information display.");
         guiHelper.HorizontalSeparator();

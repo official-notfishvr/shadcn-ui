@@ -1,6 +1,9 @@
 using shadcnui;
 using System;
 using UnityEngine;
+#if IL2CPP
+using UnhollowerBaseLib;
+#endif
 
 namespace shadcnui.GUIComponents
 {
@@ -101,13 +104,21 @@ namespace shadcnui.GUIComponents
             if (!string.IsNullOrEmpty(label))
             {
                 layoutComponents.BeginHorizontalGroup();
+#if IL2CPP
+                GUILayout.Label(new GUIContent(label), styleManager.GetLabelStyle(LabelVariant.Default), new Il2CppReferenceArray<UnityEngine.GUILayoutOption>(0));
+#else
                 GUILayout.Label(label, styleManager.GetLabelStyle(LabelVariant.Default));
+#endif
 
                 if (showPercentage)
                 {
                     GUILayout.FlexibleSpace();
                     string percentText = (value * 100f).ToString("F0") + "%";
+#if IL2CPP
+                    GUILayout.Label(new GUIContent(percentText), styleManager.GetLabelStyle(LabelVariant.Muted), new Il2CppReferenceArray<UnityEngine.GUILayoutOption>(0));
+#else
                     GUILayout.Label(percentText, styleManager.GetLabelStyle(LabelVariant.Muted));
+#endif
                 }
 
                 layoutComponents.EndHorizontalGroup();

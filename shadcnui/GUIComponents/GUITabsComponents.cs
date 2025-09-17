@@ -2,6 +2,9 @@ using shadcnui;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
+#if IL2CPP
+using UnhollowerBaseLib;
+#endif
 
 namespace shadcnui.GUIComponents
 {

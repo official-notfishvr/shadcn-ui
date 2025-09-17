@@ -1,6 +1,10 @@
 using shadcnui;
+#if BEPINEX
 using BepInEx;
 using BepInEx.Logging;
+#elif MELONLOADER
+using MelonLoader;
+#endif
 using System;
 using System.IO;
 using System.Linq;
@@ -8,6 +12,7 @@ using UnityEngine;
 
 namespace shadcnui
 {
+#if BEPINEX
     [System.ComponentModel.Description(PluginInfo.Description)]
     [BepInPlugin(PluginInfo.GUID, PluginInfo.Name, PluginInfo.Version)]
     public class Plugin : BaseUnityPlugin
@@ -31,4 +36,26 @@ namespace shadcnui
             DontDestroyOnLoad(Loader);
         }
     }
+#elif MELONLOADER
+    [MelonInfo(typeof(Plugin), PluginInfo.Name, PluginInfo.Version, "shadcnui")]
+    [MelonGame("Another Axiom", "Gorilla Tag")]
+    public class Plugin : MelonMod
+    {
+        public static bool FirstLaunch;
+
+        public override void OnInitializeMelon()
+        {
+            base.OnInitializeMelon();
+            GorillaTagger.OnPlayerSpawned(LoadMenu);
+        }
+
+        private static void LoadMenu()
+        {
+            GameObject Loader = new GameObject("Loader");
+            Loader.AddComponent<UI>();
+
+            GameObject.DontDestroyOnLoad(Loader);
+        }
+    }
+#endif
 }

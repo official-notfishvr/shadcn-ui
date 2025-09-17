@@ -1,7 +1,9 @@
-
 using System;
 using System.Collections.Generic;
 using UnityEngine;
+#if IL2CPP
+using UnhollowerBaseLib;
+#endif
 
 namespace shadcnui.GUIComponents
 {
@@ -35,7 +37,11 @@ namespace shadcnui.GUIComponents
         {
             if (!isOpen) return selectedIndex;
 
+#if IL2CPP
+            GUILayout.BeginVertical(guiHelper.GetStyleManager().GetSelectStyle(SelectVariant.Default, SelectSize.Default), new UnhollowerBaseLib.Il2CppReferenceArray<UnityEngine.GUILayoutOption>(new GUILayoutOption[] { GUILayout.MaxWidth(300), GUILayout.MaxHeight(200) }));
+#else
             GUILayout.BeginVertical(guiHelper.GetStyleManager().GetSelectStyle(SelectVariant.Default, SelectSize.Default), GUILayout.MaxWidth(300), GUILayout.MaxHeight(200));
+#endif
 
             scrollPosition = layoutComponents.DrawScrollView(scrollPosition, () =>
             {
@@ -48,7 +54,11 @@ namespace shadcnui.GUIComponents
                         itemStyle.normal.textColor = Color.blue;
                     }
 
+#if IL2CPP
+                    if (GUILayout.Button(new GUIContent(items[i]), itemStyle, new UnhollowerBaseLib.Il2CppReferenceArray<UnityEngine.GUILayoutOption>(0)))
+#else
                     if (GUILayout.Button(items[i], itemStyle))
+#endif
                     {
                         selectedIndex = i;
                         Close();
