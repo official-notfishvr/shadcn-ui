@@ -1,0 +1,20 @@
+name: Build C# Project
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build:
+    runs-on: windows-latest
+
+    steps:
+    - uses: actions/checkout@v4
+    - name: Add MSBuild to PATH
+      uses: microsoft/setup-msbuild@v1.1
+    - name: Restore NuGet packages
+      run: nuget restore shadcnui.sln
+    - name: Build
+      run: msbuild shadcnui.sln /p:Configuration=Release
