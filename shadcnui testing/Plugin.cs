@@ -1,14 +1,14 @@
+using System;
+using System.IO;
+using System.Linq;
 using shadcnui;
+using UnityEngine;
 #if BEPINEX
 using BepInEx;
 using BepInEx.Logging;
 #elif MELONLOADER
 using MelonLoader;
 #endif
-using System;
-using System.IO;
-using System.Linq;
-using UnityEngine;
 
 namespace shadcnui
 {
@@ -24,7 +24,7 @@ namespace shadcnui
         private void Awake()
         {
             instance = this;
-            
+
             GorillaTagger.OnPlayerSpawned(LoadMenu);
         }
 

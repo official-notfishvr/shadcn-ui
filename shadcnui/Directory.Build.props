@@ -7,7 +7,6 @@
     <BepInExAssemblyPath>$(GamePath)\BepInEx\core</BepInExAssemblyPath>
     <PluginsPath>$(GamePath)\BepInEx\plugins</PluginsPath>
   </PropertyGroup>
-
   <Choose>
     <When Condition=" '$(Configuration)' == 'IL2CPP_Melonloader' ">
       <PropertyGroup>
@@ -34,7 +33,6 @@
       </PropertyGroup>
     </When>
   </Choose>
-
   <PropertyGroup>
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>

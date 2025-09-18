@@ -1,7 +1,7 @@
-using shadcnui;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using shadcnui;
 using UnityEngine;
 #if IL2CPP
 using UnhollowerBaseLib;
@@ -20,10 +20,16 @@ namespace shadcnui.GUIComponents
             layoutComponents = new GUILayoutComponents(helper);
         }
 
-        public void Table(string[] headers, string[,] data, TableVariant variant = TableVariant.Default,
-            TableSize size = TableSize.Default, params GUILayoutOption[] options)
+        public void Table(
+            string[] headers,
+            string[,] data,
+            TableVariant variant = TableVariant.Default,
+            TableSize size = TableSize.Default,
+            params GUILayoutOption[] options
+        )
         {
-            if (headers == null || data == null) return;
+            if (headers == null || data == null)
+                return;
 
             var styleManager = guiHelper.GetStyleManager();
             if (styleManager == null)
@@ -42,7 +48,11 @@ namespace shadcnui.GUIComponents
             for (int i = 0; i < headers.Length; i++)
             {
 #if IL2CPP
-                GUILayout.Label(headers[i], headerStyle, (Il2CppReferenceArray<GUILayoutOption>)null);
+                GUILayout.Label(
+                    headers[i],
+                    headerStyle,
+                    (Il2CppReferenceArray<GUILayoutOption>)null
+                );
 #else
                 GUILayout.Label(headers[i], headerStyle);
 #endif
@@ -60,7 +70,11 @@ namespace shadcnui.GUIComponents
                 {
                     string cellValue = data[row, col] ?? "";
 #if IL2CPP
-                    GUILayout.Label(cellValue, cellStyle, (Il2CppReferenceArray<GUILayoutOption>)null);
+                    GUILayout.Label(
+                        cellValue,
+                        cellStyle,
+                        (Il2CppReferenceArray<GUILayoutOption>)null
+                    );
 #else
                     GUILayout.Label(cellValue, cellStyle);
 #endif
@@ -72,11 +86,17 @@ namespace shadcnui.GUIComponents
             layoutComponents.EndVerticalGroup();
         }
 
-        public void Table(Rect rect, string[] headers, string[,] data, TableVariant variant = TableVariant.Default, 
-            TableSize size = TableSize.Default)
+        public void Table(
+            Rect rect,
+            string[] headers,
+            string[,] data,
+            TableVariant variant = TableVariant.Default,
+            TableSize size = TableSize.Default
+        )
         {
-            if (headers == null || data == null) return;
-            
+            if (headers == null || data == null)
+                return;
+
             var styleManager = guiHelper.GetStyleManager();
             if (styleManager == null)
             {
@@ -94,17 +114,25 @@ namespace shadcnui.GUIComponents
             );
 
             GUI.Box(scaledRect, "", tableStyle);
-            
+
             GUILayout.BeginArea(scaledRect);
             Table(headers, data, variant, size);
             GUILayout.EndArea();
         }
 
-        public void SortableTable(string[] headers, string[,] data, ref int[] sortColumns, ref bool[] sortAscending,
-            TableVariant variant = TableVariant.Default, TableSize size = TableSize.Default,
-            Action<int, bool> onSort = null, params GUILayoutOption[] options)
+        public void SortableTable(
+            string[] headers,
+            string[,] data,
+            ref int[] sortColumns,
+            ref bool[] sortAscending,
+            TableVariant variant = TableVariant.Default,
+            TableSize size = TableSize.Default,
+            Action<int, bool> onSort = null,
+            params GUILayoutOption[] options
+        )
         {
-            if (headers == null || data == null) return;
+            if (headers == null || data == null)
+                return;
 
             var styleManager = guiHelper.GetStyleManager();
             if (styleManager == null)
@@ -118,9 +146,10 @@ namespace shadcnui.GUIComponents
             GUIStyle cellStyle = styleManager.GetTableCellStyle(variant, size);
 
 #if IL2CPP
-            var il2cppOptions = options != null ? (Il2CppReferenceArray<GUILayoutOption>)options : null;
+            var il2cppOptions =
+                options != null ? (Il2CppReferenceArray<GUILayoutOption>)options : null;
 #else
-    var il2cppOptions = options;
+            var il2cppOptions = options;
 #endif
 
             layoutComponents.BeginVerticalGroup(tableStyle, options);
@@ -142,7 +171,7 @@ namespace shadcnui.GUIComponents
 #if IL2CPP
                 if (GUILayout.Button(new GUIContent(headerText), headerStyle, il2cppOptions))
 #else
-        if (GUILayout.Button(headerText, headerStyle, options))
+                if (GUILayout.Button(headerText, headerStyle, options))
 #endif
                 {
                     if (onSort != null)
@@ -172,7 +201,7 @@ namespace shadcnui.GUIComponents
 #if IL2CPP
                     GUILayout.Label(new GUIContent(cellValue), cellStyle, il2cppOptions);
 #else
-            GUILayout.Label(cellValue, cellStyle);
+                    GUILayout.Label(cellValue, cellStyle);
 #endif
                 }
 
@@ -182,11 +211,18 @@ namespace shadcnui.GUIComponents
             layoutComponents.EndVerticalGroup();
         }
 
-        public void SelectableTable(string[] headers, string[,] data, ref bool[] selectedRows,
-            TableVariant variant = TableVariant.Default, TableSize size = TableSize.Default,
-            Action<int, bool> onSelectionChange = null, params GUILayoutOption[] options)
+        public void SelectableTable(
+            string[] headers,
+            string[,] data,
+            ref bool[] selectedRows,
+            TableVariant variant = TableVariant.Default,
+            TableSize size = TableSize.Default,
+            Action<int, bool> onSelectionChange = null,
+            params GUILayoutOption[] options
+        )
         {
-            if (headers == null || data == null) return;
+            if (headers == null || data == null)
+                return;
 
             var styleManager = guiHelper.GetStyleManager();
             if (styleManager == null)
@@ -200,9 +236,10 @@ namespace shadcnui.GUIComponents
             GUIStyle cellStyle = styleManager.GetTableCellStyle(variant, size);
 
 #if IL2CPP
-            var il2cppOptions = options != null ? (Il2CppReferenceArray<GUILayoutOption>)options : null;
+            var il2cppOptions =
+                options != null ? (Il2CppReferenceArray<GUILayoutOption>)options : null;
 #else
-    var il2cppOptions = options;
+            var il2cppOptions = options;
 #endif
 
             layoutComponents.BeginVerticalGroup(tableStyle, options);
@@ -211,14 +248,14 @@ namespace shadcnui.GUIComponents
 #if IL2CPP
             GUILayout.Label(GUIContent.none, GUI.skin.label, null);
 #else
-    GUILayout.Label("", GUILayout.Width(20 * guiHelper.uiScale));
+            GUILayout.Label("", GUILayout.Width(20 * guiHelper.uiScale));
 #endif
             for (int i = 0; i < headers.Length; i++)
             {
 #if IL2CPP
                 GUILayout.Label(new GUIContent(headers[i]), headerStyle, null);
 #else
-        GUILayout.Label(headers[i], headerStyle);
+                GUILayout.Label(headers[i], headerStyle);
 #endif
             }
             layoutComponents.EndHorizontalGroup();
@@ -237,14 +274,16 @@ namespace shadcnui.GUIComponents
                     selectedRows[row],
                     "",
                     GUI.skin.toggle,
-                    new Il2CppReferenceArray<GUILayoutOption>(new GUILayoutOption[] { GUILayout.Width(20 * guiHelper.uiScale) })
+                    new Il2CppReferenceArray<GUILayoutOption>(
+                        new GUILayoutOption[] { GUILayout.Width(20 * guiHelper.uiScale) }
+                    )
                 );
 #else
-bool newSelected = GUILayout.Toggle(
-    selectedRows[row], 
-    "", 
-    GUILayout.Width(20 * guiHelper.uiScale)
-);
+                bool newSelected = GUILayout.Toggle(
+                    selectedRows[row],
+                    "",
+                    GUILayout.Width(20 * guiHelper.uiScale)
+                );
 #endif
 
                 if (newSelected != selectedRows[row])
@@ -259,7 +298,7 @@ bool newSelected = GUILayout.Toggle(
 #if IL2CPP
                     GUILayout.Label(new GUIContent(cellValue), cellStyle, il2cppOptions);
 #else
-            GUILayout.Label(cellValue, cellStyle);
+                    GUILayout.Label(cellValue, cellStyle);
 #endif
                 }
 
@@ -269,12 +308,18 @@ bool newSelected = GUILayout.Toggle(
             layoutComponents.EndVerticalGroup();
         }
 
-        public void CustomTable(string[] headers, object[,] data, Action<object, int, int> cellRenderer,
-            TableVariant variant = TableVariant.Default, TableSize size = TableSize.Default, 
-            params GUILayoutOption[] options)
+        public void CustomTable(
+            string[] headers,
+            object[,] data,
+            Action<object, int, int> cellRenderer,
+            TableVariant variant = TableVariant.Default,
+            TableSize size = TableSize.Default,
+            params GUILayoutOption[] options
+        )
         {
-            if (headers == null || data == null || cellRenderer == null) return;
-            
+            if (headers == null || data == null || cellRenderer == null)
+                return;
+
             var styleManager = guiHelper.GetStyleManager();
             if (styleManager == null)
             {
@@ -286,54 +331,69 @@ bool newSelected = GUILayout.Toggle(
             GUIStyle headerStyle = styleManager.GetTableHeaderStyle(variant, size);
 
             layoutComponents.BeginVerticalGroup(tableStyle, options);
-            
+
             layoutComponents.BeginHorizontalGroup();
             for (int i = 0; i < headers.Length; i++)
             {
 #if IL2CPP
-                GUILayout.Label(headers[i], headerStyle, (Il2CppReferenceArray<GUILayoutOption>)null);
+                GUILayout.Label(
+                    headers[i],
+                    headerStyle,
+                    (Il2CppReferenceArray<GUILayoutOption>)null
+                );
 #else
                 GUILayout.Label(headers[i], headerStyle);
 #endif
             }
             layoutComponents.EndHorizontalGroup();
-            
+
             int rowCount = data.GetLength(0);
             int colCount = data.GetLength(1);
-            
+
             for (int row = 0; row < rowCount; row++)
             {
                 layoutComponents.BeginHorizontalGroup();
-                
+
                 for (int col = 0; col < colCount; col++)
                 {
                     object cellValue = data[row, col];
                     cellRenderer.Invoke(cellValue, row, col);
                 }
-                
+
                 layoutComponents.EndHorizontalGroup();
             }
-            
+
             layoutComponents.EndVerticalGroup();
         }
 
-        public void PaginatedTable(string[] headers, string[,] data, ref int currentPage, int pageSize,
-            TableVariant variant = TableVariant.Default, TableSize size = TableSize.Default,
-            Action<int> onPageChange = null, params GUILayoutOption[] options)
+        public void PaginatedTable(
+            string[] headers,
+            string[,] data,
+            ref int currentPage,
+            int pageSize,
+            TableVariant variant = TableVariant.Default,
+            TableSize size = TableSize.Default,
+            Action<int> onPageChange = null,
+            params GUILayoutOption[] options
+        )
         {
-            if (headers == null || data == null) return;
+            if (headers == null || data == null)
+                return;
 
 #if IL2CPP
-            var il2cppOptions = options != null ? (Il2CppReferenceArray<GUILayoutOption>)options : null;
+            var il2cppOptions =
+                options != null ? (Il2CppReferenceArray<GUILayoutOption>)options : null;
 #else
-    var il2cppOptions = options;
+            var il2cppOptions = options;
 #endif
 
             int totalRows = data.GetLength(0);
             int totalPages = Mathf.CeilToInt((float)totalRows / pageSize);
 
-            if (currentPage < 0) currentPage = 0;
-            if (currentPage >= totalPages) currentPage = totalPages - 1;
+            if (currentPage < 0)
+                currentPage = 0;
+            if (currentPage >= totalPages)
+                currentPage = totalPages - 1;
 
             int startRow = currentPage * pageSize;
             int endRow = Mathf.Min(startRow + pageSize, totalRows);
@@ -342,8 +402,8 @@ bool newSelected = GUILayout.Toggle(
             string[,] pageData = new string[pageRowCount, data.GetLength(1)];
 
             for (int row = 0; row < pageRowCount; row++)
-                for (int col = 0; col < data.GetLength(1); col++)
-                    pageData[row, col] = data[startRow + row, col];
+            for (int col = 0; col < data.GetLength(1); col++)
+                pageData[row, col] = data[startRow + row, col];
 
             Table(headers, pageData, variant, size, options);
 
@@ -353,7 +413,7 @@ bool newSelected = GUILayout.Toggle(
 #if IL2CPP
             if (GUILayout.Button(new GUIContent("← Previous"), GUI.skin.button, null))
 #else
-    if (GUILayout.Button("← Previous", GUILayout.Width(80 * guiHelper.uiScale)))
+            if (GUILayout.Button("← Previous", GUILayout.Width(80 * guiHelper.uiScale)))
 #endif
             {
                 if (currentPage > 0)
@@ -372,7 +432,7 @@ bool newSelected = GUILayout.Toggle(
 #if IL2CPP
             GUILayout.Label(new GUIContent(pageInfo), infoStyle, null);
 #else
-    GUILayout.Label(pageInfo, infoStyle);
+            GUILayout.Label(pageInfo, infoStyle);
 #endif
 
             GUILayout.FlexibleSpace();
@@ -380,7 +440,7 @@ bool newSelected = GUILayout.Toggle(
 #if IL2CPP
             if (GUILayout.Button(new GUIContent("Next →"), GUI.skin.button, null))
 #else
-    if (GUILayout.Button("Next →", GUILayout.Width(80 * guiHelper.uiScale)))
+            if (GUILayout.Button("Next →", GUILayout.Width(80 * guiHelper.uiScale)))
 #endif
             {
                 if (currentPage < totalPages - 1)
@@ -393,16 +453,25 @@ bool newSelected = GUILayout.Toggle(
             layoutComponents.EndHorizontalGroup();
         }
 
-        public void SearchableTable(string[] headers, string[,] data, ref string searchQuery, ref string[,] filteredData,
-            TableVariant variant = TableVariant.Default, TableSize size = TableSize.Default,
-            Action<string> onSearch = null, params GUILayoutOption[] options)
+        public void SearchableTable(
+            string[] headers,
+            string[,] data,
+            ref string searchQuery,
+            ref string[,] filteredData,
+            TableVariant variant = TableVariant.Default,
+            TableSize size = TableSize.Default,
+            Action<string> onSearch = null,
+            params GUILayoutOption[] options
+        )
         {
-            if (headers == null || data == null) return;
+            if (headers == null || data == null)
+                return;
 
 #if IL2CPP
-            var il2cppOptions = options != null ? (Il2CppReferenceArray<GUILayoutOption>)options : null;
+            var il2cppOptions =
+                options != null ? (Il2CppReferenceArray<GUILayoutOption>)options : null;
 #else
-    var il2cppOptions = options;
+            var il2cppOptions = options;
 #endif
 
             layoutComponents.BeginHorizontalGroup();
@@ -410,16 +479,21 @@ bool newSelected = GUILayout.Toggle(
 #if IL2CPP
             GUILayout.Label(new GUIContent("Search:"), GUI.skin.label, null);
 #else
-    GUILayout.Label("Search:", GUILayout.Width(60 * guiHelper.uiScale));
+            GUILayout.Label("Search:", GUILayout.Width(60 * guiHelper.uiScale));
 #endif
 #if IL2CPP
             string newSearchQuery = GUILayout.TextField(
                 searchQuery ?? "",
                 GUI.skin.textField,
-                new Il2CppReferenceArray<GUILayoutOption>(new GUILayoutOption[] { GUILayout.Width(200 * guiHelper.uiScale) })
+                new Il2CppReferenceArray<GUILayoutOption>(
+                    new GUILayoutOption[] { GUILayout.Width(200 * guiHelper.uiScale) }
+                )
             );
 #else
-string newSearchQuery = GUILayout.TextField(searchQuery ?? "", GUILayout.Width(200 * guiHelper.uiScale));
+            string newSearchQuery = GUILayout.TextField(
+                searchQuery ?? "",
+                GUILayout.Width(200 * guiHelper.uiScale)
+            );
 #endif
 
             if (newSearchQuery != searchQuery)
@@ -437,12 +511,18 @@ string newSearchQuery = GUILayout.TextField(searchQuery ?? "", GUILayout.Width(2
             Table(headers, displayData, variant, size, options);
         }
 
-        public void ResizableTable(string[] headers, string[,] data, ref float[] columnWidths,
-            TableVariant variant = TableVariant.Default, TableSize size = TableSize.Default, 
-            params GUILayoutOption[] options)
+        public void ResizableTable(
+            string[] headers,
+            string[,] data,
+            ref float[] columnWidths,
+            TableVariant variant = TableVariant.Default,
+            TableSize size = TableSize.Default,
+            params GUILayoutOption[] options
+        )
         {
-            if (headers == null || data == null) return;
-            
+            if (headers == null || data == null)
+                return;
+
             if (columnWidths == null || columnWidths.Length != headers.Length)
             {
                 columnWidths = new float[headers.Length];
@@ -451,7 +531,7 @@ string newSearchQuery = GUILayout.TextField(searchQuery ?? "", GUILayout.Width(2
                     columnWidths[i] = 100f;
                 }
             }
-            
+
             var styleManager = guiHelper.GetStyleManager();
             if (styleManager == null)
             {
@@ -464,47 +544,56 @@ string newSearchQuery = GUILayout.TextField(searchQuery ?? "", GUILayout.Width(2
             GUIStyle cellStyle = styleManager.GetTableCellStyle(variant, size);
 
             layoutComponents.BeginVerticalGroup(tableStyle, options);
-            
+
             layoutComponents.BeginHorizontalGroup();
             for (int i = 0; i < headers.Length; i++)
             {
                 int columnIndex = i;
                 float width = columnWidths[i] * guiHelper.uiScale;
-                
+
 #if IL2CPP
-                GUILayout.Label(headers[i], headerStyle, 
-                    (Il2CppReferenceArray<GUILayoutOption>)new GUILayoutOption[] { GUILayout.Width(width) });
+                GUILayout.Label(
+                    headers[i],
+                    headerStyle,
+                    (Il2CppReferenceArray<GUILayoutOption>)
+                        new GUILayoutOption[] { GUILayout.Width(width) }
+                );
 #else
                 GUILayout.Label(headers[i], headerStyle, GUILayout.Width(width));
 #endif
             }
             layoutComponents.EndHorizontalGroup();
-            
+
             int rowCount = data.GetLength(0);
             int colCount = data.GetLength(1);
-            
+
             for (int row = 0; row < rowCount; row++)
             {
                 layoutComponents.BeginHorizontalGroup();
-                
+
                 for (int col = 0; col < colCount; col++)
                 {
                     string cellValue = data[row, col] ?? "";
                     float width = columnWidths[col] * guiHelper.uiScale;
-                    
+
 #if IL2CPP
-                    GUILayout.Label(cellValue, cellStyle, 
-                        (Il2CppReferenceArray<GUILayoutOption>)new GUILayoutOption[] { GUILayout.Width(width) });
+                    GUILayout.Label(
+                        cellValue,
+                        cellStyle,
+                        (Il2CppReferenceArray<GUILayoutOption>)
+                            new GUILayoutOption[] { GUILayout.Width(width) }
+                    );
 #else
                     GUILayout.Label(cellValue, cellStyle, GUILayout.Width(width));
 #endif
                 }
-                
+
                 layoutComponents.EndHorizontalGroup();
             }
-            
+
             layoutComponents.EndVerticalGroup();
         }
+
         private void DrawSimpleTable(string[] headers, string[,] data)
         {
             layoutComponents.BeginVerticalGroup(GUI.skin.box);
@@ -515,7 +604,7 @@ string newSearchQuery = GUILayout.TextField(searchQuery ?? "", GUILayout.Width(2
 #if IL2CPP
                 GUILayout.Label(new GUIContent(headers[i]), GUI.skin.label, null);
 #else
-        GUILayout.Label(headers[i], GUI.skin.label);
+                GUILayout.Label(headers[i], GUI.skin.label);
 #endif
             }
             layoutComponents.EndHorizontalGroup();
@@ -533,7 +622,7 @@ string newSearchQuery = GUILayout.TextField(searchQuery ?? "", GUILayout.Width(2
 #if IL2CPP
                     GUILayout.Label(new GUIContent(cellValue), GUI.skin.label, null);
 #else
-            GUILayout.Label(cellValue, GUI.skin.label);
+                    GUILayout.Label(cellValue, GUI.skin.label);
 #endif
                 }
 
@@ -553,7 +642,7 @@ string newSearchQuery = GUILayout.TextField(searchQuery ?? "", GUILayout.Width(2
 #if IL2CPP
                 GUILayout.Label(new GUIContent(headers[i]), GUI.skin.label, null);
 #else
-        GUILayout.Label(headers[i], GUI.skin.label);
+                GUILayout.Label(headers[i], GUI.skin.label);
 #endif
             }
             layoutComponents.EndHorizontalGroup();
@@ -572,7 +661,7 @@ string newSearchQuery = GUILayout.TextField(searchQuery ?? "", GUILayout.Width(2
 #if IL2CPP
                     GUILayout.Label(new GUIContent(cellText), GUI.skin.label, null);
 #else
-            GUILayout.Label(cellText, GUI.skin.label);
+                    GUILayout.Label(cellText, GUI.skin.label);
 #endif
                 }
 
@@ -586,11 +675,11 @@ string newSearchQuery = GUILayout.TextField(searchQuery ?? "", GUILayout.Width(2
         {
             if (string.IsNullOrEmpty(searchQuery))
                 return data;
-            
+
             List<int> matchingRows = new List<int>();
             int rowCount = data.GetLength(0);
             int colCount = data.GetLength(1);
-            
+
             for (int row = 0; row < rowCount; row++)
             {
                 for (int col = 0; col < colCount; col++)
@@ -603,7 +692,7 @@ string newSearchQuery = GUILayout.TextField(searchQuery ?? "", GUILayout.Width(2
                     }
                 }
             }
-            
+
             string[,] filteredData = new string[matchingRows.Count, colCount];
             for (int i = 0; i < matchingRows.Count; i++)
             {
@@ -613,7 +702,7 @@ string newSearchQuery = GUILayout.TextField(searchQuery ?? "", GUILayout.Width(2
                     filteredData[i, col] = data[row, col];
                 }
             }
-            
+
             return filteredData;
         }
     }

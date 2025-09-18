@@ -1,7 +1,7 @@
-using shadcnui;
 using System;
 using System.Collections.Generic;
 using System.Text;
+using shadcnui;
 using UnityEngine;
 #if IL2CPP
 using UnhollowerBaseLib;
@@ -18,9 +18,17 @@ namespace shadcnui.GUIComponents
             guiHelper = helper;
         }
 
-
-        public void SetRGBValues(int red, int green, int blue, ref string r, ref string g, ref string b,
-            ref float rSlider, ref float gSlider, ref float bSlider)
+        public void SetRGBValues(
+            int red,
+            int green,
+            int blue,
+            ref string r,
+            ref string g,
+            ref string b,
+            ref float rSlider,
+            ref float gSlider,
+            ref float bSlider
+        )
         {
             r = Mathf.Clamp(red, 0, 255).ToString();
             g = Mathf.Clamp(green, 0, 255).ToString();
@@ -33,37 +41,91 @@ namespace shadcnui.GUIComponents
 
         public void ApplyTheme(string themeName, GUIHelper helper)
         {
-            string r = "", g = "", b = "";
-            float rSlider = 0, gSlider = 0, bSlider = 0;
+            string r = "",
+                g = "",
+                b = "";
+            float rSlider = 0,
+                gSlider = 0,
+                bSlider = 0;
 
             switch (themeName.ToLower())
             {
                 case "dark":
-                    SetRGBValues(20, 20, 30, ref r, ref g, ref b, ref rSlider, ref gSlider, ref bSlider);
+                    SetRGBValues(
+                        20,
+                        20,
+                        30,
+                        ref r,
+                        ref g,
+                        ref b,
+                        ref rSlider,
+                        ref gSlider,
+                        ref bSlider
+                    );
                     helper.primaryColor = new Color(0.1f, 0.1f, 0.2f);
                     helper.secondaryColor = new Color(0.2f, 0.2f, 0.3f);
                     helper.accentColor = new Color(0.4f, 0.6f, 1f);
                     break;
                 case "light":
-                    SetRGBValues(240, 240, 250, ref r, ref g, ref b, ref rSlider, ref gSlider, ref bSlider);
+                    SetRGBValues(
+                        240,
+                        240,
+                        250,
+                        ref r,
+                        ref g,
+                        ref b,
+                        ref rSlider,
+                        ref gSlider,
+                        ref bSlider
+                    );
                     helper.primaryColor = new Color(0.9f, 0.9f, 0.95f);
                     helper.secondaryColor = new Color(0.8f, 0.8f, 0.9f);
                     helper.accentColor = new Color(0.2f, 0.4f, 0.8f);
                     break;
                 case "neon":
-                    SetRGBValues(255, 0, 255, ref r, ref g, ref b, ref rSlider, ref gSlider, ref bSlider);
+                    SetRGBValues(
+                        255,
+                        0,
+                        255,
+                        ref r,
+                        ref g,
+                        ref b,
+                        ref rSlider,
+                        ref gSlider,
+                        ref bSlider
+                    );
                     helper.primaryColor = new Color(0.2f, 0f, 0.4f);
                     helper.secondaryColor = new Color(0.4f, 0f, 0.6f);
                     helper.accentColor = new Color(0f, 1f, 1f);
                     break;
                 case "forest":
-                    SetRGBValues(34, 139, 34, ref r, ref g, ref b, ref rSlider, ref gSlider, ref bSlider);
+                    SetRGBValues(
+                        34,
+                        139,
+                        34,
+                        ref r,
+                        ref g,
+                        ref b,
+                        ref rSlider,
+                        ref gSlider,
+                        ref bSlider
+                    );
                     helper.primaryColor = new Color(0.1f, 0.3f, 0.1f);
                     helper.secondaryColor = new Color(0.2f, 0.4f, 0.2f);
                     helper.accentColor = new Color(0.6f, 1f, 0.6f);
                     break;
                 default:
-                    SetRGBValues(255, 128, 0, ref r, ref g, ref b, ref rSlider, ref gSlider, ref bSlider);
+                    SetRGBValues(
+                        255,
+                        128,
+                        0,
+                        ref r,
+                        ref g,
+                        ref b,
+                        ref rSlider,
+                        ref gSlider,
+                        ref bSlider
+                    );
                     helper.primaryColor = new Color(0.2f, 0.3f, 0.6f);
                     helper.secondaryColor = new Color(0.3f, 0.2f, 0.4f);
                     helper.accentColor = new Color(0.5f, 0.8f, 1f);

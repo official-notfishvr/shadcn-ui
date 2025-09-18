@@ -30,12 +30,22 @@ namespace shadcnui.GUIComponents
 
         public void Popover(Action content)
         {
-            if (!isOpen) return;
+            if (!isOpen)
+                return;
 
 #if IL2CPP
-            GUILayout.BeginVertical(guiHelper.GetStyleManager().popoverContentStyle, new UnhollowerBaseLib.Il2CppReferenceArray<UnityEngine.GUILayoutOption>(new GUILayoutOption[] { GUILayout.MaxWidth(300), GUILayout.MaxHeight(200) }));
+            GUILayout.BeginVertical(
+                guiHelper.GetStyleManager().popoverContentStyle,
+                new UnhollowerBaseLib.Il2CppReferenceArray<UnityEngine.GUILayoutOption>(
+                    new GUILayoutOption[] { GUILayout.MaxWidth(300), GUILayout.MaxHeight(200) }
+                )
+            );
 #else
-            GUILayout.BeginVertical(guiHelper.GetStyleManager().popoverContentStyle, GUILayout.MaxWidth(300), GUILayout.MaxHeight(200));
+            GUILayout.BeginVertical(
+                guiHelper.GetStyleManager().popoverContentStyle,
+                GUILayout.MaxWidth(300),
+                GUILayout.MaxHeight(200)
+            );
 #endif
             content?.Invoke();
             GUILayout.EndVertical();
