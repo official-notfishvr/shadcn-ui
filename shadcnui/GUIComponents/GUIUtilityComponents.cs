@@ -152,7 +152,6 @@ namespace shadcnui.GUIComponents
             helper.animationSpeed = 12f;
             helper.glowEffectsEnabled = true;
             helper.particleEffectsEnabled = true;
-            helper.customColorsEnabled = true;
             helper.backgroundAlpha = 0.9f;
             helper.fontSize = 12;
             helper.cornerRadius = 8;

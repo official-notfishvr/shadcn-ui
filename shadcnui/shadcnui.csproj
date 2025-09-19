@@ -435,6 +435,8 @@
     <Compile Include="GUIComponents\GUISkeletonComponents.cs" />
     <Compile Include="GUIComponents\GUISliderComponents.cs" />
     <Compile Include="GUIComponents\GUIStyleManager.cs" />
+    <Compile Include="GUIComponents\Theme.cs" />
+    <Compile Include="GUIComponents\ThemeManager.cs" />
     <Compile Include="GUIComponents\GUISwitchComponents.cs" />
     <Compile Include="GUIComponents\GUITableComponents.cs" />
     <Compile Include="GUIComponents\GUITabsComponents.cs" />

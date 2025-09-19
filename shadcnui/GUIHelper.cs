@@ -27,7 +27,6 @@ namespace shadcnui
         internal float animationSpeed = 12f;
         internal bool glowEffectsEnabled = true;
         internal bool particleEffectsEnabled = true;
-        internal bool customColorsEnabled = true;
         internal float backgroundAlpha = 0.9f;
         internal int fontSize = 12;
         internal int cornerRadius = 14;
@@ -219,7 +218,7 @@ namespace shadcnui
                     1f
                 );
 
-                Color baseCol = customColorsEnabled ? primaryColor : new Color(0.1f, 0.1f, 0.2f);
+                Color baseCol = ThemeManager.Instance.CurrentTheme.PrimaryColor;
                 Color backgroundColor = new Color(baseCol.r, baseCol.g, baseCol.b, bgAlpha);
 
                 GUI.color = backgroundColor;
@@ -1262,7 +1261,6 @@ namespace shadcnui
 
                 animationsEnabled = true;
                 glowEffectsEnabled = true;
-                customColorsEnabled = true;
             }
         }
 

@@ -47,9 +47,7 @@ namespace shadcnui.GUIComponents
             GUI.color = new Color(0.3f, 0.3f, 0.3f, 0.8f);
             GUI.DrawTexture(progressRect, Texture2D.whiteTexture);
 
-            Color finalBarColor = guiHelper.customColorsEnabled
-                ? Color.Lerp(barColor, guiHelper.accentColor, 0.5f)
-                : barColor;
+            Color finalBarColor = Color.Lerp(barColor, guiHelper.accentColor, 0.5f);
             GUI.color = finalBarColor;
             Rect fillRect = new Rect(
                 progressRect.x,
@@ -62,7 +60,7 @@ namespace shadcnui.GUIComponents
             GUI.color = Color.white;
             if (guiHelper.borderEffectsEnabled)
             {
-                GUI.color = guiHelper.customColorsEnabled ? guiHelper.primaryColor : Color.white;
+                GUI.color = guiHelper.primaryColor;
             }
             GUI.Box(progressRect, "", GUI.skin.box);
 
@@ -104,9 +102,7 @@ namespace shadcnui.GUIComponents
             );
 #endif
             Color originalColor = GUI.backgroundColor;
-            Color separatorColor = guiHelper.customColorsEnabled
-                ? Color.Lerp(Color.gray, guiHelper.primaryColor, 0.5f)
-                : new Color(0.5f, 0.5f, 0.5f, 0.5f);
+            Color separatorColor = Color.Lerp(Color.gray, guiHelper.primaryColor, 0.5f);
             GUI.backgroundColor = separatorColor;
             GUI.Box(rect, "");
             GUI.backgroundColor = originalColor;
@@ -118,9 +114,7 @@ namespace shadcnui.GUIComponents
             var styleManager = guiHelper.GetStyleManager();
             GUIStyle instructionStyle = new GUIStyle(styleManager.glowLabelStyle);
             instructionStyle.fontSize = Mathf.RoundToInt(10 * guiHelper.uiScale);
-            Color instructionColor = guiHelper.customColorsEnabled
-                ? Color.Lerp(new Color(0.8f, 0.8f, 0.8f), guiHelper.accentColor, 0.3f)
-                : new Color(0.8f, 0.8f, 0.8f);
+            Color instructionColor = Color.Lerp(new Color(0.8f, 0.8f, 0.8f), guiHelper.accentColor, 0.3f);
             instructionStyle.normal.textColor = instructionColor;
 
 #if IL2CPP
