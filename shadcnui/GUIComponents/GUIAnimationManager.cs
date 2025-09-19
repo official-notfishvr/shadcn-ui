@@ -145,14 +145,12 @@ namespace shadcnui.GUIComponents
                     * menuAlpha
                     * guiHelper.glowIntensity;
 
-                Color particleColor = guiHelper.customColorsEnabled
-                    ? new Color(
+                Color particleColor = new Color(
                         guiHelper.accentColor.r,
                         guiHelper.accentColor.g,
                         guiHelper.accentColor.b,
                         alpha
-                    )
-                    : new Color(0.5f, 0.8f, 1f, alpha);
+                    );
 
                 GUI.color = particleColor;
                 GUI.DrawTexture(

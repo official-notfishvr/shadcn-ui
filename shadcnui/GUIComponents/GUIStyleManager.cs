@@ -658,61 +658,42 @@ namespace shadcnui.GUIComponents
         /// </summary>
         private void CreateCustomTextures()
         {
+            var theme = ThemeManager.Instance.CurrentTheme;
+
             gradientTexture = new Texture2D(1, 100);
             for (int i = 0; i < 100; i++)
             {
                 float t = i / 99f;
-                Color startColor = guiHelper.customColorsEnabled
-                    ? Color.Lerp(guiHelper.primaryColor, Color.black, 0.8f)
-                    : new Color(0.1f, 0.1f, 0.2f, 0.9f);
-                Color endColor = guiHelper.customColorsEnabled
-                    ? Color.Lerp(guiHelper.secondaryColor, Color.black, 0.6f)
-                    : new Color(0.3f, 0.2f, 0.4f, 0.9f);
+                Color startColor, endColor;
+                if (theme.Name == "Custom")
+                {
+                    startColor = Color.Lerp(guiHelper.primaryColor, Color.black, 0.8f);
+                    endColor = Color.Lerp(guiHelper.secondaryColor, Color.black, 0.6f);
+                }
+                else
+                {
+                    startColor = theme.PrimaryColor;
+                    endColor = theme.SecondaryColor;
+                }
                 Color gradColor = Color.Lerp(startColor, endColor, t);
                 gradientTexture.SetPixel(0, i, gradColor);
             }
             gradientTexture.Apply();
 
             cardBackgroundTexture = new Texture2D(1, 1);
-            Color cardBgColor = guiHelper.customColorsEnabled
-                ? new Color(
-                    guiHelper.primaryColor.r,
-                    guiHelper.primaryColor.g,
-                    guiHelper.primaryColor.b,
-                    guiHelper.backgroundAlpha
-                )
-                : new Color(0.15f, 0.15f, 0.25f, guiHelper.backgroundAlpha);
-            cardBackgroundTexture.SetPixel(0, 0, cardBgColor);
+            cardBackgroundTexture.SetPixel(0, 0, theme.Name == "Custom" ? new Color(guiHelper.primaryColor.r, guiHelper.primaryColor.g, guiHelper.primaryColor.b, guiHelper.backgroundAlpha) : theme.CardBg);
             cardBackgroundTexture.Apply();
 
             inputBackgroundTexture = new Texture2D(1, 1);
-            Color inputBgColor = guiHelper.customColorsEnabled
-                ? new Color(
-                    guiHelper.primaryColor.r * 0.3f,
-                    guiHelper.primaryColor.g * 0.3f,
-                    guiHelper.primaryColor.b * 0.3f,
-                    0.8f
-                )
-                : new Color(0.1f, 0.1f, 0.15f, 0.8f);
-            inputBackgroundTexture.SetPixel(0, 0, inputBgColor);
+            inputBackgroundTexture.SetPixel(0, 0, theme.Name == "Custom" ? new Color(guiHelper.primaryColor.r * 0.3f, guiHelper.primaryColor.g * 0.3f, guiHelper.primaryColor.b * 0.3f, 0.8f) : theme.InputBg);
             inputBackgroundTexture.Apply();
 
             inputFocusedTexture = new Texture2D(1, 1);
-            Color focusColor = guiHelper.customColorsEnabled
-                ? new Color(
-                    guiHelper.accentColor.r * 0.3f,
-                    guiHelper.accentColor.g * 0.3f,
-                    guiHelper.accentColor.b * 0.3f,
-                    0.9f
-                )
-                : new Color(0.2f, 0.3f, 0.5f, 0.9f);
-            inputFocusedTexture.SetPixel(0, 0, focusColor);
+            inputFocusedTexture.SetPixel(0, 0, theme.Name == "Custom" ? new Color(guiHelper.accentColor.r * 0.3f, guiHelper.accentColor.g * 0.3f, guiHelper.accentColor.b * 0.3f, 0.9f) : theme.InputFocusedBg);
             inputFocusedTexture.Apply();
 
             outlineTexture = new Texture2D(4, 4);
-            Color borderColor = guiHelper.customColorsEnabled
-                ? guiHelper.accentColor
-                : new Color(0.5f, 0.5f, 0.7f);
+            Color borderColor = theme.Name == "Custom" ? guiHelper.accentColor : theme.ButtonOutlineBorder;
             Color fillColor = new Color(0f, 0f, 0f, 0f);
 
             for (int x = 0; x < 4; x++)
@@ -740,9 +721,7 @@ namespace shadcnui.GUIComponents
                     float distance = Vector2.Distance(new Vector2(x, y), center);
                     float alpha = Mathf.Clamp01(1f - (distance / 16f));
                     alpha = Mathf.Pow(alpha, 2f);
-                    Color glowColor = guiHelper.customColorsEnabled
-                        ? guiHelper.accentColor
-                        : new Color(0.5f, 0.8f, 1f);
+                    Color glowColor = theme.AccentColor;
                     glowTexture.SetPixel(
                         x,
                         y,
@@ -762,113 +741,94 @@ namespace shadcnui.GUIComponents
             {
                 for (int y = 0; y < 4; y++)
                 {
-                    Color particleColor = guiHelper.customColorsEnabled
-                        ? Color.Lerp(guiHelper.accentColor, Color.white, 0.5f)
-                        : new Color(1f, 1f, 1f, 0.8f);
+                    Color particleColor = Color.Lerp(theme.AccentColor, Color.white, 0.5f);
                     particleTexture.SetPixel(x, y, particleColor);
                 }
             }
             particleTexture.Apply();
 
             progressBarBackgroundTexture = new Texture2D(1, 1);
-            Color progressBgColor = guiHelper.customColorsEnabled
-                ? new Color(
-                    guiHelper.primaryColor.r * 0.2f,
-                    guiHelper.primaryColor.g * 0.2f,
-                    guiHelper.primaryColor.b * 0.2f,
-                    0.2f
-                )
-                : new Color(0.09f, 0.09f, 0.11f, 0.2f);
-            progressBarBackgroundTexture.SetPixel(0, 0, progressBgColor);
+            progressBarBackgroundTexture.SetPixel(0, 0, new Color(theme.PrimaryColor.r * 0.2f, theme.PrimaryColor.g * 0.2f, theme.PrimaryColor.b * 0.2f, 0.2f));
             progressBarBackgroundTexture.Apply();
 
             progressBarFillTexture = new Texture2D(1, 1);
-            Color progressFillColor = guiHelper.customColorsEnabled
-                ? guiHelper.primaryColor
-                : new Color(0.09f, 0.09f, 0.11f);
-            progressBarFillTexture.SetPixel(0, 0, progressFillColor);
+            progressBarFillTexture.SetPixel(0, 0, theme.PrimaryColor);
             progressBarFillTexture.Apply();
 
             separatorTexture = new Texture2D(1, 1);
-            Color separatorColor = new Color(0.23f, 0.23f, 0.27f);
-            separatorTexture.SetPixel(0, 0, separatorColor);
+            separatorTexture.SetPixel(0, 0, theme.SeparatorColor);
             separatorTexture.Apply();
 
             tabsBackgroundTexture = new Texture2D(1, 1);
-            Color tabsBgColor = new Color(0.16f, 0.16f, 0.18f);
-            tabsBackgroundTexture.SetPixel(0, 0, tabsBgColor);
+            tabsBackgroundTexture.SetPixel(0, 0, theme.TabsBg);
             tabsBackgroundTexture.Apply();
 
             tabsActiveTexture = new Texture2D(1, 1);
-            Color tabsActiveColor = new Color(0.02f, 0.02f, 0.04f);
-            tabsActiveTexture.SetPixel(0, 0, tabsActiveColor);
+            tabsActiveTexture.SetPixel(0, 0, theme.TabsTriggerActiveBg);
             tabsActiveTexture.Apply();
 
             checkboxTexture = new Texture2D(1, 1);
-            Color checkboxColor = new Color(0.1f, 0.1f, 0.15f);
-            checkboxTexture.SetPixel(0, 0, checkboxColor);
+            checkboxTexture.SetPixel(0, 0, theme.CheckboxBg);
             checkboxTexture.Apply();
 
             checkboxCheckedTexture = new Texture2D(1, 1);
-            Color checkboxCheckedColor = guiHelper.customColorsEnabled
-                ? guiHelper.primaryColor
-                : new Color(0.09f, 0.09f, 0.11f);
-            checkboxCheckedTexture.SetPixel(0, 0, checkboxCheckedColor);
+            checkboxCheckedTexture.SetPixel(0, 0, theme.CheckboxCheckedBg);
             checkboxCheckedTexture.Apply();
 
             switchTexture = new Texture2D(1, 1);
-            Color switchColor = new Color(0.16f, 0.16f, 0.18f);
-            switchTexture.SetPixel(0, 0, switchColor);
+            switchTexture.SetPixel(0, 0, theme.SwitchBg);
             switchTexture.Apply();
 
             switchOnTexture = new Texture2D(1, 1);
-            Color switchOnColor = guiHelper.customColorsEnabled
-                ? guiHelper.primaryColor
-                : new Color(0.09f, 0.09f, 0.11f);
-            switchOnTexture.SetPixel(0, 0, switchOnColor);
+            switchOnTexture.SetPixel(0, 0, theme.SwitchOnBg);
             switchOnTexture.Apply();
 
             switchOffTexture = new Texture2D(1, 1);
-            Color switchOffColor = new Color(0.16f, 0.16f, 0.18f);
-            switchOffTexture.SetPixel(0, 0, switchOffColor);
+            switchOffTexture.SetPixel(0, 0, theme.SwitchOffBg);
             switchOffTexture.Apply();
 
             badgeTexture = new Texture2D(1, 1);
-            Color badgeColor = guiHelper.customColorsEnabled
-                ? guiHelper.primaryColor
-                : new Color(0.09f, 0.09f, 0.11f);
-            badgeTexture.SetPixel(0, 0, badgeColor);
+            badgeTexture.SetPixel(0, 0, theme.BadgeBg);
             badgeTexture.Apply();
 
             alertTexture = new Texture2D(1, 1);
-            Color alertColor = new Color(0.15f, 0.15f, 0.25f);
-            alertTexture.SetPixel(0, 0, alertColor);
+            alertTexture.SetPixel(0, 0, theme.AlertDefaultBg);
             alertTexture.Apply();
 
             avatarTexture = new Texture2D(1, 1);
-            Color avatarColor = new Color(0.16f, 0.16f, 0.18f);
-            avatarTexture.SetPixel(0, 0, avatarColor);
+            avatarTexture.SetPixel(0, 0, theme.AvatarBg);
             avatarTexture.Apply();
 
             skeletonTexture = new Texture2D(1, 1);
-            Color skeletonColor = new Color(0.09f, 0.09f, 0.11f, 0.1f);
-            skeletonTexture.SetPixel(0, 0, skeletonColor);
+            skeletonTexture.SetPixel(0, 0, theme.SkeletonBg);
             skeletonTexture.Apply();
 
             tableTexture = new Texture2D(1, 1);
-            Color tableColor = new Color(0.02f, 0.02f, 0.04f);
-            tableTexture.SetPixel(0, 0, tableColor);
+            tableTexture.SetPixel(0, 0, theme.TableBg);
             tableTexture.Apply();
 
             tableHeaderTexture = new Texture2D(1, 1);
-            Color tableHeaderColor = new Color(0.16f, 0.16f, 0.18f);
-            tableHeaderTexture.SetPixel(0, 0, tableHeaderColor);
+            tableHeaderTexture.SetPixel(0, 0, theme.TableHeaderBg);
             tableHeaderTexture.Apply();
 
             tableCellTexture = new Texture2D(1, 1);
-            Color tableCellColor = new Color(0.02f, 0.02f, 0.04f);
-            tableCellTexture.SetPixel(0, 0, tableCellColor);
+            tableCellTexture.SetPixel(0, 0, theme.TableCellBg);
             tableCellTexture.Apply();
+
+            calendarBackgroundTexture = CreateSolidTexture(theme.CardBg);
+            calendarHeaderTexture = CreateSolidTexture(theme.CardBg);
+            calendarDayTexture = CreateSolidTexture(theme.CardBg);
+            calendarDaySelectedTexture = CreateSolidTexture(theme.AccentColor);
+
+            dropdownMenuContentTexture = CreateSolidTexture(theme.CardBg);
+
+            popoverContentTexture = CreateSolidTexture(theme.CardBg);
+
+            scrollAreaThumbTexture = CreateSolidTexture(Color.Lerp(theme.BackgroundColor, Color.white, 0.2f));
+            scrollAreaTrackTexture = CreateSolidTexture(Color.Lerp(theme.BackgroundColor, Color.black, 0.1f));
+
+            selectTriggerTexture = CreateSolidTexture(theme.InputBg);
+            selectContentTexture = CreateSolidTexture(theme.CardBg);
         }
         #endregion
 
@@ -878,6 +838,8 @@ namespace shadcnui.GUIComponents
         /// </summary>
         private void SetupAnimatedStyles()
         {
+            var theme = ThemeManager.Instance.CurrentTheme;
+
             animatedBoxStyle = new GUIStyle(GUI.skin.box);
             animatedBoxStyle.normal.background = gradientTexture;
             animatedBoxStyle.border = new RectOffset(
@@ -892,15 +854,8 @@ namespace shadcnui.GUIComponents
             animatedButtonStyle.fontSize = guiHelper.fontSize;
             animatedButtonStyle.fontStyle = FontStyle.Bold;
             animatedButtonStyle.alignment = TextAnchor.MiddleCenter;
-            if (guiHelper.customColorsEnabled)
-            {
-                animatedButtonStyle.normal.textColor = Color.Lerp(
-                    Color.white,
-                    guiHelper.accentColor,
-                    0.3f
-                );
-                animatedButtonStyle.hover.textColor = guiHelper.accentColor;
-            }
+            animatedButtonStyle.normal.textColor = Color.Lerp(Color.white, theme.AccentColor, 0.3f);
+            animatedButtonStyle.hover.textColor = theme.AccentColor;
 
             colorPresetStyle = new GUIStyle(GUI.skin.button);
             colorPresetStyle.fontSize = Mathf.RoundToInt(guiHelper.fontSize * 0.9f);
@@ -910,32 +865,25 @@ namespace shadcnui.GUIComponents
             animatedInputStyle = new GUIStyle(GUI.skin.textField);
             animatedInputStyle.fontSize = guiHelper.fontSize + 1;
             animatedInputStyle.padding = new RectOffset(8, 8, 4, 4);
-            if (guiHelper.customColorsEnabled)
-            {
-                animatedInputStyle.normal.textColor = Color.white;
-                animatedInputStyle.focused.textColor = guiHelper.accentColor;
-            }
+            animatedInputStyle.normal.textColor = Color.white;
+            animatedInputStyle.focused.textColor = theme.AccentColor;
 
             glowLabelStyle = new GUIStyle(GUI.skin.label);
             glowLabelStyle.fontSize = guiHelper.fontSize;
-            Color labelColor = guiHelper.customColorsEnabled
-                ? Color.Lerp(Color.white, guiHelper.accentColor, 0.2f)
-                : Color.white;
+            Color labelColor = Color.Lerp(Color.white, theme.AccentColor, 0.2f);
             glowLabelStyle.normal.textColor = labelColor;
 
             titleStyle = new GUIStyle(GUI.skin.label);
             titleStyle.fontSize = guiHelper.fontSize + 4;
             titleStyle.fontStyle = FontStyle.Bold;
             titleStyle.alignment = TextAnchor.MiddleCenter;
-            Color titleColor = guiHelper.customColorsEnabled ? guiHelper.accentColor : Color.white;
+            Color titleColor = theme.AccentColor;
             titleStyle.normal.textColor = titleColor;
 
             sectionHeaderStyle = new GUIStyle(GUI.skin.label);
             sectionHeaderStyle.fontSize = guiHelper.fontSize + 2;
             sectionHeaderStyle.fontStyle = FontStyle.Bold;
-            Color headerColor = guiHelper.customColorsEnabled
-                ? Color.Lerp(guiHelper.accentColor, Color.white, 0.3f)
-                : new Color(0.8f, 0.9f, 1f);
+            Color headerColor = Color.Lerp(theme.AccentColor, Color.white, 0.3f);
             sectionHeaderStyle.normal.textColor = headerColor;
         }
 
@@ -944,6 +892,8 @@ namespace shadcnui.GUIComponents
         /// </summary>
         private void SetupCardStyles()
         {
+            var theme = ThemeManager.Instance.CurrentTheme;
+
             cardStyle = new GUIStyle(GUI.skin.box);
             cardStyle.normal.background = cardBackgroundTexture;
             cardStyle.border = new RectOffset(
@@ -962,17 +912,13 @@ namespace shadcnui.GUIComponents
             cardTitleStyle = new GUIStyle(GUI.skin.label);
             cardTitleStyle.fontSize = guiHelper.fontSize + 4;
             cardTitleStyle.fontStyle = FontStyle.Bold;
-            cardTitleStyle.normal.textColor = guiHelper.customColorsEnabled
-                ? Color.Lerp(guiHelper.accentColor, Color.white, 0.2f)
-                : new Color(0.9f, 0.9f, 1f);
+            cardTitleStyle.normal.textColor = theme.CardTitle;
             cardTitleStyle.wordWrap = true;
             cardTitleStyle.margin = new RectOffset(0, 0, 0, 4);
 
             cardDescriptionStyle = new GUIStyle(GUI.skin.label);
             cardDescriptionStyle.fontSize = guiHelper.fontSize - 1;
-            cardDescriptionStyle.normal.textColor = guiHelper.customColorsEnabled
-                ? Color.Lerp(Color.white, guiHelper.primaryColor, 0.3f)
-                : new Color(0.7f, 0.7f, 0.8f);
+            cardDescriptionStyle.normal.textColor = theme.CardDescription;
             cardDescriptionStyle.wordWrap = true;
 
             cardContentStyle = new GUIStyle();
@@ -987,6 +933,8 @@ namespace shadcnui.GUIComponents
         /// </summary>
         private void SetupButtonVariantStyles()
         {
+            var theme = ThemeManager.Instance.CurrentTheme;
+
             float scaledFontSize = guiHelper.fontSize * guiHelper.uiScale;
             int borderRadius = Mathf.RoundToInt(guiHelper.cornerRadius * guiHelper.uiScale);
 
@@ -1003,10 +951,8 @@ namespace shadcnui.GUIComponents
             );
             buttonDefaultStyle.fixedHeight = Mathf.RoundToInt(36 * guiHelper.uiScale);
 
-            Color primaryBg = guiHelper.customColorsEnabled
-                ? guiHelper.primaryColor
-                : new Color(0.09f, 0.09f, 0.11f);
-            Color primaryFg = new Color(0.98f, 0.98f, 0.98f);
+            Color primaryBg = theme.ButtonPrimaryBg;
+            Color primaryFg = theme.ButtonPrimaryFg;
             buttonDefaultStyle.normal.background = CreateSolidTexture(primaryBg);
             buttonDefaultStyle.hover.background = CreateSolidTexture(
                 Color.Lerp(primaryBg, Color.black, 0.1f)
@@ -1030,8 +976,8 @@ namespace shadcnui.GUIComponents
                 borderRadius
             );
 
-            Color destructiveBg = new Color(0.86f, 0.24f, 0.24f);
-            Color destructiveFg = new Color(0.98f, 0.98f, 0.98f);
+            Color destructiveBg = theme.ButtonDestructiveBg;
+            Color destructiveFg = theme.ButtonDestructiveFg;
             buttonDestructiveStyle.normal.background = CreateSolidTexture(destructiveBg);
             buttonDestructiveStyle.hover.background = CreateSolidTexture(
                 Color.Lerp(destructiveBg, Color.black, 0.1f)
@@ -1055,11 +1001,11 @@ namespace shadcnui.GUIComponents
                 borderRadius
             );
 
-            Color outlineBorder = new Color(0.23f, 0.23f, 0.27f);
-            Color outlineBg = new Color(0.02f, 0.02f, 0.04f);
-            Color outlineFg = new Color(0.98f, 0.98f, 0.98f);
-            Color outlineHoverBg = new Color(0.16f, 0.16f, 0.18f);
-            Color outlineHoverFg = new Color(0.98f, 0.98f, 0.98f);
+            Color outlineBorder = theme.ButtonOutlineBorder;
+            Color outlineBg = theme.ButtonOutlineBg;
+            Color outlineFg = theme.ButtonOutlineFg;
+            Color outlineHoverBg = theme.ButtonOutlineHoverBg;
+            Color outlineHoverFg = theme.ButtonOutlineHoverFg;
 
             buttonOutlineStyle.normal.background = CreateOutlineButtonTexture(
                 outlineBg,
@@ -1085,8 +1031,8 @@ namespace shadcnui.GUIComponents
                 borderRadius
             );
 
-            Color secondaryBg = new Color(0.16f, 0.16f, 0.18f);
-            Color secondaryFg = new Color(0.98f, 0.98f, 0.98f);
+            Color secondaryBg = theme.ButtonSecondaryBg;
+            Color secondaryFg = theme.ButtonSecondaryFg;
             buttonSecondaryStyle.normal.background = CreateSolidTexture(secondaryBg);
             buttonSecondaryStyle.hover.background = CreateSolidTexture(
                 Color.Lerp(secondaryBg, Color.white, 0.2f)
@@ -1110,9 +1056,9 @@ namespace shadcnui.GUIComponents
                 borderRadius
             );
 
-            Color ghostFg = new Color(0.98f, 0.98f, 0.98f);
-            Color ghostHoverBg = new Color(0.16f, 0.16f, 0.18f);
-            Color ghostHoverFg = new Color(0.98f, 0.98f, 0.98f);
+            Color ghostFg = theme.ButtonGhostFg;
+            Color ghostHoverBg = theme.ButtonGhostHoverBg;
+            Color ghostHoverFg = theme.ButtonGhostHoverFg;
 
             buttonGhostStyle.normal.background = transparentTexture;
             buttonGhostStyle.hover.background = CreateSolidTexture(ghostHoverBg);
@@ -1130,10 +1076,8 @@ namespace shadcnui.GUIComponents
             buttonLinkStyle.padding = GetScaledPadding(0, 0);
             buttonLinkStyle.border = new RectOffset(0, 0, 0, 0);
 
-            Color linkColor = guiHelper.customColorsEnabled
-                ? guiHelper.primaryColor
-                : new Color(0.09f, 0.09f, 0.11f);
-            Color linkHoverColor = Color.Lerp(linkColor, Color.white, 0.2f);
+            Color linkColor = theme.ButtonLinkColor;
+            Color linkHoverColor = theme.ButtonLinkHoverColor;
 
             buttonLinkStyle.normal.background = transparentTexture;
             buttonLinkStyle.hover.background = transparentTexture;
@@ -1230,73 +1174,46 @@ namespace shadcnui.GUIComponents
         /// </summary>
         private void SetupToggleVariantStyles()
         {
+            var theme = ThemeManager.Instance.CurrentTheme;
+
             toggleDefaultStyle = new GUIStyle(GUI.skin.button);
             toggleDefaultStyle.fontSize = guiHelper.fontSize;
             toggleDefaultStyle.fontStyle = FontStyle.Normal;
             toggleDefaultStyle.alignment = TextAnchor.MiddleCenter;
-            toggleDefaultStyle.normal.textColor = guiHelper.customColorsEnabled
-                ? Color.Lerp(Color.white, guiHelper.accentColor, 0.3f)
-                : new Color(0.8f, 0.8f, 0.9f);
-            toggleDefaultStyle.normal.background = CreateSolidTexture(
-                guiHelper.customColorsEnabled
-                    ? Color.Lerp(guiHelper.primaryColor, Color.black, 0.3f)
-                    : new Color(0.16f, 0.16f, 0.18f)
-            );
-            toggleDefaultStyle.hover.background = CreateSolidTexture(
-                new Color(0.16f, 0.16f, 0.18f, 0.5f)
-            );
-            toggleDefaultStyle.hover.textColor = guiHelper.customColorsEnabled
-                ? guiHelper.accentColor
-                : Color.white;
+            toggleDefaultStyle.normal.textColor = theme.ToggleFg;
+            toggleDefaultStyle.normal.background = CreateSolidTexture(theme.ToggleBg);
+            toggleDefaultStyle.hover.background = CreateSolidTexture(theme.ToggleHoverBg);
+            toggleDefaultStyle.hover.textColor = theme.ToggleHoverFg;
             toggleDefaultStyle.active.background = CreateSolidTexture(
-                new Color(0.1f, 0.1f, 0.12f, 0.7f)
+                Color.Lerp(theme.ToggleBg, Color.black, 0.1f)
             );
-            toggleDefaultStyle.active.textColor = guiHelper.customColorsEnabled
-                ? Color.Lerp(guiHelper.accentColor, Color.white, 0.5f)
-                : Color.white;
+            toggleDefaultStyle.active.textColor = Color.Lerp(theme.ToggleFg, Color.white, 0.5f);
 
-            Color onBgColor = guiHelper.customColorsEnabled
-                ? Color.Lerp(guiHelper.accentColor, Color.white, 0.3f)
-                : new Color(0.3f, 0.6f, 1.0f);
+            Color onBgColor = theme.ToggleOnBg;
             Color onHoverBgColor = Color.Lerp(onBgColor, Color.white, 0.1f);
             Color onActiveBgColor = Color.Lerp(onBgColor, Color.black, 0.1f);
 
             toggleDefaultStyle.onNormal.background = CreateSolidTexture(onBgColor);
-            toggleDefaultStyle.onNormal.textColor = Color.white;
+            toggleDefaultStyle.onNormal.textColor = theme.ToggleOnFg;
             toggleDefaultStyle.onHover.background = CreateSolidTexture(onHoverBgColor);
-            toggleDefaultStyle.onHover.textColor = Color.white;
+            toggleDefaultStyle.onHover.textColor = theme.ToggleOnFg;
             toggleDefaultStyle.onActive.background = CreateSolidTexture(onActiveBgColor);
-            toggleDefaultStyle.onActive.textColor = Color.white;
+            toggleDefaultStyle.onActive.textColor = theme.ToggleOnFg;
 
             toggleOutlineStyle = new GUIStyle(toggleDefaultStyle);
             toggleOutlineStyle.normal.background = CreateOutlineButtonTexture(
-                guiHelper.customColorsEnabled
-                    ? new Color(
-                        guiHelper.primaryColor.r,
-                        guiHelper.primaryColor.g,
-                        guiHelper.primaryColor.b,
-                        0.1f
-                    )
-                    : new Color(0.05f, 0.05f, 0.06f, 0.5f),
-                guiHelper.customColorsEnabled ? guiHelper.accentColor : new Color(0.5f, 0.5f, 0.7f)
+                Color.Lerp(theme.PrimaryColor, Color.black, 0.1f),
+                theme.AccentColor
             );
             toggleOutlineStyle.border = new RectOffset(2, 2, 2, 2);
-            toggleOutlineStyle.hover.background = CreateSolidTexture(
-                new Color(0.16f, 0.16f, 0.18f, 0.5f)
-            );
-            toggleOutlineStyle.hover.textColor = guiHelper.customColorsEnabled
-                ? guiHelper.accentColor
-                : Color.white;
+            toggleOutlineStyle.hover.background = CreateSolidTexture(theme.ToggleHoverBg);
+            toggleOutlineStyle.hover.textColor = theme.ToggleHoverFg;
             toggleOutlineStyle.active.background = CreateSolidTexture(
-                new Color(0.1f, 0.1f, 0.12f, 0.7f)
+                Color.Lerp(theme.ToggleBg, Color.black, 0.1f)
             );
-            toggleOutlineStyle.active.textColor = guiHelper.customColorsEnabled
-                ? Color.Lerp(guiHelper.accentColor, Color.white, 0.5f)
-                : Color.white;
+            toggleOutlineStyle.active.textColor = Color.Lerp(theme.ToggleFg, Color.white, 0.5f);
 
-            Color onOutlineBgColor = guiHelper.customColorsEnabled
-                ? Color.Lerp(guiHelper.accentColor, Color.white, 0.3f)
-                : new Color(0.3f, 0.6f, 1.0f);
+            Color onOutlineBgColor = theme.ToggleOnBg;
             Color onOutlineHoverBgColor = Color.Lerp(onOutlineBgColor, Color.white, 0.1f);
             Color onOutlineActiveBgColor = Color.Lerp(onOutlineBgColor, Color.black, 0.1f);
 
@@ -1304,11 +1221,11 @@ namespace shadcnui.GUIComponents
                 onOutlineBgColor,
                 onOutlineBgColor
             );
-            toggleOutlineStyle.onNormal.textColor = Color.white;
+            toggleOutlineStyle.onNormal.textColor = theme.ToggleOnFg;
             toggleOutlineStyle.onHover.background = CreateSolidTexture(onOutlineHoverBgColor);
-            toggleOutlineStyle.onHover.textColor = Color.white;
+            toggleOutlineStyle.onHover.textColor = theme.ToggleOnFg;
             toggleOutlineStyle.onActive.background = CreateSolidTexture(onOutlineActiveBgColor);
-            toggleOutlineStyle.onActive.textColor = Color.white;
+            toggleOutlineStyle.onActive.textColor = theme.ToggleOnFg;
 
             toggleSmallStyle = new GUIStyle(toggleDefaultStyle);
             toggleSmallStyle.fontSize = guiHelper.fontSize - 2;
@@ -1324,36 +1241,29 @@ namespace shadcnui.GUIComponents
         /// </summary>
         private void SetupInputVariantStyles()
         {
+            var theme = ThemeManager.Instance.CurrentTheme;
+
             inputDefaultStyle = new GUIStyle(GUI.skin.textField);
             inputDefaultStyle.fontSize = guiHelper.fontSize;
             inputDefaultStyle.padding = new RectOffset(12, 12, 4, 4);
             inputDefaultStyle.margin = new RectOffset(0, 0, 4, 4);
             inputDefaultStyle.border = new RectOffset(1, 1, 1, 1);
             inputDefaultStyle.normal.background = inputBackgroundTexture;
-            inputDefaultStyle.normal.textColor = Color.white;
+            inputDefaultStyle.normal.textColor = theme.InputFg;
             inputDefaultStyle.hover.background = inputBackgroundTexture;
             inputDefaultStyle.focused.background = inputFocusedTexture;
-            inputDefaultStyle.focused.textColor = guiHelper.customColorsEnabled
-                ? guiHelper.accentColor
-                : new Color(0.9f, 0.9f, 1f);
+            inputDefaultStyle.focused.textColor = theme.InputFocusedFg;
 
             inputOutlineStyle = new GUIStyle(inputDefaultStyle);
             inputOutlineStyle.normal.background = CreateOutlineTexture();
             inputOutlineStyle.focused.background = CreateSolidTexture(
-                guiHelper.customColorsEnabled
-                    ? new Color(
-                        guiHelper.accentColor.r,
-                        guiHelper.accentColor.g,
-                        guiHelper.accentColor.b,
-                        0.1f
-                    )
-                    : new Color(0.3f, 0.4f, 0.6f, 0.1f)
+                Color.Lerp(theme.AccentColor, Color.black, 0.1f)
             );
 
             inputGhostStyle = new GUIStyle(inputDefaultStyle);
             inputGhostStyle.normal.background = transparentTexture;
             inputGhostStyle.focused.background = CreateSolidTexture(
-                new Color(0.1f, 0.1f, 0.2f, 0.3f)
+                Color.Lerp(theme.PrimaryColor, Color.black, 0.1f)
             );
 
             inputFocusedStyle = new GUIStyle(inputDefaultStyle);
@@ -1361,10 +1271,8 @@ namespace shadcnui.GUIComponents
             inputFocusedStyle.border = new RectOffset(2, 2, 2, 2);
 
             inputDisabledStyle = new GUIStyle(inputDefaultStyle);
-            inputDisabledStyle.normal.textColor = new Color(0.5f, 0.5f, 0.5f);
-            inputDisabledStyle.normal.background = CreateSolidTexture(
-                new Color(0.2f, 0.2f, 0.2f, 0.5f)
-            );
+            inputDisabledStyle.normal.textColor = theme.InputDisabledFg;
+            inputDisabledStyle.normal.background = CreateSolidTexture(theme.InputDisabledBg);
 
             passwordFieldStyle = new GUIStyle(inputDefaultStyle);
             passwordFieldStyle.fontSize = guiHelper.fontSize + 2;
@@ -1383,16 +1291,16 @@ namespace shadcnui.GUIComponents
         /// </summary>
         private void SetupLabelVariantStyles()
         {
+            var theme = ThemeManager.Instance.CurrentTheme;
+
             labelDefaultStyle = new GUIStyle(GUI.skin.label);
             labelDefaultStyle.fontSize = guiHelper.fontSize;
             labelDefaultStyle.fontStyle = FontStyle.Normal;
-            labelDefaultStyle.normal.textColor = Color.white;
+            labelDefaultStyle.normal.textColor = theme.TextColor;
             labelDefaultStyle.padding = new RectOffset(0, 0, 2, 2);
 
             labelSecondaryStyle = new GUIStyle(labelDefaultStyle);
-            labelSecondaryStyle.normal.textColor = guiHelper.customColorsEnabled
-                ? Color.Lerp(Color.white, guiHelper.secondaryColor, 0.4f)
-                : new Color(0.8f, 0.8f, 0.9f);
+            labelSecondaryStyle.normal.textColor = Color.Lerp(theme.TextColor, theme.SecondaryColor, 0.4f);
 
             labelMutedStyle = new GUIStyle(labelDefaultStyle);
             labelMutedStyle.normal.textColor = new Color(0.6f, 0.6f, 0.7f);
@@ -1420,10 +1328,9 @@ namespace shadcnui.GUIComponents
 
         private Texture2D CreateOutlineTexture()
         {
+            var theme = ThemeManager.Instance.CurrentTheme;
             Texture2D texture = new Texture2D(4, 4);
-            Color borderColor = guiHelper.customColorsEnabled
-                ? guiHelper.accentColor
-                : new Color(0.5f, 0.5f, 0.7f);
+            Color borderColor = theme.AccentColor;
             Color fillColor = new Color(0f, 0f, 0f, 0f);
 
             for (int x = 0; x < 4; x++)
@@ -1445,6 +1352,8 @@ namespace shadcnui.GUIComponents
         /// </summary>
         private void SetupProgressBarStyles()
         {
+            var theme = ThemeManager.Instance.CurrentTheme;
+
             float scaledFontSize = guiHelper.fontSize * guiHelper.uiScale;
             int borderRadius = Mathf.RoundToInt(guiHelper.cornerRadius * guiHelper.uiScale);
 
@@ -1471,13 +1380,15 @@ namespace shadcnui.GUIComponents
         /// </summary>
         private void SetupSeparatorStyles()
         {
+            var theme = ThemeManager.Instance.CurrentTheme;
+
             separatorHorizontalStyle = new GUIStyle();
-            separatorHorizontalStyle.normal.background = separatorTexture;
+            separatorHorizontalStyle.normal.background = CreateSolidTexture(theme.SeparatorColor);
             separatorHorizontalStyle.fixedHeight = Mathf.RoundToInt(1 * guiHelper.uiScale);
             separatorHorizontalStyle.stretchWidth = true;
 
             separatorVerticalStyle = new GUIStyle();
-            separatorVerticalStyle.normal.background = separatorTexture;
+            separatorVerticalStyle.normal.background = CreateSolidTexture(theme.SeparatorColor);
             separatorVerticalStyle.fixedWidth = Mathf.RoundToInt(1 * guiHelper.uiScale);
             separatorVerticalStyle.stretchHeight = true;
         }
@@ -1487,12 +1398,14 @@ namespace shadcnui.GUIComponents
         /// </summary>
         private void SetupTabsStyles()
         {
+            var theme = ThemeManager.Instance.CurrentTheme;
+
             float scaledFontSize = guiHelper.fontSize * guiHelper.uiScale;
             int borderRadius = Mathf.RoundToInt(guiHelper.cornerRadius * guiHelper.uiScale);
             int padding = Mathf.RoundToInt(4 * guiHelper.uiScale);
 
             tabsListStyle = new GUIStyle();
-            tabsListStyle.normal.background = tabsBackgroundTexture;
+            tabsListStyle.normal.background = CreateSolidTexture(theme.TabsBg);
             tabsListStyle.border = new RectOffset(
                 borderRadius,
                 borderRadius,
@@ -1519,15 +1432,15 @@ namespace shadcnui.GUIComponents
                 borderRadius
             );
             tabsTriggerStyle.normal.background = transparentTexture;
-            tabsTriggerStyle.normal.textColor = new Color(0.64f, 0.64f, 0.71f);
+            tabsTriggerStyle.normal.textColor = theme.TabsTriggerFg;
             tabsTriggerStyle.hover.background = transparentTexture;
             tabsTriggerStyle.active.background = transparentTexture;
 
             tabsTriggerActiveStyle = new GUIStyle(tabsTriggerStyle);
-            tabsTriggerActiveStyle.normal.background = tabsActiveTexture;
-            tabsTriggerActiveStyle.normal.textColor = new Color(0.98f, 0.98f, 0.98f);
-            tabsTriggerActiveStyle.hover.background = tabsActiveTexture;
-            tabsTriggerActiveStyle.active.background = tabsActiveTexture;
+            tabsTriggerActiveStyle.normal.background = CreateSolidTexture(theme.TabsTriggerActiveBg);
+            tabsTriggerActiveStyle.normal.textColor = theme.TabsTriggerActiveFg;
+            tabsTriggerActiveStyle.hover.background = CreateSolidTexture(theme.TabsTriggerActiveBg);
+            tabsTriggerActiveStyle.active.background = CreateSolidTexture(theme.TabsTriggerActiveBg);
 
             tabsContentStyle = new GUIStyle();
             tabsContentStyle.padding = new RectOffset(
@@ -1543,6 +1456,8 @@ namespace shadcnui.GUIComponents
         /// </summary>
         private void SetupTextAreaVariantStyles()
         {
+            var theme = ThemeManager.Instance.CurrentTheme;
+
             float scaledFontSize = guiHelper.fontSize * guiHelper.uiScale;
             int padding = Mathf.RoundToInt(12 * guiHelper.uiScale);
             int verticalPadding = Mathf.RoundToInt(8 * guiHelper.uiScale);
@@ -1563,11 +1478,9 @@ namespace shadcnui.GUIComponents
                 borderRadius
             );
             textAreaStyle.normal.background = inputBackgroundTexture;
-            textAreaStyle.normal.textColor = new Color(0.98f, 0.98f, 0.98f);
+            textAreaStyle.normal.textColor = theme.InputFg;
             textAreaStyle.focused.background = inputFocusedTexture;
-            textAreaStyle.focused.textColor = guiHelper.customColorsEnabled
-                ? guiHelper.accentColor
-                : new Color(0.9f, 0.9f, 1f);
+            textAreaStyle.focused.textColor = theme.InputFocusedFg;
             textAreaStyle.hover.background = inputBackgroundTexture;
             textAreaStyle.wordWrap = true;
             textAreaStyle.stretchHeight = true;
@@ -1579,20 +1492,13 @@ namespace shadcnui.GUIComponents
             textAreaOutlineStyle = new GUIStyle(textAreaStyle);
             textAreaOutlineStyle.normal.background = CreateOutlineTexture();
             textAreaOutlineStyle.focused.background = CreateSolidTexture(
-                guiHelper.customColorsEnabled
-                    ? new Color(
-                        guiHelper.accentColor.r,
-                        guiHelper.accentColor.g,
-                        guiHelper.accentColor.b,
-                        0.1f
-                    )
-                    : new Color(0.3f, 0.4f, 0.6f, 0.1f)
+                Color.Lerp(theme.AccentColor, Color.black, 0.1f)
             );
 
             textAreaGhostStyle = new GUIStyle(textAreaStyle);
             textAreaGhostStyle.normal.background = transparentTexture;
             textAreaGhostStyle.focused.background = CreateSolidTexture(
-                new Color(0.1f, 0.1f, 0.2f, 0.3f)
+                Color.Lerp(theme.PrimaryColor, Color.black, 0.1f)
             );
         }
 
@@ -1601,6 +1507,8 @@ namespace shadcnui.GUIComponents
         /// </summary>
         private void SetupCheckboxStyles()
         {
+            var theme = ThemeManager.Instance.CurrentTheme;
+
             float scaledFontSize = guiHelper.fontSize * guiHelper.uiScale;
             int borderRadius = Mathf.RoundToInt(guiHelper.cornerRadius * guiHelper.uiScale);
 
@@ -1609,16 +1517,16 @@ namespace shadcnui.GUIComponents
             checkboxDefaultStyle.normal.background = checkboxTexture;
             checkboxDefaultStyle.onNormal.background = checkboxCheckedTexture;
             checkboxDefaultStyle.hover.background = CreateSolidTexture(
-                Color.Lerp(checkboxTexture.GetPixel(0, 0), Color.white, 0.1f)
+                Color.Lerp(theme.CheckboxBg, Color.white, 0.1f)
             );
             checkboxDefaultStyle.active.background = CreateSolidTexture(
-                Color.Lerp(checkboxTexture.GetPixel(0, 0), Color.black, 0.1f)
+                Color.Lerp(theme.CheckboxBg, Color.black, 0.1f)
             );
             checkboxDefaultStyle.onHover.background = CreateSolidTexture(
-                Color.Lerp(checkboxCheckedTexture.GetPixel(0, 0), Color.white, 0.1f)
+                Color.Lerp(theme.CheckboxCheckedBg, Color.white, 0.1f)
             );
             checkboxDefaultStyle.onActive.background = CreateSolidTexture(
-                Color.Lerp(checkboxCheckedTexture.GetPixel(0, 0), Color.black, 0.1f)
+                Color.Lerp(theme.CheckboxCheckedBg, Color.black, 0.1f)
             );
             checkboxDefaultStyle.border = new RectOffset(
                 borderRadius,
@@ -1627,9 +1535,7 @@ namespace shadcnui.GUIComponents
                 borderRadius
             );
 
-            Color onBgColor = guiHelper.customColorsEnabled
-                ? Color.Lerp(guiHelper.accentColor, Color.white, 0.3f)
-                : new Color(0.3f, 0.6f, 1.0f);
+            Color onBgColor = theme.ToggleOnBg;
             Color onHoverBgColor = Color.Lerp(onBgColor, Color.white, 0.1f);
             Color onActiveBgColor = Color.Lerp(onBgColor, Color.black, 0.1f);
 
@@ -1649,44 +1555,30 @@ namespace shadcnui.GUIComponents
                 Color.Lerp(CreateOutlineTexture().GetPixel(0, 0), Color.black, 0.1f)
             );
             checkboxOutlineStyle.onNormal.background = CreateOutlineButtonTexture(
-                guiHelper.customColorsEnabled ? guiHelper.accentColor : new Color(0.2f, 0.4f, 0.8f),
-                guiHelper.customColorsEnabled ? guiHelper.accentColor : new Color(0.2f, 0.4f, 0.8f)
+                theme.AccentColor,
+                theme.AccentColor
             );
             checkboxOutlineStyle.onHover.background = CreateSolidTexture(
-                Color.Lerp(checkboxCheckedTexture.GetPixel(0, 0), Color.white, 0.1f)
+                Color.Lerp(theme.CheckboxCheckedBg, Color.white, 0.1f)
             );
             checkboxOutlineStyle.onActive.background = CreateSolidTexture(
-                Color.Lerp(checkboxCheckedTexture.GetPixel(0, 0), Color.black, 0.1f)
+                Color.Lerp(theme.CheckboxCheckedBg, Color.black, 0.1f)
             );
 
             checkboxGhostStyle = new GUIStyle(checkboxDefaultStyle);
             checkboxGhostStyle.normal.background = transparentTexture;
             checkboxGhostStyle.hover.background = CreateSolidTexture(
-                new Color(0.16f, 0.16f, 0.18f, 0.5f)
+                Color.Lerp(theme.PrimaryColor, Color.black, 0.1f)
             );
             checkboxGhostStyle.active.background = CreateSolidTexture(
-                new Color(0.1f, 0.1f, 0.12f, 0.7f)
+                Color.Lerp(theme.PrimaryColor, Color.black, 0.2f)
             );
-            checkboxGhostStyle.onNormal.background = CreateSolidTexture(
-                guiHelper.customColorsEnabled ? guiHelper.accentColor : new Color(0.2f, 0.4f, 0.8f)
-            );
+            checkboxGhostStyle.onNormal.background = CreateSolidTexture(theme.AccentColor);
             checkboxGhostStyle.onHover.background = CreateSolidTexture(
-                Color.Lerp(
-                    guiHelper.customColorsEnabled
-                        ? guiHelper.accentColor
-                        : new Color(0.2f, 0.4f, 0.8f),
-                    Color.white,
-                    0.1f
-                )
+                Color.Lerp(theme.AccentColor, Color.white, 0.1f)
             );
             checkboxGhostStyle.onActive.background = CreateSolidTexture(
-                Color.Lerp(
-                    guiHelper.customColorsEnabled
-                        ? guiHelper.accentColor
-                        : new Color(0.2f, 0.4f, 0.8f),
-                    Color.black,
-                    0.1f
-                )
+                Color.Lerp(theme.AccentColor, Color.black, 0.1f)
             );
 
             checkboxSmallStyle = new GUIStyle(checkboxDefaultStyle);
@@ -1701,6 +1593,8 @@ namespace shadcnui.GUIComponents
         /// </summary>
         private void SetupSwitchStyles()
         {
+            var theme = ThemeManager.Instance.CurrentTheme;
+
             float scaledFontSize = guiHelper.fontSize * guiHelper.uiScale;
             int borderRadius = Mathf.RoundToInt(guiHelper.cornerRadius * guiHelper.uiScale);
 
@@ -1709,16 +1603,16 @@ namespace shadcnui.GUIComponents
             switchDefaultStyle.normal.background = switchOffTexture;
             switchDefaultStyle.onNormal.background = switchOnTexture;
             switchDefaultStyle.hover.background = CreateSolidTexture(
-                Color.Lerp(switchOffTexture.GetPixel(0, 0), Color.white, 0.1f)
+                Color.Lerp(theme.SwitchOffBg, Color.white, 0.1f)
             );
             switchDefaultStyle.active.background = CreateSolidTexture(
-                Color.Lerp(switchOffTexture.GetPixel(0, 0), Color.black, 0.1f)
+                Color.Lerp(theme.SwitchOffBg, Color.black, 0.1f)
             );
             switchDefaultStyle.onHover.background = CreateSolidTexture(
-                Color.Lerp(switchOnTexture.GetPixel(0, 0), Color.white, 0.1f)
+                Color.Lerp(theme.SwitchOnBg, Color.white, 0.1f)
             );
             switchDefaultStyle.onActive.background = CreateSolidTexture(
-                Color.Lerp(switchOnTexture.GetPixel(0, 0), Color.black, 0.1f)
+                Color.Lerp(theme.SwitchOnBg, Color.black, 0.1f)
             );
             switchDefaultStyle.border = new RectOffset(
                 borderRadius,
@@ -1736,8 +1630,8 @@ namespace shadcnui.GUIComponents
                 Color.Lerp(CreateOutlineTexture().GetPixel(0, 0), Color.black, 0.1f)
             );
             switchOutlineStyle.onNormal.background = CreateOutlineButtonTexture(
-                guiHelper.customColorsEnabled ? guiHelper.accentColor : new Color(0.2f, 0.4f, 0.8f),
-                guiHelper.customColorsEnabled ? guiHelper.accentColor : new Color(0.2f, 0.4f, 0.8f)
+                theme.AccentColor,
+                theme.AccentColor
             );
             switchOutlineStyle.onHover.background = CreateSolidTexture(
                 Color.Lerp(CreateOutlineTexture().GetPixel(0, 0), Color.white, 0.1f)
@@ -1754,26 +1648,12 @@ namespace shadcnui.GUIComponents
             switchGhostStyle.active.background = CreateSolidTexture(
                 Color.Lerp(transparentTexture.GetPixel(0, 0), Color.black, 0.1f)
             );
-            switchGhostStyle.onNormal.background = CreateSolidTexture(
-                guiHelper.customColorsEnabled ? guiHelper.accentColor : new Color(0.2f, 0.4f, 0.8f)
-            );
+            switchGhostStyle.onNormal.background = CreateSolidTexture(theme.AccentColor);
             switchGhostStyle.onHover.background = CreateSolidTexture(
-                Color.Lerp(
-                    guiHelper.customColorsEnabled
-                        ? guiHelper.accentColor
-                        : new Color(0.2f, 0.4f, 0.8f),
-                    Color.white,
-                    0.1f
-                )
+                Color.Lerp(theme.AccentColor, Color.white, 0.1f)
             );
             switchGhostStyle.onActive.background = CreateSolidTexture(
-                Color.Lerp(
-                    guiHelper.customColorsEnabled
-                        ? guiHelper.accentColor
-                        : new Color(0.2f, 0.4f, 0.8f),
-                    Color.black,
-                    0.1f
-                )
+                Color.Lerp(theme.AccentColor, Color.black, 0.1f)
             );
 
             switchSmallStyle = new GUIStyle(switchDefaultStyle);
@@ -1788,13 +1668,15 @@ namespace shadcnui.GUIComponents
         /// </summary>
         private void SetupBadgeStyles()
         {
+            var theme = ThemeManager.Instance.CurrentTheme;
+
             float scaledFontSize = guiHelper.fontSize * guiHelper.uiScale;
             int borderRadius = Mathf.RoundToInt(guiHelper.cornerRadius * guiHelper.uiScale);
 
             badgeDefaultStyle = new GUIStyle(GUI.skin.box);
             badgeDefaultStyle.fontSize = Mathf.RoundToInt(scaledFontSize);
-            badgeDefaultStyle.normal.background = badgeTexture;
-            badgeDefaultStyle.normal.textColor = new Color(0.98f, 0.98f, 0.98f);
+            badgeDefaultStyle.normal.background = CreateSolidTexture(theme.BadgeBg);
+            badgeDefaultStyle.normal.textColor = theme.TextColor;
             badgeDefaultStyle.border = new RectOffset(
                 borderRadius,
                 borderRadius,
@@ -1805,14 +1687,10 @@ namespace shadcnui.GUIComponents
             badgeDefaultStyle.alignment = TextAnchor.MiddleCenter;
 
             badgeSecondaryStyle = new GUIStyle(badgeDefaultStyle);
-            badgeSecondaryStyle.normal.background = CreateSolidTexture(
-                new Color(0.16f, 0.16f, 0.18f)
-            );
+            badgeSecondaryStyle.normal.background = CreateSolidTexture(theme.BadgeSecondaryBg);
 
             badgeDestructiveStyle = new GUIStyle(badgeDefaultStyle);
-            badgeDestructiveStyle.normal.background = CreateSolidTexture(
-                new Color(0.86f, 0.24f, 0.24f)
-            );
+            badgeDestructiveStyle.normal.background = CreateSolidTexture(theme.BadgeDestructiveBg);
 
             badgeOutlineStyle = new GUIStyle(badgeDefaultStyle);
             badgeOutlineStyle.normal.background = CreateOutlineTexture();
@@ -1829,15 +1707,17 @@ namespace shadcnui.GUIComponents
         /// </summary>
         private void SetupAlertStyles()
         {
+            var theme = ThemeManager.Instance.CurrentTheme;
+
             float scaledFontSize = guiHelper.fontSize * guiHelper.uiScale;
             int borderRadius = Mathf.RoundToInt(guiHelper.cornerRadius * guiHelper.uiScale);
             int horizontalPadding = Mathf.RoundToInt(16 * guiHelper.uiScale);
             int verticalPadding = Mathf.RoundToInt(12 * guiHelper.uiScale);
 
             alertDefaultStyle = new GUIStyle(GUI.skin.box);
-            Color defaultBg = new Color(0.02f, 0.02f, 0.04f);
-            Color defaultFg = new Color(0.98f, 0.98f, 0.98f);
-            Color defaultBorder = new Color(0.23f, 0.23f, 0.27f);
+            Color defaultBg = theme.AlertDefaultBg;
+            Color defaultFg = theme.AlertDefaultFg;
+            Color defaultBorder = theme.SeparatorColor;
             alertDefaultStyle.normal.background = CreateSolidTexture(defaultBg);
             alertDefaultStyle.normal.textColor = defaultFg;
             alertDefaultStyle.hover.background = CreateSolidTexture(defaultBg);
@@ -1855,13 +1735,8 @@ namespace shadcnui.GUIComponents
             );
 
             alertDestructiveStyle = new GUIStyle(GUI.skin.box);
-            Color destructiveColor = new Color(0.86f, 0.24f, 0.24f);
-            Color destructiveBorder = new Color(
-                destructiveColor.r,
-                destructiveColor.g,
-                destructiveColor.b,
-                0.5f
-            );
+            Color destructiveColor = theme.AlertDestructiveFg;
+            Color destructiveBorder = theme.AlertDestructiveBg;
             alertDestructiveStyle.normal.background = CreateSolidTexture(destructiveBorder);
             alertDestructiveStyle.normal.textColor = destructiveColor;
             alertDestructiveStyle.hover.background = CreateSolidTexture(destructiveBorder);
@@ -1891,7 +1766,7 @@ namespace shadcnui.GUIComponents
 
             alertDescriptionStyle = new GUIStyle(GUI.skin.label);
             alertDescriptionStyle.fontSize = Mathf.RoundToInt(scaledFontSize);
-            alertDescriptionStyle.normal.textColor = new Color(0.7f, 0.7f, 0.8f);
+            alertDescriptionStyle.normal.textColor = Color.Lerp(theme.TextColor, theme.PrimaryColor, 0.3f);
             alertDescriptionStyle.wordWrap = true;
         }
 
@@ -1900,20 +1775,22 @@ namespace shadcnui.GUIComponents
         /// </summary>
         private void SetupAvatarStyles()
         {
+            var theme = ThemeManager.Instance.CurrentTheme;
+
             float scaledFontSize = guiHelper.fontSize * guiHelper.uiScale;
             int defaultAvatarSize = Mathf.RoundToInt(40 * guiHelper.uiScale);
 
             avatarStyle = new GUIStyle(GUI.skin.box);
-            avatarStyle.normal.background = avatarTexture;
+            avatarStyle.normal.background = CreateSolidTexture(theme.AvatarBg);
             avatarStyle.alignment = TextAnchor.MiddleCenter;
             avatarStyle.fixedWidth = defaultAvatarSize;
             avatarStyle.fixedHeight = defaultAvatarSize;
             avatarStyle.border = GetAvatarBorder(AvatarShape.Circle, AvatarSize.Default);
 
             avatarFallbackStyle = new GUIStyle(GUI.skin.box);
-            Color mutedBg = new Color(0.16f, 0.16f, 0.18f);
+            Color mutedBg = theme.AvatarFallbackBg;
             avatarFallbackStyle.normal.background = CreateSolidTexture(mutedBg);
-            avatarFallbackStyle.normal.textColor = new Color(0.98f, 0.98f, 0.98f);
+            avatarFallbackStyle.normal.textColor = theme.AvatarFallbackFg;
             avatarFallbackStyle.alignment = TextAnchor.MiddleCenter;
             avatarFallbackStyle.fixedWidth = defaultAvatarSize;
             avatarFallbackStyle.fixedHeight = defaultAvatarSize;
@@ -1985,8 +1862,10 @@ namespace shadcnui.GUIComponents
         /// </summary>
         private void SetupSkeletonStyles()
         {
+            var theme = ThemeManager.Instance.CurrentTheme;
+
             skeletonStyle = new GUIStyle(GUI.skin.box);
-            skeletonStyle.normal.background = skeletonTexture;
+            skeletonStyle.normal.background = CreateSolidTexture(theme.SkeletonBg);
             skeletonStyle.border = new RectOffset(4, 4, 4, 4);
             skeletonStyle.padding = new RectOffset(0, 0, 0, 0);
 
@@ -1998,9 +1877,6 @@ namespace shadcnui.GUIComponents
 
             skeletonSmallStyle = new GUIStyle(skeletonStyle);
             skeletonSmallStyle.border = new RectOffset(2, 2, 2, 2);
-
-            skeletonLargeStyle = new GUIStyle(skeletonStyle);
-            skeletonLargeStyle.border = new RectOffset(6, 6, 6, 6);
         }
 
         /// <summary>
@@ -2008,151 +1884,97 @@ namespace shadcnui.GUIComponents
         /// </summary>
         private void SetupTableStyles()
         {
-            float scaledFontSize = guiHelper.fontSize * guiHelper.uiScale;
-            int borderRadius = Mathf.RoundToInt(guiHelper.cornerRadius * guiHelper.uiScale);
+            var theme = ThemeManager.Instance.CurrentTheme;
 
             tableStyle = new GUIStyle(GUI.skin.box);
-            tableStyle.normal.background = tableTexture;
-            tableStyle.border = new RectOffset(
-                borderRadius,
-                borderRadius,
-                borderRadius,
-                borderRadius
-            );
-            tableStyle.padding = new RectOffset(8, 8, 8, 8);
+            tableStyle.normal.background = CreateSolidTexture(theme.TableBg);
+            tableStyle.border = new RectOffset(1, 1, 1, 1);
+            tableStyle.padding = new RectOffset(0, 0, 0, 0);
 
             tableHeaderStyle = new GUIStyle(GUI.skin.label);
-            tableHeaderStyle.fontSize = Mathf.RoundToInt(scaledFontSize);
-            tableHeaderStyle.fontStyle = FontStyle.Normal;
-            tableHeaderStyle.normal.textColor = new Color(0.98f, 0.98f, 0.98f);
-            tableHeaderStyle.normal.background = tableHeaderTexture;
-            tableHeaderStyle.padding = new RectOffset(8, 8, 4, 4);
-            tableHeaderStyle.alignment = TextAnchor.MiddleLeft;
+            tableHeaderStyle.normal.background = CreateSolidTexture(theme.TableHeaderBg);
+            tableHeaderStyle.normal.textColor = theme.TextColor;
+            tableHeaderStyle.padding = new RectOffset(8, 8, 8, 8);
+            tableHeaderStyle.fontStyle = FontStyle.Bold;
 
             tableCellStyle = new GUIStyle(GUI.skin.label);
-            tableCellStyle.fontSize = Mathf.RoundToInt(scaledFontSize);
-            tableCellStyle.normal.textColor = new Color(0.9f, 0.9f, 0.9f);
-            tableCellStyle.normal.background = tableCellTexture;
-            tableCellStyle.padding = new RectOffset(8, 8, 4, 4);
-            tableCellStyle.alignment = TextAnchor.MiddleLeft;
+            tableCellStyle.normal.background = CreateSolidTexture(theme.TableCellBg);
+            tableCellStyle.normal.textColor = theme.TextColor;
+            tableCellStyle.padding = new RectOffset(8, 8, 8, 8);
 
-            tableStripedStyle = new GUIStyle(tableStyle);
-            tableStripedStyle.normal.background = CreateSolidTexture(
-                new Color(0.05f, 0.05f, 0.08f)
-            );
+            tableStripedStyle = new GUIStyle(tableCellStyle);
+            tableStripedStyle.normal.background = CreateSolidTexture(Color.Lerp(theme.TableCellBg, Color.black, 0.1f));
 
-            tableBorderedStyle = new GUIStyle(tableStyle);
-            tableBorderedStyle.normal.background = CreateOutlineTexture();
+            tableBorderedStyle = new GUIStyle(tableCellStyle);
+            tableBorderedStyle.border = new RectOffset(1, 1, 1, 1);
+            tableBorderedStyle.normal.background = CreateSolidTexture(theme.TableCellBg);
 
-            tableHoverStyle = new GUIStyle(tableStyle);
-            tableHoverStyle.hover.background = CreateSolidTexture(new Color(0.1f, 0.1f, 0.15f));
+            tableHoverStyle = new GUIStyle(tableCellStyle);
+            tableHoverStyle.hover.background = CreateSolidTexture(Color.Lerp(theme.TableCellBg, Color.white, 0.1f));
         }
 
         private void SetupCalendarStyles()
         {
-            float scaledFontSize = guiHelper.fontSize * guiHelper.uiScale;
-            int borderRadius = Mathf.RoundToInt(guiHelper.cornerRadius * guiHelper.uiScale);
-
-            calendarBackgroundTexture = new Texture2D(1, 1);
-            Color calendarBgColor = guiHelper.customColorsEnabled
-                ? new Color(
-                    guiHelper.primaryColor.r,
-                    guiHelper.primaryColor.g,
-                    guiHelper.primaryColor.b,
-                    guiHelper.backgroundAlpha
-                )
-                : new Color(0.15f, 0.15f, 0.25f, guiHelper.backgroundAlpha);
-            calendarBackgroundTexture.SetPixel(0, 0, calendarBgColor);
-            calendarBackgroundTexture.Apply();
-
-            calendarHeaderTexture = new Texture2D(1, 1);
-            Color calendarHeaderBgColor = guiHelper.customColorsEnabled
-                ? new Color(
-                    guiHelper.primaryColor.r * 0.8f,
-                    guiHelper.primaryColor.g * 0.8f,
-                    guiHelper.primaryColor.b * 0.8f,
-                    guiHelper.backgroundAlpha
-                )
-                : new Color(0.2f, 0.2f, 0.3f, guiHelper.backgroundAlpha);
-            calendarHeaderTexture.SetPixel(0, 0, calendarHeaderBgColor);
-            calendarHeaderTexture.Apply();
-
-            calendarDayTexture = new Texture2D(1, 1);
-            Color calendarDayBgColor = new Color(0, 0, 0, 0);
-            calendarDayTexture.SetPixel(0, 0, calendarDayBgColor);
-            calendarDayTexture.Apply();
-
-            calendarDaySelectedTexture = new Texture2D(1, 1);
-            Color calendarDaySelectedBgColor = guiHelper.customColorsEnabled
-                ? guiHelper.accentColor
-                : new Color(0.25f, 0.5f, 1f);
-            calendarDaySelectedTexture.SetPixel(0, 0, calendarDaySelectedBgColor);
-            calendarDaySelectedTexture.Apply();
+            var theme = ThemeManager.Instance.CurrentTheme;
 
             calendarStyle = new GUIStyle(GUI.skin.box);
-            calendarStyle.normal.background = calendarBackgroundTexture;
-            calendarStyle.border = new RectOffset(
-                borderRadius,
-                borderRadius,
-                borderRadius,
-                borderRadius
-            );
+            calendarStyle.normal.background = CreateSolidTexture(theme.CardBg);
+            calendarStyle.border = new RectOffset(4, 4, 4, 4);
             calendarStyle.padding = new RectOffset(10, 10, 10, 10);
 
-            calendarHeaderStyle = new GUIStyle(GUI.skin.box);
-            calendarHeaderStyle.normal.background = calendarHeaderTexture;
-            calendarHeaderStyle.padding = new RectOffset(5, 5, 5, 5);
-            calendarHeaderStyle.alignment = TextAnchor.MiddleCenter;
+            calendarHeaderStyle = new GUIStyle();
+            calendarHeaderStyle.padding = new RectOffset(0, 0, 5, 5);
 
             calendarTitleStyle = new GUIStyle(GUI.skin.label);
-            calendarTitleStyle.fontSize = Mathf.RoundToInt(scaledFontSize * 1.2f);
+            calendarTitleStyle.fontSize = guiHelper.fontSize + 2;
             calendarTitleStyle.fontStyle = FontStyle.Bold;
-            calendarTitleStyle.normal.textColor = Color.white;
+            calendarTitleStyle.normal.textColor = theme.TextColor;
             calendarTitleStyle.alignment = TextAnchor.MiddleCenter;
 
             calendarWeekdayStyle = new GUIStyle(GUI.skin.label);
-            calendarWeekdayStyle.fontSize = Mathf.RoundToInt(scaledFontSize * 0.9f);
-            calendarWeekdayStyle.fontStyle = FontStyle.Normal;
-            calendarWeekdayStyle.normal.textColor = new Color(0.8f, 0.8f, 0.8f);
+            calendarWeekdayStyle.fontSize = guiHelper.fontSize - 1;
+            calendarWeekdayStyle.normal.textColor = Color.Lerp(theme.TextColor, Color.black, 0.3f);
             calendarWeekdayStyle.alignment = TextAnchor.MiddleCenter;
 
             calendarDayStyle = new GUIStyle(GUI.skin.button);
-            calendarDayStyle.fontSize = Mathf.RoundToInt(scaledFontSize);
-            calendarDayStyle.fontStyle = FontStyle.Normal;
-            calendarDayStyle.alignment = TextAnchor.MiddleCenter;
-            calendarDayStyle.normal.background = calendarDayTexture;
-            calendarDayStyle.normal.textColor = Color.white;
-            calendarDayStyle.hover.background = CreateSolidTexture(new Color(0.25f, 0.25f, 0.35f));
-            calendarDayStyle.active.background = CreateSolidTexture(new Color(0.2f, 0.2f, 0.3f));
+            calendarDayStyle.fontSize = guiHelper.fontSize;
+            calendarDayStyle.normal.textColor = theme.TextColor;
+            calendarDayStyle.normal.background = CreateSolidTexture(theme.CardBg);
+            calendarDayStyle.hover.background = CreateSolidTexture(Color.Lerp(theme.CardBg, Color.white, 0.1f));
+            calendarDayStyle.active.background = CreateSolidTexture(Color.Lerp(theme.CardBg, Color.black, 0.1f));
 
             calendarDaySelectedStyle = new GUIStyle(calendarDayStyle);
-            calendarDaySelectedStyle.normal.background = calendarDaySelectedTexture;
+            calendarDaySelectedStyle.normal.background = CreateSolidTexture(theme.AccentColor);
             calendarDaySelectedStyle.normal.textColor = Color.white;
+            calendarDaySelectedStyle.hover.background = CreateSolidTexture(Color.Lerp(theme.AccentColor, Color.white, 0.1f));
+            calendarDaySelectedStyle.active.background = CreateSolidTexture(Color.Lerp(theme.AccentColor, Color.black, 0.1f));
 
             calendarDayOutsideMonthStyle = new GUIStyle(calendarDayStyle);
-            calendarDayOutsideMonthStyle.normal.textColor = new Color(0.5f, 0.5f, 0.5f);
+            calendarDayOutsideMonthStyle.normal.textColor = Color.Lerp(theme.TextColor, Color.black, 0.5f);
 
             calendarDayTodayStyle = new GUIStyle(calendarDayStyle);
-            calendarDayTodayStyle.fontStyle = FontStyle.Bold;
-            calendarDayTodayStyle.normal.textColor = guiHelper.customColorsEnabled
-                ? guiHelper.accentColor
-                : new Color(0.25f, 0.5f, 1f);
+            calendarDayTodayStyle.normal.background = CreateOutlineButtonTexture(theme.CardBg, theme.AccentColor);
+
+            calendarSmallStyle = new GUIStyle(calendarDayStyle);
+            calendarSmallStyle.fontSize = guiHelper.fontSize - 2;
+
+            calendarLargeStyle = new GUIStyle(calendarDayStyle);
+            calendarLargeStyle.fontSize = guiHelper.fontSize + 2;
         }
 
-        private void SetupDropdownMenuStyles()
+
+        private void SetupDropdownMenuStyles() // not setup for theme yet bc it just gets borken idk why
         {
             float scaledFontSize = guiHelper.fontSize * guiHelper.uiScale;
             int borderRadius = Mathf.RoundToInt(guiHelper.cornerRadius * guiHelper.uiScale);
 
             dropdownMenuContentTexture = new Texture2D(1, 1);
-            Color dropdownMenuContentBgColor = guiHelper.customColorsEnabled
-                ? new Color(
+            Color dropdownMenuContentBgColor = new Color(
                     guiHelper.primaryColor.r,
                     guiHelper.primaryColor.g,
                     guiHelper.primaryColor.b,
                     1f
-                )
-                : new Color(0.1f, 0.1f, 0.15f, 1f);
+                );
             dropdownMenuContentTexture.SetPixel(0, 0, dropdownMenuContentBgColor);
             dropdownMenuContentTexture.Apply();
 
@@ -2188,50 +2010,42 @@ namespace shadcnui.GUIComponents
 
         private void SetupPopoverStyles()
         {
-            float scaledFontSize = guiHelper.fontSize * guiHelper.uiScale;
-            int borderRadius = Mathf.RoundToInt(guiHelper.cornerRadius * guiHelper.uiScale);
-
-            popoverContentTexture = new Texture2D(1, 1);
-            Color popoverContentBgColor = guiHelper.customColorsEnabled
-                ? new Color(
-                    guiHelper.primaryColor.r,
-                    guiHelper.primaryColor.g,
-                    guiHelper.primaryColor.b,
-                    1f
-                )
-                : new Color(0.1f, 0.1f, 0.15f, 1f);
-            popoverContentTexture.SetPixel(0, 0, popoverContentBgColor);
-            popoverContentTexture.Apply();
+            var theme = ThemeManager.Instance.CurrentTheme;
 
             popoverContentStyle = new GUIStyle(GUI.skin.box);
-            popoverContentStyle.normal.background = popoverContentTexture;
-            popoverContentStyle.border = new RectOffset(
-                borderRadius,
-                borderRadius,
-                borderRadius,
-                borderRadius
-            );
+            popoverContentStyle.normal.background = CreateSolidTexture(theme.CardBg);
+            popoverContentStyle.border = new RectOffset(4, 4, 4, 4);
             popoverContentStyle.padding = new RectOffset(10, 10, 10, 10);
+
+            popoverSmallStyle = new GUIStyle(popoverContentStyle);
+            popoverSmallStyle.padding = new RectOffset(5, 5, 5, 5);
+
+            popoverLargeStyle = new GUIStyle(popoverContentStyle);
+            popoverLargeStyle.padding = new RectOffset(15, 15, 15, 15);
         }
 
         private void SetupScrollAreaStyles()
         {
-            scrollAreaThumbTexture = new Texture2D(1, 1);
-            scrollAreaThumbTexture.SetPixel(0, 0, new Color(0.5f, 0.5f, 0.5f, 0.5f));
-            scrollAreaThumbTexture.Apply();
+            var theme = ThemeManager.Instance.CurrentTheme;
 
-            scrollAreaTrackTexture = new Texture2D(1, 1);
-            scrollAreaTrackTexture.SetPixel(0, 0, new Color(0.2f, 0.2f, 0.2f, 0.5f));
-            scrollAreaTrackTexture.Apply();
+            scrollAreaStyle = new GUIStyle();
+            scrollAreaStyle.normal.background = CreateSolidTexture(theme.BackgroundColor);
 
-            scrollAreaStyle = new GUIStyle(GUI.skin.scrollView);
+            scrollAreaThumbStyle = new GUIStyle();
+            scrollAreaThumbStyle.normal.background = CreateSolidTexture(Color.Lerp(theme.BackgroundColor, Color.white, 0.2f));
+            scrollAreaThumbStyle.border = new RectOffset(4, 4, 4, 4);
 
-            scrollAreaThumbStyle = new GUIStyle(GUI.skin.verticalScrollbarThumb);
-            scrollAreaThumbStyle.normal.background = scrollAreaThumbTexture;
+            scrollAreaTrackStyle = new GUIStyle();
+            scrollAreaTrackStyle.normal.background = CreateSolidTexture(Color.Lerp(theme.BackgroundColor, Color.black, 0.1f));
+            scrollAreaTrackStyle.border = new RectOffset(4, 4, 4, 4);
 
-            scrollAreaTrackStyle = new GUIStyle(GUI.skin.verticalScrollbar);
-            scrollAreaTrackStyle.normal.background = scrollAreaTrackTexture;
+            scrollAreaSmallStyle = new GUIStyle(scrollAreaStyle);
+            scrollAreaSmallStyle.fixedWidth = 10;
+
+            scrollAreaLargeStyle = new GUIStyle(scrollAreaStyle);
+            scrollAreaLargeStyle.fixedWidth = 20;
         }
+
 
         private void SetupSelectStyles()
         {
@@ -2239,26 +2053,23 @@ namespace shadcnui.GUIComponents
             int borderRadius = Mathf.RoundToInt(guiHelper.cornerRadius * guiHelper.uiScale);
 
             selectTriggerTexture = new Texture2D(1, 1);
-            Color selectTriggerBgColor = guiHelper.customColorsEnabled
-                ? new Color(
+            Color selectTriggerBgColor = new Color(
                     guiHelper.primaryColor.r,
                     guiHelper.primaryColor.g,
                     guiHelper.primaryColor.b,
                     1f
-                )
-                : new Color(0.1f, 0.1f, 0.15f, 1f);
+                );
             selectTriggerTexture.SetPixel(0, 0, selectTriggerBgColor);
             selectTriggerTexture.Apply();
 
             selectContentTexture = new Texture2D(1, 1);
-            Color selectContentBgColor = guiHelper.customColorsEnabled
-                ? new Color(
+            Color selectContentBgColor = new Color(
                     guiHelper.primaryColor.r,
                     guiHelper.primaryColor.g,
                     guiHelper.primaryColor.b,
                     1f
-                )
-                : new Color(0.1f, 0.1f, 0.15f, 1f);
+                );
+
             selectContentTexture.SetPixel(0, 0, selectContentBgColor);
             selectContentTexture.Apply();
 
@@ -2347,6 +2158,8 @@ namespace shadcnui.GUIComponents
 
         private GUIStyle ApplyVariantToSizeStyle(GUIStyle sizeStyle, ButtonVariant variant)
         {
+            var theme = ThemeManager.Instance.CurrentTheme;
+
             if (sizeStyle == null)
                 return GUI.skin.button;
 
@@ -2355,10 +2168,8 @@ namespace shadcnui.GUIComponents
             switch (variant)
             {
                 case ButtonVariant.Default:
-                    Color primaryBg = guiHelper.customColorsEnabled
-                        ? guiHelper.primaryColor
-                        : new Color(0.09f, 0.09f, 0.11f);
-                    Color primaryFg = new Color(0.98f, 0.98f, 0.98f);
+                    Color primaryBg = theme.ButtonPrimaryBg;
+                    Color primaryFg = theme.ButtonPrimaryFg;
                     style.normal.background = CreateSolidTexture(primaryBg);
                     style.hover.background = CreateSolidTexture(
                         Color.Lerp(primaryBg, Color.black, 0.1f)
@@ -2371,8 +2182,8 @@ namespace shadcnui.GUIComponents
                     style.active.textColor = primaryFg;
                     break;
                 case ButtonVariant.Destructive:
-                    Color destructiveBg = new Color(0.86f, 0.24f, 0.24f);
-                    Color destructiveFg = new Color(0.98f, 0.98f, 0.98f);
+                    Color destructiveBg = theme.ButtonDestructiveBg;
+                    Color destructiveFg = theme.ButtonDestructiveFg;
                     style.normal.background = CreateSolidTexture(destructiveBg);
                     style.hover.background = CreateSolidTexture(
                         Color.Lerp(destructiveBg, Color.black, 0.1f)
@@ -2385,11 +2196,11 @@ namespace shadcnui.GUIComponents
                     style.active.textColor = destructiveFg;
                     break;
                 case ButtonVariant.Outline:
-                    Color outlineBorder = new Color(0.23f, 0.23f, 0.27f);
-                    Color outlineBg = new Color(0.02f, 0.02f, 0.04f);
-                    Color outlineFg = new Color(0.98f, 0.98f, 0.98f);
-                    Color outlineHoverBg = new Color(0.16f, 0.16f, 0.18f);
-                    Color outlineHoverFg = new Color(0.98f, 0.98f, 0.98f);
+                    Color outlineBorder = theme.ButtonOutlineBorder;
+                    Color outlineBg = theme.ButtonOutlineBg;
+                    Color outlineFg = theme.ButtonOutlineFg;
+                    Color outlineHoverBg = theme.ButtonOutlineHoverBg;
+                    Color outlineHoverFg = theme.ButtonOutlineHoverFg;
 
                     style.normal.background = CreateOutlineButtonTexture(outlineBg, outlineBorder);
                     style.hover.background = CreateSolidTexture(outlineHoverBg);
@@ -2401,8 +2212,8 @@ namespace shadcnui.GUIComponents
                     style.active.textColor = outlineHoverFg;
                     break;
                 case ButtonVariant.Secondary:
-                    Color secondaryBg = new Color(0.16f, 0.16f, 0.18f);
-                    Color secondaryFg = new Color(0.98f, 0.98f, 0.98f);
+                    Color secondaryBg = theme.ButtonSecondaryBg;
+                    Color secondaryFg = theme.ButtonSecondaryFg;
                     style.normal.background = CreateSolidTexture(secondaryBg);
                     style.hover.background = CreateSolidTexture(
                         Color.Lerp(secondaryBg, Color.white, 0.2f)
@@ -2415,9 +2226,9 @@ namespace shadcnui.GUIComponents
                     style.active.textColor = secondaryFg;
                     break;
                 case ButtonVariant.Ghost:
-                    Color ghostFg = new Color(0.98f, 0.98f, 0.98f);
-                    Color ghostHoverBg = new Color(0.16f, 0.16f, 0.18f);
-                    Color ghostHoverFg = new Color(0.98f, 0.98f, 0.98f);
+                    Color ghostFg = theme.ButtonGhostFg;
+                    Color ghostHoverBg = theme.ButtonGhostHoverBg;
+                    Color ghostHoverFg = theme.ButtonGhostHoverFg;
 
                     style.normal.background = transparentTexture;
                     style.hover.background = CreateSolidTexture(ghostHoverBg);
@@ -2429,10 +2240,8 @@ namespace shadcnui.GUIComponents
                     style.active.textColor = ghostHoverFg;
                     break;
                 case ButtonVariant.Link:
-                    Color linkColor = guiHelper.customColorsEnabled
-                        ? guiHelper.primaryColor
-                        : new Color(0.09f, 0.09f, 0.11f);
-                    Color linkHoverColor = Color.Lerp(linkColor, Color.white, 0.2f);
+                    Color linkColor = theme.ButtonLinkColor;
+                    Color linkHoverColor = theme.ButtonLinkHoverColor;
 
                     style.normal.background = transparentTexture;
                     style.hover.background = transparentTexture;
@@ -2452,6 +2261,8 @@ namespace shadcnui.GUIComponents
         /// </summary>
         public GUIStyle GetToggleStyle(ToggleVariant variant, ToggleSize size)
         {
+            var theme = ThemeManager.Instance.CurrentTheme;
+
             GUIStyle baseStyle;
             switch (variant)
             {
@@ -2491,6 +2302,8 @@ namespace shadcnui.GUIComponents
             bool disabled = false
         )
         {
+            var theme = ThemeManager.Instance.CurrentTheme;
+
             if (disabled)
                 return inputDisabledStyle ?? GUI.skin.textField;
             if (focused)
@@ -2518,6 +2331,8 @@ namespace shadcnui.GUIComponents
         /// </summary>
         public GUIStyle GetLabelStyle(LabelVariant variant)
         {
+            var theme = ThemeManager.Instance.CurrentTheme;
+
             GUIStyle style;
             switch (variant)
             {
@@ -2543,6 +2358,7 @@ namespace shadcnui.GUIComponents
         /// </summary>
         public GUIStyle GetPasswordFieldStyle()
         {
+            var theme = ThemeManager.Instance.CurrentTheme;
             return passwordFieldStyle ?? GUI.skin.textField;
         }
 
@@ -2554,6 +2370,8 @@ namespace shadcnui.GUIComponents
             bool focused = false
         )
         {
+            var theme = ThemeManager.Instance.CurrentTheme;
+
             GUIStyle baseStyle;
             switch (variant)
             {
@@ -2592,6 +2410,7 @@ namespace shadcnui.GUIComponents
         /// </summary>
         public GUIStyle GetSeparatorStyle(SeparatorOrientation orientation)
         {
+            var theme = ThemeManager.Instance.CurrentTheme;
             return orientation == SeparatorOrientation.Horizontal
                 ? (separatorHorizontalStyle ?? GUI.skin.box)
                 : (separatorVerticalStyle ?? GUI.skin.box);
@@ -2607,6 +2426,7 @@ namespace shadcnui.GUIComponents
         /// </summary>
         public GUIStyle GetTabsTriggerStyle(bool active = false)
         {
+            var theme = ThemeManager.Instance.CurrentTheme;
             return active
                 ? (tabsTriggerActiveStyle ?? tabsTriggerStyle ?? GUI.skin.button)
                 : (tabsTriggerStyle ?? GUI.skin.button);
@@ -2657,6 +2477,8 @@ namespace shadcnui.GUIComponents
         /// </summary>
         public GUIStyle GetCheckboxStyle(CheckboxVariant variant, CheckboxSize size)
         {
+            var theme = ThemeManager.Instance.CurrentTheme;
+
             GUIStyle baseStyle;
             switch (variant)
             {
@@ -2690,6 +2512,8 @@ namespace shadcnui.GUIComponents
         /// </summary>
         public GUIStyle GetSwitchStyle(SwitchVariant variant, SwitchSize size)
         {
+            var theme = ThemeManager.Instance.CurrentTheme;
+
             GUIStyle baseStyle;
             switch (variant)
             {
@@ -2723,6 +2547,8 @@ namespace shadcnui.GUIComponents
         /// </summary>
         public GUIStyle GetBadgeStyle(BadgeVariant variant, BadgeSize size)
         {
+            var theme = ThemeManager.Instance.CurrentTheme;
+
             GUIStyle baseStyle;
             switch (variant)
             {
@@ -2759,6 +2585,7 @@ namespace shadcnui.GUIComponents
         /// </summary>
         public GUIStyle GetAlertStyle(AlertVariant variant, AlertType type)
         {
+            var theme = ThemeManager.Instance.CurrentTheme;
             GUIStyle baseStyle =
                 variant == AlertVariant.Destructive ? alertDestructiveStyle : alertDefaultStyle;
             return baseStyle ?? GUI.skin.box;
@@ -2769,6 +2596,7 @@ namespace shadcnui.GUIComponents
         /// </summary>
         public GUIStyle GetAlertTitleStyle(AlertType type)
         {
+            var theme = ThemeManager.Instance.CurrentTheme;
             return alertTitleStyle ?? GUI.skin.label;
         }
 
@@ -2777,6 +2605,7 @@ namespace shadcnui.GUIComponents
         /// </summary>
         public GUIStyle GetAlertDescriptionStyle(AlertType type)
         {
+            var theme = ThemeManager.Instance.CurrentTheme;
             return alertDescriptionStyle ?? GUI.skin.label;
         }
 
@@ -2785,6 +2614,8 @@ namespace shadcnui.GUIComponents
         /// </summary>
         public GUIStyle GetAvatarStyle(AvatarSize size, AvatarShape shape)
         {
+            var theme = ThemeManager.Instance.CurrentTheme;
+
             GUIStyle baseStyle = avatarStyle;
             if (baseStyle == null)
                 return GUI.skin.box;
@@ -2821,6 +2652,8 @@ namespace shadcnui.GUIComponents
         /// </summary>
         public GUIStyle GetAvatarFallbackStyle(AvatarSize size, AvatarShape shape)
         {
+            var theme = ThemeManager.Instance.CurrentTheme;
+
             GUIStyle baseStyle = avatarFallbackStyle;
             if (baseStyle == null)
                 return GUI.skin.box;
@@ -2857,6 +2690,8 @@ namespace shadcnui.GUIComponents
         /// </summary>
         public GUIStyle GetSkeletonStyle(SkeletonVariant variant, SkeletonSize size)
         {
+            var theme = ThemeManager.Instance.CurrentTheme;
+
             GUIStyle baseStyle;
             switch (variant)
             {
@@ -2890,6 +2725,8 @@ namespace shadcnui.GUIComponents
         /// </summary>
         public GUIStyle GetTableStyle(TableVariant variant, TableSize size)
         {
+            var theme = ThemeManager.Instance.CurrentTheme;
+
             GUIStyle baseStyle;
             switch (variant)
             {
@@ -2915,6 +2752,7 @@ namespace shadcnui.GUIComponents
         /// </summary>
         public GUIStyle GetTableHeaderStyle(TableVariant variant, TableSize size)
         {
+            var theme = ThemeManager.Instance.CurrentTheme;
             return tableHeaderStyle ?? GUI.skin.label;
         }
 
@@ -2923,6 +2761,7 @@ namespace shadcnui.GUIComponents
         /// </summary>
         public GUIStyle GetTableCellStyle(TableVariant variant, TableSize size)
         {
+            var theme = ThemeManager.Instance.CurrentTheme;
             return tableCellStyle ?? GUI.skin.label;
         }
 
@@ -2931,6 +2770,7 @@ namespace shadcnui.GUIComponents
         /// </summary>
         public GUIStyle GetCalendarStyle(CalendarVariant variant, CalendarSize size)
         {
+            var theme = ThemeManager.Instance.CurrentTheme;
             return calendarStyle;
         }
 
@@ -2939,6 +2779,7 @@ namespace shadcnui.GUIComponents
         /// </summary>
         public GUIStyle GetDropdownMenuStyle(DropdownMenuVariant variant, DropdownMenuSize size)
         {
+            var theme = ThemeManager.Instance.CurrentTheme;
             return dropdownMenuContentStyle;
         }
 
@@ -2947,6 +2788,7 @@ namespace shadcnui.GUIComponents
         /// </summary>
         public GUIStyle GetPopoverStyle(PopoverVariant variant, PopoverSize size)
         {
+            var theme = ThemeManager.Instance.CurrentTheme;
             return popoverContentStyle;
         }
 
@@ -2955,6 +2797,7 @@ namespace shadcnui.GUIComponents
         /// </summary>
         public GUIStyle GetScrollAreaStyle(ScrollAreaVariant variant, ScrollAreaSize size)
         {
+            var theme = ThemeManager.Instance.CurrentTheme;
             return scrollAreaStyle;
         }
 
@@ -2963,12 +2806,21 @@ namespace shadcnui.GUIComponents
         /// </summary>
         public GUIStyle GetSelectStyle(SelectVariant variant, SelectSize size)
         {
+            var theme = ThemeManager.Instance.CurrentTheme;
             return selectContentStyle;
         }
 
-        public GUIStyle GetSelectTriggerStyle() => selectTriggerStyle;
+        public GUIStyle GetSelectTriggerStyle()
+        {
+            var theme = ThemeManager.Instance.CurrentTheme;
+            return selectTriggerStyle;
+        }
 
-        public GUIStyle GetSelectItemStyle() => selectItemStyle;
+        public GUIStyle GetSelectItemStyle()
+        {
+            var theme = ThemeManager.Instance.CurrentTheme;
+            return selectItemStyle;
+        }
         #endregion
 
         #region Cleanup
@@ -3028,6 +2880,31 @@ namespace shadcnui.GUIComponents
                 Object.Destroy(tableHeaderTexture);
             if (tableCellTexture)
                 Object.Destroy(tableCellTexture);
+
+            if (calendarBackgroundTexture)
+                Object.Destroy(calendarBackgroundTexture);
+            if (calendarHeaderTexture)
+                Object.Destroy(calendarHeaderTexture);
+            if (calendarDayTexture)
+                Object.Destroy(calendarDayTexture);
+            if (calendarDaySelectedTexture)
+                Object.Destroy(calendarDaySelectedTexture);
+
+            if (dropdownMenuContentTexture)
+                Object.Destroy(dropdownMenuContentTexture);
+
+            if (popoverContentTexture)
+                Object.Destroy(popoverContentTexture);
+
+            if (scrollAreaThumbTexture)
+                Object.Destroy(scrollAreaThumbTexture);
+            if (scrollAreaTrackTexture)
+                Object.Destroy(scrollAreaTrackTexture);
+
+            if (selectTriggerTexture)
+                Object.Destroy(selectTriggerTexture);
+            if (selectContentTexture)
+                Object.Destroy(selectContentTexture);
         }
         #endregion
     }

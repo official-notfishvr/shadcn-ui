@@ -30,12 +30,6 @@ namespace shadcnui.GUIComponents
             var styleManager = guiHelper.GetStyleManager();
             string toggleText = label + (value ? " [ON]" : " [OFF]");
             Color originalColor = GUI.backgroundColor;
-            if (guiHelper.customColorsEnabled)
-            {
-                GUI.backgroundColor = value
-                    ? Color.Lerp(Color.green, guiHelper.primaryColor, 0.3f)
-                    : Color.Lerp(Color.gray, guiHelper.secondaryColor, 0.3f);
-            }
 #if IL2CPP
             bool clicked = GUILayout.Button(
                 toggleText,

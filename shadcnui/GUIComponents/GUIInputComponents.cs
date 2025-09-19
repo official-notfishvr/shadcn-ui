@@ -376,9 +376,7 @@ namespace shadcnui.GUIComponents
 
             if (guiHelper.glowEffectsEnabled && inputFieldGlow[fieldIndex] > 0.1f)
             {
-                Color glowColor = guiHelper.customColorsEnabled
-                    ? guiHelper.accentColor
-                    : new Color(0.5f, 0.8f, 1f);
+                Color glowColor = guiHelper.accentColor;
                 GUI.color = new Color(
                     glowColor.r,
                     glowColor.g,

@@ -57,16 +57,6 @@ namespace shadcnui
             }
         }
 
-        public bool SetCustomColors
-        {
-            get => helper?.customColorsEnabled ?? false;
-            set
-            {
-                if (helper != null)
-                    helper.customColorsEnabled = value;
-            }
-        }
-
         public float SetBackgroundAlpha
         {
             get => helper?.backgroundAlpha ?? 0.9f;
