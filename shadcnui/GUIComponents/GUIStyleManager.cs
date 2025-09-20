@@ -605,7 +605,11 @@ namespace shadcnui.GUIComponents
             string tempPath = Path.Combine(Application.temporaryCachePath, fontName);
             File.WriteAllBytes(tempPath, fontData);
 
-            Font loadedFont = new Font(tempPath);
+#if IL2CPP
+// it does not work for il2cpp idk why :sob
+#else
+    Font loadedFont = new Font(tempPath);
+#endif
 
             if (loadedFont != null)
             {
