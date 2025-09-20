@@ -442,11 +442,11 @@
     <Compile Include="GUIComponents\GUITabsComponents.cs" />
     <Compile Include="GUIComponents\GUITextAreaComponents.cs" />
     <Compile Include="GUIComponents\GUIToggleComponents.cs" />
-    <Compile Include="GUIComponents\GUIUtilityComponents.cs" />
     <Compile Include="GUIComponents\GUIVisualComponents.cs" />
     <Compile Include="GUIHelper.cs" />
     <Compile Include="GUISettings.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

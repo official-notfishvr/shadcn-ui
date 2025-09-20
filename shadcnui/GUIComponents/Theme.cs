@@ -1,4 +1,3 @@
-
 using UnityEngine;
 
 namespace shadcnui.GUIComponents
@@ -95,7 +94,6 @@ namespace shadcnui.GUIComponents
         public Color TableBg { get; set; }
         public Color TableHeaderBg { get; set; }
         public Color TableCellBg { get; set; }
-
 
         public static Theme Dark = new Theme
         {

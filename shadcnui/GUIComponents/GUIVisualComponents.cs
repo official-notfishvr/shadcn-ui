@@ -114,7 +114,11 @@ namespace shadcnui.GUIComponents
             var styleManager = guiHelper.GetStyleManager();
             GUIStyle instructionStyle = new GUIStyle(styleManager.glowLabelStyle);
             instructionStyle.fontSize = Mathf.RoundToInt(10 * guiHelper.uiScale);
-            Color instructionColor = Color.Lerp(new Color(0.8f, 0.8f, 0.8f), guiHelper.accentColor, 0.3f);
+            Color instructionColor = Color.Lerp(
+                new Color(0.8f, 0.8f, 0.8f),
+                guiHelper.accentColor,
+                0.3f
+            );
             instructionStyle.normal.textColor = instructionColor;
 
 #if IL2CPP

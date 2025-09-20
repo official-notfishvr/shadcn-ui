@@ -1,12 +1,13 @@
+using System;
+using System.IO;
 using System.Linq;
+using System.Reflection;
 using shadcnui;
 using shadcnui.GUIComponents;
 using UnityEngine;
 #if IL2CPP
 using UnhollowerBaseLib;
 #endif
-
-
 
 public class UI : MonoBehaviour
 {
@@ -91,9 +92,19 @@ public class UI : MonoBehaviour
     private string inputFieldValue = "Default Input";
     private Vector2 scrollAreaScrollPosition = Vector2.zero;
 
+    private bool fontInitialized = false;
+
     void Start()
     {
         guiHelper = new GUIHelper();
+        /*
+        // Custom Font Loading
+        byte[] fontData = LoadEmbeddedFontBytes("shadcnui_testing.Fonts.ProggyClean.ttf"); // {file name}.Fonts.{font name}.ttf // you need Directory.Build.targets to do it or fully find the name yourself
+        if (fontData != null)
+        {
+            guiHelper.GetStyleManager().SetCustomFont(fontData, "ProggyClean.ttf");
+        }
+        */
         demoTabs = new GUITabsComponents.TabConfig[]
         {
             new GUITabsComponents.TabConfig("Alert", DrawAlertDemos),
@@ -120,6 +131,32 @@ public class UI : MonoBehaviour
             new GUITabsComponents.TabConfig("Select", DrawSelectDemos),
             new GUITabsComponents.TabConfig("Visual", DrawVisualDemos),
         };
+    }
+
+    private byte[] LoadEmbeddedFontBytes(string path)
+    {
+        try
+        {
+            Assembly assembly = Assembly.GetExecutingAssembly();
+            using (Stream stream = assembly.GetManifestResourceStream(path))
+            {
+                if (stream == null)
+                {
+                    Debug.LogError(
+                        $"Embedded font resource not found: {path}. Available resources: {string.Join(", ", assembly.GetManifestResourceNames())}"
+                    );
+                    return null;
+                }
+                byte[] fontData = new byte[stream.Length];
+                stream.Read(fontData, 0, fontData.Length);
+                return fontData;
+            }
+        }
+        catch (Exception ex)
+        {
+            Debug.LogError($"Error loading embedded font resource '{path}': {ex.Message}");
+            return null;
+        }
     }
 
     void OnGUI()
@@ -1629,31 +1666,6 @@ public class UI : MonoBehaviour
         guiHelper.Label($"Draw Toggle Value: {drawToggleValue}");
         guiHelper.Label(
             "Code: guiHelper.DrawToggle(width, label, ref value, onToggle);",
-            LabelVariant.Muted
-        );
-        guiHelper.HorizontalSeparator();
-
-        guiHelper.Label("Draw Checkbox (Legacy)", LabelVariant.Default);
-        drawCheckboxValue = guiHelper.DrawCheckbox(200, "Draw Checkbox", ref drawCheckboxValue);
-        guiHelper.Label($"Draw Checkbox Value: {drawCheckboxValue}");
-        guiHelper.Label(
-            "Code: guiHelper.DrawCheckbox(width, label, ref value);",
-            LabelVariant.Muted
-        );
-        guiHelper.HorizontalSeparator();
-
-        guiHelper.Label("Draw Selection Grid (Legacy)", LabelVariant.Default);
-        string[] selectionGridOptions = { "Option A", "Option B", "Option C" };
-        selectionGridValue = guiHelper.DrawSelectionGrid(
-            300,
-            "Select an Option",
-            selectionGridValue,
-            selectionGridOptions,
-            3
-        );
-        guiHelper.Label($"Selected Grid Option: {selectionGridOptions[selectionGridValue]}");
-        guiHelper.Label(
-            "Code: guiHelper.DrawSelectionGrid(width, label, selected, texts, xCount);",
             LabelVariant.Muted
         );
         guiHelper.HorizontalSeparator();
