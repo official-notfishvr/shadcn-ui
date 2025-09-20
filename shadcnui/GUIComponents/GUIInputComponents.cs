@@ -7,8 +7,6 @@ using UnityEngine;
 using UnhollowerBaseLib;
 #endif
 
-
-
 namespace shadcnui.GUIComponents
 {
     public class GUIInputComponents

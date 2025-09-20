@@ -65,7 +65,6 @@ namespace shadcnui
         private GUIToggleComponents toggleComponents;
         private GUIVisualComponents visualComponents;
         private GUILayoutComponents layoutComponents;
-        private GUIUtilityComponents utilityComponents;
         private GUICardComponents cardComponents;
         private GUIStyleManager styleManager;
         private GUIAnimationManager animationManager;
@@ -124,7 +123,6 @@ namespace shadcnui
                 toggleComponents = new GUIToggleComponents(this);
                 visualComponents = new GUIVisualComponents(this);
                 layoutComponents = new GUILayoutComponents(this);
-                utilityComponents = new GUIUtilityComponents(this);
                 cardComponents = new GUICardComponents(this);
                 labelComponents = new GUILabelComponents(this);
                 progressComponents = new GUIProgressComponents(this);
@@ -761,58 +759,6 @@ namespace shadcnui
             }
         }
 
-        public bool DrawCheckbox(float windowWidth, string label, ref bool value)
-        {
-            try
-            {
-                return toggleComponents?.DrawCheckbox(windowWidth, label, ref value) ?? false;
-            }
-            catch (Exception ex)
-            {
-                Debug.LogError("Error drawing checkbox: " + ex.Message);
-                return false;
-            }
-        }
-
-        public int DrawSelectionGrid(
-            float windowWidth,
-            string label,
-            int selected,
-            string[] texts,
-            int xCount
-        )
-        {
-            try
-            {
-                if (texts == null || texts.Length == 0)
-                {
-                    Debug.LogWarning("Selection grid texts array is null or empty");
-                    return 0;
-                }
-
-                if (selected < 0 || selected >= texts.Length)
-                {
-                    Debug.LogWarning(
-                        $"Selection index {selected} out of bounds for array of length {texts.Length}"
-                    );
-                    selected = 0;
-                }
-
-                return toggleComponents?.DrawSelectionGrid(
-                        windowWidth,
-                        label,
-                        selected,
-                        texts,
-                        xCount
-                    ) ?? selected;
-            }
-            catch (Exception ex)
-            {
-                Debug.LogError("Error drawing selection grid: " + ex.Message);
-                return -1;
-            }
-        }
-
         public bool Toggle(
             string text,
             bool value,
@@ -1212,58 +1158,6 @@ namespace shadcnui
         #endregion
 
         #region Utility Components
-        public void SetRGBValues(int red, int green, int blue)
-        {
-            try
-            {
-                utilityComponents?.SetRGBValues(
-                    red,
-                    green,
-                    blue,
-                    ref r,
-                    ref g,
-                    ref b,
-                    ref rSlider,
-                    ref gSlider,
-                    ref bSlider
-                );
-            }
-            catch (Exception ex)
-            {
-                Debug.LogError("Error setting RGB values: " + ex.Message);
-                r = Mathf.Clamp(red, 0, 255).ToString();
-                g = Mathf.Clamp(green, 0, 255).ToString();
-                b = Mathf.Clamp(blue, 0, 255).ToString();
-            }
-        }
-
-        public void ApplyTheme(string themeName)
-        {
-            try
-            {
-                utilityComponents?.ApplyTheme(themeName, this);
-            }
-            catch (Exception ex)
-            {
-                Debug.LogError("Error applying theme: " + ex.Message);
-            }
-        }
-
-        public void ResetAllSettings()
-        {
-            try
-            {
-                utilityComponents?.ResetAllSettings(this);
-            }
-            catch (Exception ex)
-            {
-                Debug.LogError("Error resetting all settings: " + ex.Message);
-
-                animationsEnabled = true;
-                glowEffectsEnabled = true;
-            }
-        }
-
         internal float GetMenuAlpha() => menuAlpha;
 
         internal Vector2 GetMousePos() => mousePos;
