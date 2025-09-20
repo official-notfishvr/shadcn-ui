@@ -606,9 +606,9 @@ namespace shadcnui.GUIComponents
             File.WriteAllBytes(tempPath, fontData);
 
 #if IL2CPP
-// it does not work for il2cpp idk why :sob
+            // it does not work for il2cpp idk why :sob
 #else
-    Font loadedFont = new Font(tempPath);
+            Font loadedFont = new Font(tempPath);
 #endif
 
             if (loadedFont != null)
