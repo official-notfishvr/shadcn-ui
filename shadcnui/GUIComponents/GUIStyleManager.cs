@@ -609,7 +609,7 @@ namespace shadcnui.GUIComponents
             // it does not work for il2cpp idk why :sob
 #else
             Font loadedFont = new Font(tempPath);
-#endif
+
 
             if (loadedFont != null)
             {
@@ -626,6 +626,7 @@ namespace shadcnui.GUIComponents
                 File.Delete(tempPath);
             }
             catch { }
+#endif
         }
 
         #region Initialization
