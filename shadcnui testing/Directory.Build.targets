@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Project>
-  <ItemGroup>
-    <EmbeddedResource Include="Fonts\**\*.ttf" />
-  </ItemGroup>
-  <Target Name="CopyToPlugins" AfterTargets="Build">
-    <Copy SourceFiles="$(TargetPath)" DestinationFiles="$(PluginsPath)\$(TargetFileName)" />
-    <Message Text="Copied to Plugins: $(TargetFileName)" Importance="high" />
-  </Target>
+    <ItemGroup>
+        <EmbeddedResource Include="Fonts\**\*.ttf" />
+    </ItemGroup>
+    <Target Name="CopyToPlugins" AfterTargets="Build">
+        <Copy SourceFiles="$(TargetPath)" DestinationFiles="$(PluginsPath)\$(TargetFileName)" />
+        <Message Text="Copied to Plugins: $(TargetFileName)" Importance="high" />
+    </Target>
 </Project>

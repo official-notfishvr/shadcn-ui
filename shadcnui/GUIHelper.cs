@@ -160,19 +160,7 @@ namespace shadcnui
         {
             try
             {
-                animationManager?.UpdateAnimations(
-                    isOpen,
-                    ref menuAlpha,
-                    ref menuScale,
-                    ref titleGlow,
-                    ref backgroundPulse,
-                    ref hoveredButton,
-                    buttonGlowEffects,
-                    inputFieldGlow,
-                    ref focusedField,
-                    ref particleTime,
-                    ref mousePos
-                );
+                animationManager?.UpdateAnimations(isOpen, ref menuAlpha, ref menuScale, ref titleGlow, ref backgroundPulse, ref hoveredButton, buttonGlowEffects, inputFieldGlow, ref focusedField, ref particleTime, ref mousePos);
             }
             catch (Exception ex)
             {
@@ -205,16 +193,8 @@ namespace shadcnui
                 Rect scaledBackgroundRect = new Rect(-offsetX, -offsetY, screenWidth, screenHeight);
 
                 float targetPulse = animationsEnabled ? currentBackgroundPulse : 1f;
-                float smoothPulse = Mathf.Lerp(
-                    targetPulse,
-                    currentBackgroundPulse,
-                    Time.deltaTime * animationSpeed
-                );
-                float bgAlpha = Mathf.Clamp(
-                    currentMenuAlpha * backgroundAlpha * smoothPulse,
-                    0.05f,
-                    1f
-                );
+                float smoothPulse = Mathf.Lerp(targetPulse, currentBackgroundPulse, Time.deltaTime * animationSpeed);
+                float bgAlpha = Mathf.Clamp(currentMenuAlpha * backgroundAlpha * smoothPulse, 0.05f, 1f);
 
                 Color baseCol = ThemeManager.Instance.CurrentTheme.PrimaryColor;
                 Color backgroundColor = new Color(baseCol.r, baseCol.g, baseCol.b, bgAlpha);
@@ -223,11 +203,7 @@ namespace shadcnui
                 GUI.DrawTexture(scaledBackgroundRect, Texture2D.whiteTexture);
                 GUI.color = Color.white;
 
-                return animationManager?.BeginAnimatedGUI(
-                        currentMenuAlpha,
-                        currentBackgroundPulse,
-                        currentMousePos
-                    ) ?? true;
+                return animationManager?.BeginAnimatedGUI(currentMenuAlpha, currentBackgroundPulse, currentMousePos) ?? true;
             }
             catch (Exception ex)
             {
@@ -287,12 +263,7 @@ namespace shadcnui
             }
         }
 
-        public string RenderGlowInputField(
-            string text,
-            int fieldIndex,
-            string placeholder,
-            int width
-        )
+        public string RenderGlowInputField(string text, int fieldIndex, string placeholder, int width)
         {
             try
             {
@@ -302,15 +273,7 @@ namespace shadcnui
                     return "Input field index {fieldIndex} out of bounds";
                 }
 
-                return inputComponents?.RenderGlowInputField(
-                    text,
-                    fieldIndex,
-                    placeholder,
-                    width,
-                    inputFieldGlow,
-                    focusedField,
-                    menuAlpha
-                );
+                return inputComponents?.RenderGlowInputField(text, fieldIndex, placeholder, width, inputFieldGlow, focusedField, menuAlpha);
             }
             catch (Exception ex)
             {
@@ -319,21 +282,11 @@ namespace shadcnui
             }
         }
 
-        public string DrawPasswordField(
-            float windowWidth,
-            string label,
-            ref string password,
-            char maskChar = '*'
-        )
+        public string DrawPasswordField(float windowWidth, string label, ref string password, char maskChar = '*')
         {
             try
             {
-                return inputComponents?.DrawPasswordField(
-                        windowWidth,
-                        label,
-                        ref password,
-                        maskChar
-                    ) ?? password;
+                return inputComponents?.DrawPasswordField(windowWidth, label, ref password, maskChar) ?? password;
             }
             catch (Exception ex)
             {
@@ -342,13 +295,7 @@ namespace shadcnui
             }
         }
 
-        public void DrawTextArea(
-            float windowWidth,
-            string label,
-            ref string text,
-            int maxLength,
-            float height = 60f
-        )
+        public void DrawTextArea(float windowWidth, string label, ref string text, int maxLength, float height = 60f)
         {
             try
             {
@@ -375,11 +322,7 @@ namespace shadcnui
                 GUIStyle glowButtonStyle = styleManager?.animatedButtonStyle ?? GUI.skin.button;
 
 #if IL2CPP
-                bool clicked = GUILayout.Button(
-                    text ?? "Button",
-                    glowButtonStyle,
-                    new Il2CppReferenceArray<GUILayoutOption>(0)
-                );
+                bool clicked = GUILayout.Button(text ?? "Button", glowButtonStyle, new Il2CppReferenceArray<GUILayoutOption>(0));
 #else
                 bool clicked = GUILayout.Button(text ?? "Button", glowButtonStyle);
 #endif
@@ -389,10 +332,7 @@ namespace shadcnui
                 {
                     hoveredButton = buttonIndex;
                 }
-                else if (
-                    hoveredButton == buttonIndex
-                    && !lastRect.Contains(Event.current.mousePosition)
-                )
+                else if (hoveredButton == buttonIndex && !lastRect.Contains(Event.current.mousePosition))
                 {
                     hoveredButton = -1;
                 }
@@ -414,23 +354,15 @@ namespace shadcnui
 
                 GUIStyle customButtonStyle = new GUIStyle(GUI.skin.button);
                 customButtonStyle.normal.background = styleManager.CreateSolidTexture(presetColor);
-                customButtonStyle.hover.background = styleManager.CreateSolidTexture(
-                    presetColor * 1.2f
-                );
-                customButtonStyle.active.background = styleManager.CreateSolidTexture(
-                    presetColor * 0.8f
-                );
+                customButtonStyle.hover.background = styleManager.CreateSolidTexture(presetColor * 1.2f);
+                customButtonStyle.active.background = styleManager.CreateSolidTexture(presetColor * 0.8f);
                 customButtonStyle.normal.textColor = Color.white;
                 customButtonStyle.alignment = TextAnchor.MiddleCenter;
                 customButtonStyle.fontSize = fontSize;
                 customButtonStyle.padding = new RectOffset(10, 10, 5, 5);
 
 #if IL2CPP
-                return GUILayout.Button(
-                    colorName ?? "Color",
-                    customButtonStyle,
-                    new Il2CppReferenceArray<GUILayoutOption>(0)
-                );
+                return GUILayout.Button(colorName ?? "Color", customButtonStyle, new Il2CppReferenceArray<GUILayoutOption>(0));
 #else
                 return GUILayout.Button(colorName ?? "Color", customButtonStyle);
 #endif
@@ -446,14 +378,7 @@ namespace shadcnui
         {
             try
             {
-                return buttonComponents?.Button(
-                        text,
-                        ButtonVariant.Default,
-                        ButtonSize.Default,
-                        onClick,
-                        false,
-                        GUILayout.Width(windowWidth)
-                    ) ?? false;
+                return buttonComponents?.Button(text, ButtonVariant.Default, ButtonSize.Default, onClick, false, GUILayout.Width(windowWidth)) ?? false;
             }
             catch (Exception ex)
             {
@@ -470,12 +395,7 @@ namespace shadcnui
                 if (styleManager == null)
                 {
 #if IL2CPP
-                    return GUILayout.Button(
-                        text ?? "Button",
-                        new Il2CppReferenceArray<GUILayoutOption>(
-                            new GUILayoutOption[] { GUILayout.Width(windowWidth) }
-                        )
-                    );
+                    return GUILayout.Button(text ?? "Button", new Il2CppReferenceArray<GUILayoutOption>(new GUILayoutOption[] { GUILayout.Width(windowWidth) }));
 #else
                     return GUILayout.Button(text ?? "Button", GUILayout.Width(windowWidth));
 #endif
@@ -491,19 +411,9 @@ namespace shadcnui
                 customButtonStyle.padding = new RectOffset(10, 10, 5, 5);
 
 #if IL2CPP
-                bool clicked = GUILayout.Button(
-                    text ?? "Button",
-                    customButtonStyle,
-                    new Il2CppReferenceArray<GUILayoutOption>(
-                        new GUILayoutOption[] { GUILayout.Width(windowWidth) }
-                    )
-                );
+                bool clicked = GUILayout.Button(text ?? "Button", customButtonStyle, new Il2CppReferenceArray<GUILayoutOption>(new GUILayoutOption[] { GUILayout.Width(windowWidth) }));
 #else
-                bool clicked = GUILayout.Button(
-                    text ?? "Button",
-                    customButtonStyle,
-                    GUILayout.Width(windowWidth)
-                );
+                bool clicked = GUILayout.Button(text ?? "Button", customButtonStyle, GUILayout.Width(windowWidth));
 #endif
 
                 if (clicked)
@@ -522,15 +432,7 @@ namespace shadcnui
         {
             try
             {
-                return buttonComponents?.Button(
-                        text,
-                        ButtonVariant.Default,
-                        ButtonSize.Default,
-                        onClick,
-                        false,
-                        GUILayout.Width(width),
-                        GUILayout.Height(height)
-                    ) ?? false;
+                return buttonComponents?.Button(text, ButtonVariant.Default, ButtonSize.Default, onClick, false, GUILayout.Width(width), GUILayout.Height(height)) ?? false;
             }
             catch (Exception ex)
             {
@@ -539,19 +441,11 @@ namespace shadcnui
             }
         }
 
-        public bool Button(
-            string text,
-            ButtonVariant variant = ButtonVariant.Default,
-            ButtonSize size = ButtonSize.Default,
-            Action onClick = null,
-            bool disabled = false,
-            params GUILayoutOption[] options
-        )
+        public bool Button(string text, ButtonVariant variant = ButtonVariant.Default, ButtonSize size = ButtonSize.Default, Action onClick = null, bool disabled = false, params GUILayoutOption[] options)
         {
             try
             {
-                return buttonComponents?.Button(text, variant, size, onClick, disabled, options)
-                    ?? false;
+                return buttonComponents?.Button(text, variant, size, onClick, disabled, options) ?? false;
             }
             catch (Exception ex)
             {
@@ -560,19 +454,11 @@ namespace shadcnui
             }
         }
 
-        public bool Button(
-            Rect rect,
-            string text,
-            ButtonVariant variant = ButtonVariant.Default,
-            ButtonSize size = ButtonSize.Default,
-            Action onClick = null,
-            bool disabled = false
-        )
+        public bool Button(Rect rect, string text, ButtonVariant variant = ButtonVariant.Default, ButtonSize size = ButtonSize.Default, Action onClick = null, bool disabled = false)
         {
             try
             {
-                return buttonComponents?.Button(rect, text, variant, size, onClick, disabled)
-                    ?? false;
+                return buttonComponents?.Button(rect, text, variant, size, onClick, disabled) ?? false;
             }
             catch (Exception ex)
             {
@@ -581,82 +467,42 @@ namespace shadcnui
             }
         }
 
-        public bool DestructiveButton(
-            string text,
-            Action onClick,
-            ButtonSize size = ButtonSize.Default,
-            params GUILayoutOption[] options
-        )
+        public bool DestructiveButton(string text, Action onClick, ButtonSize size = ButtonSize.Default, params GUILayoutOption[] options)
         {
             return Button(text, ButtonVariant.Destructive, size, onClick, false, options);
         }
 
-        public bool OutlineButton(
-            string text,
-            Action onClick,
-            ButtonSize size = ButtonSize.Default,
-            params GUILayoutOption[] options
-        )
+        public bool OutlineButton(string text, Action onClick, ButtonSize size = ButtonSize.Default, params GUILayoutOption[] options)
         {
             return Button(text, ButtonVariant.Outline, size, onClick, false, options);
         }
 
-        public bool SecondaryButton(
-            string text,
-            Action onClick,
-            ButtonSize size = ButtonSize.Default,
-            params GUILayoutOption[] options
-        )
+        public bool SecondaryButton(string text, Action onClick, ButtonSize size = ButtonSize.Default, params GUILayoutOption[] options)
         {
             return Button(text, ButtonVariant.Secondary, size, onClick, false, options);
         }
 
-        public bool GhostButton(
-            string text,
-            Action onClick,
-            ButtonSize size = ButtonSize.Default,
-            params GUILayoutOption[] options
-        )
+        public bool GhostButton(string text, Action onClick, ButtonSize size = ButtonSize.Default, params GUILayoutOption[] options)
         {
             return Button(text, ButtonVariant.Ghost, size, onClick, false, options);
         }
 
-        public bool LinkButton(
-            string text,
-            Action onClick,
-            ButtonSize size = ButtonSize.Default,
-            params GUILayoutOption[] options
-        )
+        public bool LinkButton(string text, Action onClick, ButtonSize size = ButtonSize.Default, params GUILayoutOption[] options)
         {
             return Button(text, ButtonVariant.Link, size, onClick, false, options);
         }
 
-        public bool SmallButton(
-            string text,
-            Action onClick,
-            ButtonVariant variant = ButtonVariant.Default,
-            params GUILayoutOption[] options
-        )
+        public bool SmallButton(string text, Action onClick, ButtonVariant variant = ButtonVariant.Default, params GUILayoutOption[] options)
         {
             return Button(text, variant, ButtonSize.Small, onClick, false, options);
         }
 
-        public bool LargeButton(
-            string text,
-            Action onClick,
-            ButtonVariant variant = ButtonVariant.Default,
-            params GUILayoutOption[] options
-        )
+        public bool LargeButton(string text, Action onClick, ButtonVariant variant = ButtonVariant.Default, params GUILayoutOption[] options)
         {
             return Button(text, variant, ButtonSize.Large, onClick, false, options);
         }
 
-        public bool IconButton(
-            string text,
-            Action onClick,
-            ButtonVariant variant = ButtonVariant.Default,
-            params GUILayoutOption[] options
-        )
+        public bool IconButton(string text, Action onClick, ButtonVariant variant = ButtonVariant.Default, params GUILayoutOption[] options)
         {
             return Button(text, variant, ButtonSize.Icon, onClick, false, options);
         }
@@ -684,49 +530,30 @@ namespace shadcnui
                 {
                     case ButtonSize.Small:
 #if IL2CPP
-                        options =
-                            (Il2CppReferenceArray<GUILayoutOption>)
-                                new GUILayoutOption[] { GUILayout.Height(24 * uiScale) };
+                        options = (Il2CppReferenceArray<GUILayoutOption>)new GUILayoutOption[] { GUILayout.Height(24 * uiScale) };
 #else
                         options = new GUILayoutOption[] { GUILayout.Height(24 * uiScale) };
 #endif
                         break;
                     case ButtonSize.Large:
 #if IL2CPP
-                        options =
-                            (Il2CppReferenceArray<GUILayoutOption>)
-                                new GUILayoutOption[] { GUILayout.Height(40 * uiScale) };
+                        options = (Il2CppReferenceArray<GUILayoutOption>)new GUILayoutOption[] { GUILayout.Height(40 * uiScale) };
 #else
                         options = new GUILayoutOption[] { GUILayout.Height(40 * uiScale) };
 #endif
                         break;
                     case ButtonSize.Icon:
 #if IL2CPP
-                        options =
-                            (Il2CppReferenceArray<GUILayoutOption>)
-                                new GUILayoutOption[]
-                                {
-                                    GUILayout.Width(36 * uiScale),
-                                    GUILayout.Height(36 * uiScale),
-                                };
+                        options = (Il2CppReferenceArray<GUILayoutOption>)new GUILayoutOption[] { GUILayout.Width(36 * uiScale), GUILayout.Height(36 * uiScale) };
 #else
-                        options = new GUILayoutOption[]
-                        {
-                            GUILayout.Width(36 * uiScale),
-                            GUILayout.Height(36 * uiScale),
-                        };
+                        options = new GUILayoutOption[] { GUILayout.Width(36 * uiScale), GUILayout.Height(36 * uiScale) };
 #endif
                         break;
                     default:
 #if IL2CPP
-                        options =
-                            (Il2CppReferenceArray<GUILayoutOption>)
-                                new GUILayoutOption[] { GUILayout.Height(buttonHeight * uiScale) };
+                        options = (Il2CppReferenceArray<GUILayoutOption>)new GUILayoutOption[] { GUILayout.Height(buttonHeight * uiScale) };
 #else
-                        options = new GUILayoutOption[]
-                        {
-                            GUILayout.Height(buttonHeight * uiScale),
-                        };
+                        options = new GUILayoutOption[] { GUILayout.Height(buttonHeight * uiScale) };
 #endif
                         break;
                 }
@@ -742,12 +569,7 @@ namespace shadcnui
         #endregion
 
         #region Toggle Components
-        public void DrawToggle(
-            float windowWidth,
-            string label,
-            ref bool value,
-            Action<bool> onToggle
-        )
+        public void DrawToggle(float windowWidth, string label, ref bool value, Action<bool> onToggle)
         {
             try
             {
@@ -759,28 +581,11 @@ namespace shadcnui
             }
         }
 
-        public bool Toggle(
-            string text,
-            bool value,
-            ToggleVariant variant = ToggleVariant.Default,
-            ToggleSize size = ToggleSize.Default,
-            Action<bool> onToggle = null,
-            bool disabled = false,
-            params GUILayoutOption[] options
-        )
+        public bool Toggle(string text, bool value, ToggleVariant variant = ToggleVariant.Default, ToggleSize size = ToggleSize.Default, Action<bool> onToggle = null, bool disabled = false, params GUILayoutOption[] options)
         {
             try
             {
-                bool newValue =
-                    toggleComponents?.Toggle(
-                        text,
-                        value,
-                        variant,
-                        size,
-                        onToggle,
-                        disabled,
-                        options
-                    ) ?? value;
+                bool newValue = toggleComponents?.Toggle(text, value, variant, size, onToggle, disabled, options) ?? value;
                 if (newValue != value)
                 {
                     onToggle?.Invoke(newValue);
@@ -794,27 +599,11 @@ namespace shadcnui
             }
         }
 
-        public bool Toggle(
-            Rect rect,
-            string text,
-            bool value,
-            ToggleVariant variant = ToggleVariant.Default,
-            ToggleSize size = ToggleSize.Default,
-            Action<bool> onToggle = null,
-            bool disabled = false
-        )
+        public bool Toggle(Rect rect, string text, bool value, ToggleVariant variant = ToggleVariant.Default, ToggleSize size = ToggleSize.Default, Action<bool> onToggle = null, bool disabled = false)
         {
             try
             {
-                return toggleComponents?.Toggle(
-                        rect,
-                        text,
-                        value,
-                        variant,
-                        size,
-                        onToggle,
-                        disabled
-                    ) ?? value;
+                return toggleComponents?.Toggle(rect, text, value, variant, size, onToggle, disabled) ?? value;
             }
             catch (Exception ex)
             {
@@ -823,60 +612,26 @@ namespace shadcnui
             }
         }
 
-        public bool OutlineToggle(
-            string text,
-            bool value,
-            Action<bool> onToggle = null,
-            ToggleSize size = ToggleSize.Default,
-            params GUILayoutOption[] options
-        )
+        public bool OutlineToggle(string text, bool value, Action<bool> onToggle = null, ToggleSize size = ToggleSize.Default, params GUILayoutOption[] options)
         {
             return Toggle(text, value, ToggleVariant.Outline, size, onToggle, false, options);
         }
 
-        public bool SmallToggle(
-            string text,
-            bool value,
-            Action<bool> onToggle = null,
-            ToggleVariant variant = ToggleVariant.Default,
-            params GUILayoutOption[] options
-        )
+        public bool SmallToggle(string text, bool value, Action<bool> onToggle = null, ToggleVariant variant = ToggleVariant.Default, params GUILayoutOption[] options)
         {
             return Toggle(text, value, variant, ToggleSize.Small, onToggle, false, options);
         }
 
-        public bool LargeToggle(
-            string text,
-            bool value,
-            Action<bool> onToggle = null,
-            ToggleVariant variant = ToggleVariant.Default,
-            params GUILayoutOption[] options
-        )
+        public bool LargeToggle(string text, bool value, Action<bool> onToggle = null, ToggleVariant variant = ToggleVariant.Default, params GUILayoutOption[] options)
         {
             return Toggle(text, value, variant, ToggleSize.Large, onToggle, false, options);
         }
 
-        public int ToggleGroup(
-            string[] texts,
-            int selectedIndex,
-            Action<int> onSelectionChange = null,
-            ToggleVariant variant = ToggleVariant.Default,
-            ToggleSize size = ToggleSize.Default,
-            bool horizontal = true,
-            float spacing = 5f
-        )
+        public int ToggleGroup(string[] texts, int selectedIndex, Action<int> onSelectionChange = null, ToggleVariant variant = ToggleVariant.Default, ToggleSize size = ToggleSize.Default, bool horizontal = true, float spacing = 5f)
         {
             try
             {
-                return toggleComponents?.ToggleGroup(
-                        texts,
-                        selectedIndex,
-                        onSelectionChange,
-                        variant,
-                        size,
-                        horizontal,
-                        spacing
-                    ) ?? selectedIndex;
+                return toggleComponents?.ToggleGroup(texts, selectedIndex, onSelectionChange, variant, size, horizontal, spacing) ?? selectedIndex;
             }
             catch (Exception ex)
             {
@@ -885,27 +640,11 @@ namespace shadcnui
             }
         }
 
-        public bool[] MultiToggleGroup(
-            string[] texts,
-            bool[] selectedStates,
-            Action<int, bool> onToggleChange = null,
-            ToggleVariant variant = ToggleVariant.Default,
-            ToggleSize size = ToggleSize.Default,
-            bool horizontal = true,
-            float spacing = 5f
-        )
+        public bool[] MultiToggleGroup(string[] texts, bool[] selectedStates, Action<int, bool> onToggleChange = null, ToggleVariant variant = ToggleVariant.Default, ToggleSize size = ToggleSize.Default, bool horizontal = true, float spacing = 5f)
         {
             try
             {
-                return toggleComponents?.MultiToggleGroup(
-                        texts,
-                        selectedStates,
-                        onToggleChange,
-                        variant,
-                        size,
-                        horizontal,
-                        spacing
-                    ) ?? selectedStates;
+                return toggleComponents?.MultiToggleGroup(texts, selectedStates, onToggleChange, variant, size, horizontal, spacing) ?? selectedStates;
             }
             catch (Exception ex)
             {
@@ -946,8 +685,7 @@ namespace shadcnui
 
         public void DrawCardTitle(string title) => cardComponents?.DrawCardTitle(title);
 
-        public void DrawCardDescription(string description) =>
-            cardComponents?.DrawCardDescription(description);
+        public void DrawCardDescription(string description) => cardComponents?.DrawCardDescription(description);
 
         public void BeginCardContent() => cardComponents?.BeginCardContent();
 
@@ -957,14 +695,7 @@ namespace shadcnui
 
         public void EndCardFooter() => cardComponents?.EndCardFooter();
 
-        public void DrawCard(
-            string title,
-            string description,
-            string content,
-            System.Action footerContent = null,
-            float width = -1,
-            float height = -1
-        )
+        public void DrawCard(string title, string description, string content, System.Action footerContent = null, float width = -1, float height = -1)
         {
             try
             {
@@ -990,13 +721,7 @@ namespace shadcnui
         #endregion
 
         #region Slider Components
-        public void DrawSlider(
-            float windowWidth,
-            string label,
-            ref float value,
-            float minValue,
-            float maxValue
-        )
+        public void DrawSlider(float windowWidth, string label, ref float value, float minValue, float maxValue)
         {
             try
             {
@@ -1008,13 +733,7 @@ namespace shadcnui
             }
         }
 
-        public void DrawIntSlider(
-            float windowWidth,
-            string label,
-            ref int value,
-            int minValue,
-            int maxValue
-        )
+        public void DrawIntSlider(float windowWidth, string label, ref int value, int minValue, int maxValue)
         {
             try
             {
@@ -1078,16 +797,11 @@ namespace shadcnui
         #endregion
 
         #region Layout Components
-        public Vector2 DrawScrollView(
-            Vector2 scrollPosition,
-            System.Action drawContent,
-            params GUILayoutOption[] options
-        )
+        public Vector2 DrawScrollView(Vector2 scrollPosition, System.Action drawContent, params GUILayoutOption[] options)
         {
             try
             {
-                return layoutComponents?.DrawScrollView(scrollPosition, drawContent, options)
-                    ?? scrollPosition;
+                return layoutComponents?.DrawScrollView(scrollPosition, drawContent, options) ?? scrollPosition;
             }
             catch (Exception ex)
             {
@@ -1166,12 +880,7 @@ namespace shadcnui
         #endregion
 
         #region Label Components
-        public void Label(
-            string text,
-            LabelVariant variant = LabelVariant.Default,
-            bool disabled = false,
-            params GUILayoutOption[] options
-        )
+        public void Label(string text, LabelVariant variant = LabelVariant.Default, bool disabled = false, params GUILayoutOption[] options)
         {
             try
             {
@@ -1183,12 +892,7 @@ namespace shadcnui
             }
         }
 
-        public void Label(
-            Rect rect,
-            string text,
-            LabelVariant variant = LabelVariant.Default,
-            bool disabled = false
-        )
+        public void Label(Rect rect, string text, LabelVariant variant = LabelVariant.Default, bool disabled = false)
         {
             try
             {
@@ -1238,12 +942,7 @@ namespace shadcnui
         #endregion
 
         #region Progress Components
-        public void Progress(
-            float value,
-            float width = -1,
-            float height = -1,
-            params GUILayoutOption[] options
-        )
+        public void Progress(float value, float width = -1, float height = -1, params GUILayoutOption[] options)
         {
             try
             {
@@ -1267,25 +966,11 @@ namespace shadcnui
             }
         }
 
-        public void LabeledProgress(
-            string label,
-            float value,
-            float width = -1,
-            float height = -1,
-            bool showPercentage = true,
-            params GUILayoutOption[] options
-        )
+        public void LabeledProgress(string label, float value, float width = -1, float height = -1, bool showPercentage = true, params GUILayoutOption[] options)
         {
             try
             {
-                progressComponents?.LabeledProgress(
-                    label,
-                    value,
-                    width,
-                    height,
-                    showPercentage,
-                    options
-                );
+                progressComponents?.LabeledProgress(label, value, width, height, showPercentage, options);
             }
             catch (Exception ex)
             {
@@ -1293,11 +978,7 @@ namespace shadcnui
             }
         }
 
-        public void CircularProgress(
-            float value,
-            float size = 32f,
-            params GUILayoutOption[] options
-        )
+        public void CircularProgress(float value, float size = 32f, params GUILayoutOption[] options)
         {
             try
             {
@@ -1311,11 +992,7 @@ namespace shadcnui
         #endregion
 
         #region Separator Components
-        public void Separator(
-            SeparatorOrientation orientation = SeparatorOrientation.Horizontal,
-            bool decorative = true,
-            params GUILayoutOption[] options
-        )
+        public void Separator(SeparatorOrientation orientation = SeparatorOrientation.Horizontal, bool decorative = true, params GUILayoutOption[] options)
         {
             try
             {
@@ -1351,10 +1028,7 @@ namespace shadcnui
             }
         }
 
-        public void Separator(
-            Rect rect,
-            SeparatorOrientation orientation = SeparatorOrientation.Horizontal
-        )
+        public void Separator(Rect rect, SeparatorOrientation orientation = SeparatorOrientation.Horizontal)
         {
             try
             {
@@ -1366,21 +1040,11 @@ namespace shadcnui
             }
         }
 
-        public void SeparatorWithSpacing(
-            SeparatorOrientation orientation = SeparatorOrientation.Horizontal,
-            float spacingBefore = 8f,
-            float spacingAfter = 8f,
-            params GUILayoutOption[] options
-        )
+        public void SeparatorWithSpacing(SeparatorOrientation orientation = SeparatorOrientation.Horizontal, float spacingBefore = 8f, float spacingAfter = 8f, params GUILayoutOption[] options)
         {
             try
             {
-                separatorComponents?.SeparatorWithSpacing(
-                    orientation,
-                    spacingBefore,
-                    spacingAfter,
-                    options
-                );
+                separatorComponents?.SeparatorWithSpacing(orientation, spacingBefore, spacingAfter, options);
             }
             catch (Exception ex)
             {
@@ -1402,18 +1066,11 @@ namespace shadcnui
         #endregion
 
         #region Tabs Components
-        public int Tabs(
-            string[] tabNames,
-            int selectedIndex,
-            Action<int> onTabChange = null,
-            int maxLines = 1,
-            params GUILayoutOption[] options
-        )
+        public int Tabs(string[] tabNames, int selectedIndex, Action<int> onTabChange = null, int maxLines = 1, params GUILayoutOption[] options)
         {
             try
             {
-                return tabsComponents?.Tabs(tabNames, selectedIndex, onTabChange, maxLines, options)
-                    ?? selectedIndex;
+                return tabsComponents?.Tabs(tabNames, selectedIndex, onTabChange, maxLines, options) ?? selectedIndex;
             }
             catch (Exception ex)
             {
@@ -1446,16 +1103,11 @@ namespace shadcnui
             }
         }
 
-        public int TabsWithContent(
-            GUITabsComponents.TabConfig[] tabConfigs,
-            int selectedIndex,
-            Action<int> onTabChange = null
-        )
+        public int TabsWithContent(GUITabsComponents.TabConfig[] tabConfigs, int selectedIndex, Action<int> onTabChange = null)
         {
             try
             {
-                return tabsComponents?.TabsWithContent(tabConfigs, selectedIndex, onTabChange)
-                    ?? selectedIndex;
+                return tabsComponents?.TabsWithContent(tabConfigs, selectedIndex, onTabChange) ?? selectedIndex;
             }
             catch (Exception ex)
             {
@@ -1464,23 +1116,11 @@ namespace shadcnui
             }
         }
 
-        public int VerticalTabs(
-            string[] tabNames,
-            int selectedIndex,
-            Action<int> onTabChange = null,
-            float tabWidth = 120f,
-            params GUILayoutOption[] options
-        )
+        public int VerticalTabs(string[] tabNames, int selectedIndex, Action<int> onTabChange = null, float tabWidth = 120f, params GUILayoutOption[] options)
         {
             try
             {
-                return tabsComponents?.VerticalTabs(
-                        tabNames,
-                        selectedIndex,
-                        onTabChange,
-                        tabWidth,
-                        options
-                    ) ?? selectedIndex;
+                return tabsComponents?.VerticalTabs(tabNames, selectedIndex, onTabChange, tabWidth, options) ?? selectedIndex;
             }
             catch (Exception ex)
             {
@@ -1491,27 +1131,11 @@ namespace shadcnui
         #endregion
 
         #region TextArea Components
-        public string TextArea(
-            string text,
-            TextAreaVariant variant = TextAreaVariant.Default,
-            string placeholder = "",
-            bool disabled = false,
-            float minHeight = 60f,
-            int maxLength = -1,
-            params GUILayoutOption[] options
-        )
+        public string TextArea(string text, TextAreaVariant variant = TextAreaVariant.Default, string placeholder = "", bool disabled = false, float minHeight = 60f, int maxLength = -1, params GUILayoutOption[] options)
         {
             try
             {
-                return textAreaComponents?.TextArea(
-                        text,
-                        variant,
-                        placeholder,
-                        disabled,
-                        minHeight,
-                        maxLength,
-                        options
-                    ) ?? text;
+                return textAreaComponents?.TextArea(text, variant, placeholder, disabled, minHeight, maxLength, options) ?? text;
             }
             catch (Exception ex)
             {
@@ -1520,25 +1144,11 @@ namespace shadcnui
             }
         }
 
-        public string TextArea(
-            Rect rect,
-            string text,
-            TextAreaVariant variant = TextAreaVariant.Default,
-            string placeholder = "",
-            bool disabled = false,
-            int maxLength = -1
-        )
+        public string TextArea(Rect rect, string text, TextAreaVariant variant = TextAreaVariant.Default, string placeholder = "", bool disabled = false, int maxLength = -1)
         {
             try
             {
-                return textAreaComponents?.TextArea(
-                        rect,
-                        text,
-                        variant,
-                        placeholder,
-                        disabled,
-                        maxLength
-                    ) ?? text;
+                return textAreaComponents?.TextArea(rect, text, variant, placeholder, disabled, maxLength) ?? text;
             }
             catch (Exception ex)
             {
@@ -1547,25 +1157,11 @@ namespace shadcnui
             }
         }
 
-        public string OutlineTextArea(
-            string text,
-            string placeholder = "",
-            bool disabled = false,
-            float minHeight = 60f,
-            int maxLength = -1,
-            params GUILayoutOption[] options
-        )
+        public string OutlineTextArea(string text, string placeholder = "", bool disabled = false, float minHeight = 60f, int maxLength = -1, params GUILayoutOption[] options)
         {
             try
             {
-                return textAreaComponents?.OutlineTextArea(
-                        text,
-                        placeholder,
-                        disabled,
-                        minHeight,
-                        maxLength,
-                        options
-                    ) ?? text;
+                return textAreaComponents?.OutlineTextArea(text, placeholder, disabled, minHeight, maxLength, options) ?? text;
             }
             catch (Exception ex)
             {
@@ -1574,25 +1170,11 @@ namespace shadcnui
             }
         }
 
-        public string GhostTextArea(
-            string text,
-            string placeholder = "",
-            bool disabled = false,
-            float minHeight = 60f,
-            int maxLength = -1,
-            params GUILayoutOption[] options
-        )
+        public string GhostTextArea(string text, string placeholder = "", bool disabled = false, float minHeight = 60f, int maxLength = -1, params GUILayoutOption[] options)
         {
             try
             {
-                return textAreaComponents?.GhostTextArea(
-                        text,
-                        placeholder,
-                        disabled,
-                        minHeight,
-                        maxLength,
-                        options
-                    ) ?? text;
+                return textAreaComponents?.GhostTextArea(text, placeholder, disabled, minHeight, maxLength, options) ?? text;
             }
             catch (Exception ex)
             {
@@ -1601,31 +1183,11 @@ namespace shadcnui
             }
         }
 
-        public string LabeledTextArea(
-            string label,
-            string text,
-            TextAreaVariant variant = TextAreaVariant.Default,
-            string placeholder = "",
-            bool disabled = false,
-            float minHeight = 60f,
-            int maxLength = -1,
-            bool showCharCount = true,
-            params GUILayoutOption[] options
-        )
+        public string LabeledTextArea(string label, string text, TextAreaVariant variant = TextAreaVariant.Default, string placeholder = "", bool disabled = false, float minHeight = 60f, int maxLength = -1, bool showCharCount = true, params GUILayoutOption[] options)
         {
             try
             {
-                return textAreaComponents?.LabeledTextArea(
-                        label,
-                        text,
-                        variant,
-                        placeholder,
-                        disabled,
-                        minHeight,
-                        maxLength,
-                        showCharCount,
-                        options
-                    ) ?? text;
+                return textAreaComponents?.LabeledTextArea(label, text, variant, placeholder, disabled, minHeight, maxLength, showCharCount, options) ?? text;
             }
             catch (Exception ex)
             {
@@ -1634,31 +1196,11 @@ namespace shadcnui
             }
         }
 
-        public string ResizableTextArea(
-            string text,
-            ref float height,
-            TextAreaVariant variant = TextAreaVariant.Default,
-            string placeholder = "",
-            bool disabled = false,
-            float minHeight = 60f,
-            float maxHeight = 300f,
-            int maxLength = -1,
-            params GUILayoutOption[] options
-        )
+        public string ResizableTextArea(string text, ref float height, TextAreaVariant variant = TextAreaVariant.Default, string placeholder = "", bool disabled = false, float minHeight = 60f, float maxHeight = 300f, int maxLength = -1, params GUILayoutOption[] options)
         {
             try
             {
-                return textAreaComponents?.ResizableTextArea(
-                        text,
-                        ref height,
-                        variant,
-                        placeholder,
-                        disabled,
-                        minHeight,
-                        maxHeight,
-                        maxLength,
-                        options
-                    ) ?? text;
+                return textAreaComponents?.ResizableTextArea(text, ref height, variant, placeholder, disabled, minHeight, maxHeight, maxLength, options) ?? text;
             }
             catch (Exception ex)
             {
@@ -1669,27 +1211,11 @@ namespace shadcnui
         #endregion
 
         #region Checkbox Components
-        public bool Checkbox(
-            string text,
-            bool value,
-            CheckboxVariant variant = CheckboxVariant.Default,
-            CheckboxSize size = CheckboxSize.Default,
-            Action<bool> onToggle = null,
-            bool disabled = false,
-            params GUILayoutOption[] options
-        )
+        public bool Checkbox(string text, bool value, CheckboxVariant variant = CheckboxVariant.Default, CheckboxSize size = CheckboxSize.Default, Action<bool> onToggle = null, bool disabled = false, params GUILayoutOption[] options)
         {
             try
             {
-                return checkboxComponents?.Checkbox(
-                        text,
-                        value,
-                        variant,
-                        size,
-                        onToggle,
-                        disabled,
-                        options
-                    ) ?? value;
+                return checkboxComponents?.Checkbox(text, value, variant, size, onToggle, disabled, options) ?? value;
             }
             catch (Exception ex)
             {
@@ -1698,27 +1224,11 @@ namespace shadcnui
             }
         }
 
-        public bool Checkbox(
-            Rect rect,
-            string text,
-            bool value,
-            CheckboxVariant variant = CheckboxVariant.Default,
-            CheckboxSize size = CheckboxSize.Default,
-            Action<bool> onToggle = null,
-            bool disabled = false
-        )
+        public bool Checkbox(Rect rect, string text, bool value, CheckboxVariant variant = CheckboxVariant.Default, CheckboxSize size = CheckboxSize.Default, Action<bool> onToggle = null, bool disabled = false)
         {
             try
             {
-                return checkboxComponents?.Checkbox(
-                        rect,
-                        text,
-                        value,
-                        variant,
-                        size,
-                        onToggle,
-                        disabled
-                    ) ?? value;
+                return checkboxComponents?.Checkbox(rect, text, value, variant, size, onToggle, disabled) ?? value;
             }
             catch (Exception ex)
             {
@@ -1727,25 +1237,11 @@ namespace shadcnui
             }
         }
 
-        public bool CheckboxWithLabel(
-            string label,
-            ref bool value,
-            CheckboxVariant variant = CheckboxVariant.Default,
-            CheckboxSize size = CheckboxSize.Default,
-            Action<bool> onToggle = null,
-            bool disabled = false
-        )
+        public bool CheckboxWithLabel(string label, ref bool value, CheckboxVariant variant = CheckboxVariant.Default, CheckboxSize size = CheckboxSize.Default, Action<bool> onToggle = null, bool disabled = false)
         {
             try
             {
-                return checkboxComponents?.CheckboxWithLabel(
-                        label,
-                        ref value,
-                        variant,
-                        size,
-                        onToggle,
-                        disabled
-                    ) ?? value;
+                return checkboxComponents?.CheckboxWithLabel(label, ref value, variant, size, onToggle, disabled) ?? value;
             }
             catch (Exception ex)
             {
@@ -1754,29 +1250,11 @@ namespace shadcnui
             }
         }
 
-        public bool[] CheckboxGroup(
-            string[] labels,
-            bool[] values,
-            CheckboxVariant variant = CheckboxVariant.Default,
-            CheckboxSize size = CheckboxSize.Default,
-            Action<int, bool> onToggleChange = null,
-            bool disabled = false,
-            bool horizontal = false,
-            float spacing = 5f
-        )
+        public bool[] CheckboxGroup(string[] labels, bool[] values, CheckboxVariant variant = CheckboxVariant.Default, CheckboxSize size = CheckboxSize.Default, Action<int, bool> onToggleChange = null, bool disabled = false, bool horizontal = false, float spacing = 5f)
         {
             try
             {
-                return checkboxComponents?.CheckboxGroup(
-                        labels,
-                        values,
-                        variant,
-                        size,
-                        onToggleChange,
-                        disabled,
-                        horizontal,
-                        spacing
-                    ) ?? values;
+                return checkboxComponents?.CheckboxGroup(labels, values, variant, size, onToggleChange, disabled, horizontal, spacing) ?? values;
             }
             catch (Exception ex)
             {
@@ -1785,27 +1263,11 @@ namespace shadcnui
             }
         }
 
-        public bool CustomCheckbox(
-            string text,
-            bool value,
-            Color checkColor,
-            Color backgroundColor,
-            Action<bool> onToggle = null,
-            bool disabled = false,
-            params GUILayoutOption[] options
-        )
+        public bool CustomCheckbox(string text, bool value, Color checkColor, Color backgroundColor, Action<bool> onToggle = null, bool disabled = false, params GUILayoutOption[] options)
         {
             try
             {
-                return checkboxComponents?.CustomCheckbox(
-                        text,
-                        value,
-                        checkColor,
-                        backgroundColor,
-                        onToggle,
-                        disabled,
-                        options
-                    ) ?? value;
+                return checkboxComponents?.CustomCheckbox(text, value, checkColor, backgroundColor, onToggle, disabled, options) ?? value;
             }
             catch (Exception ex)
             {
@@ -1814,27 +1276,11 @@ namespace shadcnui
             }
         }
 
-        public bool CheckboxWithIcon(
-            string text,
-            ref bool value,
-            Texture2D icon,
-            CheckboxVariant variant = CheckboxVariant.Default,
-            CheckboxSize size = CheckboxSize.Default,
-            Action<bool> onToggle = null,
-            bool disabled = false
-        )
+        public bool CheckboxWithIcon(string text, ref bool value, Texture2D icon, CheckboxVariant variant = CheckboxVariant.Default, CheckboxSize size = CheckboxSize.Default, Action<bool> onToggle = null, bool disabled = false)
         {
             try
             {
-                return checkboxComponents?.CheckboxWithIcon(
-                        text,
-                        ref value,
-                        icon,
-                        variant,
-                        size,
-                        onToggle,
-                        disabled
-                    ) ?? value;
+                return checkboxComponents?.CheckboxWithIcon(text, ref value, icon, variant, size, onToggle, disabled) ?? value;
             }
             catch (Exception ex)
             {
@@ -1843,27 +1289,11 @@ namespace shadcnui
             }
         }
 
-        public bool CheckboxWithDescription(
-            string label,
-            string description,
-            ref bool value,
-            CheckboxVariant variant = CheckboxVariant.Default,
-            CheckboxSize size = CheckboxSize.Default,
-            Action<bool> onToggle = null,
-            bool disabled = false
-        )
+        public bool CheckboxWithDescription(string label, string description, ref bool value, CheckboxVariant variant = CheckboxVariant.Default, CheckboxSize size = CheckboxSize.Default, Action<bool> onToggle = null, bool disabled = false)
         {
             try
             {
-                return checkboxComponents?.CheckboxWithDescription(
-                        label,
-                        description,
-                        ref value,
-                        variant,
-                        size,
-                        onToggle,
-                        disabled
-                    ) ?? value;
+                return checkboxComponents?.CheckboxWithDescription(label, description, ref value, variant, size, onToggle, disabled) ?? value;
             }
             catch (Exception ex)
             {
@@ -1872,29 +1302,11 @@ namespace shadcnui
             }
         }
 
-        public bool ValidatedCheckbox(
-            string text,
-            ref bool value,
-            bool isValid,
-            string validationMessage,
-            CheckboxVariant variant = CheckboxVariant.Default,
-            CheckboxSize size = CheckboxSize.Default,
-            Action<bool> onToggle = null,
-            bool disabled = false
-        )
+        public bool ValidatedCheckbox(string text, ref bool value, bool isValid, string validationMessage, CheckboxVariant variant = CheckboxVariant.Default, CheckboxSize size = CheckboxSize.Default, Action<bool> onToggle = null, bool disabled = false)
         {
             try
             {
-                return checkboxComponents?.ValidatedCheckbox(
-                        text,
-                        ref value,
-                        isValid,
-                        validationMessage,
-                        variant,
-                        size,
-                        onToggle,
-                        disabled
-                    ) ?? value;
+                return checkboxComponents?.ValidatedCheckbox(text, ref value, isValid, validationMessage, variant, size, onToggle, disabled) ?? value;
             }
             catch (Exception ex)
             {
@@ -1903,27 +1315,11 @@ namespace shadcnui
             }
         }
 
-        public bool CheckboxWithTooltip(
-            string text,
-            ref bool value,
-            string tooltip,
-            CheckboxVariant variant = CheckboxVariant.Default,
-            CheckboxSize size = CheckboxSize.Default,
-            Action<bool> onToggle = null,
-            bool disabled = false
-        )
+        public bool CheckboxWithTooltip(string text, ref bool value, string tooltip, CheckboxVariant variant = CheckboxVariant.Default, CheckboxSize size = CheckboxSize.Default, Action<bool> onToggle = null, bool disabled = false)
         {
             try
             {
-                return checkboxComponents?.CheckboxWithTooltip(
-                        text,
-                        ref value,
-                        tooltip,
-                        variant,
-                        size,
-                        onToggle,
-                        disabled
-                    ) ?? value;
+                return checkboxComponents?.CheckboxWithTooltip(text, ref value, tooltip, variant, size, onToggle, disabled) ?? value;
             }
             catch (Exception ex)
             {
@@ -1934,27 +1330,11 @@ namespace shadcnui
         #endregion
 
         #region Switch Components
-        public bool Switch(
-            string text,
-            bool value,
-            SwitchVariant variant = SwitchVariant.Default,
-            SwitchSize size = SwitchSize.Default,
-            Action<bool> onToggle = null,
-            bool disabled = false,
-            params GUILayoutOption[] options
-        )
+        public bool Switch(string text, bool value, SwitchVariant variant = SwitchVariant.Default, SwitchSize size = SwitchSize.Default, Action<bool> onToggle = null, bool disabled = false, params GUILayoutOption[] options)
         {
             try
             {
-                return switchComponents?.Switch(
-                        text,
-                        value,
-                        variant,
-                        size,
-                        onToggle,
-                        disabled,
-                        options
-                    ) ?? value;
+                return switchComponents?.Switch(text, value, variant, size, onToggle, disabled, options) ?? value;
             }
             catch (Exception ex)
             {
@@ -1963,27 +1343,11 @@ namespace shadcnui
             }
         }
 
-        public bool Switch(
-            Rect rect,
-            string text,
-            bool value,
-            SwitchVariant variant = SwitchVariant.Default,
-            SwitchSize size = SwitchSize.Default,
-            Action<bool> onToggle = null,
-            bool disabled = false
-        )
+        public bool Switch(Rect rect, string text, bool value, SwitchVariant variant = SwitchVariant.Default, SwitchSize size = SwitchSize.Default, Action<bool> onToggle = null, bool disabled = false)
         {
             try
             {
-                return switchComponents?.Switch(
-                        rect,
-                        text,
-                        value,
-                        variant,
-                        size,
-                        onToggle,
-                        disabled
-                    ) ?? value;
+                return switchComponents?.Switch(rect, text, value, variant, size, onToggle, disabled) ?? value;
             }
             catch (Exception ex)
             {
@@ -1992,25 +1356,11 @@ namespace shadcnui
             }
         }
 
-        public bool SwitchWithLabel(
-            string label,
-            bool value,
-            SwitchVariant variant = SwitchVariant.Default,
-            SwitchSize size = SwitchSize.Default,
-            Action<bool> onToggle = null,
-            bool disabled = false
-        )
+        public bool SwitchWithLabel(string label, bool value, SwitchVariant variant = SwitchVariant.Default, SwitchSize size = SwitchSize.Default, Action<bool> onToggle = null, bool disabled = false)
         {
             try
             {
-                return switchComponents?.SwitchWithLabel(
-                        label,
-                        ref value,
-                        variant,
-                        size,
-                        onToggle,
-                        disabled
-                    ) ?? value;
+                return switchComponents?.SwitchWithLabel(label, ref value, variant, size, onToggle, disabled) ?? value;
             }
             catch (Exception ex)
             {
@@ -2019,27 +1369,11 @@ namespace shadcnui
             }
         }
 
-        public bool SwitchWithDescription(
-            string label,
-            string description,
-            bool value,
-            SwitchVariant variant = SwitchVariant.Default,
-            SwitchSize size = SwitchSize.Default,
-            Action<bool> onToggle = null,
-            bool disabled = false
-        )
+        public bool SwitchWithDescription(string label, string description, bool value, SwitchVariant variant = SwitchVariant.Default, SwitchSize size = SwitchSize.Default, Action<bool> onToggle = null, bool disabled = false)
         {
             try
             {
-                return switchComponents?.SwitchWithDescription(
-                        label,
-                        description,
-                        ref value,
-                        variant,
-                        size,
-                        onToggle,
-                        disabled
-                    ) ?? value;
+                return switchComponents?.SwitchWithDescription(label, description, ref value, variant, size, onToggle, disabled) ?? value;
             }
             catch (Exception ex)
             {
@@ -2048,29 +1382,11 @@ namespace shadcnui
             }
         }
 
-        public bool CustomSwitch(
-            string text,
-            bool value,
-            Color onColor,
-            Color offColor,
-            Color thumbColor,
-            Action<bool> onToggle = null,
-            bool disabled = false,
-            params GUILayoutOption[] options
-        )
+        public bool CustomSwitch(string text, bool value, Color onColor, Color offColor, Color thumbColor, Action<bool> onToggle = null, bool disabled = false, params GUILayoutOption[] options)
         {
             try
             {
-                return switchComponents?.CustomSwitch(
-                        text,
-                        value,
-                        onColor,
-                        offColor,
-                        thumbColor,
-                        onToggle,
-                        disabled,
-                        options
-                    ) ?? value;
+                return switchComponents?.CustomSwitch(text, value, onColor, offColor, thumbColor, onToggle, disabled, options) ?? value;
             }
             catch (Exception ex)
             {
@@ -2079,29 +1395,11 @@ namespace shadcnui
             }
         }
 
-        public bool SwitchWithIcon(
-            string text,
-            bool value,
-            Texture2D onIcon,
-            Texture2D offIcon,
-            SwitchVariant variant = SwitchVariant.Default,
-            SwitchSize size = SwitchSize.Default,
-            Action<bool> onToggle = null,
-            bool disabled = false
-        )
+        public bool SwitchWithIcon(string text, bool value, Texture2D onIcon, Texture2D offIcon, SwitchVariant variant = SwitchVariant.Default, SwitchSize size = SwitchSize.Default, Action<bool> onToggle = null, bool disabled = false)
         {
             try
             {
-                return switchComponents?.SwitchWithIcon(
-                        text,
-                        value,
-                        onIcon,
-                        offIcon,
-                        variant,
-                        size,
-                        onToggle,
-                        disabled
-                    ) ?? value;
+                return switchComponents?.SwitchWithIcon(text, value, onIcon, offIcon, variant, size, onToggle, disabled) ?? value;
             }
             catch (Exception ex)
             {
@@ -2110,29 +1408,11 @@ namespace shadcnui
             }
         }
 
-        public bool ValidatedSwitch(
-            string text,
-            bool value,
-            bool isValid,
-            string validationMessage,
-            SwitchVariant variant = SwitchVariant.Default,
-            SwitchSize size = SwitchSize.Default,
-            Action<bool> onToggle = null,
-            bool disabled = false
-        )
+        public bool ValidatedSwitch(string text, bool value, bool isValid, string validationMessage, SwitchVariant variant = SwitchVariant.Default, SwitchSize size = SwitchSize.Default, Action<bool> onToggle = null, bool disabled = false)
         {
             try
             {
-                return switchComponents?.ValidatedSwitch(
-                        text,
-                        ref value,
-                        isValid,
-                        validationMessage,
-                        variant,
-                        size,
-                        onToggle,
-                        disabled
-                    ) ?? value;
+                return switchComponents?.ValidatedSwitch(text, ref value, isValid, validationMessage, variant, size, onToggle, disabled) ?? value;
             }
             catch (Exception ex)
             {
@@ -2141,27 +1421,11 @@ namespace shadcnui
             }
         }
 
-        public bool SwitchWithTooltip(
-            string text,
-            bool value,
-            string tooltip,
-            SwitchVariant variant = SwitchVariant.Default,
-            SwitchSize size = SwitchSize.Default,
-            Action<bool> onToggle = null,
-            bool disabled = false
-        )
+        public bool SwitchWithTooltip(string text, bool value, string tooltip, SwitchVariant variant = SwitchVariant.Default, SwitchSize size = SwitchSize.Default, Action<bool> onToggle = null, bool disabled = false)
         {
             try
             {
-                return switchComponents?.SwitchWithTooltip(
-                        text,
-                        ref value,
-                        tooltip,
-                        variant,
-                        size,
-                        onToggle,
-                        disabled
-                    ) ?? value;
+                return switchComponents?.SwitchWithTooltip(text, ref value, tooltip, variant, size, onToggle, disabled) ?? value;
             }
             catch (Exception ex)
             {
@@ -2170,29 +1434,11 @@ namespace shadcnui
             }
         }
 
-        public bool[] SwitchGroup(
-            string[] labels,
-            bool[] values,
-            SwitchVariant variant = SwitchVariant.Default,
-            SwitchSize size = SwitchSize.Default,
-            Action<int, bool> onToggleChange = null,
-            bool disabled = false,
-            bool horizontal = false,
-            float spacing = 5f
-        )
+        public bool[] SwitchGroup(string[] labels, bool[] values, SwitchVariant variant = SwitchVariant.Default, SwitchSize size = SwitchSize.Default, Action<int, bool> onToggleChange = null, bool disabled = false, bool horizontal = false, float spacing = 5f)
         {
             try
             {
-                return switchComponents?.SwitchGroup(
-                        labels,
-                        values,
-                        variant,
-                        size,
-                        onToggleChange,
-                        disabled,
-                        horizontal,
-                        spacing
-                    ) ?? values;
+                return switchComponents?.SwitchGroup(labels, values, variant, size, onToggleChange, disabled, horizontal, spacing) ?? values;
             }
             catch (Exception ex)
             {
@@ -2201,27 +1447,11 @@ namespace shadcnui
             }
         }
 
-        public bool SwitchWithLoading(
-            string text,
-            bool value,
-            bool isLoading,
-            SwitchVariant variant = SwitchVariant.Default,
-            SwitchSize size = SwitchSize.Default,
-            Action<bool> onToggle = null,
-            bool disabled = false
-        )
+        public bool SwitchWithLoading(string text, bool value, bool isLoading, SwitchVariant variant = SwitchVariant.Default, SwitchSize size = SwitchSize.Default, Action<bool> onToggle = null, bool disabled = false)
         {
             try
             {
-                return switchComponents?.SwitchWithLoading(
-                        text,
-                        value,
-                        isLoading,
-                        variant,
-                        size,
-                        onToggle,
-                        disabled
-                    ) ?? value;
+                return switchComponents?.SwitchWithLoading(text, value, isLoading, variant, size, onToggle, disabled) ?? value;
             }
             catch (Exception ex)
             {
@@ -2232,12 +1462,7 @@ namespace shadcnui
         #endregion
 
         #region Badge Components
-        public void Badge(
-            string text,
-            BadgeVariant variant = BadgeVariant.Default,
-            BadgeSize size = BadgeSize.Default,
-            params GUILayoutOption[] options
-        )
+        public void Badge(string text, BadgeVariant variant = BadgeVariant.Default, BadgeSize size = BadgeSize.Default, params GUILayoutOption[] options)
         {
             try
             {
@@ -2249,12 +1474,7 @@ namespace shadcnui
             }
         }
 
-        public void Badge(
-            Rect rect,
-            string text,
-            BadgeVariant variant = BadgeVariant.Default,
-            BadgeSize size = BadgeSize.Default
-        )
+        public void Badge(Rect rect, string text, BadgeVariant variant = BadgeVariant.Default, BadgeSize size = BadgeSize.Default)
         {
             try
             {
@@ -2266,13 +1486,7 @@ namespace shadcnui
             }
         }
 
-        public void BadgeWithIcon(
-            string text,
-            Texture2D icon,
-            BadgeVariant variant = BadgeVariant.Default,
-            BadgeSize size = BadgeSize.Default,
-            params GUILayoutOption[] options
-        )
+        public void BadgeWithIcon(string text, Texture2D icon, BadgeVariant variant = BadgeVariant.Default, BadgeSize size = BadgeSize.Default, params GUILayoutOption[] options)
         {
             try
             {
@@ -2284,13 +1498,7 @@ namespace shadcnui
             }
         }
 
-        public void CustomBadge(
-            string text,
-            Color backgroundColor,
-            Color textColor,
-            BadgeSize size = BadgeSize.Default,
-            params GUILayoutOption[] options
-        )
+        public void CustomBadge(string text, Color backgroundColor, Color textColor, BadgeSize size = BadgeSize.Default, params GUILayoutOption[] options)
         {
             try
             {
@@ -2302,13 +1510,7 @@ namespace shadcnui
             }
         }
 
-        public void CountBadge(
-            int count,
-            BadgeVariant variant = BadgeVariant.Default,
-            BadgeSize size = BadgeSize.Default,
-            int maxCount = 99,
-            params GUILayoutOption[] options
-        )
+        public void CountBadge(int count, BadgeVariant variant = BadgeVariant.Default, BadgeSize size = BadgeSize.Default, int maxCount = 99, params GUILayoutOption[] options)
         {
             try
             {
@@ -2320,13 +1522,7 @@ namespace shadcnui
             }
         }
 
-        public void StatusBadge(
-            string text,
-            bool isActive,
-            BadgeVariant variant = BadgeVariant.Default,
-            BadgeSize size = BadgeSize.Default,
-            params GUILayoutOption[] options
-        )
+        public void StatusBadge(string text, bool isActive, BadgeVariant variant = BadgeVariant.Default, BadgeSize size = BadgeSize.Default, params GUILayoutOption[] options)
         {
             try
             {
@@ -2338,18 +1534,11 @@ namespace shadcnui
             }
         }
 
-        public bool DismissibleBadge(
-            string text,
-            BadgeVariant variant = BadgeVariant.Default,
-            BadgeSize size = BadgeSize.Default,
-            Action onDismiss = null,
-            params GUILayoutOption[] options
-        )
+        public bool DismissibleBadge(string text, BadgeVariant variant = BadgeVariant.Default, BadgeSize size = BadgeSize.Default, Action onDismiss = null, params GUILayoutOption[] options)
         {
             try
             {
-                return badgeComponents?.DismissibleBadge(text, variant, size, onDismiss, options)
-                    ?? false;
+                return badgeComponents?.DismissibleBadge(text, variant, size, onDismiss, options) ?? false;
             }
             catch (Exception ex)
             {
@@ -2358,13 +1547,7 @@ namespace shadcnui
             }
         }
 
-        public void ProgressBadge(
-            string text,
-            float progress,
-            BadgeVariant variant = BadgeVariant.Default,
-            BadgeSize size = BadgeSize.Default,
-            params GUILayoutOption[] options
-        )
+        public void ProgressBadge(string text, float progress, BadgeVariant variant = BadgeVariant.Default, BadgeSize size = BadgeSize.Default, params GUILayoutOption[] options)
         {
             try
             {
@@ -2376,12 +1559,7 @@ namespace shadcnui
             }
         }
 
-        public void AnimatedBadge(
-            string text,
-            BadgeVariant variant = BadgeVariant.Default,
-            BadgeSize size = BadgeSize.Default,
-            params GUILayoutOption[] options
-        )
+        public void AnimatedBadge(string text, BadgeVariant variant = BadgeVariant.Default, BadgeSize size = BadgeSize.Default, params GUILayoutOption[] options)
         {
             try
             {
@@ -2393,13 +1571,7 @@ namespace shadcnui
             }
         }
 
-        public void BadgeWithTooltip(
-            string text,
-            string tooltip,
-            BadgeVariant variant = BadgeVariant.Default,
-            BadgeSize size = BadgeSize.Default,
-            params GUILayoutOption[] options
-        )
+        public void BadgeWithTooltip(string text, string tooltip, BadgeVariant variant = BadgeVariant.Default, BadgeSize size = BadgeSize.Default, params GUILayoutOption[] options)
         {
             try
             {
@@ -2411,13 +1583,7 @@ namespace shadcnui
             }
         }
 
-        public void BadgeGroup(
-            string[] texts,
-            BadgeVariant[] variants,
-            BadgeSize size = BadgeSize.Default,
-            bool horizontal = true,
-            float spacing = 5f
-        )
+        public void BadgeGroup(string[] texts, BadgeVariant[] variants, BadgeSize size = BadgeSize.Default, bool horizontal = true, float spacing = 5f)
         {
             try
             {
@@ -2429,13 +1595,7 @@ namespace shadcnui
             }
         }
 
-        public void RoundedBadge(
-            string text,
-            BadgeVariant variant = BadgeVariant.Default,
-            BadgeSize size = BadgeSize.Default,
-            float cornerRadius = 12f,
-            params GUILayoutOption[] options
-        )
+        public void RoundedBadge(string text, BadgeVariant variant = BadgeVariant.Default, BadgeSize size = BadgeSize.Default, float cornerRadius = 12f, params GUILayoutOption[] options)
         {
             try
             {
@@ -2449,13 +1609,7 @@ namespace shadcnui
         #endregion
 
         #region Alert Components
-        public void Alert(
-            string title,
-            string description,
-            AlertVariant variant = AlertVariant.Default,
-            AlertType type = AlertType.Info,
-            params GUILayoutOption[] options
-        )
+        public void Alert(string title, string description, AlertVariant variant = AlertVariant.Default, AlertType type = AlertType.Info, params GUILayoutOption[] options)
         {
             try
             {
@@ -2467,14 +1621,7 @@ namespace shadcnui
             }
         }
 
-        public void AlertWithIcon(
-            string title,
-            string description,
-            Texture2D icon,
-            AlertVariant variant = AlertVariant.Default,
-            AlertType type = AlertType.Info,
-            params GUILayoutOption[] options
-        )
+        public void AlertWithIcon(string title, string description, Texture2D icon, AlertVariant variant = AlertVariant.Default, AlertType type = AlertType.Info, params GUILayoutOption[] options)
         {
             try
             {
@@ -2486,25 +1633,11 @@ namespace shadcnui
             }
         }
 
-        public bool DismissibleAlert(
-            string title,
-            string description,
-            AlertVariant variant = AlertVariant.Default,
-            AlertType type = AlertType.Info,
-            Action onDismiss = null,
-            params GUILayoutOption[] options
-        )
+        public bool DismissibleAlert(string title, string description, AlertVariant variant = AlertVariant.Default, AlertType type = AlertType.Info, Action onDismiss = null, params GUILayoutOption[] options)
         {
             try
             {
-                return alertComponents?.DismissibleAlert(
-                        title,
-                        description,
-                        variant,
-                        type,
-                        onDismiss,
-                        options
-                    ) ?? false;
+                return alertComponents?.DismissibleAlert(title, description, variant, type, onDismiss, options) ?? false;
             }
             catch (Exception ex)
             {
@@ -2513,27 +1646,11 @@ namespace shadcnui
             }
         }
 
-        public void AlertWithActions(
-            string title,
-            string description,
-            string[] buttonTexts,
-            Action<int> onButtonClick,
-            AlertVariant variant = AlertVariant.Default,
-            AlertType type = AlertType.Info,
-            params GUILayoutOption[] options
-        )
+        public void AlertWithActions(string title, string description, string[] buttonTexts, Action<int> onButtonClick, AlertVariant variant = AlertVariant.Default, AlertType type = AlertType.Info, params GUILayoutOption[] options)
         {
             try
             {
-                alertComponents?.AlertWithActions(
-                    title,
-                    description,
-                    buttonTexts,
-                    onButtonClick,
-                    variant,
-                    type,
-                    options
-                );
+                alertComponents?.AlertWithActions(title, description, buttonTexts, onButtonClick, variant, type, options);
             }
             catch (Exception ex)
             {
@@ -2541,23 +1658,11 @@ namespace shadcnui
             }
         }
 
-        public void CustomAlert(
-            string title,
-            string description,
-            Color backgroundColor,
-            Color textColor,
-            params GUILayoutOption[] options
-        )
+        public void CustomAlert(string title, string description, Color backgroundColor, Color textColor, params GUILayoutOption[] options)
         {
             try
             {
-                alertComponents?.CustomAlert(
-                    title,
-                    description,
-                    backgroundColor,
-                    textColor,
-                    options
-                );
+                alertComponents?.CustomAlert(title, description, backgroundColor, textColor, options);
             }
             catch (Exception ex)
             {
@@ -2565,25 +1670,11 @@ namespace shadcnui
             }
         }
 
-        public void AlertWithProgress(
-            string title,
-            string description,
-            float progress,
-            AlertVariant variant = AlertVariant.Default,
-            AlertType type = AlertType.Info,
-            params GUILayoutOption[] options
-        )
+        public void AlertWithProgress(string title, string description, float progress, AlertVariant variant = AlertVariant.Default, AlertType type = AlertType.Info, params GUILayoutOption[] options)
         {
             try
             {
-                alertComponents?.AlertWithProgress(
-                    title,
-                    description,
-                    progress,
-                    variant,
-                    type,
-                    options
-                );
+                alertComponents?.AlertWithProgress(title, description, progress, variant, type, options);
             }
             catch (Exception ex)
             {
@@ -2591,13 +1682,7 @@ namespace shadcnui
             }
         }
 
-        public void AnimatedAlert(
-            string title,
-            string description,
-            AlertVariant variant = AlertVariant.Default,
-            AlertType type = AlertType.Info,
-            params GUILayoutOption[] options
-        )
+        public void AnimatedAlert(string title, string description, AlertVariant variant = AlertVariant.Default, AlertType type = AlertType.Info, params GUILayoutOption[] options)
         {
             try
             {
@@ -2609,27 +1694,11 @@ namespace shadcnui
             }
         }
 
-        public void AlertWithCountdown(
-            string title,
-            string description,
-            float countdownTime,
-            Action onTimeout,
-            AlertVariant variant = AlertVariant.Default,
-            AlertType type = AlertType.Info,
-            params GUILayoutOption[] options
-        )
+        public void AlertWithCountdown(string title, string description, float countdownTime, Action onTimeout, AlertVariant variant = AlertVariant.Default, AlertType type = AlertType.Info, params GUILayoutOption[] options)
         {
             try
             {
-                alertComponents?.AlertWithCountdown(
-                    title,
-                    description,
-                    countdownTime,
-                    onTimeout,
-                    variant,
-                    type,
-                    options
-                );
+                alertComponents?.AlertWithCountdown(title, description, countdownTime, onTimeout, variant, type, options);
             }
             catch (Exception ex)
             {
@@ -2637,27 +1706,11 @@ namespace shadcnui
             }
         }
 
-        public bool ExpandableAlert(
-            string title,
-            string description,
-            string expandedContent,
-            ref bool isExpanded,
-            AlertVariant variant = AlertVariant.Default,
-            AlertType type = AlertType.Info,
-            params GUILayoutOption[] options
-        )
+        public bool ExpandableAlert(string title, string description, string expandedContent, ref bool isExpanded, AlertVariant variant = AlertVariant.Default, AlertType type = AlertType.Info, params GUILayoutOption[] options)
         {
             try
             {
-                return alertComponents?.ExpandableAlert(
-                        title,
-                        description,
-                        expandedContent,
-                        ref isExpanded,
-                        variant,
-                        type,
-                        options
-                    ) ?? false;
+                return alertComponents?.ExpandableAlert(title, description, expandedContent, ref isExpanded, variant, type, options) ?? false;
             }
             catch (Exception ex)
             {
@@ -2666,25 +1719,11 @@ namespace shadcnui
             }
         }
 
-        public void AlertWithStatus(
-            string title,
-            string description,
-            bool isActive,
-            AlertVariant variant = AlertVariant.Default,
-            AlertType type = AlertType.Info,
-            params GUILayoutOption[] options
-        )
+        public void AlertWithStatus(string title, string description, bool isActive, AlertVariant variant = AlertVariant.Default, AlertType type = AlertType.Info, params GUILayoutOption[] options)
         {
             try
             {
-                alertComponents?.AlertWithStatus(
-                    title,
-                    description,
-                    isActive,
-                    variant,
-                    type,
-                    options
-                );
+                alertComponents?.AlertWithStatus(title, description, isActive, variant, type, options);
             }
             catch (Exception ex)
             {
@@ -2692,15 +1731,7 @@ namespace shadcnui
             }
         }
 
-        public void AlertWithCustomIcon(
-            string title,
-            string description,
-            Texture2D icon,
-            Color iconColor,
-            AlertVariant variant = AlertVariant.Default,
-            AlertType type = AlertType.Info,
-            params GUILayoutOption[] options
-        )
+        public void AlertWithCustomIcon(string title, string description, Texture2D icon, Color iconColor, AlertVariant variant = AlertVariant.Default, AlertType type = AlertType.Info, params GUILayoutOption[] options)
         {
             try
             {
@@ -2714,13 +1745,7 @@ namespace shadcnui
         #endregion
 
         #region Avatar Components
-        public void Avatar(
-            Texture2D image,
-            string fallbackText,
-            AvatarSize size = AvatarSize.Default,
-            AvatarShape shape = AvatarShape.Circle,
-            params GUILayoutOption[] options
-        )
+        public void Avatar(Texture2D image, string fallbackText, AvatarSize size = AvatarSize.Default, AvatarShape shape = AvatarShape.Circle, params GUILayoutOption[] options)
         {
             try
             {
@@ -2732,13 +1757,7 @@ namespace shadcnui
             }
         }
 
-        public void Avatar(
-            Rect rect,
-            Texture2D image,
-            string fallbackText,
-            AvatarSize size = AvatarSize.Default,
-            AvatarShape shape = AvatarShape.Circle
-        )
+        public void Avatar(Rect rect, Texture2D image, string fallbackText, AvatarSize size = AvatarSize.Default, AvatarShape shape = AvatarShape.Circle)
         {
             try
             {
@@ -2750,25 +1769,11 @@ namespace shadcnui
             }
         }
 
-        public void AvatarWithStatus(
-            Texture2D image,
-            string fallbackText,
-            bool isOnline,
-            AvatarSize size = AvatarSize.Default,
-            AvatarShape shape = AvatarShape.Circle,
-            params GUILayoutOption[] options
-        )
+        public void AvatarWithStatus(Texture2D image, string fallbackText, bool isOnline, AvatarSize size = AvatarSize.Default, AvatarShape shape = AvatarShape.Circle, params GUILayoutOption[] options)
         {
             try
             {
-                avatarComponents?.AvatarWithStatus(
-                    image,
-                    fallbackText,
-                    isOnline,
-                    size,
-                    shape,
-                    options
-                );
+                avatarComponents?.AvatarWithStatus(image, fallbackText, isOnline, size, shape, options);
             }
             catch (Exception ex)
             {
@@ -2776,27 +1781,11 @@ namespace shadcnui
             }
         }
 
-        public void AvatarWithName(
-            Texture2D image,
-            string fallbackText,
-            string name,
-            AvatarSize size = AvatarSize.Default,
-            AvatarShape shape = AvatarShape.Circle,
-            bool showNameBelow = false,
-            params GUILayoutOption[] options
-        )
+        public void AvatarWithName(Texture2D image, string fallbackText, string name, AvatarSize size = AvatarSize.Default, AvatarShape shape = AvatarShape.Circle, bool showNameBelow = false, params GUILayoutOption[] options)
         {
             try
             {
-                avatarComponents?.AvatarWithName(
-                    image,
-                    fallbackText,
-                    name,
-                    size,
-                    shape,
-                    showNameBelow,
-                    options
-                );
+                avatarComponents?.AvatarWithName(image, fallbackText, name, size, shape, showNameBelow, options);
             }
             catch (Exception ex)
             {
@@ -2804,27 +1793,11 @@ namespace shadcnui
             }
         }
 
-        public void CustomAvatar(
-            Texture2D image,
-            string fallbackText,
-            Color backgroundColor,
-            Color textColor,
-            AvatarSize size = AvatarSize.Default,
-            AvatarShape shape = AvatarShape.Circle,
-            params GUILayoutOption[] options
-        )
+        public void CustomAvatar(Texture2D image, string fallbackText, Color backgroundColor, Color textColor, AvatarSize size = AvatarSize.Default, AvatarShape shape = AvatarShape.Circle, params GUILayoutOption[] options)
         {
             try
             {
-                avatarComponents?.CustomAvatar(
-                    image,
-                    fallbackText,
-                    backgroundColor,
-                    textColor,
-                    size,
-                    shape,
-                    options
-                );
+                avatarComponents?.CustomAvatar(image, fallbackText, backgroundColor, textColor, size, shape, options);
             }
             catch (Exception ex)
             {
@@ -2832,25 +1805,11 @@ namespace shadcnui
             }
         }
 
-        public void AvatarWithBorder(
-            Texture2D image,
-            string fallbackText,
-            Color borderColor,
-            AvatarSize size = AvatarSize.Default,
-            AvatarShape shape = AvatarShape.Circle,
-            params GUILayoutOption[] options
-        )
+        public void AvatarWithBorder(Texture2D image, string fallbackText, Color borderColor, AvatarSize size = AvatarSize.Default, AvatarShape shape = AvatarShape.Circle, params GUILayoutOption[] options)
         {
             try
             {
-                avatarComponents?.AvatarWithBorder(
-                    image,
-                    fallbackText,
-                    borderColor,
-                    size,
-                    shape,
-                    options
-                );
+                avatarComponents?.AvatarWithBorder(image, fallbackText, borderColor, size, shape, options);
             }
             catch (Exception ex)
             {
@@ -2858,25 +1817,11 @@ namespace shadcnui
             }
         }
 
-        public void AvatarWithHover(
-            Texture2D image,
-            string fallbackText,
-            AvatarSize size = AvatarSize.Default,
-            AvatarShape shape = AvatarShape.Circle,
-            Action onClick = null,
-            params GUILayoutOption[] options
-        )
+        public void AvatarWithHover(Texture2D image, string fallbackText, AvatarSize size = AvatarSize.Default, AvatarShape shape = AvatarShape.Circle, Action onClick = null, params GUILayoutOption[] options)
         {
             try
             {
-                avatarComponents?.AvatarWithHover(
-                    image,
-                    fallbackText,
-                    size,
-                    shape,
-                    onClick,
-                    options
-                );
+                avatarComponents?.AvatarWithHover(image, fallbackText, size, shape, onClick, options);
             }
             catch (Exception ex)
             {
@@ -2884,25 +1829,11 @@ namespace shadcnui
             }
         }
 
-        public void AvatarWithLoading(
-            Texture2D image,
-            string fallbackText,
-            bool isLoading,
-            AvatarSize size = AvatarSize.Default,
-            AvatarShape shape = AvatarShape.Circle,
-            params GUILayoutOption[] options
-        )
+        public void AvatarWithLoading(Texture2D image, string fallbackText, bool isLoading, AvatarSize size = AvatarSize.Default, AvatarShape shape = AvatarShape.Circle, params GUILayoutOption[] options)
         {
             try
             {
-                avatarComponents?.AvatarWithLoading(
-                    image,
-                    fallbackText,
-                    isLoading,
-                    size,
-                    shape,
-                    options
-                );
+                avatarComponents?.AvatarWithLoading(image, fallbackText, isLoading, size, shape, options);
             }
             catch (Exception ex)
             {
@@ -2910,25 +1841,11 @@ namespace shadcnui
             }
         }
 
-        public void AvatarWithTooltip(
-            Texture2D image,
-            string fallbackText,
-            string tooltip,
-            AvatarSize size = AvatarSize.Default,
-            AvatarShape shape = AvatarShape.Circle,
-            params GUILayoutOption[] options
-        )
+        public void AvatarWithTooltip(Texture2D image, string fallbackText, string tooltip, AvatarSize size = AvatarSize.Default, AvatarShape shape = AvatarShape.Circle, params GUILayoutOption[] options)
         {
             try
             {
-                avatarComponents?.AvatarWithTooltip(
-                    image,
-                    fallbackText,
-                    tooltip,
-                    size,
-                    shape,
-                    options
-                );
+                avatarComponents?.AvatarWithTooltip(image, fallbackText, tooltip, size, shape, options);
             }
             catch (Exception ex)
             {
@@ -2936,14 +1853,7 @@ namespace shadcnui
             }
         }
 
-        public void AvatarGroup(
-            AvatarData[] avatars,
-            AvatarSize size = AvatarSize.Default,
-            AvatarShape shape = AvatarShape.Circle,
-            int maxVisible = 3,
-            float overlap = -8f,
-            params GUILayoutOption[] options
-        )
+        public void AvatarGroup(AvatarData[] avatars, AvatarSize size = AvatarSize.Default, AvatarShape shape = AvatarShape.Circle, int maxVisible = 3, float overlap = -8f, params GUILayoutOption[] options)
         {
             try
             {
@@ -2957,13 +1867,7 @@ namespace shadcnui
         #endregion
 
         #region Skeleton Components
-        public void Skeleton(
-            float width,
-            float height,
-            SkeletonVariant variant = SkeletonVariant.Default,
-            SkeletonSize size = SkeletonSize.Default,
-            params GUILayoutOption[] options
-        )
+        public void Skeleton(float width, float height, SkeletonVariant variant = SkeletonVariant.Default, SkeletonSize size = SkeletonSize.Default, params GUILayoutOption[] options)
         {
             try
             {
@@ -2975,13 +1879,7 @@ namespace shadcnui
             }
         }
 
-        public void AnimatedSkeleton(
-            float width,
-            float height,
-            SkeletonVariant variant = SkeletonVariant.Default,
-            SkeletonSize size = SkeletonSize.Default,
-            params GUILayoutOption[] options
-        )
+        public void AnimatedSkeleton(float width, float height, SkeletonVariant variant = SkeletonVariant.Default, SkeletonSize size = SkeletonSize.Default, params GUILayoutOption[] options)
         {
             try
             {
@@ -2993,13 +1891,7 @@ namespace shadcnui
             }
         }
 
-        public void ShimmerSkeleton(
-            float width,
-            float height,
-            SkeletonVariant variant = SkeletonVariant.Default,
-            SkeletonSize size = SkeletonSize.Default,
-            params GUILayoutOption[] options
-        )
+        public void ShimmerSkeleton(float width, float height, SkeletonVariant variant = SkeletonVariant.Default, SkeletonSize size = SkeletonSize.Default, params GUILayoutOption[] options)
         {
             try
             {
@@ -3011,27 +1903,11 @@ namespace shadcnui
             }
         }
 
-        public void CustomSkeleton(
-            float width,
-            float height,
-            Color backgroundColor,
-            Color shimmerColor,
-            SkeletonVariant variant = SkeletonVariant.Default,
-            SkeletonSize size = SkeletonSize.Default,
-            params GUILayoutOption[] options
-        )
+        public void CustomSkeleton(float width, float height, Color backgroundColor, Color shimmerColor, SkeletonVariant variant = SkeletonVariant.Default, SkeletonSize size = SkeletonSize.Default, params GUILayoutOption[] options)
         {
             try
             {
-                skeletonComponents?.CustomSkeleton(
-                    width,
-                    height,
-                    backgroundColor,
-                    shimmerColor,
-                    variant,
-                    size,
-                    options
-                );
+                skeletonComponents?.CustomSkeleton(width, height, backgroundColor, shimmerColor, variant, size, options);
             }
             catch (Exception ex)
             {
@@ -3039,14 +1915,7 @@ namespace shadcnui
             }
         }
 
-        public void SkeletonText(
-            float width,
-            int lineCount,
-            float lineHeight = 20f,
-            SkeletonVariant variant = SkeletonVariant.Default,
-            SkeletonSize size = SkeletonSize.Default,
-            params GUILayoutOption[] options
-        )
+        public void SkeletonText(float width, int lineCount, float lineHeight = 20f, SkeletonVariant variant = SkeletonVariant.Default, SkeletonSize size = SkeletonSize.Default, params GUILayoutOption[] options)
         {
             try
             {
@@ -3058,11 +1927,7 @@ namespace shadcnui
             }
         }
 
-        public void SkeletonAvatar(
-            float size,
-            SkeletonVariant variant = SkeletonVariant.Circular,
-            params GUILayoutOption[] options
-        )
+        public void SkeletonAvatar(float size, SkeletonVariant variant = SkeletonVariant.Circular, params GUILayoutOption[] options)
         {
             try
             {
@@ -3074,13 +1939,7 @@ namespace shadcnui
             }
         }
 
-        public void SkeletonButton(
-            float width = 120f,
-            float height = 36f,
-            SkeletonVariant variant = SkeletonVariant.Rounded,
-            SkeletonSize size = SkeletonSize.Default,
-            params GUILayoutOption[] options
-        )
+        public void SkeletonButton(float width = 120f, float height = 36f, SkeletonVariant variant = SkeletonVariant.Rounded, SkeletonSize size = SkeletonSize.Default, params GUILayoutOption[] options)
         {
             try
             {
@@ -3092,23 +1951,11 @@ namespace shadcnui
             }
         }
 
-        public void SkeletonCard(
-            float width = 300f,
-            float height = 200f,
-            bool includeHeader = true,
-            bool includeFooter = false,
-            params GUILayoutOption[] options
-        )
+        public void SkeletonCard(float width = 300f, float height = 200f, bool includeHeader = true, bool includeFooter = false, params GUILayoutOption[] options)
         {
             try
             {
-                skeletonComponents?.SkeletonCard(
-                    width,
-                    height,
-                    includeHeader,
-                    includeFooter,
-                    options
-                );
+                skeletonComponents?.SkeletonCard(width, height, includeHeader, includeFooter, options);
             }
             catch (Exception ex)
             {
@@ -3116,24 +1963,11 @@ namespace shadcnui
             }
         }
 
-        public void SkeletonTable(
-            int rowCount,
-            int columnCount,
-            float cellWidth = 100f,
-            float cellHeight = 30f,
-            params GUILayoutOption[] options
-        )
+        public void SkeletonTable(int rowCount, int columnCount, float cellWidth = 100f, float cellHeight = 30f, params GUILayoutOption[] options)
         {
             try
             {
-                skeletonComponents?.SkeletonTable(
-                    cellWidth,
-                    rowCount,
-                    columnCount,
-                    cellHeight,
-                    0f,
-                    options
-                );
+                skeletonComponents?.SkeletonTable(cellWidth, rowCount, columnCount, cellHeight, 0f, options);
             }
             catch (Exception ex)
             {
@@ -3141,11 +1975,7 @@ namespace shadcnui
             }
         }
 
-        public void SkeletonList(
-            int itemCount,
-            float itemHeight = 60f,
-            params GUILayoutOption[] options
-        )
+        public void SkeletonList(int itemCount, float itemHeight = 60f, params GUILayoutOption[] options)
         {
             try
             {
@@ -3157,25 +1987,11 @@ namespace shadcnui
             }
         }
 
-        public void SkeletonWithProgress(
-            float width,
-            float height,
-            float progress,
-            SkeletonVariant variant = SkeletonVariant.Default,
-            SkeletonSize size = SkeletonSize.Default,
-            params GUILayoutOption[] options
-        )
+        public void SkeletonWithProgress(float width, float height, float progress, SkeletonVariant variant = SkeletonVariant.Default, SkeletonSize size = SkeletonSize.Default, params GUILayoutOption[] options)
         {
             try
             {
-                skeletonComponents?.SkeletonWithProgress(
-                    width,
-                    height,
-                    progress,
-                    variant,
-                    size,
-                    options
-                );
+                skeletonComponents?.SkeletonWithProgress(width, height, progress, variant, size, options);
             }
             catch (Exception ex)
             {
@@ -3183,14 +1999,7 @@ namespace shadcnui
             }
         }
 
-        public void FadeSkeleton(
-            float width,
-            float height,
-            float fadeTime,
-            SkeletonVariant variant = SkeletonVariant.Default,
-            SkeletonSize size = SkeletonSize.Default,
-            params GUILayoutOption[] options
-        )
+        public void FadeSkeleton(float width, float height, float fadeTime, SkeletonVariant variant = SkeletonVariant.Default, SkeletonSize size = SkeletonSize.Default, params GUILayoutOption[] options)
         {
             try
             {
@@ -3204,13 +2013,7 @@ namespace shadcnui
         #endregion
 
         #region Table Components
-        public void Table(
-            string[] headers,
-            string[,] data,
-            TableVariant variant = TableVariant.Default,
-            TableSize size = TableSize.Default,
-            params GUILayoutOption[] options
-        )
+        public void Table(string[] headers, string[,] data, TableVariant variant = TableVariant.Default, TableSize size = TableSize.Default, params GUILayoutOption[] options)
         {
             try
             {
@@ -3222,13 +2025,7 @@ namespace shadcnui
             }
         }
 
-        public void Table(
-            Rect rect,
-            string[] headers,
-            string[,] data,
-            TableVariant variant = TableVariant.Default,
-            TableSize size = TableSize.Default
-        )
+        public void Table(Rect rect, string[] headers, string[,] data, TableVariant variant = TableVariant.Default, TableSize size = TableSize.Default)
         {
             try
             {
@@ -3240,29 +2037,11 @@ namespace shadcnui
             }
         }
 
-        public void SortableTable(
-            string[] headers,
-            string[,] data,
-            ref int[] sortColumns,
-            ref bool[] sortAscending,
-            TableVariant variant = TableVariant.Default,
-            TableSize size = TableSize.Default,
-            Action<int, bool> onSort = null,
-            params GUILayoutOption[] options
-        )
+        public void SortableTable(string[] headers, string[,] data, ref int[] sortColumns, ref bool[] sortAscending, TableVariant variant = TableVariant.Default, TableSize size = TableSize.Default, Action<int, bool> onSort = null, params GUILayoutOption[] options)
         {
             try
             {
-                tableComponents?.SortableTable(
-                    headers,
-                    data,
-                    ref sortColumns,
-                    ref sortAscending,
-                    variant,
-                    size,
-                    onSort,
-                    options
-                );
+                tableComponents?.SortableTable(headers, data, ref sortColumns, ref sortAscending, variant, size, onSort, options);
             }
             catch (Exception ex)
             {
@@ -3270,27 +2049,11 @@ namespace shadcnui
             }
         }
 
-        public void SelectableTable(
-            string[] headers,
-            string[,] data,
-            ref bool[] selectedRows,
-            TableVariant variant = TableVariant.Default,
-            TableSize size = TableSize.Default,
-            Action<int, bool> onSelectionChange = null,
-            params GUILayoutOption[] options
-        )
+        public void SelectableTable(string[] headers, string[,] data, ref bool[] selectedRows, TableVariant variant = TableVariant.Default, TableSize size = TableSize.Default, Action<int, bool> onSelectionChange = null, params GUILayoutOption[] options)
         {
             try
             {
-                tableComponents?.SelectableTable(
-                    headers,
-                    data,
-                    ref selectedRows,
-                    variant,
-                    size,
-                    onSelectionChange,
-                    options
-                );
+                tableComponents?.SelectableTable(headers, data, ref selectedRows, variant, size, onSelectionChange, options);
             }
             catch (Exception ex)
             {
@@ -3298,14 +2061,7 @@ namespace shadcnui
             }
         }
 
-        public void CustomTable(
-            string[] headers,
-            object[,] data,
-            Action<object, int, int> cellRenderer,
-            TableVariant variant = TableVariant.Default,
-            TableSize size = TableSize.Default,
-            params GUILayoutOption[] options
-        )
+        public void CustomTable(string[] headers, object[,] data, Action<object, int, int> cellRenderer, TableVariant variant = TableVariant.Default, TableSize size = TableSize.Default, params GUILayoutOption[] options)
         {
             try
             {
@@ -3317,29 +2073,11 @@ namespace shadcnui
             }
         }
 
-        public void PaginatedTable(
-            string[] headers,
-            string[,] data,
-            ref int currentPage,
-            int pageSize,
-            TableVariant variant = TableVariant.Default,
-            TableSize size = TableSize.Default,
-            Action<int> onPageChange = null,
-            params GUILayoutOption[] options
-        )
+        public void PaginatedTable(string[] headers, string[,] data, ref int currentPage, int pageSize, TableVariant variant = TableVariant.Default, TableSize size = TableSize.Default, Action<int> onPageChange = null, params GUILayoutOption[] options)
         {
             try
             {
-                tableComponents?.PaginatedTable(
-                    headers,
-                    data,
-                    ref currentPage,
-                    pageSize,
-                    variant,
-                    size,
-                    onPageChange,
-                    options
-                );
+                tableComponents?.PaginatedTable(headers, data, ref currentPage, pageSize, variant, size, onPageChange, options);
             }
             catch (Exception ex)
             {
@@ -3347,29 +2085,11 @@ namespace shadcnui
             }
         }
 
-        public void SearchableTable(
-            string[] headers,
-            string[,] data,
-            ref string searchQuery,
-            ref string[,] filteredData,
-            TableVariant variant = TableVariant.Default,
-            TableSize size = TableSize.Default,
-            Action<string> onSearch = null,
-            params GUILayoutOption[] options
-        )
+        public void SearchableTable(string[] headers, string[,] data, ref string searchQuery, ref string[,] filteredData, TableVariant variant = TableVariant.Default, TableSize size = TableSize.Default, Action<string> onSearch = null, params GUILayoutOption[] options)
         {
             try
             {
-                tableComponents?.SearchableTable(
-                    headers,
-                    data,
-                    ref searchQuery,
-                    ref filteredData,
-                    variant,
-                    size,
-                    onSearch,
-                    options
-                );
+                tableComponents?.SearchableTable(headers, data, ref searchQuery, ref filteredData, variant, size, onSearch, options);
             }
             catch (Exception ex)
             {
@@ -3377,25 +2097,11 @@ namespace shadcnui
             }
         }
 
-        public void ResizableTable(
-            string[] headers,
-            string[,] data,
-            ref float[] columnWidths,
-            TableVariant variant = TableVariant.Default,
-            TableSize size = TableSize.Default,
-            params GUILayoutOption[] options
-        )
+        public void ResizableTable(string[] headers, string[,] data, ref float[] columnWidths, TableVariant variant = TableVariant.Default, TableSize size = TableSize.Default, params GUILayoutOption[] options)
         {
             try
             {
-                tableComponents?.ResizableTable(
-                    headers,
-                    data,
-                    ref columnWidths,
-                    variant,
-                    size,
-                    options
-                );
+                tableComponents?.ResizableTable(headers, data, ref columnWidths, variant, size, options);
             }
             catch (Exception ex)
             {
