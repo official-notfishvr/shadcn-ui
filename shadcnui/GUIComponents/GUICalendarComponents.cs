@@ -23,6 +23,7 @@ namespace shadcnui.GUIComponents
         {
             var styleManager = guiHelper.GetStyleManager();
 
+            layoutComponents.BeginHorizontalGroup();
 #if IL2CPP
             if (GUILayout.Button("<", styleManager.buttonGhostStyle, new Il2CppReferenceArray<GUILayoutOption>(new GUILayoutOption[0])))
 #else
@@ -46,7 +47,9 @@ namespace shadcnui.GUIComponents
             {
                 selectedDate = selectedDate.AddMonths(1);
             }
+            layoutComponents.EndHorizontalGroup();
 
+            layoutComponents.BeginHorizontalGroup();
             for (int i = 0; i < 7; i++)
             {
 #if IL2CPP
@@ -55,6 +58,7 @@ namespace shadcnui.GUIComponents
                 GUILayout.Label(((DayOfWeek)i).ToString().Substring(0, 2), styleManager.calendarWeekdayStyle);
 #endif
             }
+            layoutComponents.EndHorizontalGroup();
 
             int daysInMonth = DateTime.DaysInMonth(selectedDate.Year, selectedDate.Month);
             int firstDayOfMonth = (int)new DateTime(selectedDate.Year, selectedDate.Month, 1).DayOfWeek;
@@ -62,6 +66,7 @@ namespace shadcnui.GUIComponents
             int dayCounter = 1;
             for (int i = 0; i < 6; i++)
             {
+                layoutComponents.BeginHorizontalGroup();
                 for (int j = 0; j < 7; j++)
                 {
                     if ((i == 0 && j < firstDayOfMonth) || dayCounter > daysInMonth)
@@ -92,6 +97,7 @@ namespace shadcnui.GUIComponents
                         dayCounter++;
                     }
                 }
+                layoutComponents.EndHorizontalGroup();
                 if (dayCounter > daysInMonth)
                     break;
             }
