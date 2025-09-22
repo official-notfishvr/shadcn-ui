@@ -9,18 +9,18 @@ using UnhollowerBaseLib;
 
 namespace shadcnui.GUIComponents
 {
-    public class GUIToggleComponents
+    public class Toggle
     {
         private GUIHelper guiHelper;
-        private GUILayoutComponents layoutComponents;
+        private Layout layoutComponents;
 
-        public GUIToggleComponents(GUIHelper helper)
+        public Toggle(GUIHelper helper)
         {
             guiHelper = helper;
-            layoutComponents = new GUILayoutComponents(helper);
+            layoutComponents = new Layout(helper);
         }
 
-        public bool Toggle(string text, bool value, ToggleVariant variant = ToggleVariant.Default, ToggleSize size = ToggleSize.Default, Action<bool> onToggle = null, bool disabled = false, params GUILayoutOption[] options)
+        public bool DrawToggle(string text, bool value, ToggleVariant variant = ToggleVariant.Default, ToggleSize size = ToggleSize.Default, Action<bool> onToggle = null, bool disabled = false, params GUILayoutOption[] options)
         {
             var styleManager = guiHelper.GetStyleManager();
             GUIStyle toggleStyle = styleManager.GetToggleStyle(variant, size);
@@ -49,7 +49,7 @@ namespace shadcnui.GUIComponents
             return newValue;
         }
 
-        public bool Toggle(Rect rect, string text, bool value, ToggleVariant variant = ToggleVariant.Default, ToggleSize size = ToggleSize.Default, Action<bool> onToggle = null, bool disabled = false)
+        public bool DrawToggle(Rect rect, string text, bool value, ToggleVariant variant = ToggleVariant.Default, ToggleSize size = ToggleSize.Default, Action<bool> onToggle = null, bool disabled = false)
         {
             var styleManager = guiHelper.GetStyleManager();
             GUIStyle toggleStyle = styleManager.GetToggleStyle(variant, size);
@@ -94,7 +94,7 @@ namespace shadcnui.GUIComponents
             for (int i = 0; i < texts.Length; i++)
             {
                 bool isSelected = (i == selectedIndex);
-                if (Toggle(texts[i], isSelected, variant, size) && !isSelected)
+                if (DrawToggle(texts[i], isSelected, variant, size) && !isSelected)
                 {
                     newSelectedIndex = i;
                     onSelectionChange?.Invoke(i);
@@ -138,7 +138,7 @@ namespace shadcnui.GUIComponents
 
             for (int i = 0; i < texts.Length; i++)
             {
-                newStates[i] = Toggle(texts[i], selectedStates[i], variant, size, (value) => onToggleChange?.Invoke(i, value));
+                newStates[i] = DrawToggle(texts[i], selectedStates[i], variant, size, (value) => onToggleChange?.Invoke(i, value));
 
                 if (horizontal && i < texts.Length - 1)
                     layoutComponents.AddSpace(spacing);

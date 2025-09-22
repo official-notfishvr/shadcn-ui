@@ -8,18 +8,18 @@ using UnhollowerBaseLib;
 
 namespace shadcnui.GUIComponents
 {
-    public class GUIAlertComponents
+    public class Alert
     {
         private GUIHelper guiHelper;
-        private GUILayoutComponents layoutComponents;
+        private Layout layoutComponents;
 
-        public GUIAlertComponents(GUIHelper helper)
+        public Alert(GUIHelper helper)
         {
             guiHelper = helper;
-            layoutComponents = new GUILayoutComponents(helper);
+            layoutComponents = new Layout(helper);
         }
 
-        public void Alert(string title, string description, AlertVariant variant = AlertVariant.Default, AlertType type = AlertType.Info, Texture2D icon = null, params GUILayoutOption[] options)
+        public void DrawAlert(string title, string description, AlertVariant variant = AlertVariant.Default, AlertType type = AlertType.Info, Texture2D icon = null, params GUILayoutOption[] options)
         {
             var styleManager = guiHelper.GetStyleManager();
             GUIStyle alertStyle = styleManager.GetAlertStyle(variant, type);
@@ -62,26 +62,11 @@ namespace shadcnui.GUIComponents
             layoutComponents.EndVerticalGroup();
         }
 
-        public bool DismissibleAlert(string title, string description, AlertVariant variant = AlertVariant.Default, AlertType type = AlertType.Info, Action onDismiss = null, params GUILayoutOption[] options)
-        {
-            layoutComponents.BeginVerticalGroup();
-
-            Alert(title, description, variant, type, null, options);
-
-            layoutComponents.AddSpace(4);
-            layoutComponents.BeginHorizontalGroup();
-            GUILayout.FlexibleSpace();
-            bool closeClicked = guiHelper.Button("X", ButtonVariant.Ghost, ButtonSize.Icon, onClick: onDismiss);
-            layoutComponents.EndHorizontalGroup();
-
-            return closeClicked;
-        }
-
         public void AlertWithActions(string title, string description, string[] buttonTexts, Action<int> onButtonClick, AlertVariant variant = AlertVariant.Default, AlertType type = AlertType.Info, params GUILayoutOption[] options)
         {
             layoutComponents.BeginVerticalGroup();
 
-            Alert(title, description, variant, type, null, options);
+            DrawAlert(title, description, variant, type, null, options);
 
             if (buttonTexts != null && buttonTexts.Length > 0)
             {
@@ -150,7 +135,7 @@ namespace shadcnui.GUIComponents
         {
             layoutComponents.BeginVerticalGroup();
 
-            Alert(title, description, variant, type, null, options);
+            DrawAlert(title, description, variant, type, null, options);
 
             layoutComponents.AddSpace(8);
             Rect progressRect = GUILayoutUtility.GetRect(200 * guiHelper.uiScale, 6 * guiHelper.uiScale);
@@ -177,9 +162,7 @@ namespace shadcnui.GUIComponents
             float alpha = Mathf.Clamp01(time);
 
             Color originalColor = GUI.color;
-            GUI.color = new Color(originalColor.r, originalColor.g, originalColor.b, alpha);
-
-            Alert(title, description, variant, type, null, options);
+            DrawAlert(title, description, variant, type, null, options);
 
             GUI.color = originalColor;
         }
@@ -188,7 +171,7 @@ namespace shadcnui.GUIComponents
         {
             layoutComponents.BeginVerticalGroup();
 
-            Alert(title, description, variant, type, null, options);
+            DrawAlert(title, description, variant, type, null, options);
 
             layoutComponents.AddSpace(4);
             int remainingSeconds = Mathf.CeilToInt(countdownTime);
@@ -214,7 +197,7 @@ namespace shadcnui.GUIComponents
         {
             layoutComponents.BeginVerticalGroup();
 
-            Alert(title, description, variant, type, null, options);
+            DrawAlert(title, description, variant, type, null, options);
 
             layoutComponents.AddSpace(4);
             string buttonText = isExpanded ? "Show Less" : "Show More";
@@ -265,8 +248,7 @@ namespace shadcnui.GUIComponents
             }
 
             layoutComponents.BeginVerticalGroup();
-            Alert(title, description, variant, type, null, options);
-            layoutComponents.EndVerticalGroup();
+            DrawAlert(title, description, variant, type, null, options);
 
             layoutComponents.EndHorizontalGroup();
         }

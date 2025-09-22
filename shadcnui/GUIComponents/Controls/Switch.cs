@@ -8,18 +8,18 @@ using UnhollowerBaseLib;
 
 namespace shadcnui.GUIComponents
 {
-    public class GUISwitchComponents
+    public class Switch
     {
         private GUIHelper guiHelper;
-        private GUILayoutComponents layoutComponents;
+        private Layout layoutComponents;
 
-        public GUISwitchComponents(GUIHelper helper)
+        public Switch(GUIHelper helper)
         {
             guiHelper = helper;
-            layoutComponents = new GUILayoutComponents(helper);
+            layoutComponents = new Layout(helper);
         }
 
-        public bool Switch(string text, bool value, SwitchVariant variant = SwitchVariant.Default, SwitchSize size = SwitchSize.Default, Action<bool> onToggle = null, bool disabled = false, params GUILayoutOption[] options)
+        public bool DrawSwitch(string text, bool value, SwitchVariant variant = SwitchVariant.Default, SwitchSize size = SwitchSize.Default, Action<bool> onToggle = null, bool disabled = false, params GUILayoutOption[] options)
         {
             var styleManager = guiHelper.GetStyleManager();
             if (styleManager == null)
@@ -52,7 +52,7 @@ namespace shadcnui.GUIComponents
             return newValue && !disabled;
         }
 
-        public bool Switch(Rect rect, string text, bool value, SwitchVariant variant = SwitchVariant.Default, SwitchSize size = SwitchSize.Default, Action<bool> onToggle = null, bool disabled = false)
+        public bool DrawSwitch(Rect rect, string text, bool value, SwitchVariant variant = SwitchVariant.Default, SwitchSize size = SwitchSize.Default, Action<bool> onToggle = null, bool disabled = false)
         {
             var styleManager = guiHelper.GetStyleManager();
             if (styleManager == null)
@@ -82,7 +82,7 @@ namespace shadcnui.GUIComponents
         {
             layoutComponents.BeginHorizontalGroup();
 
-            bool newValue = Switch("", value, variant, size, onToggle, disabled, GUILayout.Width(40 * guiHelper.uiScale));
+            bool newValue = DrawSwitch("", value, variant, size, onToggle, disabled, GUILayout.Width(40 * guiHelper.uiScale));
 
             if (newValue != value)
             {
@@ -179,7 +179,7 @@ namespace shadcnui.GUIComponents
 #else
             GUILayout.BeginHorizontal(new GUILayoutOption[0]);
 #endif
-            bool newValue = Switch("", value, variant, size, onToggle, disabled, GUILayout.Width(50 * guiHelper.uiScale));
+            bool newValue = DrawSwitch("", value, variant, size, onToggle, disabled, GUILayout.Width(50 * guiHelper.uiScale));
 
             Texture2D iconToShow = value ? onIcon : offIcon;
             if (iconToShow != null)

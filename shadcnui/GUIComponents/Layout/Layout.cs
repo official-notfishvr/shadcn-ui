@@ -9,11 +9,11 @@ using UnhollowerBaseLib;
 
 namespace shadcnui.GUIComponents
 {
-    public class GUILayoutComponents
+    public class Layout
     {
         private GUIHelper guiHelper;
 
-        public GUILayoutComponents(GUIHelper helper)
+        public Layout(GUIHelper helper)
         {
             guiHelper = helper;
         }

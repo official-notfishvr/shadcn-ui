@@ -8,18 +8,18 @@ using UnhollowerBaseLib;
 
 namespace shadcnui.GUIComponents
 {
-    public class GUITabsComponents
+    public class Tabs
     {
         private GUIHelper guiHelper;
-        private GUILayoutComponents layoutComponents;
+        private Layout layoutComponents;
 
-        public GUITabsComponents(GUIHelper helper)
+        public Tabs(GUIHelper helper)
         {
             guiHelper = helper;
-            layoutComponents = new GUILayoutComponents(helper);
+            layoutComponents = new Layout(helper);
         }
 
-        public int Tabs(string[] tabNames, int selectedIndex, Action<int> onTabChange = null, int maxLines = 1, params GUILayoutOption[] options)
+        public int DrawTabs(string[] tabNames, int selectedIndex, Action<int> onTabChange = null, int maxLines = 1, params GUILayoutOption[] options)
         {
             if (tabNames == null || tabNames.Length == 0)
                 return selectedIndex;
@@ -90,7 +90,7 @@ namespace shadcnui.GUIComponents
                 tabNames[i] = tabConfigs[i].Name;
             }
 
-            int newSelectedIndex = Tabs(tabNames, selectedIndex, onTabChange);
+            int newSelectedIndex = DrawTabs(tabNames, selectedIndex, onTabChange);
 
             if (newSelectedIndex >= 0 && newSelectedIndex < tabConfigs.Length)
             {

@@ -16,6 +16,8 @@ namespace shadcnui.GUIComponents
         // Button
         public Color ButtonPrimaryBg { get; set; }
         public Color ButtonPrimaryFg { get; set; }
+        public Color ButtonPrimaryActiveBg { get; set; }
+        public Color ButtonPrimaryActiveFg { get; set; }
         public Color ButtonDestructiveBg { get; set; }
         public Color ButtonDestructiveFg { get; set; }
         public Color ButtonOutlineBorder { get; set; }
@@ -106,6 +108,8 @@ namespace shadcnui.GUIComponents
 
             ButtonPrimaryBg = new Color(0.09f, 0.09f, 0.11f),
             ButtonPrimaryFg = new Color(0.98f, 0.98f, 0.98f),
+            ButtonPrimaryActiveBg = new Color(0.12f, 0.12f, 0.14f),
+            ButtonPrimaryActiveFg = new Color(0.98f, 0.98f, 0.98f),
             ButtonDestructiveBg = new Color(0.86f, 0.24f, 0.24f),
             ButtonDestructiveFg = new Color(0.98f, 0.98f, 0.98f),
             ButtonOutlineBorder = new Color(0.23f, 0.23f, 0.27f),
@@ -185,6 +189,8 @@ namespace shadcnui.GUIComponents
 
             ButtonPrimaryBg = new Color(0.9f, 0.9f, 0.9f),
             ButtonPrimaryFg = new Color(0.02f, 0.02f, 0.02f),
+            ButtonPrimaryActiveBg = new Color(0.8f, 0.8f, 0.8f),
+            ButtonPrimaryActiveFg = new Color(0.02f, 0.02f, 0.02f),
             ButtonDestructiveBg = new Color(0.86f, 0.24f, 0.24f),
             ButtonDestructiveFg = new Color(0.98f, 0.98f, 0.98f),
             ButtonOutlineBorder = new Color(0.8f, 0.8f, 0.8f),

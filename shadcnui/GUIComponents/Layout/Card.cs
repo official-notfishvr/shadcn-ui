@@ -9,15 +9,15 @@ using UnhollowerBaseLib;
 
 namespace shadcnui.GUIComponents
 {
-    public class GUICardComponents
+    public class Card
     {
         private GUIHelper guiHelper;
-        private GUILayoutComponents layoutComponents;
+        private Layout layoutComponents;
 
-        public GUICardComponents(GUIHelper helper)
+        public Card(GUIHelper helper)
         {
             guiHelper = helper;
-            layoutComponents = new GUILayoutComponents(helper);
+            layoutComponents = new Layout(helper);
         }
 
         public void BeginCard(float width = -1, float height = -1)
@@ -137,10 +137,11 @@ namespace shadcnui.GUIComponents
             if (!string.IsNullOrEmpty(content))
             {
                 BeginCardContent();
+                var styleManager = guiHelper.GetStyleManager();
 #if IL2CPP
-                GUILayout.Label(content, guiHelper.labelStyle2, new Il2CppReferenceArray<GUILayoutOption>(new GUILayoutOption[0]));
+                GUILayout.Label(content, styleManager.labelDefaultStyle, new Il2CppReferenceArray<GUILayoutOption>(new GUILayoutOption[0]));
 #else
-                GUILayout.Label(content, guiHelper.labelStyle2);
+                GUILayout.Label(content, styleManager.labelDefaultStyle);
 #endif
                 EndCardContent();
             }
@@ -159,10 +160,11 @@ namespace shadcnui.GUIComponents
         {
             BeginCard(width, height);
             BeginCardContent();
+            var styleManager = guiHelper.GetStyleManager();
 #if IL2CPP
-            GUILayout.Label(content, guiHelper.labelStyle2, new Il2CppReferenceArray<GUILayoutOption>(new GUILayoutOption[0]));
+            GUILayout.Label(content, styleManager.labelDefaultStyle, new Il2CppReferenceArray<GUILayoutOption>(new GUILayoutOption[0]));
 #else
-            GUILayout.Label(content, guiHelper.labelStyle2);
+            GUILayout.Label(content, styleManager.labelDefaultStyle);
 #endif
             EndCardContent();
             EndCard();

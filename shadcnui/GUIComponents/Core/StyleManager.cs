@@ -387,7 +387,7 @@ namespace shadcnui.GUIComponents
     /// <summary>
     /// Manages the GUI styles for the shadcnui components.
     /// </summary>
-    public class GUIStyleManager
+    public class StyleManager
     {
         private GUIHelper guiHelper;
 
@@ -589,7 +589,7 @@ namespace shadcnui.GUIComponents
         #endregion
 
 
-        public GUIStyleManager(GUIHelper helper)
+        public StyleManager(GUIHelper helper)
         {
             guiHelper = helper;
         }
@@ -960,8 +960,8 @@ namespace shadcnui.GUIComponents
             buttonDefaultStyle.hover.background = CreateSolidTexture(Color.Lerp(primaryBg, Color.black, 0.1f));
             buttonDefaultStyle.normal.textColor = primaryFg;
             buttonDefaultStyle.hover.textColor = primaryFg;
-            buttonDefaultStyle.active.background = CreateSolidTexture(Color.Lerp(primaryBg, Color.black, 0.2f));
-            buttonDefaultStyle.active.textColor = primaryFg;
+            buttonDefaultStyle.active.background = CreateSolidTexture(theme.ButtonPrimaryActiveBg);
+            buttonDefaultStyle.active.textColor = theme.ButtonPrimaryActiveFg;
 
             buttonDestructiveStyle = CreateBaseButtonStyle();
             if (customFont != null)

@@ -9,15 +9,15 @@ using UnhollowerBaseLib;
 
 namespace shadcnui.GUIComponents
 {
-    public class GUISliderComponents
+    public class Slider
     {
         private GUIHelper guiHelper;
-        private GUILayoutComponents layoutComponents;
+        private Layout layoutComponents;
 
-        public GUISliderComponents(GUIHelper helper)
+        public Slider(GUIHelper helper)
         {
             guiHelper = helper;
-            layoutComponents = new GUILayoutComponents(helper);
+            layoutComponents = new Layout(helper);
         }
 
         public void DrawSlider(float windowWidth, string label, ref float value, float minValue, float maxValue)

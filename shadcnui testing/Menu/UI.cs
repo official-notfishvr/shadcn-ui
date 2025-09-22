@@ -22,10 +22,9 @@ public class UI : MonoBehaviour
     private string textAreaValue = "";
     private int selectedTab = 0;
     private int selectedToggle = 0;
-    private bool isAlertDismissed = true;
     private float progressValue = 0.3f;
     private int glowButtonIndex = 0;
-    private GUITabsComponents.TabConfig[] demoTabs;
+    private Tabs.TabConfig[] demoTabs;
     private int currentDemoTab = 0;
 
     private string passwordValue = "password123";
@@ -105,30 +104,30 @@ public class UI : MonoBehaviour
             guiHelper.GetStyleManager().SetCustomFont(fontData, "ProggyClean.ttf");
         }
         */
-        demoTabs = new GUITabsComponents.TabConfig[]
+        demoTabs = new Tabs.TabConfig[]
         {
-            new GUITabsComponents.TabConfig("Alert", DrawAlertDemos),
-            new GUITabsComponents.TabConfig("Avatar", DrawAvatarDemos),
-            new GUITabsComponents.TabConfig("Badge", DrawBadgeDemos),
-            new GUITabsComponents.TabConfig("Button", DrawButtonDemos),
-            new GUITabsComponents.TabConfig("Card", DrawCardDemos),
-            new GUITabsComponents.TabConfig("Checkbox", DrawCheckboxDemos),
-            new GUITabsComponents.TabConfig("Input", DrawInputDemos),
-            new GUITabsComponents.TabConfig("Label", DrawLabelDemos),
-            new GUITabsComponents.TabConfig("Layout", DrawLayoutDemos),
-            new GUITabsComponents.TabConfig("Progress", DrawProgressDemos),
-            new GUITabsComponents.TabConfig("Separator", DrawSeparatorDemos),
-            new GUITabsComponents.TabConfig("Skeleton", DrawSkeletonDemos),
-            new GUITabsComponents.TabConfig("Slider", DrawSliderDemos),
-            new GUITabsComponents.TabConfig("Switch", DrawSwitchDemos),
-            new GUITabsComponents.TabConfig("Table", DrawTableDemos),
-            new GUITabsComponents.TabConfig("Tabs", DrawTabsDemos),
-            new GUITabsComponents.TabConfig("Text Area", DrawTextAreaDemos),
-            new GUITabsComponents.TabConfig("Toggle", DrawToggleDemos),
-            new GUITabsComponents.TabConfig("Calendar", DrawCalendarDemos),
-            new GUITabsComponents.TabConfig("DropdownMenu", DrawDropdownMenuDemos),
-            new GUITabsComponents.TabConfig("Popover", DrawPopoverDemos),
-            new GUITabsComponents.TabConfig("Select", DrawSelectDemos),
+            new Tabs.TabConfig("Alert", DrawAlertDemos),
+            new Tabs.TabConfig("Avatar", DrawAvatarDemos),
+            new Tabs.TabConfig("Badge", DrawBadgeDemos),
+            new Tabs.TabConfig("Button", DrawButtonDemos),
+            new Tabs.TabConfig("Card", DrawCardDemos),
+            new Tabs.TabConfig("Checkbox", DrawCheckboxDemos),
+            new Tabs.TabConfig("Input", DrawInputDemos),
+            new Tabs.TabConfig("Label", DrawLabelDemos),
+            new Tabs.TabConfig("Layout", DrawLayoutDemos),
+            new Tabs.TabConfig("Progress", DrawProgressDemos),
+            new Tabs.TabConfig("Separator", DrawSeparatorDemos),
+            new Tabs.TabConfig("Skeleton", DrawSkeletonDemos),
+            new Tabs.TabConfig("Slider", DrawSliderDemos),
+            new Tabs.TabConfig("Switch", DrawSwitchDemos),
+            new Tabs.TabConfig("Table", DrawTableDemos),
+            new Tabs.TabConfig("Tabs", DrawTabsDemos),
+            new Tabs.TabConfig("Text Area", DrawTextAreaDemos),
+            new Tabs.TabConfig("Toggle", DrawToggleDemos),
+            new Tabs.TabConfig("Calendar", DrawCalendarDemos),
+            new Tabs.TabConfig("DropdownMenu", DrawDropdownMenuDemos),
+            new Tabs.TabConfig("Popover", DrawPopoverDemos),
+            new Tabs.TabConfig("Select", DrawSelectDemos),
         };
     }
 
@@ -223,12 +222,6 @@ public class UI : MonoBehaviour
         guiHelper.Label("Code: guiHelper.RenderLabel(\"Rendered Label (width 150)\", 150);", LabelVariant.Muted);
         guiHelper.HorizontalSeparator();
 
-        guiHelper.Label("Glow Input Field", LabelVariant.Default);
-        glowInputFieldText = guiHelper.RenderGlowInputField(glowInputFieldText, glowInputFieldIdx, "Enter text...", 200);
-        guiHelper.Label($"Glow Input Value: {glowInputFieldText}");
-        guiHelper.Label("Code: guiHelper.RenderGlowInputField(text, index, placeholder, width);", LabelVariant.Muted);
-        guiHelper.HorizontalSeparator();
-
         guiHelper.Label("Password Field", LabelVariant.Default);
         passwordValue = guiHelper.DrawPasswordField(300, "Password", ref passwordValue);
         guiHelper.Label($"Password Value: {passwordValue}");
@@ -264,12 +257,7 @@ public class UI : MonoBehaviour
         guiHelper.HorizontalSeparator();
 
         guiHelper.Label("Tabs with Content (using TabConfig)");
-        GUITabsComponents.TabConfig[] tabConfigs = new GUITabsComponents.TabConfig[]
-        {
-            new GUITabsComponents.TabConfig("Tab A", () => guiHelper.Label("Content for Tab A.")),
-            new GUITabsComponents.TabConfig("Tab B", () => guiHelper.Label("Content for Tab B.")),
-            new GUITabsComponents.TabConfig("Tab C", () => guiHelper.Label("Content for Tab C.")),
-        };
+        Tabs.TabConfig[] tabConfigs = new Tabs.TabConfig[] { new Tabs.TabConfig("Tab A", () => guiHelper.Label("Content for Tab A.")), new Tabs.TabConfig("Tab B", () => guiHelper.Label("Content for Tab B.")), new Tabs.TabConfig("Tab C", () => guiHelper.Label("Content for Tab C.")) };
         guiHelper.TabsWithContent(tabConfigs, selectedTab);
         guiHelper.Label("Code: guiHelper.TabsWithContent(tabConfigs, selectedTab);", LabelVariant.Muted);
         guiHelper.HorizontalSeparator();
@@ -344,33 +332,6 @@ public class UI : MonoBehaviour
         guiHelper.Label("Code: guiHelper.Alert(title, description, variant, type, iconTexture);", LabelVariant.Muted);
         guiHelper.HorizontalSeparator();
 
-        guiHelper.Label("Warning Alert (Dismissible)", LabelVariant.Default);
-        if (!isAlertDismissed)
-        {
-            isAlertDismissed = guiHelper.DismissibleAlert(
-                "Warning",
-                "This action cannot be undone.",
-                AlertVariant.Default,
-                AlertType.Warning,
-                () =>
-                {
-                    isAlertDismissed = true;
-                }
-            );
-        }
-        else
-        {
-            guiHelper.Button(
-                "Reset Dismissible Alert",
-                onClick: () =>
-                {
-                    isAlertDismissed = false;
-                }
-            );
-        }
-        guiHelper.Label("Code: isAlertDismissed = guiHelper.DismissibleAlert(...);", LabelVariant.Muted);
-        guiHelper.HorizontalSeparator();
-
         guiHelper.Label("Alert with Actions", LabelVariant.Default);
         guiHelper.AlertWithActions(
             "Confirm Action",
@@ -411,23 +372,23 @@ public class UI : MonoBehaviour
         );
         guiHelper.Label("Code: guiHelper.AlertWithCountdown(title, description, countdownTime, onTimeout);", LabelVariant.Muted);
         guiHelper.HorizontalSeparator();
-
+        /*
         guiHelper.Label("Expandable Alert", LabelVariant.Default);
         expandableAlertExpanded = guiHelper.ExpandableAlert("Details", "Click to see more information.", "This is the expanded content with more details about the alert.", ref expandableAlertExpanded);
         guiHelper.Label($"Expandable Alert Expanded: {expandableAlertExpanded}");
         guiHelper.Label("Code: guiHelper.ExpandableAlert(title, description, expandedContent, ref isExpanded);", LabelVariant.Muted);
         guiHelper.HorizontalSeparator();
-
+        
         guiHelper.Label("Alert with Status", LabelVariant.Default);
         guiHelper.AlertWithStatus("Service Status", "All systems are operational.", true);
         guiHelper.Label("Code: guiHelper.AlertWithStatus(title, description, isActive);", LabelVariant.Muted);
         guiHelper.HorizontalSeparator();
-
+        
         guiHelper.Label("Alert with Custom Icon", LabelVariant.Default);
         guiHelper.AlertWithCustomIcon("Custom Icon Alert", "This alert uses a custom icon.", null, Color.yellow);
         guiHelper.Label("Code: guiHelper.AlertWithCustomIcon(title, description, icon, iconColor);", LabelVariant.Muted);
         guiHelper.HorizontalSeparator();
-
+        */
         GUILayout.EndVertical();
     }
 
@@ -716,11 +677,6 @@ public class UI : MonoBehaviour
         guiHelper.Label("Button Disabled State", LabelVariant.Default);
         guiHelper.Button("Disabled", disabled: true);
         guiHelper.Label("Code: guiHelper.Button(label, disabled: true);", LabelVariant.Muted);
-        guiHelper.HorizontalSeparator();
-
-        guiHelper.Label("Render Glow Button", LabelVariant.Default);
-        guiHelper.RenderGlowButton("Glow Button", glowButtonIndex);
-        guiHelper.Label("Code: guiHelper.RenderGlowButton(\"Glow Button\", glowButtonIndex);", LabelVariant.Muted);
         guiHelper.HorizontalSeparator();
 
         guiHelper.Label("Render Color Preset Button", LabelVariant.Default);
