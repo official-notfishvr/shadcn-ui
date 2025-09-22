@@ -8,13 +8,13 @@ using UnityEngine;
 
 namespace shadcnui
 {
-    public class GUISettings
+    public class Settings
     {
         private GUIHelper helper;
 
-        internal GUISettings(GUIHelper guiHelper)
+        public Settings(GUIHelper helper)
         {
-            helper = guiHelper;
+            helper = this.helper;
         }
 
         public bool SetAnimation

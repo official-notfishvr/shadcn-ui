@@ -8,18 +8,18 @@ using UnhollowerBaseLib;
 
 namespace shadcnui.GUIComponents
 {
-    public class GUIAvatarComponents
+    public class Avatar
     {
         private GUIHelper guiHelper;
-        private GUILayoutComponents layoutComponents;
+        private Layout layoutComponents;
 
-        public GUIAvatarComponents(GUIHelper helper)
+        public Avatar(GUIHelper helper)
         {
             guiHelper = helper;
-            layoutComponents = new GUILayoutComponents(helper);
+            layoutComponents = new Layout(helper);
         }
 
-        public void Avatar(Texture2D image, string fallbackText, AvatarSize size = AvatarSize.Default, AvatarShape shape = AvatarShape.Circle, params GUILayoutOption[] options)
+        public void DrawAvatar(Texture2D image, string fallbackText, AvatarSize size = AvatarSize.Default, AvatarShape shape = AvatarShape.Circle, params GUILayoutOption[] options)
         {
             var styleManager = guiHelper.GetStyleManager();
             GUIStyle avatarStyle = styleManager.GetAvatarStyle(size, shape);
@@ -45,7 +45,7 @@ namespace shadcnui.GUIComponents
             }
         }
 
-        public void Avatar(Rect rect, Texture2D image, string fallbackText, AvatarSize size = AvatarSize.Default, AvatarShape shape = AvatarShape.Circle)
+        public void DrawAvatar(Rect rect, Texture2D image, string fallbackText, AvatarSize size = AvatarSize.Default, AvatarShape shape = AvatarShape.Circle)
         {
             var styleManager = guiHelper.GetStyleManager();
             GUIStyle avatarStyle = styleManager.GetAvatarStyle(size, shape);
@@ -65,7 +65,7 @@ namespace shadcnui.GUIComponents
         public void AvatarWithStatus(Texture2D image, string fallbackText, bool isOnline, AvatarSize size = AvatarSize.Default, AvatarShape shape = AvatarShape.Circle, params GUILayoutOption[] options)
         {
             layoutComponents.BeginHorizontalGroup();
-            Avatar(image, fallbackText, size, shape, options);
+            DrawAvatar(image, fallbackText, size, shape, options);
 
             if (isOnline)
             {
@@ -105,7 +105,7 @@ namespace shadcnui.GUIComponents
             if (showNameBelow)
             {
                 layoutComponents.BeginVerticalGroup();
-                Avatar(image, fallbackText, size, shape, options);
+                DrawAvatar(image, fallbackText, size, shape, options);
 
                 if (!string.IsNullOrEmpty(name))
                 {
@@ -124,7 +124,7 @@ namespace shadcnui.GUIComponents
             else
             {
                 layoutComponents.BeginHorizontalGroup();
-                Avatar(image, fallbackText, size, shape, options);
+                DrawAvatar(image, fallbackText, size, shape, options);
 
                 if (!string.IsNullOrEmpty(name))
                 {
@@ -183,7 +183,7 @@ namespace shadcnui.GUIComponents
             borderedStyle.padding = new RectOffset(2, 2, 2, 2);
 
             layoutComponents.BeginVerticalGroup(borderedStyle, options);
-            Avatar(image, fallbackText, size, shape, options);
+            DrawAvatar(image, fallbackText, size, shape, options);
             layoutComponents.EndVerticalGroup();
         }
 
@@ -213,13 +213,13 @@ namespace shadcnui.GUIComponents
                 Color originalColor = GUI.color;
                 GUI.color = new Color(originalColor.r, originalColor.g, originalColor.b, alpha);
 
-                Avatar(image, fallbackText, size, shape, options);
+                DrawAvatar(image, fallbackText, size, shape, options);
 
                 GUI.color = originalColor;
             }
             else
             {
-                Avatar(image, fallbackText, size, shape, options);
+                DrawAvatar(image, fallbackText, size, shape, options);
             }
         }
 
@@ -227,7 +227,7 @@ namespace shadcnui.GUIComponents
         {
             layoutComponents.BeginHorizontalGroup();
 
-            Avatar(image, fallbackText, size, shape, options);
+            DrawAvatar(image, fallbackText, size, shape, options);
 
             if (!string.IsNullOrEmpty(tooltip))
             {
@@ -262,7 +262,7 @@ namespace shadcnui.GUIComponents
                 if (i > 0)
                     layoutComponents.AddSpace(overlap);
 
-                Avatar(avatar.Image, avatar.FallbackText, size, shape, options);
+                DrawAvatar(avatar.Image, avatar.FallbackText, size, shape, options);
             }
 
             if (avatars.Length > maxVisible)

@@ -10,18 +10,18 @@ using UnhollowerBaseLib;
 
 namespace shadcnui.GUIComponents
 {
-    public class GUIButtonComponents
+    public class Button
     {
         private GUIHelper guiHelper;
-        private GUILayoutComponents layoutComponents;
+        private Layout layoutComponents;
 
-        public GUIButtonComponents(GUIHelper helper)
+        public Button(GUIHelper helper)
         {
             guiHelper = helper;
-            layoutComponents = new GUILayoutComponents(helper);
+            layoutComponents = new Layout(helper);
         }
 
-        public bool Button(string text, ButtonVariant variant = ButtonVariant.Default, ButtonSize size = ButtonSize.Default, Action onClick = null, bool disabled = false, params GUILayoutOption[] options)
+        public bool DrawButton(string text, ButtonVariant variant = ButtonVariant.Default, ButtonSize size = ButtonSize.Default, Action onClick = null, bool disabled = false, params GUILayoutOption[] options)
         {
             var styleManager = guiHelper.GetStyleManager();
             GUIStyle buttonStyle = styleManager.GetButtonStyle(variant, size);
@@ -56,7 +56,7 @@ namespace shadcnui.GUIComponents
             return clicked && !disabled;
         }
 
-        public bool Button(Rect rect, string text, ButtonVariant variant = ButtonVariant.Default, ButtonSize size = ButtonSize.Default, Action onClick = null, bool disabled = false)
+        public bool DrawButton(Rect rect, string text, ButtonVariant variant = ButtonVariant.Default, ButtonSize size = ButtonSize.Default, Action onClick = null, bool disabled = false)
         {
             var styleManager = guiHelper.GetStyleManager();
             GUIStyle buttonStyle = styleManager.GetButtonStyle(variant, size);
@@ -119,7 +119,7 @@ namespace shadcnui.GUIComponents
                     for (int i = 0; i < buttons.Length; i++)
                     {
                         var config = buttons[i];
-                        Button(config.Text, config.Variant, config.Size, config.OnClick, config.Disabled, config.Options);
+                        DrawButton(config.Text, config.Variant, config.Size, config.OnClick, config.Disabled, config.Options);
 
                         if (i < buttons.Length - 1)
                         {

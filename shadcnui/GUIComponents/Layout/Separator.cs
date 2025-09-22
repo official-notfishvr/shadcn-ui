@@ -7,16 +7,16 @@ using UnhollowerBaseLib;
 
 namespace shadcnui.GUIComponents
 {
-    public class GUISeparatorComponents
+    public class Separator
     {
         private GUIHelper guiHelper;
 
-        public GUISeparatorComponents(GUIHelper helper)
+        public Separator(GUIHelper helper)
         {
             guiHelper = helper;
         }
 
-        public void Separator(SeparatorOrientation orientation = SeparatorOrientation.Horizontal, bool decorative = true, params GUILayoutOption[] options)
+        public void DrawSeparator(SeparatorOrientation orientation = SeparatorOrientation.Horizontal, bool decorative = true, params GUILayoutOption[] options)
         {
             var styleManager = guiHelper.GetStyleManager();
             GUIStyle separatorStyle = styleManager.GetSeparatorStyle(orientation);
@@ -46,15 +46,15 @@ namespace shadcnui.GUIComponents
 
         public void HorizontalSeparator(params GUILayoutOption[] options)
         {
-            Separator(SeparatorOrientation.Horizontal, true, options);
+            DrawSeparator(SeparatorOrientation.Horizontal, true, options);
         }
 
         public void VerticalSeparator(params GUILayoutOption[] options)
         {
-            Separator(SeparatorOrientation.Vertical, true, options);
+            DrawSeparator(SeparatorOrientation.Vertical, true, options);
         }
 
-        public void Separator(Rect rect, SeparatorOrientation orientation = SeparatorOrientation.Horizontal)
+        public void DrawSeparator(Rect rect, SeparatorOrientation orientation = SeparatorOrientation.Horizontal)
         {
             var styleManager = guiHelper.GetStyleManager();
             GUIStyle separatorStyle = styleManager.GetSeparatorStyle(orientation);
@@ -74,7 +74,7 @@ namespace shadcnui.GUIComponents
                     GUILayout.Space(spacingBefore * guiHelper.uiScale);
             }
 
-            Separator(orientation, true, options);
+            DrawSeparator(orientation, true, options);
 
             if (spacingAfter > 0)
             {
@@ -95,7 +95,7 @@ namespace shadcnui.GUIComponents
             GUILayout.BeginHorizontal();
 #endif
 
-            Separator(SeparatorOrientation.Horizontal, true, GUILayout.ExpandWidth(true));
+            DrawSeparator(SeparatorOrientation.Horizontal, true, GUILayout.ExpandWidth(true));
 
             if (!string.IsNullOrEmpty(text))
             {
@@ -108,7 +108,7 @@ namespace shadcnui.GUIComponents
                 GUILayout.Space(8 * guiHelper.uiScale);
             }
 
-            Separator(SeparatorOrientation.Horizontal, true, GUILayout.ExpandWidth(true));
+            DrawSeparator(SeparatorOrientation.Horizontal, true, GUILayout.ExpandWidth(true));
 
             GUILayout.EndHorizontal();
         }

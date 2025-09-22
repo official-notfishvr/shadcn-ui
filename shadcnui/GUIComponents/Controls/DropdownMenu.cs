@@ -7,17 +7,17 @@ using UnhollowerBaseLib;
 
 namespace shadcnui.GUIComponents
 {
-    public class GUIDropdownMenuComponents
+    public class DropdownMenu
     {
         private GUIHelper guiHelper;
-        private GUILayoutComponents layoutComponents;
+        private Layout layoutComponents;
         private bool isOpen;
         private Vector2 scrollPosition;
 
-        public GUIDropdownMenuComponents(GUIHelper helper)
+        public DropdownMenu(GUIHelper helper)
         {
             this.guiHelper = helper;
-            layoutComponents = new GUILayoutComponents(helper);
+            layoutComponents = new Layout(helper);
         }
 
         public bool IsOpen => isOpen;
@@ -32,7 +32,7 @@ namespace shadcnui.GUIComponents
             isOpen = false;
         }
 
-        public void DropdownMenu(string[] items, Action<int> onItemSelected)
+        public void DrawDropdownMenu(string[] items, Action<int> onItemSelected)
         {
             if (!isOpen)
                 return;

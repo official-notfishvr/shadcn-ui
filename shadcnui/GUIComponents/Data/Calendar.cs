@@ -6,20 +6,20 @@ using UnhollowerBaseLib;
 
 namespace shadcnui.GUIComponents
 {
-    public class GUICalendarComponents
+    public class Calendar
     {
         private GUIHelper guiHelper;
-        private GUILayoutComponents layoutComponents;
+        private Layout layoutComponents;
         private DateTime selectedDate;
 
-        public GUICalendarComponents(GUIHelper helper)
+        public Calendar(GUIHelper helper)
         {
             this.guiHelper = helper;
-            layoutComponents = new GUILayoutComponents(helper);
+            layoutComponents = new Layout(helper);
             selectedDate = DateTime.Today;
         }
 
-        public void Calendar()
+        public void DrawCalendar()
         {
             var styleManager = guiHelper.GetStyleManager();
 

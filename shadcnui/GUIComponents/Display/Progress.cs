@@ -7,18 +7,18 @@ using UnhollowerBaseLib;
 
 namespace shadcnui.GUIComponents
 {
-    public class GUIProgressComponents
+    public class Progress
     {
         private GUIHelper guiHelper;
-        private GUILayoutComponents layoutComponents;
+        private Layout layoutComponents;
 
-        public GUIProgressComponents(GUIHelper helper)
+        public Progress(GUIHelper helper)
         {
             guiHelper = helper;
-            layoutComponents = new GUILayoutComponents(helper);
+            layoutComponents = new Layout(helper);
         }
 
-        public void Progress(float value, float width = -1, float height = -1, params GUILayoutOption[] options)
+        public void DrawProgress(float value, float width = -1, float height = -1, params GUILayoutOption[] options)
         {
             var styleManager = guiHelper.GetStyleManager();
 
@@ -53,7 +53,7 @@ namespace shadcnui.GUIComponents
             }
         }
 
-        public void Progress(Rect rect, float value)
+        public void DrawProgress(Rect rect, float value)
         {
             var styleManager = guiHelper.GetStyleManager();
 
@@ -99,7 +99,7 @@ namespace shadcnui.GUIComponents
                 layoutComponents.AddSpace(4);
             }
 
-            Progress(value, width, height, options);
+            DrawProgress(value, width, height, options);
         }
 
         public void CircularProgress(float value, float size = 32f, params GUILayoutOption[] options)

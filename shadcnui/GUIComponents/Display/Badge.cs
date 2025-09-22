@@ -8,18 +8,18 @@ using UnhollowerBaseLib;
 
 namespace shadcnui.GUIComponents
 {
-    public class GUIBadgeComponents
+    public class Badge
     {
         private GUIHelper guiHelper;
-        private GUILayoutComponents layoutComponents;
+        private Layout layoutComponents;
 
-        public GUIBadgeComponents(GUIHelper helper)
+        public Badge(GUIHelper helper)
         {
             guiHelper = helper;
-            layoutComponents = new GUILayoutComponents(helper);
+            layoutComponents = new Layout(helper);
         }
 
-        public void Badge(string text, BadgeVariant variant = BadgeVariant.Default, BadgeSize size = BadgeSize.Default, params GUILayoutOption[] options)
+        public void DrawBadge(string text, BadgeVariant variant = BadgeVariant.Default, BadgeSize size = BadgeSize.Default, params GUILayoutOption[] options)
         {
             var styleManager = guiHelper.GetStyleManager();
 
@@ -32,7 +32,7 @@ namespace shadcnui.GUIComponents
 #endif
         }
 
-        public void Badge(Rect rect, string text, BadgeVariant variant = BadgeVariant.Default, BadgeSize size = BadgeSize.Default)
+        public void DrawBadge(Rect rect, string text, BadgeVariant variant = BadgeVariant.Default, BadgeSize size = BadgeSize.Default)
         {
             var styleManager = guiHelper.GetStyleManager();
 
@@ -57,7 +57,7 @@ namespace shadcnui.GUIComponents
                 layoutComponents.AddSpace(4);
             }
 
-            Badge(text, variant, size, options);
+            DrawBadge(text, variant, size, options);
 
             layoutComponents.EndHorizontalGroup();
         }
@@ -84,7 +84,7 @@ namespace shadcnui.GUIComponents
         public void CountBadge(int count, BadgeVariant variant = BadgeVariant.Default, BadgeSize size = BadgeSize.Default, int maxCount = 99, params GUILayoutOption[] options)
         {
             string displayText = count > maxCount ? $"{maxCount}+" : count.ToString();
-            Badge(displayText, variant, size, options);
+            DrawBadge(displayText, variant, size, options);
         }
 
         public void StatusBadge(string text, bool isActive, BadgeVariant variant = BadgeVariant.Default, BadgeSize size = BadgeSize.Default, params GUILayoutOption[] options)
@@ -113,7 +113,7 @@ namespace shadcnui.GUIComponents
                 layoutComponents.AddSpace(4);
             }
 
-            Badge(text, variant, size, options);
+            DrawBadge(text, variant, size, options);
 
             layoutComponents.EndHorizontalGroup();
         }
@@ -122,7 +122,7 @@ namespace shadcnui.GUIComponents
         {
             layoutComponents.BeginHorizontalGroup();
 
-            Badge(text, variant, size, options);
+            DrawBadge(text, variant, size, options);
 
             layoutComponents.AddSpace(4);
 #if IL2CPP
@@ -144,7 +144,7 @@ namespace shadcnui.GUIComponents
         {
             layoutComponents.BeginVerticalGroup();
 
-            Badge(text, variant, size, options);
+            DrawBadge(text, variant, size, options);
 
             layoutComponents.AddSpace(2);
             Rect progressRect = GUILayoutUtility.GetRect(60 * guiHelper.uiScale, 4 * guiHelper.uiScale);
@@ -173,7 +173,7 @@ namespace shadcnui.GUIComponents
             Color originalColor = GUI.color;
             GUI.color = new Color(originalColor.r, originalColor.g, originalColor.b, alpha);
 
-            Badge(text, variant, size, options);
+            DrawBadge(text, variant, size, options);
 
             GUI.color = originalColor;
         }
@@ -182,7 +182,7 @@ namespace shadcnui.GUIComponents
         {
             layoutComponents.BeginHorizontalGroup();
 
-            Badge(text, variant, size, options);
+            DrawBadge(text, variant, size, options);
 
             if (!string.IsNullOrEmpty(tooltip))
             {
@@ -230,7 +230,7 @@ namespace shadcnui.GUIComponents
 
             for (int i = 0; i < texts.Length; i++)
             {
-                Badge(texts[i], variants[i], size);
+                DrawBadge(texts[i], variants[i], size);
 
                 if (i < texts.Length - 1)
                 {

@@ -7,18 +7,18 @@ using UnhollowerBaseLib;
 
 namespace shadcnui.GUIComponents
 {
-    public class GUISelectComponents
+    public class Select
     {
         private GUIHelper guiHelper;
-        private GUILayoutComponents layoutComponents;
+        private Layout layoutComponents;
         private bool isOpen;
         private int selectedIndex;
         private Vector2 scrollPosition;
 
-        public GUISelectComponents(GUIHelper helper)
+        public Select(GUIHelper helper)
         {
             this.guiHelper = helper;
-            layoutComponents = new GUILayoutComponents(helper);
+            layoutComponents = new Layout(helper);
         }
 
         public bool IsOpen => isOpen;
@@ -33,7 +33,7 @@ namespace shadcnui.GUIComponents
             isOpen = false;
         }
 
-        public int Select(string[] items, int selectedIndex)
+        public int DrawSelect(string[] items, int selectedIndex)
         {
             if (!isOpen)
                 return selectedIndex;

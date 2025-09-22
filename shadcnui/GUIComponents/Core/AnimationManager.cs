@@ -9,15 +9,15 @@ using UnhollowerBaseLib;
 
 namespace shadcnui.GUIComponents
 {
-    public class GUIAnimationManager
+    public class AnimationManager
     {
         private GUIHelper guiHelper;
-        private GUILayoutComponents layoutComponents;
+        private Layout layoutComponents;
 
-        public GUIAnimationManager(GUIHelper helper)
+        public AnimationManager(GUIHelper helper)
         {
             guiHelper = helper;
-            layoutComponents = new GUILayoutComponents(helper);
+            layoutComponents = new Layout(helper);
         }
 
         public void UpdateAnimations(bool isOpen, ref float menuAlpha, ref float menuScale, ref float titleGlow, ref float backgroundPulse, ref int hoveredButton, float[] buttonGlowEffects, float[] inputFieldGlow, ref int focusedField, ref float particleTime, ref Vector2 mousePos)

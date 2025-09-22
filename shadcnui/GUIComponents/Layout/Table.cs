@@ -9,18 +9,18 @@ using UnhollowerBaseLib;
 
 namespace shadcnui.GUIComponents
 {
-    internal class GUITableComponents
+    public class Table
     {
         private GUIHelper guiHelper;
-        private GUILayoutComponents layoutComponents;
+        private Layout layoutComponents;
 
-        public GUITableComponents(GUIHelper helper)
+        public Table(GUIHelper helper)
         {
             guiHelper = helper;
-            layoutComponents = new GUILayoutComponents(helper);
+            layoutComponents = new Layout(helper);
         }
 
-        public void Table(string[] headers, string[,] data, TableVariant variant = TableVariant.Default, TableSize size = TableSize.Default, params GUILayoutOption[] options)
+        public void DrawTable(string[] headers, string[,] data, TableVariant variant = TableVariant.Default, TableSize size = TableSize.Default, params GUILayoutOption[] options)
         {
             if (headers == null || data == null)
                 return;
@@ -72,7 +72,7 @@ namespace shadcnui.GUIComponents
             layoutComponents.EndVerticalGroup();
         }
 
-        public void Table(Rect rect, string[] headers, string[,] data, TableVariant variant = TableVariant.Default, TableSize size = TableSize.Default)
+        public void DrawTable(Rect rect, string[] headers, string[,] data, TableVariant variant = TableVariant.Default, TableSize size = TableSize.Default)
         {
             if (headers == null || data == null)
                 return;
@@ -91,7 +91,7 @@ namespace shadcnui.GUIComponents
             GUI.Box(scaledRect, "", tableStyle);
 
             GUILayout.BeginArea(scaledRect);
-            Table(headers, data, variant, size);
+            DrawTable(headers, data, variant, size);
             GUILayout.EndArea();
         }
 
@@ -329,7 +329,7 @@ namespace shadcnui.GUIComponents
             for (int col = 0; col < data.GetLength(1); col++)
                 pageData[row, col] = data[startRow + row, col];
 
-            Table(headers, pageData, variant, size, options);
+            DrawTable(headers, pageData, variant, size, options);
 
             layoutComponents.AddSpace(8);
             layoutComponents.BeginHorizontalGroup();
@@ -413,7 +413,7 @@ namespace shadcnui.GUIComponents
             layoutComponents.AddSpace(8);
 
             string[,] displayData = filteredData ?? data;
-            Table(headers, displayData, variant, size, options);
+            DrawTable(headers, displayData, variant, size, options);
         }
 
         public void ResizableTable(string[] headers, string[,] data, ref float[] columnWidths, TableVariant variant = TableVariant.Default, TableSize size = TableSize.Default, params GUILayoutOption[] options)

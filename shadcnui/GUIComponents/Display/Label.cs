@@ -7,16 +7,16 @@ using UnhollowerBaseLib;
 
 namespace shadcnui.GUIComponents
 {
-    public class GUILabelComponents
+    public class Label
     {
         private GUIHelper guiHelper;
 
-        public GUILabelComponents(GUIHelper helper)
+        public Label(GUIHelper helper)
         {
             guiHelper = helper;
         }
 
-        public void Label(string text, LabelVariant variant = LabelVariant.Default, bool disabled = false, params GUILayoutOption[] options)
+        public void DrawLabel(string text, LabelVariant variant = LabelVariant.Default, bool disabled = false, params GUILayoutOption[] options)
         {
             var styleManager = guiHelper.GetStyleManager();
             GUIStyle labelStyle = styleManager.GetLabelStyle(variant);
@@ -39,7 +39,7 @@ namespace shadcnui.GUIComponents
 #endif
         }
 
-        public void Label(Rect rect, string text, LabelVariant variant = LabelVariant.Default, bool disabled = false)
+        public void DrawLabel(Rect rect, string text, LabelVariant variant = LabelVariant.Default, bool disabled = false)
         {
             var styleManager = guiHelper.GetStyleManager();
             GUIStyle labelStyle = styleManager.GetLabelStyle(variant);
@@ -60,17 +60,17 @@ namespace shadcnui.GUIComponents
 
         public void SecondaryLabel(string text, params GUILayoutOption[] options)
         {
-            Label(text, LabelVariant.Secondary, false, options);
+            DrawLabel(text, LabelVariant.Secondary, false, options);
         }
 
         public void MutedLabel(string text, params GUILayoutOption[] options)
         {
-            Label(text, LabelVariant.Muted, false, options);
+            DrawLabel(text, LabelVariant.Muted, false, options);
         }
 
         public void DestructiveLabel(string text, params GUILayoutOption[] options)
         {
-            Label(text, LabelVariant.Destructive, false, options);
+            DrawLabel(text, LabelVariant.Destructive, false, options);
         }
 
         private GUILayoutOption[] GetAutoScaledOptions(GUILayoutOption[] userOptions)

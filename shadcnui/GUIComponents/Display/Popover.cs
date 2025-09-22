@@ -6,12 +6,12 @@ using UnhollowerBaseLib;
 
 namespace shadcnui.GUIComponents
 {
-    public class GUIPopoverComponents
+    public class Popover
     {
         private GUIHelper guiHelper;
         private bool isOpen;
 
-        public GUIPopoverComponents(GUIHelper helper)
+        public Popover(GUIHelper helper)
         {
             this.guiHelper = helper;
         }
@@ -28,7 +28,7 @@ namespace shadcnui.GUIComponents
             isOpen = false;
         }
 
-        public void Popover(Action content)
+        public void DrawPopover(Action content)
         {
             if (!isOpen)
                 return;

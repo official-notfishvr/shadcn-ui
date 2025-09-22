@@ -8,18 +8,18 @@ using UnhollowerBaseLib;
 
 namespace shadcnui.GUIComponents
 {
-    public class GUICheckboxComponents
+    public class Checkbox
     {
         private GUIHelper guiHelper;
-        private GUILayoutComponents layoutComponents;
+        private Layout layoutComponents;
 
-        public GUICheckboxComponents(GUIHelper helper)
+        public Checkbox(GUIHelper helper)
         {
             guiHelper = helper;
-            layoutComponents = new GUILayoutComponents(helper);
+            layoutComponents = new Layout(helper);
         }
 
-        public bool Checkbox(string text, bool value, CheckboxVariant variant = CheckboxVariant.Default, CheckboxSize size = CheckboxSize.Default, Action<bool> onToggle = null, bool disabled = false, params GUILayoutOption[] options)
+        public bool DrawCheckbox(string text, bool value, CheckboxVariant variant = CheckboxVariant.Default, CheckboxSize size = CheckboxSize.Default, Action<bool> onToggle = null, bool disabled = false, params GUILayoutOption[] options)
         {
             var styleManager = guiHelper.GetStyleManager();
             if (styleManager == null)
@@ -52,7 +52,7 @@ namespace shadcnui.GUIComponents
             return newValue && !disabled;
         }
 
-        public bool Checkbox(Rect rect, string text, bool value, CheckboxVariant variant = CheckboxVariant.Default, CheckboxSize size = CheckboxSize.Default, Action<bool> onToggle = null, bool disabled = false)
+        public bool DrawCheckbox(Rect rect, string text, bool value, CheckboxVariant variant = CheckboxVariant.Default, CheckboxSize size = CheckboxSize.Default, Action<bool> onToggle = null, bool disabled = false)
         {
             var styleManager = guiHelper.GetStyleManager();
             if (styleManager == null)
@@ -82,7 +82,7 @@ namespace shadcnui.GUIComponents
         {
             layoutComponents.BeginHorizontalGroup();
 
-            bool newValue = Checkbox("", value, variant, size, onToggle, disabled, GUILayout.Width(20 * guiHelper.uiScale));
+            bool newValue = DrawCheckbox("", value, variant, size, onToggle, disabled, GUILayout.Width(20 * guiHelper.uiScale));
 
             if (newValue != value)
             {
@@ -203,7 +203,7 @@ namespace shadcnui.GUIComponents
         {
             layoutComponents.BeginHorizontalGroup();
 
-            bool newValue = Checkbox("", value, variant, size, onToggle, disabled, GUILayout.Width(20 * guiHelper.uiScale));
+            bool newValue = DrawCheckbox("", value, variant, size, onToggle, disabled, GUILayout.Width(20 * guiHelper.uiScale));
             if (newValue != value)
             {
                 value = newValue;

@@ -9,16 +9,16 @@ using UnhollowerBaseLib;
 
 namespace shadcnui.GUIComponents
 {
-    public class GUIInputComponents
+    public class Input
     {
         private GUIHelper guiHelper;
-        private GUILayoutComponents layoutComponents;
+        private Layout layoutComponents;
         private static float horizontalPadding = 10f;
 
-        public GUIInputComponents(GUIHelper helper)
+        public Input(GUIHelper helper)
         {
             guiHelper = helper;
-            layoutComponents = new GUILayoutComponents(helper);
+            layoutComponents = new Layout(helper);
         }
 
         public void DrawLabel(string text, LabelVariant variant = LabelVariant.Default, int width = -1, bool disabled = false)
@@ -206,45 +206,6 @@ namespace shadcnui.GUIComponents
         public void RenderLabel(string text, int width = -1)
         {
             DrawLabel(text, LabelVariant.Default, width, false);
-        }
-
-        public string RenderGlowInputField(string text, int fieldIndex, string placeholder, int width, float[] inputFieldGlow, int focusedField, float menuAlpha)
-        {
-            var styleManager = guiHelper.GetStyleManager();
-
-#if IL2CPP
-            Rect fieldRect = GUILayoutUtility.GetRect(width * guiHelper.uiScale, 25 * guiHelper.uiScale, new Il2CppReferenceArray<GUILayoutOption>(new GUILayoutOption[] { GUILayout.Width(width * guiHelper.uiScale) }));
-#else
-            Rect fieldRect = GUILayoutUtility.GetRect(width * guiHelper.uiScale, 25 * guiHelper.uiScale, GUILayout.Width(width * guiHelper.uiScale));
-#endif
-
-            if (guiHelper.glowEffectsEnabled && inputFieldGlow[fieldIndex] > 0.1f)
-            {
-                Color glowColor = guiHelper.accentColor;
-                GUI.color = new Color(glowColor.r, glowColor.g, glowColor.b, inputFieldGlow[fieldIndex] * 0.4f * menuAlpha);
-                GUI.DrawTexture(new Rect(fieldRect.x - 3, fieldRect.y - 2, fieldRect.width + 6, fieldRect.height + 4), styleManager.GetGlowTexture());
-            }
-
-            GUI.color = new Color(1f, 1f, 1f, menuAlpha);
-
-            GUI.SetNextControlName("input" + fieldIndex);
-            string newText = GUI.TextField(fieldRect, text, styleManager.animatedInputStyle);
-
-            if (fieldIndex > 0)
-            {
-                if (int.TryParse(newText, out int value))
-                {
-                    if (value >= 0 && value <= 255)
-                        return newText;
-                }
-                else if (string.IsNullOrEmpty(newText))
-                {
-                    return "";
-                }
-                return text;
-            }
-
-            return newText;
         }
 
         public string DrawPasswordField(float windowWidth, string label, ref string password, char maskChar = '*')

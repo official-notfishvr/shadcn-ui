@@ -8,18 +8,18 @@ using UnhollowerBaseLib;
 
 namespace shadcnui.GUIComponents
 {
-    public class GUISkeletonComponents
+    public class Skeleton
     {
         private GUIHelper guiHelper;
-        private GUILayoutComponents layoutComponents;
+        private Layout layoutComponents;
 
-        public GUISkeletonComponents(GUIHelper helper)
+        public Skeleton(GUIHelper helper)
         {
             guiHelper = helper;
-            layoutComponents = new GUILayoutComponents(helper);
+            layoutComponents = new Layout(helper);
         }
 
-        public void Skeleton(float width, float height, SkeletonVariant variant, SkeletonSize size, params GUILayoutOption[] options)
+        public void DrawSkeleton(float width, float height, SkeletonVariant variant, SkeletonSize size, params GUILayoutOption[] options)
         {
             var styleManager = guiHelper.GetStyleManager();
 
@@ -43,7 +43,7 @@ namespace shadcnui.GUIComponents
             Color originalColor = GUI.color;
             GUI.color = new Color(originalColor.r, originalColor.g, originalColor.b, alpha);
 
-            Skeleton(width, height, variant, size, options);
+            DrawSkeleton(width, height, variant, size, options);
 
             GUI.color = originalColor;
         }
@@ -98,7 +98,7 @@ namespace shadcnui.GUIComponents
                 if (i == lines - 1 && lines > 1)
                     currentWidth *= 0.7f;
 
-                Skeleton(currentWidth, guiHelper.fontSize * 1.2f, SkeletonVariant.Default, SkeletonSize.Default, options);
+                DrawSkeleton(currentWidth, guiHelper.fontSize * 1.2f, SkeletonVariant.Default, SkeletonSize.Default, options);
                 if (i < lines - 1)
                 {
                     layoutComponents.AddSpace(guiHelper.fontSize * 0.3f);
@@ -109,12 +109,12 @@ namespace shadcnui.GUIComponents
 
         public void SkeletonAvatar(float size, SkeletonVariant variant, params GUILayoutOption[] options)
         {
-            Skeleton((float)size, (float)size, variant, SkeletonSize.Default, options ?? new GUILayoutOption[0]);
+            DrawSkeleton((float)size, (float)size, variant, SkeletonSize.Default, options ?? new GUILayoutOption[0]);
         }
 
         public void SkeletonButton(float width, float height, SkeletonVariant variant, SkeletonSize size, params GUILayoutOption[] options)
         {
-            Skeleton((float)width, (float)height, variant, size, options ?? new GUILayoutOption[0]);
+            DrawSkeleton((float)width, (float)height, variant, size, options ?? new GUILayoutOption[0]);
         }
 
         public void SkeletonCard(float width, float height, bool includeHeader, bool includeFooter, params GUILayoutOption[] options)
@@ -137,9 +137,9 @@ namespace shadcnui.GUIComponents
             {
                 layoutComponents.AddSpace(guiHelper.controlSpacing);
                 layoutComponents.BeginHorizontalGroup();
-                Skeleton(width * 0.3f, guiHelper.fontSize * 1.5f, SkeletonVariant.Default, SkeletonSize.Default, options);
+                DrawSkeleton(width * 0.3f, guiHelper.fontSize * 1.5f, SkeletonVariant.Default, SkeletonSize.Default, options);
                 layoutComponents.AddSpace(guiHelper.controlSpacing);
-                Skeleton(width * 0.3f, guiHelper.fontSize * 1.5f, SkeletonVariant.Default, SkeletonSize.Default, options);
+                DrawSkeleton(width * 0.3f, guiHelper.fontSize * 1.5f, SkeletonVariant.Default, SkeletonSize.Default, options);
                 layoutComponents.EndHorizontalGroup();
             }
 
@@ -154,7 +154,7 @@ namespace shadcnui.GUIComponents
                 layoutComponents.BeginHorizontalGroup();
                 for (int c = 0; c < columns; c++)
                 {
-                    Skeleton(width / columns - cellSpacing, cellHeight, SkeletonVariant.Default, SkeletonSize.Default, options);
+                    DrawSkeleton(width / columns - cellSpacing, cellHeight, SkeletonVariant.Default, SkeletonSize.Default, options);
                     if (c < columns - 1)
                     {
                         layoutComponents.AddSpace(cellSpacing);
@@ -174,7 +174,7 @@ namespace shadcnui.GUIComponents
             layoutComponents.BeginVerticalGroup();
             for (int i = 0; i < itemCount; i++)
             {
-                Skeleton(itemWidth, itemHeight, SkeletonVariant.Default, SkeletonSize.Default, options);
+                DrawSkeleton(itemWidth, itemHeight, SkeletonVariant.Default, SkeletonSize.Default, options);
                 if (i < itemCount - 1)
                 {
                     layoutComponents.AddSpace(spacing);
@@ -205,7 +205,7 @@ namespace shadcnui.GUIComponents
         {
             layoutComponents.BeginVerticalGroup();
 
-            Skeleton(width, height, variant, size, options);
+            DrawSkeleton(width, height, variant, size, options);
 
             GUILayout.Space(4 * guiHelper.uiScale);
             Rect progressRect = GUILayoutUtility.GetRect(width * guiHelper.uiScale, 4 * guiHelper.uiScale);
@@ -234,7 +234,7 @@ namespace shadcnui.GUIComponents
             Color originalColor = GUI.color;
             GUI.color = new Color(originalColor.r, originalColor.g, originalColor.b, alpha);
 
-            Skeleton(width, height, variant, size, options);
+            DrawSkeleton(width, height, variant, size, options);
 
             GUI.color = originalColor;
         }

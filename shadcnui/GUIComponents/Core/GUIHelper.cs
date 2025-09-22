@@ -1,9 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 using shadcnui.GUIComponents;
 using UnityEngine;
-using static shadcnui.GUIComponents.GUIAvatarComponents;
 #if IL2CPP
 using UnhollowerBaseLib;
 #endif
@@ -59,40 +56,37 @@ namespace shadcnui
         #endregion
 
         #region Component Instances
-        private GUIInputComponents inputComponents;
-        private GUIButtonComponents buttonComponents;
-        private GUISliderComponents sliderComponents;
-        private GUIToggleComponents toggleComponents;
-        private GUILayoutComponents layoutComponents;
-        private GUICardComponents cardComponents;
-        private GUIStyleManager styleManager;
-        private GUIAnimationManager animationManager;
-        private GUILabelComponents labelComponents;
-        private GUIProgressComponents progressComponents;
-        private GUISeparatorComponents separatorComponents;
-        private GUITabsComponents tabsComponents;
-        private GUITextAreaComponents textAreaComponents;
-        private GUICheckboxComponents checkboxComponents;
-        private GUISwitchComponents switchComponents;
-        private GUIBadgeComponents badgeComponents;
-        private GUIAlertComponents alertComponents;
-        private GUIAvatarComponents avatarComponents;
-        private GUISkeletonComponents skeletonComponents;
-        private GUITableComponents tableComponents;
-        private GUICalendarComponents calendarComponents;
-        private GUIDropdownMenuComponents dropdownMenuComponents;
-        private GUIPopoverComponents popoverComponents;
-        private GUISelectComponents selectComponents;
+        private GUIComponents.Input inputComponents;
+        private Button buttonComponents;
+        private Slider sliderComponents;
+        private Toggle toggleComponents;
+        private Layout layoutComponents;
+        private Card cardComponents;
+        private StyleManager styleManager;
+        private AnimationManager animationManager;
+        private Label labelComponents;
+        private Progress progressComponents;
+        private Separator separatorComponents;
+        private Tabs tabsComponents;
+        private TextArea textAreaComponents;
+        private Checkbox checkboxComponents;
+        private Switch switchComponents;
+        private Badge badgeComponents;
+        private Alert alertComponents;
+        private GUIComponents.Avatar avatarComponents;
+        private Skeleton skeletonComponents;
+        private Table tableComponents;
+        private Calendar calendarComponents;
+        private DropdownMenu dropdownMenuComponents;
+        private Popover popoverComponents;
+        private Select selectComponents;
         #endregion
 
         #region Public Style Access
-        public GUIStyle labelStyle2 => styleManager?.glowLabelStyle ?? GUI.skin.label;
-        public GUIStyle buttonStylePublic => styleManager?.animatedButtonStyle ?? GUI.skin.button;
-
         /// <summary>
         /// Get the style manager for advanced styling operations
         /// </summary>
-        public GUIStyleManager GetStyleManager() => styleManager;
+        public StyleManager GetStyleManager() => styleManager;
 
         #endregion
 
@@ -114,30 +108,30 @@ namespace shadcnui
         {
             try
             {
-                styleManager = new GUIStyleManager(this);
-                animationManager = new GUIAnimationManager(this);
-                inputComponents = new GUIInputComponents(this);
-                buttonComponents = new GUIButtonComponents(this);
-                sliderComponents = new GUISliderComponents(this);
-                toggleComponents = new GUIToggleComponents(this);
-                layoutComponents = new GUILayoutComponents(this);
-                cardComponents = new GUICardComponents(this);
-                labelComponents = new GUILabelComponents(this);
-                progressComponents = new GUIProgressComponents(this);
-                separatorComponents = new GUISeparatorComponents(this);
-                tabsComponents = new GUITabsComponents(this);
-                textAreaComponents = new GUITextAreaComponents(this);
-                checkboxComponents = new GUICheckboxComponents(this);
-                switchComponents = new GUISwitchComponents(this);
-                badgeComponents = new GUIBadgeComponents(this);
-                alertComponents = new GUIAlertComponents(this);
-                avatarComponents = new GUIAvatarComponents(this);
-                skeletonComponents = new GUISkeletonComponents(this);
-                tableComponents = new GUITableComponents(this);
-                calendarComponents = new GUICalendarComponents(this);
-                dropdownMenuComponents = new GUIDropdownMenuComponents(this);
-                popoverComponents = new GUIPopoverComponents(this);
-                selectComponents = new GUISelectComponents(this);
+                styleManager = new StyleManager(this);
+                animationManager = new AnimationManager(this);
+                inputComponents = new GUIComponents.Input(this);
+                buttonComponents = new GUIComponents.Button(this);
+                sliderComponents = new Slider(this);
+                toggleComponents = new GUIComponents.Toggle(this);
+                layoutComponents = new Layout(this);
+                cardComponents = new Card(this);
+                labelComponents = new GUIComponents.Label(this);
+                progressComponents = new Progress(this);
+                separatorComponents = new GUIComponents.Separator(this);
+                tabsComponents = new GUIComponents.Tabs(this);
+                textAreaComponents = new GUIComponents.TextArea(this);
+                checkboxComponents = new GUIComponents.Checkbox(this);
+                switchComponents = new GUIComponents.Switch(this);
+                badgeComponents = new GUIComponents.Badge(this);
+                alertComponents = new GUIComponents.Alert(this);
+                avatarComponents = new GUIComponents.Avatar(this);
+                skeletonComponents = new GUIComponents.Skeleton(this);
+                tableComponents = new GUIComponents.Table(this);
+                calendarComponents = new GUIComponents.Calendar(this);
+                dropdownMenuComponents = new GUIComponents.DropdownMenu(this);
+                popoverComponents = new GUIComponents.Popover(this);
+                selectComponents = new Select(this);
             }
             catch (Exception ex)
             {
@@ -149,9 +143,9 @@ namespace shadcnui
         #endregion
 
         #region Core Methods
-        public GUISettings CreateSetting()
+        public Settings CreateSetting()
         {
-            return new GUISettings(this);
+            return new Settings(this);
         }
 
         public void UpdateAnimations(bool isOpen)
@@ -261,25 +255,6 @@ namespace shadcnui
             }
         }
 
-        public string RenderGlowInputField(string text, int fieldIndex, string placeholder, int width)
-        {
-            try
-            {
-                if (fieldIndex < 0 || fieldIndex >= inputFieldGlow.Length)
-                {
-                    Debug.LogWarning($"Input field index {fieldIndex} out of bounds");
-                    return "Input field index {fieldIndex} out of bounds";
-                }
-
-                return inputComponents?.RenderGlowInputField(text, fieldIndex, placeholder, width, inputFieldGlow, focusedField, menuAlpha);
-            }
-            catch (Exception ex)
-            {
-                Debug.LogError("Error rendering glow input field: " + ex.Message);
-                return "Error: " + ex.Message;
-            }
-        }
-
         public string DrawPasswordField(float windowWidth, string label, ref string password, char maskChar = '*')
         {
             try
@@ -307,43 +282,6 @@ namespace shadcnui
         #endregion
 
         #region Button Components
-        public bool RenderGlowButton(string text, int buttonIndex)
-        {
-            try
-            {
-                if (buttonIndex < 0 || buttonIndex >= buttonGlowEffects.Length)
-                {
-                    Debug.LogWarning($"Button index {buttonIndex} out of bounds");
-                    return false;
-                }
-
-                GUIStyle glowButtonStyle = styleManager?.animatedButtonStyle ?? GUI.skin.button;
-
-#if IL2CPP
-                bool clicked = GUILayout.Button(text ?? "Button", glowButtonStyle, new Il2CppReferenceArray<GUILayoutOption>(0));
-#else
-                bool clicked = GUILayout.Button(text ?? "Button", glowButtonStyle);
-#endif
-
-                Rect lastRect = GUILayoutUtility.GetLastRect();
-                if (lastRect.Contains(Event.current.mousePosition))
-                {
-                    hoveredButton = buttonIndex;
-                }
-                else if (hoveredButton == buttonIndex && !lastRect.Contains(Event.current.mousePosition))
-                {
-                    hoveredButton = -1;
-                }
-
-                return clicked;
-            }
-            catch (Exception ex)
-            {
-                Debug.LogError("Error rendering glow button: " + ex.Message);
-                return false;
-            }
-        }
-
         public bool RenderColorPresetButton(string colorName, Color presetColor)
         {
             try
@@ -376,7 +314,7 @@ namespace shadcnui
         {
             try
             {
-                return buttonComponents?.Button(text, ButtonVariant.Default, ButtonSize.Default, onClick, false, GUILayout.Width(windowWidth)) ?? false;
+                return buttonComponents?.DrawButton(text, ButtonVariant.Default, ButtonSize.Default, onClick, false, GUILayout.Width(windowWidth)) ?? false;
             }
             catch (Exception ex)
             {
@@ -430,7 +368,7 @@ namespace shadcnui
         {
             try
             {
-                return buttonComponents?.Button(text, ButtonVariant.Default, ButtonSize.Default, onClick, false, GUILayout.Width(width), GUILayout.Height(height)) ?? false;
+                return buttonComponents?.DrawButton(text, ButtonVariant.Default, ButtonSize.Default, onClick, false, GUILayout.Width(width), GUILayout.Height(height)) ?? false;
             }
             catch (Exception ex)
             {
@@ -443,7 +381,7 @@ namespace shadcnui
         {
             try
             {
-                return buttonComponents?.Button(text, variant, size, onClick, disabled, options) ?? false;
+                return buttonComponents?.DrawButton(text, variant, size, onClick, disabled, options) ?? false;
             }
             catch (Exception ex)
             {
@@ -456,7 +394,7 @@ namespace shadcnui
         {
             try
             {
-                return buttonComponents?.Button(rect, text, variant, size, onClick, disabled) ?? false;
+                return buttonComponents?.DrawButton(rect, text, variant, size, onClick, disabled) ?? false;
             }
             catch (Exception ex)
             {
@@ -571,7 +509,7 @@ namespace shadcnui
         {
             try
             {
-                bool newValue = toggleComponents?.Toggle(text, value, variant, size, onToggle, disabled, options) ?? value;
+                bool newValue = toggleComponents?.DrawToggle(text, value, variant, size, onToggle, disabled, options) ?? value;
                 if (newValue != value)
                 {
                     onToggle?.Invoke(newValue);
@@ -589,7 +527,7 @@ namespace shadcnui
         {
             try
             {
-                return toggleComponents?.Toggle(rect, text, value, variant, size, onToggle, disabled) ?? value;
+                return toggleComponents?.DrawToggle(rect, text, value, variant, size, onToggle, disabled) ?? value;
             }
             catch (Exception ex)
             {
@@ -820,7 +758,7 @@ namespace shadcnui
         {
             try
             {
-                labelComponents?.Label(text, variant, disabled, options);
+                labelComponents?.DrawLabel(text, variant, disabled, options);
             }
             catch (Exception ex)
             {
@@ -832,7 +770,7 @@ namespace shadcnui
         {
             try
             {
-                labelComponents?.Label(rect, text, variant, disabled);
+                labelComponents?.DrawLabel(rect, text, variant, disabled);
             }
             catch (Exception ex)
             {
@@ -882,7 +820,7 @@ namespace shadcnui
         {
             try
             {
-                progressComponents?.Progress(value, width, height, options);
+                progressComponents?.DrawProgress(value, width, height, options);
             }
             catch (Exception ex)
             {
@@ -894,7 +832,7 @@ namespace shadcnui
         {
             try
             {
-                progressComponents?.Progress(rect, value);
+                progressComponents?.DrawProgress(rect, value);
             }
             catch (Exception ex)
             {
@@ -932,7 +870,7 @@ namespace shadcnui
         {
             try
             {
-                separatorComponents?.Separator(orientation, decorative, options);
+                separatorComponents?.DrawSeparator(orientation, decorative, options);
             }
             catch (Exception ex)
             {
@@ -968,7 +906,7 @@ namespace shadcnui
         {
             try
             {
-                separatorComponents?.Separator(rect, orientation);
+                separatorComponents?.DrawSeparator(rect, orientation);
             }
             catch (Exception ex)
             {
@@ -1006,7 +944,7 @@ namespace shadcnui
         {
             try
             {
-                return tabsComponents?.Tabs(tabNames, selectedIndex, onTabChange, maxLines, options) ?? selectedIndex;
+                return tabsComponents?.DrawTabs(tabNames, selectedIndex, onTabChange, maxLines, options) ?? selectedIndex;
             }
             catch (Exception ex)
             {
@@ -1039,7 +977,7 @@ namespace shadcnui
             }
         }
 
-        public int TabsWithContent(GUITabsComponents.TabConfig[] tabConfigs, int selectedIndex, Action<int> onTabChange = null)
+        public int TabsWithContent(Tabs.TabConfig[] tabConfigs, int selectedIndex, Action<int> onTabChange = null)
         {
             try
             {
@@ -1071,7 +1009,7 @@ namespace shadcnui
         {
             try
             {
-                return textAreaComponents?.TextArea(text, variant, placeholder, disabled, minHeight, maxLength, options) ?? text;
+                return textAreaComponents?.DrawTextArea(text, variant, placeholder, disabled, minHeight, maxLength, options) ?? text;
             }
             catch (Exception ex)
             {
@@ -1084,7 +1022,7 @@ namespace shadcnui
         {
             try
             {
-                return textAreaComponents?.TextArea(rect, text, variant, placeholder, disabled, maxLength) ?? text;
+                return textAreaComponents?.DrawTextArea(rect, text, variant, placeholder, disabled, maxLength) ?? text;
             }
             catch (Exception ex)
             {
@@ -1151,7 +1089,7 @@ namespace shadcnui
         {
             try
             {
-                return checkboxComponents?.Checkbox(text, value, variant, size, onToggle, disabled, options) ?? value;
+                return checkboxComponents?.DrawCheckbox(text, value, variant, size, onToggle, disabled, options) ?? value;
             }
             catch (Exception ex)
             {
@@ -1164,7 +1102,7 @@ namespace shadcnui
         {
             try
             {
-                return checkboxComponents?.Checkbox(rect, text, value, variant, size, onToggle, disabled) ?? value;
+                return checkboxComponents?.DrawCheckbox(rect, text, value, variant, size, onToggle, disabled) ?? value;
             }
             catch (Exception ex)
             {
@@ -1270,7 +1208,7 @@ namespace shadcnui
         {
             try
             {
-                return switchComponents?.Switch(text, value, variant, size, onToggle, disabled, options) ?? value;
+                return switchComponents?.DrawSwitch(text, value, variant, size, onToggle, disabled, options) ?? value;
             }
             catch (Exception ex)
             {
@@ -1283,7 +1221,7 @@ namespace shadcnui
         {
             try
             {
-                return switchComponents?.Switch(rect, text, value, variant, size, onToggle, disabled) ?? value;
+                return switchComponents?.DrawSwitch(rect, text, value, variant, size, onToggle, disabled) ?? value;
             }
             catch (Exception ex)
             {
@@ -1402,7 +1340,7 @@ namespace shadcnui
         {
             try
             {
-                badgeComponents?.Badge(text, variant, size, options);
+                badgeComponents?.DrawBadge(text, variant, size, options);
             }
             catch (Exception ex)
             {
@@ -1414,7 +1352,7 @@ namespace shadcnui
         {
             try
             {
-                badgeComponents?.Badge(rect, text, variant, size);
+                badgeComponents?.DrawBadge(rect, text, variant, size);
             }
             catch (Exception ex)
             {
@@ -1549,7 +1487,7 @@ namespace shadcnui
         {
             try
             {
-                alertComponents?.Alert(title, description, variant, type, null, options);
+                alertComponents?.DrawAlert(title, description, variant, type, null, options);
             }
             catch (Exception ex)
             {
@@ -1561,24 +1499,11 @@ namespace shadcnui
         {
             try
             {
-                alertComponents?.Alert(title, description, variant, type, icon, options);
+                alertComponents?.DrawAlert(title, description, variant, type, icon, options);
             }
             catch (Exception ex)
             {
                 Debug.LogError("Error drawing alert with icon: " + ex.Message);
-            }
-        }
-
-        public bool DismissibleAlert(string title, string description, AlertVariant variant = AlertVariant.Default, AlertType type = AlertType.Info, Action onDismiss = null, params GUILayoutOption[] options)
-        {
-            try
-            {
-                return alertComponents?.DismissibleAlert(title, description, variant, type, onDismiss, options) ?? false;
-            }
-            catch (Exception ex)
-            {
-                Debug.LogError("Error drawing dismissible alert: " + ex.Message);
-                return false;
             }
         }
 
@@ -1671,7 +1596,7 @@ namespace shadcnui
         {
             try
             {
-                alertComponents?.Alert(title, description, variant, type, icon, options);
+                alertComponents?.DrawAlert(title, description, variant, type, icon, options);
             }
             catch (Exception ex)
             {
@@ -1685,7 +1610,7 @@ namespace shadcnui
         {
             try
             {
-                avatarComponents?.Avatar(image, fallbackText, size, shape, options);
+                avatarComponents?.DrawAvatar(image, fallbackText, size, shape, options);
             }
             catch (Exception ex)
             {
@@ -1697,7 +1622,7 @@ namespace shadcnui
         {
             try
             {
-                avatarComponents?.Avatar(rect, image, fallbackText, size, shape);
+                avatarComponents?.DrawAvatar(rect, image, fallbackText, size, shape);
             }
             catch (Exception ex)
             {
@@ -1789,7 +1714,7 @@ namespace shadcnui
             }
         }
 
-        public void AvatarGroup(AvatarData[] avatars, AvatarSize size = AvatarSize.Default, AvatarShape shape = AvatarShape.Circle, int maxVisible = 3, float overlap = -8f, params GUILayoutOption[] options)
+        public void AvatarGroup(GUIComponents.Avatar.AvatarData[] avatars, AvatarSize size = AvatarSize.Default, AvatarShape shape = AvatarShape.Circle, int maxVisible = 3, float overlap = -8f, params GUILayoutOption[] options)
         {
             try
             {
@@ -1807,7 +1732,7 @@ namespace shadcnui
         {
             try
             {
-                skeletonComponents?.Skeleton(width, height, variant, size, options);
+                skeletonComponents?.DrawSkeleton(width, height, variant, size, options);
             }
             catch (Exception ex)
             {
@@ -1953,7 +1878,7 @@ namespace shadcnui
         {
             try
             {
-                tableComponents?.Table(headers, data, variant, size, options);
+                tableComponents?.DrawTable(headers, data, variant, size, options);
             }
             catch (Exception ex)
             {
@@ -1965,7 +1890,7 @@ namespace shadcnui
         {
             try
             {
-                tableComponents?.Table(rect, headers, data, variant, size);
+                tableComponents?.DrawTable(rect, headers, data, variant, size);
             }
             catch (Exception ex)
             {
@@ -2051,7 +1976,7 @@ namespace shadcnui
         {
             try
             {
-                calendarComponents?.Calendar();
+                calendarComponents?.DrawCalendar();
             }
             catch (Exception ex)
             {
@@ -2065,7 +1990,7 @@ namespace shadcnui
         {
             try
             {
-                dropdownMenuComponents?.DropdownMenu(items, onItemSelected);
+                dropdownMenuComponents?.DrawDropdownMenu(items, onItemSelected);
             }
             catch (Exception ex)
             {
@@ -2094,7 +2019,7 @@ namespace shadcnui
         {
             try
             {
-                popoverComponents?.Popover(content);
+                popoverComponents?.DrawPopover(content);
             }
             catch (Exception ex)
             {
@@ -2123,7 +2048,7 @@ namespace shadcnui
         {
             try
             {
-                return selectComponents?.Select(items, selectedIndex) ?? selectedIndex;
+                return selectComponents?.DrawSelect(items, selectedIndex) ?? selectedIndex;
             }
             catch (Exception ex)
             {

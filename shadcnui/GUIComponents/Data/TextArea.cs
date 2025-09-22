@@ -7,18 +7,18 @@ using UnhollowerBaseLib;
 
 namespace shadcnui.GUIComponents
 {
-    public class GUITextAreaComponents
+    public class TextArea
     {
         private GUIHelper guiHelper;
-        private GUILayoutComponents layoutComponents;
+        private Layout layoutComponents;
 
-        public GUITextAreaComponents(GUIHelper helper)
+        public TextArea(GUIHelper helper)
         {
             guiHelper = helper;
-            layoutComponents = new GUILayoutComponents(helper);
+            layoutComponents = new Layout(helper);
         }
 
-        public string TextArea(string text, TextAreaVariant variant = TextAreaVariant.Default, string placeholder = "", bool disabled = false, float minHeight = 60f, int maxLength = -1, params GUILayoutOption[] options)
+        public string DrawTextArea(string text, TextAreaVariant variant = TextAreaVariant.Default, string placeholder = "", bool disabled = false, float minHeight = 60f, int maxLength = -1, params GUILayoutOption[] options)
         {
             var styleManager = guiHelper.GetStyleManager();
 
@@ -58,7 +58,7 @@ namespace shadcnui.GUIComponents
             return disabled ? text : result;
         }
 
-        public string TextArea(Rect rect, string text, TextAreaVariant variant = TextAreaVariant.Default, string placeholder = "", bool disabled = false, int maxLength = -1)
+        public string DrawTextArea(Rect rect, string text, TextAreaVariant variant = TextAreaVariant.Default, string placeholder = "", bool disabled = false, int maxLength = -1)
         {
             var styleManager = guiHelper.GetStyleManager();
 
@@ -88,12 +88,12 @@ namespace shadcnui.GUIComponents
 
         public string OutlineTextArea(string text, string placeholder = "", bool disabled = false, float minHeight = 60f, int maxLength = -1, params GUILayoutOption[] options)
         {
-            return TextArea(text, TextAreaVariant.Outline, placeholder, disabled, minHeight, maxLength, options);
+            return DrawTextArea(text, TextAreaVariant.Outline, placeholder, disabled, minHeight, maxLength, options);
         }
 
         public string GhostTextArea(string text, string placeholder = "", bool disabled = false, float minHeight = 60f, int maxLength = -1, params GUILayoutOption[] options)
         {
-            return TextArea(text, TextAreaVariant.Ghost, placeholder, disabled, minHeight, maxLength, options);
+            return DrawTextArea(text, TextAreaVariant.Ghost, placeholder, disabled, minHeight, maxLength, options);
         }
 
         public string LabeledTextArea(string label, string text, TextAreaVariant variant = TextAreaVariant.Default, string placeholder = "", bool disabled = false, float minHeight = 60f, int maxLength = -1, bool showCharCount = true, params GUILayoutOption[] options)
@@ -110,7 +110,7 @@ namespace shadcnui.GUIComponents
                 layoutComponents.AddSpace(4);
             }
 
-            string result = TextArea(text, variant, placeholder, disabled, minHeight, maxLength, options);
+            string result = DrawTextArea(text, variant, placeholder, disabled, minHeight, maxLength, options);
 
             if (showCharCount)
             {
@@ -147,7 +147,7 @@ namespace shadcnui.GUIComponents
             if (options != null && options.Length > 0)
                 layoutOptions.AddRange(options);
 
-            string result = TextArea(text, variant, placeholder, disabled, height, maxLength, layoutOptions.ToArray());
+            string result = DrawTextArea(text, variant, placeholder, disabled, height, maxLength, layoutOptions.ToArray());
 
             layoutComponents.BeginHorizontalGroup();
             GUILayout.FlexibleSpace();
