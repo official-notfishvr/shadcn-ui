@@ -200,7 +200,7 @@ namespace shadcnui.GUIComponents
 #else
             GUILayout.Label(title, styleManager?.sectionHeaderStyle ?? GUI.skin.label);
 #endif
-            guiHelper.DrawSeparator(300, guiHelper.borderEffectsEnabled ? 2f : 1f);
+            layoutComponents.AddSpace(guiHelper.borderEffectsEnabled ? 2f : 1f);
         }
 
         public void RenderLabel(string text, int width = -1)

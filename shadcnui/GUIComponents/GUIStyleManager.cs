@@ -1751,18 +1751,15 @@ namespace shadcnui.GUIComponents
             calendarDayTodayStyle.normal.background = CreateOutlineButtonTexture(theme.CardBg, theme.AccentColor);
         }
 
-        private void SetupDropdownMenuStyles() // not setup for theme yet bc it just gets borken idk why
+        private void SetupDropdownMenuStyles()
         {
+            var theme = ThemeManager.Instance.CurrentTheme;
+
             float scaledFontSize = guiHelper.fontSize * guiHelper.uiScale;
             int borderRadius = Mathf.RoundToInt(guiHelper.cornerRadius * guiHelper.uiScale);
 
-            dropdownMenuContentTexture = new Texture2D(1, 1);
-            Color dropdownMenuContentBgColor = new Color(guiHelper.primaryColor.r, guiHelper.primaryColor.g, guiHelper.primaryColor.b, 1f);
-            dropdownMenuContentTexture.SetPixel(0, 0, dropdownMenuContentBgColor);
-            dropdownMenuContentTexture.Apply();
-
             dropdownMenuContentStyle = new GUIStyle(GUI.skin.box);
-            dropdownMenuContentStyle.normal.background = dropdownMenuContentTexture;
+            dropdownMenuContentStyle.normal.background = CreateSolidTexture(theme.CardBg);
             dropdownMenuContentStyle.border = new RectOffset(borderRadius, borderRadius, borderRadius, borderRadius);
             dropdownMenuContentStyle.padding = new RectOffset(5, 5, 5, 5);
 
@@ -1773,13 +1770,13 @@ namespace shadcnui.GUIComponents
             dropdownMenuItemStyle.fontStyle = FontStyle.Normal;
             dropdownMenuItemStyle.alignment = TextAnchor.MiddleLeft;
             dropdownMenuItemStyle.normal.background = transparentTexture;
-            dropdownMenuItemStyle.normal.textColor = Color.white;
-            dropdownMenuItemStyle.hover.background = CreateSolidTexture(new Color(0.25f, 0.25f, 0.35f));
-            dropdownMenuItemStyle.active.background = CreateSolidTexture(new Color(0.2f, 0.2f, 0.3f));
+            dropdownMenuItemStyle.normal.textColor = theme.TextColor;
+            dropdownMenuItemStyle.hover.background = CreateSolidTexture(theme.AccentColor);
+            dropdownMenuItemStyle.active.background = CreateSolidTexture(Color.Lerp(theme.AccentColor, Color.black, 0.1f));
             dropdownMenuItemStyle.padding = new RectOffset(10, 10, 5, 5);
 
             dropdownMenuSeparatorStyle = new GUIStyle();
-            dropdownMenuSeparatorStyle.normal.background = separatorTexture;
+            dropdownMenuSeparatorStyle.normal.background = CreateSolidTexture(theme.SeparatorColor);
             dropdownMenuSeparatorStyle.fixedHeight = 1;
             dropdownMenuSeparatorStyle.margin = new RectOffset(5, 5, 5, 5);
         }
@@ -1810,47 +1807,38 @@ namespace shadcnui.GUIComponents
             scrollAreaTrackStyle.border = new RectOffset(4, 4, 4, 4);
         }
 
-        private void SetupSelectStyles() // not setup for theme yet bc it just gets borken idk why
+        private void SetupSelectStyles()
         {
+            var theme = ThemeManager.Instance.CurrentTheme;
+
             float scaledFontSize = guiHelper.fontSize * guiHelper.uiScale;
             int borderRadius = Mathf.RoundToInt(guiHelper.cornerRadius * guiHelper.uiScale);
-
-            selectTriggerTexture = new Texture2D(1, 1);
-            Color selectTriggerBgColor = new Color(guiHelper.primaryColor.r, guiHelper.primaryColor.g, guiHelper.primaryColor.b, 1f);
-            selectTriggerTexture.SetPixel(0, 0, selectTriggerBgColor);
-            selectTriggerTexture.Apply();
-
-            selectContentTexture = new Texture2D(1, 1);
-            Color selectContentBgColor = new Color(guiHelper.primaryColor.r, guiHelper.primaryColor.g, guiHelper.primaryColor.b, 1f);
-
-            selectContentTexture.SetPixel(0, 0, selectContentBgColor);
 
             selectTriggerStyle = new GUIStyle(GUI.skin.button);
             if (customFont != null)
                 selectTriggerStyle.font = customFont;
-            selectContentTexture.Apply();
-
-            selectTriggerStyle = new GUIStyle(GUI.skin.button);
-            selectTriggerStyle.normal.background = selectTriggerTexture;
+            selectTriggerStyle.normal.background = CreateSolidTexture(theme.InputBg);
             selectTriggerStyle.border = new RectOffset(borderRadius, borderRadius, borderRadius, borderRadius);
             selectTriggerStyle.padding = new RectOffset(10, 10, 5, 5);
             selectTriggerStyle.alignment = TextAnchor.MiddleLeft;
-            selectTriggerStyle.normal.textColor = Color.white;
+            selectTriggerStyle.normal.textColor = theme.TextColor;
             selectTriggerStyle.fontSize = Mathf.RoundToInt(scaledFontSize);
 
             selectContentStyle = new GUIStyle(GUI.skin.box);
-            selectContentStyle.normal.background = selectContentTexture;
+            selectContentStyle.normal.background = CreateSolidTexture(theme.CardBg);
             selectContentStyle.border = new RectOffset(borderRadius, borderRadius, borderRadius, borderRadius);
             selectContentStyle.padding = new RectOffset(5, 5, 5, 5);
 
             selectItemStyle = new GUIStyle(GUI.skin.button);
+            if (customFont != null)
+                selectItemStyle.font = customFont;
             selectItemStyle.fontSize = Mathf.RoundToInt(scaledFontSize);
             selectItemStyle.fontStyle = FontStyle.Normal;
             selectItemStyle.alignment = TextAnchor.MiddleLeft;
             selectItemStyle.normal.background = transparentTexture;
-            selectItemStyle.normal.textColor = Color.white;
-            selectItemStyle.hover.background = CreateSolidTexture(new Color(0.25f, 0.25f, 0.35f));
-            selectItemStyle.active.background = CreateSolidTexture(new Color(0.2f, 0.2f, 0.3f));
+            selectItemStyle.normal.textColor = theme.TextColor;
+            selectItemStyle.hover.background = CreateSolidTexture(theme.AccentColor);
+            selectItemStyle.active.background = CreateSolidTexture(Color.Lerp(theme.AccentColor, Color.black, 0.1f));
             selectItemStyle.padding = new RectOffset(10, 10, 5, 5);
         }
         #endregion

@@ -63,7 +63,6 @@ namespace shadcnui
         private GUIButtonComponents buttonComponents;
         private GUISliderComponents sliderComponents;
         private GUIToggleComponents toggleComponents;
-        private GUIVisualComponents visualComponents;
         private GUILayoutComponents layoutComponents;
         private GUICardComponents cardComponents;
         private GUIStyleManager styleManager;
@@ -121,7 +120,6 @@ namespace shadcnui
                 buttonComponents = new GUIButtonComponents(this);
                 sliderComponents = new GUISliderComponents(this);
                 toggleComponents = new GUIToggleComponents(this);
-                visualComponents = new GUIVisualComponents(this);
                 layoutComponents = new GUILayoutComponents(this);
                 cardComponents = new GUICardComponents(this);
                 labelComponents = new GUILabelComponents(this);
@@ -569,18 +567,6 @@ namespace shadcnui
         #endregion
 
         #region Toggle Components
-        public void DrawToggle(float windowWidth, string label, ref bool value, Action<bool> onToggle)
-        {
-            try
-            {
-                toggleComponents?.DrawToggle(windowWidth, label, ref value, onToggle);
-            }
-            catch (Exception ex)
-            {
-                Debug.LogError("Error drawing toggle: " + ex.Message);
-            }
-        }
-
         public bool Toggle(string text, bool value, ToggleVariant variant = ToggleVariant.Default, ToggleSize size = ToggleSize.Default, Action<bool> onToggle = null, bool disabled = false, params GUILayoutOption[] options)
         {
             try
@@ -742,56 +728,6 @@ namespace shadcnui
             catch (Exception ex)
             {
                 Debug.LogError("Error drawing int slider: " + ex.Message);
-            }
-        }
-        #endregion
-
-        #region Visual Components
-        public void DrawProgressBar(float windowWidth, string label, float progress, Color barColor)
-        {
-            try
-            {
-                visualComponents?.DrawProgressBar(windowWidth, label, progress, barColor);
-            }
-            catch (Exception ex)
-            {
-                Debug.LogError("Error drawing progress bar: " + ex.Message);
-            }
-        }
-
-        public void DrawBox(float windowWidth, string content, float height = 30f)
-        {
-            try
-            {
-                visualComponents?.DrawBox(windowWidth, content, height);
-            }
-            catch (Exception ex)
-            {
-                Debug.LogError("Error drawing box: " + ex.Message);
-            }
-        }
-
-        public void DrawSeparator(float windowWidth, float height = 2f)
-        {
-            try
-            {
-                visualComponents?.DrawSeparator(windowWidth, height);
-            }
-            catch (Exception ex)
-            {
-                Debug.LogError("Error drawing separator: " + ex.Message);
-            }
-        }
-
-        public void RenderInstructions(string text)
-        {
-            try
-            {
-                visualComponents?.RenderInstructions(text);
-            }
-            catch (Exception ex)
-            {
-                Debug.LogError("Error rendering instructions: " + ex.Message);
             }
         }
         #endregion
