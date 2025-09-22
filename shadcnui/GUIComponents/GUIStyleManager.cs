@@ -1074,8 +1074,15 @@ namespace shadcnui.GUIComponents
             return new RectOffset(Mathf.RoundToInt(horizontal * guiHelper.uiScale), Mathf.RoundToInt(horizontal * guiHelper.uiScale), Mathf.RoundToInt(vertical * guiHelper.uiScale), Mathf.RoundToInt(vertical * guiHelper.uiScale));
         }
 
+        private Dictionary<(Color, Color), Texture2D> outlineButtonTextureCache = new Dictionary<(Color, Color), Texture2D>();
+
         public Texture2D CreateOutlineButtonTexture(Color backgroundColor, Color borderColor)
         {
+            if (outlineButtonTextureCache.TryGetValue((backgroundColor, borderColor), out var cachedTexture))
+            {
+                return cachedTexture;
+            }
+
             Texture2D texture = new Texture2D(4, 4);
             for (int x = 0; x < 4; x++)
             {
@@ -1088,6 +1095,7 @@ namespace shadcnui.GUIComponents
                 }
             }
             texture.Apply();
+            outlineButtonTextureCache[(backgroundColor, borderColor)] = texture;
             return texture;
         }
 
@@ -1239,17 +1247,32 @@ namespace shadcnui.GUIComponents
             labelDestructiveStyle.fontStyle = FontStyle.Bold;
         }
 
+        private Dictionary<Color, Texture2D> solidColorTextureCache = new Dictionary<Color, Texture2D>();
+
         public Texture2D CreateSolidTexture(Color color)
         {
+            if (solidColorTextureCache.TryGetValue(color, out var cachedTexture))
+            {
+                return cachedTexture;
+            }
+
             Texture2D texture = new Texture2D(1, 1);
             texture.SetPixel(0, 0, color);
             texture.Apply();
+            solidColorTextureCache[color] = texture;
             return texture;
         }
+
+        private Dictionary<Color, Texture2D> outlineTextureCache = new Dictionary<Color, Texture2D>();
 
         private Texture2D CreateOutlineTexture()
         {
             var theme = ThemeManager.Instance.CurrentTheme;
+            if (outlineTextureCache.TryGetValue(theme.AccentColor, out var cachedTexture))
+            {
+                return cachedTexture;
+            }
+
             Texture2D texture = new Texture2D(4, 4);
             Color borderColor = theme.AccentColor;
             Color fillColor = new Color(0f, 0f, 0f, 0f);
@@ -1265,6 +1288,7 @@ namespace shadcnui.GUIComponents
                 }
             }
             texture.Apply();
+            outlineTextureCache[theme.AccentColor] = texture;
             return texture;
         }
 
@@ -1751,18 +1775,15 @@ namespace shadcnui.GUIComponents
             calendarDayTodayStyle.normal.background = CreateOutlineButtonTexture(theme.CardBg, theme.AccentColor);
         }
 
-        private void SetupDropdownMenuStyles() // not setup for theme yet bc it just gets borken idk why
+        private void SetupDropdownMenuStyles()
         {
+            var theme = ThemeManager.Instance.CurrentTheme;
+
             float scaledFontSize = guiHelper.fontSize * guiHelper.uiScale;
             int borderRadius = Mathf.RoundToInt(guiHelper.cornerRadius * guiHelper.uiScale);
 
-            dropdownMenuContentTexture = new Texture2D(1, 1);
-            Color dropdownMenuContentBgColor = new Color(guiHelper.primaryColor.r, guiHelper.primaryColor.g, guiHelper.primaryColor.b, 1f);
-            dropdownMenuContentTexture.SetPixel(0, 0, dropdownMenuContentBgColor);
-            dropdownMenuContentTexture.Apply();
-
             dropdownMenuContentStyle = new GUIStyle(GUI.skin.box);
-            dropdownMenuContentStyle.normal.background = dropdownMenuContentTexture;
+            dropdownMenuContentStyle.normal.background = CreateSolidTexture(theme.CardBg);
             dropdownMenuContentStyle.border = new RectOffset(borderRadius, borderRadius, borderRadius, borderRadius);
             dropdownMenuContentStyle.padding = new RectOffset(5, 5, 5, 5);
 
@@ -1773,13 +1794,13 @@ namespace shadcnui.GUIComponents
             dropdownMenuItemStyle.fontStyle = FontStyle.Normal;
             dropdownMenuItemStyle.alignment = TextAnchor.MiddleLeft;
             dropdownMenuItemStyle.normal.background = transparentTexture;
-            dropdownMenuItemStyle.normal.textColor = Color.white;
-            dropdownMenuItemStyle.hover.background = CreateSolidTexture(new Color(0.25f, 0.25f, 0.35f));
-            dropdownMenuItemStyle.active.background = CreateSolidTexture(new Color(0.2f, 0.2f, 0.3f));
+            dropdownMenuItemStyle.normal.textColor = theme.TextColor;
+            dropdownMenuItemStyle.hover.background = CreateSolidTexture(theme.AccentColor);
+            dropdownMenuItemStyle.active.background = CreateSolidTexture(Color.Lerp(theme.AccentColor, Color.black, 0.1f));
             dropdownMenuItemStyle.padding = new RectOffset(10, 10, 5, 5);
 
             dropdownMenuSeparatorStyle = new GUIStyle();
-            dropdownMenuSeparatorStyle.normal.background = separatorTexture;
+            dropdownMenuSeparatorStyle.normal.background = CreateSolidTexture(theme.SeparatorColor);
             dropdownMenuSeparatorStyle.fixedHeight = 1;
             dropdownMenuSeparatorStyle.margin = new RectOffset(5, 5, 5, 5);
         }
@@ -1810,47 +1831,38 @@ namespace shadcnui.GUIComponents
             scrollAreaTrackStyle.border = new RectOffset(4, 4, 4, 4);
         }
 
-        private void SetupSelectStyles() // not setup for theme yet bc it just gets borken idk why
+        private void SetupSelectStyles()
         {
+            var theme = ThemeManager.Instance.CurrentTheme;
+
             float scaledFontSize = guiHelper.fontSize * guiHelper.uiScale;
             int borderRadius = Mathf.RoundToInt(guiHelper.cornerRadius * guiHelper.uiScale);
-
-            selectTriggerTexture = new Texture2D(1, 1);
-            Color selectTriggerBgColor = new Color(guiHelper.primaryColor.r, guiHelper.primaryColor.g, guiHelper.primaryColor.b, 1f);
-            selectTriggerTexture.SetPixel(0, 0, selectTriggerBgColor);
-            selectTriggerTexture.Apply();
-
-            selectContentTexture = new Texture2D(1, 1);
-            Color selectContentBgColor = new Color(guiHelper.primaryColor.r, guiHelper.primaryColor.g, guiHelper.primaryColor.b, 1f);
-
-            selectContentTexture.SetPixel(0, 0, selectContentBgColor);
 
             selectTriggerStyle = new GUIStyle(GUI.skin.button);
             if (customFont != null)
                 selectTriggerStyle.font = customFont;
-            selectContentTexture.Apply();
-
-            selectTriggerStyle = new GUIStyle(GUI.skin.button);
-            selectTriggerStyle.normal.background = selectTriggerTexture;
+            selectTriggerStyle.normal.background = CreateSolidTexture(theme.InputBg);
             selectTriggerStyle.border = new RectOffset(borderRadius, borderRadius, borderRadius, borderRadius);
             selectTriggerStyle.padding = new RectOffset(10, 10, 5, 5);
             selectTriggerStyle.alignment = TextAnchor.MiddleLeft;
-            selectTriggerStyle.normal.textColor = Color.white;
+            selectTriggerStyle.normal.textColor = theme.TextColor;
             selectTriggerStyle.fontSize = Mathf.RoundToInt(scaledFontSize);
 
             selectContentStyle = new GUIStyle(GUI.skin.box);
-            selectContentStyle.normal.background = selectContentTexture;
+            selectContentStyle.normal.background = CreateSolidTexture(theme.CardBg);
             selectContentStyle.border = new RectOffset(borderRadius, borderRadius, borderRadius, borderRadius);
             selectContentStyle.padding = new RectOffset(5, 5, 5, 5);
 
             selectItemStyle = new GUIStyle(GUI.skin.button);
+            if (customFont != null)
+                selectItemStyle.font = customFont;
             selectItemStyle.fontSize = Mathf.RoundToInt(scaledFontSize);
             selectItemStyle.fontStyle = FontStyle.Normal;
             selectItemStyle.alignment = TextAnchor.MiddleLeft;
             selectItemStyle.normal.background = transparentTexture;
-            selectItemStyle.normal.textColor = Color.white;
-            selectItemStyle.hover.background = CreateSolidTexture(new Color(0.25f, 0.25f, 0.35f));
-            selectItemStyle.active.background = CreateSolidTexture(new Color(0.2f, 0.2f, 0.3f));
+            selectItemStyle.normal.textColor = theme.TextColor;
+            selectItemStyle.hover.background = CreateSolidTexture(theme.AccentColor);
+            selectItemStyle.active.background = CreateSolidTexture(Color.Lerp(theme.AccentColor, Color.black, 0.1f));
             selectItemStyle.padding = new RectOffset(10, 10, 5, 5);
         }
         #endregion
@@ -1859,8 +1871,15 @@ namespace shadcnui.GUIComponents
         /// <summary>
         /// Gets the button style for the given variant and size.
         /// </summary>
+        private Dictionary<(ButtonVariant, ButtonSize), GUIStyle> buttonStyleCache = new Dictionary<(ButtonVariant, ButtonSize), GUIStyle>();
+
         public GUIStyle GetButtonStyle(ButtonVariant variant, ButtonSize size)
         {
+            if (buttonStyleCache.TryGetValue((variant, size), out var cachedStyle))
+            {
+                return cachedStyle;
+            }
+
             var theme = ThemeManager.Instance.CurrentTheme;
 
             GUIStyle baseStyle = null;
@@ -1922,14 +1941,22 @@ namespace shadcnui.GUIComponents
                     break;
             }
 
+            buttonStyleCache[(variant, size)] = sizedStyle;
             return sizedStyle;
         }
 
         /// <summary>
         /// Gets the toggle style for the given variant and size.
         /// </summary>
+        private Dictionary<(ToggleVariant, ToggleSize), GUIStyle> toggleStyleCache = new Dictionary<(ToggleVariant, ToggleSize), GUIStyle>();
+
         public GUIStyle GetToggleStyle(ToggleVariant variant, ToggleSize size)
         {
+            if (toggleStyleCache.TryGetValue((variant, size), out var cachedStyle))
+            {
+                return cachedStyle;
+            }
+
             var theme = ThemeManager.Instance.CurrentTheme;
 
             GUIStyle baseStyle;
@@ -1959,20 +1986,34 @@ namespace shadcnui.GUIComponents
                     break;
             }
 
+            toggleStyleCache[(variant, size)] = sizedStyle;
             return sizedStyle;
         }
 
         /// <summary>
         /// Gets the input style for the given variant, focus, and disabled state.
         /// </summary>
+        private Dictionary<(InputVariant, bool, bool), GUIStyle> inputStyleCache = new Dictionary<(InputVariant, bool, bool), GUIStyle>();
+
         public GUIStyle GetInputStyle(InputVariant variant, bool focused = false, bool disabled = false)
         {
+            if (inputStyleCache.TryGetValue((variant, focused, disabled), out var cachedStyle))
+            {
+                return cachedStyle;
+            }
+
             var theme = ThemeManager.Instance.CurrentTheme;
 
             if (disabled)
+            {
+                inputStyleCache[(variant, focused, disabled)] = inputDisabledStyle ?? GUI.skin.textField;
                 return inputDisabledStyle ?? GUI.skin.textField;
+            }
             if (focused)
+            {
+                inputStyleCache[(variant, focused, disabled)] = inputFocusedStyle ?? GUI.skin.textField;
                 return inputFocusedStyle ?? GUI.skin.textField;
+            }
 
             GUIStyle style;
             switch (variant)
@@ -1988,14 +2029,22 @@ namespace shadcnui.GUIComponents
                     break;
             }
 
+            inputStyleCache[(variant, focused, disabled)] = style;
             return style;
         }
 
         /// <summary>
         /// Gets the label style for the given variant.
         /// </summary>
+        private Dictionary<LabelVariant, GUIStyle> labelStyleCache = new Dictionary<LabelVariant, GUIStyle>();
+
         public GUIStyle GetLabelStyle(LabelVariant variant)
         {
+            if (labelStyleCache.TryGetValue(variant, out var cachedStyle))
+            {
+                return cachedStyle;
+            }
+
             var theme = ThemeManager.Instance.CurrentTheme;
 
             GUIStyle style;
@@ -2015,6 +2064,7 @@ namespace shadcnui.GUIComponents
                     break;
             }
 
+            labelStyleCache[variant] = style;
             return style;
         }
 
@@ -2030,8 +2080,15 @@ namespace shadcnui.GUIComponents
         /// <summary>
         /// Gets the text area style for the given variant and focus state.
         /// </summary>
+        private Dictionary<(TextAreaVariant, bool), GUIStyle> textAreaStyleCache = new Dictionary<(TextAreaVariant, bool), GUIStyle>();
+
         public GUIStyle GetTextAreaStyle(TextAreaVariant variant = TextAreaVariant.Default, bool focused = false)
         {
+            if (textAreaStyleCache.TryGetValue((variant, focused), out var cachedStyle))
+            {
+                return cachedStyle;
+            }
+
             var theme = ThemeManager.Instance.CurrentTheme;
 
             GUIStyle baseStyle;
@@ -2048,7 +2105,9 @@ namespace shadcnui.GUIComponents
                     break;
             }
 
-            return focused ? (textAreaFocusedStyle ?? baseStyle) : baseStyle;
+            var style = focused ? (textAreaFocusedStyle ?? baseStyle) : baseStyle;
+            textAreaStyleCache[(variant, focused)] = style;
+            return style;
         }
 
         /// <summary>
@@ -2132,8 +2191,15 @@ namespace shadcnui.GUIComponents
         /// <summary>
         /// Gets the checkbox style for the given variant and size.
         /// </summary>
+        private Dictionary<(CheckboxVariant, CheckboxSize), GUIStyle> checkboxStyleCache = new Dictionary<(CheckboxVariant, CheckboxSize), GUIStyle>();
+
         public GUIStyle GetCheckboxStyle(CheckboxVariant variant, CheckboxSize size)
         {
+            if (checkboxStyleCache.TryGetValue((variant, size), out var cachedStyle))
+            {
+                return cachedStyle;
+            }
+
             var theme = ThemeManager.Instance.CurrentTheme;
 
             GUIStyle baseStyle;
@@ -2165,14 +2231,22 @@ namespace shadcnui.GUIComponents
                     break;
             }
 
+            checkboxStyleCache[(variant, size)] = sizedStyle;
             return sizedStyle;
         }
 
         /// <summary>
         /// Gets the switch style for the given variant and size.
         /// </summary>
+        private Dictionary<(SwitchVariant, SwitchSize), GUIStyle> switchStyleCache = new Dictionary<(SwitchVariant, SwitchSize), GUIStyle>();
+
         public GUIStyle GetSwitchStyle(SwitchVariant variant, SwitchSize size)
         {
+            if (switchStyleCache.TryGetValue((variant, size), out var cachedStyle))
+            {
+                return cachedStyle;
+            }
+
             var theme = ThemeManager.Instance.CurrentTheme;
 
             GUIStyle baseStyle;
@@ -2204,14 +2278,22 @@ namespace shadcnui.GUIComponents
                     break;
             }
 
+            switchStyleCache[(variant, size)] = sizedStyle;
             return sizedStyle;
         }
 
         /// <summary>
         /// Gets the badge style for the given variant and size.
         /// </summary>
+        private Dictionary<(BadgeVariant, BadgeSize), GUIStyle> badgeStyleCache = new Dictionary<(BadgeVariant, BadgeSize), GUIStyle>();
+
         public GUIStyle GetBadgeStyle(BadgeVariant variant, BadgeSize size)
         {
+            if (badgeStyleCache.TryGetValue((variant, size), out var cachedStyle))
+            {
+                return cachedStyle;
+            }
+
             var theme = ThemeManager.Instance.CurrentTheme;
 
             GUIStyle baseStyle;
@@ -2246,17 +2328,27 @@ namespace shadcnui.GUIComponents
                     break;
             }
 
+            badgeStyleCache[(variant, size)] = sizedStyle;
             return sizedStyle;
         }
 
         /// <summary>
         /// Gets the alert style for the given variant and type.
         /// </summary>
+        private Dictionary<(AlertVariant, AlertType), GUIStyle> alertStyleCache = new Dictionary<(AlertVariant, AlertType), GUIStyle>();
+
         public GUIStyle GetAlertStyle(AlertVariant variant, AlertType type)
         {
+            if (alertStyleCache.TryGetValue((variant, type), out var cachedStyle))
+            {
+                return cachedStyle;
+            }
+
             var theme = ThemeManager.Instance.CurrentTheme;
             GUIStyle baseStyle = variant == AlertVariant.Destructive ? alertDestructiveStyle : alertDefaultStyle;
-            return baseStyle ?? GUI.skin.box;
+            var style = baseStyle ?? GUI.skin.box;
+            alertStyleCache[(variant, type)] = style;
+            return style;
         }
 
         /// <summary>
@@ -2280,8 +2372,15 @@ namespace shadcnui.GUIComponents
         /// <summary>
         /// Gets the avatar style for the given size and shape.
         /// </summary>
+        private Dictionary<(AvatarSize, AvatarShape), GUIStyle> avatarStyleCache = new Dictionary<(AvatarSize, AvatarShape), GUIStyle>();
+
         public GUIStyle GetAvatarStyle(AvatarSize size, AvatarShape shape)
         {
+            if (avatarStyleCache.TryGetValue((size, shape), out var cachedStyle))
+            {
+                return cachedStyle;
+            }
+
             var theme = ThemeManager.Instance.CurrentTheme;
 
             GUIStyle baseStyle = avatarStyle;
@@ -2316,58 +2415,25 @@ namespace shadcnui.GUIComponents
                     break;
             }
 
+            avatarStyleCache[(size, shape)] = sizedStyle;
             return sizedStyle;
         }
 
         /// <summary>
         /// Gets the avatar fallback style for the given size and shape.
         /// </summary>
-        public GUIStyle GetAvatarFallbackStyle(AvatarSize size, AvatarShape shape)
-        {
-            var theme = ThemeManager.Instance.CurrentTheme;
-
-            GUIStyle baseStyle = avatarStyle;
-
-            GUIStyle sizedStyle = new GUIStyle(baseStyle);
-
-            int avatarSizeValue = 0;
-            switch (size)
-            {
-                case AvatarSize.Small:
-                    avatarSizeValue = Mathf.RoundToInt(32 * guiHelper.uiScale);
-                    break;
-                case AvatarSize.Large:
-                    avatarSizeValue = Mathf.RoundToInt(48 * guiHelper.uiScale);
-                    break;
-                default:
-                    avatarSizeValue = Mathf.RoundToInt(40 * guiHelper.uiScale);
-                    break;
-            }
-            sizedStyle.fixedWidth = avatarSizeValue;
-            sizedStyle.fixedHeight = avatarSizeValue;
-            sizedStyle.fontSize = GetAvatarFontSize(size);
-
-            switch (shape)
-            {
-                case AvatarShape.Circle:
-                    sizedStyle.border = new RectOffset(50, 50, 50, 50);
-                    break;
-                case AvatarShape.Rounded:
-                    sizedStyle.border = new RectOffset(8, 8, 8, 8);
-                    break;
-                case AvatarShape.Square:
-                    sizedStyle.border = new RectOffset(0, 0, 0, 0);
-                    break;
-            }
-
-            return sizedStyle;
-        }
-
         /// <summary>
         /// Gets the skeleton style for the given variant and size.
         /// </summary>
+        private Dictionary<(SkeletonVariant, SkeletonSize), GUIStyle> skeletonStyleCache = new Dictionary<(SkeletonVariant, SkeletonSize), GUIStyle>();
+
         public GUIStyle GetSkeletonStyle(SkeletonVariant variant, SkeletonSize size)
         {
+            if (skeletonStyleCache.TryGetValue((variant, size), out var cachedStyle))
+            {
+                return cachedStyle;
+            }
+
             var theme = ThemeManager.Instance.CurrentTheme;
 
             GUIStyle baseStyle;
@@ -2399,14 +2465,22 @@ namespace shadcnui.GUIComponents
                     break;
             }
 
+            skeletonStyleCache[(variant, size)] = sizedStyle;
             return sizedStyle;
         }
 
         /// <summary>
         /// Gets the table style for the given variant and size.
         /// </summary>
+        private Dictionary<(TableVariant, TableSize), GUIStyle> tableStyleCache = new Dictionary<(TableVariant, TableSize), GUIStyle>();
+
         public GUIStyle GetTableStyle(TableVariant variant, TableSize size)
         {
+            if (tableStyleCache.TryGetValue((variant, size), out var cachedStyle))
+            {
+                return cachedStyle;
+            }
+
             var theme = ThemeManager.Instance.CurrentTheme;
 
             GUIStyle baseStyle;
@@ -2426,7 +2500,9 @@ namespace shadcnui.GUIComponents
                     break;
             }
 
-            return baseStyle ?? GUI.skin.box;
+            var style = baseStyle ?? GUI.skin.box;
+            tableStyleCache[(variant, size)] = style;
+            return style;
         }
 
         /// <summary>
@@ -2450,8 +2526,15 @@ namespace shadcnui.GUIComponents
         /// <summary>
         /// Gets the calendar style for the given variant and size.
         /// </summary>
+        private Dictionary<(CalendarVariant, CalendarSize), GUIStyle> calendarStyleCache = new Dictionary<(CalendarVariant, CalendarSize), GUIStyle>();
+
         public GUIStyle GetCalendarStyle(CalendarVariant variant, CalendarSize size)
         {
+            if (calendarStyleCache.TryGetValue((variant, size), out var cachedStyle))
+            {
+                return cachedStyle;
+            }
+
             var theme = ThemeManager.Instance.CurrentTheme;
             GUIStyle sizedStyle = new GUIStyle(calendarStyle);
 
@@ -2468,23 +2551,40 @@ namespace shadcnui.GUIComponents
                     break;
             }
 
+            calendarStyleCache[(variant, size)] = sizedStyle;
             return sizedStyle;
         }
 
         /// <summary>
         /// Gets the dropdown menu style for the given variant and size.
         /// </summary>
+        private Dictionary<(DropdownMenuVariant, DropdownMenuSize), GUIStyle> dropdownMenuStyleCache = new Dictionary<(DropdownMenuVariant, DropdownMenuSize), GUIStyle>();
+
         public GUIStyle GetDropdownMenuStyle(DropdownMenuVariant variant, DropdownMenuSize size)
         {
+            if (dropdownMenuStyleCache.TryGetValue((variant, size), out var cachedStyle))
+            {
+                return cachedStyle;
+            }
+
             var theme = ThemeManager.Instance.CurrentTheme;
-            return dropdownMenuContentStyle;
+            var style = dropdownMenuContentStyle;
+            dropdownMenuStyleCache[(variant, size)] = style;
+            return style;
         }
 
         /// <summary>
         /// Gets the popover style for the given variant and size.
         /// </summary>
+        private Dictionary<(PopoverVariant, PopoverSize), GUIStyle> popoverStyleCache = new Dictionary<(PopoverVariant, PopoverSize), GUIStyle>();
+
         public GUIStyle GetPopoverStyle(PopoverVariant variant, PopoverSize size)
         {
+            if (popoverStyleCache.TryGetValue((variant, size), out var cachedStyle))
+            {
+                return cachedStyle;
+            }
+
             var theme = ThemeManager.Instance.CurrentTheme;
             GUIStyle sizedStyle = new GUIStyle(popoverContentStyle);
 
@@ -2501,14 +2601,22 @@ namespace shadcnui.GUIComponents
                     break;
             }
 
+            popoverStyleCache[(variant, size)] = sizedStyle;
             return sizedStyle;
         }
 
         /// <summary>
         /// Gets the scroll area style for the given variant and size.
         /// </summary>
+        private Dictionary<(ScrollAreaVariant, ScrollAreaSize), GUIStyle> scrollAreaStyleCache = new Dictionary<(ScrollAreaVariant, ScrollAreaSize), GUIStyle>();
+
         public GUIStyle GetScrollAreaStyle(ScrollAreaVariant variant, ScrollAreaSize size)
         {
+            if (scrollAreaStyleCache.TryGetValue((variant, size), out var cachedStyle))
+            {
+                return cachedStyle;
+            }
+
             var theme = ThemeManager.Instance.CurrentTheme;
             GUIStyle sizedStyle = new GUIStyle(scrollAreaStyle);
 
@@ -2525,14 +2633,22 @@ namespace shadcnui.GUIComponents
                     break;
             }
 
+            scrollAreaStyleCache[(variant, size)] = sizedStyle;
             return sizedStyle;
         }
 
         /// <summary>
         /// Gets the select style for the given variant and size.
         /// </summary>
+        private Dictionary<(SelectVariant, SelectSize), GUIStyle> selectStyleCache = new Dictionary<(SelectVariant, SelectSize), GUIStyle>();
+
         public GUIStyle GetSelectStyle(SelectVariant variant, SelectSize size)
         {
+            if (selectStyleCache.TryGetValue((variant, size), out var cachedStyle))
+            {
+                return cachedStyle;
+            }
+
             var theme = ThemeManager.Instance.CurrentTheme;
             GUIStyle sizedStyle = new GUIStyle(selectContentStyle);
 
@@ -2549,6 +2665,7 @@ namespace shadcnui.GUIComponents
                     break;
             }
 
+            selectStyleCache[(variant, size)] = sizedStyle;
             return sizedStyle;
         }
 
@@ -2647,6 +2764,27 @@ namespace shadcnui.GUIComponents
                 Object.Destroy(selectTriggerTexture);
             if (selectContentTexture)
                 Object.Destroy(selectContentTexture);
+
+            foreach (var texture in solidColorTextureCache.Values)
+            {
+                if (texture)
+                    Object.Destroy(texture);
+            }
+            solidColorTextureCache.Clear();
+
+            foreach (var texture in outlineButtonTextureCache.Values)
+            {
+                if (texture)
+                    Object.Destroy(texture);
+            }
+            outlineButtonTextureCache.Clear();
+
+            foreach (var texture in outlineTextureCache.Values)
+            {
+                if (texture)
+                    Object.Destroy(texture);
+            }
+            outlineTextureCache.Clear();
         }
         #endregion
     }

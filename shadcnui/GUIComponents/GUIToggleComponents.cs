@@ -20,25 +20,6 @@ namespace shadcnui.GUIComponents
             layoutComponents = new GUILayoutComponents(helper);
         }
 
-        public void DrawToggle(float windowWidth, string label, ref bool value, Action<bool> onToggle)
-        {
-            var styleManager = guiHelper.GetStyleManager();
-            string toggleText = label + (value ? " [ON]" : " [OFF]");
-            Color originalColor = GUI.backgroundColor;
-#if IL2CPP
-            bool clicked = GUILayout.Button(toggleText, styleManager.animatedButtonStyle, (Il2CppReferenceArray<GUILayoutOption>)null);
-#else
-            bool clicked = GUILayout.Button(toggleText, styleManager.animatedButtonStyle);
-#endif
-            GUI.backgroundColor = originalColor;
-            if (clicked)
-            {
-                value = !value;
-                onToggle?.Invoke(value);
-            }
-            layoutComponents.AddSpace(guiHelper.controlSpacing);
-        }
-
         public bool Toggle(string text, bool value, ToggleVariant variant = ToggleVariant.Default, ToggleSize size = ToggleSize.Default, Action<bool> onToggle = null, bool disabled = false, params GUILayoutOption[] options)
         {
             var styleManager = guiHelper.GetStyleManager();

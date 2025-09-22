@@ -23,7 +23,7 @@ namespace shadcnui.GUIComponents
         {
             var styleManager = guiHelper.GetStyleManager();
             GUIStyle avatarStyle = styleManager.GetAvatarStyle(size, shape);
-            GUIStyle fallbackStyle = styleManager.GetAvatarFallbackStyle(size, shape);
+            GUIStyle fallbackStyle = styleManager.GetAvatarStyle(size, shape);
 
             GUILayoutOption[] layoutOptions = new List<GUILayoutOption>(options).ToArray();
 
@@ -57,7 +57,7 @@ namespace shadcnui.GUIComponents
             }
             else
             {
-                GUIStyle fallbackStyle = styleManager.GetAvatarFallbackStyle(size, shape);
+                GUIStyle fallbackStyle = styleManager.GetAvatarStyle(size, shape);
                 GUI.Label(scaledRect, new GUIContent(fallbackText ?? "A"), fallbackStyle);
             }
         }
@@ -199,7 +199,7 @@ namespace shadcnui.GUIComponents
             }
             else
             {
-                GUI.Label(lastRect, new GUIContent(fallbackText ?? "A"), styleManager.GetAvatarFallbackStyle(size, shape));
+                GUI.Label(lastRect, new GUIContent(fallbackText ?? "A"), styleManager.GetAvatarStyle(size, shape));
             }
         }
 
@@ -272,7 +272,7 @@ namespace shadcnui.GUIComponents
                 string countText = $"+{remainingCount}";
 
                 var styleManager = guiHelper.GetStyleManager();
-                GUIStyle countStyle = styleManager?.GetAvatarFallbackStyle(size, shape) ?? GUI.skin.box;
+                GUIStyle countStyle = styleManager?.GetAvatarStyle(size, shape) ?? GUI.skin.box;
                 countStyle.normal.textColor = Color.white;
                 countStyle.normal.background = styleManager?.CreateSolidTexture(Color.gray) ?? GUI.skin.box.normal.background;
 

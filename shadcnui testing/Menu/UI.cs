@@ -129,7 +129,6 @@ public class UI : MonoBehaviour
             new GUITabsComponents.TabConfig("DropdownMenu", DrawDropdownMenuDemos),
             new GUITabsComponents.TabConfig("Popover", DrawPopoverDemos),
             new GUITabsComponents.TabConfig("Select", DrawSelectDemos),
-            new GUITabsComponents.TabConfig("Visual", DrawVisualDemos),
         };
     }
 
@@ -1252,42 +1251,6 @@ public class UI : MonoBehaviour
         multiToggleGroupValues = guiHelper.MultiToggleGroup(new string[] { "Red", "Green", "Blue" }, multiToggleGroupValues);
         guiHelper.Label($"Multi Toggle Group Values: {string.Join(", ", multiToggleGroupValues)}");
         guiHelper.Label("Code: guiHelper.MultiToggleGroup(labels, values);", LabelVariant.Muted);
-        guiHelper.HorizontalSeparator();
-
-        guiHelper.Label("Draw Toggle (Legacy)", LabelVariant.Default);
-        guiHelper.DrawToggle(200, "Draw Toggle", ref drawToggleValue, (val) => drawToggleValue = val);
-        guiHelper.Label($"Draw Toggle Value: {drawToggleValue}");
-        guiHelper.Label("Code: guiHelper.DrawToggle(width, label, ref value, onToggle);", LabelVariant.Muted);
-        guiHelper.HorizontalSeparator();
-
-        GUILayout.EndVertical();
-    }
-
-    void DrawVisualDemos()
-    {
-        guiHelper.BeginVerticalGroup(GUILayout.ExpandWidth(true), GUILayout.ExpandHeight(true));
-        guiHelper.Label("Visual", LabelVariant.Default);
-        guiHelper.MutedLabel("Components for visual feedback and information display.");
-        guiHelper.HorizontalSeparator();
-
-        guiHelper.Label("Progress Bar (Legacy)", LabelVariant.Default);
-        guiHelper.DrawProgressBar(300, "Loading Progress", visualProgressBarValue, Color.green);
-        guiHelper.Label("Code: guiHelper.DrawProgressBar(width, label, progress, color);", LabelVariant.Muted);
-        guiHelper.HorizontalSeparator();
-
-        guiHelper.Label("Box (Legacy)", LabelVariant.Default);
-        guiHelper.DrawBox(300, "This is a custom drawn box.", 50);
-        guiHelper.Label("Code: guiHelper.DrawBox(width, content, height);", LabelVariant.Muted);
-        guiHelper.HorizontalSeparator();
-
-        guiHelper.Label("Separator (Legacy)", LabelVariant.Default);
-        guiHelper.DrawSeparator(300, 5);
-        guiHelper.Label("Code: guiHelper.DrawSeparator(width, height);", LabelVariant.Muted);
-        guiHelper.HorizontalSeparator();
-
-        guiHelper.Label("Instructions (Legacy)", LabelVariant.Default);
-        guiHelper.RenderInstructions("Follow these instructions carefully.");
-        guiHelper.Label("Code: guiHelper.RenderInstructions(text);", LabelVariant.Muted);
         guiHelper.HorizontalSeparator();
 
         GUILayout.EndVertical();
