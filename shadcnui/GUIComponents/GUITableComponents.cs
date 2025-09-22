@@ -20,13 +20,7 @@ namespace shadcnui.GUIComponents
             layoutComponents = new GUILayoutComponents(helper);
         }
 
-        public void Table(
-            string[] headers,
-            string[,] data,
-            TableVariant variant = TableVariant.Default,
-            TableSize size = TableSize.Default,
-            params GUILayoutOption[] options
-        )
+        public void Table(string[] headers, string[,] data, TableVariant variant = TableVariant.Default, TableSize size = TableSize.Default, params GUILayoutOption[] options)
         {
             if (headers == null || data == null)
                 return;
@@ -48,11 +42,7 @@ namespace shadcnui.GUIComponents
             for (int i = 0; i < headers.Length; i++)
             {
 #if IL2CPP
-                GUILayout.Label(
-                    headers[i],
-                    headerStyle,
-                    (Il2CppReferenceArray<GUILayoutOption>)null
-                );
+                GUILayout.Label(headers[i], headerStyle, (Il2CppReferenceArray<GUILayoutOption>)null);
 #else
                 GUILayout.Label(headers[i], headerStyle);
 #endif
@@ -70,11 +60,7 @@ namespace shadcnui.GUIComponents
                 {
                     string cellValue = data[row, col] ?? "";
 #if IL2CPP
-                    GUILayout.Label(
-                        cellValue,
-                        cellStyle,
-                        (Il2CppReferenceArray<GUILayoutOption>)null
-                    );
+                    GUILayout.Label(cellValue, cellStyle, (Il2CppReferenceArray<GUILayoutOption>)null);
 #else
                     GUILayout.Label(cellValue, cellStyle);
 #endif
@@ -86,13 +72,7 @@ namespace shadcnui.GUIComponents
             layoutComponents.EndVerticalGroup();
         }
 
-        public void Table(
-            Rect rect,
-            string[] headers,
-            string[,] data,
-            TableVariant variant = TableVariant.Default,
-            TableSize size = TableSize.Default
-        )
+        public void Table(Rect rect, string[] headers, string[,] data, TableVariant variant = TableVariant.Default, TableSize size = TableSize.Default)
         {
             if (headers == null || data == null)
                 return;
@@ -106,12 +86,7 @@ namespace shadcnui.GUIComponents
 
             GUIStyle tableStyle = styleManager.GetTableStyle(variant, size);
 
-            Rect scaledRect = new Rect(
-                rect.x * guiHelper.uiScale,
-                rect.y * guiHelper.uiScale,
-                rect.width * guiHelper.uiScale,
-                rect.height * guiHelper.uiScale
-            );
+            Rect scaledRect = new Rect(rect.x * guiHelper.uiScale, rect.y * guiHelper.uiScale, rect.width * guiHelper.uiScale, rect.height * guiHelper.uiScale);
 
             GUI.Box(scaledRect, "", tableStyle);
 
@@ -120,16 +95,7 @@ namespace shadcnui.GUIComponents
             GUILayout.EndArea();
         }
 
-        public void SortableTable(
-            string[] headers,
-            string[,] data,
-            ref int[] sortColumns,
-            ref bool[] sortAscending,
-            TableVariant variant = TableVariant.Default,
-            TableSize size = TableSize.Default,
-            Action<int, bool> onSort = null,
-            params GUILayoutOption[] options
-        )
+        public void SortableTable(string[] headers, string[,] data, ref int[] sortColumns, ref bool[] sortAscending, TableVariant variant = TableVariant.Default, TableSize size = TableSize.Default, Action<int, bool> onSort = null, params GUILayoutOption[] options)
         {
             if (headers == null || data == null)
                 return;
@@ -146,8 +112,7 @@ namespace shadcnui.GUIComponents
             GUIStyle cellStyle = styleManager.GetTableCellStyle(variant, size);
 
 #if IL2CPP
-            var il2cppOptions =
-                options != null ? (Il2CppReferenceArray<GUILayoutOption>)options : null;
+            var il2cppOptions = options != null ? (Il2CppReferenceArray<GUILayoutOption>)options : null;
 #else
             var il2cppOptions = options;
 #endif
@@ -211,15 +176,7 @@ namespace shadcnui.GUIComponents
             layoutComponents.EndVerticalGroup();
         }
 
-        public void SelectableTable(
-            string[] headers,
-            string[,] data,
-            ref bool[] selectedRows,
-            TableVariant variant = TableVariant.Default,
-            TableSize size = TableSize.Default,
-            Action<int, bool> onSelectionChange = null,
-            params GUILayoutOption[] options
-        )
+        public void SelectableTable(string[] headers, string[,] data, ref bool[] selectedRows, TableVariant variant = TableVariant.Default, TableSize size = TableSize.Default, Action<int, bool> onSelectionChange = null, params GUILayoutOption[] options)
         {
             if (headers == null || data == null)
                 return;
@@ -236,8 +193,7 @@ namespace shadcnui.GUIComponents
             GUIStyle cellStyle = styleManager.GetTableCellStyle(variant, size);
 
 #if IL2CPP
-            var il2cppOptions =
-                options != null ? (Il2CppReferenceArray<GUILayoutOption>)options : null;
+            var il2cppOptions = options != null ? (Il2CppReferenceArray<GUILayoutOption>)options : null;
 #else
             var il2cppOptions = options;
 #endif
@@ -270,20 +226,9 @@ namespace shadcnui.GUIComponents
             {
                 layoutComponents.BeginHorizontalGroup();
 #if IL2CPP
-                bool newSelected = GUILayout.Toggle(
-                    selectedRows[row],
-                    "",
-                    GUI.skin.toggle,
-                    new Il2CppReferenceArray<GUILayoutOption>(
-                        new GUILayoutOption[] { GUILayout.Width(20 * guiHelper.uiScale) }
-                    )
-                );
+                bool newSelected = GUILayout.Toggle(selectedRows[row], "", GUI.skin.toggle, new Il2CppReferenceArray<GUILayoutOption>(new GUILayoutOption[] { GUILayout.Width(20 * guiHelper.uiScale) }));
 #else
-                bool newSelected = GUILayout.Toggle(
-                    selectedRows[row],
-                    "",
-                    GUILayout.Width(20 * guiHelper.uiScale)
-                );
+                bool newSelected = GUILayout.Toggle(selectedRows[row], "", GUILayout.Width(20 * guiHelper.uiScale));
 #endif
 
                 if (newSelected != selectedRows[row])
@@ -308,14 +253,7 @@ namespace shadcnui.GUIComponents
             layoutComponents.EndVerticalGroup();
         }
 
-        public void CustomTable(
-            string[] headers,
-            object[,] data,
-            Action<object, int, int> cellRenderer,
-            TableVariant variant = TableVariant.Default,
-            TableSize size = TableSize.Default,
-            params GUILayoutOption[] options
-        )
+        public void CustomTable(string[] headers, object[,] data, Action<object, int, int> cellRenderer, TableVariant variant = TableVariant.Default, TableSize size = TableSize.Default, params GUILayoutOption[] options)
         {
             if (headers == null || data == null || cellRenderer == null)
                 return;
@@ -336,11 +274,7 @@ namespace shadcnui.GUIComponents
             for (int i = 0; i < headers.Length; i++)
             {
 #if IL2CPP
-                GUILayout.Label(
-                    headers[i],
-                    headerStyle,
-                    (Il2CppReferenceArray<GUILayoutOption>)null
-                );
+                GUILayout.Label(headers[i], headerStyle, (Il2CppReferenceArray<GUILayoutOption>)null);
 #else
                 GUILayout.Label(headers[i], headerStyle);
 #endif
@@ -366,23 +300,13 @@ namespace shadcnui.GUIComponents
             layoutComponents.EndVerticalGroup();
         }
 
-        public void PaginatedTable(
-            string[] headers,
-            string[,] data,
-            ref int currentPage,
-            int pageSize,
-            TableVariant variant = TableVariant.Default,
-            TableSize size = TableSize.Default,
-            Action<int> onPageChange = null,
-            params GUILayoutOption[] options
-        )
+        public void PaginatedTable(string[] headers, string[,] data, ref int currentPage, int pageSize, TableVariant variant = TableVariant.Default, TableSize size = TableSize.Default, Action<int> onPageChange = null, params GUILayoutOption[] options)
         {
             if (headers == null || data == null)
                 return;
 
 #if IL2CPP
-            var il2cppOptions =
-                options != null ? (Il2CppReferenceArray<GUILayoutOption>)options : null;
+            var il2cppOptions = options != null ? (Il2CppReferenceArray<GUILayoutOption>)options : null;
 #else
             var il2cppOptions = options;
 #endif
@@ -453,23 +377,13 @@ namespace shadcnui.GUIComponents
             layoutComponents.EndHorizontalGroup();
         }
 
-        public void SearchableTable(
-            string[] headers,
-            string[,] data,
-            ref string searchQuery,
-            ref string[,] filteredData,
-            TableVariant variant = TableVariant.Default,
-            TableSize size = TableSize.Default,
-            Action<string> onSearch = null,
-            params GUILayoutOption[] options
-        )
+        public void SearchableTable(string[] headers, string[,] data, ref string searchQuery, ref string[,] filteredData, TableVariant variant = TableVariant.Default, TableSize size = TableSize.Default, Action<string> onSearch = null, params GUILayoutOption[] options)
         {
             if (headers == null || data == null)
                 return;
 
 #if IL2CPP
-            var il2cppOptions =
-                options != null ? (Il2CppReferenceArray<GUILayoutOption>)options : null;
+            var il2cppOptions = options != null ? (Il2CppReferenceArray<GUILayoutOption>)options : null;
 #else
             var il2cppOptions = options;
 #endif
@@ -482,18 +396,9 @@ namespace shadcnui.GUIComponents
             GUILayout.Label("Search:", GUILayout.Width(60 * guiHelper.uiScale));
 #endif
 #if IL2CPP
-            string newSearchQuery = GUILayout.TextField(
-                searchQuery ?? "",
-                GUI.skin.textField,
-                new Il2CppReferenceArray<GUILayoutOption>(
-                    new GUILayoutOption[] { GUILayout.Width(200 * guiHelper.uiScale) }
-                )
-            );
+            string newSearchQuery = GUILayout.TextField(searchQuery ?? "", GUI.skin.textField, new Il2CppReferenceArray<GUILayoutOption>(new GUILayoutOption[] { GUILayout.Width(200 * guiHelper.uiScale) }));
 #else
-            string newSearchQuery = GUILayout.TextField(
-                searchQuery ?? "",
-                GUILayout.Width(200 * guiHelper.uiScale)
-            );
+            string newSearchQuery = GUILayout.TextField(searchQuery ?? "", GUILayout.Width(200 * guiHelper.uiScale));
 #endif
 
             if (newSearchQuery != searchQuery)
@@ -511,14 +416,7 @@ namespace shadcnui.GUIComponents
             Table(headers, displayData, variant, size, options);
         }
 
-        public void ResizableTable(
-            string[] headers,
-            string[,] data,
-            ref float[] columnWidths,
-            TableVariant variant = TableVariant.Default,
-            TableSize size = TableSize.Default,
-            params GUILayoutOption[] options
-        )
+        public void ResizableTable(string[] headers, string[,] data, ref float[] columnWidths, TableVariant variant = TableVariant.Default, TableSize size = TableSize.Default, params GUILayoutOption[] options)
         {
             if (headers == null || data == null)
                 return;
@@ -552,12 +450,7 @@ namespace shadcnui.GUIComponents
                 float width = columnWidths[i] * guiHelper.uiScale;
 
 #if IL2CPP
-                GUILayout.Label(
-                    headers[i],
-                    headerStyle,
-                    (Il2CppReferenceArray<GUILayoutOption>)
-                        new GUILayoutOption[] { GUILayout.Width(width) }
-                );
+                GUILayout.Label(headers[i], headerStyle, (Il2CppReferenceArray<GUILayoutOption>)new GUILayoutOption[] { GUILayout.Width(width) });
 #else
                 GUILayout.Label(headers[i], headerStyle, GUILayout.Width(width));
 #endif
@@ -577,12 +470,7 @@ namespace shadcnui.GUIComponents
                     float width = columnWidths[col] * guiHelper.uiScale;
 
 #if IL2CPP
-                    GUILayout.Label(
-                        cellValue,
-                        cellStyle,
-                        (Il2CppReferenceArray<GUILayoutOption>)
-                            new GUILayoutOption[] { GUILayout.Width(width) }
-                    );
+                    GUILayout.Label(cellValue, cellStyle, (Il2CppReferenceArray<GUILayoutOption>)new GUILayoutOption[] { GUILayout.Width(width) });
 #else
                     GUILayout.Label(cellValue, cellStyle, GUILayout.Width(width));
 #endif

@@ -19,78 +19,40 @@ namespace shadcnui.GUIComponents
             layoutComponents = new GUILayoutComponents(helper);
         }
 
-        public void Badge(
-            string text,
-            BadgeVariant variant = BadgeVariant.Default,
-            BadgeSize size = BadgeSize.Default,
-            params GUILayoutOption[] options
-        )
+        public void Badge(string text, BadgeVariant variant = BadgeVariant.Default, BadgeSize size = BadgeSize.Default, params GUILayoutOption[] options)
         {
             var styleManager = guiHelper.GetStyleManager();
 
             GUIStyle badgeStyle = styleManager.GetBadgeStyle(variant, size);
 
 #if IL2CPP
-            GUILayout.Label(
-                text ?? "Badge",
-                badgeStyle,
-                (Il2CppReferenceArray<GUILayoutOption>)options
-            );
+            GUILayout.Label(text ?? "Badge", badgeStyle, (Il2CppReferenceArray<GUILayoutOption>)options);
 #else
             GUILayout.Label(text ?? "Badge", badgeStyle, options);
 #endif
         }
 
-        public void Badge(
-            Rect rect,
-            string text,
-            BadgeVariant variant = BadgeVariant.Default,
-            BadgeSize size = BadgeSize.Default
-        )
+        public void Badge(Rect rect, string text, BadgeVariant variant = BadgeVariant.Default, BadgeSize size = BadgeSize.Default)
         {
             var styleManager = guiHelper.GetStyleManager();
 
             GUIStyle badgeStyle = styleManager.GetBadgeStyle(variant, size);
 
-            Rect scaledRect = new Rect(
-                rect.x * guiHelper.uiScale,
-                rect.y * guiHelper.uiScale,
-                rect.width * guiHelper.uiScale,
-                rect.height * guiHelper.uiScale
-            );
+            Rect scaledRect = new Rect(rect.x * guiHelper.uiScale, rect.y * guiHelper.uiScale, rect.width * guiHelper.uiScale, rect.height * guiHelper.uiScale);
 
             GUI.Label(scaledRect, text ?? "Badge", badgeStyle);
         }
 
-        public void BadgeWithIcon(
-            string text,
-            Texture2D icon,
-            BadgeVariant variant = BadgeVariant.Default,
-            BadgeSize size = BadgeSize.Default,
-            params GUILayoutOption[] options
-        )
+        public void BadgeWithIcon(string text, Texture2D icon, BadgeVariant variant = BadgeVariant.Default, BadgeSize size = BadgeSize.Default, params GUILayoutOption[] options)
         {
             layoutComponents.BeginHorizontalGroup();
 
             if (icon != null)
             {
 #if IL2CPP
-                GUILayout.Label(
-                    icon,
-                    GUI.skin.label,
-                    (Il2CppReferenceArray<GUILayoutOption>)
-                        new GUILayoutOption[]
-                        {
-                            GUILayout.Width(16 * guiHelper.uiScale),
-                            GUILayout.Height(16 * guiHelper.uiScale),
-                        }
-                );
+                GUILayout.Label(icon, GUI.skin.label, (Il2CppReferenceArray<GUILayoutOption>)new GUILayoutOption[] { GUILayout.Width(16 * guiHelper.uiScale), GUILayout.Height(16 * guiHelper.uiScale) });
 #else
-                GUILayout.Label(
-                    icon,
-                    GUILayout.Width(16 * guiHelper.uiScale),
-                    GUILayout.Height(16 * guiHelper.uiScale)
-                );
+                GUILayout.Label(icon, GUILayout.Width(16 * guiHelper.uiScale), GUILayout.Height(16 * guiHelper.uiScale));
 #endif
                 layoutComponents.AddSpace(4);
             }
@@ -100,13 +62,7 @@ namespace shadcnui.GUIComponents
             layoutComponents.EndHorizontalGroup();
         }
 
-        public void CustomBadge(
-            string text,
-            Color backgroundColor,
-            Color textColor,
-            BadgeSize size = BadgeSize.Default,
-            params GUILayoutOption[] options
-        )
+        public void CustomBadge(string text, Color backgroundColor, Color textColor, BadgeSize size = BadgeSize.Default, params GUILayoutOption[] options)
         {
             var styleManager = guiHelper.GetStyleManager();
 
@@ -119,35 +75,19 @@ namespace shadcnui.GUIComponents
             customStyle.alignment = TextAnchor.MiddleCenter;
 
 #if IL2CPP
-            GUILayout.Label(
-                text ?? "Badge",
-                customStyle,
-                (Il2CppReferenceArray<GUILayoutOption>)options
-            );
+            GUILayout.Label(text ?? "Badge", customStyle, (Il2CppReferenceArray<GUILayoutOption>)options);
 #else
             GUILayout.Label(text ?? "Badge", customStyle, options);
 #endif
         }
 
-        public void CountBadge(
-            int count,
-            BadgeVariant variant = BadgeVariant.Default,
-            BadgeSize size = BadgeSize.Default,
-            int maxCount = 99,
-            params GUILayoutOption[] options
-        )
+        public void CountBadge(int count, BadgeVariant variant = BadgeVariant.Default, BadgeSize size = BadgeSize.Default, int maxCount = 99, params GUILayoutOption[] options)
         {
             string displayText = count > maxCount ? $"{maxCount}+" : count.ToString();
             Badge(displayText, variant, size, options);
         }
 
-        public void StatusBadge(
-            string text,
-            bool isActive,
-            BadgeVariant variant = BadgeVariant.Default,
-            BadgeSize size = BadgeSize.Default,
-            params GUILayoutOption[] options
-        )
+        public void StatusBadge(string text, bool isActive, BadgeVariant variant = BadgeVariant.Default, BadgeSize size = BadgeSize.Default, params GUILayoutOption[] options)
         {
             layoutComponents.BeginHorizontalGroup();
 
@@ -166,11 +106,7 @@ namespace shadcnui.GUIComponents
                 };
 
 #if IL2CPP
-                GUILayout.Label(
-                    GUIContent.none,
-                    dotStyle,
-                    (Il2CppReferenceArray<GUILayoutOption>)null
-                );
+                GUILayout.Label(GUIContent.none, dotStyle, (Il2CppReferenceArray<GUILayoutOption>)null);
 #else
                 GUILayout.Label("", dotStyle);
 #endif
@@ -182,13 +118,7 @@ namespace shadcnui.GUIComponents
             layoutComponents.EndHorizontalGroup();
         }
 
-        public bool DismissibleBadge(
-            string text,
-            BadgeVariant variant = BadgeVariant.Default,
-            BadgeSize size = BadgeSize.Default,
-            Action onDismiss = null,
-            params GUILayoutOption[] options
-        )
+        public bool DismissibleBadge(string text, BadgeVariant variant = BadgeVariant.Default, BadgeSize size = BadgeSize.Default, Action onDismiss = null, params GUILayoutOption[] options)
         {
             layoutComponents.BeginHorizontalGroup();
 
@@ -196,27 +126,9 @@ namespace shadcnui.GUIComponents
 
             layoutComponents.AddSpace(4);
 #if IL2CPP
-            bool closeClicked = GUILayout.Button(
-                "×",
-                GUI.skin.button,
-                new Il2CppReferenceArray<GUILayoutOption>(
-                    new GUILayoutOption[]
-                    {
-                        GUILayout.Width(16 * guiHelper.uiScale),
-                        GUILayout.Height(16 * guiHelper.uiScale),
-                    }
-                )
-            );
+            bool closeClicked = GUILayout.Button("×", GUI.skin.button, new Il2CppReferenceArray<GUILayoutOption>(new GUILayoutOption[] { GUILayout.Width(16 * guiHelper.uiScale), GUILayout.Height(16 * guiHelper.uiScale) }));
 #else
-            bool closeClicked = GUILayout.Button(
-                "×",
-                GUI.skin.button,
-                new GUILayoutOption[]
-                {
-                    GUILayout.Width(16 * guiHelper.uiScale),
-                    GUILayout.Height(16 * guiHelper.uiScale),
-                }
-            );
+            bool closeClicked = GUILayout.Button("×", GUI.skin.button, new GUILayoutOption[] { GUILayout.Width(16 * guiHelper.uiScale), GUILayout.Height(16 * guiHelper.uiScale) });
 #endif
             if (closeClicked && onDismiss != null)
             {
@@ -228,23 +140,14 @@ namespace shadcnui.GUIComponents
             return closeClicked;
         }
 
-        public void ProgressBadge(
-            string text,
-            float progress,
-            BadgeVariant variant = BadgeVariant.Default,
-            BadgeSize size = BadgeSize.Default,
-            params GUILayoutOption[] options
-        )
+        public void ProgressBadge(string text, float progress, BadgeVariant variant = BadgeVariant.Default, BadgeSize size = BadgeSize.Default, params GUILayoutOption[] options)
         {
             layoutComponents.BeginVerticalGroup();
 
             Badge(text, variant, size, options);
 
             layoutComponents.AddSpace(2);
-            Rect progressRect = GUILayoutUtility.GetRect(
-                60 * guiHelper.uiScale,
-                4 * guiHelper.uiScale
-            );
+            Rect progressRect = GUILayoutUtility.GetRect(60 * guiHelper.uiScale, 4 * guiHelper.uiScale);
 
             var styleManager = guiHelper.GetStyleManager();
             if (styleManager != null)
@@ -253,12 +156,7 @@ namespace shadcnui.GUIComponents
                 bgStyle.normal.background = styleManager.CreateSolidTexture(Color.gray);
                 GUI.Box(progressRect, "", bgStyle);
 
-                Rect fillRect = new Rect(
-                    progressRect.x,
-                    progressRect.y,
-                    progressRect.width * Mathf.Clamp01(progress),
-                    progressRect.height
-                );
+                Rect fillRect = new Rect(progressRect.x, progressRect.y, progressRect.width * Mathf.Clamp01(progress), progressRect.height);
                 GUIStyle fillStyle = new GUIStyle(GUI.skin.box);
                 fillStyle.normal.background = styleManager.CreateSolidTexture(Color.green);
                 GUI.Box(fillRect, "", fillStyle);
@@ -267,12 +165,7 @@ namespace shadcnui.GUIComponents
             layoutComponents.EndVerticalGroup();
         }
 
-        public void AnimatedBadge(
-            string text,
-            BadgeVariant variant = BadgeVariant.Default,
-            BadgeSize size = BadgeSize.Default,
-            params GUILayoutOption[] options
-        )
+        public void AnimatedBadge(string text, BadgeVariant variant = BadgeVariant.Default, BadgeSize size = BadgeSize.Default, params GUILayoutOption[] options)
         {
             float time = Time.time * 2f;
             float alpha = (Mathf.Sin(time) + 1f) * 0.5f * 0.3f + 0.7f;
@@ -285,13 +178,7 @@ namespace shadcnui.GUIComponents
             GUI.color = originalColor;
         }
 
-        public void BadgeWithTooltip(
-            string text,
-            string tooltip,
-            BadgeVariant variant = BadgeVariant.Default,
-            BadgeSize size = BadgeSize.Default,
-            params GUILayoutOption[] options
-        )
+        public void BadgeWithTooltip(string text, string tooltip, BadgeVariant variant = BadgeVariant.Default, BadgeSize size = BadgeSize.Default, params GUILayoutOption[] options)
         {
             layoutComponents.BeginHorizontalGroup();
 
@@ -302,8 +189,7 @@ namespace shadcnui.GUIComponents
                 layoutComponents.AddSpace(4);
 
                 var styleManager = guiHelper.GetStyleManager();
-                GUIStyle tooltipStyle =
-                    styleManager?.GetLabelStyle(LabelVariant.Muted) ?? GUI.skin.label;
+                GUIStyle tooltipStyle = styleManager?.GetLabelStyle(LabelVariant.Muted) ?? GUI.skin.label;
 
                 Color originalColor = GUI.color;
                 GUI.color = new Color(originalColor.r, originalColor.g, originalColor.b, 0.6f);
@@ -319,13 +205,7 @@ namespace shadcnui.GUIComponents
             layoutComponents.EndHorizontalGroup();
         }
 
-        public void BadgeGroup(
-            string[] texts,
-            BadgeVariant[] variants,
-            BadgeSize size = BadgeSize.Default,
-            bool horizontal = true,
-            float spacing = 5f
-        )
+        public void BadgeGroup(string[] texts, BadgeVariant[] variants, BadgeSize size = BadgeSize.Default, bool horizontal = true, float spacing = 5f)
         {
             if (texts == null || texts.Length == 0)
                 return;
@@ -364,32 +244,17 @@ namespace shadcnui.GUIComponents
                 layoutComponents.EndVerticalGroup();
         }
 
-        public void RoundedBadge(
-            string text,
-            BadgeVariant variant = BadgeVariant.Default,
-            BadgeSize size = BadgeSize.Default,
-            float cornerRadius = 12f,
-            params GUILayoutOption[] options
-        )
+        public void RoundedBadge(string text, BadgeVariant variant = BadgeVariant.Default, BadgeSize size = BadgeSize.Default, float cornerRadius = 12f, params GUILayoutOption[] options)
         {
             var styleManager = guiHelper.GetStyleManager();
 
             GUIStyle badgeStyle = styleManager.GetBadgeStyle(variant, size);
 
             GUIStyle roundedStyle = new GUIStyle(badgeStyle);
-            roundedStyle.border = new RectOffset(
-                Mathf.RoundToInt(cornerRadius * guiHelper.uiScale),
-                Mathf.RoundToInt(cornerRadius * guiHelper.uiScale),
-                Mathf.RoundToInt(cornerRadius * guiHelper.uiScale),
-                Mathf.RoundToInt(cornerRadius * guiHelper.uiScale)
-            );
+            roundedStyle.border = new RectOffset(Mathf.RoundToInt(cornerRadius * guiHelper.uiScale), Mathf.RoundToInt(cornerRadius * guiHelper.uiScale), Mathf.RoundToInt(cornerRadius * guiHelper.uiScale), Mathf.RoundToInt(cornerRadius * guiHelper.uiScale));
 
 #if IL2CPP
-            GUILayout.Label(
-                text ?? "Badge",
-                roundedStyle,
-                (Il2CppReferenceArray<GUILayoutOption>)options
-            );
+            GUILayout.Label(text ?? "Badge", roundedStyle, (Il2CppReferenceArray<GUILayoutOption>)options);
 #else
             GUILayout.Label(text ?? "Badge", roundedStyle, options);
 #endif
@@ -414,26 +279,11 @@ namespace shadcnui.GUIComponents
             switch (size)
             {
                 case BadgeSize.Small:
-                    return new RectOffset(
-                        Mathf.RoundToInt(6 * scale),
-                        Mathf.RoundToInt(6 * scale),
-                        Mathf.RoundToInt(2 * scale),
-                        Mathf.RoundToInt(2 * scale)
-                    );
+                    return new RectOffset(Mathf.RoundToInt(6 * scale), Mathf.RoundToInt(6 * scale), Mathf.RoundToInt(2 * scale), Mathf.RoundToInt(2 * scale));
                 case BadgeSize.Large:
-                    return new RectOffset(
-                        Mathf.RoundToInt(12 * scale),
-                        Mathf.RoundToInt(12 * scale),
-                        Mathf.RoundToInt(4 * scale),
-                        Mathf.RoundToInt(4 * scale)
-                    );
+                    return new RectOffset(Mathf.RoundToInt(12 * scale), Mathf.RoundToInt(12 * scale), Mathf.RoundToInt(4 * scale), Mathf.RoundToInt(4 * scale));
                 default:
-                    return new RectOffset(
-                        Mathf.RoundToInt(8 * scale),
-                        Mathf.RoundToInt(8 * scale),
-                        Mathf.RoundToInt(3 * scale),
-                        Mathf.RoundToInt(3 * scale)
-                    );
+                    return new RectOffset(Mathf.RoundToInt(8 * scale), Mathf.RoundToInt(8 * scale), Mathf.RoundToInt(3 * scale), Mathf.RoundToInt(3 * scale));
             }
         }
     }

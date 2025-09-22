@@ -19,13 +19,7 @@ namespace shadcnui.GUIComponents
             layoutComponents = new GUILayoutComponents(helper);
         }
 
-        public int Tabs(
-            string[] tabNames,
-            int selectedIndex,
-            Action<int> onTabChange = null,
-            int maxLines = 1,
-            params GUILayoutOption[] options
-        )
+        public int Tabs(string[] tabNames, int selectedIndex, Action<int> onTabChange = null, int maxLines = 1, params GUILayoutOption[] options)
         {
             if (tabNames == null || tabNames.Length == 0)
                 return selectedIndex;
@@ -40,11 +34,7 @@ namespace shadcnui.GUIComponents
             for (int line = 0; line < maxLines; line++)
             {
                 layoutComponents.BeginHorizontalGroup(styleManager.GetTabsListStyle());
-                for (
-                    int i = line * tabsPerLine;
-                    i < (line + 1) * tabsPerLine && i < tabNames.Length;
-                    i++
-                )
+                for (int i = line * tabsPerLine; i < (line + 1) * tabsPerLine && i < tabNames.Length; i++)
                 {
                     bool isActive = i == selectedIndex;
                     GUIStyle triggerStyle = styleManager.GetTabsTriggerStyle(isActive);
@@ -56,17 +46,9 @@ namespace shadcnui.GUIComponents
                         tabOptions.AddRange(options);
 
 #if IL2CPP
-                    bool clicked = GUILayout.Button(
-                        tabNames[i] ?? $"Tab {i + 1}",
-                        triggerStyle,
-                        (Il2CppReferenceArray<GUILayoutOption>)tabOptions.ToArray()
-                    );
+                    bool clicked = GUILayout.Button(tabNames[i] ?? $"Tab {i + 1}", triggerStyle, (Il2CppReferenceArray<GUILayoutOption>)tabOptions.ToArray());
 #else
-                    bool clicked = GUILayout.Button(
-                        tabNames[i] ?? $"Tab {i + 1}",
-                        triggerStyle,
-                        tabOptions.ToArray()
-                    );
+                    bool clicked = GUILayout.Button(tabNames[i] ?? $"Tab {i + 1}", triggerStyle, tabOptions.ToArray());
 #endif
 
                     if (clicked && i != selectedIndex)
@@ -97,11 +79,7 @@ namespace shadcnui.GUIComponents
             layoutComponents.EndVerticalGroup();
         }
 
-        public int TabsWithContent(
-            TabConfig[] tabConfigs,
-            int selectedIndex,
-            Action<int> onTabChange = null
-        )
+        public int TabsWithContent(TabConfig[] tabConfigs, int selectedIndex, Action<int> onTabChange = null)
         {
             if (tabConfigs == null || tabConfigs.Length == 0)
                 return selectedIndex;
@@ -124,13 +102,7 @@ namespace shadcnui.GUIComponents
             return newSelectedIndex;
         }
 
-        public int VerticalTabs(
-            string[] tabNames,
-            int selectedIndex,
-            Action<int> onTabChange = null,
-            float tabWidth = 120f,
-            params GUILayoutOption[] options
-        )
+        public int VerticalTabs(string[] tabNames, int selectedIndex, Action<int> onTabChange = null, float tabWidth = 120f, params GUILayoutOption[] options)
         {
             if (tabNames == null || tabNames.Length == 0)
                 return selectedIndex;
@@ -156,17 +128,9 @@ namespace shadcnui.GUIComponents
                     tabOptions.AddRange(options);
 
 #if IL2CPP
-                bool clicked = GUILayout.Button(
-                    tabNames[i] ?? $"Tab {i + 1}",
-                    triggerStyle,
-                    (Il2CppReferenceArray<GUILayoutOption>)tabOptions.ToArray()
-                );
+                bool clicked = GUILayout.Button(tabNames[i] ?? $"Tab {i + 1}", triggerStyle, (Il2CppReferenceArray<GUILayoutOption>)tabOptions.ToArray());
 #else
-                bool clicked = GUILayout.Button(
-                    tabNames[i] ?? $"Tab {i + 1}",
-                    triggerStyle,
-                    tabOptions.ToArray()
-                );
+                bool clicked = GUILayout.Button(tabNames[i] ?? $"Tab {i + 1}", triggerStyle, tabOptions.ToArray());
 #endif
 
                 if (clicked && i != selectedIndex)

@@ -142,9 +142,7 @@ public class UI : MonoBehaviour
             {
                 if (stream == null)
                 {
-                    Debug.LogError(
-                        $"Embedded font resource not found: {path}. Available resources: {string.Join(", ", assembly.GetManifestResourceNames())}"
-                    );
+                    Debug.LogError($"Embedded font resource not found: {path}. Available resources: {string.Join(", ", assembly.GetManifestResourceNames())}");
                     return null;
                 }
                 byte[] fontData = new byte[stream.Length];
@@ -171,12 +169,7 @@ public class UI : MonoBehaviour
 
         if (showDemoWindow)
         {
-            windowRect = GUI.Window(
-                101,
-                windowRect,
-                (GUI.WindowFunction)DrawDemoWindow,
-                "shadcn/ui Demo"
-            );
+            windowRect = GUI.Window(101, windowRect, (GUI.WindowFunction)DrawDemoWindow, "shadcn/ui Demo");
         }
     }
 
@@ -185,11 +178,7 @@ public class UI : MonoBehaviour
         guiHelper.UpdateAnimations(showDemoWindow);
         if (guiHelper.BeginAnimatedGUI())
         {
-            currentDemoTab = guiHelper.Tabs(
-                demoTabs.Select(tab => tab.Name).ToArray(),
-                currentDemoTab,
-                maxLines: 2
-            );
+            currentDemoTab = guiHelper.Tabs(demoTabs.Select(tab => tab.Name).ToArray(), currentDemoTab, maxLines: 2);
 
             guiHelper.BeginTabContent();
             scrollPosition = guiHelper.DrawScrollView(
@@ -197,11 +186,7 @@ public class UI : MonoBehaviour
                 () =>
                 {
 #if IL2CPP
-                    GUILayout.BeginVertical(
-                        new Il2CppReferenceArray<GUILayoutOption>(
-                            new GUILayoutOption[] { GUILayout.Width(windowRect.width - 20) }
-                        )
-                    );
+                    GUILayout.BeginVertical(new Il2CppReferenceArray<GUILayoutOption>(new GUILayoutOption[] { GUILayout.Width(windowRect.width - 20) }));
 #else
                     GUILayout.BeginVertical(GUILayout.Width(windowRect.width - 20));
 #endif
@@ -231,50 +216,30 @@ public class UI : MonoBehaviour
 
         guiHelper.Label("Section Header", LabelVariant.Default);
         guiHelper.DrawSectionHeader("Section Header");
-        guiHelper.Label(
-            "Code: guiHelper.DrawSectionHeader(\"Section Header\");",
-            LabelVariant.Muted
-        );
+        guiHelper.Label("Code: guiHelper.DrawSectionHeader(\"Section Header\");", LabelVariant.Muted);
         guiHelper.HorizontalSeparator();
 
         guiHelper.Label("Rendered Label (width 150)", LabelVariant.Default);
         guiHelper.RenderLabel("Rendered Label (width 150)", 150);
-        guiHelper.Label(
-            "Code: guiHelper.RenderLabel(\"Rendered Label (width 150)\", 150);",
-            LabelVariant.Muted
-        );
+        guiHelper.Label("Code: guiHelper.RenderLabel(\"Rendered Label (width 150)\", 150);", LabelVariant.Muted);
         guiHelper.HorizontalSeparator();
 
         guiHelper.Label("Glow Input Field", LabelVariant.Default);
-        glowInputFieldText = guiHelper.RenderGlowInputField(
-            glowInputFieldText,
-            glowInputFieldIdx,
-            "Enter text...",
-            200
-        );
+        glowInputFieldText = guiHelper.RenderGlowInputField(glowInputFieldText, glowInputFieldIdx, "Enter text...", 200);
         guiHelper.Label($"Glow Input Value: {glowInputFieldText}");
-        guiHelper.Label(
-            "Code: guiHelper.RenderGlowInputField(text, index, placeholder, width);",
-            LabelVariant.Muted
-        );
+        guiHelper.Label("Code: guiHelper.RenderGlowInputField(text, index, placeholder, width);", LabelVariant.Muted);
         guiHelper.HorizontalSeparator();
 
         guiHelper.Label("Password Field", LabelVariant.Default);
         passwordValue = guiHelper.DrawPasswordField(300, "Password", ref passwordValue);
         guiHelper.Label($"Password Value: {passwordValue}");
-        guiHelper.Label(
-            "Code: guiHelper.DrawPasswordField(width, label, ref password);",
-            LabelVariant.Muted
-        );
+        guiHelper.Label("Code: guiHelper.DrawPasswordField(width, label, ref password);", LabelVariant.Muted);
         guiHelper.HorizontalSeparator();
 
         guiHelper.Label("Text Area Input", LabelVariant.Default);
         guiHelper.DrawTextArea(300, "Input Text Area", ref inputTextAreaValue, 200, 80);
         guiHelper.Label($"Input Text Area Value: {inputTextAreaValue}");
-        guiHelper.Label(
-            "Code: guiHelper.DrawTextArea(width, label, ref text, maxLength, height);",
-            LabelVariant.Muted
-        );
+        guiHelper.Label("Code: guiHelper.DrawTextArea(width, label, ref text, maxLength, height);", LabelVariant.Muted);
         guiHelper.HorizontalSeparator();
 
         GUILayout.EndVertical();
@@ -296,10 +261,7 @@ public class UI : MonoBehaviour
             guiHelper.Label("Manage your notification settings here.");
 
         guiHelper.EndTabContent();
-        guiHelper.Label(
-            "Code: selectedTab = guiHelper.Tabs(tabNames, selectedTab); ... guiHelper.BeginTabContent(); ... guiHelper.EndTabContent();",
-            LabelVariant.Muted
-        );
+        guiHelper.Label("Code: selectedTab = guiHelper.Tabs(tabNames, selectedTab); ... guiHelper.BeginTabContent(); ... guiHelper.EndTabContent();", LabelVariant.Muted);
         guiHelper.HorizontalSeparator();
 
         guiHelper.Label("Tabs with Content (using TabConfig)");
@@ -310,19 +272,12 @@ public class UI : MonoBehaviour
             new GUITabsComponents.TabConfig("Tab C", () => guiHelper.Label("Content for Tab C.")),
         };
         guiHelper.TabsWithContent(tabConfigs, selectedTab);
-        guiHelper.Label(
-            "Code: guiHelper.TabsWithContent(tabConfigs, selectedTab);",
-            LabelVariant.Muted
-        );
+        guiHelper.Label("Code: guiHelper.TabsWithContent(tabConfigs, selectedTab);", LabelVariant.Muted);
         guiHelper.HorizontalSeparator();
 
         guiHelper.Label("Vertical Tabs");
         string[] verticalTabNames = { "Profile", "Settings", "Privacy" };
-        selectedVerticalTab = guiHelper.VerticalTabs(
-            verticalTabNames,
-            selectedVerticalTab,
-            tabWidth: 100
-        );
+        selectedVerticalTab = guiHelper.VerticalTabs(verticalTabNames, selectedVerticalTab, tabWidth: 100);
         guiHelper.BeginTabContent();
 
         if (selectedVerticalTab == 0)
@@ -333,10 +288,7 @@ public class UI : MonoBehaviour
             guiHelper.Label("Privacy content.");
 
         guiHelper.EndTabContent();
-        guiHelper.Label(
-            "Code: guiHelper.VerticalTabs(names, selected, tabWidth);",
-            LabelVariant.Muted
-        );
+        guiHelper.Label("Code: guiHelper.VerticalTabs(names, selected, tabWidth);", LabelVariant.Muted);
         guiHelper.HorizontalSeparator();
         GUILayout.EndVertical();
     }
@@ -345,47 +297,27 @@ public class UI : MonoBehaviour
     {
         guiHelper.BeginVerticalGroup(GUILayout.ExpandWidth(true), GUILayout.ExpandHeight(true));
 
-        textAreaValue = guiHelper.TextArea(
-            textAreaValue,
-            placeholder: "Type your message here.",
-            minHeight: 100
-        );
+        textAreaValue = guiHelper.TextArea(textAreaValue, placeholder: "Type your message here.", minHeight: 100);
         guiHelper.Label("Code: textAreaValue = guiHelper.TextArea(value, placeholder, minHeight);");
         guiHelper.HorizontalSeparator();
 
-        outlineTextAreaValue = guiHelper.OutlineTextArea(
-            outlineTextAreaValue,
-            placeholder: "Outline Text Area"
-        );
+        outlineTextAreaValue = guiHelper.OutlineTextArea(outlineTextAreaValue, placeholder: "Outline Text Area");
         guiHelper.Label($"Outline Text Area Value: {outlineTextAreaValue}");
         guiHelper.Label("Code: guiHelper.OutlineTextArea(text, placeholder);");
         guiHelper.HorizontalSeparator();
 
-        ghostTextAreaValue = guiHelper.GhostTextArea(
-            ghostTextAreaValue,
-            placeholder: "Ghost Text Area"
-        );
+        ghostTextAreaValue = guiHelper.GhostTextArea(ghostTextAreaValue, placeholder: "Ghost Text Area");
         guiHelper.Label($"Ghost Text Area Value: {ghostTextAreaValue}");
         guiHelper.Label("Code: guiHelper.GhostTextArea(text, placeholder);");
         guiHelper.HorizontalSeparator();
 
-        labeledTextAreaValue = guiHelper.LabeledTextArea(
-            "Your Message",
-            labeledTextAreaValue,
-            placeholder: "Type here..."
-        );
+        labeledTextAreaValue = guiHelper.LabeledTextArea("Your Message", labeledTextAreaValue, placeholder: "Type here...");
         guiHelper.Label($"Labeled Text Area Value: {labeledTextAreaValue}");
         guiHelper.Label("Code: guiHelper.LabeledTextArea(label, text, placeholder);");
         guiHelper.HorizontalSeparator();
 
-        resizableTextAreaValue = guiHelper.ResizableTextArea(
-            resizableTextAreaValue,
-            ref resizableTextAreaHeight,
-            placeholder: "Resize me!"
-        );
-        guiHelper.Label(
-            $"Resizable Text Area Value: {resizableTextAreaValue} (Height: {resizableTextAreaHeight:F2})"
-        );
+        resizableTextAreaValue = guiHelper.ResizableTextArea(resizableTextAreaValue, ref resizableTextAreaHeight, placeholder: "Resize me!");
+        guiHelper.Label($"Resizable Text Area Value: {resizableTextAreaValue} (Height: {resizableTextAreaHeight:F2})");
         guiHelper.Label("Code: guiHelper.ResizableTextArea(text, ref height, placeholder);");
         guiHelper.HorizontalSeparator();
         GUILayout.EndVertical();
@@ -399,43 +331,18 @@ public class UI : MonoBehaviour
         guiHelper.HorizontalSeparator();
 
         guiHelper.Label("Info Alert", LabelVariant.Default);
-        guiHelper.Alert(
-            "Heads up!",
-            "You can use this component to show a message to the user.",
-            AlertVariant.Default,
-            AlertType.Info
-        );
-        guiHelper.Label(
-            "Code: guiHelper.Alert(title, description, variant, type);",
-            LabelVariant.Muted
-        );
+        guiHelper.Alert("Heads up!", "You can use this component to show a message to the user.", AlertVariant.Default, AlertType.Info);
+        guiHelper.Label("Code: guiHelper.Alert(title, description, variant, type);", LabelVariant.Muted);
         guiHelper.HorizontalSeparator();
 
         guiHelper.Label("Destructive Alert", LabelVariant.Default);
-        guiHelper.Alert(
-            "Error",
-            "Your session has expired. Please log in again.",
-            AlertVariant.Destructive,
-            AlertType.Error
-        );
-        guiHelper.Label(
-            "Code: guiHelper.Alert(title, description, AlertVariant.Destructive, AlertType.Error);",
-            LabelVariant.Muted
-        );
+        guiHelper.Alert("Error", "Your session has expired. Please log in again.", AlertVariant.Destructive, AlertType.Error);
+        guiHelper.Label("Code: guiHelper.Alert(title, description, AlertVariant.Destructive, AlertType.Error);", LabelVariant.Muted);
         guiHelper.HorizontalSeparator();
 
         guiHelper.Label("Success Alert with Icon", LabelVariant.Default);
-        guiHelper.Alert(
-            "Success",
-            "Your profile has been updated successfully.",
-            AlertVariant.Default,
-            AlertType.Success,
-            null
-        );
-        guiHelper.Label(
-            "Code: guiHelper.Alert(title, description, variant, type, iconTexture);",
-            LabelVariant.Muted
-        );
+        guiHelper.Alert("Success", "Your profile has been updated successfully.", AlertVariant.Default, AlertType.Success, null);
+        guiHelper.Label("Code: guiHelper.Alert(title, description, variant, type, iconTexture);", LabelVariant.Muted);
         guiHelper.HorizontalSeparator();
 
         guiHelper.Label("Warning Alert (Dismissible)", LabelVariant.Default);
@@ -462,10 +369,7 @@ public class UI : MonoBehaviour
                 }
             );
         }
-        guiHelper.Label(
-            "Code: isAlertDismissed = guiHelper.DismissibleAlert(...);",
-            LabelVariant.Muted
-        );
+        guiHelper.Label("Code: isAlertDismissed = guiHelper.DismissibleAlert(...);", LabelVariant.Muted);
         guiHelper.HorizontalSeparator();
 
         guiHelper.Label("Alert with Actions", LabelVariant.Default);
@@ -478,38 +382,21 @@ public class UI : MonoBehaviour
                 Debug.Log($"Action button {index} clicked!");
             }
         );
-        guiHelper.Label(
-            "Code: guiHelper.AlertWithActions(title, description, buttonTexts, onButtonClick);",
-            LabelVariant.Muted
-        );
+        guiHelper.Label("Code: guiHelper.AlertWithActions(title, description, buttonTexts, onButtonClick);", LabelVariant.Muted);
         guiHelper.HorizontalSeparator();
 
         guiHelper.Label("Custom Alert", LabelVariant.Default);
-        guiHelper.CustomAlert(
-            "Custom Title",
-            "This is a custom alert with custom colors.",
-            Color.magenta,
-            Color.white
-        );
-        guiHelper.Label(
-            "Code: guiHelper.CustomAlert(title, description, backgroundColor, textColor);",
-            LabelVariant.Muted
-        );
+        guiHelper.CustomAlert("Custom Title", "This is a custom alert with custom colors.", Color.magenta, Color.white);
+        guiHelper.Label("Code: guiHelper.CustomAlert(title, description, backgroundColor, textColor);", LabelVariant.Muted);
         guiHelper.HorizontalSeparator();
 
         guiHelper.Label("Alert with Progress", LabelVariant.Default);
         guiHelper.AlertWithProgress("Downloading", "Please wait while the file downloads.", 0.75f);
-        guiHelper.Label(
-            "Code: guiHelper.AlertWithProgress(title, description, progress);",
-            LabelVariant.Muted
-        );
+        guiHelper.Label("Code: guiHelper.AlertWithProgress(title, description, progress);", LabelVariant.Muted);
         guiHelper.HorizontalSeparator();
 
         guiHelper.Label("Animated Alert", LabelVariant.Default);
-        guiHelper.AnimatedAlert(
-            "New Update Available",
-            "A new version of the application is ready to be installed."
-        );
+        guiHelper.AnimatedAlert("New Update Available", "A new version of the application is ready to be installed.");
         guiHelper.Label("Code: guiHelper.AnimatedAlert(title, description);", LabelVariant.Muted);
         guiHelper.HorizontalSeparator();
 
@@ -523,45 +410,23 @@ public class UI : MonoBehaviour
                 Debug.Log("Countdown finished!");
             }
         );
-        guiHelper.Label(
-            "Code: guiHelper.AlertWithCountdown(title, description, countdownTime, onTimeout);",
-            LabelVariant.Muted
-        );
+        guiHelper.Label("Code: guiHelper.AlertWithCountdown(title, description, countdownTime, onTimeout);", LabelVariant.Muted);
         guiHelper.HorizontalSeparator();
 
         guiHelper.Label("Expandable Alert", LabelVariant.Default);
-        expandableAlertExpanded = guiHelper.ExpandableAlert(
-            "Details",
-            "Click to see more information.",
-            "This is the expanded content with more details about the alert.",
-            ref expandableAlertExpanded
-        );
+        expandableAlertExpanded = guiHelper.ExpandableAlert("Details", "Click to see more information.", "This is the expanded content with more details about the alert.", ref expandableAlertExpanded);
         guiHelper.Label($"Expandable Alert Expanded: {expandableAlertExpanded}");
-        guiHelper.Label(
-            "Code: guiHelper.ExpandableAlert(title, description, expandedContent, ref isExpanded);",
-            LabelVariant.Muted
-        );
+        guiHelper.Label("Code: guiHelper.ExpandableAlert(title, description, expandedContent, ref isExpanded);", LabelVariant.Muted);
         guiHelper.HorizontalSeparator();
 
         guiHelper.Label("Alert with Status", LabelVariant.Default);
         guiHelper.AlertWithStatus("Service Status", "All systems are operational.", true);
-        guiHelper.Label(
-            "Code: guiHelper.AlertWithStatus(title, description, isActive);",
-            LabelVariant.Muted
-        );
+        guiHelper.Label("Code: guiHelper.AlertWithStatus(title, description, isActive);", LabelVariant.Muted);
         guiHelper.HorizontalSeparator();
 
         guiHelper.Label("Alert with Custom Icon", LabelVariant.Default);
-        guiHelper.AlertWithCustomIcon(
-            "Custom Icon Alert",
-            "This alert uses a custom icon.",
-            null,
-            Color.yellow
-        );
-        guiHelper.Label(
-            "Code: guiHelper.AlertWithCustomIcon(title, description, icon, iconColor);",
-            LabelVariant.Muted
-        );
+        guiHelper.AlertWithCustomIcon("Custom Icon Alert", "This alert uses a custom icon.", null, Color.yellow);
+        guiHelper.Label("Code: guiHelper.AlertWithCustomIcon(title, description, icon, iconColor);", LabelVariant.Muted);
         guiHelper.HorizontalSeparator();
 
         GUILayout.EndVertical();
@@ -580,10 +445,7 @@ public class UI : MonoBehaviour
         guiHelper.Avatar(null, "SM", AvatarSize.Small);
         guiHelper.Avatar(null, "LG", AvatarSize.Large);
         guiHelper.EndHorizontalGroup();
-        guiHelper.Label(
-            "Code: guiHelper.Avatar(texture, fallbackText, size, shape);",
-            LabelVariant.Muted
-        );
+        guiHelper.Label("Code: guiHelper.Avatar(texture, fallbackText, size, shape);", LabelVariant.Muted);
         guiHelper.HorizontalSeparator();
 
         guiHelper.Label("Avatar Shapes", LabelVariant.Default);
@@ -592,10 +454,7 @@ public class UI : MonoBehaviour
         guiHelper.Avatar(null, "SQ", AvatarSize.Default, AvatarShape.Square);
         guiHelper.Avatar(null, "RD", AvatarSize.Default, AvatarShape.Rounded);
         guiHelper.EndHorizontalGroup();
-        guiHelper.Label(
-            "Code: guiHelper.Avatar(texture, fallbackText, size, shape);",
-            LabelVariant.Muted
-        );
+        guiHelper.Label("Code: guiHelper.Avatar(texture, fallbackText, size, shape);", LabelVariant.Muted);
         guiHelper.HorizontalSeparator();
 
         guiHelper.Label("Avatar with Status", LabelVariant.Default);
@@ -603,10 +462,7 @@ public class UI : MonoBehaviour
         guiHelper.AvatarWithStatus(null, "ON", true);
         guiHelper.AvatarWithStatus(null, "OFF", false);
         guiHelper.EndHorizontalGroup();
-        guiHelper.Label(
-            "Code: guiHelper.AvatarWithStatus(image, fallbackText, isOnline);",
-            LabelVariant.Muted
-        );
+        guiHelper.Label("Code: guiHelper.AvatarWithStatus(image, fallbackText, isOnline);", LabelVariant.Muted);
         guiHelper.HorizontalSeparator();
 
         guiHelper.Label("Avatar with Name", LabelVariant.Default);
@@ -614,50 +470,32 @@ public class UI : MonoBehaviour
         guiHelper.AvatarWithName(null, "JD", "John Doe");
         guiHelper.AvatarWithName(null, "JS", "Jane Smith", showNameBelow: true);
         guiHelper.EndHorizontalGroup();
-        guiHelper.Label(
-            "Code: guiHelper.AvatarWithName(image, fallbackText, name, showNameBelow);",
-            LabelVariant.Muted
-        );
+        guiHelper.Label("Code: guiHelper.AvatarWithName(image, fallbackText, name, showNameBelow);", LabelVariant.Muted);
         guiHelper.HorizontalSeparator();
 
         guiHelper.Label("Custom Avatar", LabelVariant.Default);
         guiHelper.CustomAvatar(null, "CA", Color.blue, Color.white);
-        guiHelper.Label(
-            "Code: guiHelper.CustomAvatar(image, fallbackText, backgroundColor, textColor);",
-            LabelVariant.Muted
-        );
+        guiHelper.Label("Code: guiHelper.CustomAvatar(image, fallbackText, backgroundColor, textColor);", LabelVariant.Muted);
         guiHelper.HorizontalSeparator();
 
         guiHelper.Label("Avatar with Border", LabelVariant.Default);
         guiHelper.AvatarWithBorder(null, "BR", Color.red);
-        guiHelper.Label(
-            "Code: guiHelper.AvatarWithBorder(image, fallbackText, borderColor);",
-            LabelVariant.Muted
-        );
+        guiHelper.Label("Code: guiHelper.AvatarWithBorder(image, fallbackText, borderColor);", LabelVariant.Muted);
         guiHelper.HorizontalSeparator();
 
         guiHelper.Label("Avatar with Hover", LabelVariant.Default);
         guiHelper.AvatarWithHover(null, "HV", onClick: () => Debug.Log("Avatar Hover Clicked!"));
-        guiHelper.Label(
-            "Code: guiHelper.AvatarWithHover(image, fallbackText, onClick);",
-            LabelVariant.Muted
-        );
+        guiHelper.Label("Code: guiHelper.AvatarWithHover(image, fallbackText, onClick);", LabelVariant.Muted);
         guiHelper.HorizontalSeparator();
 
         guiHelper.Label("Avatar with Loading", LabelVariant.Default);
         guiHelper.AvatarWithLoading(null, "LD", true);
-        guiHelper.Label(
-            "Code: guiHelper.AvatarWithLoading(image, fallbackText, isLoading);",
-            LabelVariant.Muted
-        );
+        guiHelper.Label("Code: guiHelper.AvatarWithLoading(image, fallbackText, isLoading);", LabelVariant.Muted);
         guiHelper.HorizontalSeparator();
 
         guiHelper.Label("Avatar with Tooltip", LabelVariant.Default);
         guiHelper.AvatarWithTooltip(null, "TP", "This is a user avatar.");
-        guiHelper.Label(
-            "Code: guiHelper.AvatarWithTooltip(image, fallbackText, tooltip);",
-            LabelVariant.Muted
-        );
+        guiHelper.Label("Code: guiHelper.AvatarWithTooltip(image, fallbackText, tooltip);", LabelVariant.Muted);
         guiHelper.HorizontalSeparator();
 
         GUILayout.EndVertical();
@@ -696,10 +534,7 @@ public class UI : MonoBehaviour
 
         guiHelper.Label("Custom Badge", LabelVariant.Default);
         guiHelper.CustomBadge("Custom", Color.yellow, Color.black);
-        guiHelper.Label(
-            "Code: guiHelper.CustomBadge(text, backgroundColor, textColor);",
-            LabelVariant.Muted
-        );
+        guiHelper.Label("Code: guiHelper.CustomBadge(text, backgroundColor, textColor);", LabelVariant.Muted);
         guiHelper.HorizontalSeparator();
 
         guiHelper.Label("Count Badge", LabelVariant.Default);
@@ -717,17 +552,11 @@ public class UI : MonoBehaviour
         guiHelper.Label("Dismissible Badge", LabelVariant.Default);
         if (!dismissibleBadgeDismissed)
         {
-            dismissibleBadgeDismissed = guiHelper.DismissibleBadge(
-                "Dismissible",
-                onDismiss: () => dismissibleBadgeDismissed = true
-            );
+            dismissibleBadgeDismissed = guiHelper.DismissibleBadge("Dismissible", onDismiss: () => dismissibleBadgeDismissed = true);
         }
         else
         {
-            guiHelper.Button(
-                "Reset Dismissible Badge",
-                onClick: () => dismissibleBadgeDismissed = false
-            );
+            guiHelper.Button("Reset Dismissible Badge", onClick: () => dismissibleBadgeDismissed = false);
         }
         guiHelper.Label("Code: guiHelper.DismissibleBadge(text, onDismiss);", LabelVariant.Muted);
         guiHelper.HorizontalSeparator();
@@ -748,15 +577,7 @@ public class UI : MonoBehaviour
         guiHelper.HorizontalSeparator();
 
         guiHelper.Label("Badge Group", LabelVariant.Default);
-        guiHelper.BadgeGroup(
-            new string[] { "Tag1", "Tag2", "Tag3" },
-            new BadgeVariant[]
-            {
-                BadgeVariant.Default,
-                BadgeVariant.Secondary,
-                BadgeVariant.Destructive,
-            }
-        );
+        guiHelper.BadgeGroup(new string[] { "Tag1", "Tag2", "Tag3" }, new BadgeVariant[] { BadgeVariant.Default, BadgeVariant.Secondary, BadgeVariant.Destructive });
         guiHelper.Label("Code: guiHelper.BadgeGroup(texts, variants);", LabelVariant.Muted);
         guiHelper.HorizontalSeparator();
 
@@ -796,19 +617,7 @@ public class UI : MonoBehaviour
 
         if (guiHelper.IsDropdownMenuOpen())
         {
-            string[] items =
-            {
-                "Item 1",
-                "Item 2",
-                "Item 3",
-                "Item 4",
-                "Item 5",
-                "Item 6",
-                "Item 7",
-                "Item 8",
-                "Item 9",
-                "Item 10",
-            };
+            string[] items = { "Item 1", "Item 2", "Item 3", "Item 4", "Item 5", "Item 6", "Item 7", "Item 8", "Item 9", "Item 10" };
             guiHelper.DropdownMenu(
                 items,
                 (index) =>
@@ -818,10 +627,7 @@ public class UI : MonoBehaviour
             );
         }
 
-        guiHelper.Label(
-            "Code: guiHelper.DropdownMenu(rect, items, onItemSelected);",
-            LabelVariant.Muted
-        );
+        guiHelper.Label("Code: guiHelper.DropdownMenu(rect, items, onItemSelected);", LabelVariant.Muted);
         guiHelper.HorizontalSeparator();
 
         GUILayout.EndVertical();
@@ -873,10 +679,7 @@ public class UI : MonoBehaviour
         }
 
         guiHelper.Label($"Selected: {options[selectDemoCurrentSelection]}");
-        guiHelper.Label(
-            "Code: guiHelper.Select(rect, options, selectedIndex);",
-            LabelVariant.Muted
-        );
+        guiHelper.Label("Code: guiHelper.Select(rect, options, selectedIndex);", LabelVariant.Muted);
         guiHelper.HorizontalSeparator();
 
         GUILayout.EndVertical();
@@ -898,10 +701,7 @@ public class UI : MonoBehaviour
         guiHelper.Button("Ghost", ButtonVariant.Ghost);
         guiHelper.Button("Link", ButtonVariant.Link);
         guiHelper.EndHorizontalGroup();
-        guiHelper.Label(
-            "Code: guiHelper.Button(label, variant, size, onClick, disabled);",
-            LabelVariant.Muted
-        );
+        guiHelper.Label("Code: guiHelper.Button(label, variant, size, onClick, disabled);", LabelVariant.Muted);
         guiHelper.HorizontalSeparator();
 
         guiHelper.Label("Button Sizes", LabelVariant.Default);
@@ -921,54 +721,28 @@ public class UI : MonoBehaviour
 
         guiHelper.Label("Render Glow Button", LabelVariant.Default);
         guiHelper.RenderGlowButton("Glow Button", glowButtonIndex);
-        guiHelper.Label(
-            "Code: guiHelper.RenderGlowButton(\"Glow Button\", glowButtonIndex);",
-            LabelVariant.Muted
-        );
+        guiHelper.Label("Code: guiHelper.RenderGlowButton(\"Glow Button\", glowButtonIndex);", LabelVariant.Muted);
         guiHelper.HorizontalSeparator();
 
         guiHelper.Label("Render Color Preset Button", LabelVariant.Default);
         guiHelper.RenderColorPresetButton("Red Button", Color.red);
         guiHelper.RenderColorPresetButton("Blue Button", Color.blue);
-        guiHelper.Label(
-            "Code: guiHelper.RenderColorPresetButton(name, color);",
-            LabelVariant.Muted
-        );
+        guiHelper.Label("Code: guiHelper.RenderColorPresetButton(name, color);", LabelVariant.Muted);
         guiHelper.HorizontalSeparator();
 
         guiHelper.Label("Draw Button (Simple)", LabelVariant.Default);
-        guiHelper.DrawButton(
-            200,
-            "Simple Draw Button",
-            () => Debug.Log("Simple Draw Button Clicked!")
-        );
+        guiHelper.DrawButton(200, "Simple Draw Button", () => Debug.Log("Simple Draw Button Clicked!"));
         guiHelper.Label("Code: guiHelper.DrawButton(width, text, onClick);", LabelVariant.Muted);
         guiHelper.HorizontalSeparator();
 
         guiHelper.Label("Draw Colored Button", LabelVariant.Default);
-        guiHelper.DrawColoredButton(
-            200,
-            "Colored Draw Button",
-            Color.magenta,
-            () => Debug.Log("Colored Draw Button Clicked!")
-        );
-        guiHelper.Label(
-            "Code: guiHelper.DrawColoredButton(width, text, color, onClick);",
-            LabelVariant.Muted
-        );
+        guiHelper.DrawColoredButton(200, "Colored Draw Button", Color.magenta, () => Debug.Log("Colored Draw Button Clicked!"));
+        guiHelper.Label("Code: guiHelper.DrawColoredButton(width, text, color, onClick);", LabelVariant.Muted);
         guiHelper.HorizontalSeparator();
 
         guiHelper.Label("Draw Fixed Button", LabelVariant.Default);
-        guiHelper.DrawFixedButton(
-            "Fixed Button",
-            150,
-            40,
-            () => Debug.Log("Fixed Button Clicked!")
-        );
-        guiHelper.Label(
-            "Code: guiHelper.DrawFixedButton(text, width, height, onClick);",
-            LabelVariant.Muted
-        );
+        guiHelper.DrawFixedButton("Fixed Button", 150, 40, () => Debug.Log("Fixed Button Clicked!"));
+        guiHelper.Label("Code: guiHelper.DrawFixedButton(text, width, height, onClick);", LabelVariant.Muted);
         guiHelper.HorizontalSeparator();
 
         guiHelper.Label("Specific Variant Buttons (Direct Calls)", LabelVariant.Default);
@@ -993,10 +767,7 @@ public class UI : MonoBehaviour
 
         guiHelper.Label("Draw Button Variant (Direct Call)", LabelVariant.Default);
         guiHelper.DrawButtonVariant("Direct Variant", ButtonVariant.Destructive, ButtonSize.Large);
-        guiHelper.Label(
-            "Code: guiHelper.DrawButtonVariant(\"Direct Variant\", ButtonVariant.Destructive, ButtonSize.Large);",
-            LabelVariant.Muted
-        );
+        guiHelper.Label("Code: guiHelper.DrawButtonVariant(\"Direct Variant\", ButtonVariant.Destructive, ButtonSize.Large);", LabelVariant.Muted);
         guiHelper.HorizontalSeparator();
 
         guiHelper.Label("Button Group", LabelVariant.Default);
@@ -1020,24 +791,13 @@ public class UI : MonoBehaviour
         guiHelper.HorizontalSeparator();
 
         guiHelper.Label("Default Card", LabelVariant.Default);
-        guiHelper.DrawCard(
-            "Create project",
-            "Deploy your new project in one-click.",
-            "This is the main content of the card where you can put any controls.",
-            () => guiHelper.Button("Deploy")
-        );
-        guiHelper.Label(
-            "Code: guiHelper.DrawCard(title, description, content, footerAction);",
-            LabelVariant.Muted
-        );
+        guiHelper.DrawCard("Create project", "Deploy your new project in one-click.", "This is the main content of the card where you can put any controls.", () => guiHelper.Button("Deploy"));
+        guiHelper.Label("Code: guiHelper.DrawCard(title, description, content, footerAction);", LabelVariant.Muted);
         guiHelper.HorizontalSeparator();
 
         guiHelper.Label("Simple Card", LabelVariant.Default);
         guiHelper.DrawSimpleCard("This is a simple card with just content.", 300, 100);
-        guiHelper.Label(
-            "Code: guiHelper.DrawSimpleCard(content, width, height);",
-            LabelVariant.Muted
-        );
+        guiHelper.Label("Code: guiHelper.DrawSimpleCard(content, width, height);", LabelVariant.Muted);
         guiHelper.HorizontalSeparator();
 
         guiHelper.Label("Card with Sections", LabelVariant.Default);
@@ -1053,10 +813,7 @@ public class UI : MonoBehaviour
         guiHelper.Button("Action");
         guiHelper.EndCardFooter();
         guiHelper.EndCard();
-        guiHelper.Label(
-            "Code: guiHelper.BeginCard(); ... guiHelper.EndCard(); with sections.",
-            LabelVariant.Muted
-        );
+        guiHelper.Label("Code: guiHelper.BeginCard(); ... guiHelper.EndCard(); with sections.", LabelVariant.Muted);
         guiHelper.HorizontalSeparator();
 
         GUILayout.EndVertical();
@@ -1066,18 +823,13 @@ public class UI : MonoBehaviour
     {
         guiHelper.BeginVerticalGroup(GUILayout.ExpandWidth(true), GUILayout.ExpandHeight(true));
         guiHelper.Label("Checkbox", LabelVariant.Default);
-        guiHelper.MutedLabel(
-            "A control that allows the user to toggle between checked and unchecked states."
-        );
+        guiHelper.MutedLabel("A control that allows the user to toggle between checked and unchecked states.");
         guiHelper.HorizontalSeparator();
 
         guiHelper.Label("Default Checkbox");
         checkboxValue = guiHelper.Checkbox("Accept terms and conditions", checkboxValue);
         guiHelper.Label($"The checkbox is {(checkboxValue ? "checked" : "unchecked")}");
-        guiHelper.Label(
-            "Code: checkboxValue = guiHelper.Checkbox(label, value);",
-            LabelVariant.Muted
-        );
+        guiHelper.Label("Code: checkboxValue = guiHelper.Checkbox(label, value);", LabelVariant.Muted);
         guiHelper.HorizontalSeparator();
 
         guiHelper.Label("Checkbox Variants");
@@ -1106,10 +858,7 @@ public class UI : MonoBehaviour
         guiHelper.HorizontalSeparator();
 
         guiHelper.Label("Checkbox Group");
-        checkboxGroupValues = guiHelper.CheckboxGroup(
-            new string[] { "Option 1", "Option 2", "Option 3" },
-            checkboxGroupValues
-        );
+        checkboxGroupValues = guiHelper.CheckboxGroup(new string[] { "Option 1", "Option 2", "Option 3" }, checkboxGroupValues);
         guiHelper.Label($"Checkbox Group Values: {string.Join(", ", checkboxGroupValues)}");
         guiHelper.Label("Code: guiHelper.CheckboxGroup(labels, values);", LabelVariant.Muted);
         guiHelper.HorizontalSeparator();
@@ -1117,64 +866,31 @@ public class UI : MonoBehaviour
         guiHelper.Label("Checkbox with Icon");
         guiHelper.CheckboxWithIcon("Enable notifications", ref checkboxWithIconValue, null);
         guiHelper.Label($"Checkbox with Icon: {checkboxWithIconValue}");
-        guiHelper.Label(
-            "Code: guiHelper.CheckboxWithIcon(label, ref value, icon);",
-            LabelVariant.Muted
-        );
+        guiHelper.Label("Code: guiHelper.CheckboxWithIcon(label, ref value, icon);", LabelVariant.Muted);
         guiHelper.HorizontalSeparator();
 
         guiHelper.Label("Checkbox with Description");
-        guiHelper.CheckboxWithDescription(
-            "Email marketing",
-            "Send me marketing emails about new products and features.",
-            ref checkboxWithDescriptionValue
-        );
+        guiHelper.CheckboxWithDescription("Email marketing", "Send me marketing emails about new products and features.", ref checkboxWithDescriptionValue);
         guiHelper.Label($"Checkbox with Description: {checkboxWithDescriptionValue}");
-        guiHelper.Label(
-            "Code: guiHelper.CheckboxWithDescription(label, description, ref value);",
-            LabelVariant.Muted
-        );
+        guiHelper.Label("Code: guiHelper.CheckboxWithDescription(label, description, ref value);", LabelVariant.Muted);
         guiHelper.HorizontalSeparator();
 
         guiHelper.Label("Validated Checkbox");
-        guiHelper.ValidatedCheckbox(
-            "I agree to the terms",
-            ref validatedCheckboxValue,
-            false,
-            "You must agree to the terms."
-        );
+        guiHelper.ValidatedCheckbox("I agree to the terms", ref validatedCheckboxValue, false, "You must agree to the terms.");
         guiHelper.Label($"Validated Checkbox: {validatedCheckboxValue}");
-        guiHelper.Label(
-            "Code: guiHelper.ValidatedCheckbox(label, ref value, isValid, validationMessage);",
-            LabelVariant.Muted
-        );
+        guiHelper.Label("Code: guiHelper.ValidatedCheckbox(label, ref value, isValid, validationMessage);", LabelVariant.Muted);
         guiHelper.HorizontalSeparator();
 
         guiHelper.Label("Checkbox with Tooltip");
-        guiHelper.CheckboxWithTooltip(
-            "Show advanced settings",
-            ref checkboxWithTooltipValue,
-            "This will reveal additional configuration options."
-        );
+        guiHelper.CheckboxWithTooltip("Show advanced settings", ref checkboxWithTooltipValue, "This will reveal additional configuration options.");
         guiHelper.Label($"Checkbox with Tooltip: {checkboxWithTooltipValue}");
-        guiHelper.Label(
-            "Code: guiHelper.CheckboxWithTooltip(label, ref value, tooltip);",
-            LabelVariant.Muted
-        );
+        guiHelper.Label("Code: guiHelper.CheckboxWithTooltip(label, ref value, tooltip);", LabelVariant.Muted);
         guiHelper.HorizontalSeparator();
 
         guiHelper.Label("Custom Checkbox");
-        customCheckboxValue = guiHelper.CustomCheckbox(
-            "Custom Checkbox",
-            customCheckboxValue,
-            Color.cyan,
-            Color.black
-        );
+        customCheckboxValue = guiHelper.CustomCheckbox("Custom Checkbox", customCheckboxValue, Color.cyan, Color.black);
         guiHelper.Label($"Custom Checkbox: {customCheckboxValue}");
-        guiHelper.Label(
-            "Code: guiHelper.CustomCheckbox(label, value, checkColor, backgroundColor);",
-            LabelVariant.Muted
-        );
+        guiHelper.Label("Code: guiHelper.CustomCheckbox(label, value, checkColor, backgroundColor);", LabelVariant.Muted);
         guiHelper.HorizontalSeparator();
 
         GUILayout.EndVertical();
@@ -1215,10 +931,7 @@ public class UI : MonoBehaviour
         guiHelper.Button("Two");
         guiHelper.Button("Three");
         guiHelper.EndHorizontalGroup();
-        guiHelper.Label(
-            "Code: guiHelper.BeginHorizontalGroup(); ... guiHelper.EndHorizontalGroup();",
-            LabelVariant.Muted
-        );
+        guiHelper.Label("Code: guiHelper.BeginHorizontalGroup(); ... guiHelper.EndHorizontalGroup();", LabelVariant.Muted);
         guiHelper.HorizontalSeparator();
 
         guiHelper.Label("Vertical Group", LabelVariant.Default);
@@ -1226,10 +939,7 @@ public class UI : MonoBehaviour
         optionAValue = guiHelper.Checkbox("Option A", optionAValue);
         optionBValue = guiHelper.Checkbox("Option B", optionBValue);
         guiHelper.EndVerticalGroup();
-        guiHelper.Label(
-            "Code: guiHelper.BeginVerticalGroup(); ... guiHelper.EndVerticalGroup();",
-            LabelVariant.Muted
-        );
+        guiHelper.Label("Code: guiHelper.BeginVerticalGroup(); ... guiHelper.EndVerticalGroup();", LabelVariant.Muted);
         guiHelper.HorizontalSeparator();
 
         guiHelper.Label("Add Space", LabelVariant.Default);
@@ -1257,10 +967,7 @@ public class UI : MonoBehaviour
 
         guiHelper.Label("Labeled Progress Bar", LabelVariant.Default);
         guiHelper.LabeledProgress("Download", 0.75f, 300, showPercentage: true);
-        guiHelper.Label(
-            "Code: guiHelper.LabeledProgress(label, value, width, showPercentage);",
-            LabelVariant.Muted
-        );
+        guiHelper.Label("Code: guiHelper.LabeledProgress(label, value, width, showPercentage);", LabelVariant.Muted);
         guiHelper.HorizontalSeparator();
 
         guiHelper.Label("Circular Progress", LabelVariant.Default);
@@ -1329,10 +1036,7 @@ public class UI : MonoBehaviour
         guiHelper.Skeleton(150, 20, SkeletonVariant.Default, SkeletonSize.Default);
         guiHelper.EndVerticalGroup();
         guiHelper.EndHorizontalGroup();
-        guiHelper.Label(
-            "Code: guiHelper.Skeleton(width, height, variant, size);",
-            LabelVariant.Muted
-        );
+        guiHelper.Label("Code: guiHelper.Skeleton(width, height, variant, size);", LabelVariant.Muted);
         guiHelper.HorizontalSeparator();
 
         guiHelper.Label("Skeleton Variants", LabelVariant.Default);
@@ -1350,10 +1054,7 @@ public class UI : MonoBehaviour
         guiHelper.Skeleton(100, 30, SkeletonVariant.Default, SkeletonSize.Default);
         guiHelper.Skeleton(100, 40, SkeletonVariant.Default, SkeletonSize.Large);
         guiHelper.EndHorizontalGroup();
-        guiHelper.Label(
-            "Code: guiHelper.Skeleton(width, height, variant, size);",
-            LabelVariant.Muted
-        );
+        guiHelper.Label("Code: guiHelper.Skeleton(width, height, variant, size);", LabelVariant.Muted);
         guiHelper.HorizontalSeparator();
 
         GUILayout.EndVertical();
@@ -1369,19 +1070,13 @@ public class UI : MonoBehaviour
         guiHelper.Label("Default Slider", LabelVariant.Default);
         guiHelper.DrawSlider(300, "Volume", ref sliderValue, 0, 100);
         guiHelper.Label($"Current Value: {sliderValue:F2}");
-        guiHelper.Label(
-            "Code: guiHelper.DrawSlider(width, label, ref value, min, max);",
-            LabelVariant.Muted
-        );
+        guiHelper.Label("Code: guiHelper.DrawSlider(width, label, ref value, min, max);", LabelVariant.Muted);
         guiHelper.HorizontalSeparator();
 
         guiHelper.Label("Integer Slider", LabelVariant.Default);
         guiHelper.DrawIntSlider(300, "Integer Value", ref intSliderValue, 0, 100);
         guiHelper.Label($"Current Integer Value: {intSliderValue}");
-        guiHelper.Label(
-            "Code: guiHelper.DrawIntSlider(width, label, ref value, min, max);",
-            LabelVariant.Muted
-        );
+        guiHelper.Label("Code: guiHelper.DrawIntSlider(width, label, ref value, min, max);", LabelVariant.Muted);
         guiHelper.HorizontalSeparator();
 
         GUILayout.EndVertical();
@@ -1402,16 +1097,8 @@ public class UI : MonoBehaviour
 
         guiHelper.Label("Switch Variants");
         guiHelper.BeginHorizontalGroup();
-        defaultSwitchVariant = guiHelper.Switch(
-            "Default",
-            defaultSwitchVariant,
-            SwitchVariant.Default
-        );
-        outlineSwitchVariant = guiHelper.Switch(
-            "Outline",
-            outlineSwitchVariant,
-            SwitchVariant.Outline
-        );
+        defaultSwitchVariant = guiHelper.Switch("Default", defaultSwitchVariant, SwitchVariant.Default);
+        outlineSwitchVariant = guiHelper.Switch("Outline", outlineSwitchVariant, SwitchVariant.Outline);
         ghostSwitchVariant = guiHelper.Switch("Ghost", ghostSwitchVariant, SwitchVariant.Ghost);
         GUILayout.EndHorizontal();
         guiHelper.Label("Code: guiHelper.Switch(label, value, variant);", LabelVariant.Muted);
@@ -1419,11 +1106,7 @@ public class UI : MonoBehaviour
 
         guiHelper.Label("Switch Sizes");
         guiHelper.BeginHorizontalGroup();
-        defaultSwitchSize = guiHelper.Switch(
-            "Default",
-            defaultSwitchSize,
-            size: SwitchSize.Default
-        );
+        defaultSwitchSize = guiHelper.Switch("Default", defaultSwitchSize, size: SwitchSize.Default);
         smallSwitchSize = guiHelper.Switch("Small", smallSwitchSize, size: SwitchSize.Small);
         largeSwitchSize = guiHelper.Switch("Large", largeSwitchSize, size: SwitchSize.Large);
         GUILayout.EndHorizontal();
@@ -1431,103 +1114,51 @@ public class UI : MonoBehaviour
         guiHelper.HorizontalSeparator();
 
         guiHelper.Label("Switch with Label");
-        switchWithLabelValue = guiHelper.SwitchWithLabel(
-            "Enable notifications",
-            switchWithLabelValue
-        );
+        switchWithLabelValue = guiHelper.SwitchWithLabel("Enable notifications", switchWithLabelValue);
         guiHelper.Label($"Switch with Label: {switchWithLabelValue}");
         guiHelper.Label("Code: guiHelper.SwitchWithLabel(label, value);", LabelVariant.Muted);
         guiHelper.HorizontalSeparator();
 
         guiHelper.Label("Switch Group");
-        switchGroupValues = guiHelper.SwitchGroup(
-            new string[] { "Option A", "Option B", "Option C" },
-            switchGroupValues
-        );
+        switchGroupValues = guiHelper.SwitchGroup(new string[] { "Option A", "Option B", "Option C" }, switchGroupValues);
         guiHelper.Label($"Switch Group Values: {string.Join(", ", switchGroupValues)}");
         guiHelper.Label("Code: guiHelper.SwitchGroup(labels, values);", LabelVariant.Muted);
         guiHelper.HorizontalSeparator();
 
         guiHelper.Label("Switch with Description");
-        switchWithDescriptionValue = guiHelper.SwitchWithDescription(
-            "Auto-update",
-            "Automatically download and install updates.",
-            switchWithDescriptionValue
-        );
+        switchWithDescriptionValue = guiHelper.SwitchWithDescription("Auto-update", "Automatically download and install updates.", switchWithDescriptionValue);
         guiHelper.Label($"Switch with Description: {switchWithDescriptionValue}");
-        guiHelper.Label(
-            "Code: guiHelper.SwitchWithDescription(label, description, value);",
-            LabelVariant.Muted
-        );
+        guiHelper.Label("Code: guiHelper.SwitchWithDescription(label, description, value);", LabelVariant.Muted);
         guiHelper.HorizontalSeparator();
 
         guiHelper.Label("Validated Switch");
-        validatedSwitchValue = guiHelper.ValidatedSwitch(
-            "Accept privacy policy",
-            validatedSwitchValue,
-            false,
-            "You must accept the privacy policy."
-        );
+        validatedSwitchValue = guiHelper.ValidatedSwitch("Accept privacy policy", validatedSwitchValue, false, "You must accept the privacy policy.");
         guiHelper.Label($"Validated Switch: {validatedSwitchValue}");
-        guiHelper.Label(
-            "Code: guiHelper.ValidatedSwitch(label, value, isValid, validationMessage);",
-            LabelVariant.Muted
-        );
+        guiHelper.Label("Code: guiHelper.ValidatedSwitch(label, value, isValid, validationMessage);", LabelVariant.Muted);
         guiHelper.HorizontalSeparator();
 
         guiHelper.Label("Switch with Tooltip");
-        switchWithTooltipValue = guiHelper.SwitchWithTooltip(
-            "Show advanced options",
-            switchWithTooltipValue,
-            "Toggle to reveal more settings."
-        );
+        switchWithTooltipValue = guiHelper.SwitchWithTooltip("Show advanced options", switchWithTooltipValue, "Toggle to reveal more settings.");
         guiHelper.Label($"Switch with Tooltip: {switchWithTooltipValue}");
-        guiHelper.Label(
-            "Code: guiHelper.SwitchWithTooltip(label, value, tooltip);",
-            LabelVariant.Muted
-        );
+        guiHelper.Label("Code: guiHelper.SwitchWithTooltip(label, value, tooltip);", LabelVariant.Muted);
         guiHelper.HorizontalSeparator();
 
         guiHelper.Label("Switch with Icon");
-        switchWithIconValue = guiHelper.SwitchWithIcon(
-            "Enable sound",
-            switchWithIconValue,
-            null,
-            null
-        );
+        switchWithIconValue = guiHelper.SwitchWithIcon("Enable sound", switchWithIconValue, null, null);
         guiHelper.Label($"Switch with Icon: {switchWithIconValue}");
-        guiHelper.Label(
-            "Code: guiHelper.SwitchWithIcon(label, value, onIcon, offIcon);",
-            LabelVariant.Muted
-        );
+        guiHelper.Label("Code: guiHelper.SwitchWithIcon(label, value, onIcon, offIcon);", LabelVariant.Muted);
         guiHelper.HorizontalSeparator();
 
         guiHelper.Label("Switch with Loading");
-        switchWithLoadingValue = guiHelper.SwitchWithLoading(
-            "Syncing data",
-            switchWithLoadingValue,
-            true
-        );
+        switchWithLoadingValue = guiHelper.SwitchWithLoading("Syncing data", switchWithLoadingValue, true);
         guiHelper.Label($"Switch with Loading: {switchWithLoadingValue}");
-        guiHelper.Label(
-            "Code: guiHelper.SwitchWithLoading(label, value, isLoading);",
-            LabelVariant.Muted
-        );
+        guiHelper.Label("Code: guiHelper.SwitchWithLoading(label, value, isLoading);", LabelVariant.Muted);
         guiHelper.HorizontalSeparator();
 
         guiHelper.Label("Custom Switch");
-        customSwitchValue = guiHelper.CustomSwitch(
-            "Custom Switch",
-            customSwitchValue,
-            Color.green,
-            Color.red,
-            Color.white
-        );
+        customSwitchValue = guiHelper.CustomSwitch("Custom Switch", customSwitchValue, Color.green, Color.red, Color.white);
         guiHelper.Label($"Custom Switch: {customSwitchValue}");
-        guiHelper.Label(
-            "Code: guiHelper.CustomSwitch(label, value, onColor, offColor, thumbColor);",
-            LabelVariant.Muted
-        );
+        guiHelper.Label("Code: guiHelper.CustomSwitch(label, value, onColor, offColor, thumbColor);", LabelVariant.Muted);
         guiHelper.HorizontalSeparator();
 
         GUILayout.EndVertical();
@@ -1554,42 +1185,27 @@ public class UI : MonoBehaviour
 
         guiHelper.Label("Striped Table", LabelVariant.Default);
         guiHelper.Table(headers, data, TableVariant.Striped);
-        guiHelper.Label(
-            "Code: guiHelper.Table(headers, data, TableVariant.Striped);",
-            LabelVariant.Muted
-        );
+        guiHelper.Label("Code: guiHelper.Table(headers, data, TableVariant.Striped);", LabelVariant.Muted);
         guiHelper.HorizontalSeparator();
 
         guiHelper.Label("Bordered Table", LabelVariant.Default);
         guiHelper.Table(headers, data, TableVariant.Bordered);
-        guiHelper.Label(
-            "Code: guiHelper.Table(headers, data, TableVariant.Bordered);",
-            LabelVariant.Muted
-        );
+        guiHelper.Label("Code: guiHelper.Table(headers, data, TableVariant.Bordered);", LabelVariant.Muted);
         guiHelper.HorizontalSeparator();
 
         guiHelper.Label("Hover Table", LabelVariant.Default);
         guiHelper.Table(headers, data, TableVariant.Hover);
-        guiHelper.Label(
-            "Code: guiHelper.Table(headers, data, TableVariant.Hover);",
-            LabelVariant.Muted
-        );
+        guiHelper.Label("Code: guiHelper.Table(headers, data, TableVariant.Hover);", LabelVariant.Muted);
         guiHelper.HorizontalSeparator();
 
         guiHelper.Label("Small Table", LabelVariant.Default);
         guiHelper.Table(headers, data, TableVariant.Default, TableSize.Small);
-        guiHelper.Label(
-            "Code: guiHelper.Table(headers, data, variant, TableSize.Small);",
-            LabelVariant.Muted
-        );
+        guiHelper.Label("Code: guiHelper.Table(headers, data, variant, TableSize.Small);", LabelVariant.Muted);
         guiHelper.HorizontalSeparator();
 
         guiHelper.Label("Large Table", LabelVariant.Default);
         guiHelper.Table(headers, data, TableVariant.Default, TableSize.Large);
-        guiHelper.Label(
-            "Code: guiHelper.Table(headers, data, variant, TableSize.Large);",
-            LabelVariant.Muted
-        );
+        guiHelper.Label("Code: guiHelper.Table(headers, data, variant, TableSize.Large);", LabelVariant.Muted);
         guiHelper.HorizontalSeparator();
 
         GUILayout.EndVertical();
@@ -1610,27 +1226,15 @@ public class UI : MonoBehaviour
 
         guiHelper.Label("Toggle Variants", LabelVariant.Default);
         guiHelper.BeginHorizontalGroup();
-        defaultVariantToggle = guiHelper.Toggle(
-            "Default",
-            defaultVariantToggle,
-            ToggleVariant.Default
-        );
-        outlineVariantToggle = guiHelper.Toggle(
-            "Outline",
-            outlineVariantToggle,
-            ToggleVariant.Outline
-        );
+        defaultVariantToggle = guiHelper.Toggle("Default", defaultVariantToggle, ToggleVariant.Default);
+        outlineVariantToggle = guiHelper.Toggle("Outline", outlineVariantToggle, ToggleVariant.Outline);
         GUILayout.EndHorizontal();
         guiHelper.Label("Code: guiHelper.Toggle(text, value, variant);", LabelVariant.Muted);
         guiHelper.HorizontalSeparator();
 
         guiHelper.Label("Toggle Sizes", LabelVariant.Default);
         guiHelper.BeginHorizontalGroup();
-        defaultSizeToggle = guiHelper.Toggle(
-            "Default",
-            defaultSizeToggle,
-            size: ToggleSize.Default
-        );
+        defaultSizeToggle = guiHelper.Toggle("Default", defaultSizeToggle, size: ToggleSize.Default);
         smallSizeToggle = guiHelper.Toggle("Small", smallSizeToggle, size: ToggleSize.Small);
         largeSizeToggle = guiHelper.Toggle("Large", largeSizeToggle, size: ToggleSize.Large);
         GUILayout.EndHorizontal();
@@ -1641,33 +1245,19 @@ public class UI : MonoBehaviour
         string[] toggleLabels = { "Left", "Center", "Right" };
         selectedToggle = guiHelper.ToggleGroup(toggleLabels, selectedToggle);
         guiHelper.Label($"Selected alignment: {toggleLabels[selectedToggle]}");
-        guiHelper.Label(
-            "Code: selectedToggle = guiHelper.ToggleGroup(labels, selectedIndex);",
-            LabelVariant.Muted
-        );
+        guiHelper.Label("Code: selectedToggle = guiHelper.ToggleGroup(labels, selectedIndex);", LabelVariant.Muted);
         guiHelper.HorizontalSeparator();
 
         guiHelper.Label("Multi Toggle Group", LabelVariant.Default);
-        multiToggleGroupValues = guiHelper.MultiToggleGroup(
-            new string[] { "Red", "Green", "Blue" },
-            multiToggleGroupValues
-        );
+        multiToggleGroupValues = guiHelper.MultiToggleGroup(new string[] { "Red", "Green", "Blue" }, multiToggleGroupValues);
         guiHelper.Label($"Multi Toggle Group Values: {string.Join(", ", multiToggleGroupValues)}");
         guiHelper.Label("Code: guiHelper.MultiToggleGroup(labels, values);", LabelVariant.Muted);
         guiHelper.HorizontalSeparator();
 
         guiHelper.Label("Draw Toggle (Legacy)", LabelVariant.Default);
-        guiHelper.DrawToggle(
-            200,
-            "Draw Toggle",
-            ref drawToggleValue,
-            (val) => drawToggleValue = val
-        );
+        guiHelper.DrawToggle(200, "Draw Toggle", ref drawToggleValue, (val) => drawToggleValue = val);
         guiHelper.Label($"Draw Toggle Value: {drawToggleValue}");
-        guiHelper.Label(
-            "Code: guiHelper.DrawToggle(width, label, ref value, onToggle);",
-            LabelVariant.Muted
-        );
+        guiHelper.Label("Code: guiHelper.DrawToggle(width, label, ref value, onToggle);", LabelVariant.Muted);
         guiHelper.HorizontalSeparator();
 
         GUILayout.EndVertical();
@@ -1682,10 +1272,7 @@ public class UI : MonoBehaviour
 
         guiHelper.Label("Progress Bar (Legacy)", LabelVariant.Default);
         guiHelper.DrawProgressBar(300, "Loading Progress", visualProgressBarValue, Color.green);
-        guiHelper.Label(
-            "Code: guiHelper.DrawProgressBar(width, label, progress, color);",
-            LabelVariant.Muted
-        );
+        guiHelper.Label("Code: guiHelper.DrawProgressBar(width, label, progress, color);", LabelVariant.Muted);
         guiHelper.HorizontalSeparator();
 
         guiHelper.Label("Box (Legacy)", LabelVariant.Default);

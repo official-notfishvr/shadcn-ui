@@ -27,34 +27,19 @@ namespace shadcnui.GUIComponents
             progress = Mathf.Clamp01(progress);
 
 #if IL2CPP
-            GUILayout.Label(
-                label + ": " + (progress * 100f).ToString("F0") + "%",
-                styleManager.glowLabelStyle,
-                (Il2CppReferenceArray<GUILayoutOption>)null
-            );
+            GUILayout.Label(label + ": " + (progress * 100f).ToString("F0") + "%", styleManager.glowLabelStyle, (Il2CppReferenceArray<GUILayoutOption>)null);
 #else
-            GUILayout.Label(
-                label + ": " + (progress * 100f).ToString("F0") + "%",
-                styleManager.glowLabelStyle
-            );
+            GUILayout.Label(label + ": " + (progress * 100f).ToString("F0") + "%", styleManager.glowLabelStyle);
 #endif
 
-            Rect progressRect = GUILayoutUtility.GetRect(
-                (windowWidth - 2 * horizontalPadding) * guiHelper.uiScale,
-                20 * guiHelper.uiScale
-            );
+            Rect progressRect = GUILayoutUtility.GetRect((windowWidth - 2 * horizontalPadding) * guiHelper.uiScale, 20 * guiHelper.uiScale);
 
             GUI.color = new Color(0.3f, 0.3f, 0.3f, 0.8f);
             GUI.DrawTexture(progressRect, Texture2D.whiteTexture);
 
             Color finalBarColor = Color.Lerp(barColor, guiHelper.accentColor, 0.5f);
             GUI.color = finalBarColor;
-            Rect fillRect = new Rect(
-                progressRect.x,
-                progressRect.y,
-                progressRect.width * progress,
-                progressRect.height
-            );
+            Rect fillRect = new Rect(progressRect.x, progressRect.y, progressRect.width * progress, progressRect.height);
             GUI.DrawTexture(fillRect, Texture2D.whiteTexture);
 
             GUI.color = Color.white;
@@ -71,18 +56,9 @@ namespace shadcnui.GUIComponents
         {
             var styleManager = guiHelper.GetStyleManager();
 #if IL2CPP
-            GUILayout.Box(
-                content,
-                styleManager.animatedInputStyle,
-                (Il2CppReferenceArray<GUILayoutOption>)
-                    new GUILayoutOption[] { GUILayout.Height(height * guiHelper.uiScale) }
-            );
+            GUILayout.Box(content, styleManager.animatedInputStyle, (Il2CppReferenceArray<GUILayoutOption>)new GUILayoutOption[] { GUILayout.Height(height * guiHelper.uiScale) });
 #else
-            GUILayout.Box(
-                content,
-                styleManager.animatedInputStyle,
-                GUILayout.Height(height * guiHelper.uiScale)
-            );
+            GUILayout.Box(content, styleManager.animatedInputStyle, GUILayout.Height(height * guiHelper.uiScale));
 #endif
             layoutComponents.AddSpace(guiHelper.controlSpacing);
         }
@@ -90,16 +66,9 @@ namespace shadcnui.GUIComponents
         public void DrawSeparator(float windowWidth, float height = 2f)
         {
 #if IL2CPP
-            Rect rect = GUILayoutUtility.GetRect(
-                (windowWidth - 2 * horizontalPadding) * guiHelper.uiScale,
-                height * guiHelper.uiScale,
-                (Il2CppReferenceArray<GUILayoutOption>)null
-            );
+            Rect rect = GUILayoutUtility.GetRect((windowWidth - 2 * horizontalPadding) * guiHelper.uiScale, height * guiHelper.uiScale, (Il2CppReferenceArray<GUILayoutOption>)null);
 #else
-            Rect rect = GUILayoutUtility.GetRect(
-                (windowWidth - 2 * horizontalPadding) * guiHelper.uiScale,
-                height * guiHelper.uiScale
-            );
+            Rect rect = GUILayoutUtility.GetRect((windowWidth - 2 * horizontalPadding) * guiHelper.uiScale, height * guiHelper.uiScale);
 #endif
             Color originalColor = GUI.backgroundColor;
             Color separatorColor = Color.Lerp(Color.gray, guiHelper.primaryColor, 0.5f);
@@ -114,18 +83,11 @@ namespace shadcnui.GUIComponents
             var styleManager = guiHelper.GetStyleManager();
             GUIStyle instructionStyle = new GUIStyle(styleManager.glowLabelStyle);
             instructionStyle.fontSize = Mathf.RoundToInt(10 * guiHelper.uiScale);
-            Color instructionColor = Color.Lerp(
-                new Color(0.8f, 0.8f, 0.8f),
-                guiHelper.accentColor,
-                0.3f
-            );
+            Color instructionColor = Color.Lerp(new Color(0.8f, 0.8f, 0.8f), guiHelper.accentColor, 0.3f);
             instructionStyle.normal.textColor = instructionColor;
 
 #if IL2CPP
-            layoutComponents.BeginHorizontalGroup(
-                GUIStyle.none,
-                (Il2CppReferenceArray<GUILayoutOption>)null
-            );
+            layoutComponents.BeginHorizontalGroup(GUIStyle.none, (Il2CppReferenceArray<GUILayoutOption>)null);
             GUILayout.FlexibleSpace();
             GUILayout.Label(text, instructionStyle, (Il2CppReferenceArray<GUILayoutOption>)null);
             GUILayout.FlexibleSpace();

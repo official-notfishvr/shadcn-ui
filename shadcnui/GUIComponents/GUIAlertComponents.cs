@@ -19,14 +19,7 @@ namespace shadcnui.GUIComponents
             layoutComponents = new GUILayoutComponents(helper);
         }
 
-        public void Alert(
-            string title,
-            string description,
-            AlertVariant variant = AlertVariant.Default,
-            AlertType type = AlertType.Info,
-            Texture2D icon = null,
-            params GUILayoutOption[] options
-        )
+        public void Alert(string title, string description, AlertVariant variant = AlertVariant.Default, AlertType type = AlertType.Info, Texture2D icon = null, params GUILayoutOption[] options)
         {
             var styleManager = guiHelper.GetStyleManager();
             GUIStyle alertStyle = styleManager.GetAlertStyle(variant, type);
@@ -37,21 +30,9 @@ namespace shadcnui.GUIComponents
             if (icon != null)
             {
 #if IL2CPP
-                GUILayout.Label(
-                    icon,
-                    (Il2CppReferenceArray<GUILayoutOption>)
-                        new GUILayoutOption[]
-                        {
-                            GUILayout.Width(24 * guiHelper.uiScale),
-                            GUILayout.Height(24 * guiHelper.uiScale),
-                        }
-                );
+                GUILayout.Label(icon, (Il2CppReferenceArray<GUILayoutOption>)new GUILayoutOption[] { GUILayout.Width(24 * guiHelper.uiScale), GUILayout.Height(24 * guiHelper.uiScale) });
 #else
-                GUILayout.Label(
-                    icon,
-                    GUILayout.Width(24 * guiHelper.uiScale),
-                    GUILayout.Height(24 * guiHelper.uiScale)
-                );
+                GUILayout.Label(icon, GUILayout.Width(24 * guiHelper.uiScale), GUILayout.Height(24 * guiHelper.uiScale));
 #endif
                 layoutComponents.AddSpace(8);
             }
@@ -61,11 +42,7 @@ namespace shadcnui.GUIComponents
             {
                 GUIStyle titleStyle = styleManager.GetAlertTitleStyle(type);
 #if IL2CPP
-                GUILayout.Label(
-                    new GUIContent(title),
-                    titleStyle,
-                    (Il2CppReferenceArray<GUILayoutOption>)null
-                );
+                GUILayout.Label(new GUIContent(title), titleStyle, (Il2CppReferenceArray<GUILayoutOption>)null);
 #else
                 GUILayout.Label(title, titleStyle);
 #endif
@@ -75,11 +52,7 @@ namespace shadcnui.GUIComponents
             {
                 GUIStyle descStyle = styleManager.GetAlertDescriptionStyle(type);
 #if IL2CPP
-                GUILayout.Label(
-                    new GUIContent(description),
-                    descStyle,
-                    (Il2CppReferenceArray<GUILayoutOption>)null
-                );
+                GUILayout.Label(new GUIContent(description), descStyle, (Il2CppReferenceArray<GUILayoutOption>)null);
 #else
                 GUILayout.Label(description, descStyle);
 #endif
@@ -89,14 +62,7 @@ namespace shadcnui.GUIComponents
             layoutComponents.EndVerticalGroup();
         }
 
-        public bool DismissibleAlert(
-            string title,
-            string description,
-            AlertVariant variant = AlertVariant.Default,
-            AlertType type = AlertType.Info,
-            Action onDismiss = null,
-            params GUILayoutOption[] options
-        )
+        public bool DismissibleAlert(string title, string description, AlertVariant variant = AlertVariant.Default, AlertType type = AlertType.Info, Action onDismiss = null, params GUILayoutOption[] options)
         {
             layoutComponents.BeginVerticalGroup();
 
@@ -105,26 +71,13 @@ namespace shadcnui.GUIComponents
             layoutComponents.AddSpace(4);
             layoutComponents.BeginHorizontalGroup();
             GUILayout.FlexibleSpace();
-            bool closeClicked = guiHelper.Button(
-                "X",
-                ButtonVariant.Ghost,
-                ButtonSize.Icon,
-                onClick: onDismiss
-            );
+            bool closeClicked = guiHelper.Button("X", ButtonVariant.Ghost, ButtonSize.Icon, onClick: onDismiss);
             layoutComponents.EndHorizontalGroup();
 
             return closeClicked;
         }
 
-        public void AlertWithActions(
-            string title,
-            string description,
-            string[] buttonTexts,
-            Action<int> onButtonClick,
-            AlertVariant variant = AlertVariant.Default,
-            AlertType type = AlertType.Info,
-            params GUILayoutOption[] options
-        )
+        public void AlertWithActions(string title, string description, string[] buttonTexts, Action<int> onButtonClick, AlertVariant variant = AlertVariant.Default, AlertType type = AlertType.Info, params GUILayoutOption[] options)
         {
             layoutComponents.BeginVerticalGroup();
 
@@ -156,25 +109,14 @@ namespace shadcnui.GUIComponents
             layoutComponents.EndVerticalGroup();
         }
 
-        public void CustomAlert(
-            string title,
-            string description,
-            Color backgroundColor,
-            Color textColor,
-            params GUILayoutOption[] options
-        )
+        public void CustomAlert(string title, string description, Color backgroundColor, Color textColor, params GUILayoutOption[] options)
         {
             var styleManager = guiHelper.GetStyleManager();
 
             GUIStyle customStyle = new GUIStyle(GUI.skin.box);
             customStyle.normal.background = styleManager.CreateSolidTexture(backgroundColor);
             customStyle.normal.textColor = textColor;
-            customStyle.border = new RectOffset(
-                guiHelper.cornerRadius,
-                guiHelper.cornerRadius,
-                guiHelper.cornerRadius,
-                guiHelper.cornerRadius
-            );
+            customStyle.border = new RectOffset(guiHelper.cornerRadius, guiHelper.cornerRadius, guiHelper.cornerRadius, guiHelper.cornerRadius);
             customStyle.padding = new RectOffset(16, 16, 12, 12);
 
             layoutComponents.BeginVerticalGroup(customStyle, options);
@@ -184,11 +126,7 @@ namespace shadcnui.GUIComponents
                 GUIStyle titleStyle = styleManager.GetAlertTitleStyle(AlertType.Info);
                 titleStyle.normal.textColor = textColor;
 #if IL2CPP
-                GUILayout.Label(
-                    new GUIContent(title),
-                    titleStyle,
-                    (Il2CppReferenceArray<GUILayoutOption>)null
-                );
+                GUILayout.Label(new GUIContent(title), titleStyle, (Il2CppReferenceArray<GUILayoutOption>)null);
 #else
                 GUILayout.Label(title, titleStyle);
 #endif
@@ -199,11 +137,7 @@ namespace shadcnui.GUIComponents
                 GUIStyle descStyle = styleManager.GetAlertDescriptionStyle(AlertType.Info);
                 descStyle.normal.textColor = textColor;
 #if IL2CPP
-                GUILayout.Label(
-                    new GUIContent(description),
-                    descStyle,
-                    (Il2CppReferenceArray<GUILayoutOption>)null
-                );
+                GUILayout.Label(new GUIContent(description), descStyle, (Il2CppReferenceArray<GUILayoutOption>)null);
 #else
                 GUILayout.Label(description, descStyle);
 #endif
@@ -212,24 +146,14 @@ namespace shadcnui.GUIComponents
             layoutComponents.EndVerticalGroup();
         }
 
-        public void AlertWithProgress(
-            string title,
-            string description,
-            float progress,
-            AlertVariant variant = AlertVariant.Default,
-            AlertType type = AlertType.Info,
-            params GUILayoutOption[] options
-        )
+        public void AlertWithProgress(string title, string description, float progress, AlertVariant variant = AlertVariant.Default, AlertType type = AlertType.Info, params GUILayoutOption[] options)
         {
             layoutComponents.BeginVerticalGroup();
 
             Alert(title, description, variant, type, null, options);
 
             layoutComponents.AddSpace(8);
-            Rect progressRect = GUILayoutUtility.GetRect(
-                200 * guiHelper.uiScale,
-                6 * guiHelper.uiScale
-            );
+            Rect progressRect = GUILayoutUtility.GetRect(200 * guiHelper.uiScale, 6 * guiHelper.uiScale);
 
             var styleManager = guiHelper.GetStyleManager();
             if (styleManager != null)
@@ -238,29 +162,16 @@ namespace shadcnui.GUIComponents
                 bgStyle.normal.background = styleManager.CreateSolidTexture(Color.gray);
                 GUI.Box(progressRect, GUIContent.none, bgStyle);
 
-                Rect fillRect = new Rect(
-                    progressRect.x,
-                    progressRect.y,
-                    progressRect.width * Mathf.Clamp01(progress),
-                    progressRect.height
-                );
+                Rect fillRect = new Rect(progressRect.x, progressRect.y, progressRect.width * Mathf.Clamp01(progress), progressRect.height);
                 GUIStyle fillStyle = new GUIStyle(GUI.skin.box);
-                fillStyle.normal.background = styleManager.CreateSolidTexture(
-                    GetProgressColor(type)
-                );
+                fillStyle.normal.background = styleManager.CreateSolidTexture(GetProgressColor(type));
                 GUI.Box(fillRect, GUIContent.none, fillStyle);
             }
 
             layoutComponents.EndVerticalGroup();
         }
 
-        public void AnimatedAlert(
-            string title,
-            string description,
-            AlertVariant variant = AlertVariant.Default,
-            AlertType type = AlertType.Info,
-            params GUILayoutOption[] options
-        )
+        public void AnimatedAlert(string title, string description, AlertVariant variant = AlertVariant.Default, AlertType type = AlertType.Info, params GUILayoutOption[] options)
         {
             float time = Time.time * 2f;
             float alpha = Mathf.Clamp01(time);
@@ -273,15 +184,7 @@ namespace shadcnui.GUIComponents
             GUI.color = originalColor;
         }
 
-        public void AlertWithCountdown(
-            string title,
-            string description,
-            float countdownTime,
-            Action onTimeout,
-            AlertVariant variant = AlertVariant.Default,
-            AlertType type = AlertType.Info,
-            params GUILayoutOption[] options
-        )
+        public void AlertWithCountdown(string title, string description, float countdownTime, Action onTimeout, AlertVariant variant = AlertVariant.Default, AlertType type = AlertType.Info, params GUILayoutOption[] options)
         {
             layoutComponents.BeginVerticalGroup();
 
@@ -292,14 +195,9 @@ namespace shadcnui.GUIComponents
             string countdownText = $"Auto-dismiss in {remainingSeconds}s";
 
             var styleManager = guiHelper.GetStyleManager();
-            GUIStyle countdownStyle =
-                styleManager?.GetLabelStyle(LabelVariant.Muted) ?? GUI.skin.label;
+            GUIStyle countdownStyle = styleManager?.GetLabelStyle(LabelVariant.Muted) ?? GUI.skin.label;
 #if IL2CPP
-            GUILayout.Label(
-                new GUIContent(countdownText),
-                countdownStyle,
-                (Il2CppReferenceArray<GUILayoutOption>)null
-            );
+            GUILayout.Label(new GUIContent(countdownText), countdownStyle, (Il2CppReferenceArray<GUILayoutOption>)null);
 #else
             GUILayout.Label(countdownText, countdownStyle);
 #endif
@@ -312,15 +210,7 @@ namespace shadcnui.GUIComponents
             layoutComponents.EndVerticalGroup();
         }
 
-        public bool ExpandableAlert(
-            string title,
-            string description,
-            string expandedContent,
-            ref bool isExpanded,
-            AlertVariant variant = AlertVariant.Default,
-            AlertType type = AlertType.Info,
-            params GUILayoutOption[] options
-        )
+        public bool ExpandableAlert(string title, string description, string expandedContent, ref bool isExpanded, AlertVariant variant = AlertVariant.Default, AlertType type = AlertType.Info, params GUILayoutOption[] options)
         {
             layoutComponents.BeginVerticalGroup();
 
@@ -328,11 +218,7 @@ namespace shadcnui.GUIComponents
 
             layoutComponents.AddSpace(4);
             string buttonText = isExpanded ? "Show Less" : "Show More";
-            bool buttonClicked = guiHelper.Button(
-                buttonText,
-                ButtonVariant.Outline,
-                ButtonSize.Small
-            );
+            bool buttonClicked = guiHelper.Button(buttonText, ButtonVariant.Outline, ButtonSize.Small);
 
             if (buttonClicked)
             {
@@ -343,14 +229,9 @@ namespace shadcnui.GUIComponents
             {
                 layoutComponents.AddSpace(4);
                 var styleManager = guiHelper.GetStyleManager();
-                GUIStyle expandedStyle =
-                    styleManager?.GetLabelStyle(LabelVariant.Muted) ?? GUI.skin.label;
+                GUIStyle expandedStyle = styleManager?.GetLabelStyle(LabelVariant.Muted) ?? GUI.skin.label;
 #if IL2CPP
-                GUILayout.Label(
-                    new GUIContent(expandedContent),
-                    expandedStyle,
-                    (Il2CppReferenceArray<GUILayoutOption>)null
-                );
+                GUILayout.Label(new GUIContent(expandedContent), expandedStyle, (Il2CppReferenceArray<GUILayoutOption>)null);
 #else
                 GUILayout.Label(expandedContent, expandedStyle);
 #endif
@@ -360,14 +241,7 @@ namespace shadcnui.GUIComponents
             return buttonClicked;
         }
 
-        public void AlertWithStatus(
-            string title,
-            string description,
-            bool isActive,
-            AlertVariant variant = AlertVariant.Default,
-            AlertType type = AlertType.Info,
-            params GUILayoutOption[] options
-        )
+        public void AlertWithStatus(string title, string description, bool isActive, AlertVariant variant = AlertVariant.Default, AlertType type = AlertType.Info, params GUILayoutOption[] options)
         {
             layoutComponents.BeginHorizontalGroup();
 
@@ -383,11 +257,7 @@ namespace shadcnui.GUIComponents
                 statusStyle.padding = new RectOffset(0, 0, 0, 0);
                 statusStyle.margin = new RectOffset(0, 0, 0, 0);
 #if IL2CPP
-                GUILayout.Label(
-                    GUIContent.none,
-                    statusStyle,
-                    (Il2CppReferenceArray<GUILayoutOption>)null
-                );
+                GUILayout.Label(GUIContent.none, statusStyle, (Il2CppReferenceArray<GUILayoutOption>)null);
 #else
                 GUILayout.Label(GUIContent.none, statusStyle);
 #endif

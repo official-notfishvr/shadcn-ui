@@ -20,22 +20,13 @@ namespace shadcnui.GUIComponents
             layoutComponents = new GUILayoutComponents(helper);
         }
 
-        public void DrawToggle(
-            float windowWidth,
-            string label,
-            ref bool value,
-            Action<bool> onToggle
-        )
+        public void DrawToggle(float windowWidth, string label, ref bool value, Action<bool> onToggle)
         {
             var styleManager = guiHelper.GetStyleManager();
             string toggleText = label + (value ? " [ON]" : " [OFF]");
             Color originalColor = GUI.backgroundColor;
 #if IL2CPP
-            bool clicked = GUILayout.Button(
-                toggleText,
-                styleManager.animatedButtonStyle,
-                (Il2CppReferenceArray<GUILayoutOption>)null
-            );
+            bool clicked = GUILayout.Button(toggleText, styleManager.animatedButtonStyle, (Il2CppReferenceArray<GUILayoutOption>)null);
 #else
             bool clicked = GUILayout.Button(toggleText, styleManager.animatedButtonStyle);
 #endif
@@ -48,15 +39,7 @@ namespace shadcnui.GUIComponents
             layoutComponents.AddSpace(guiHelper.controlSpacing);
         }
 
-        public bool Toggle(
-            string text,
-            bool value,
-            ToggleVariant variant = ToggleVariant.Default,
-            ToggleSize size = ToggleSize.Default,
-            Action<bool> onToggle = null,
-            bool disabled = false,
-            params GUILayoutOption[] options
-        )
+        public bool Toggle(string text, bool value, ToggleVariant variant = ToggleVariant.Default, ToggleSize size = ToggleSize.Default, Action<bool> onToggle = null, bool disabled = false, params GUILayoutOption[] options)
         {
             var styleManager = guiHelper.GetStyleManager();
             GUIStyle toggleStyle = styleManager.GetToggleStyle(variant, size);
@@ -68,24 +51,11 @@ namespace shadcnui.GUIComponents
             bool newValue;
 #if IL2CPP
             if (options != null && options.Length > 0)
-                newValue = GUILayout.Toggle(
-                    value,
-                    text,
-                    toggleStyle,
-                    (Il2CppReferenceArray<GUILayoutOption>)options
-                );
+                newValue = GUILayout.Toggle(value, text, toggleStyle, (Il2CppReferenceArray<GUILayoutOption>)options);
             else
-                newValue = GUILayout.Toggle(
-                    value,
-                    text,
-                    toggleStyle,
-                    (Il2CppReferenceArray<GUILayoutOption>)null
-                );
+                newValue = GUILayout.Toggle(value, text, toggleStyle, (Il2CppReferenceArray<GUILayoutOption>)null);
 #else
-            newValue =
-                options != null && options.Length > 0
-                    ? GUILayout.Toggle(value, text, toggleStyle, options)
-                    : GUILayout.Toggle(value, text, toggleStyle);
+            newValue = options != null && options.Length > 0 ? GUILayout.Toggle(value, text, toggleStyle, options) : GUILayout.Toggle(value, text, toggleStyle);
 #endif
 
             GUI.enabled = wasEnabled;
@@ -98,15 +68,7 @@ namespace shadcnui.GUIComponents
             return newValue;
         }
 
-        public bool Toggle(
-            Rect rect,
-            string text,
-            bool value,
-            ToggleVariant variant = ToggleVariant.Default,
-            ToggleSize size = ToggleSize.Default,
-            Action<bool> onToggle = null,
-            bool disabled = false
-        )
+        public bool Toggle(Rect rect, string text, bool value, ToggleVariant variant = ToggleVariant.Default, ToggleSize size = ToggleSize.Default, Action<bool> onToggle = null, bool disabled = false)
         {
             var styleManager = guiHelper.GetStyleManager();
             GUIStyle toggleStyle = styleManager.GetToggleStyle(variant, size);
@@ -127,25 +89,14 @@ namespace shadcnui.GUIComponents
             return newValue;
         }
 
-        public int ToggleGroup(
-            string[] texts,
-            int selectedIndex,
-            Action<int> onSelectionChange = null,
-            ToggleVariant variant = ToggleVariant.Default,
-            ToggleSize size = ToggleSize.Default,
-            bool horizontal = true,
-            float spacing = 5f
-        )
+        public int ToggleGroup(string[] texts, int selectedIndex, Action<int> onSelectionChange = null, ToggleVariant variant = ToggleVariant.Default, ToggleSize size = ToggleSize.Default, bool horizontal = true, float spacing = 5f)
         {
             int newSelectedIndex = selectedIndex;
 
             if (horizontal)
             {
 #if IL2CPP
-                layoutComponents.BeginHorizontalGroup(
-                    GUIStyle.none,
-                    (Il2CppReferenceArray<GUILayoutOption>)null
-                );
+                layoutComponents.BeginHorizontalGroup(GUIStyle.none, (Il2CppReferenceArray<GUILayoutOption>)null);
 #else
                 layoutComponents.BeginHorizontalGroup();
 #endif
@@ -153,10 +104,7 @@ namespace shadcnui.GUIComponents
             else
             {
 #if IL2CPP
-                layoutComponents.BeginVerticalGroup(
-                    GUIStyle.none,
-                    (Il2CppReferenceArray<GUILayoutOption>)null
-                );
+                layoutComponents.BeginVerticalGroup(GUIStyle.none, (Il2CppReferenceArray<GUILayoutOption>)null);
 #else
                 layoutComponents.BeginVerticalGroup();
 #endif
@@ -185,15 +133,7 @@ namespace shadcnui.GUIComponents
             return newSelectedIndex;
         }
 
-        public bool[] MultiToggleGroup(
-            string[] texts,
-            bool[] selectedStates,
-            Action<int, bool> onToggleChange = null,
-            ToggleVariant variant = ToggleVariant.Default,
-            ToggleSize size = ToggleSize.Default,
-            bool horizontal = true,
-            float spacing = 5f
-        )
+        public bool[] MultiToggleGroup(string[] texts, bool[] selectedStates, Action<int, bool> onToggleChange = null, ToggleVariant variant = ToggleVariant.Default, ToggleSize size = ToggleSize.Default, bool horizontal = true, float spacing = 5f)
         {
             bool[] newStates = new bool[selectedStates.Length];
             Array.Copy(selectedStates, newStates, selectedStates.Length);
@@ -201,10 +141,7 @@ namespace shadcnui.GUIComponents
             if (horizontal)
             {
 #if IL2CPP
-                layoutComponents.BeginHorizontalGroup(
-                    GUIStyle.none,
-                    (Il2CppReferenceArray<GUILayoutOption>)null
-                );
+                layoutComponents.BeginHorizontalGroup(GUIStyle.none, (Il2CppReferenceArray<GUILayoutOption>)null);
 #else
                 layoutComponents.BeginHorizontalGroup();
 #endif
@@ -212,10 +149,7 @@ namespace shadcnui.GUIComponents
             else
             {
 #if IL2CPP
-                layoutComponents.BeginVerticalGroup(
-                    GUIStyle.none,
-                    (Il2CppReferenceArray<GUILayoutOption>)null
-                );
+                layoutComponents.BeginVerticalGroup(GUIStyle.none, (Il2CppReferenceArray<GUILayoutOption>)null);
 #else
                 layoutComponents.BeginVerticalGroup();
 #endif
@@ -223,13 +157,7 @@ namespace shadcnui.GUIComponents
 
             for (int i = 0; i < texts.Length; i++)
             {
-                newStates[i] = Toggle(
-                    texts[i],
-                    selectedStates[i],
-                    variant,
-                    size,
-                    (value) => onToggleChange?.Invoke(i, value)
-                );
+                newStates[i] = Toggle(texts[i], selectedStates[i], variant, size, (value) => onToggleChange?.Invoke(i, value));
 
                 if (horizontal && i < texts.Length - 1)
                     layoutComponents.AddSpace(spacing);

@@ -37,12 +37,7 @@ namespace shadcnui.GUIComponents
             if (!isOpen)
                 return;
 
-            layoutComponents.BeginVerticalGroup(
-                guiHelper.GetStyleManager().dropdownMenuContentStyle,
-                GUILayout.ExpandWidth(true),
-                GUILayout.MinHeight(0),
-                GUILayout.MaxHeight(200)
-            );
+            layoutComponents.BeginVerticalGroup(guiHelper.GetStyleManager().dropdownMenuContentStyle, GUILayout.ExpandWidth(true), GUILayout.MinHeight(0), GUILayout.MaxHeight(200));
             scrollPosition = layoutComponents.DrawScrollView(
                 scrollPosition,
                 () =>
@@ -50,20 +45,9 @@ namespace shadcnui.GUIComponents
                     for (int i = 0; i < items.Length; i++)
                     {
 #if IL2CPP
-                        if (
-                            GUILayout.Button(
-                                items[i],
-                                guiHelper.GetStyleManager().dropdownMenuItemStyle,
-                                new Il2CppReferenceArray<GUILayoutOption>(new GUILayoutOption[0])
-                            )
-                        )
+                        if (GUILayout.Button(items[i], guiHelper.GetStyleManager().dropdownMenuItemStyle, new Il2CppReferenceArray<GUILayoutOption>(new GUILayoutOption[0])))
 #else
-                        if (
-                            GUILayout.Button(
-                                items[i],
-                                guiHelper.GetStyleManager().dropdownMenuItemStyle
-                            )
-                        )
+                        if (GUILayout.Button(items[i], guiHelper.GetStyleManager().dropdownMenuItemStyle))
 #endif
                         {
                             onItemSelected?.Invoke(i);
