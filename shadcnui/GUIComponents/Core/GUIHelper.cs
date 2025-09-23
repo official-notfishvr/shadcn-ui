@@ -318,6 +318,7 @@ namespace shadcnui
                 return false;
             }
         }
+
         public bool DrawColoredButton(float windowWidth, string text, Color color, Action onClick)
         {
             try
@@ -371,6 +372,7 @@ namespace shadcnui
                 return false;
             }
         }
+
         public bool Button(string text, ButtonVariant variant = ButtonVariant.Default, ButtonSize size = ButtonSize.Default, Action onClick = null, bool disabled = false, float opacity = 1f, params GUILayoutOption[] options)
         {
             try
@@ -396,38 +398,47 @@ namespace shadcnui
                 return false;
             }
         }
+
         public bool DestructiveButton(string text, Action onClick, ButtonSize size = ButtonSize.Default, float opacity = 1f, params GUILayoutOption[] options)
         {
             return Button(text, ButtonVariant.Destructive, size, onClick, false, opacity, options);
         }
+
         public bool OutlineButton(string text, Action onClick, ButtonSize size = ButtonSize.Default, float opacity = 1f, params GUILayoutOption[] options)
         {
             return Button(text, ButtonVariant.Outline, size, onClick, false, opacity, options);
         }
+
         public bool SecondaryButton(string text, Action onClick, ButtonSize size = ButtonSize.Default, float opacity = 1f, params GUILayoutOption[] options)
         {
             return Button(text, ButtonVariant.Secondary, size, onClick, false, opacity, options);
         }
+
         public bool GhostButton(string text, Action onClick, ButtonSize size = ButtonSize.Default, float opacity = 1f, params GUILayoutOption[] options)
         {
             return Button(text, ButtonVariant.Ghost, size, onClick, false, opacity, options);
         }
+
         public bool LinkButton(string text, Action onClick, ButtonSize size = ButtonSize.Default, float opacity = 1f, params GUILayoutOption[] options)
         {
             return Button(text, ButtonVariant.Link, size, onClick, false, opacity, options);
         }
+
         public bool SmallButton(string text, Action onClick, ButtonVariant variant = ButtonVariant.Default, float opacity = 1f, params GUILayoutOption[] options)
         {
             return Button(text, variant, ButtonSize.Small, onClick, false, opacity, options);
         }
+
         public bool LargeButton(string text, Action onClick, ButtonVariant variant = ButtonVariant.Default, float opacity = 1f, params GUILayoutOption[] options)
         {
             return Button(text, variant, ButtonSize.Large, onClick, false, opacity, options);
         }
+
         public bool IconButton(string text, Action onClick, ButtonVariant variant = ButtonVariant.Default, float opacity = 1f, params GUILayoutOption[] options)
         {
             return Button(text, variant, ButtonSize.Icon, onClick, false, opacity, options);
         }
+
         public void ButtonGroup(Action drawButtons, bool horizontal = true, float spacing = 5f)
         {
             try
@@ -937,6 +948,7 @@ namespace shadcnui
                 return -1;
             }
         }
+
         public void BeginTabContent()
         {
             try

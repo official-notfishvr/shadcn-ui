@@ -618,7 +618,8 @@ namespace shadcnui.GUIComponents
             for (int i = 0; i < 100; i++)
             {
                 float t = i / 99f;
-                Color startColor, endColor;
+                Color startColor,
+                    endColor;
                 startColor = theme.PrimaryColor;
                 endColor = theme.SecondaryColor;
 

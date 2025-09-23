@@ -691,7 +691,7 @@ public class UI : MonoBehaviour
     }
 
     void DrawButtonDemos()
-    { 
+    {
         guiHelper.BeginVerticalGroup(GUILayout.Width(windowRect.width - 25), GUILayout.ExpandHeight(true));
         guiHelper.Label("Button", LabelVariant.Default);
         guiHelper.MutedLabel("Displays a button or a clickable element that activates an event.");

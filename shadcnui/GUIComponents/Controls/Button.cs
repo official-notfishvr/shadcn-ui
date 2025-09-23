@@ -25,9 +25,9 @@ namespace shadcnui.GUIComponents
         {
             var styleManager = guiHelper.GetStyleManager();
             GUIStyle buttonStyle = styleManager.GetButtonStyle(variant, size);
-        
+
             List<GUILayoutOption> layoutOptions = new List<GUILayoutOption>(options);
-        
+
             if (buttonStyle.fixedWidth > 0)
             {
                 layoutOptions.Add(GUILayout.Width(buttonStyle.fixedWidth));
@@ -36,54 +36,54 @@ namespace shadcnui.GUIComponents
             {
                 layoutOptions.Add(GUILayout.Height(buttonStyle.fixedHeight));
             }
-        
+
             bool wasEnabled = GUI.enabled;
             if (disabled)
                 GUI.enabled = false;
-        
+
             Color originalColor = GUI.color;
             GUI.color = new Color(originalColor.r, originalColor.g, originalColor.b, originalColor.a * opacity);
-        
+
             bool clicked;
-        #if IL2CPP
+#if IL2CPP
             clicked = GUILayout.Button(text ?? "Button", buttonStyle, (Il2CppReferenceArray<GUILayoutOption>)layoutOptions.ToArray());
-        #else
+#else
             clicked = GUILayout.Button(text ?? "Button", buttonStyle, layoutOptions.ToArray());
-        #endif
-        
+#endif
             GUI.color = originalColor;
             GUI.enabled = wasEnabled;
-        
+
             if (clicked && !disabled && onClick != null)
                 onClick();
-        
+
             return clicked && !disabled;
         }
-        
+
         public bool DrawButton(Rect rect, string text, ButtonVariant variant = ButtonVariant.Default, ButtonSize size = ButtonSize.Default, Action onClick = null, bool disabled = false, float opacity = 1f)
         {
             var styleManager = guiHelper.GetStyleManager();
             GUIStyle buttonStyle = styleManager.GetButtonStyle(variant, size);
-        
+
             Rect scaledRect = new Rect(rect.x * guiHelper.uiScale, rect.y * guiHelper.uiScale, rect.width * guiHelper.uiScale, rect.height * guiHelper.uiScale);
-        
+
             bool wasEnabled = GUI.enabled;
             if (disabled)
                 GUI.enabled = false;
-        
+
             Color originalColor = GUI.color;
             GUI.color = new Color(originalColor.r, originalColor.g, originalColor.b, originalColor.a * opacity);
-        
+
             bool clicked = GUI.Button(scaledRect, text ?? "Button", buttonStyle);
-        
+
             GUI.color = originalColor;
             GUI.enabled = wasEnabled;
-        
+
             if (clicked && !disabled && onClick != null)
                 onClick();
-        
+
             return clicked && !disabled;
         }
+
         public void ButtonGroup(Action drawButtons, bool horizontal = true, float spacing = 5f)
         {
             float scaledSpacing = spacing * guiHelper.uiScale;
