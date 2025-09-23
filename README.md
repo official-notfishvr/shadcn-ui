@@ -94,7 +94,7 @@ public class ExampleUI : MonoBehaviour
 
 * Fix Styles that are borken if there is any
 * Fix the GUIComponents not ending of the end of the gui
-* Fix the Custom Font not working for table
+* Fix the Custom Font not working for IL2CPP
 
 ## Contribution Guidelines
 
