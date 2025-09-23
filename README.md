@@ -25,21 +25,22 @@ To use `shadcnui` in your C# project:
 
 Once referenced, you can integrate `shadcnui` components into your application. This library is designed with Unity's IMGUI system in mind, leveraging `GUILayout` for flexible UI layouts.
 
-### Basic Example (Unity)
+For more examples, please see the `shadcnui testing` project in the solution.
 
-To use `shadcnui` components in your Unity project, you'll typically instantiate `GUIHelper` and use its methods within an `OnGUI()` function or a custom GUI window.
+## Example
+
+Here is a basic example of how to use the `Button` component:
 
 ```csharp
-using UnityEngine;
 using shadcnui;
 using shadcnui.GUIComponents;
+using UnityEngine;
 
-public class MyUIExample : MonoBehaviour
+public class ExampleUI : MonoBehaviour
 {
     private GUIHelper guiHelper;
-    private bool checkboxValue = false;
-    private float sliderValue = 50f;
-    private string inputValue = "Hello shadcnui!";
+    private Rect windowRect = new Rect(20, 20, 400, 500);
+    private bool showWindow = true;
 
     void Start()
     {
@@ -48,46 +49,46 @@ public class MyUIExample : MonoBehaviour
 
     void OnGUI()
     {
-        // Begin a vertical layout group
-        GUILayout.BeginVertical(GUILayout.Width(300));
-
-        // Display a label
-        guiHelper.Label("Welcome to shadcnui!", LabelVariant.Default);
-        guiHelper.MutedLabel("A C# UI component library for Unity.");
-
-        guiHelper.HorizontalSeparator();
-
-        // Example Button
-        if (guiHelper.Button("Click Me!"))
+        if (showWindow)
         {
-            Debug.Log("Button Clicked!");
+            windowRect = GUI.Window(102, windowRect, (GUI.WindowFunction)DrawWindow, "Button Demo");
         }
+    }
 
+    void DrawWindow(int windowID)
+    {
+        guiHelper.BeginVerticalGroup(GUILayout.ExpandWidth(true), GUILayout.ExpandHeight(true));
+        guiHelper.Label("Button", LabelVariant.Default);
+        guiHelper.MutedLabel("Displays a button or a clickable element that activates an event.");
         guiHelper.HorizontalSeparator();
 
-        // Example Checkbox
-        checkboxValue = guiHelper.Checkbox("Enable Feature", checkboxValue);
-        guiHelper.Label($"Feature Enabled: {checkboxValue}");
-
+        guiHelper.Label("Button Variants", LabelVariant.Default);
+        guiHelper.BeginHorizontalGroup();
+        guiHelper.Button("Default");
+        guiHelper.Button("Destructive", ButtonVariant.Destructive);
+        guiHelper.Button("Outline", ButtonVariant.Outline);
+        guiHelper.Button("Secondary", ButtonVariant.Secondary);
+        guiHelper.Button("Ghost", ButtonVariant.Ghost);
+        guiHelper.Button("Link", ButtonVariant.Link);
+        guiHelper.EndHorizontalGroup();
+        guiHelper.Label("Code: guiHelper.Button(label, variant, size, onClick, disabled);", LabelVariant.Muted);
         guiHelper.HorizontalSeparator();
 
-        // Example Slider
-        sliderValue = guiHelper.DrawSlider(280, "Volume", ref sliderValue, 0, 100);
-        guiHelper.Label($"Volume: {sliderValue:F0}");
-
+        guiHelper.Label("Button Sizes", LabelVariant.Default);
+        guiHelper.BeginHorizontalGroup();
+        guiHelper.Button("Default", ButtonVariant.Default, ButtonSize.Default);
+        guiHelper.Button("Small", ButtonVariant.Default, ButtonSize.Small);
+        guiHelper.Button("Large", ButtonVariant.Default, ButtonSize.Large);
+        guiHelper.Button("Icon", ButtonVariant.Default, ButtonSize.Icon);
+        guiHelper.EndHorizontalGroup();
+        guiHelper.Label("Code: guiHelper.Button(label, variant, size);", LabelVariant.Muted);
         guiHelper.HorizontalSeparator();
-
-        // Example Input Field
-        inputValue = guiHelper.RenderGlowInputField(inputValue, 0, "Enter text...", 280);
-        guiHelper.Label($"Input Text: {inputValue}");
-
-        // End the vertical layout group
+        
         GUILayout.EndVertical();
+        GUI.DragWindow();
     }
 }
 ```
-
-the `shadcnui testing/Menu/UI.cs` file has more examples.
 
 ## Todo
 
