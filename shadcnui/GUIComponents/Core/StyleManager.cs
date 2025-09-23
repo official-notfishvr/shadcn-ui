@@ -255,27 +255,6 @@ namespace shadcnui.GUIComponents
     }
 
     /// <summary>
-    /// Variants for the Slider component.
-    /// </summary>
-    public enum SliderVariant
-    {
-        Default,
-        Range,
-        Vertical,
-        Disabled,
-    }
-
-    /// <summary>
-    /// Sizes for the Slider component.
-    /// </summary>
-    public enum SliderSize
-    {
-        Small,
-        Default,
-        Large,
-    }
-
-    /// <summary>
     /// Variants for the Calendar component.
     /// </summary>
     public enum CalendarVariant
@@ -294,24 +273,6 @@ namespace shadcnui.GUIComponents
     }
 
     /// <summary>
-    /// Variants for the Dialog component.
-    /// </summary>
-    public enum DialogVariant
-    {
-        Default,
-    }
-
-    /// <summary>
-    /// Sizes for the Dialog component.
-    /// </summary>
-    public enum DialogSize
-    {
-        Default,
-        Small,
-        Large,
-    }
-
-    /// <summary>
     /// Variants for the DropdownMenu component.
     /// </summary>
     public enum DropdownMenuVariant
@@ -323,24 +284,6 @@ namespace shadcnui.GUIComponents
     /// Sizes for the DropdownMenu component.
     /// </summary>
     public enum DropdownMenuSize
-    {
-        Default,
-        Small,
-        Large,
-    }
-
-    /// <summary>
-    /// Variants for the Popover component.
-    /// </summary>
-    public enum PopoverVariant
-    {
-        Default,
-    }
-
-    /// <summary>
-    /// Sizes for the Popover component.
-    /// </summary>
-    public enum PopoverSize
     {
         Default,
         Small,
@@ -518,11 +461,14 @@ namespace shadcnui.GUIComponents
         public GUIStyle calendarDaySelectedStyle;
         public GUIStyle calendarDayOutsideMonthStyle;
         public GUIStyle calendarDayTodayStyle;
+        public GUIStyle calendarDayDisabledStyle;
+        public GUIStyle calendarDayInRangeStyle;
 
         // DropdownMenu Styles
         public GUIStyle dropdownMenuContentStyle;
         public GUIStyle dropdownMenuItemStyle;
         public GUIStyle dropdownMenuSeparatorStyle;
+        public GUIStyle dropdownMenuHeaderStyle;
 
         // Popover Styles
         public GUIStyle popoverContentStyle;
@@ -672,37 +618,29 @@ namespace shadcnui.GUIComponents
             for (int i = 0; i < 100; i++)
             {
                 float t = i / 99f;
-                Color startColor,
-                    endColor;
-                if (theme.Name == "Custom")
-                {
-                    startColor = Color.Lerp(guiHelper.primaryColor, Color.black, 0.8f);
-                    endColor = Color.Lerp(guiHelper.secondaryColor, Color.black, 0.6f);
-                }
-                else
-                {
-                    startColor = theme.PrimaryColor;
-                    endColor = theme.SecondaryColor;
-                }
+                Color startColor, endColor;
+                startColor = theme.PrimaryColor;
+                endColor = theme.SecondaryColor;
+
                 Color gradColor = Color.Lerp(startColor, endColor, t);
                 gradientTexture.SetPixel(0, i, gradColor);
             }
             gradientTexture.Apply();
 
             cardBackgroundTexture = new Texture2D(1, 1);
-            cardBackgroundTexture.SetPixel(0, 0, theme.Name == "Custom" ? new Color(guiHelper.primaryColor.r, guiHelper.primaryColor.g, guiHelper.primaryColor.b, guiHelper.backgroundAlpha) : theme.CardBg);
+            cardBackgroundTexture.SetPixel(0, 0, theme.CardBg);
             cardBackgroundTexture.Apply();
 
             inputBackgroundTexture = new Texture2D(1, 1);
-            inputBackgroundTexture.SetPixel(0, 0, theme.Name == "Custom" ? new Color(guiHelper.primaryColor.r * 0.3f, guiHelper.primaryColor.g * 0.3f, guiHelper.primaryColor.b * 0.3f, 0.8f) : theme.InputBg);
+            inputBackgroundTexture.SetPixel(0, 0, theme.InputBg);
             inputBackgroundTexture.Apply();
 
             inputFocusedTexture = new Texture2D(1, 1);
-            inputFocusedTexture.SetPixel(0, 0, theme.Name == "Custom" ? new Color(guiHelper.accentColor.r * 0.3f, guiHelper.accentColor.g * 0.3f, guiHelper.accentColor.b * 0.3f, 0.9f) : theme.InputFocusedBg);
+            inputFocusedTexture.SetPixel(0, 0, theme.InputFocusedBg);
             inputFocusedTexture.Apply();
 
             outlineTexture = new Texture2D(4, 4);
-            Color borderColor = theme.Name == "Custom" ? guiHelper.accentColor : theme.ButtonOutlineBorder;
+            Color borderColor = theme.ButtonOutlineBorder;
             Color fillColor = new Color(0f, 0f, 0f, 0f);
 
             for (int x = 0; x < 4; x++)
@@ -905,7 +843,7 @@ namespace shadcnui.GUIComponents
             cardStyle.normal.background = cardBackgroundTexture;
             cardStyle.border = new RectOffset(guiHelper.cornerRadius, guiHelper.cornerRadius, guiHelper.cornerRadius, guiHelper.cornerRadius);
             cardStyle.padding = new RectOffset(0, 0, 0, 0);
-            cardStyle.margin = new RectOffset(0, 0, 5, 5);
+            cardStyle.margin = new RectOffset(0, 0, 5, 0);
 
             cardHeaderStyle = new GUIStyle();
             cardHeaderStyle.padding = new RectOffset(16, 16, 16, 8);
@@ -1237,7 +1175,7 @@ namespace shadcnui.GUIComponents
             labelMutedStyle = new GUIStyle(labelDefaultStyle);
             if (customFont != null)
                 labelMutedStyle.font = customFont;
-            labelMutedStyle.normal.textColor = new Color(0.6f, 0.6f, 0.7f);
+            labelMutedStyle.normal.textColor = theme.MutedColor;
             labelMutedStyle.fontSize = guiHelper.fontSize - 1;
 
             labelDestructiveStyle = new GUIStyle(labelDefaultStyle);
@@ -1773,6 +1711,16 @@ namespace shadcnui.GUIComponents
             if (customFont != null)
                 calendarDayTodayStyle.font = customFont;
             calendarDayTodayStyle.normal.background = CreateOutlineButtonTexture(theme.CardBg, theme.AccentColor);
+
+            calendarDayDisabledStyle = new GUIStyle(calendarDayStyle);
+            if (customFont != null)
+                calendarDayDisabledStyle.font = customFont;
+            calendarDayDisabledStyle.normal.textColor = theme.MutedColor;
+
+            calendarDayInRangeStyle = new GUIStyle(calendarDayStyle);
+            if (customFont != null)
+                calendarDayInRangeStyle.font = customFont;
+            calendarDayInRangeStyle.normal.background = CreateSolidTexture(new Color(theme.AccentColor.r, theme.AccentColor.g, theme.AccentColor.b, 0.5f));
         }
 
         private void SetupDropdownMenuStyles()
@@ -1802,7 +1750,15 @@ namespace shadcnui.GUIComponents
             dropdownMenuSeparatorStyle = new GUIStyle();
             dropdownMenuSeparatorStyle.normal.background = CreateSolidTexture(theme.SeparatorColor);
             dropdownMenuSeparatorStyle.fixedHeight = 1;
-            dropdownMenuSeparatorStyle.margin = new RectOffset(5, 5, 5, 5);
+            dropdownMenuSeparatorStyle.margin = new RectOffset(5, 5, 5, 0);
+
+            dropdownMenuHeaderStyle = new GUIStyle(GUI.skin.label);
+            if (customFont != null)
+                dropdownMenuHeaderStyle.font = customFont;
+            dropdownMenuHeaderStyle.fontSize = Mathf.RoundToInt(scaledFontSize * 0.9f);
+            dropdownMenuHeaderStyle.fontStyle = FontStyle.Bold;
+            dropdownMenuHeaderStyle.normal.textColor = theme.MutedColor;
+            dropdownMenuHeaderStyle.padding = new RectOffset(10, 10, 5, 5);
         }
 
         private void SetupPopoverStyles()
@@ -2571,38 +2527,6 @@ namespace shadcnui.GUIComponents
             var style = dropdownMenuContentStyle;
             dropdownMenuStyleCache[(variant, size)] = style;
             return style;
-        }
-
-        /// <summary>
-        /// Gets the popover style for the given variant and size.
-        /// </summary>
-        private Dictionary<(PopoverVariant, PopoverSize), GUIStyle> popoverStyleCache = new Dictionary<(PopoverVariant, PopoverSize), GUIStyle>();
-
-        public GUIStyle GetPopoverStyle(PopoverVariant variant, PopoverSize size)
-        {
-            if (popoverStyleCache.TryGetValue((variant, size), out var cachedStyle))
-            {
-                return cachedStyle;
-            }
-
-            var theme = ThemeManager.Instance.CurrentTheme;
-            GUIStyle sizedStyle = new GUIStyle(popoverContentStyle);
-
-            switch (size)
-            {
-                case PopoverSize.Small:
-                    sizedStyle.padding = new RectOffset(5, 5, 5, 5);
-                    break;
-                case PopoverSize.Large:
-                    sizedStyle.padding = new RectOffset(15, 15, 15, 15);
-                    break;
-                default:
-
-                    break;
-            }
-
-            popoverStyleCache[(variant, size)] = sizedStyle;
-            return sizedStyle;
         }
 
         /// <summary>

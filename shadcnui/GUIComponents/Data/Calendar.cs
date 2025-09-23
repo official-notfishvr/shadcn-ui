@@ -1,4 +1,6 @@
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 #if IL2CPP
 using UnhollowerBaseLib;
@@ -10,34 +12,76 @@ namespace shadcnui.GUIComponents
     {
         private GUIHelper guiHelper;
         private Layout layoutComponents;
-        private DateTime selectedDate;
+        private DateTime displayedMonth;
+
+        public DateTime? SelectedDate { get; set; }
+
+        public List<(DateTime Start, DateTime End)> Ranges { get; set; }
+        private DateTime? pendingRangeStart;
+
+        public List<DateTime> DisabledDates { get; set; }
+        public Action<DateTime> OnDateSelected { get; set; }
+
+        private bool showMonthDropdown;
+        private bool showYearDropdown;
 
         public Calendar(GUIHelper helper)
         {
             this.guiHelper = helper;
-            layoutComponents = new Layout(helper);
-            selectedDate = DateTime.Today;
+            this.layoutComponents = new Layout(helper);
+            this.displayedMonth = DateTime.Today;
+
+            this.Ranges = new List<(DateTime Start, DateTime End)>();
+            this.DisabledDates = new List<DateTime>();
         }
 
         public void DrawCalendar()
         {
             var styleManager = guiHelper.GetStyleManager();
 
+            DrawHeader(styleManager);
+            DrawWeekdays(styleManager);
+            DrawDays(styleManager);
+        }
+
+        private void DrawHeader(StyleManager styleManager)
+        {
             layoutComponents.BeginHorizontalGroup();
+
 #if IL2CPP
             if (GUILayout.Button("<", styleManager.buttonGhostStyle, new Il2CppReferenceArray<GUILayoutOption>(new GUILayoutOption[0])))
 #else
             if (GUILayout.Button("<", styleManager.buttonGhostStyle))
 #endif
             {
-                selectedDate = selectedDate.AddMonths(-1);
+                displayedMonth = displayedMonth.AddMonths(-1);
             }
 
+            if (showMonthDropdown) { }
+            else
+            {
 #if IL2CPP
-            GUILayout.Label(selectedDate.ToString("MMMM yyyy"), styleManager.calendarTitleStyle, new Il2CppReferenceArray<GUILayoutOption>(new GUILayoutOption[0]));
+                if (GUILayout.Button(displayedMonth.ToString("MMMM"), styleManager.buttonGhostStyle, new Il2CppReferenceArray<GUILayoutOption>(new GUILayoutOption[0])))
 #else
-            GUILayout.Label(selectedDate.ToString("MMMM yyyy"), styleManager.calendarTitleStyle);
+                if (GUILayout.Button(displayedMonth.ToString("MMMM"), styleManager.buttonGhostStyle))
 #endif
+                {
+                    showMonthDropdown = true;
+                }
+            }
+
+            if (showYearDropdown) { }
+            else
+            {
+#if IL2CPP
+                if (GUILayout.Button(displayedMonth.ToString("yyyy"), styleManager.buttonGhostStyle, new Il2CppReferenceArray<GUILayoutOption>(new GUILayoutOption[0])))
+#else
+                if (GUILayout.Button(displayedMonth.ToString("yyyy"), styleManager.buttonGhostStyle))
+#endif
+                {
+                    showYearDropdown = true;
+                }
+            }
 
 #if IL2CPP
             if (GUILayout.Button(">", styleManager.buttonGhostStyle, new Il2CppReferenceArray<GUILayoutOption>(new GUILayoutOption[0])))
@@ -45,10 +89,14 @@ namespace shadcnui.GUIComponents
             if (GUILayout.Button(">", styleManager.buttonGhostStyle))
 #endif
             {
-                selectedDate = selectedDate.AddMonths(1);
+                displayedMonth = displayedMonth.AddMonths(1);
             }
-            layoutComponents.EndHorizontalGroup();
 
+            layoutComponents.EndHorizontalGroup();
+        }
+
+        private void DrawWeekdays(StyleManager styleManager)
+        {
             layoutComponents.BeginHorizontalGroup();
             for (int i = 0; i < 7; i++)
             {
@@ -59,9 +107,12 @@ namespace shadcnui.GUIComponents
 #endif
             }
             layoutComponents.EndHorizontalGroup();
+        }
 
-            int daysInMonth = DateTime.DaysInMonth(selectedDate.Year, selectedDate.Month);
-            int firstDayOfMonth = (int)new DateTime(selectedDate.Year, selectedDate.Month, 1).DayOfWeek;
+        private void DrawDays(StyleManager styleManager)
+        {
+            int daysInMonth = DateTime.DaysInMonth(displayedMonth.Year, displayedMonth.Month);
+            int firstDayOfMonth = (int)new DateTime(displayedMonth.Year, displayedMonth.Month, 1).DayOfWeek;
 
             int dayCounter = 1;
             for (int i = 0; i < 6; i++)
@@ -79,12 +130,26 @@ namespace shadcnui.GUIComponents
                     }
                     else
                     {
+                        var currentDay = new DateTime(displayedMonth.Year, displayedMonth.Month, dayCounter);
+                        bool isDisabled = DisabledDates.Contains(currentDay.Date);
+
                         GUIStyle dayStyle = styleManager.calendarDayStyle;
-                        var currentDay = new DateTime(selectedDate.Year, selectedDate.Month, dayCounter);
-                        if (currentDay == DateTime.Today)
-                            dayStyle = styleManager.calendarDayTodayStyle;
-                        if (currentDay == selectedDate)
+                        if (isDisabled)
+                        {
+                            dayStyle = styleManager.calendarDayDisabledStyle;
+                        }
+                        else if (SelectedDate.HasValue && SelectedDate.Value.Date == currentDay.Date)
+                        {
                             dayStyle = styleManager.calendarDaySelectedStyle;
+                        }
+                        else if (Ranges.Any(r => currentDay.Date >= r.Start.Date && currentDay.Date <= r.End.Date))
+                        {
+                            dayStyle = styleManager.calendarDayInRangeStyle;
+                        }
+                        else if (currentDay.Date == DateTime.Today)
+                        {
+                            dayStyle = styleManager.calendarDayTodayStyle;
+                        }
 
 #if IL2CPP
                         if (GUILayout.Button(dayCounter.ToString(), dayStyle, new Il2CppReferenceArray<GUILayoutOption>(new GUILayoutOption[0])))
@@ -92,7 +157,10 @@ namespace shadcnui.GUIComponents
                         if (GUILayout.Button(dayCounter.ToString(), dayStyle))
 #endif
                         {
-                            selectedDate = currentDay;
+                            if (!isDisabled)
+                            {
+                                HandleDateSelection(currentDay);
+                            }
                         }
                         dayCounter++;
                     }
@@ -100,6 +168,28 @@ namespace shadcnui.GUIComponents
                 layoutComponents.EndHorizontalGroup();
                 if (dayCounter > daysInMonth)
                     break;
+            }
+        }
+
+        private void HandleDateSelection(DateTime date)
+        {
+            if (pendingRangeStart.HasValue)
+            {
+                var start = pendingRangeStart.Value;
+                var end = date >= start ? date : start;
+
+                Ranges.Add((start, end));
+                pendingRangeStart = null;
+            }
+            else
+            {
+                pendingRangeStart = date;
+            }
+
+            SelectedDate = date;
+            if (OnDateSelected != null)
+            {
+                OnDateSelected(date);
             }
         }
     }

@@ -87,16 +87,6 @@ namespace shadcnui
             }
         }
 
-        public bool SetShadowEffects
-        {
-            get => helper?.shadowEffectsEnabled ?? false;
-            set
-            {
-                if (helper != null)
-                    helper.shadowEffectsEnabled = value;
-            }
-        }
-
         public bool SetHoverEffects
         {
             get => helper?.hoverEffectsEnabled ?? false;
@@ -114,66 +104,6 @@ namespace shadcnui
             {
                 if (helper != null)
                     helper.fadeTransitionsEnabled = value;
-            }
-        }
-
-        public Color SetPrimaryColor
-        {
-            get => helper?.primaryColor ?? Color.white;
-            set
-            {
-                if (helper != null)
-                    helper.primaryColor = value;
-            }
-        }
-
-        public Color SetSecondaryColor
-        {
-            get => helper?.secondaryColor ?? Color.gray;
-            set
-            {
-                if (helper != null)
-                    helper.secondaryColor = value;
-            }
-        }
-
-        public Color SetAccentColor
-        {
-            get => helper?.accentColor ?? Color.cyan;
-            set
-            {
-                if (helper != null)
-                    helper.accentColor = value;
-            }
-        }
-
-        public float SetControlSpacing
-        {
-            get => helper?.controlSpacing ?? 10f;
-            set
-            {
-                if (helper != null)
-                    helper.controlSpacing = Mathf.Clamp(value, 0f, 50f);
-            }
-        }
-
-        public float SetButtonHeight
-        {
-            get => helper?.buttonHeight ?? 30f;
-            set
-            {
-                if (helper != null)
-                    helper.buttonHeight = Mathf.Clamp(value, 20f, 60f);
-            }
-        }
-
-        public bool SetBorderEffects
-        {
-            get => helper?.borderEffectsEnabled ?? false;
-            set
-            {
-                if (helper != null)
-                    helper.borderEffectsEnabled = value;
             }
         }
 
@@ -204,16 +134,6 @@ namespace shadcnui
             {
                 if (helper != null)
                     helper.uiScale = Mathf.Clamp(value, 0.5f, 2f);
-            }
-        }
-
-        public bool SetDebugMode
-        {
-            get => helper?.debugModeEnabled ?? false;
-            set
-            {
-                if (helper != null)
-                    helper.debugModeEnabled = value;
             }
         }
     }

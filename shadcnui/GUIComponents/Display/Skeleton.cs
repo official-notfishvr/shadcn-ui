@@ -128,17 +128,17 @@ namespace shadcnui.GUIComponents
                 layoutComponents.AddSpace(guiHelper.fontSize * 0.3f);
                 SkeletonText(width * 0.6f, 1);
                 layoutComponents.EndVerticalGroup();
-                layoutComponents.AddSpace(guiHelper.controlSpacing);
+                layoutComponents.AddSpace(10f);
             }
 
             SkeletonText(width, 3);
 
             if (includeFooter)
             {
-                layoutComponents.AddSpace(guiHelper.controlSpacing);
+                layoutComponents.AddSpace(10f);
                 layoutComponents.BeginHorizontalGroup();
                 DrawSkeleton(width * 0.3f, guiHelper.fontSize * 1.5f, SkeletonVariant.Default, SkeletonSize.Default, options);
-                layoutComponents.AddSpace(guiHelper.controlSpacing);
+                layoutComponents.AddSpace(10f);
                 DrawSkeleton(width * 0.3f, guiHelper.fontSize * 1.5f, SkeletonVariant.Default, SkeletonSize.Default, options);
                 layoutComponents.EndHorizontalGroup();
             }

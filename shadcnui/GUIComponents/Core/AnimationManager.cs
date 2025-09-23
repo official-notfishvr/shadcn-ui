@@ -13,6 +13,7 @@ namespace shadcnui.GUIComponents
     {
         private GUIHelper guiHelper;
         private Layout layoutComponents;
+        private bool _layoutGroupStarted = false;
 
         public AnimationManager(GUIHelper helper)
         {
@@ -59,18 +60,10 @@ namespace shadcnui.GUIComponents
                 particleTime += Time.deltaTime;
 
             mousePos = Event.current.mousePosition;
-
-            if (guiHelper.debugModeEnabled && Time.frameCount % 60 == 0)
-            {
-                Debug.Log($"GUI Debug - Alpha: {menuAlpha:F2}, Scale: {menuScale:F2}, Hover: {hoveredButton}");
-            }
         }
 
         public bool BeginAnimatedGUI(float menuAlpha, float backgroundPulse, Vector2 mousePos)
         {
-            if (guiHelper.fadeTransitionsEnabled && menuAlpha < 0.01f)
-                return false;
-
             float currentAlpha = guiHelper.fadeTransitionsEnabled ? menuAlpha : 1f;
             GUI.color = new Color(1f, 1f, 1f, currentAlpha);
 
@@ -87,13 +80,17 @@ namespace shadcnui.GUIComponents
             layoutComponents.BeginVerticalGroup(styleManager.animatedBoxStyle);
 #endif
             GUI.color = new Color(1f, 1f, 1f, currentAlpha);
-
+            _layoutGroupStarted = true;
             return true;
         }
 
         public void EndAnimatedGUI()
         {
-            layoutComponents.EndVerticalGroup();
+            if (_layoutGroupStarted)
+            {
+                layoutComponents.EndVerticalGroup();
+                _layoutGroupStarted = false;
+            }
             GUI.color = Color.white;
         }
 
@@ -106,14 +103,14 @@ namespace shadcnui.GUIComponents
             var particleTexture = styleManager.GetParticleTexture();
             var particleTime = guiHelper.GetParticleTime();
 
-            int particleCount = guiHelper.debugModeEnabled ? 12 : 6;
+            int particleCount = 12;
             for (int i = 0; i < particleCount; i++)
             {
                 float x = 30 + Mathf.Sin(particleTime * 0.5f + i * 0.8f) * 25 + i * 35;
                 float y = 40 + Mathf.Cos(particleTime * 0.3f + i * 1.2f) * 20 + i * 20;
                 float alpha = (Mathf.Sin(particleTime * 2f + i) * 0.3f + 0.4f) * menuAlpha * guiHelper.glowIntensity;
 
-                Color particleColor = new Color(guiHelper.accentColor.r, guiHelper.accentColor.g, guiHelper.accentColor.b, alpha);
+                Color particleColor = new Color(ThemeManager.Instance.CurrentTheme.AccentColor.r, ThemeManager.Instance.CurrentTheme.AccentColor.g, ThemeManager.Instance.CurrentTheme.AccentColor.b, alpha);
 
                 GUI.color = particleColor;
                 GUI.DrawTexture(new Rect(x * guiHelper.uiScale, y * guiHelper.uiScale, 4 * guiHelper.uiScale, 4 * guiHelper.uiScale), particleTexture);

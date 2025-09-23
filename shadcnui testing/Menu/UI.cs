@@ -91,6 +91,13 @@ public class UI : MonoBehaviour
     private string inputFieldValue = "Default Input";
     private Vector2 scrollAreaScrollPosition = Vector2.zero;
 
+    private System.Collections.Generic.List<DropdownMenuItem> dropdownMenuItems;
+
+    private DateTime? calendarSelectedDate;
+    private DateTime? calendarRangeStart;
+    private DateTime? calendarRangeEnd;
+    private System.Collections.Generic.List<DateTime> calendarDisabledDates = new System.Collections.Generic.List<DateTime>();
+
     private bool fontInitialized = false;
 
     void Start()
@@ -200,8 +207,8 @@ public class UI : MonoBehaviour
                 GUILayout.ExpandHeight(true)
             );
             guiHelper.EndTabContent();
+            guiHelper.EndAnimatedGUI();
         }
-        guiHelper.EndAnimatedGUI();
         GUI.DragWindow();
     }
 
@@ -312,7 +319,7 @@ public class UI : MonoBehaviour
 
     void DrawAlertDemos()
     {
-        guiHelper.BeginVerticalGroup(GUILayout.ExpandWidth(true), GUILayout.ExpandHeight(true));
+        guiHelper.BeginVerticalGroup(GUILayout.Width(windowRect.width - 25), GUILayout.ExpandHeight(true));
         guiHelper.Label("Alert", LabelVariant.Default);
         guiHelper.MutedLabel("Displays a callout for user attention.");
         guiHelper.HorizontalSeparator();
@@ -556,8 +563,39 @@ public class UI : MonoBehaviour
         guiHelper.MutedLabel("A component for displaying a calendar and selecting dates.");
         guiHelper.HorizontalSeparator();
 
+        var calendar = guiHelper.GetCalendarComponents();
+        calendar.SelectedDate = calendarSelectedDate;
+        calendar.DisabledDates = calendarDisabledDates;
+        calendar.OnDateSelected += (date) =>
+        {
+            calendarSelectedDate = date;
+        };
+
         guiHelper.Calendar();
-        guiHelper.Label("Code: guiHelper.Calendar();", LabelVariant.Muted);
+
+        guiHelper.HorizontalSeparator();
+
+        guiHelper.Label($"Selected Date: {(calendarSelectedDate.HasValue ? calendarSelectedDate.Value.ToShortDateString() : "None")}");
+
+        if (calendar.Ranges.Count > 0)
+        {
+            for (int i = 0; i < calendar.Ranges.Count; i++)
+            {
+                var r = calendar.Ranges[i];
+                guiHelper.Label($"Range {i + 1}: {r.Start.ToShortDateString()} - {r.End.ToShortDateString()}");
+            }
+        }
+        else
+        {
+            guiHelper.Label("No ranges selected");
+        }
+
+        if (guiHelper.Button("Disable Today"))
+        {
+            calendarDisabledDates.Add(DateTime.Today);
+        }
+
+        guiHelper.Label("Code: var calendar = guiHelper.GetCalendarComponents(); ... calendar.DrawCalendar();", LabelVariant.Muted);
         guiHelper.HorizontalSeparator();
 
         GUILayout.EndVertical();
@@ -572,22 +610,29 @@ public class UI : MonoBehaviour
 
         if (guiHelper.Button("Open Dropdown Menu"))
         {
-            guiHelper.OpenDropdownMenu();
+            dropdownMenuItems = new System.Collections.Generic.List<DropdownMenuItem>()
+            {
+                new DropdownMenuItem(DropdownMenuItemType.Header, "My Account"),
+                new DropdownMenuItem(DropdownMenuItemType.Item, "Profile", () => Debug.Log("Profile selected")),
+                new DropdownMenuItem(DropdownMenuItemType.Item, "Billing", () => Debug.Log("Billing selected")),
+                new DropdownMenuItem(DropdownMenuItemType.Item, "Settings", () => Debug.Log("Settings selected")),
+                new DropdownMenuItem(DropdownMenuItemType.Separator),
+                new DropdownMenuItem(DropdownMenuItemType.Item, "Team")
+                {
+                    SubItems = new System.Collections.Generic.List<DropdownMenuItem>() { new DropdownMenuItem(DropdownMenuItemType.Item, "Email", () => Debug.Log("Invite by Email")), new DropdownMenuItem(DropdownMenuItemType.Item, "Phone", () => Debug.Log("Invite by Phone")) },
+                },
+                new DropdownMenuItem(DropdownMenuItemType.Separator),
+                new DropdownMenuItem(DropdownMenuItemType.Item, "Log out", () => Debug.Log("Log out selected")),
+            };
+            guiHelper.OpenDropdownMenu(dropdownMenuItems);
         }
 
         if (guiHelper.IsDropdownMenuOpen())
         {
-            string[] items = { "Item 1", "Item 2", "Item 3", "Item 4", "Item 5", "Item 6", "Item 7", "Item 8", "Item 9", "Item 10" };
-            guiHelper.DropdownMenu(
-                items,
-                (index) =>
-                {
-                    Debug.Log("Selected item: " + items[index]);
-                }
-            );
+            guiHelper.DropdownMenu();
         }
 
-        guiHelper.Label("Code: guiHelper.DropdownMenu(rect, items, onItemSelected);", LabelVariant.Muted);
+        guiHelper.Label("Code: guiHelper.DropdownMenu(items);", LabelVariant.Muted);
         guiHelper.HorizontalSeparator();
 
         GUILayout.EndVertical();
@@ -646,8 +691,8 @@ public class UI : MonoBehaviour
     }
 
     void DrawButtonDemos()
-    {
-        guiHelper.BeginVerticalGroup(GUILayout.ExpandWidth(true), GUILayout.ExpandHeight(true));
+    { 
+        guiHelper.BeginVerticalGroup(GUILayout.Width(windowRect.width - 25), GUILayout.ExpandHeight(true));
         guiHelper.Label("Button", LabelVariant.Default);
         guiHelper.MutedLabel("Displays a button or a clickable element that activates an event.");
         guiHelper.HorizontalSeparator();

@@ -55,7 +55,7 @@ namespace shadcnui.GUIComponents
 
         public void BeginVerticalGroup(params GUILayoutOption[] options)
         {
-            GUIStyle boxStyle = guiHelper.borderEffectsEnabled ? GUI.skin.box : GUIStyle.none;
+            GUIStyle boxStyle = GUIStyle.none;
 #if IL2CPP
             GUILayout.BeginVertical(boxStyle, (Il2CppReferenceArray<GUILayoutOption>)options);
 #else
