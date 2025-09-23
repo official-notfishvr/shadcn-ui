@@ -128,7 +128,7 @@ namespace shadcnui.GUIComponents
 #endif
 
             GUI.color = originalColor;
-            layoutComponents.AddSpace(guiHelper.controlSpacing);
+            layoutComponents.AddSpace(10f);
 
             if (newValue != value && !disabled && onChange != null)
             {
@@ -181,7 +181,7 @@ namespace shadcnui.GUIComponents
 #endif
 
             GUI.color = originalColor;
-            layoutComponents.AddSpace(guiHelper.controlSpacing);
+            layoutComponents.AddSpace(10f);
 
             if (newValue != value && !disabled && onChange != null)
             {
@@ -194,13 +194,13 @@ namespace shadcnui.GUIComponents
         public void DrawSectionHeader(string title)
         {
             var styleManager = guiHelper.GetStyleManager();
-            layoutComponents.AddSpace(guiHelper.controlSpacing * 0.5f);
+            layoutComponents.AddSpace(10f * 0.5f);
 #if IL2CPP
             GUILayout.Label(title, styleManager?.sectionHeaderStyle ?? GUI.skin.label, new Il2CppReferenceArray<GUILayoutOption>(0));
 #else
             GUILayout.Label(title, styleManager?.sectionHeaderStyle ?? GUI.skin.label);
 #endif
-            layoutComponents.AddSpace(guiHelper.borderEffectsEnabled ? 2f : 1f);
+            layoutComponents.AddSpace(2f);
         }
 
         public void RenderLabel(string text, int width = -1)

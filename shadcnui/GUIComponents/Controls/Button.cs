@@ -21,7 +21,7 @@ namespace shadcnui.GUIComponents
             layoutComponents = new Layout(helper);
         }
 
-        public bool DrawButton(string text, ButtonVariant variant = ButtonVariant.Default, ButtonSize size = ButtonSize.Default, Action onClick = null, bool disabled = false, params GUILayoutOption[] options)
+        public bool DrawButton(string text, ButtonVariant variant = ButtonVariant.Default, ButtonSize size = ButtonSize.Default, Action onClick = null, bool disabled = false, float opacity = 1f, params GUILayoutOption[] options)
         {
             var styleManager = guiHelper.GetStyleManager();
             GUIStyle buttonStyle = styleManager.GetButtonStyle(variant, size);
@@ -41,13 +41,16 @@ namespace shadcnui.GUIComponents
             if (disabled)
                 GUI.enabled = false;
 
+            Color originalColor = GUI.color;
+            GUI.color = new Color(originalColor.r, originalColor.g, originalColor.b, originalColor.a * opacity);
+
             bool clicked;
 #if IL2CPP
             clicked = GUILayout.Button(text ?? "Button", buttonStyle, (Il2CppReferenceArray<GUILayoutOption>)layoutOptions.ToArray());
 #else
             clicked = GUILayout.Button(text ?? "Button", buttonStyle, layoutOptions.ToArray());
 #endif
-
+            GUI.color = originalColor;
             GUI.enabled = wasEnabled;
 
             if (clicked && !disabled && onClick != null)
@@ -56,7 +59,7 @@ namespace shadcnui.GUIComponents
             return clicked && !disabled;
         }
 
-        public bool DrawButton(Rect rect, string text, ButtonVariant variant = ButtonVariant.Default, ButtonSize size = ButtonSize.Default, Action onClick = null, bool disabled = false)
+        public bool DrawButton(Rect rect, string text, ButtonVariant variant = ButtonVariant.Default, ButtonSize size = ButtonSize.Default, Action onClick = null, bool disabled = false, float opacity = 1f)
         {
             var styleManager = guiHelper.GetStyleManager();
             GUIStyle buttonStyle = styleManager.GetButtonStyle(variant, size);
@@ -67,8 +70,12 @@ namespace shadcnui.GUIComponents
             if (disabled)
                 GUI.enabled = false;
 
+            Color originalColor = GUI.color;
+            GUI.color = new Color(originalColor.r, originalColor.g, originalColor.b, originalColor.a * opacity);
+
             bool clicked = GUI.Button(scaledRect, text ?? "Button", buttonStyle);
 
+            GUI.color = originalColor;
             GUI.enabled = wasEnabled;
 
             if (clicked && !disabled && onClick != null)
@@ -119,7 +126,7 @@ namespace shadcnui.GUIComponents
                     for (int i = 0; i < buttons.Length; i++)
                     {
                         var config = buttons[i];
-                        DrawButton(config.Text, config.Variant, config.Size, config.OnClick, config.Disabled, config.Options);
+                        DrawButton(config.Text, config.Variant, config.Size, config.OnClick, config.Disabled, 1f, config.Options); // Added 1f for opacity
 
                         if (i < buttons.Length - 1)
                         {

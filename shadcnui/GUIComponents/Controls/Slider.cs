@@ -30,7 +30,7 @@ namespace shadcnui.GUIComponents
             GUILayout.Label(label + ": " + value.ToString("F2"), styleManager.glowLabelStyle);
             value = GUILayout.HorizontalSlider(value, minValue, maxValue);
 #endif
-            layoutComponents.AddSpace(guiHelper.controlSpacing);
+            layoutComponents.AddSpace(10f);
         }
 
         public void DrawIntSlider(float windowWidth, string label, ref int value, int minValue, int maxValue)
@@ -43,7 +43,7 @@ namespace shadcnui.GUIComponents
             GUILayout.Label(label + ": " + value.ToString(), styleManager.glowLabelStyle);
             value = (int)GUILayout.HorizontalSlider(value, minValue, maxValue);
 #endif
-            layoutComponents.AddSpace(guiHelper.controlSpacing);
+            layoutComponents.AddSpace(10f);
         }
     }
 }

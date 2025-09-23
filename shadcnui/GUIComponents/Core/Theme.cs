@@ -12,6 +12,7 @@ namespace shadcnui.GUIComponents
         public Color AccentColor { get; set; }
         public Color BackgroundColor { get; set; }
         public Color TextColor { get; set; }
+        public Color MutedColor { get; set; }
 
         // Button
         public Color ButtonPrimaryBg { get; set; }
@@ -105,6 +106,7 @@ namespace shadcnui.GUIComponents
             AccentColor = new Color(0.5f, 0.8f, 1f),
             BackgroundColor = new Color(0.02f, 0.02f, 0.04f),
             TextColor = new Color(0.98f, 0.98f, 0.98f),
+            MutedColor = new Color(0.6f, 0.6f, 0.7f),
 
             ButtonPrimaryBg = new Color(0.09f, 0.09f, 0.11f),
             ButtonPrimaryFg = new Color(0.98f, 0.98f, 0.98f),
@@ -186,6 +188,7 @@ namespace shadcnui.GUIComponents
             AccentColor = new Color(0.2f, 0.5f, 1f),
             BackgroundColor = new Color(1f, 1f, 1f),
             TextColor = new Color(0.02f, 0.02f, 0.02f),
+            MutedColor = new Color(0.4f, 0.4f, 0.4f),
 
             ButtonPrimaryBg = new Color(0.9f, 0.9f, 0.9f),
             ButtonPrimaryFg = new Color(0.02f, 0.02f, 0.02f),

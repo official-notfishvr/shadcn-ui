@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using shadcnui.GUIComponents;
 using UnityEngine;
 #if IL2CPP
@@ -9,37 +10,19 @@ namespace shadcnui
 {
     public class GUIHelper
     {
-        #region Public Fields for Compatibility
-        public string inputText = "default";
-        public string r = "255";
-        public string g = "128";
-        public string b = "0";
-        public float rSlider = 255f;
-        public float gSlider = 128f;
-        public float bSlider = 0f;
-        #endregion
-
         #region Internal Settings
-        internal bool animationsEnabled = true;
+        internal bool animationsEnabled = false;
         internal float animationSpeed = 12f;
         internal bool glowEffectsEnabled = true;
-        internal bool particleEffectsEnabled = true;
+        internal bool particleEffectsEnabled = false;
         internal float backgroundAlpha = 0.9f;
         internal int fontSize = 12;
         internal int cornerRadius = 14;
-        internal bool shadowEffectsEnabled = false;
         internal bool hoverEffectsEnabled = true;
         internal bool fadeTransitionsEnabled = true;
-        internal Color primaryColor = new Color(0.2f, 0.3f, 0.6f);
-        internal Color secondaryColor = new Color(0.3f, 0.2f, 0.4f);
-        internal Color accentColor = new Color(0.5f, 0.8f, 1f);
-        internal float controlSpacing = 10f;
-        internal float buttonHeight = 30f;
-        internal bool borderEffectsEnabled = false;
         internal float glowIntensity = 16.5f;
         internal bool smoothAnimationsEnabled = true;
         public float uiScale = 1f;
-        internal bool debugModeEnabled = false;
         #endregion
 
         #region Animation State
@@ -87,6 +70,8 @@ namespace shadcnui
         /// Get the style manager for advanced styling operations
         /// </summary>
         public StyleManager GetStyleManager() => styleManager;
+
+        public Calendar GetCalendarComponents() => calendarComponents;
 
         #endregion
 
@@ -152,6 +137,17 @@ namespace shadcnui
         {
             try
             {
+                if (!animationsEnabled)
+                {
+                    menuAlpha = 1f;
+                    menuScale = uiScale;
+                    titleGlow = 1f;
+                    backgroundPulse = backgroundAlpha;
+                    hoveredButton = -1;
+                    focusedField = -1;
+                    particleTime = 0f;
+                    return;
+                }
                 animationManager?.UpdateAnimations(isOpen, ref menuAlpha, ref menuScale, ref titleGlow, ref backgroundPulse, ref hoveredButton, buttonGlowEffects, inputFieldGlow, ref focusedField, ref particleTime, ref mousePos);
             }
             catch (Exception ex)
@@ -310,11 +306,11 @@ namespace shadcnui
             }
         }
 
-        public bool DrawButton(float windowWidth, string text, Action onClick)
+        public bool DrawButton(float windowWidth, string text, Action onClick, float opacity = 1f)
         {
             try
             {
-                return buttonComponents?.DrawButton(text, ButtonVariant.Default, ButtonSize.Default, onClick, false, GUILayout.Width(windowWidth)) ?? false;
+                return buttonComponents?.DrawButton(text, ButtonVariant.Default, ButtonSize.Default, onClick, false, opacity, new GUILayoutOption[] { GUILayout.Width(windowWidth) }) ?? false;
             }
             catch (Exception ex)
             {
@@ -364,11 +360,11 @@ namespace shadcnui
             }
         }
 
-        public bool DrawFixedButton(string text, float width, float height, Action onClick = null)
+        public bool DrawFixedButton(string text, float width, float height, Action onClick = null, float opacity = 1f)
         {
             try
             {
-                return buttonComponents?.DrawButton(text, ButtonVariant.Default, ButtonSize.Default, onClick, false, GUILayout.Width(width), GUILayout.Height(height)) ?? false;
+                return buttonComponents?.DrawButton(text, ButtonVariant.Default, ButtonSize.Default, onClick, false, opacity, new GUILayoutOption[] { GUILayout.Width(width), GUILayout.Height(height) }) ?? false;
             }
             catch (Exception ex)
             {
@@ -377,11 +373,11 @@ namespace shadcnui
             }
         }
 
-        public bool Button(string text, ButtonVariant variant = ButtonVariant.Default, ButtonSize size = ButtonSize.Default, Action onClick = null, bool disabled = false, params GUILayoutOption[] options)
+        public bool Button(string text, ButtonVariant variant = ButtonVariant.Default, ButtonSize size = ButtonSize.Default, Action onClick = null, bool disabled = false, float opacity = 1f, params GUILayoutOption[] options)
         {
             try
             {
-                return buttonComponents?.DrawButton(text, variant, size, onClick, disabled, options) ?? false;
+                return buttonComponents?.DrawButton(text, variant, size, onClick, disabled, opacity, options ?? new GUILayoutOption[0]) ?? false;
             }
             catch (Exception ex)
             {
@@ -390,11 +386,11 @@ namespace shadcnui
             }
         }
 
-        public bool Button(Rect rect, string text, ButtonVariant variant = ButtonVariant.Default, ButtonSize size = ButtonSize.Default, Action onClick = null, bool disabled = false)
+        public bool Button(Rect rect, string text, ButtonVariant variant = ButtonVariant.Default, ButtonSize size = ButtonSize.Default, Action onClick = null, bool disabled = false, float opacity = 1f)
         {
             try
             {
-                return buttonComponents?.DrawButton(rect, text, variant, size, onClick, disabled) ?? false;
+                return buttonComponents?.DrawButton(rect, text, variant, size, onClick, disabled, opacity) ?? false;
             }
             catch (Exception ex)
             {
@@ -403,44 +399,44 @@ namespace shadcnui
             }
         }
 
-        public bool DestructiveButton(string text, Action onClick, ButtonSize size = ButtonSize.Default, params GUILayoutOption[] options)
+        public bool DestructiveButton(string text, Action onClick, ButtonSize size = ButtonSize.Default, float opacity = 1f, params GUILayoutOption[] options)
         {
-            return Button(text, ButtonVariant.Destructive, size, onClick, false, options);
+            return Button(text, ButtonVariant.Destructive, size, onClick, false, opacity, options);
         }
 
-        public bool OutlineButton(string text, Action onClick, ButtonSize size = ButtonSize.Default, params GUILayoutOption[] options)
+        public bool OutlineButton(string text, Action onClick, ButtonSize size = ButtonSize.Default, float opacity = 1f, params GUILayoutOption[] options)
         {
-            return Button(text, ButtonVariant.Outline, size, onClick, false, options);
+            return Button(text, ButtonVariant.Outline, size, onClick, false, opacity, options);
         }
 
-        public bool SecondaryButton(string text, Action onClick, ButtonSize size = ButtonSize.Default, params GUILayoutOption[] options)
+        public bool SecondaryButton(string text, Action onClick, ButtonSize size = ButtonSize.Default, float opacity = 1f, params GUILayoutOption[] options)
         {
-            return Button(text, ButtonVariant.Secondary, size, onClick, false, options);
+            return Button(text, ButtonVariant.Secondary, size, onClick, false, opacity, options);
         }
 
-        public bool GhostButton(string text, Action onClick, ButtonSize size = ButtonSize.Default, params GUILayoutOption[] options)
+        public bool GhostButton(string text, Action onClick, ButtonSize size = ButtonSize.Default, float opacity = 1f, params GUILayoutOption[] options)
         {
-            return Button(text, ButtonVariant.Ghost, size, onClick, false, options);
+            return Button(text, ButtonVariant.Ghost, size, onClick, false, opacity, options);
         }
 
-        public bool LinkButton(string text, Action onClick, ButtonSize size = ButtonSize.Default, params GUILayoutOption[] options)
+        public bool LinkButton(string text, Action onClick, ButtonSize size = ButtonSize.Default, float opacity = 1f, params GUILayoutOption[] options)
         {
-            return Button(text, ButtonVariant.Link, size, onClick, false, options);
+            return Button(text, ButtonVariant.Link, size, onClick, false, opacity, options);
         }
 
-        public bool SmallButton(string text, Action onClick, ButtonVariant variant = ButtonVariant.Default, params GUILayoutOption[] options)
+        public bool SmallButton(string text, Action onClick, ButtonVariant variant = ButtonVariant.Default, float opacity = 1f, params GUILayoutOption[] options)
         {
-            return Button(text, variant, ButtonSize.Small, onClick, false, options);
+            return Button(text, variant, ButtonSize.Small, onClick, false, opacity, options);
         }
 
-        public bool LargeButton(string text, Action onClick, ButtonVariant variant = ButtonVariant.Default, params GUILayoutOption[] options)
+        public bool LargeButton(string text, Action onClick, ButtonVariant variant = ButtonVariant.Default, float opacity = 1f, params GUILayoutOption[] options)
         {
-            return Button(text, variant, ButtonSize.Large, onClick, false, options);
+            return Button(text, variant, ButtonSize.Large, onClick, false, opacity, options);
         }
 
-        public bool IconButton(string text, Action onClick, ButtonVariant variant = ButtonVariant.Default, params GUILayoutOption[] options)
+        public bool IconButton(string text, Action onClick, ButtonVariant variant = ButtonVariant.Default, float opacity = 1f, params GUILayoutOption[] options)
         {
-            return Button(text, variant, ButtonSize.Icon, onClick, false, options);
+            return Button(text, variant, ButtonSize.Icon, onClick, false, opacity, options);
         }
 
         public void ButtonGroup(Action drawButtons, bool horizontal = true, float spacing = 5f)
@@ -487,9 +483,9 @@ namespace shadcnui
                         break;
                     default:
 #if IL2CPP
-                        options = (Il2CppReferenceArray<GUILayoutOption>)new GUILayoutOption[] { GUILayout.Height(buttonHeight * uiScale) };
+                        options = (Il2CppReferenceArray<GUILayoutOption>)new GUILayoutOption[] { GUILayout.Height(30 * uiScale) };
 #else
-                        options = new GUILayoutOption[] { GUILayout.Height(buttonHeight * uiScale) };
+                        options = new GUILayoutOption[] { GUILayout.Height(30 * uiScale) };
 #endif
                         break;
                 }
@@ -944,7 +940,7 @@ namespace shadcnui
         {
             try
             {
-                return tabsComponents?.DrawTabs(tabNames, selectedIndex, onTabChange, maxLines, options) ?? selectedIndex;
+                return tabsComponents?.DrawTabButtons(tabNames, selectedIndex, onTabChange, maxLines, options) ?? selectedIndex;
             }
             catch (Exception ex)
             {
@@ -1986,11 +1982,11 @@ namespace shadcnui
         #endregion
 
         #region DropdownMenu Components
-        public void DropdownMenu(string[] items, Action<int> onItemSelected)
+        public void DropdownMenu()
         {
             try
             {
-                dropdownMenuComponents?.DrawDropdownMenu(items, onItemSelected);
+                dropdownMenuComponents?.DrawDropdownMenu();
             }
             catch (Exception ex)
             {
@@ -1998,9 +1994,9 @@ namespace shadcnui
             }
         }
 
-        public void OpenDropdownMenu()
+        public void OpenDropdownMenu(List<DropdownMenuItem> items)
         {
-            dropdownMenuComponents?.Open();
+            dropdownMenuComponents?.Open(items);
         }
 
         public void CloseDropdownMenu()

@@ -19,7 +19,7 @@ namespace shadcnui.GUIComponents
             layoutComponents = new Layout(helper);
         }
 
-        public int DrawTabs(string[] tabNames, int selectedIndex, Action<int> onTabChange = null, int maxLines = 1, params GUILayoutOption[] options)
+        public int DrawTabButtons(string[] tabNames, int selectedIndex, Action<int> onTabChange = null, int maxLines = 1, params GUILayoutOption[] options)
         {
             if (tabNames == null || tabNames.Length == 0)
                 return selectedIndex;
@@ -50,7 +50,6 @@ namespace shadcnui.GUIComponents
 #else
                     bool clicked = GUILayout.Button(tabNames[i] ?? $"Tab {i + 1}", triggerStyle, tabOptions.ToArray());
 #endif
-
                     if (clicked && i != selectedIndex)
                     {
                         newSelectedIndex = i;
@@ -66,6 +65,11 @@ namespace shadcnui.GUIComponents
             }
 
             return newSelectedIndex;
+        }
+
+        public int DrawTabs(string[] tabNames, int selectedIndex, Action<int> onTabChange = null, int maxLines = 1, params GUILayoutOption[] options)
+        {
+            return DrawTabButtons(tabNames, selectedIndex, onTabChange, maxLines, options);
         }
 
         public void BeginTabContent()
@@ -90,7 +94,7 @@ namespace shadcnui.GUIComponents
                 tabNames[i] = tabConfigs[i].Name;
             }
 
-            int newSelectedIndex = DrawTabs(tabNames, selectedIndex, onTabChange);
+            int newSelectedIndex = DrawTabButtons(tabNames, selectedIndex, onTabChange);
 
             if (newSelectedIndex >= 0 && newSelectedIndex < tabConfigs.Length)
             {
