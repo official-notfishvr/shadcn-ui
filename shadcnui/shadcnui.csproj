@@ -428,10 +428,13 @@
         <Compile Include="GUIComponents\Core\Theme.cs" />
         <Compile Include="GUIComponents\Core\ThemeManager.cs" />
         <Compile Include="GUIComponents\Data\Calendar.cs" />
+        <Compile Include="GUIComponents\Data\DataTable.cs" />
         <Compile Include="GUIComponents\Data\TextArea.cs" />
+        <Compile Include="GUIComponents\Data\DatePicker.cs" />
         <Compile Include="GUIComponents\Display\Alert.cs" />
         <Compile Include="GUIComponents\Display\Avatar.cs" />
         <Compile Include="GUIComponents\Display\Badge.cs" />
+        <Compile Include="GUIComponents\Display\Dialog.cs" />
         <Compile Include="GUIComponents\Display\Label.cs" />
         <Compile Include="GUIComponents\Display\Popover.cs" />
         <Compile Include="GUIComponents\Display\Progress.cs" />

@@ -98,6 +98,17 @@ public class UI : MonoBehaviour
     private DateTime? calendarRangeEnd;
     private System.Collections.Generic.List<DateTime> calendarDisabledDates = new System.Collections.Generic.List<DateTime>();
 
+    // Dialog state
+    private bool dialogOpen = false;
+
+    // DatePicker state
+    private DateTime? selectedDate;
+    private DateTime? selectedDateWithLabel;
+
+    // DataTable state
+    private System.Collections.Generic.List<DataTableColumn> dataTableColumns;
+    private System.Collections.Generic.List<DataTableRow> dataTableData;
+
     private bool fontInitialized = false;
 
     void Start()
@@ -119,6 +130,9 @@ public class UI : MonoBehaviour
             new Tabs.TabConfig("Button", DrawButtonDemos),
             new Tabs.TabConfig("Card", DrawCardDemos),
             new Tabs.TabConfig("Checkbox", DrawCheckboxDemos),
+            new Tabs.TabConfig("DataTable", DrawDataTableDemos),
+            new Tabs.TabConfig("DatePicker", DrawDatePickerDemos),
+            new Tabs.TabConfig("Dialog", DrawDialogDemos),
             new Tabs.TabConfig("Input", DrawInputDemos),
             new Tabs.TabConfig("Label", DrawLabelDemos),
             new Tabs.TabConfig("Layout", DrawLayoutDemos),
@@ -337,19 +351,6 @@ public class UI : MonoBehaviour
         guiHelper.Label("Success Alert with Icon", LabelVariant.Default);
         guiHelper.Alert("Success", "Your profile has been updated successfully.", AlertVariant.Default, AlertType.Success, null);
         guiHelper.Label("Code: guiHelper.Alert(title, description, variant, type, iconTexture);", LabelVariant.Muted);
-        guiHelper.HorizontalSeparator();
-
-        guiHelper.Label("Alert with Actions", LabelVariant.Default);
-        guiHelper.AlertWithActions(
-            "Confirm Action",
-            "Are you sure you want to delete this item?",
-            new string[] { "Cancel", "Delete" },
-            (index) =>
-            {
-                Debug.Log($"Action button {index} clicked!");
-            }
-        );
-        guiHelper.Label("Code: guiHelper.AlertWithActions(title, description, buttonTexts, onButtonClick);", LabelVariant.Muted);
         guiHelper.HorizontalSeparator();
 
         guiHelper.Label("Custom Alert", LabelVariant.Default);
@@ -787,33 +788,153 @@ public class UI : MonoBehaviour
     {
         guiHelper.BeginVerticalGroup(GUILayout.ExpandWidth(true), GUILayout.ExpandHeight(true));
         guiHelper.Label("Card", LabelVariant.Default);
-        guiHelper.MutedLabel("A flexible content container.");
+        guiHelper.MutedLabel("A flexible content container with header, content, and footer sections.");
         guiHelper.HorizontalSeparator();
 
-        guiHelper.Label("Default Card", LabelVariant.Default);
-        guiHelper.DrawCard("Create project", "Deploy your new project in one-click.", "This is the main content of the card where you can put any controls.", () => guiHelper.Button("Deploy"));
-        guiHelper.Label("Code: guiHelper.DrawCard(title, description, content, footerAction);", LabelVariant.Muted);
+        guiHelper.Label("Project Card", LabelVariant.Default);
+        guiHelper.DrawCard(
+            "Create New Project",
+            "Deploy your new project in one-click with our streamlined deployment process.",
+            "Choose from our pre-configured templates or start from scratch. All projects include automatic CI/CD, monitoring, and scaling capabilities.",
+            () =>
+            {
+                guiHelper.BeginHorizontalGroup();
+                if (guiHelper.Button("Cancel", ButtonVariant.Outline))
+                {
+                    Debug.Log("Project creation cancelled");
+                }
+                GUILayout.Space(8);
+                if (guiHelper.Button("Deploy Now", ButtonVariant.Default))
+                {
+                    Debug.Log("Project deployed!");
+                }
+                guiHelper.EndHorizontalGroup();
+            },
+            400,
+            180
+        );
+        guiHelper.Label("Code: guiHelper.DrawCard(title, description, content, footerAction, width, height);", LabelVariant.Muted);
         guiHelper.HorizontalSeparator();
 
-        guiHelper.Label("Simple Card", LabelVariant.Default);
-        guiHelper.DrawSimpleCard("This is a simple card with just content.", 300, 100);
-        guiHelper.Label("Code: guiHelper.DrawSimpleCard(content, width, height);", LabelVariant.Muted);
-        guiHelper.HorizontalSeparator();
-
-        guiHelper.Label("Card with Sections", LabelVariant.Default);
-        guiHelper.BeginCard(300, 200);
-        guiHelper.BeginCardHeader();
-        guiHelper.DrawCardTitle("Card Title");
-        guiHelper.DrawCardDescription("Card Description");
-        guiHelper.EndCardHeader();
-        guiHelper.BeginCardContent();
-        guiHelper.Label("Content goes here.");
-        guiHelper.EndCardContent();
-        guiHelper.BeginCardFooter();
-        guiHelper.Button("Action");
-        guiHelper.EndCardFooter();
+        guiHelper.Label("User Profile Card", LabelVariant.Default);
+        guiHelper.BeginCard(350, 220);
+        guiHelper.CardHeader(() =>
+        {
+            guiHelper.BeginHorizontalGroup();
+            guiHelper.Avatar(null, "JD", AvatarSize.Default);
+            GUILayout.Space(12);
+            guiHelper.BeginVerticalGroup();
+            guiHelper.CardTitle("John Doe");
+            guiHelper.CardDescription("Senior Developer");
+            guiHelper.Badge("Pro", BadgeVariant.Default, BadgeSize.Small);
+            guiHelper.EndVerticalGroup();
+            guiHelper.EndHorizontalGroup();
+        });
+        guiHelper.CardContent(() =>
+        {
+            guiHelper.Label("📧 john.doe@company.com");
+            guiHelper.Label("📍 San Francisco, CA");
+            guiHelper.Label("🏢 Tech Solutions Inc.");
+            GUILayout.Space(8);
+            guiHelper.Label("Experienced full-stack developer with expertise in Unity, C#, and web technologies.");
+        });
+        guiHelper.CardFooter(() =>
+        {
+            guiHelper.BeginHorizontalGroup();
+            if (guiHelper.Button("Message", ButtonVariant.Outline, ButtonSize.Small))
+            {
+                Debug.Log("Send message to John");
+            }
+            GUILayout.Space(8);
+            if (guiHelper.Button("View Profile", ButtonVariant.Default, ButtonSize.Small))
+            {
+                Debug.Log("View John's profile");
+            }
+            guiHelper.EndHorizontalGroup();
+        });
         guiHelper.EndCard();
-        guiHelper.Label("Code: guiHelper.BeginCard(); ... guiHelper.EndCard(); with sections.", LabelVariant.Muted);
+        guiHelper.Label("Code: guiHelper.BeginCard(); guiHelper.CardHeader/Content/Footer(() => {}); guiHelper.EndCard();", LabelVariant.Muted);
+        guiHelper.HorizontalSeparator();
+
+        guiHelper.Label("Statistics Cards", LabelVariant.Default);
+        guiHelper.BeginHorizontalGroup();
+
+        guiHelper.BeginCard(180, 120);
+        guiHelper.CardContent(() =>
+        {
+            guiHelper.Label("Total Revenue", LabelVariant.Muted);
+            guiHelper.Label("$45,231.89", LabelVariant.Default);
+            guiHelper.BeginHorizontalGroup();
+            guiHelper.Label("+20.1%", LabelVariant.Default);
+            guiHelper.Label("from last month", LabelVariant.Muted);
+            guiHelper.EndHorizontalGroup();
+        });
+        guiHelper.EndCard();
+
+        GUILayout.Space(12);
+
+        guiHelper.BeginCard(180, 120);
+        guiHelper.CardContent(() =>
+        {
+            guiHelper.Label("Active Users", LabelVariant.Muted);
+            guiHelper.Label("2,350", LabelVariant.Default);
+            guiHelper.BeginHorizontalGroup();
+            guiHelper.Label("+180.1%", LabelVariant.Default);
+            guiHelper.Label("from last month", LabelVariant.Muted);
+            guiHelper.EndHorizontalGroup();
+        });
+        guiHelper.EndCard();
+
+        GUILayout.Space(12);
+
+        guiHelper.BeginCard(180, 120);
+        guiHelper.CardContent(() =>
+        {
+            guiHelper.Label("Sales", LabelVariant.Muted);
+            guiHelper.Label("+12,234", LabelVariant.Default);
+            guiHelper.BeginHorizontalGroup();
+            guiHelper.Label("+19%", LabelVariant.Default);
+            guiHelper.Label("from last month", LabelVariant.Muted);
+            guiHelper.EndHorizontalGroup();
+        });
+        guiHelper.EndCard();
+
+        guiHelper.EndHorizontalGroup();
+        guiHelper.Label("Code: Multiple cards in horizontal layout for dashboard statistics", LabelVariant.Muted);
+        guiHelper.HorizontalSeparator();
+
+        guiHelper.Label("Notification Card", LabelVariant.Default);
+        guiHelper.BeginCard(400, 140);
+        guiHelper.CardHeader(() =>
+        {
+            guiHelper.BeginHorizontalGroup();
+            guiHelper.CardTitle("🔔 New Notification");
+            GUILayout.FlexibleSpace();
+            guiHelper.Badge("New", BadgeVariant.Destructive, BadgeSize.Small);
+            guiHelper.EndHorizontalGroup();
+        });
+        guiHelper.CardContent(() =>
+        {
+            guiHelper.Label("You have 3 new messages and 2 friend requests waiting for your attention.");
+        });
+        guiHelper.CardFooter(() =>
+        {
+            guiHelper.BeginHorizontalGroup();
+            guiHelper.Label("2 minutes ago", LabelVariant.Muted);
+            GUILayout.FlexibleSpace();
+            if (guiHelper.Button("Mark as Read", ButtonVariant.Ghost, ButtonSize.Small))
+            {
+                Debug.Log("Notification marked as read");
+            }
+            guiHelper.EndHorizontalGroup();
+        });
+        guiHelper.EndCard();
+        guiHelper.Label("Code: Card with notification styling and timestamp", LabelVariant.Muted);
+        guiHelper.HorizontalSeparator();
+
+        guiHelper.Label("Simple Content Card", LabelVariant.Default);
+        guiHelper.DrawSimpleCard("This is a simple card with just content. Perfect for displaying basic information without headers or footers. You can use it for quick notes, simple displays, or as a container for other UI elements.", 400, 80);
+        guiHelper.Label("Code: guiHelper.DrawSimpleCard(content, width, height);", LabelVariant.Muted);
         guiHelper.HorizontalSeparator();
 
         GUILayout.EndVertical();
@@ -1252,6 +1373,259 @@ public class UI : MonoBehaviour
         multiToggleGroupValues = guiHelper.MultiToggleGroup(new string[] { "Red", "Green", "Blue" }, multiToggleGroupValues);
         guiHelper.Label($"Multi Toggle Group Values: {string.Join(", ", multiToggleGroupValues)}");
         guiHelper.Label("Code: guiHelper.MultiToggleGroup(labels, values);", LabelVariant.Muted);
+        guiHelper.HorizontalSeparator();
+
+        GUILayout.EndVertical();
+    }
+
+    void DrawDialogDemos()
+    {
+        guiHelper.BeginVerticalGroup(GUILayout.ExpandWidth(true), GUILayout.ExpandHeight(true));
+        guiHelper.Label("Dialog", LabelVariant.Default);
+        guiHelper.MutedLabel("A modal dialog component for displaying content over the main interface.");
+        guiHelper.HorizontalSeparator();
+
+        guiHelper.Label("Basic Dialog", LabelVariant.Default);
+        if (guiHelper.Button("Open Dialog"))
+        {
+            guiHelper.OpenDialog("basic-dialog");
+        }
+
+        guiHelper.DrawDialog(
+            "basic-dialog",
+            "Dialog Title",
+            "This is a basic dialog with a title and description.",
+            () =>
+            {
+                guiHelper.Label("This is the dialog content area.");
+                guiHelper.Label("You can put any content here.");
+            },
+            () =>
+            {
+                if (guiHelper.Button("Cancel", ButtonVariant.Outline))
+                {
+                    guiHelper.CloseDialog();
+                }
+                if (guiHelper.Button("Confirm"))
+                {
+                    guiHelper.CloseDialog();
+                    Debug.Log("Dialog confirmed!");
+                }
+            }
+        );
+
+        guiHelper.Label("Code: guiHelper.OpenDialog(id); guiHelper.DrawDialog(id, title, description, content, footer);", LabelVariant.Muted);
+        guiHelper.HorizontalSeparator();
+
+        guiHelper.Label("Simple Dialog", LabelVariant.Default);
+        if (guiHelper.Button("Open Simple Dialog"))
+        {
+            guiHelper.OpenDialog("simple-dialog");
+        }
+
+        guiHelper.DrawDialog(
+            "simple-dialog",
+            () =>
+            {
+                guiHelper.Label("Simple Dialog Content");
+                guiHelper.Label("This dialog has no title or footer.");
+                guiHelper.HorizontalSeparator();
+                if (guiHelper.Button("Close"))
+                {
+                    guiHelper.CloseDialog();
+                }
+            }
+        );
+
+        guiHelper.Label("Code: guiHelper.DrawDialog(id, content);", LabelVariant.Muted);
+        guiHelper.HorizontalSeparator();
+
+        guiHelper.Label("Dialog Status", LabelVariant.Default);
+        guiHelper.Label($"Dialog Open: {guiHelper.IsDialogOpen()}");
+        if (guiHelper.IsDialogOpen())
+        {
+            if (guiHelper.Button("Force Close Dialog"))
+            {
+                guiHelper.CloseDialog();
+            }
+        }
+        guiHelper.Label("Code: guiHelper.IsDialogOpen(); guiHelper.CloseDialog();", LabelVariant.Muted);
+        guiHelper.HorizontalSeparator();
+
+        GUILayout.EndVertical();
+    }
+
+    void DrawDatePickerDemos()
+    {
+        guiHelper.BeginVerticalGroup(GUILayout.ExpandWidth(true), GUILayout.ExpandHeight(true));
+        guiHelper.Label("Date Picker", LabelVariant.Default);
+        guiHelper.MutedLabel("A date picker component for selecting dates with a calendar interface.");
+        guiHelper.HorizontalSeparator();
+
+        guiHelper.Label("Basic Date Picker", LabelVariant.Default);
+        selectedDate = guiHelper.DatePicker("Select a date", selectedDate, "basic-datepicker", GUILayout.Width(200));
+        guiHelper.Label($"Selected Date: {(selectedDate.HasValue ? selectedDate.Value.ToString("MMM dd, yyyy") : "None")}");
+        guiHelper.Label("Code: selectedDate = guiHelper.DatePicker(placeholder, selectedDate, id);", LabelVariant.Muted);
+        guiHelper.HorizontalSeparator();
+
+        guiHelper.Label("Date Picker with Label", LabelVariant.Default);
+        selectedDateWithLabel = guiHelper.DatePickerWithLabel("Birth Date", "Pick your birth date", selectedDateWithLabel, "labeled-datepicker", GUILayout.Width(200));
+        guiHelper.Label($"Birth Date: {(selectedDateWithLabel.HasValue ? selectedDateWithLabel.Value.ToString("MMM dd, yyyy") : "None")}");
+        guiHelper.Label("Code: selectedDate = guiHelper.DatePickerWithLabel(label, placeholder, selectedDate, id);", LabelVariant.Muted);
+        guiHelper.HorizontalSeparator();
+
+        guiHelper.Label("Date Picker Controls", LabelVariant.Default);
+        guiHelper.BeginHorizontalGroup();
+        if (guiHelper.Button("Set Today"))
+        {
+            selectedDate = DateTime.Today;
+        }
+        if (guiHelper.Button("Clear Date"))
+        {
+            selectedDate = null;
+        }
+        if (guiHelper.Button("Close Picker"))
+        {
+            guiHelper.CloseDatePicker("basic-datepicker");
+        }
+        guiHelper.EndHorizontalGroup();
+        guiHelper.Label("Code: guiHelper.CloseDatePicker(id);", LabelVariant.Muted);
+        guiHelper.HorizontalSeparator();
+
+        guiHelper.Label("Date Picker Status", LabelVariant.Default);
+        guiHelper.Label($"Basic Picker Open: {guiHelper.IsDatePickerOpen("basic-datepicker")}");
+        guiHelper.Label($"Labeled Picker Open: {guiHelper.IsDatePickerOpen("labeled-datepicker")}");
+        guiHelper.Label("Code: guiHelper.IsDatePickerOpen(id);", LabelVariant.Muted);
+        guiHelper.HorizontalSeparator();
+
+        GUILayout.EndVertical();
+    }
+
+    void DrawDataTableDemos()
+    {
+        guiHelper.BeginVerticalGroup(GUILayout.ExpandWidth(true), GUILayout.ExpandHeight(true));
+        guiHelper.Label("Data Table", LabelVariant.Default);
+        guiHelper.MutedLabel("A powerful data table component with sorting, filtering, and pagination.");
+        guiHelper.HorizontalSeparator();
+
+        if (dataTableColumns == null)
+        {
+            dataTableColumns = new System.Collections.Generic.List<DataTableColumn>();
+
+            var idColumn = guiHelper.CreateDataTableColumn("id", "ID");
+            idColumn.Width = 60;
+            dataTableColumns.Add(idColumn);
+
+            var nameColumn = guiHelper.CreateDataTableColumn("name", "Name");
+            nameColumn.Width = 150;
+            dataTableColumns.Add(nameColumn);
+
+            var emailColumn = guiHelper.CreateDataTableColumn("email", "Email");
+            emailColumn.Width = 200;
+            dataTableColumns.Add(emailColumn);
+
+            var statusColumn = guiHelper.CreateDataTableColumn("status", "Status");
+            statusColumn.Width = 100;
+            dataTableColumns.Add(statusColumn);
+
+            dataTableData = new System.Collections.Generic.List<DataTableRow>();
+
+            var row1 = guiHelper.CreateDataTableRow("1");
+            row1.SetData("id", "1");
+            row1.SetData("name", "John Doe");
+            row1.SetData("email", "john@example.com");
+            row1.SetData("status", "Active");
+            dataTableData.Add(row1);
+
+            var row2 = guiHelper.CreateDataTableRow("2");
+            row2.SetData("id", "2");
+            row2.SetData("name", "Jane Smith");
+            row2.SetData("email", "jane@example.com");
+            row2.SetData("status", "Active");
+            dataTableData.Add(row2);
+
+            var row3 = guiHelper.CreateDataTableRow("3");
+            row3.SetData("id", "3");
+            row3.SetData("name", "Bob Johnson");
+            row3.SetData("email", "bob@example.com");
+            row3.SetData("status", "Inactive");
+            dataTableData.Add(row3);
+
+            var row4 = guiHelper.CreateDataTableRow("4");
+            row4.SetData("id", "4");
+            row4.SetData("name", "Alice Brown");
+            row4.SetData("email", "alice@example.com");
+            row4.SetData("status", "Active");
+            dataTableData.Add(row4);
+
+            var row5 = guiHelper.CreateDataTableRow("5");
+            row5.SetData("id", "5");
+            row5.SetData("name", "Charlie Wilson");
+            row5.SetData("email", "charlie@example.com");
+            row5.SetData("status", "Active");
+            dataTableData.Add(row5);
+        }
+
+        guiHelper.Label("Basic Data Table", LabelVariant.Default);
+
+        guiHelper.DrawDataTable("demo-table", dataTableColumns, dataTableData, showPagination: true, showSearch: true, showSelection: true, showColumnToggle: false, GUILayout.Height(200));
+
+        var selectedRows = guiHelper.GetSelectedRows("demo-table");
+        if (selectedRows.Count > 0)
+        {
+            guiHelper.Label($"Selected: {string.Join(", ", selectedRows)}", LabelVariant.Muted);
+            if (guiHelper.Button("Clear Selection"))
+            {
+                guiHelper.ClearSelection("demo-table");
+            }
+        }
+
+        guiHelper.Label("Code: guiHelper.DrawDataTable(id, columns, data, showPagination, showSearch, showSelection, showColumnToggle);", LabelVariant.Muted);
+        guiHelper.HorizontalSeparator();
+
+        guiHelper.Label("Simple Table", LabelVariant.Default);
+        var simpleColumns = new System.Collections.Generic.List<DataTableColumn>();
+
+        var productColumn = guiHelper.CreateDataTableColumn("product", "Product");
+        productColumn.Width = 150;
+        simpleColumns.Add(productColumn);
+
+        var priceColumn = guiHelper.CreateDataTableColumn("price", "Price");
+        priceColumn.Width = 100;
+        simpleColumns.Add(priceColumn);
+
+        var simpleData = new System.Collections.Generic.List<DataTableRow>
+        {
+            guiHelper.CreateDataTableRow("p1").SetData("product", "Laptop").SetData("price", "$999"),
+            guiHelper.CreateDataTableRow("p2").SetData("product", "Mouse").SetData("price", "$25"),
+            guiHelper.CreateDataTableRow("p3").SetData("product", "Keyboard").SetData("price", "$75"),
+        };
+
+        guiHelper.DrawDataTable("simple-table", simpleColumns, simpleData, showPagination: false, showSearch: false, showSelection: false, showColumnToggle: false, GUILayout.Height(120));
+
+        guiHelper.Label("Code: guiHelper.DrawDataTable(id, columns, data, false, false, false, false);", LabelVariant.Muted);
+        guiHelper.HorizontalSeparator();
+
+        guiHelper.Label("Table Actions", LabelVariant.Default);
+        guiHelper.BeginHorizontalGroup();
+
+        if (guiHelper.Button("Add Row"))
+        {
+            int newId = dataTableData.Count + 1;
+            var newRow = guiHelper.CreateDataTableRow(newId.ToString()).SetData("id", newId.ToString()).SetData("name", $"User {newId}").SetData("email", $"user{newId}@example.com").SetData("status", "Active");
+            dataTableData.Add(newRow);
+        }
+
+        if (guiHelper.Button("Remove Last"))
+        {
+            if (dataTableData.Count > 0)
+            {
+                dataTableData.RemoveAt(dataTableData.Count - 1);
+            }
+        }
+
+        guiHelper.EndHorizontalGroup();
+        guiHelper.Label("Code: guiHelper.CreateDataTableRow(id).SetData(key, value);", LabelVariant.Muted);
         guiHelper.HorizontalSeparator();
 
         GUILayout.EndVertical();
