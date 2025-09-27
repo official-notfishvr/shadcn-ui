@@ -10,7 +10,7 @@ namespace shadcnui.GUIComponents
     public class Select
     {
         private GUIHelper guiHelper;
-        private Layout layoutComponents;
+        private Layout _layoutComponents;
         private bool isOpen;
         private int selectedIndex;
         private Vector2 scrollPosition;
@@ -18,7 +18,7 @@ namespace shadcnui.GUIComponents
         public Select(GUIHelper helper)
         {
             this.guiHelper = helper;
-            layoutComponents = new Layout(helper);
+            _layoutComponents = new Layout(helper);
         }
 
         public bool IsOpen => isOpen;
@@ -38,24 +38,15 @@ namespace shadcnui.GUIComponents
             if (!isOpen)
                 return selectedIndex;
 
-#if IL2CPP
-            GUILayout.BeginVertical(guiHelper.GetStyleManager().GetSelectStyle(SelectVariant.Default, SelectSize.Default), new UnhollowerBaseLib.Il2CppReferenceArray<UnityEngine.GUILayoutOption>(new GUILayoutOption[] { GUILayout.MaxWidth(300), GUILayout.MaxHeight(200) }));
-#else
-            GUILayout.BeginVertical(guiHelper.GetStyleManager().GetSelectStyle(SelectVariant.Default, SelectSize.Default), GUILayout.MaxWidth(300), GUILayout.MaxHeight(200));
-#endif
+            _layoutComponents.BeginVerticalGroup(guiHelper.GetStyleManager().GetSelectStyle(SelectVariant.Default, SelectSize.Default), GUILayout.MaxWidth(300), GUILayout.MaxHeight(200));
 
-            scrollPosition = layoutComponents.DrawScrollView(
+            scrollPosition = _layoutComponents.DrawScrollView(
                 scrollPosition,
                 () =>
                 {
                     for (int i = 0; i < items.Length; i++)
                     {
                         GUIStyle itemStyle = guiHelper.GetStyleManager().GetSelectItemStyle();
-                        if (i == selectedIndex)
-                        {
-                            itemStyle = new GUIStyle(itemStyle);
-                            itemStyle.normal.textColor = Color.blue;
-                        }
 
 #if IL2CPP
                         if (GUILayout.Button(new GUIContent(items[i]), itemStyle, new UnhollowerBaseLib.Il2CppReferenceArray<UnityEngine.GUILayoutOption>(0)))

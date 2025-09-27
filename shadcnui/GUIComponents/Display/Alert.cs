@@ -62,38 +62,6 @@ namespace shadcnui.GUIComponents
             layoutComponents.EndVerticalGroup();
         }
 
-        public void AlertWithActions(string title, string description, string[] buttonTexts, Action<int> onButtonClick, AlertVariant variant = AlertVariant.Default, AlertType type = AlertType.Info, params GUILayoutOption[] options)
-        {
-            layoutComponents.BeginVerticalGroup();
-
-            DrawAlert(title, description, variant, type, null, options);
-
-            if (buttonTexts != null && buttonTexts.Length > 0)
-            {
-                layoutComponents.AddSpace(8);
-                layoutComponents.BeginHorizontalGroup();
-
-                for (int i = 0; i < buttonTexts.Length; i++)
-                {
-                    int index = i;
-
-                    if (guiHelper.Button(buttonTexts[i], ButtonVariant.Outline, ButtonSize.Small))
-                    {
-                        onButtonClick?.Invoke(index);
-                    }
-
-                    if (i < buttonTexts.Length - 1)
-                    {
-                        layoutComponents.AddSpace(4);
-                    }
-                }
-
-                layoutComponents.EndHorizontalGroup();
-            }
-
-            layoutComponents.EndVerticalGroup();
-        }
-
         public void CustomAlert(string title, string description, Color backgroundColor, Color textColor, params GUILayoutOption[] options)
         {
             var styleManager = guiHelper.GetStyleManager();

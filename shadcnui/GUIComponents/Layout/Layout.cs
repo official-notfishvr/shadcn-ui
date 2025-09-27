@@ -11,6 +11,9 @@ namespace shadcnui.GUIComponents
 {
     public class Layout
     {
+#if IL2CPP
+        public static readonly Il2CppReferenceArray<GUILayoutOption> EmptyOptions = new Il2CppReferenceArray<GUILayoutOption>(0);
+#endif
         private GUIHelper guiHelper;
 
         public Layout(GUIHelper helper)
@@ -33,7 +36,7 @@ namespace shadcnui.GUIComponents
         public void BeginHorizontalGroup()
         {
 #if IL2CPP
-            GUILayout.BeginHorizontal(GUIStyle.none, (Il2CppReferenceArray<GUILayoutOption>)null);
+            GUILayout.BeginHorizontal(GUIStyle.none, EmptyOptions);
 #else
             GUILayout.BeginHorizontal();
 #endif
@@ -51,6 +54,16 @@ namespace shadcnui.GUIComponents
         public void EndHorizontalGroup()
         {
             GUILayout.EndHorizontal();
+        }
+
+        public void BeginVerticalGroup()
+        {
+            GUIStyle boxStyle = GUIStyle.none;
+#if IL2CPP
+            GUILayout.BeginVertical(boxStyle, EmptyOptions);
+#else
+            GUILayout.BeginVertical(boxStyle);
+#endif
         }
 
         public void BeginVerticalGroup(params GUILayoutOption[] options)

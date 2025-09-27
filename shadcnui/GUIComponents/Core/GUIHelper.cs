@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using shadcnui.GUIComponents;
 using UnityEngine;
@@ -63,6 +63,9 @@ namespace shadcnui
         private DropdownMenu dropdownMenuComponents;
         private Popover popoverComponents;
         private Select selectComponents;
+        private DatePicker datePickerComponents;
+        private Dialog dialogComponents;
+        private DataTable dataTableComponents;
         #endregion
 
         #region Public Style Access
@@ -117,6 +120,9 @@ namespace shadcnui
                 dropdownMenuComponents = new GUIComponents.DropdownMenu(this);
                 popoverComponents = new GUIComponents.Popover(this);
                 selectComponents = new Select(this);
+                datePickerComponents = new DatePicker(this);
+                dialogComponents = new Dialog(this);
+                dataTableComponents = new DataTable(this);
             }
             catch (Exception ex)
             {
@@ -575,6 +581,8 @@ namespace shadcnui
         #endregion
 
         #region Card Components
+
+
         public void BeginCard(float width = -1, float height = -1)
         {
             try
@@ -599,22 +607,6 @@ namespace shadcnui
             }
         }
 
-        public void BeginCardHeader() => cardComponents?.BeginCardHeader();
-
-        public void EndCardHeader() => cardComponents?.EndCardHeader();
-
-        public void DrawCardTitle(string title) => cardComponents?.DrawCardTitle(title);
-
-        public void DrawCardDescription(string description) => cardComponents?.DrawCardDescription(description);
-
-        public void BeginCardContent() => cardComponents?.BeginCardContent();
-
-        public void EndCardContent() => cardComponents?.EndCardContent();
-
-        public void BeginCardFooter() => cardComponents?.BeginCardFooter();
-
-        public void EndCardFooter() => cardComponents?.EndCardFooter();
-
         public void DrawCard(string title, string description, string content, System.Action footerContent = null, float width = -1, float height = -1)
         {
             try
@@ -624,6 +616,42 @@ namespace shadcnui
             catch (Exception ex)
             {
                 Debug.LogError("Error drawing card: " + ex.Message);
+            }
+        }
+
+        public void DrawCardWithImage(Texture2D image, string title, string description, string content, Action footerContent = null, float width = -1, float height = -1)
+        {
+            try
+            {
+                cardComponents?.DrawCardWithImage(image, title, description, content, footerContent, width, height);
+            }
+            catch (Exception ex)
+            {
+                Debug.LogError("Error drawing card with image: " + ex.Message);
+            }
+        }
+
+        public void DrawCardWithAvatar(Texture2D avatar, string title, string subtitle, string content, Action footerContent = null, float width = -1, float height = -1)
+        {
+            try
+            {
+                cardComponents?.DrawCardWithAvatar(avatar, title, subtitle, content, footerContent, width, height);
+            }
+            catch (Exception ex)
+            {
+                Debug.LogError("Error drawing card with avatar: " + ex.Message);
+            }
+        }
+
+        public void DrawCardWithHeader(string title, string description, Action header, string content, Action footerContent = null, float width = -1, float height = -1)
+        {
+            try
+            {
+                cardComponents?.DrawCardWithHeader(title, description, header, content, footerContent, width, height);
+            }
+            catch (Exception ex)
+            {
+                Debug.LogError("Error drawing card with header : " + ex.Message);
             }
         }
 
@@ -638,6 +666,17 @@ namespace shadcnui
                 Debug.LogError("Error drawing simple card: " + ex.Message);
             }
         }
+
+        public void CardHeader(Action content) => cardComponents?.CardHeader(content);
+
+        public void CardTitle(string title) => cardComponents?.CardTitle(title);
+
+        public void CardDescription(string description) => cardComponents?.CardDescription(description);
+
+        public void CardContent(Action content) => cardComponents?.CardContent(content);
+
+        public void CardFooter(Action content) => cardComponents?.CardFooter(content);
+
         #endregion
 
         #region Slider Components
@@ -1503,18 +1542,6 @@ namespace shadcnui
             }
         }
 
-        public void AlertWithActions(string title, string description, string[] buttonTexts, Action<int> onButtonClick, AlertVariant variant = AlertVariant.Default, AlertType type = AlertType.Info, params GUILayoutOption[] options)
-        {
-            try
-            {
-                alertComponents?.AlertWithActions(title, description, buttonTexts, onButtonClick, variant, type, options);
-            }
-            catch (Exception ex)
-            {
-                Debug.LogError("Error drawing alert with actions: " + ex.Message);
-            }
-        }
-
         public void CustomAlert(string title, string description, Color backgroundColor, Color textColor, params GUILayoutOption[] options)
         {
             try
@@ -1998,16 +2025,6 @@ namespace shadcnui
         {
             dropdownMenuComponents?.Open(items);
         }
-
-        public void CloseDropdownMenu()
-        {
-            dropdownMenuComponents?.Close();
-        }
-
-        public bool IsDropdownMenuOpen()
-        {
-            return dropdownMenuComponents?.IsOpen ?? false;
-        }
         #endregion
 
         #region Popover Components
@@ -2066,6 +2083,210 @@ namespace shadcnui
         public bool IsSelectOpen()
         {
             return selectComponents?.IsOpen ?? false;
+        }
+        #endregion
+
+        #region Dialog Components
+
+        public void DrawDialog(string dialogId, Action content, float width = 400, float height = 300) => dialogComponents?.DrawDialog(dialogId, content, width, height);
+
+        public void DrawDialog(string dialogId, string title, string description, Action content, Action footer = null, float width = 400, float height = 300) => dialogComponents?.DrawDialog(dialogId, title, description, content, footer, width, height);
+
+        public Rect GetLastRect() => GUILayoutUtility.GetLastRect();
+
+        public void OpenDialog(string dialogId) => dialogComponents?.Open(dialogId);
+
+        public void CloseDialog() => dialogComponents?.Close();
+
+        public bool IsDialogOpen() => dialogComponents?.IsOpen ?? false;
+
+        public void CloseDropdownMenu()
+        {
+            dropdownMenuComponents?.Close();
+        }
+
+        public bool IsDropdownMenuOpen()
+        {
+            return dropdownMenuComponents?.IsOpen ?? false;
+        }
+
+        public bool DrawDialogTrigger(string label, ButtonVariant variant = ButtonVariant.Default, ButtonSize size = ButtonSize.Default)
+        {
+            try
+            {
+                return dialogComponents?.DrawDialogTrigger(label, variant, size) ?? false;
+            }
+            catch (Exception ex)
+            {
+                Debug.LogError("Error drawing dialog trigger: " + ex.Message);
+                return false;
+            }
+        }
+
+        public void DrawDialogHeader(string title, string description = null)
+        {
+            try
+            {
+                dialogComponents?.DrawDialogHeader(title, description);
+            }
+            catch (Exception ex)
+            {
+                Debug.LogError("Error drawing dialog header: " + ex.Message);
+            }
+        }
+
+        public void DrawDialogContent(Action content)
+        {
+            try
+            {
+                dialogComponents?.DrawDialogContent(content);
+            }
+            catch (Exception ex)
+            {
+                Debug.LogError("Error drawing dialog content: " + ex.Message);
+            }
+        }
+
+        public void DrawDialogFooter(Action footer)
+        {
+            try
+            {
+                dialogComponents?.DrawDialogFooter(footer);
+            }
+            catch (Exception ex)
+            {
+                Debug.LogError("Error drawing dialog footer: " + ex.Message);
+            }
+        }
+        #endregion
+
+        #region DatePicker Components
+        public DateTime? DatePicker(string placeholder, DateTime? selectedDate, string id = "datepicker", params GUILayoutOption[] options)
+        {
+            try
+            {
+                return datePickerComponents?.DrawDatePicker(placeholder, selectedDate, id, options) ?? selectedDate;
+            }
+            catch (Exception ex)
+            {
+                Debug.LogError("Error drawing date picker: " + ex.Message);
+                return selectedDate;
+            }
+        }
+
+        public DateTime? DatePickerWithLabel(string label, string placeholder, DateTime? selectedDate, string id = "datepicker", params GUILayoutOption[] options)
+        {
+            try
+            {
+                return datePickerComponents?.DrawDatePickerWithLabel(label, placeholder, selectedDate, id, options) ?? selectedDate;
+            }
+            catch (Exception ex)
+            {
+                Debug.LogError("Error drawing date picker with label: " + ex.Message);
+                return selectedDate;
+            }
+        }
+
+        public DateTime? DateRangePicker(string placeholder, DateTime? startDate, DateTime? endDate, string id = "daterange", params GUILayoutOption[] options)
+        {
+            try
+            {
+                return datePickerComponents?.DrawDateRangePicker(placeholder, startDate, endDate, id, options) ?? startDate;
+            }
+            catch (Exception ex)
+            {
+                Debug.LogError("Error drawing date range picker: " + ex.Message);
+                return startDate;
+            }
+        }
+
+        public void CloseDatePicker(string id)
+        {
+            try
+            {
+                datePickerComponents?.CloseDatePicker(id);
+            }
+            catch (Exception ex)
+            {
+                Debug.LogError("Error closing date picker: " + ex.Message);
+            }
+        }
+
+        public bool IsDatePickerOpen(string id)
+        {
+            try
+            {
+                return datePickerComponents?.IsDatePickerOpen(id) ?? false;
+            }
+            catch (Exception ex)
+            {
+                Debug.LogError("Error checking date picker state: " + ex.Message);
+                return false;
+            }
+        }
+        #endregion
+
+        #region DataTable Components
+        /// <summary>
+        /// Draws a data table with sorting, filtering, and pagination.
+        /// </summary>
+        public void DrawDataTable(string id, List<DataTableColumn> columns, List<DataTableRow> data, bool showPagination = true, bool showSearch = true, bool showSelection = true, bool showColumnToggle = false, params GUILayoutOption[] options)
+        {
+            try
+            {
+                dataTableComponents?.DrawDataTable(id, columns, data, showPagination, showSearch, showSelection, showColumnToggle, options);
+            }
+            catch (Exception ex)
+            {
+                Debug.LogError("Error drawing data table: " + ex.Message);
+            }
+        }
+
+        /// <summary>
+        /// Creates a new DataTableColumn.
+        /// </summary>
+        public DataTableColumn CreateDataTableColumn(string id, string header, string accessorKey = null)
+        {
+            return new DataTableColumn(id, header, accessorKey);
+        }
+
+        /// <summary>
+        /// Creates a new DataTableRow.
+        /// </summary>
+        public DataTableRow CreateDataTableRow(string id)
+        {
+            return new DataTableRow(id);
+        }
+
+        /// <summary>
+        /// Gets the selected rows from a data table.
+        /// </summary>
+        public List<string> GetSelectedRows(string tableId)
+        {
+            try
+            {
+                return dataTableComponents?.GetSelectedRows(tableId) ?? new List<string>();
+            }
+            catch (Exception ex)
+            {
+                Debug.LogError("Error getting selected rows: " + ex.Message);
+                return new List<string>();
+            }
+        }
+
+        /// <summary>
+        /// Clears the selection for a data table.
+        /// </summary>
+        public void ClearSelection(string tableId)
+        {
+            try
+            {
+                dataTableComponents?.ClearSelection(tableId);
+            }
+            catch (Exception ex)
+            {
+                Debug.LogError("Error clearing selection: " + ex.Message);
+            }
         }
         #endregion
     }
