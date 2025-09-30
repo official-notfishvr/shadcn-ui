@@ -975,17 +975,21 @@ namespace shadcnui
         #endregion
 
         #region Tabs Components
-        public int Tabs(string[] tabNames, int selectedIndex, Action<int> onTabChange = null, int maxLines = 1, params GUILayoutOption[] options)
+        public int Tabs(string[] tabNames, int selectedIndex, Action<int> onTabChange, int maxLines = 1, params GUILayoutOption[] options)
         {
             try
             {
-                return tabsComponents?.DrawTabButtons(tabNames, selectedIndex, onTabChange, maxLines, options) ?? selectedIndex;
+                return tabsComponents?.DrawTabs(tabNames, selectedIndex, onTabChange, maxLines, options) ?? selectedIndex;
             }
             catch (Exception ex)
             {
-                Debug.LogError("Error drawing tabs: " + ex.Message);
                 return -1;
             }
+        }
+
+        public int Tabs(string[] tabNames, int selectedIndex, Action content, int maxLines = 1, Tabs.TabPosition position = shadcnui.GUIComponents.Tabs.TabPosition.Top)
+        {
+            return tabsComponents?.DrawTabButtons(tabNames, selectedIndex, content, null, maxLines, position) ?? selectedIndex;
         }
 
         public void BeginTabContent()
@@ -1025,11 +1029,11 @@ namespace shadcnui
             }
         }
 
-        public int VerticalTabs(string[] tabNames, int selectedIndex, Action<int> onTabChange = null, float tabWidth = 120f, params GUILayoutOption[] options)
+        public int VerticalTabs(string[] tabNames, int selectedIndex, Action content, float tabWidth = 120f, int maxLines = 1, Tabs.TabSide side = shadcnui.GUIComponents.Tabs.TabSide.Left)
         {
             try
             {
-                return tabsComponents?.VerticalTabs(tabNames, selectedIndex, onTabChange, tabWidth, options) ?? selectedIndex;
+                return tabsComponents?.VerticalTabs(tabNames, selectedIndex, content, null, tabWidth, maxLines, side) ?? selectedIndex;
             }
             catch (Exception ex)
             {
