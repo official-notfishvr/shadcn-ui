@@ -896,7 +896,7 @@ namespace shadcnui.GUIComponents
             var theme = ThemeManager.Instance.CurrentTheme;
 
             cardStyle = new GUIStyle(GUI.skin.box);
-            cardStyle.normal.background = CreateBorderTexture(theme.ButtonOutlineBorder, 0);
+            cardStyle.normal.background = CreateSolidTexture(theme.CardBg);
             cardStyle.border = GetBorderOffset(12f);
             cardStyle.padding = GetSpacingOffset(0f, 0f);
             cardStyle.margin = GetSpacingOffset(0f, 0f);
