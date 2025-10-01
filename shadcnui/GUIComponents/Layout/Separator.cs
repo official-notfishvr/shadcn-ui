@@ -1,8 +1,11 @@
 using System;
+using System.Collections.Generic;
 using shadcnui;
 using UnityEngine;
-#if IL2CPP
+#if IL2CPP_MELONLOADER
 using UnhollowerBaseLib;
+#elif IL2CPP_BEPINEX
+using Il2CppInterop.Runtime.InteropTypes.Arrays;
 #endif
 
 namespace shadcnui.GUIComponents
@@ -21,7 +24,7 @@ namespace shadcnui.GUIComponents
             var styleManager = guiHelper.GetStyleManager();
             GUIStyle separatorStyle = styleManager.GetSeparatorStyle(orientation);
 
-            var layoutOptions = new System.Collections.Generic.List<GUILayoutOption>();
+            var layoutOptions = new List<GUILayoutOption>();
 
             if (orientation == SeparatorOrientation.Horizontal)
             {
@@ -37,10 +40,14 @@ namespace shadcnui.GUIComponents
             if (options != null && options.Length > 0)
                 layoutOptions.AddRange(options);
 
-#if IL2CPP
-            GUILayout.Box(GUIContent.none, separatorStyle, (Il2CppReferenceArray<GUILayoutOption>)layoutOptions.ToArray());
+#if IL2CPP_BEPINEX || IL2CPP_MELONLOADER
+            var il2cppOptions = new Il2CppReferenceArray<GUILayoutOption>(layoutOptions.Count);
+            for (int i = 0; i < layoutOptions.Count; i++)
+                il2cppOptions[i] = layoutOptions[i];
+
+            GUILayout.Box(UnityHelpers.GUIContent.none, separatorStyle, il2cppOptions);
 #else
-            GUILayout.Box(GUIContent.none, separatorStyle, layoutOptions.ToArray());
+            GUILayout.Box(UnityHelpers.GUIContent.none, separatorStyle, layoutOptions.ToArray());
 #endif
         }
 
@@ -61,27 +68,21 @@ namespace shadcnui.GUIComponents
 
             Rect scaledRect = new Rect(rect.x * guiHelper.uiScale, rect.y * guiHelper.uiScale, rect.width * guiHelper.uiScale, rect.height * guiHelper.uiScale);
 
-            GUI.Box(scaledRect, GUIContent.none, separatorStyle);
+            GUI.Box(scaledRect, UnityHelpers.GUIContent.none, separatorStyle);
         }
 
         public void SeparatorWithSpacing(SeparatorOrientation orientation = SeparatorOrientation.Horizontal, float spacingBefore = 8f, float spacingAfter = 8f, params GUILayoutOption[] options)
         {
             if (spacingBefore > 0)
             {
-                if (orientation == SeparatorOrientation.Horizontal)
-                    GUILayout.Space(spacingBefore * guiHelper.uiScale);
-                else
-                    GUILayout.Space(spacingBefore * guiHelper.uiScale);
+                GUILayout.Space(spacingBefore * guiHelper.uiScale);
             }
 
             DrawSeparator(orientation, true, options);
 
             if (spacingAfter > 0)
             {
-                if (orientation == SeparatorOrientation.Horizontal)
-                    GUILayout.Space(spacingAfter * guiHelper.uiScale);
-                else
-                    GUILayout.Space(spacingAfter * guiHelper.uiScale);
+                GUILayout.Space(spacingAfter * guiHelper.uiScale);
             }
         }
 
@@ -89,8 +90,8 @@ namespace shadcnui.GUIComponents
         {
             var styleManager = guiHelper.GetStyleManager();
 
-#if IL2CPP
-            GUILayout.BeginHorizontal(new UnhollowerBaseLib.Il2CppReferenceArray<UnityEngine.GUILayoutOption>(0));
+#if IL2CPP_BEPINEX || IL2CPP_MELONLOADER
+            GUILayout.BeginHorizontal(new Il2CppReferenceArray<GUILayoutOption>(0));
 #else
             GUILayout.BeginHorizontal();
 #endif
@@ -100,8 +101,8 @@ namespace shadcnui.GUIComponents
             if (!string.IsNullOrEmpty(text))
             {
                 GUILayout.Space(8 * guiHelper.uiScale);
-#if IL2CPP
-                GUILayout.Label(new GUIContent(text), styleManager.GetLabelStyle(LabelVariant.Muted), new UnhollowerBaseLib.Il2CppReferenceArray<UnityEngine.GUILayoutOption>(0));
+#if IL2CPP_BEPINEX || IL2CPP_MELONLOADER
+                GUILayout.Label(new UnityHelpers.GUIContent(text), styleManager.GetLabelStyle(LabelVariant.Muted), new Il2CppReferenceArray<GUILayoutOption>(0));
 #else
                 GUILayout.Label(text, styleManager.GetLabelStyle(LabelVariant.Muted));
 #endif

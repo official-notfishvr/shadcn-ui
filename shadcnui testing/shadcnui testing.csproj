@@ -326,7 +326,7 @@
         <Reference Include="BepInEx">
             <HintPath>$(ReferencePath)BepInEx.dll</HintPath>
         </Reference>
-        <Reference Include="MelonLoader" Condition=" '$(Configuration)' == 'IL2CPP_Melonloader' Or '$(Configuration)' == 'Mono_Melonloader' ">
+        <Reference Include="MelonLoader" Condition=" '$(Configuration)' == 'IL2CPP_MELONLOADER' Or '$(Configuration)' == 'Mono_Melonloader' ">
             <HintPath>$(ReferencePath)MelonLoader.dll</HintPath>
         </Reference>
         <Reference Include="Assembly-CSharp">
@@ -334,7 +334,7 @@
         </Reference>
     </ItemGroup>
     <Choose>
-        <When Condition=" '$(Configuration)' == 'IL2CPP_Melonloader' OR '$(Configuration)' == 'IL2CPP_BepInEx' ">
+        <When Condition=" '$(Configuration)' == 'IL2CPP_MELONLOADER' OR '$(Configuration)' == 'IL2CPP_BEPINEX' ">
             <ItemGroup>
                 <Reference Include="UnhollowerBaseLib">
                     <HintPath>$(ReferencePath)UnhollowerBaseLib.dll</HintPath>
@@ -348,4 +348,30 @@
             </ItemGroup>
         </When>
     </Choose>
+    <ItemGroup Condition=" '$(Configuration)' == 'IL2CPP_BepInEx' ">
+        <Reference Include="BepInEx.Core">
+            <HintPath>$(ReferencePath)\BepInEx.Core.dll</HintPath>
+        </Reference>
+        <Reference Include="BepInEx.Preloader.Core">
+            <HintPath>$(ReferencePath)\BepInEx.Preloader.Core.dll</HintPath>
+        </Reference>
+        <Reference Include="BepInEx.Unity.Common">
+            <HintPath>$(ReferencePath)\BepInEx.Unity.Common.dll</HintPath>
+        </Reference>
+        <Reference Include="BepInEx.Unity.IL2CPP">
+            <HintPath>$(ReferencePath)\BepInEx.Unity.IL2CPP.dll</HintPath>
+        </Reference>
+        <Reference Include="Il2CppInterop.Common">
+            <HintPath>$(ReferencePath)\Il2CppInterop.Common.dll</HintPath>
+        </Reference>
+        <Reference Include="Il2CppInterop.Generator">
+            <HintPath>$(ReferencePath)\Il2CppInterop.Generator.dll</HintPath>
+        </Reference>
+        <Reference Include="Il2CppInterop.HarmonySupport">
+            <HintPath>$(ReferencePath)\Il2CppInterop.HarmonySupport.dll</HintPath>
+        </Reference>
+        <Reference Include="Il2CppInterop.Runtime">
+            <HintPath>$(ReferencePath)\Il2CppInterop.Runtime.dll</HintPath>
+        </Reference>
+    </ItemGroup>
 </Project>

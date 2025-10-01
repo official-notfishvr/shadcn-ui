@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using shadcnui;
 using UnityEngine;
-#if IL2CPP
+#if IL2CPP_MELONLOADER
 using UnhollowerBaseLib;
 #endif
 
@@ -30,7 +30,7 @@ namespace shadcnui.GUIComponents
                 GUI.enabled = false;
 
             bool newValue;
-#if IL2CPP
+#if IL2CPP_MELONLOADER
             if (options != null && options.Length > 0)
                 newValue = GUILayout.Toggle(value, text, toggleStyle, (Il2CppReferenceArray<GUILayoutOption>)options);
             else
@@ -76,7 +76,7 @@ namespace shadcnui.GUIComponents
 
             if (horizontal)
             {
-#if IL2CPP
+#if IL2CPP_MELONLOADER
                 layoutComponents.BeginHorizontalGroup(GUIStyle.none, (Il2CppReferenceArray<GUILayoutOption>)null);
 #else
                 layoutComponents.BeginHorizontalGroup();
@@ -84,7 +84,7 @@ namespace shadcnui.GUIComponents
             }
             else
             {
-#if IL2CPP
+#if IL2CPP_MELONLOADER
                 layoutComponents.BeginVerticalGroup(GUIStyle.none, (Il2CppReferenceArray<GUILayoutOption>)null);
 #else
                 layoutComponents.BeginVerticalGroup();
@@ -121,7 +121,7 @@ namespace shadcnui.GUIComponents
 
             if (horizontal)
             {
-#if IL2CPP
+#if IL2CPP_MELONLOADER
                 layoutComponents.BeginHorizontalGroup(GUIStyle.none, (Il2CppReferenceArray<GUILayoutOption>)null);
 #else
                 layoutComponents.BeginHorizontalGroup();
@@ -129,7 +129,7 @@ namespace shadcnui.GUIComponents
             }
             else
             {
-#if IL2CPP
+#if IL2CPP_MELONLOADER
                 layoutComponents.BeginVerticalGroup(GUIStyle.none, (Il2CppReferenceArray<GUILayoutOption>)null);
 #else
                 layoutComponents.BeginVerticalGroup();

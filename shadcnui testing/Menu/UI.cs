@@ -5,7 +5,7 @@ using System.Reflection;
 using shadcnui;
 using shadcnui.GUIComponents;
 using UnityEngine;
-#if IL2CPP
+#if IL2CPP_MELONLOADER
 using UnhollowerBaseLib;
 #endif
 
@@ -249,7 +249,7 @@ public class UI : MonoBehaviour
 
     void DrawCurrentTabContent()
     {
-#if IL2CPP
+#if IL2CPP_MELONLOADER
         GUILayout.BeginVertical(new Il2CppReferenceArray<GUILayoutOption>(new GUILayoutOption[] { }));
 #else
         GUILayout.BeginVertical();

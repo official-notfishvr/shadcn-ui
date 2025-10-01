@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using shadcnui;
 using UnityEngine;
-#if IL2CPP
+#if IL2CPP_MELONLOADER
 using UnhollowerBaseLib;
 #endif
 
@@ -74,7 +74,7 @@ namespace shadcnui.GUIComponents
             GUI.color = new Color(1f, 1f, 1f, currentAlpha * pulseAlpha);
 
             var styleManager = guiHelper.GetStyleManager();
-#if IL2CPP
+#if IL2CPP_MELONLOADER
             layoutComponents.BeginVerticalGroup(styleManager.animatedBoxStyle, (Il2CppReferenceArray<GUILayoutOption>)null);
 #else
             layoutComponents.BeginVerticalGroup(styleManager.animatedBoxStyle);

@@ -1,7 +1,7 @@
 using System;
 using shadcnui;
 using UnityEngine;
-#if IL2CPP
+#if IL2CPP_MELONLOADER
 using UnhollowerBaseLib;
 #endif
 
@@ -42,7 +42,7 @@ namespace shadcnui.GUIComponents
             GUI.SetNextControlName("textarea_" + text?.GetHashCode());
 
             string result;
-#if IL2CPP
+#if IL2CPP_MELONLOADER
             result = GUILayout.TextArea(text ?? (string.IsNullOrEmpty(placeholder) ? "" : placeholder), textAreaStyle, (Il2CppReferenceArray<GUILayoutOption>)layoutOptions.ToArray());
 #else
             result = GUILayout.TextArea(text ?? (string.IsNullOrEmpty(placeholder) ? "" : placeholder), textAreaStyle, layoutOptions.ToArray());
@@ -102,7 +102,7 @@ namespace shadcnui.GUIComponents
 
             if (!string.IsNullOrEmpty(label))
             {
-#if IL2CPP
+#if IL2CPP_MELONLOADER
                 GUILayout.Label(new GUIContent(label), styleManager.GetLabelStyle(LabelVariant.Default), (Il2CppReferenceArray<GUILayoutOption>)null);
 #else
                 GUILayout.Label(label, styleManager.GetLabelStyle(LabelVariant.Default));
@@ -122,9 +122,9 @@ namespace shadcnui.GUIComponents
 
                 Color countColor = (maxLength > 0 && (result?.Length ?? 0) > maxLength * 0.9f) ? new Color(0.9f, 0.3f, 0.3f) : new Color(0.64f, 0.64f, 0.71f);
 
-                var countStyle = new GUIStyle(styleManager.GetLabelStyle(LabelVariant.Muted)) { normal = { textColor = countColor } };
+                var countStyle = new UnityHelpers.GUIStyle(styleManager.GetLabelStyle(LabelVariant.Muted)) { normal = { textColor = countColor } };
 
-#if IL2CPP
+#if IL2CPP_MELONLOADER
                 GUILayout.Label(new GUIContent(countText), countStyle, (Il2CppReferenceArray<GUILayoutOption>)null);
 #else
                 GUILayout.Label(countText, countStyle);
@@ -153,7 +153,7 @@ namespace shadcnui.GUIComponents
             GUILayout.FlexibleSpace();
 
             var styleManager = guiHelper.GetStyleManager();
-#if IL2CPP
+#if IL2CPP_MELONLOADER
             if (GUILayout.Button("⋮⋮⋮", styleManager.GetLabelStyle(LabelVariant.Muted), new Il2CppReferenceArray<GUILayoutOption>(new GUILayoutOption[] { GUILayout.Width(20 * guiHelper.uiScale), GUILayout.Height(10 * guiHelper.uiScale) })))
 #else
             if (GUILayout.Button("⋮⋮⋮", styleManager.GetLabelStyle(LabelVariant.Muted), new GUILayoutOption[] { GUILayout.Width(20 * guiHelper.uiScale), GUILayout.Height(10 * guiHelper.uiScale) }))

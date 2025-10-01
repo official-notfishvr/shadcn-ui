@@ -1,7 +1,7 @@
 using System;
 using shadcnui;
 using UnityEngine;
-#if IL2CPP
+#if IL2CPP_MELONLOADER
 using UnhollowerBaseLib;
 #endif
 
@@ -37,7 +37,7 @@ namespace shadcnui.GUIComponents
             if (options != null && options.Length > 0)
                 layoutOptions.AddRange(options);
 
-#if IL2CPP
+#if IL2CPP_MELONLOADER
             Rect progressRect = GUILayoutUtility.GetRect(GUIContent.none, styleManager.GetProgressBarStyle(), (Il2CppReferenceArray<GUILayoutOption>)layoutOptions.ToArray());
 #else
             Rect progressRect = GUILayoutUtility.GetRect(GUIContent.none, styleManager.GetProgressBarStyle(), layoutOptions.ToArray());
@@ -78,7 +78,7 @@ namespace shadcnui.GUIComponents
             if (!string.IsNullOrEmpty(label))
             {
                 layoutComponents.BeginHorizontalGroup();
-#if IL2CPP
+#if IL2CPP_MELONLOADER
                 GUILayout.Label(new GUIContent(label), styleManager.GetLabelStyle(LabelVariant.Default), new Il2CppReferenceArray<UnityEngine.GUILayoutOption>(0));
 #else
                 GUILayout.Label(label, styleManager.GetLabelStyle(LabelVariant.Default));
@@ -88,7 +88,7 @@ namespace shadcnui.GUIComponents
                 {
                     GUILayout.FlexibleSpace();
                     string percentText = (value * 100f).ToString("F0") + "%";
-#if IL2CPP
+#if IL2CPP_MELONLOADER
                     GUILayout.Label(new GUIContent(percentText), styleManager.GetLabelStyle(LabelVariant.Muted), new Il2CppReferenceArray<UnityEngine.GUILayoutOption>(0));
 #else
                     GUILayout.Label(percentText, styleManager.GetLabelStyle(LabelVariant.Muted));
@@ -115,7 +115,7 @@ namespace shadcnui.GUIComponents
             if (options != null && options.Length > 0)
                 layoutOptions.AddRange(options);
 
-#if IL2CPP
+#if IL2CPP_MELONLOADER
             Rect circleRect = GUILayoutUtility.GetRect(GUIContent.none, GUIStyle.none, (Il2CppReferenceArray<GUILayoutOption>)layoutOptions.ToArray());
 #else
             Rect circleRect = GUILayoutUtility.GetRect(GUIContent.none, GUIStyle.none, layoutOptions.ToArray());

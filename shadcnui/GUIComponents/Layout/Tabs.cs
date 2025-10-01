@@ -2,8 +2,10 @@ using System;
 using System.Collections.Generic;
 using shadcnui;
 using UnityEngine;
-#if IL2CPP
+#if IL2CPP_MELONLOADER
 using UnhollowerBaseLib;
+#elif IL2CPP_BEPINEX
+using Il2CppInterop.Runtime.InteropTypes.Arrays;
 #endif
 
 namespace shadcnui.GUIComponents
@@ -47,35 +49,58 @@ namespace shadcnui.GUIComponents
                 int tabsPerLine = (int)Mathf.Ceil((float)tabNames.Length / maxLines);
                 for (int line = 0; line < maxLines; line++)
                 {
-                    layoutComponents.BeginHorizontalGroup(styleManager.GetTabsListStyle());
-                    for (int i = line * tabsPerLine; i < (line + 1) * tabsPerLine && i < tabNames.Length; i++)
+                    bool horizontalStarted = false;
+                    try
                     {
-                        bool isActive = i == selectedIndex;
-                        GUIStyle triggerStyle = styleManager.GetTabsTriggerStyle(isActive);
+                        layoutComponents.BeginHorizontalGroup(styleManager.GetTabsListStyle());
+                        horizontalStarted = true;
 
-                        var tabOptions = new List<GUILayoutOption>();
-                        tabOptions.Add(GUILayout.Height(Mathf.RoundToInt(36 * guiHelper.uiScale)));
+                        for (int i = line * tabsPerLine; i < (line + 1) * tabsPerLine && i < tabNames.Length; i++)
+                        {
+                            bool isActive = i == selectedIndex;
+                            GUIStyle triggerStyle = styleManager.GetTabsTriggerStyle(isActive);
 
-                        if (options != null && options.Length > 0)
-                            tabOptions.AddRange(options);
+                            var tabOptions = new List<GUILayoutOption>();
+                            tabOptions.Add(GUILayout.Height(Mathf.RoundToInt(36 * guiHelper.uiScale)));
 
-#if IL2CPP
-                        bool clicked = GUILayout.Button(tabNames[i] ?? $"Tab {i + 1}", triggerStyle, (Il2CppReferenceArray<GUILayoutOption>)tabOptions.ToArray());
+                            if (options != null && options.Length > 0)
+                                tabOptions.AddRange(options);
+
+                            bool clicked = false;
+#if IL2CPP_MELONLOADER
+                            clicked = GUILayout.Button(tabNames[i] ?? $"Tab {i + 1}", triggerStyle, tabOptions.ToArray());
+#elif IL2CPP_BEPINEX
+                            var optionsArray = new Il2CppReferenceArray<GUILayoutOption>(tabOptions.Count);
+                            for (int j = 0; j < tabOptions.Count; j++)
+                            {
+                                optionsArray[j] = tabOptions[j];
+                            }
+                            clicked = GUILayout.Button(tabNames[i] ?? $"Tab {i + 1}", triggerStyle, optionsArray);
 #else
-                        bool clicked = GUILayout.Button(tabNames[i] ?? $"Tab {i + 1}", triggerStyle, tabOptions.ToArray());
+                            clicked = GUILayout.Button(tabNames[i] ?? $"Tab {i + 1}", triggerStyle, tabOptions.ToArray());
 #endif
-                        if (clicked && i != selectedIndex)
-                        {
-                            newSelectedIndex = i;
-                            onTabChange?.Invoke(i);
-                        }
+                            if (clicked && i != selectedIndex)
+                            {
+                                newSelectedIndex = i;
+                                onTabChange?.Invoke(i);
+                            }
 
-                        if (i < (line + 1) * tabsPerLine - 1 && i < tabNames.Length - 1)
-                        {
-                            layoutComponents.AddSpace(2);
+                            if (i < (line + 1) * tabsPerLine - 1 && i < tabNames.Length - 1)
+                            {
+                                layoutComponents.AddSpace(2);
+                            }
                         }
                     }
-                    layoutComponents.EndHorizontalGroup();
+                    catch (Exception)
+                    {
+                    }
+                    finally
+                    {
+                        if (horizontalStarted)
+                        {
+                            try { layoutComponents.EndHorizontalGroup(); } catch { }
+                        }
+                    }
                 }
             };
 
@@ -146,52 +171,107 @@ namespace shadcnui.GUIComponents
 
             Action drawTabs = () =>
             {
-                layoutComponents.BeginHorizontalGroup();
-                int tabsPerColumn = (int)Mathf.Ceil((float)tabNames.Length / maxLines);
-                for (int col = 0; col < maxLines; col++)
+                bool outerHorizontalStarted = false;
+                try
                 {
-                    layoutComponents.BeginVerticalGroup();
-                    for (int i = col * tabsPerColumn; i < (col + 1) * tabsPerColumn && i < tabNames.Length; i++)
+                    layoutComponents.BeginHorizontalGroup();
+                    outerHorizontalStarted = true;
+
+                    int tabsPerColumn = (int)Mathf.Ceil((float)tabNames.Length / maxLines);
+                    for (int col = 0; col < maxLines; col++)
                     {
-                        bool isActive = i == selectedIndex;
-                        GUIStyle triggerStyle = styleManager.GetTabsTriggerStyle(isActive);
-                        var tabOptions = new List<GUILayoutOption>();
-                        tabOptions.Add(GUILayout.Width(tabWidth * guiHelper.uiScale));
-                        tabOptions.Add(GUILayout.Height(Mathf.RoundToInt(36 * guiHelper.uiScale)));
-                        if (options != null && options.Length > 0)
-                            tabOptions.AddRange(options);
-#if IL2CPP
-                        bool clicked = GUILayout.Button(tabNames[i] ?? $"Tab {i + 1}", triggerStyle, (Il2CppReferenceArray<GUILayoutOption>)tabOptions.ToArray());
+                        bool verticalStarted = false;
+                        try
+                        {
+                            layoutComponents.BeginVerticalGroup();
+                            verticalStarted = true;
+
+                            for (int i = col * tabsPerColumn; i < (col + 1) * tabsPerColumn && i < tabNames.Length; i++)
+                            {
+                                bool isActive = i == selectedIndex;
+                                GUIStyle triggerStyle = styleManager.GetTabsTriggerStyle(isActive);
+                                var tabOptions = new List<GUILayoutOption>();
+                                tabOptions.Add(GUILayout.Width(tabWidth * guiHelper.uiScale));
+                                tabOptions.Add(GUILayout.Height(Mathf.RoundToInt(36 * guiHelper.uiScale)));
+                                if (options != null && options.Length > 0)
+                                    tabOptions.AddRange(options);
+
+                                bool clicked = false;
+#if IL2CPP_MELONLOADER
+                                clicked = GUILayout.Button(tabNames[i] ?? $"Tab {i + 1}", triggerStyle, tabOptions.ToArray());
+#elif IL2CPP_BEPINEX
+                                var optionsArray = new Il2CppReferenceArray<GUILayoutOption>(tabOptions.Count);
+                                for (int j = 0; j < tabOptions.Count; j++)
+                                {
+                                    optionsArray[j] = tabOptions[j];
+                                }
+                                clicked = GUILayout.Button(tabNames[i] ?? $"Tab {i + 1}", triggerStyle, optionsArray);
 #else
-                        bool clicked = GUILayout.Button(tabNames[i] ?? $"Tab {i + 1}", triggerStyle, tabOptions.ToArray());
+                                clicked = GUILayout.Button(tabNames[i] ?? $"Tab {i + 1}", triggerStyle, tabOptions.ToArray());
 #endif
-                        if (clicked && i != selectedIndex)
-                        {
-                            newSelectedIndex = i;
-                            onTabChange?.Invoke(i);
+                                if (clicked && i != selectedIndex)
+                                {
+                                    newSelectedIndex = i;
+                                    onTabChange?.Invoke(i);
+                                }
+                                if (i < (col + 1) * tabsPerColumn - 1 && i < tabNames.Length - 1)
+                                {
+                                    layoutComponents.AddSpace(2);
+                                }
+                            }
                         }
-                        if (i < (col + 1) * tabsPerColumn - 1 && i < tabNames.Length - 1)
+                        catch (Exception)
                         {
-                            layoutComponents.AddSpace(2);
+                        }
+                        finally
+                        {
+                            if (verticalStarted)
+                            {
+                                try { layoutComponents.EndVerticalGroup(); } catch { }
+                            }
                         }
                     }
-                    layoutComponents.EndVerticalGroup();
                 }
-                layoutComponents.EndHorizontalGroup();
+                catch (Exception)
+                {
+                }
+                finally
+                {
+                    if (outerHorizontalStarted)
+                    {
+                        try { layoutComponents.EndHorizontalGroup(); } catch { }
+                    }
+                }
             };
 
-            layoutComponents.BeginHorizontalGroup();
-            if (side == TabSide.Left)
+            bool mainHorizontalStarted = false;
+            try
             {
-                drawTabs();
-                content?.Invoke();
+                layoutComponents.BeginHorizontalGroup();
+                mainHorizontalStarted = true;
+
+                if (side == TabSide.Left)
+                {
+                    drawTabs();
+                    content?.Invoke();
+                }
+                else
+                {
+                    content?.Invoke();
+                    drawTabs();
+                }
             }
-            else
+            catch (Exception)
             {
-                content?.Invoke();
-                drawTabs();
+
             }
-            layoutComponents.EndHorizontalGroup();
+            finally
+            {
+                if (mainHorizontalStarted)
+                {
+                    try { layoutComponents.EndHorizontalGroup(); } catch { }
+                }
+            }
 
             return newSelectedIndex;
         }

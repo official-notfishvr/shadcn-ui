@@ -1,9 +1,12 @@
 using System;
 using System.IO;
-using System.Linq;
 using shadcnui;
 using UnityEngine;
-#if BEPINEX
+#if IL2CPP_BEPINEX
+using BepInEx.Unity.IL2CPP;
+using BepInEx;
+using BepInEx.Logging;
+#elif BEPINEX
 using BepInEx;
 using BepInEx.Logging;
 #elif MELONLOADER
@@ -12,7 +15,30 @@ using MelonLoader;
 
 namespace shadcnui
 {
-#if BEPINEX
+#if IL2CPP_BEPINEX // BepInEx6 il2cpp
+    [System.ComponentModel.Description(PluginInfo.Description)]
+    [BepInPlugin(PluginInfo.GUID, PluginInfo.Name, PluginInfo.Version)]
+    public class Plugin : BasePlugin
+    {
+        public static Plugin instance;
+        public static ManualLogSource PluginLogger => instance.Log;
+        public static bool FirstLaunch;
+
+        public override void Load()
+        {
+            instance = this;
+            GorillaTagger.OnPlayerSpawned(LoadMenu);
+        }
+
+        private static void LoadMenu()
+        {
+            GameObject Loader = new GameObject("Loader");
+            Loader.AddComponent<UI>();
+
+            UnityEngine.Object.DontDestroyOnLoad(Loader);
+        }
+    }
+#elif BEPINEX
     [System.ComponentModel.Description(PluginInfo.Description)]
     [BepInPlugin(PluginInfo.GUID, PluginInfo.Name, PluginInfo.Version)]
     public class Plugin : BaseUnityPlugin
@@ -24,7 +50,6 @@ namespace shadcnui
         private void Awake()
         {
             instance = this;
-
             GorillaTagger.OnPlayerSpawned(LoadMenu);
         }
 
@@ -33,12 +58,10 @@ namespace shadcnui
             GameObject Loader = new GameObject("Loader");
             Loader.AddComponent<UI>();
 
-            DontDestroyOnLoad(Loader);
+            UnityEngine.Object.DontDestroyOnLoad(Loader);
         }
     }
 #elif MELONLOADER
-    //[MelonInfo(typeof(Plugin), PluginInfo.Name, PluginInfo.Version, "shadcnui")]
-    //[MelonGame("Another Axiom", "Gorilla Tag")]
     public class Plugin : MelonMod
     {
         public static bool FirstLaunch;
@@ -54,7 +77,7 @@ namespace shadcnui
             GameObject Loader = new GameObject("Loader");
             Loader.AddComponent<UI>();
 
-            GameObject.DontDestroyOnLoad(Loader);
+            UnityEngine.Object.DontDestroyOnLoad(Loader);
         }
     }
 #endif

@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using shadcnui.GUIComponents;
 using UnityEngine;
-#if IL2CPP
+#if IL2CPP_MELONLOADER
 using UnhollowerBaseLib;
 #endif
 
@@ -126,7 +126,7 @@ namespace shadcnui
             }
             catch (Exception ex)
             {
-                Debug.LogError("Failed to initialize GUIHelper components: " + ex.Message);
+                //Debug.LogError("Failed to initialize GUIHelper components: " + ex.Message);
                 styleManager = null;
                 animationManager = null;
             }
@@ -158,7 +158,7 @@ namespace shadcnui
             }
             catch (Exception ex)
             {
-                Debug.LogError("Error updating animations: " + ex.Message);
+                //Debug.LogError("Error updating animations: " + ex.Message);
             }
         }
 
@@ -201,7 +201,7 @@ namespace shadcnui
             }
             catch (Exception ex)
             {
-                Debug.LogError("Error in BeginAnimatedGUI: " + ex.Message);
+                //Debug.LogError("Error in BeginAnimatedGUI: " + ex.Message);
                 return true;
             }
         }
@@ -214,7 +214,7 @@ namespace shadcnui
             }
             catch (Exception ex)
             {
-                Debug.LogError("Error in EndAnimatedGUI: " + ex.Message);
+                //Debug.LogError("Error in EndAnimatedGUI: " + ex.Message);
             }
         }
 
@@ -227,7 +227,7 @@ namespace shadcnui
             }
             catch (Exception ex)
             {
-                Debug.LogError("Cleanup error: " + ex.Message);
+                //Debug.LogError("Cleanup error: " + ex.Message);
             }
         }
         #endregion
@@ -241,7 +241,7 @@ namespace shadcnui
             }
             catch (Exception ex)
             {
-                Debug.LogError("Error drawing section header: " + ex.Message);
+                //Debug.LogError("Error drawing section header: " + ex.Message);
             }
         }
 
@@ -253,7 +253,7 @@ namespace shadcnui
             }
             catch (Exception ex)
             {
-                Debug.LogError("Error rendering label: " + ex.Message);
+                //Debug.LogError("Error rendering label: " + ex.Message);
             }
         }
 
@@ -265,7 +265,7 @@ namespace shadcnui
             }
             catch (Exception ex)
             {
-                Debug.LogError("Error drawing password field: " + ex.Message);
+                //Debug.LogError("Error drawing password field: " + ex.Message);
                 return "Error: " + ex.Message;
             }
         }
@@ -278,7 +278,7 @@ namespace shadcnui
             }
             catch (Exception ex)
             {
-                Debug.LogError("Error drawing text area: " + ex.Message);
+                //Debug.LogError("Error drawing text area: " + ex.Message);
             }
         }
         #endregion
@@ -290,16 +290,16 @@ namespace shadcnui
             {
                 var styleManager = GetStyleManager();
 
-                GUIStyle customButtonStyle = new GUIStyle(GUI.skin.button);
+                GUIStyle customButtonStyle = new UnityHelpers.GUIStyle(GUI.skin.button);
                 customButtonStyle.normal.background = styleManager.CreateSolidTexture(presetColor);
                 customButtonStyle.hover.background = styleManager.CreateSolidTexture(presetColor * 1.2f);
                 customButtonStyle.active.background = styleManager.CreateSolidTexture(presetColor * 0.8f);
                 customButtonStyle.normal.textColor = Color.white;
                 customButtonStyle.alignment = TextAnchor.MiddleCenter;
                 customButtonStyle.fontSize = fontSize;
-                customButtonStyle.padding = new RectOffset(10, 10, 5, 5);
+                customButtonStyle.padding = new UnityHelpers.RectOffset(10, 10, 5, 5);
 
-#if IL2CPP
+#if IL2CPP_MELONLOADER
                 return GUILayout.Button(colorName ?? "Color", customButtonStyle, new Il2CppReferenceArray<GUILayoutOption>(0));
 #else
                 return GUILayout.Button(colorName ?? "Color", customButtonStyle);
@@ -307,7 +307,7 @@ namespace shadcnui
             }
             catch (Exception ex)
             {
-                Debug.LogError("Error rendering color preset button: " + ex.Message);
+               // Debug.LogError("Error rendering color preset button: " + ex.Message);
                 return false;
             }
         }
@@ -320,7 +320,7 @@ namespace shadcnui
             }
             catch (Exception ex)
             {
-                Debug.LogError("Error drawing button: " + ex.Message);
+               // Debug.LogError("Error drawing button: " + ex.Message);
                 return false;
             }
         }
@@ -332,23 +332,23 @@ namespace shadcnui
                 var styleManager = GetStyleManager();
                 if (styleManager == null)
                 {
-#if IL2CPP
+#if IL2CPP_MELONLOADER
                     return GUILayout.Button(text ?? "Button", new Il2CppReferenceArray<GUILayoutOption>(new GUILayoutOption[] { GUILayout.Width(windowWidth) }));
 #else
                     return GUILayout.Button(text ?? "Button", GUILayout.Width(windowWidth));
 #endif
                 }
 
-                GUIStyle customButtonStyle = new GUIStyle(GUI.skin.button);
+                GUIStyle customButtonStyle = new UnityHelpers.GUIStyle(GUI.skin.button);
                 customButtonStyle.normal.background = styleManager.CreateSolidTexture(color);
                 customButtonStyle.hover.background = styleManager.CreateSolidTexture(color * 1.2f);
                 customButtonStyle.active.background = styleManager.CreateSolidTexture(color * 0.8f);
                 customButtonStyle.normal.textColor = Color.white;
                 customButtonStyle.alignment = TextAnchor.MiddleCenter;
                 customButtonStyle.fontSize = fontSize;
-                customButtonStyle.padding = new RectOffset(10, 10, 5, 5);
+                customButtonStyle.padding = new UnityHelpers.RectOffset(10, 10, 5, 5);
 
-#if IL2CPP
+#if IL2CPP_MELONLOADER
                 bool clicked = GUILayout.Button(text ?? "Button", customButtonStyle, new Il2CppReferenceArray<GUILayoutOption>(new GUILayoutOption[] { GUILayout.Width(windowWidth) }));
 #else
                 bool clicked = GUILayout.Button(text ?? "Button", customButtonStyle, GUILayout.Width(windowWidth));
@@ -361,7 +361,7 @@ namespace shadcnui
             }
             catch (Exception ex)
             {
-                Debug.LogError("Error drawing colored button: " + ex.Message);
+                //Debug.LogError("Error drawing colored button: " + ex.Message);
                 return false;
             }
         }
@@ -374,7 +374,7 @@ namespace shadcnui
             }
             catch (Exception ex)
             {
-                Debug.LogError("Error drawing fixed button: " + ex.Message);
+               // Debug.LogError("Error drawing fixed button: " + ex.Message);
                 return false;
             }
         }
@@ -387,7 +387,7 @@ namespace shadcnui
             }
             catch (Exception ex)
             {
-                Debug.LogError("Error drawing button variant: " + ex.Message);
+                //Debug.LogError("Error drawing button variant: " + ex.Message);
                 return false;
             }
         }
@@ -400,7 +400,7 @@ namespace shadcnui
             }
             catch (Exception ex)
             {
-                Debug.LogError("Error drawing button variant in rect: " + ex.Message);
+              //  Debug.LogError("Error drawing button variant in rect: " + ex.Message);
                 return false;
             }
         }
@@ -453,7 +453,7 @@ namespace shadcnui
             }
             catch (Exception ex)
             {
-                Debug.LogError("Error drawing button group: " + ex.Message);
+                //Debug.LogError("Error drawing button group: " + ex.Message);
             }
         }
 
@@ -467,28 +467,28 @@ namespace shadcnui
                 switch (size)
                 {
                     case ButtonSize.Small:
-#if IL2CPP
+#if IL2CPP_MELONLOADER
                         options = (Il2CppReferenceArray<GUILayoutOption>)new GUILayoutOption[] { GUILayout.Height(24 * uiScale) };
 #else
                         options = new GUILayoutOption[] { GUILayout.Height(24 * uiScale) };
 #endif
                         break;
                     case ButtonSize.Large:
-#if IL2CPP
+#if IL2CPP_MELONLOADER
                         options = (Il2CppReferenceArray<GUILayoutOption>)new GUILayoutOption[] { GUILayout.Height(40 * uiScale) };
 #else
                         options = new GUILayoutOption[] { GUILayout.Height(40 * uiScale) };
 #endif
                         break;
                     case ButtonSize.Icon:
-#if IL2CPP
+#if IL2CPP_MELONLOADER
                         options = (Il2CppReferenceArray<GUILayoutOption>)new GUILayoutOption[] { GUILayout.Width(36 * uiScale), GUILayout.Height(36 * uiScale) };
 #else
                         options = new GUILayoutOption[] { GUILayout.Width(36 * uiScale), GUILayout.Height(36 * uiScale) };
 #endif
                         break;
                     default:
-#if IL2CPP
+#if IL2CPP_MELONLOADER
                         options = (Il2CppReferenceArray<GUILayoutOption>)new GUILayoutOption[] { GUILayout.Height(30 * uiScale) };
 #else
                         options = new GUILayoutOption[] { GUILayout.Height(30 * uiScale) };
@@ -500,7 +500,7 @@ namespace shadcnui
             }
             catch (Exception ex)
             {
-                Debug.LogError("Error drawing button variant: " + ex.Message);
+                //Debug.LogError("Error drawing button variant: " + ex.Message);
                 return false;
             }
         }
@@ -520,7 +520,7 @@ namespace shadcnui
             }
             catch (Exception ex)
             {
-                Debug.LogError("Error drawing toggle variant: " + ex.Message);
+                //Debug.LogError("Error drawing toggle variant: " + ex.Message);
                 return value;
             }
         }
@@ -533,7 +533,7 @@ namespace shadcnui
             }
             catch (Exception ex)
             {
-                Debug.LogError("Error drawing toggle variant in rect: " + ex.Message);
+              //  Debug.LogError("Error drawing toggle variant in rect: " + ex.Message);
                 return false;
             }
         }
@@ -561,7 +561,7 @@ namespace shadcnui
             }
             catch (Exception ex)
             {
-                Debug.LogError("Error drawing toggle group: " + ex.Message);
+                //Debug.LogError("Error drawing toggle group: " + ex.Message);
                 return selectedIndex;
             }
         }
@@ -574,7 +574,8 @@ namespace shadcnui
             }
             catch (Exception ex)
             {
-                Debug.LogError("Error drawing multi toggle group: " + ex.Message);
+               //
+               //Debug.LogError("Error drawing multi toggle group: " + ex.Message);
                 return selectedStates;
             }
         }
@@ -591,7 +592,7 @@ namespace shadcnui
             }
             catch (Exception ex)
             {
-                Debug.LogError("Error beginning card: " + ex.Message);
+               // Debug.LogError("Error beginning card: " + ex.Message);
             }
         }
 
@@ -603,7 +604,7 @@ namespace shadcnui
             }
             catch (Exception ex)
             {
-                Debug.LogError("Error ending card: " + ex.Message);
+               // Debug.LogError("Error ending card: " + ex.Message);
             }
         }
 
@@ -615,7 +616,7 @@ namespace shadcnui
             }
             catch (Exception ex)
             {
-                Debug.LogError("Error drawing card: " + ex.Message);
+              //  Debug.LogError("Error drawing card: " + ex.Message);
             }
         }
 
@@ -627,7 +628,7 @@ namespace shadcnui
             }
             catch (Exception ex)
             {
-                Debug.LogError("Error drawing card with image: " + ex.Message);
+               // Debug.LogError("Error drawing card with image: " + ex.Message);
             }
         }
 
@@ -639,7 +640,7 @@ namespace shadcnui
             }
             catch (Exception ex)
             {
-                Debug.LogError("Error drawing card with avatar: " + ex.Message);
+               // Debug.LogError("Error drawing card with avatar: " + ex.Message);
             }
         }
 
@@ -651,7 +652,7 @@ namespace shadcnui
             }
             catch (Exception ex)
             {
-                Debug.LogError("Error drawing card with header : " + ex.Message);
+               // Debug.LogError("Error drawing card with header : " + ex.Message);
             }
         }
 
@@ -663,7 +664,7 @@ namespace shadcnui
             }
             catch (Exception ex)
             {
-                Debug.LogError("Error drawing simple card: " + ex.Message);
+                //Debug.LogError("Error drawing simple card: " + ex.Message);
             }
         }
 
@@ -688,7 +689,7 @@ namespace shadcnui
             }
             catch (Exception ex)
             {
-                Debug.LogError("Error drawing slider: " + ex.Message);
+              //  Debug.LogError("Error drawing slider: " + ex.Message);
             }
         }
 
@@ -700,7 +701,7 @@ namespace shadcnui
             }
             catch (Exception ex)
             {
-                Debug.LogError("Error drawing int slider: " + ex.Message);
+                //Debug.LogError("Error drawing int slider: " + ex.Message);
             }
         }
         #endregion
@@ -714,7 +715,7 @@ namespace shadcnui
             }
             catch (Exception ex)
             {
-                Debug.LogError("Error drawing scroll view: " + ex.Message);
+                //Debug.LogError("Error drawing scroll view: " + ex.Message);
                 return new Vector3(0, 0, 0);
             }
         }
@@ -727,7 +728,7 @@ namespace shadcnui
             }
             catch (Exception ex)
             {
-                Debug.LogError("Error beginning horizontal group: " + ex.Message);
+                //Debug.LogError("Error beginning horizontal group: " + ex.Message);
             }
         }
 
@@ -739,7 +740,7 @@ namespace shadcnui
             }
             catch (Exception ex)
             {
-                Debug.LogError("Error ending horizontal group: " + ex.Message);
+              //  Debug.LogError("Error ending horizontal group: " + ex.Message);
             }
         }
 
@@ -751,7 +752,7 @@ namespace shadcnui
             }
             catch (Exception ex)
             {
-                Debug.LogError("Error beginning vertical group: " + ex.Message);
+              //  Debug.LogError("Error beginning vertical group: " + ex.Message);
             }
         }
 
@@ -763,7 +764,7 @@ namespace shadcnui
             }
             catch (Exception ex)
             {
-                Debug.LogError("Error ending vertical group: " + ex.Message);
+              //  Debug.LogError("Error ending vertical group: " + ex.Message);
             }
         }
 
@@ -775,7 +776,7 @@ namespace shadcnui
             }
             catch (Exception ex)
             {
-                Debug.LogError("Error adding space: " + ex.Message);
+             //   Debug.LogError("Error adding space: " + ex.Message);
             }
         }
         #endregion
@@ -797,7 +798,7 @@ namespace shadcnui
             }
             catch (Exception ex)
             {
-                Debug.LogError("Error drawing label: " + ex.Message);
+                //Debug.LogError("Error drawing label: " + ex.Message);
             }
         }
 
@@ -809,7 +810,7 @@ namespace shadcnui
             }
             catch (Exception ex)
             {
-                Debug.LogError("Error drawing label in rect: " + ex.Message);
+                //Debug.LogError("Error drawing label in rect: " + ex.Message);
             }
         }
 
@@ -821,7 +822,7 @@ namespace shadcnui
             }
             catch (Exception ex)
             {
-                Debug.LogError("Error drawing secondary label: " + ex.Message);
+              //  Debug.LogError("Error drawing secondary label: " + ex.Message);
             }
         }
 
@@ -833,7 +834,7 @@ namespace shadcnui
             }
             catch (Exception ex)
             {
-                Debug.LogError("Error drawing muted label: " + ex.Message);
+               // Debug.LogError("Error drawing muted label: " + ex.Message);
             }
         }
 
@@ -845,7 +846,7 @@ namespace shadcnui
             }
             catch (Exception ex)
             {
-                Debug.LogError("Error drawing destructive label: " + ex.Message);
+                //Debug.LogError("Error drawing destructive label: " + ex.Message);
             }
         }
         #endregion
@@ -859,7 +860,7 @@ namespace shadcnui
             }
             catch (Exception ex)
             {
-                Debug.LogError("Error drawing progress: " + ex.Message);
+              //  Debug.LogError("Error drawing progress: " + ex.Message);
             }
         }
 
@@ -871,7 +872,7 @@ namespace shadcnui
             }
             catch (Exception ex)
             {
-                Debug.LogError("Error drawing progress in rect: " + ex.Message);
+               // Debug.LogError("Error drawing progress in rect: " + ex.Message);
             }
         }
 
@@ -883,7 +884,7 @@ namespace shadcnui
             }
             catch (Exception ex)
             {
-                Debug.LogError("Error drawing labeled progress: " + ex.Message);
+              //  Debug.LogError("Error drawing labeled progress: " + ex.Message);
             }
         }
 
@@ -895,7 +896,7 @@ namespace shadcnui
             }
             catch (Exception ex)
             {
-                Debug.LogError("Error drawing circular progress: " + ex.Message);
+               // Debug.LogError("Error drawing circular progress: " + ex.Message);
             }
         }
         #endregion
@@ -909,7 +910,7 @@ namespace shadcnui
             }
             catch (Exception ex)
             {
-                Debug.LogError("Error drawing separator: " + ex.Message);
+                //Debug.LogError("Error drawing separator: " + ex.Message);
             }
         }
 
@@ -921,7 +922,7 @@ namespace shadcnui
             }
             catch (Exception ex)
             {
-                Debug.LogError("Error drawing horizontal separator: " + ex.Message);
+               // Debug.LogError("Error drawing horizontal separator: " + ex.Message);
             }
         }
 
@@ -933,7 +934,7 @@ namespace shadcnui
             }
             catch (Exception ex)
             {
-                Debug.LogError("Error drawing vertical separator: " + ex.Message);
+              //  Debug.LogError("Error drawing vertical separator: " + ex.Message);
             }
         }
 
@@ -945,7 +946,7 @@ namespace shadcnui
             }
             catch (Exception ex)
             {
-                Debug.LogError("Error drawing separator in rect: " + ex.Message);
+                //Debug.LogError("Error drawing separator in rect: " + ex.Message);
             }
         }
 
@@ -957,7 +958,7 @@ namespace shadcnui
             }
             catch (Exception ex)
             {
-                Debug.LogError("Error drawing separator with spacing: " + ex.Message);
+               // Debug.LogError("Error drawing separator with spacing: " + ex.Message);
             }
         }
 
@@ -969,7 +970,7 @@ namespace shadcnui
             }
             catch (Exception ex)
             {
-                Debug.LogError("Error drawing labeled separator: " + ex.Message);
+               // Debug.LogError("Error drawing labeled separator: " + ex.Message);
             }
         }
         #endregion
@@ -1000,7 +1001,7 @@ namespace shadcnui
             }
             catch (Exception ex)
             {
-                Debug.LogError("Error beginning tab content: " + ex.Message);
+               // Debug.LogError("Error beginning tab content: " + ex.Message);
             }
         }
 
@@ -1012,7 +1013,7 @@ namespace shadcnui
             }
             catch (Exception ex)
             {
-                Debug.LogError("Error ending tab content: " + ex.Message);
+               // Debug.LogError("Error ending tab content: " + ex.Message);
             }
         }
 
@@ -1024,7 +1025,7 @@ namespace shadcnui
             }
             catch (Exception ex)
             {
-                Debug.LogError("Error drawing tabs with content: " + ex.Message);
+              //  Debug.LogError("Error drawing tabs with content: " + ex.Message);
                 return -1;
             }
         }
@@ -1037,7 +1038,7 @@ namespace shadcnui
             }
             catch (Exception ex)
             {
-                Debug.LogError("Error drawing vertical tabs: " + ex.Message);
+             //   Debug.LogError("Error drawing vertical tabs: " + ex.Message);
                 return -1;
             }
         }
@@ -1052,7 +1053,7 @@ namespace shadcnui
             }
             catch (Exception ex)
             {
-                Debug.LogError("Error drawing text area: " + ex.Message);
+              //  Debug.LogError("Error drawing text area: " + ex.Message);
                 return "Error: " + ex.Message;
             }
         }
@@ -1065,7 +1066,7 @@ namespace shadcnui
             }
             catch (Exception ex)
             {
-                Debug.LogError("Error drawing text area in rect: " + ex.Message);
+              //  Debug.LogError("Error drawing text area in rect: " + ex.Message);
                 return "Error: " + ex.Message;
             }
         }
@@ -1078,7 +1079,7 @@ namespace shadcnui
             }
             catch (Exception ex)
             {
-                Debug.LogError("Error drawing outline text area: " + ex.Message);
+              //  Debug.LogError("Error drawing outline text area: " + ex.Message);
                 return "Error: " + ex.Message;
             }
         }
@@ -1091,7 +1092,7 @@ namespace shadcnui
             }
             catch (Exception ex)
             {
-                Debug.LogError("Error drawing ghost text area: " + ex.Message);
+              //  Debug.LogError("Error drawing ghost text area: " + ex.Message);
                 return "Error: " + ex.Message;
             }
         }
@@ -1104,7 +1105,7 @@ namespace shadcnui
             }
             catch (Exception ex)
             {
-                Debug.LogError("Error drawing labeled text area: " + ex.Message);
+              //  Debug.LogError("Error drawing labeled text area: " + ex.Message);
                 return "Error: " + ex.Message;
             }
         }
@@ -1117,7 +1118,7 @@ namespace shadcnui
             }
             catch (Exception ex)
             {
-                Debug.LogError("Error drawing resizable text area: " + ex.Message);
+               // Debug.LogError("Error drawing resizable text area: " + ex.Message);
                 return "Error: " + ex.Message;
             }
         }
@@ -1132,7 +1133,7 @@ namespace shadcnui
             }
             catch (Exception ex)
             {
-                Debug.LogError("Error drawing checkbox: " + ex.Message);
+                //Debug.LogError("Error drawing checkbox: " + ex.Message);
                 return false;
             }
         }
@@ -1145,7 +1146,7 @@ namespace shadcnui
             }
             catch (Exception ex)
             {
-                Debug.LogError("Error drawing checkbox in rect: " + ex.Message);
+              //  Debug.LogError("Error drawing checkbox in rect: " + ex.Message);
                 return false;
             }
         }
@@ -1171,7 +1172,7 @@ namespace shadcnui
             }
             catch (Exception ex)
             {
-                Debug.LogError("Error drawing checkbox group: " + ex.Message);
+               // Debug.LogError("Error drawing checkbox group: " + ex.Message);
                 return values ?? new bool[0];
             }
         }
@@ -1184,7 +1185,7 @@ namespace shadcnui
             }
             catch (Exception ex)
             {
-                Debug.LogError("Error drawing custom checkbox: " + ex.Message);
+                //Debug.LogError("Error drawing custom checkbox: " + ex.Message);
                 return false;
             }
         }
@@ -1197,7 +1198,7 @@ namespace shadcnui
             }
             catch (Exception ex)
             {
-                Debug.LogError("Error drawing checkbox with icon: " + ex.Message);
+               // Debug.LogError("Error drawing checkbox with icon: " + ex.Message);
                 return false;
             }
         }
@@ -1210,7 +1211,7 @@ namespace shadcnui
             }
             catch (Exception ex)
             {
-                Debug.LogError("Error drawing checkbox with description: " + ex.Message);
+                //Debug.LogError("Error drawing checkbox with description: " + ex.Message);
                 return false;
             }
         }
@@ -1223,7 +1224,7 @@ namespace shadcnui
             }
             catch (Exception ex)
             {
-                Debug.LogError("Error drawing validated checkbox: " + ex.Message);
+                //Debug.LogError("Error drawing validated checkbox: " + ex.Message);
                 return false;
             }
         }
@@ -1236,7 +1237,7 @@ namespace shadcnui
             }
             catch (Exception ex)
             {
-                Debug.LogError("Error drawing checkbox with tooltip: " + ex.Message);
+               // Debug.LogError("Error drawing checkbox with tooltip: " + ex.Message);
                 return false;
             }
         }
@@ -1251,7 +1252,7 @@ namespace shadcnui
             }
             catch (Exception ex)
             {
-                Debug.LogError("Error drawing switch: " + ex.Message);
+              //  Debug.LogError("Error drawing switch: " + ex.Message);
                 return false;
             }
         }
@@ -1264,7 +1265,7 @@ namespace shadcnui
             }
             catch (Exception ex)
             {
-                Debug.LogError("Error drawing switch in rect: " + ex.Message);
+                //Debug.LogError("Error drawing switch in rect: " + ex.Message);
                 return false;
             }
         }
@@ -1277,7 +1278,7 @@ namespace shadcnui
             }
             catch (Exception ex)
             {
-                Debug.LogError("Error drawing switch with label: " + ex.Message);
+              //  Debug.LogError("Error drawing switch with label: " + ex.Message);
                 return false;
             }
         }
@@ -1290,7 +1291,7 @@ namespace shadcnui
             }
             catch (Exception ex)
             {
-                Debug.LogError("Error drawing switch with description: " + ex.Message);
+              //  Debug.LogError("Error drawing switch with description: " + ex.Message);
                 return false;
             }
         }
@@ -1303,7 +1304,7 @@ namespace shadcnui
             }
             catch (Exception ex)
             {
-                Debug.LogError("Error drawing custom switch: " + ex.Message);
+                //Debug.LogError("Error drawing custom switch: " + ex.Message);
                 return false;
             }
         }
@@ -1316,7 +1317,7 @@ namespace shadcnui
             }
             catch (Exception ex)
             {
-                Debug.LogError("Error drawing switch with icon: " + ex.Message);
+                //Debug.LogError("Error drawing switch with icon: " + ex.Message);
                 return false;
             }
         }
@@ -1329,7 +1330,7 @@ namespace shadcnui
             }
             catch (Exception ex)
             {
-                Debug.LogError("Error drawing validated switch: " + ex.Message);
+              //  Debug.LogError("Error drawing validated switch: " + ex.Message);
                 return false;
             }
         }
@@ -1342,7 +1343,7 @@ namespace shadcnui
             }
             catch (Exception ex)
             {
-                Debug.LogError("Error drawing switch with tooltip: " + ex.Message);
+               // Debug.LogError("Error drawing switch with tooltip: " + ex.Message);
                 return false;
             }
         }
@@ -1355,7 +1356,7 @@ namespace shadcnui
             }
             catch (Exception ex)
             {
-                Debug.LogError("Error drawing switch group: " + ex.Message);
+               // Debug.LogError("Error drawing switch group: " + ex.Message);
                 return values ?? new bool[0];
             }
         }
@@ -1368,7 +1369,7 @@ namespace shadcnui
             }
             catch (Exception ex)
             {
-                Debug.LogError("Error drawing switch with loading: " + ex.Message);
+              //  Debug.LogError("Error drawing switch with loading: " + ex.Message);
                 return false;
             }
         }
@@ -1383,7 +1384,7 @@ namespace shadcnui
             }
             catch (Exception ex)
             {
-                Debug.LogError("Error drawing badge: " + ex.Message);
+               // Debug.LogError("Error drawing badge: " + ex.Message);
             }
         }
 
@@ -1395,7 +1396,7 @@ namespace shadcnui
             }
             catch (Exception ex)
             {
-                Debug.LogError("Error drawing badge in rect: " + ex.Message);
+                //Debug.LogError("Error drawing badge in rect: " + ex.Message);
             }
         }
 
@@ -1407,7 +1408,7 @@ namespace shadcnui
             }
             catch (Exception ex)
             {
-                Debug.LogError("Error drawing badge with icon: " + ex.Message);
+                //Debug.LogError("Error drawing badge with icon: " + ex.Message);
             }
         }
 
@@ -1419,7 +1420,7 @@ namespace shadcnui
             }
             catch (Exception ex)
             {
-                Debug.LogError("Error drawing custom badge: " + ex.Message);
+                //Debug.LogError("Error drawing custom badge: " + ex.Message);
             }
         }
 
@@ -1431,7 +1432,7 @@ namespace shadcnui
             }
             catch (Exception ex)
             {
-                Debug.LogError("Error drawing count badge: " + ex.Message);
+               // Debug.LogError("Error drawing count badge: " + ex.Message);
             }
         }
 
@@ -1443,7 +1444,7 @@ namespace shadcnui
             }
             catch (Exception ex)
             {
-                Debug.LogError("Error drawing status badge: " + ex.Message);
+               // Debug.LogError("Error drawing status badge: " + ex.Message);
             }
         }
 
@@ -1455,7 +1456,7 @@ namespace shadcnui
             }
             catch (Exception ex)
             {
-                Debug.LogError("Error drawing dismissible badge: " + ex.Message);
+               // Debug.LogError("Error drawing dismissible badge: " + ex.Message);
                 return false;
             }
         }
@@ -1468,7 +1469,7 @@ namespace shadcnui
             }
             catch (Exception ex)
             {
-                Debug.LogError("Error drawing progress badge: " + ex.Message);
+             //   Debug.LogError("Error drawing progress badge: " + ex.Message);
             }
         }
 
@@ -1480,7 +1481,7 @@ namespace shadcnui
             }
             catch (Exception ex)
             {
-                Debug.LogError("Error drawing animated badge: " + ex.Message);
+             //   Debug.LogError("Error drawing animated badge: " + ex.Message);
             }
         }
 
@@ -1492,7 +1493,7 @@ namespace shadcnui
             }
             catch (Exception ex)
             {
-                Debug.LogError("Error drawing badge with tooltip: " + ex.Message);
+               // Debug.LogError("Error drawing badge with tooltip: " + ex.Message);
             }
         }
 
@@ -1504,7 +1505,7 @@ namespace shadcnui
             }
             catch (Exception ex)
             {
-                Debug.LogError("Error drawing badge group: " + ex.Message);
+               // Debug.LogError("Error drawing badge group: " + ex.Message);
             }
         }
 
@@ -1516,7 +1517,7 @@ namespace shadcnui
             }
             catch (Exception ex)
             {
-                Debug.LogError("Error drawing rounded badge: " + ex.Message);
+               // Debug.LogError("Error drawing rounded badge: " + ex.Message);
             }
         }
         #endregion
@@ -1530,7 +1531,7 @@ namespace shadcnui
             }
             catch (Exception ex)
             {
-                Debug.LogError("Error drawing alert: " + ex.Message);
+               // Debug.LogError("Error drawing alert: " + ex.Message);
             }
         }
 
@@ -1542,7 +1543,7 @@ namespace shadcnui
             }
             catch (Exception ex)
             {
-                Debug.LogError("Error drawing alert with icon: " + ex.Message);
+               // Debug.LogError("Error drawing alert with icon: " + ex.Message);
             }
         }
 
@@ -1554,7 +1555,7 @@ namespace shadcnui
             }
             catch (Exception ex)
             {
-                Debug.LogError("Error drawing custom alert: " + ex.Message);
+               // Debug.LogError("Error drawing custom alert: " + ex.Message);
             }
         }
 
@@ -1566,7 +1567,7 @@ namespace shadcnui
             }
             catch (Exception ex)
             {
-                Debug.LogError("Error drawing alert with progress: " + ex.Message);
+              //  Debug.LogError("Error drawing alert with progress: " + ex.Message);
             }
         }
 
@@ -1578,7 +1579,7 @@ namespace shadcnui
             }
             catch (Exception ex)
             {
-                Debug.LogError("Error drawing animated alert: " + ex.Message);
+                //Debug.LogError("Error drawing animated alert: " + ex.Message);
             }
         }
 
@@ -1590,7 +1591,7 @@ namespace shadcnui
             }
             catch (Exception ex)
             {
-                Debug.LogError("Error drawing alert with countdown: " + ex.Message);
+              //  Debug.LogError("Error drawing alert with countdown: " + ex.Message);
             }
         }
 
@@ -1602,7 +1603,7 @@ namespace shadcnui
             }
             catch (Exception ex)
             {
-                Debug.LogError("Error drawing expandable alert: " + ex.Message);
+              //  Debug.LogError("Error drawing expandable alert: " + ex.Message);
                 return false;
             }
         }
@@ -1615,7 +1616,7 @@ namespace shadcnui
             }
             catch (Exception ex)
             {
-                Debug.LogError("Error drawing alert with status: " + ex.Message);
+               // Debug.LogError("Error drawing alert with status: " + ex.Message);
             }
         }
 
@@ -1627,7 +1628,7 @@ namespace shadcnui
             }
             catch (Exception ex)
             {
-                Debug.LogError("Error drawing alert with custom icon: " + ex.Message);
+               // Debug.LogError("Error drawing alert with custom icon: " + ex.Message);
             }
         }
         #endregion
@@ -1641,7 +1642,7 @@ namespace shadcnui
             }
             catch (Exception ex)
             {
-                Debug.LogError("Error drawing avatar: " + ex.Message);
+               // Debug.LogError("Error drawing avatar: " + ex.Message);
             }
         }
 
@@ -1653,7 +1654,7 @@ namespace shadcnui
             }
             catch (Exception ex)
             {
-                Debug.LogError("Error drawing avatar in rect: " + ex.Message);
+                //Debug.LogError("Error drawing avatar in rect: " + ex.Message);
             }
         }
 
@@ -1665,7 +1666,7 @@ namespace shadcnui
             }
             catch (Exception ex)
             {
-                Debug.LogError("Error drawing avatar with status: " + ex.Message);
+               // Debug.LogError("Error drawing avatar with status: " + ex.Message);
             }
         }
 
@@ -1677,7 +1678,7 @@ namespace shadcnui
             }
             catch (Exception ex)
             {
-                Debug.LogError("Error drawing avatar with name: " + ex.Message);
+               // Debug.LogError("Error drawing avatar with name: " + ex.Message);
             }
         }
 
@@ -1689,7 +1690,7 @@ namespace shadcnui
             }
             catch (Exception ex)
             {
-                Debug.LogError("Error drawing custom avatar: " + ex.Message);
+               // Debug.LogError("Error drawing custom avatar: " + ex.Message);
             }
         }
 
@@ -1701,7 +1702,7 @@ namespace shadcnui
             }
             catch (Exception ex)
             {
-                Debug.LogError("Error drawing avatar with border: " + ex.Message);
+                //Debug.LogError("Error drawing avatar with border: " + ex.Message);
             }
         }
 
@@ -1713,7 +1714,7 @@ namespace shadcnui
             }
             catch (Exception ex)
             {
-                Debug.LogError("Error drawing avatar with hover: " + ex.Message);
+                //Debug.LogError("Error drawing avatar with hover: " + ex.Message);
             }
         }
 
@@ -1725,7 +1726,7 @@ namespace shadcnui
             }
             catch (Exception ex)
             {
-                Debug.LogError("Error drawing avatar with loading: " + ex.Message);
+              // Debug.LogError("Error drawing avatar with loading: " + ex.Message);
             }
         }
 
@@ -1737,7 +1738,7 @@ namespace shadcnui
             }
             catch (Exception ex)
             {
-                Debug.LogError("Error drawing avatar with tooltip: " + ex.Message);
+              //  Debug.LogError("Error drawing avatar with tooltip: " + ex.Message);
             }
         }
 
@@ -1749,7 +1750,7 @@ namespace shadcnui
             }
             catch (Exception ex)
             {
-                Debug.LogError("Error drawing avatar group: " + ex.Message);
+              //  Debug.LogError("Error drawing avatar group: " + ex.Message);
             }
         }
         #endregion
@@ -1763,7 +1764,7 @@ namespace shadcnui
             }
             catch (Exception ex)
             {
-                Debug.LogError("Error drawing skeleton: " + ex.Message);
+              //  Debug.LogError("Error drawing skeleton: " + ex.Message);
             }
         }
 
@@ -1775,7 +1776,7 @@ namespace shadcnui
             }
             catch (Exception ex)
             {
-                Debug.LogError("Error drawing animated skeleton: " + ex.Message);
+                //Debug.LogError("Error drawing animated skeleton: " + ex.Message);
             }
         }
 
@@ -1787,7 +1788,7 @@ namespace shadcnui
             }
             catch (Exception ex)
             {
-                Debug.LogError("Error drawing shimmer skeleton: " + ex.Message);
+               // Debug.LogError("Error drawing shimmer skeleton: " + ex.Message);
             }
         }
 
@@ -1799,7 +1800,7 @@ namespace shadcnui
             }
             catch (Exception ex)
             {
-                Debug.LogError("Error drawing custom skeleton: " + ex.Message);
+               // Debug.LogError("Error drawing custom skeleton: " + ex.Message);
             }
         }
 
@@ -1811,7 +1812,7 @@ namespace shadcnui
             }
             catch (Exception ex)
             {
-                Debug.LogError("Error drawing skeleton text: " + ex.Message);
+              //  Debug.LogError("Error drawing skeleton text: " + ex.Message);
             }
         }
 
@@ -1823,7 +1824,7 @@ namespace shadcnui
             }
             catch (Exception ex)
             {
-                Debug.LogError("Error drawing skeleton avatar: " + ex.Message);
+                //Debug.LogError("Error drawing skeleton avatar: " + ex.Message);
             }
         }
 
@@ -1835,7 +1836,7 @@ namespace shadcnui
             }
             catch (Exception ex)
             {
-                Debug.LogError("Error drawing skeleton button: " + ex.Message);
+               // Debug.LogError("Error drawing skeleton button: " + ex.Message);
             }
         }
 
@@ -1847,7 +1848,7 @@ namespace shadcnui
             }
             catch (Exception ex)
             {
-                Debug.LogError("Error drawing skeleton card: " + ex.Message);
+               // Debug.LogError("Error drawing skeleton card: " + ex.Message);
             }
         }
 
@@ -1859,7 +1860,7 @@ namespace shadcnui
             }
             catch (Exception ex)
             {
-                Debug.LogError("Error drawing skeleton table: " + ex.Message);
+              //  Debug.LogError("Error drawing skeleton table: " + ex.Message);
             }
         }
 
@@ -1871,7 +1872,7 @@ namespace shadcnui
             }
             catch (Exception ex)
             {
-                Debug.LogError("Error drawing skeleton list: " + ex.Message);
+              //  Debug.LogError("Error drawing skeleton list: " + ex.Message);
             }
         }
 
@@ -1883,7 +1884,7 @@ namespace shadcnui
             }
             catch (Exception ex)
             {
-                Debug.LogError("Error drawing skeleton with progress: " + ex.Message);
+               // Debug.LogError("Error drawing skeleton with progress: " + ex.Message);
             }
         }
 
@@ -1895,7 +1896,7 @@ namespace shadcnui
             }
             catch (Exception ex)
             {
-                Debug.LogError("Error drawing fade skeleton: " + ex.Message);
+               // Debug.LogError("Error drawing fade skeleton: " + ex.Message);
             }
         }
         #endregion
@@ -1909,7 +1910,7 @@ namespace shadcnui
             }
             catch (Exception ex)
             {
-                Debug.LogError("Error drawing table: " + ex.Message);
+             //   Debug.LogError("Error drawing table: " + ex.Message);
             }
         }
 
@@ -1921,7 +1922,7 @@ namespace shadcnui
             }
             catch (Exception ex)
             {
-                Debug.LogError("Error drawing table in rect: " + ex.Message);
+              //  Debug.LogError("Error drawing table in rect: " + ex.Message);
             }
         }
 
@@ -1933,7 +1934,7 @@ namespace shadcnui
             }
             catch (Exception ex)
             {
-                Debug.LogError("Error drawing sortable table: " + ex.Message);
+              //  Debug.LogError("Error drawing sortable table: " + ex.Message);
             }
         }
 
@@ -1945,7 +1946,7 @@ namespace shadcnui
             }
             catch (Exception ex)
             {
-                Debug.LogError("Error drawing selectable table: " + ex.Message);
+              //  Debug.LogError("Error drawing selectable table: " + ex.Message);
             }
         }
 
@@ -1957,7 +1958,7 @@ namespace shadcnui
             }
             catch (Exception ex)
             {
-                Debug.LogError("Error drawing custom table: " + ex.Message);
+               // Debug.LogError("Error drawing custom table: " + ex.Message);
             }
         }
 
@@ -1969,7 +1970,7 @@ namespace shadcnui
             }
             catch (Exception ex)
             {
-                Debug.LogError("Error drawing paginated table: " + ex.Message);
+               // Debug.LogError("Error drawing paginated table: " + ex.Message);
             }
         }
 
@@ -1981,7 +1982,7 @@ namespace shadcnui
             }
             catch (Exception ex)
             {
-                Debug.LogError("Error drawing searchable table: " + ex.Message);
+               // Debug.LogError("Error drawing searchable table: " + ex.Message);
             }
         }
 
@@ -1993,7 +1994,7 @@ namespace shadcnui
             }
             catch (Exception ex)
             {
-                Debug.LogError("Error drawing resizable table: " + ex.Message);
+               // Debug.LogError("Error drawing resizable table: " + ex.Message);
             }
         }
         #endregion
@@ -2007,7 +2008,7 @@ namespace shadcnui
             }
             catch (Exception ex)
             {
-                Debug.LogError("Error drawing calendar: " + ex.Message);
+               // Debug.LogError("Error drawing calendar: " + ex.Message);
             }
         }
         #endregion
@@ -2021,7 +2022,7 @@ namespace shadcnui
             }
             catch (Exception ex)
             {
-                Debug.LogError("Error drawing dropdown menu: " + ex.Message);
+                //Debug.LogError("Error drawing dropdown menu: " + ex.Message);
             }
         }
 
@@ -2040,7 +2041,7 @@ namespace shadcnui
             }
             catch (Exception ex)
             {
-                Debug.LogError("Error drawing popover: " + ex.Message);
+               // Debug.LogError("Error drawing popover: " + ex.Message);
             }
         }
 
@@ -2069,7 +2070,7 @@ namespace shadcnui
             }
             catch (Exception ex)
             {
-                Debug.LogError("Error drawing select: " + ex.Message);
+                //Debug.LogError("Error drawing select: " + ex.Message);
                 return selectedIndex;
             }
         }
@@ -2122,7 +2123,7 @@ namespace shadcnui
             }
             catch (Exception ex)
             {
-                Debug.LogError("Error drawing dialog trigger: " + ex.Message);
+                //Debug.LogError("Error drawing dialog trigger: " + ex.Message);
                 return false;
             }
         }
@@ -2135,7 +2136,7 @@ namespace shadcnui
             }
             catch (Exception ex)
             {
-                Debug.LogError("Error drawing dialog header: " + ex.Message);
+              //  Debug.LogError("Error drawing dialog header: " + ex.Message);
             }
         }
 
@@ -2147,7 +2148,7 @@ namespace shadcnui
             }
             catch (Exception ex)
             {
-                Debug.LogError("Error drawing dialog content: " + ex.Message);
+              //  Debug.LogError("Error drawing dialog content: " + ex.Message);
             }
         }
 
@@ -2159,7 +2160,7 @@ namespace shadcnui
             }
             catch (Exception ex)
             {
-                Debug.LogError("Error drawing dialog footer: " + ex.Message);
+             //   Debug.LogError("Error drawing dialog footer: " + ex.Message);
             }
         }
         #endregion
@@ -2173,7 +2174,7 @@ namespace shadcnui
             }
             catch (Exception ex)
             {
-                Debug.LogError("Error drawing date picker: " + ex.Message);
+              //  Debug.LogError("Error drawing date picker: " + ex.Message);
                 return selectedDate;
             }
         }
@@ -2186,7 +2187,7 @@ namespace shadcnui
             }
             catch (Exception ex)
             {
-                Debug.LogError("Error drawing date picker with label: " + ex.Message);
+                //Debug.LogError("Error drawing date picker with label: " + ex.Message);
                 return selectedDate;
             }
         }
@@ -2199,7 +2200,7 @@ namespace shadcnui
             }
             catch (Exception ex)
             {
-                Debug.LogError("Error drawing date range picker: " + ex.Message);
+               // Debug.LogError("Error drawing date range picker: " + ex.Message);
                 return startDate;
             }
         }
@@ -2212,7 +2213,7 @@ namespace shadcnui
             }
             catch (Exception ex)
             {
-                Debug.LogError("Error closing date picker: " + ex.Message);
+                //Debug.LogError("Error closing date picker: " + ex.Message);
             }
         }
 
@@ -2224,7 +2225,7 @@ namespace shadcnui
             }
             catch (Exception ex)
             {
-                Debug.LogError("Error checking date picker state: " + ex.Message);
+               // Debug.LogError("Error checking date picker state: " + ex.Message);
                 return false;
             }
         }
@@ -2242,7 +2243,7 @@ namespace shadcnui
             }
             catch (Exception ex)
             {
-                Debug.LogError("Error drawing data table: " + ex.Message);
+                //Debug.LogError("Error drawing data table: " + ex.Message);
             }
         }
 
@@ -2273,7 +2274,7 @@ namespace shadcnui
             }
             catch (Exception ex)
             {
-                Debug.LogError("Error getting selected rows: " + ex.Message);
+              //  Debug.LogError("Error getting selected rows: " + ex.Message);
                 return new List<string>();
             }
         }
@@ -2289,7 +2290,7 @@ namespace shadcnui
             }
             catch (Exception ex)
             {
-                Debug.LogError("Error clearing selection: " + ex.Message);
+               // Debug.LogError("Error clearing selection: " + ex.Message);
             }
         }
         #endregion

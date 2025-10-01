@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
-#if IL2CPP
+#if IL2CPP_MELONLOADER
 using UnhollowerBaseLib;
 #endif
 
@@ -48,7 +48,7 @@ namespace shadcnui.GUIComponents
         {
             layoutComponents.BeginHorizontalGroup();
 
-#if IL2CPP
+#if IL2CPP_MELONLOADER
             if (GUILayout.Button("<", styleManager.buttonGhostStyle, new Il2CppReferenceArray<GUILayoutOption>(new GUILayoutOption[0])))
 #else
             if (GUILayout.Button("<", styleManager.buttonGhostStyle))
@@ -60,7 +60,7 @@ namespace shadcnui.GUIComponents
             if (showMonthDropdown) { }
             else
             {
-#if IL2CPP
+#if IL2CPP_MELONLOADER
                 if (GUILayout.Button(displayedMonth.ToString("MMMM"), styleManager.buttonGhostStyle, new Il2CppReferenceArray<GUILayoutOption>(new GUILayoutOption[0])))
 #else
                 if (GUILayout.Button(displayedMonth.ToString("MMMM"), styleManager.buttonGhostStyle))
@@ -73,7 +73,7 @@ namespace shadcnui.GUIComponents
             if (showYearDropdown) { }
             else
             {
-#if IL2CPP
+#if IL2CPP_MELONLOADER
                 if (GUILayout.Button(displayedMonth.ToString("yyyy"), styleManager.buttonGhostStyle, new Il2CppReferenceArray<GUILayoutOption>(new GUILayoutOption[0])))
 #else
                 if (GUILayout.Button(displayedMonth.ToString("yyyy"), styleManager.buttonGhostStyle))
@@ -83,7 +83,7 @@ namespace shadcnui.GUIComponents
                 }
             }
 
-#if IL2CPP
+#if IL2CPP_MELONLOADER
             if (GUILayout.Button(">", styleManager.buttonGhostStyle, new Il2CppReferenceArray<GUILayoutOption>(new GUILayoutOption[0])))
 #else
             if (GUILayout.Button(">", styleManager.buttonGhostStyle))
@@ -100,7 +100,7 @@ namespace shadcnui.GUIComponents
             layoutComponents.BeginHorizontalGroup();
             for (int i = 0; i < 7; i++)
             {
-#if IL2CPP
+#if IL2CPP_MELONLOADER
                 GUILayout.Label(((DayOfWeek)i).ToString().Substring(0, 2), styleManager.calendarWeekdayStyle, new Il2CppReferenceArray<GUILayoutOption>(new GUILayoutOption[0]));
 #else
                 GUILayout.Label(((DayOfWeek)i).ToString().Substring(0, 2), styleManager.calendarWeekdayStyle);
@@ -122,7 +122,7 @@ namespace shadcnui.GUIComponents
                 {
                     if ((i == 0 && j < firstDayOfMonth) || dayCounter > daysInMonth)
                     {
-#if IL2CPP
+#if IL2CPP_MELONLOADER
                         GUILayout.Label("", styleManager.calendarDayOutsideMonthStyle, new Il2CppReferenceArray<GUILayoutOption>(new GUILayoutOption[0]));
 #else
                         GUILayout.Label("", styleManager.calendarDayOutsideMonthStyle);
@@ -151,7 +151,7 @@ namespace shadcnui.GUIComponents
                             dayStyle = styleManager.calendarDayTodayStyle;
                         }
 
-#if IL2CPP
+#if IL2CPP_MELONLOADER
                         if (GUILayout.Button(dayCounter.ToString(), dayStyle, new Il2CppReferenceArray<GUILayoutOption>(new GUILayoutOption[0])))
 #else
                         if (GUILayout.Button(dayCounter.ToString(), dayStyle))

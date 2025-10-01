@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using shadcnui;
 using UnityEngine;
-#if IL2CPP
+#if IL2CPP_MELONLOADER
 using UnhollowerBaseLib;
 #endif
 
@@ -45,7 +45,7 @@ namespace shadcnui.GUIComponents
             GUI.color = new Color(originalColor.r, originalColor.g, originalColor.b, originalColor.a * opacity);
 
             bool clicked;
-#if IL2CPP
+#if IL2CPP_MELONLOADER
             clicked = GUILayout.Button(text ?? "Button", buttonStyle, (Il2CppReferenceArray<GUILayoutOption>)layoutOptions.ToArray());
 #else
             clicked = GUILayout.Button(text ?? "Button", buttonStyle, layoutOptions.ToArray());
@@ -90,7 +90,7 @@ namespace shadcnui.GUIComponents
 
             if (horizontal)
             {
-#if IL2CPP
+#if IL2CPP_MELONLOADER
                 layoutComponents.BeginHorizontalGroup(GUIStyle.none, (Il2CppReferenceArray<GUILayoutOption>)null);
 #else
                 layoutComponents.BeginHorizontalGroup();
@@ -98,7 +98,7 @@ namespace shadcnui.GUIComponents
             }
             else
             {
-#if IL2CPP
+#if IL2CPP_MELONLOADER
                 layoutComponents.BeginVerticalGroup(GUIStyle.none, (Il2CppReferenceArray<GUILayoutOption>)null);
 #else
                 layoutComponents.BeginVerticalGroup();

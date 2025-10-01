@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 using UnityEngine;
-#if IL2CPP
+#if IL2CPP_MELONLOADER
 using UnhollowerBaseLib;
 #endif
 
@@ -50,7 +50,7 @@ namespace shadcnui.GUIComponents
         public void CardTitle(string title)
         {
             var styleManager = _guiHelper.GetStyleManager();
-#if IL2CPP
+#if IL2CPP_MELONLOADER
             GUILayout.Label(new GUIContent(title), styleManager.cardTitleStyle, new Il2CppReferenceArray<GUILayoutOption>(new GUILayoutOption[0]));
 #else
             GUILayout.Label(title, styleManager.cardTitleStyle);
@@ -60,7 +60,7 @@ namespace shadcnui.GUIComponents
         public void CardDescription(string description)
         {
             var styleManager = _guiHelper.GetStyleManager();
-#if IL2CPP
+#if IL2CPP_MELONLOADER
             GUILayout.Label(new GUIContent(description), styleManager.cardDescriptionStyle, new Il2CppReferenceArray<GUILayoutOption>(new GUILayoutOption[0]));
 #else
             GUILayout.Label(description, styleManager.cardDescriptionStyle);
@@ -103,7 +103,7 @@ namespace shadcnui.GUIComponents
                 CardContent(() =>
                 {
                     var styleManager = _guiHelper.GetStyleManager();
-#if IL2CPP
+#if IL2CPP_MELONLOADER
                     GUILayout.Label(new GUIContent(content), styleManager.labelDefaultStyle, new Il2CppReferenceArray<GUILayoutOption>(new GUILayoutOption[0]));
 #else
                     GUILayout.Label(content, styleManager.labelDefaultStyle);
@@ -122,7 +122,7 @@ namespace shadcnui.GUIComponents
         public void CardImage(Texture2D image, float height = 150)
         {
             var styleManager = _guiHelper.GetStyleManager();
-#if IL2CPP
+#if IL2CPP_MELONLOADER
             var rect = GUILayoutUtility.GetRect(0, height, new Il2CppReferenceArray<GUILayoutOption>(new GUILayoutOption[] { GUILayout.ExpandWidth(true) }));
 #else
             var rect = GUILayoutUtility.GetRect(0, height, GUILayout.ExpandWidth(true));
@@ -152,7 +152,7 @@ namespace shadcnui.GUIComponents
                 CardContent(() =>
                 {
                     var styleManager = _guiHelper.GetStyleManager();
-#if IL2CPP
+#if IL2CPP_MELONLOADER
                     GUILayout.Label(new GUIContent(content), styleManager.labelDefaultStyle, new Il2CppReferenceArray<GUILayoutOption>(new GUILayoutOption[0]));
 #else
                     GUILayout.Label(content, styleManager.labelDefaultStyle);
@@ -191,7 +191,7 @@ namespace shadcnui.GUIComponents
                 CardContent(() =>
                 {
                     var styleManager = _guiHelper.GetStyleManager();
-#if IL2CPP
+#if IL2CPP_MELONLOADER
                     GUILayout.Label(new GUIContent(content), styleManager.labelDefaultStyle, new Il2CppReferenceArray<GUILayoutOption>(new GUILayoutOption[0]));
 #else
                     GUILayout.Label(content, styleManager.labelDefaultStyle);
@@ -231,7 +231,7 @@ namespace shadcnui.GUIComponents
                 CardContent(() =>
                 {
                     var styleManager = _guiHelper.GetStyleManager();
-#if IL2CPP
+#if IL2CPP_MELONLOADER
                     GUILayout.Label(new GUIContent(content), styleManager.labelDefaultStyle, new Il2CppReferenceArray<GUILayoutOption>(new GUILayoutOption[0]));
 #else
                     GUILayout.Label(content, styleManager.labelDefaultStyle);
@@ -253,7 +253,7 @@ namespace shadcnui.GUIComponents
             CardContent(() =>
             {
                 var styleManager = _guiHelper.GetStyleManager();
-#if IL2CPP
+#if IL2CPP_MELONLOADER
                 GUILayout.Label(new GUIContent(content), styleManager.labelDefaultStyle, new Il2CppReferenceArray<GUILayoutOption>(new GUILayoutOption[0]));
 #else
                 GUILayout.Label(content, styleManager.labelDefaultStyle);
