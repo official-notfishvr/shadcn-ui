@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using shadcnui;
 using UnityEngine;
-#if IL2CPP
+#if IL2CPP_MELONLOADER
 using UnhollowerBaseLib;
 #endif
 
@@ -25,7 +25,7 @@ namespace shadcnui.GUIComponents
 
             GUIStyle badgeStyle = styleManager.GetBadgeStyle(variant, size);
 
-#if IL2CPP
+#if IL2CPP_MELONLOADER
             GUILayout.Label(text ?? "Badge", badgeStyle, (Il2CppReferenceArray<GUILayoutOption>)options);
 #else
             GUILayout.Label(text ?? "Badge", badgeStyle, options);
@@ -49,7 +49,7 @@ namespace shadcnui.GUIComponents
 
             if (icon != null)
             {
-#if IL2CPP
+#if IL2CPP_MELONLOADER
                 GUILayout.Label(icon, GUI.skin.label, (Il2CppReferenceArray<GUILayoutOption>)new GUILayoutOption[] { GUILayout.Width(16 * guiHelper.uiScale), GUILayout.Height(16 * guiHelper.uiScale) });
 #else
                 GUILayout.Label(icon, GUILayout.Width(16 * guiHelper.uiScale), GUILayout.Height(16 * guiHelper.uiScale));
@@ -66,15 +66,15 @@ namespace shadcnui.GUIComponents
         {
             var styleManager = guiHelper.GetStyleManager();
 
-            GUIStyle customStyle = new GUIStyle(GUI.skin.box);
+            GUIStyle customStyle = new UnityHelpers.GUIStyle(GUI.skin.box);
             customStyle.normal.background = styleManager.CreateSolidTexture(backgroundColor);
             customStyle.normal.textColor = textColor;
             customStyle.fontSize = GetBadgeFontSize(size);
             customStyle.padding = GetBadgePadding(size);
-            customStyle.border = new RectOffset(4, 4, 2, 2);
+            customStyle.border = new UnityHelpers.RectOffset(4, 4, 2, 2);
             customStyle.alignment = TextAnchor.MiddleCenter;
 
-#if IL2CPP
+#if IL2CPP_MELONLOADER
             GUILayout.Label(text ?? "Badge", customStyle, (Il2CppReferenceArray<GUILayoutOption>)options);
 #else
             GUILayout.Label(text ?? "Badge", customStyle, options);
@@ -95,17 +95,17 @@ namespace shadcnui.GUIComponents
             var styleManager = guiHelper.GetStyleManager();
             if (styleManager != null)
             {
-                GUIStyle dotStyle = new GUIStyle(GUI.skin.box)
+                GUIStyle dotStyle = new UnityHelpers.GUIStyle(GUI.skin.box)
                 {
                     normal = { background = styleManager.CreateSolidTexture(dotColor) },
                     fixedWidth = 8 * guiHelper.uiScale,
                     fixedHeight = 8 * guiHelper.uiScale,
-                    border = new RectOffset(0, 0, 0, 0),
-                    padding = new RectOffset(0, 0, 0, 0),
-                    margin = new RectOffset(0, 0, 0, 0),
+                    border = new UnityHelpers.RectOffset(0, 0, 0, 0),
+                    padding = new UnityHelpers.RectOffset(0, 0, 0, 0),
+                    margin = new UnityHelpers.RectOffset(0, 0, 0, 0),
                 };
 
-#if IL2CPP
+#if IL2CPP_MELONLOADER
                 GUILayout.Label(GUIContent.none, dotStyle, (Il2CppReferenceArray<GUILayoutOption>)null);
 #else
                 GUILayout.Label("", dotStyle);
@@ -125,7 +125,7 @@ namespace shadcnui.GUIComponents
             DrawBadge(text, variant, size, options);
 
             layoutComponents.AddSpace(4);
-#if IL2CPP
+#if IL2CPP_MELONLOADER
             bool closeClicked = GUILayout.Button("×", GUI.skin.button, new Il2CppReferenceArray<GUILayoutOption>(new GUILayoutOption[] { GUILayout.Width(16 * guiHelper.uiScale), GUILayout.Height(16 * guiHelper.uiScale) }));
 #else
             bool closeClicked = GUILayout.Button("×", GUI.skin.button, new GUILayoutOption[] { GUILayout.Width(16 * guiHelper.uiScale), GUILayout.Height(16 * guiHelper.uiScale) });
@@ -152,12 +152,12 @@ namespace shadcnui.GUIComponents
             var styleManager = guiHelper.GetStyleManager();
             if (styleManager != null)
             {
-                GUIStyle bgStyle = new GUIStyle(GUI.skin.box);
+                GUIStyle bgStyle = new UnityHelpers.GUIStyle(GUI.skin.box);
                 bgStyle.normal.background = styleManager.CreateSolidTexture(Color.gray);
                 GUI.Box(progressRect, "", bgStyle);
 
                 Rect fillRect = new Rect(progressRect.x, progressRect.y, progressRect.width * Mathf.Clamp01(progress), progressRect.height);
-                GUIStyle fillStyle = new GUIStyle(GUI.skin.box);
+                GUIStyle fillStyle = new UnityHelpers.GUIStyle(GUI.skin.box);
                 fillStyle.normal.background = styleManager.CreateSolidTexture(Color.green);
                 GUI.Box(fillRect, "", fillStyle);
             }
@@ -194,7 +194,7 @@ namespace shadcnui.GUIComponents
                 Color originalColor = GUI.color;
                 GUI.color = new Color(originalColor.r, originalColor.g, originalColor.b, 0.6f);
 
-#if IL2CPP
+#if IL2CPP_MELONLOADER
                 GUILayout.Label("?", tooltipStyle, (Il2CppReferenceArray<GUILayoutOption>)null);
 #else
                 GUILayout.Label("?", tooltipStyle);
@@ -250,10 +250,10 @@ namespace shadcnui.GUIComponents
 
             GUIStyle badgeStyle = styleManager.GetBadgeStyle(variant, size);
 
-            GUIStyle roundedStyle = new GUIStyle(badgeStyle);
-            roundedStyle.border = new RectOffset(Mathf.RoundToInt(cornerRadius * guiHelper.uiScale), Mathf.RoundToInt(cornerRadius * guiHelper.uiScale), Mathf.RoundToInt(cornerRadius * guiHelper.uiScale), Mathf.RoundToInt(cornerRadius * guiHelper.uiScale));
+            GUIStyle roundedStyle = new UnityHelpers.GUIStyle(badgeStyle);
+            roundedStyle.border = new UnityHelpers.RectOffset(Mathf.RoundToInt(cornerRadius * guiHelper.uiScale), Mathf.RoundToInt(cornerRadius * guiHelper.uiScale), Mathf.RoundToInt(cornerRadius * guiHelper.uiScale), Mathf.RoundToInt(cornerRadius * guiHelper.uiScale));
 
-#if IL2CPP
+#if IL2CPP_MELONLOADER
             GUILayout.Label(text ?? "Badge", roundedStyle, (Il2CppReferenceArray<GUILayoutOption>)options);
 #else
             GUILayout.Label(text ?? "Badge", roundedStyle, options);
@@ -279,11 +279,11 @@ namespace shadcnui.GUIComponents
             switch (size)
             {
                 case BadgeSize.Small:
-                    return new RectOffset(Mathf.RoundToInt(6 * scale), Mathf.RoundToInt(6 * scale), Mathf.RoundToInt(2 * scale), Mathf.RoundToInt(2 * scale));
+                    return new UnityHelpers.RectOffset(Mathf.RoundToInt(6 * scale), Mathf.RoundToInt(6 * scale), Mathf.RoundToInt(2 * scale), Mathf.RoundToInt(2 * scale));
                 case BadgeSize.Large:
-                    return new RectOffset(Mathf.RoundToInt(12 * scale), Mathf.RoundToInt(12 * scale), Mathf.RoundToInt(4 * scale), Mathf.RoundToInt(4 * scale));
+                    return new UnityHelpers.RectOffset(Mathf.RoundToInt(12 * scale), Mathf.RoundToInt(12 * scale), Mathf.RoundToInt(4 * scale), Mathf.RoundToInt(4 * scale));
                 default:
-                    return new RectOffset(Mathf.RoundToInt(8 * scale), Mathf.RoundToInt(8 * scale), Mathf.RoundToInt(3 * scale), Mathf.RoundToInt(3 * scale));
+                    return new UnityHelpers.RectOffset(Mathf.RoundToInt(8 * scale), Mathf.RoundToInt(8 * scale), Mathf.RoundToInt(3 * scale), Mathf.RoundToInt(3 * scale));
             }
         }
     }

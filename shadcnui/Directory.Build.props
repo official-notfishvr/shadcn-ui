@@ -8,28 +8,28 @@
         <PluginsPath>$(GamePath)\BepInEx\plugins</PluginsPath>
     </PropertyGroup>
     <Choose>
-        <When Condition=" '$(Configuration)' == 'IL2CPP_Melonloader' ">
-            <PropertyGroup>
-                <DefineConstants>IL2CPP;MELONLOADER</DefineConstants>
-                <ReferencePath>$(SolutionDir)References_Il2CPP\</ReferencePath>
-            </PropertyGroup>
-        </When>
         <When Condition=" '$(Configuration)' == 'IL2CPP_BepInEx' ">
             <PropertyGroup>
-                <DefineConstants>IL2CPP;BEPINEX</DefineConstants>
-                <ReferencePath>$(SolutionDir)References_Il2CPP\</ReferencePath>
+                <DefineConstants>IL2CPP_BEPINEX;BEPINEX</DefineConstants>
+                <ReferencePath>$(SolutionDir)References\IL2CPP_BepInEx\</ReferencePath>
+            </PropertyGroup>
+        </When>
+        <When Condition=" '$(Configuration)' == 'IL2CPP_MELONLOADER' ">
+            <PropertyGroup>
+                <DefineConstants>IL2CPP_MELONLOADER;MELONLOADER</DefineConstants>
+                <ReferencePath>$(SolutionDir)References\IL2CPP_MELONLOADER\</ReferencePath>
             </PropertyGroup>
         </When>
         <When Condition=" '$(Configuration)' == 'Mono_Melonloader' ">
             <PropertyGroup>
                 <DefineConstants>MONO;MELONLOADER</DefineConstants>
-                <ReferencePath>$(SolutionDir)References\</ReferencePath>
+                <ReferencePath>$(SolutionDir)References\Mono\</ReferencePath>
             </PropertyGroup>
         </When>
         <When Condition=" '$(Configuration)' == 'Mono_BepInEx' ">
             <PropertyGroup>
                 <DefineConstants>MONO;BEPINEX</DefineConstants>
-                <ReferencePath>$(SolutionDir)References\</ReferencePath>
+                <ReferencePath>$(SolutionDir)References\Mono\</ReferencePath>
             </PropertyGroup>
         </When>
     </Choose>

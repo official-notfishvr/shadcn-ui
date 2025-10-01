@@ -1,6 +1,6 @@
 using System;
 using UnityEngine;
-#if IL2CPP
+#if IL2CPP_MELONLOADER
 using UnhollowerBaseLib;
 #endif
 
@@ -47,7 +47,7 @@ namespace shadcnui.GUIComponents
 
             _layoutComponents.BeginHorizontalGroup();
             GUILayout.FlexibleSpace();
-#if IL2CPP
+#if IL2CPP_MELONLOADER
             if (GUILayout.Button(new GUIContent("×"), _styleManager.buttonGhostStyle, new Il2CppReferenceArray<GUILayoutOption>(new GUILayoutOption[] { GUILayout.Width(24), GUILayout.Height(24) })))
 #else
             if (GUILayout.Button("×", _styleManager.buttonGhostStyle, GUILayout.Width(24), GUILayout.Height(24)))
@@ -75,7 +75,7 @@ namespace shadcnui.GUIComponents
             _layoutComponents.BeginVerticalGroup();
             if (!string.IsNullOrEmpty(title))
             {
-#if IL2CPP
+#if IL2CPP_MELONLOADER
                 GUILayout.Label(new GUIContent(title), _styleManager.dialogTitleStyle, Layout.EmptyOptions);
 #else
                 GUILayout.Label(title, _styleManager.dialogTitleStyle);
@@ -83,7 +83,7 @@ namespace shadcnui.GUIComponents
             }
             if (!string.IsNullOrEmpty(description))
             {
-#if IL2CPP
+#if IL2CPP_MELONLOADER
                 GUILayout.Label(new GUIContent(description), _styleManager.dialogDescriptionStyle, Layout.EmptyOptions);
 #else
                 GUILayout.Label(description, _styleManager.dialogDescriptionStyle);
@@ -91,7 +91,7 @@ namespace shadcnui.GUIComponents
             }
             _layoutComponents.EndVerticalGroup();
             GUILayout.FlexibleSpace();
-#if IL2CPP
+#if IL2CPP_MELONLOADER
             if (GUILayout.Button(new GUIContent("×"), _styleManager.buttonGhostStyle, new Il2CppReferenceArray<GUILayoutOption>(new GUILayoutOption[] { GUILayout.Width(24), GUILayout.Height(24) })))
 #else
             if (GUILayout.Button("×", _styleManager.buttonGhostStyle, GUILayout.Width(24), GUILayout.Height(24)))
@@ -127,7 +127,7 @@ namespace shadcnui.GUIComponents
             _layoutComponents.BeginVerticalGroup();
             if (!string.IsNullOrEmpty(title))
             {
-#if IL2CPP
+#if IL2CPP_MELONLOADER
                 GUILayout.Label(new GUIContent(title), _styleManager.dialogTitleStyle, Layout.EmptyOptions);
 #else
                 GUILayout.Label(title, _styleManager.dialogTitleStyle);
@@ -135,7 +135,7 @@ namespace shadcnui.GUIComponents
             }
             if (!string.IsNullOrEmpty(description))
             {
-#if IL2CPP
+#if IL2CPP_MELONLOADER
                 GUILayout.Label(new GUIContent(description), _styleManager.dialogDescriptionStyle, Layout.EmptyOptions);
 #else
                 GUILayout.Label(description, _styleManager.dialogDescriptionStyle);

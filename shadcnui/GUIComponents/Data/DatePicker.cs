@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 using UnityEngine;
-#if IL2CPP
+#if IL2CPP_MELONLOADER
 using UnhollowerBaseLib;
 #endif
 
@@ -37,7 +37,7 @@ namespace shadcnui.GUIComponents
 
             _layoutComponents.BeginVerticalGroup();
 
-#if IL2CPP
+#if IL2CPP_MELONLOADER
             if (GUILayout.Button($"📅 {buttonText}", _styleManager.selectTriggerStyle, new Il2CppReferenceArray<GUILayoutOption>(options)))
 #else
             if (GUILayout.Button($"📅 {buttonText}", _styleManager.selectTriggerStyle, options))
@@ -70,7 +70,7 @@ namespace shadcnui.GUIComponents
             _layoutComponents.BeginVerticalGroup();
             if (!string.IsNullOrEmpty(label))
             {
-#if IL2CPP
+#if IL2CPP_MELONLOADER
                 GUILayout.Label(new GUIContent(label), _styleManager.labelDefaultStyle, new Il2CppReferenceArray<GUILayoutOption>(new GUILayoutOption[0]));
 #else
                 GUILayout.Label(label, _styleManager.labelDefaultStyle);
@@ -96,7 +96,7 @@ namespace shadcnui.GUIComponents
 
             _layoutComponents.BeginVerticalGroup();
 
-#if IL2CPP
+#if IL2CPP_MELONLOADER
             if (GUILayout.Button($"📅 {buttonText}", _styleManager.selectTriggerStyle, new Il2CppReferenceArray<GUILayoutOption>(options)))
 #else
             if (GUILayout.Button($"📅 {buttonText}", _styleManager.selectTriggerStyle, options))
@@ -117,7 +117,7 @@ namespace shadcnui.GUIComponents
 
         private DateTime? DrawCalendarPopover(string id, DateTime? selectedDate, DateTime displayDate)
         {
-#if IL2CPP
+#if IL2CPP_MELONLOADER
             _layoutComponents.BeginVerticalGroup(_styleManager.popoverContentStyle, new Il2CppReferenceArray<GUILayoutOption>(new GUILayoutOption[] { GUILayout.Width(280) }));
 #else
             _layoutComponents.BeginVerticalGroup(_styleManager.popoverContentStyle, GUILayout.Width(280));
@@ -142,7 +142,7 @@ namespace shadcnui.GUIComponents
         {
             _layoutComponents.BeginHorizontalGroup();
 
-#if IL2CPP
+#if IL2CPP_MELONLOADER
             if (GUILayout.Button(new GUIContent("‹"), _styleManager.buttonGhostStyle, new Il2CppReferenceArray<GUILayoutOption>(new GUILayoutOption[] { GUILayout.Width(32), GUILayout.Height(32) })))
 #else
             if (GUILayout.Button("‹", _styleManager.buttonGhostStyle, GUILayout.Width(32), GUILayout.Height(32)))
@@ -153,14 +153,14 @@ namespace shadcnui.GUIComponents
 
             GUILayout.FlexibleSpace();
             string currentMonthYear = displayDate.ToString("MMMM yyyy");
-#if IL2CPP
+#if IL2CPP_MELONLOADER
             GUILayout.Label(new GUIContent(currentMonthYear), _styleManager.datePickerTitleStyle, Layout.EmptyOptions);
 #else
             GUILayout.Label(currentMonthYear, _styleManager.datePickerTitleStyle);
 #endif
             GUILayout.FlexibleSpace();
 
-#if IL2CPP
+#if IL2CPP_MELONLOADER
             if (GUILayout.Button(new GUIContent("›"), _styleManager.buttonGhostStyle, new Il2CppReferenceArray<GUILayoutOption>(new GUILayoutOption[] { GUILayout.Width(32), GUILayout.Height(32) })))
 #else
             if (GUILayout.Button("›", _styleManager.buttonGhostStyle, GUILayout.Width(32), GUILayout.Height(32)))
@@ -180,7 +180,7 @@ namespace shadcnui.GUIComponents
             _layoutComponents.BeginHorizontalGroup();
             foreach (string day in weekdays)
             {
-#if IL2CPP
+#if IL2CPP_MELONLOADER
                 GUILayout.Label(new GUIContent(day), _styleManager.datePickerWeekdayStyle, new Il2CppReferenceArray<GUILayoutOption>(new GUILayoutOption[] { GUILayout.Width(36), GUILayout.Height(24) }));
 #else
                 GUILayout.Label(day, _styleManager.datePickerWeekdayStyle, GUILayout.Width(36), GUILayout.Height(24));
@@ -212,7 +212,7 @@ namespace shadcnui.GUIComponents
 
                     GUIStyle dayStyle = GetDayStyle(isCurrentMonth, isSelected, isToday);
 
-#if IL2CPP
+#if IL2CPP_MELONLOADER
                     if (GUILayout.Button(new GUIContent(currentDate.Day.ToString()), dayStyle, new Il2CppReferenceArray<GUILayoutOption>(new GUILayoutOption[] { GUILayout.Width(36), GUILayout.Height(32) })))
 #else
                     if (GUILayout.Button(currentDate.Day.ToString(), dayStyle, GUILayout.Width(36), GUILayout.Height(32)))
@@ -249,7 +249,7 @@ namespace shadcnui.GUIComponents
         {
             _layoutComponents.BeginHorizontalGroup();
 
-#if IL2CPP
+#if IL2CPP_MELONLOADER
             if (GUILayout.Button(new GUIContent("Today"), _styleManager.buttonOutlineStyle, new Il2CppReferenceArray<GUILayoutOption>(new GUILayoutOption[] { GUILayout.Height(32) })))
 #else
             if (GUILayout.Button("Today", _styleManager.buttonOutlineStyle, GUILayout.Height(32)))
@@ -260,7 +260,7 @@ namespace shadcnui.GUIComponents
 
             GUILayout.FlexibleSpace();
 
-#if IL2CPP
+#if IL2CPP_MELONLOADER
             if (GUILayout.Button(new GUIContent("Clear"), _styleManager.buttonGhostStyle, new Il2CppReferenceArray<GUILayoutOption>(new GUILayoutOption[] { GUILayout.Height(32) })))
 #else
             if (GUILayout.Button("Clear", _styleManager.buttonGhostStyle, GUILayout.Height(32)))

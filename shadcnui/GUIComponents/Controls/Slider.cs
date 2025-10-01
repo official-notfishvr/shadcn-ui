@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using shadcnui;
 using UnityEngine;
-#if IL2CPP
+#if IL2CPP_MELONLOADER
 using UnhollowerBaseLib;
 #endif
 
@@ -23,7 +23,7 @@ namespace shadcnui.GUIComponents
         public void DrawSlider(float windowWidth, string label, ref float value, float minValue, float maxValue)
         {
             var styleManager = guiHelper.GetStyleManager();
-#if IL2CPP
+#if IL2CPP_MELONLOADER
             GUILayout.Label(label + ": " + value.ToString("F2"), styleManager.glowLabelStyle, (Il2CppReferenceArray<GUILayoutOption>)null);
             value = GUILayout.HorizontalSlider(value, minValue, maxValue, (Il2CppReferenceArray<GUILayoutOption>)null);
 #else
@@ -36,7 +36,7 @@ namespace shadcnui.GUIComponents
         public void DrawIntSlider(float windowWidth, string label, ref int value, int minValue, int maxValue)
         {
             var styleManager = guiHelper.GetStyleManager();
-#if IL2CPP
+#if IL2CPP_MELONLOADER
             GUILayout.Label(label + ": " + value.ToString(), styleManager.glowLabelStyle, (Il2CppReferenceArray<GUILayoutOption>)null);
             value = (int)GUILayout.HorizontalSlider(value, minValue, maxValue, (Il2CppReferenceArray<GUILayoutOption>)null);
 #else

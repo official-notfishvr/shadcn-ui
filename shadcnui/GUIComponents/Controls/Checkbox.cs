@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using shadcnui;
 using UnityEngine;
-#if IL2CPP
+#if IL2CPP_MELONLOADER
 using UnhollowerBaseLib;
 #endif
 
@@ -24,7 +24,7 @@ namespace shadcnui.GUIComponents
             var styleManager = guiHelper.GetStyleManager();
             if (styleManager == null)
             {
-#if IL2CPP
+#if IL2CPP_MELONLOADER
                 return GUILayout.Toggle(value, text ?? "Checkbox", GUI.skin.toggle, new Il2CppReferenceArray<GUILayoutOption>(0));
 #else
                 return GUILayout.Toggle(value, text ?? "Checkbox", GUI.skin.toggle, new GUILayoutOption[0]);
@@ -38,7 +38,7 @@ namespace shadcnui.GUIComponents
                 GUI.enabled = false;
 
             bool newValue;
-#if IL2CPP
+#if IL2CPP_MELONLOADER
             newValue = GUILayout.Toggle(value, text ?? "Checkbox", checkboxStyle, options != null && options.Length > 0 ? new Il2CppReferenceArray<GUILayoutOption>(options) : new Il2CppReferenceArray<GUILayoutOption>(0));
 #else
             newValue = GUILayout.Toggle(value, text ?? "Checkbox", checkboxStyle, options);
@@ -99,7 +99,7 @@ namespace shadcnui.GUIComponents
                 GUI.color = new Color(originalColor.r, originalColor.g, originalColor.b, 0.7f);
             }
 
-#if IL2CPP
+#if IL2CPP_MELONLOADER
             GUILayout.Label(label ?? "", labelStyle, (Il2CppReferenceArray<GUILayoutOption>)null);
 #else
             GUILayout.Label(label ?? "", labelStyle);
@@ -166,7 +166,7 @@ namespace shadcnui.GUIComponents
         {
             var styleManager = guiHelper.GetStyleManager();
 
-            GUIStyle customStyle = new GUIStyle(GUI.skin.toggle);
+            GUIStyle customStyle = new UnityHelpers.GUIStyle(GUI.skin.toggle);
             customStyle.normal.background = styleManager.CreateSolidTexture(backgroundColor);
             customStyle.active.background = styleManager.CreateSolidTexture(Color.Lerp(backgroundColor, checkColor, 0.3f));
             customStyle.hover.background = styleManager.CreateSolidTexture(Color.Lerp(backgroundColor, checkColor, 0.1f));
@@ -185,7 +185,7 @@ namespace shadcnui.GUIComponents
                 GUI.enabled = false;
 
             bool newValue;
-#if IL2CPP
+#if IL2CPP_MELONLOADER
             newValue = GUILayout.Toggle(value, text ?? "Checkbox", customStyle, (Il2CppReferenceArray<GUILayoutOption>)options);
 #else
             newValue = GUILayout.Toggle(value, text ?? "Checkbox", customStyle, options);
@@ -212,7 +212,7 @@ namespace shadcnui.GUIComponents
 
             if (icon != null)
             {
-#if IL2CPP
+#if IL2CPP_MELONLOADER
                 GUILayout.Label(icon, GUIStyle.none, new Il2CppReferenceArray<GUILayoutOption>(new GUILayoutOption[] { GUILayout.Width(16 * guiHelper.uiScale), GUILayout.Height(16 * guiHelper.uiScale) }));
 #else
                 GUILayout.Label(icon, GUILayout.Width(16 * guiHelper.uiScale), GUILayout.Height(16 * guiHelper.uiScale));
@@ -229,7 +229,7 @@ namespace shadcnui.GUIComponents
                 GUI.color = new Color(originalColor.r, originalColor.g, originalColor.b, 0.7f);
             }
 
-#if IL2CPP
+#if IL2CPP_MELONLOADER
             GUILayout.Label(text ?? "", labelStyle, (Il2CppReferenceArray<GUILayoutOption>)null);
 #else
             GUILayout.Label(text ?? "", labelStyle);
@@ -259,7 +259,7 @@ namespace shadcnui.GUIComponents
                 }
 
                 layoutComponents.AddSpace(2);
-#if IL2CPP
+#if IL2CPP_MELONLOADER
                 GUILayout.Label(description, descStyle, (Il2CppReferenceArray<GUILayoutOption>)null);
 #else
                 GUILayout.Label(description, descStyle);
@@ -285,7 +285,7 @@ namespace shadcnui.GUIComponents
                 GUIStyle errorStyle = styleManager?.GetLabelStyle(LabelVariant.Destructive) ?? GUI.skin.label;
 
                 layoutComponents.AddSpace(2);
-#if IL2CPP
+#if IL2CPP_MELONLOADER
                 GUILayout.Label(validationMessage, errorStyle, (Il2CppReferenceArray<GUILayoutOption>)null);
 #else
                 GUILayout.Label(validationMessage, errorStyle);
@@ -313,7 +313,7 @@ namespace shadcnui.GUIComponents
                 Color originalColor = GUI.color;
                 GUI.color = new Color(originalColor.r, originalColor.g, originalColor.b, 0.6f);
 
-#if IL2CPP
+#if IL2CPP_MELONLOADER
                 GUILayout.Label("?", tooltipStyle, (Il2CppReferenceArray<GUILayoutOption>)null);
 #else
                 GUILayout.Label("?", tooltipStyle);

@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
-#if IL2CPP
+#if IL2CPP_MELONLOADER
 using UnhollowerBaseLib;
 #endif
 
@@ -111,17 +111,17 @@ namespace shadcnui.GUIComponents
             var state = _tableStates[id];
             state.ShowColumnToggle = showColumnToggle;
 
-            var containerStyle = new GUIStyle(_styleManager.cardStyle);
-            containerStyle.padding = new RectOffset(0, 0, 0, 0);
+            var containerStyle = new UnityHelpers.GUIStyle(_styleManager.cardStyle);
+            containerStyle.padding = new UnityHelpers.RectOffset(0, 0, 0, 0);
 
             _layoutComponents.BeginVerticalGroup(containerStyle);
 
             DrawToolbar(id, state, columns, showSearch, showColumnToggle);
 
-            var tableContainerStyle = new GUIStyle();
+            var tableContainerStyle = new UnityHelpers.GUIStyle();
             var theme = ThemeManager.Instance.CurrentTheme;
             tableContainerStyle.normal.background = _styleManager.CreateSolidTexture(theme.ButtonOutlineBorder);
-            tableContainerStyle.padding = new RectOffset(1, 1, 1, 1);
+            tableContainerStyle.padding = new UnityHelpers.RectOffset(1, 1, 1, 1);
 
             _layoutComponents.BeginVerticalGroup(tableContainerStyle);
 
@@ -149,8 +149,8 @@ namespace shadcnui.GUIComponents
             if (!showSearch && !showColumnToggle)
                 return;
 
-            var toolbarStyle = new GUIStyle();
-            toolbarStyle.padding = new RectOffset(16, 16, 16, 16);
+            var toolbarStyle = new UnityHelpers.GUIStyle();
+            toolbarStyle.padding = new UnityHelpers.RectOffset(16, 16, 16, 16);
 
             _layoutComponents.BeginVerticalGroup();
             _layoutComponents.BeginHorizontalGroup();
@@ -173,22 +173,22 @@ namespace shadcnui.GUIComponents
 
         private void DrawSearchInput(string id, DataTableState state)
         {
-            var searchContainerStyle = new GUIStyle();
+            var searchContainerStyle = new UnityHelpers.GUIStyle();
             searchContainerStyle.fixedWidth = 250;
 
             _layoutComponents.BeginHorizontalGroup();
 
-            var iconStyle = new GUIStyle(_styleManager.labelMutedStyle);
+            var iconStyle = new UnityHelpers.GUIStyle(_styleManager.labelMutedStyle);
             iconStyle.alignment = TextAnchor.MiddleCenter;
             iconStyle.fixedWidth = 20;
             _guiHelper.Label("🔍", LabelVariant.Muted);
 
-            var inputStyle = new GUIStyle(_styleManager.inputDefaultStyle);
+            var inputStyle = new UnityHelpers.GUIStyle(_styleManager.inputDefaultStyle);
             inputStyle.margin.left = 0;
             inputStyle.stretchWidth = true;
 
             string placeholder = string.IsNullOrEmpty(state.FilterText) ? "Filter..." : "";
-#if IL2CPP
+#if IL2CPP_MELONLOADER
             string newFilterText = GUILayout.TextField(state.FilterText, inputStyle, new Il2CppReferenceArray<GUILayoutOption>(0));
 #else
             string newFilterText = GUILayout.TextField(state.FilterText, inputStyle);
@@ -211,21 +211,21 @@ namespace shadcnui.GUIComponents
         {
             var theme = _styleManager.GetTheme();
 
-            var headerStyle = new GUIStyle();
+            var headerStyle = new UnityHelpers.GUIStyle();
             headerStyle.normal.background = _styleManager.CreateSolidTexture(theme.SecondaryColor);
-            headerStyle.padding = new RectOffset(12, 12, 12, 12);
-            headerStyle.margin = new RectOffset(0, 0, 0, 0);
+            headerStyle.padding = new UnityHelpers.RectOffset(12, 12, 12, 12);
+            headerStyle.margin = new UnityHelpers.RectOffset(0, 0, 0, 0);
 
             _layoutComponents.BeginHorizontalGroup();
 
             if (showSelection)
             {
-                var checkboxStyle = new GUIStyle(GUI.skin.toggle);
+                var checkboxStyle = new UnityHelpers.GUIStyle(GUI.skin.toggle);
                 checkboxStyle.fixedWidth = 16;
                 checkboxStyle.fixedHeight = 16;
-                checkboxStyle.margin = new RectOffset(0, 8, 0, 0);
+                checkboxStyle.margin = new UnityHelpers.RectOffset(0, 8, 0, 0);
 
-#if IL2CPP
+#if IL2CPP_MELONLOADER
                 bool newSelectAll = GUILayout.Toggle(state.SelectAll, new GUIContent(""), checkboxStyle, Layout.EmptyOptions);
 #else
                 bool newSelectAll = GUILayout.Toggle(state.SelectAll, "", checkboxStyle);
@@ -238,12 +238,12 @@ namespace shadcnui.GUIComponents
 
             foreach (var column in columns)
             {
-                var columnHeaderStyle = new GUIStyle(GUI.skin.label);
+                var columnHeaderStyle = new UnityHelpers.GUIStyle(GUI.skin.label);
                 columnHeaderStyle.fontStyle = FontStyle.Bold;
                 columnHeaderStyle.fontSize = 12;
                 columnHeaderStyle.alignment = TextAnchor.MiddleLeft;
                 columnHeaderStyle.normal.textColor = theme.TextColor != Color.clear ? theme.TextColor : Color.black;
-                columnHeaderStyle.padding = new RectOffset(4, 4, 0, 0);
+                columnHeaderStyle.padding = new UnityHelpers.RectOffset(4, 4, 0, 0);
 
                 if (column.Sortable)
                 {
@@ -256,7 +256,7 @@ namespace shadcnui.GUIComponents
                         columnHeaderStyle.normal.textColor = theme.PrimaryColor;
                     }
 
-                    var buttonStyle = new GUIStyle(columnHeaderStyle);
+                    var buttonStyle = new UnityHelpers.GUIStyle(columnHeaderStyle);
                     buttonStyle.normal.background = null;
                     buttonStyle.hover.background = _styleManager.CreateSolidTexture(new Color(0, 0, 0, 0.05f));
                     buttonStyle.active.background = _styleManager.CreateSolidTexture(new Color(0, 0, 0, 0.1f));
@@ -299,7 +299,7 @@ namespace shadcnui.GUIComponents
                 bool isSelected = state.SelectedRows.Contains(row.Id);
                 bool isEven = i % 2 == 0;
 
-                var rowStyle = new GUIStyle();
+                var rowStyle = new UnityHelpers.GUIStyle();
                 if (isSelected)
                 {
                     rowStyle.normal.background = _styleManager.CreateSolidTexture(new Color(theme.PrimaryColor.r, theme.PrimaryColor.g, theme.PrimaryColor.b, 0.1f));
@@ -313,10 +313,10 @@ namespace shadcnui.GUIComponents
                     rowStyle.normal.background = _styleManager.CreateSolidTexture(new Color(theme.SecondaryColor.r, theme.SecondaryColor.g, theme.SecondaryColor.b, 0.3f));
                 }
 
-                rowStyle.padding = new RectOffset(12, 12, 8, 8);
-                rowStyle.margin = new RectOffset(0, 0, 0, 0);
+                rowStyle.padding = new UnityHelpers.RectOffset(12, 12, 8, 8);
+                rowStyle.margin = new UnityHelpers.RectOffset(0, 0, 0, 0);
 
-#if IL2CPP
+#if IL2CPP_MELONLOADER
                 GUILayout.BeginHorizontal(rowStyle, new Il2CppReferenceArray<GUILayoutOption>(new GUILayoutOption[] { GUILayout.ExpandWidth(true), GUILayout.Height(40) }));
 #else
                 GUILayout.BeginHorizontal(rowStyle, GUILayout.ExpandWidth(true), GUILayout.Height(40));
@@ -324,12 +324,12 @@ namespace shadcnui.GUIComponents
 
                 if (showSelection)
                 {
-                    var checkboxStyle = new GUIStyle(GUI.skin.toggle);
+                    var checkboxStyle = new UnityHelpers.GUIStyle(GUI.skin.toggle);
                     checkboxStyle.fixedWidth = 16;
                     checkboxStyle.fixedHeight = 16;
-                    checkboxStyle.margin = new RectOffset(0, 8, 0, 0);
+                    checkboxStyle.margin = new UnityHelpers.RectOffset(0, 8, 0, 0);
 
-#if IL2CPP
+#if IL2CPP_MELONLOADER
                     bool newSelected = GUILayout.Toggle(isSelected, new GUIContent(""), checkboxStyle, new Il2CppReferenceArray<GUILayoutOption>(new GUILayoutOption[] { GUILayout.Width(24) }));
 #else
                     bool newSelected = GUILayout.Toggle(isSelected, "", checkboxStyle, GUILayout.Width(24));
@@ -362,13 +362,13 @@ namespace shadcnui.GUIComponents
                         cellText = row.GetValue<string>(column.AccessorKey, "");
                     }
 
-                    var cellStyle = new GUIStyle(GUI.skin.label);
+                    var cellStyle = new UnityHelpers.GUIStyle(GUI.skin.label);
                     cellStyle.alignment = column.Alignment;
                     cellStyle.fontSize = 14;
                     cellStyle.normal.textColor = theme.TextColor != Color.clear && theme.TextColor.a > 0 ? theme.TextColor : Color.white;
                     cellStyle.wordWrap = false;
                     cellStyle.clipping = TextClipping.Clip;
-                    cellStyle.padding = new RectOffset(4, 4, 0, 0);
+                    cellStyle.padding = new UnityHelpers.RectOffset(4, 4, 0, 0);
 
                     string displayText = cellText ?? "";
                     if (string.IsNullOrEmpty(displayText))
@@ -376,7 +376,7 @@ namespace shadcnui.GUIComponents
                         displayText = $"[{column.AccessorKey}]";
                     }
 
-#if IL2CPP
+#if IL2CPP_MELONLOADER
                     GUILayout.Label(new GUIContent(displayText), cellStyle, new Il2CppReferenceArray<GUILayoutOption>(new GUILayoutOption[] { GUILayout.Width(column.Width) }));
 #else
                     GUILayout.Label(displayText, cellStyle, GUILayout.Width(column.Width));
@@ -389,20 +389,20 @@ namespace shadcnui.GUIComponents
 
         private void DrawEmptyState()
         {
-            var emptyStyle = new GUIStyle();
-            emptyStyle.padding = new RectOffset(24, 24, 48, 48);
+            var emptyStyle = new UnityHelpers.GUIStyle();
+            emptyStyle.padding = new UnityHelpers.RectOffset(24, 24, 48, 48);
             emptyStyle.alignment = TextAnchor.MiddleCenter;
 
             _layoutComponents.BeginVerticalGroup();
 
-            var emptyTextStyle = new GUIStyle(_styleManager.labelMutedStyle);
+            var emptyTextStyle = new UnityHelpers.GUIStyle(_styleManager.labelMutedStyle);
             emptyTextStyle.fontSize = 16;
             emptyTextStyle.alignment = TextAnchor.MiddleCenter;
 
             _guiHelper.Label("No results.", LabelVariant.Default);
             GUILayout.Space(8);
 
-            var emptySubtextStyle = new GUIStyle(_styleManager.labelMutedStyle);
+            var emptySubtextStyle = new UnityHelpers.GUIStyle(_styleManager.labelMutedStyle);
             emptySubtextStyle.fontSize = 14;
             emptySubtextStyle.alignment = TextAnchor.MiddleCenter;
 
@@ -421,7 +421,7 @@ namespace shadcnui.GUIComponents
 
             GUILayout.FlexibleSpace();
 
-#if IL2CPP
+#if IL2CPP_MELONLOADER
             if (GUILayout.Button("‹‹", _styleManager.buttonOutlineStyle, new Il2CppReferenceArray<GUILayoutOption>(new GUILayoutOption[] { GUILayout.Width(32) })))
 #else
             if (GUILayout.Button("‹‹", _styleManager.buttonOutlineStyle, GUILayout.Width(32)))
@@ -430,7 +430,7 @@ namespace shadcnui.GUIComponents
                 state.CurrentPage = 0;
             }
 
-#if IL2CPP
+#if IL2CPP_MELONLOADER
             if (GUILayout.Button("‹", _styleManager.buttonOutlineStyle, new Il2CppReferenceArray<GUILayoutOption>(new GUILayoutOption[] { GUILayout.Width(32) })))
 #else
             if (GUILayout.Button("‹", _styleManager.buttonOutlineStyle, GUILayout.Width(32)))
@@ -442,7 +442,7 @@ namespace shadcnui.GUIComponents
 
             _guiHelper.Label($"Page {state.CurrentPage + 1} of {totalPages}", LabelVariant.Default);
 
-#if IL2CPP
+#if IL2CPP_MELONLOADER
             if (GUILayout.Button("›", _styleManager.buttonOutlineStyle, new Il2CppReferenceArray<GUILayoutOption>(new GUILayoutOption[] { GUILayout.Width(32) })))
 #else
             if (GUILayout.Button("›", _styleManager.buttonOutlineStyle, GUILayout.Width(32)))
@@ -452,7 +452,7 @@ namespace shadcnui.GUIComponents
                     state.CurrentPage++;
             }
 
-#if IL2CPP
+#if IL2CPP_MELONLOADER
             if (GUILayout.Button("››", _styleManager.buttonOutlineStyle, new Il2CppReferenceArray<GUILayoutOption>(new GUILayoutOption[] { GUILayout.Width(32) })))
 #else
             if (GUILayout.Button("››", _styleManager.buttonOutlineStyle, GUILayout.Width(32)))

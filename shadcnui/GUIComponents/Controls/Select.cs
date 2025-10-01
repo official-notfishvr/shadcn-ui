@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 using UnityEngine;
-#if IL2CPP
+#if IL2CPP_MELONLOADER
 using UnhollowerBaseLib;
 #endif
 
@@ -48,7 +48,7 @@ namespace shadcnui.GUIComponents
                     {
                         GUIStyle itemStyle = guiHelper.GetStyleManager().GetSelectItemStyle();
 
-#if IL2CPP
+#if IL2CPP_MELONLOADER
                         if (GUILayout.Button(new GUIContent(items[i]), itemStyle, new UnhollowerBaseLib.Il2CppReferenceArray<UnityEngine.GUILayoutOption>(0)))
 #else
                         if (GUILayout.Button(items[i], itemStyle))

@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using shadcnui;
 using UnityEngine;
-#if IL2CPP
+#if IL2CPP_MELONLOADER
 using UnhollowerBaseLib;
 #endif
 
@@ -28,7 +28,7 @@ namespace shadcnui.GUIComponents
             float scaledWidth = width * guiHelper.uiScale;
             float scaledHeight = height * guiHelper.uiScale;
 
-#if IL2CPP
+#if IL2CPP_MELONLOADER
             GUILayout.Box("", skeletonStyle, (Il2CppReferenceArray<GUILayoutOption>)new GUILayoutOption[] { GUILayout.Width(scaledWidth), GUILayout.Height(scaledHeight) });
 #else
             GUILayout.Box("", skeletonStyle, GUILayout.Width(scaledWidth), GUILayout.Height(scaledHeight));
@@ -63,7 +63,7 @@ namespace shadcnui.GUIComponents
             Color originalColor = GUI.color;
             GUI.color = new Color(originalColor.r, originalColor.g, originalColor.b, 0.7f);
 
-#if IL2CPP
+#if IL2CPP_MELONLOADER
             GUILayout.Box("", skeletonStyle, (Il2CppReferenceArray<GUILayoutOption>)new GUILayoutOption[] { GUILayout.Width(scaledWidth), GUILayout.Height(scaledHeight) });
 #else
             GUILayout.Box("", skeletonStyle, GUILayout.Width(scaledWidth), GUILayout.Height(scaledHeight));
@@ -75,14 +75,14 @@ namespace shadcnui.GUIComponents
         {
             var styleManager = guiHelper.GetStyleManager();
 
-            GUIStyle customStyle = new GUIStyle(GUI.skin.box);
+            GUIStyle customStyle = new UnityHelpers.GUIStyle(GUI.skin.box);
             customStyle.normal.background = styleManager.CreateSolidTexture(backgroundColor);
             customStyle.border = GetSkeletonBorder(variant, size);
 
             float scaledWidth = width * guiHelper.uiScale;
             float scaledHeight = height * guiHelper.uiScale;
 
-#if IL2CPP
+#if IL2CPP_MELONLOADER
             GUILayout.Box("", customStyle, (Il2CppReferenceArray<GUILayoutOption>)new GUILayoutOption[] { GUILayout.Width(scaledWidth), GUILayout.Height(scaledHeight) });
 #else
             GUILayout.Box("", customStyle, GUILayout.Width(scaledWidth), GUILayout.Height(scaledHeight));
@@ -187,14 +187,14 @@ namespace shadcnui.GUIComponents
         {
             var styleManager = guiHelper.GetStyleManager();
 
-            GUIStyle customStyle = new GUIStyle(GUI.skin.box);
+            GUIStyle customStyle = new UnityHelpers.GUIStyle(GUI.skin.box);
             customStyle.normal.background = styleManager.CreateSolidTexture(backgroundColor);
-            customStyle.border = new RectOffset(Mathf.RoundToInt(cornerRadius * guiHelper.uiScale), Mathf.RoundToInt(cornerRadius * guiHelper.uiScale), Mathf.RoundToInt(cornerRadius * guiHelper.uiScale), Mathf.RoundToInt(cornerRadius * guiHelper.uiScale));
+            customStyle.border = new UnityHelpers.RectOffset(Mathf.RoundToInt(cornerRadius * guiHelper.uiScale), Mathf.RoundToInt(cornerRadius * guiHelper.uiScale), Mathf.RoundToInt(cornerRadius * guiHelper.uiScale), Mathf.RoundToInt(cornerRadius * guiHelper.uiScale));
 
             float scaledWidth = width * guiHelper.uiScale;
             float scaledHeight = height * guiHelper.uiScale;
 
-#if IL2CPP
+#if IL2CPP_MELONLOADER
             GUILayout.Box("", customStyle, (Il2CppReferenceArray<GUILayoutOption>)new GUILayoutOption[] { GUILayout.Width(scaledWidth), GUILayout.Height(scaledHeight) });
 #else
             GUILayout.Box("", customStyle, GUILayout.Width(scaledWidth), GUILayout.Height(scaledHeight));
@@ -213,12 +213,12 @@ namespace shadcnui.GUIComponents
             var styleManager = guiHelper.GetStyleManager();
             if (styleManager != null)
             {
-                GUIStyle bgStyle = new GUIStyle(GUI.skin.box);
+                GUIStyle bgStyle = new UnityHelpers.GUIStyle(GUI.skin.box);
                 bgStyle.normal.background = styleManager.CreateSolidTexture(Color.gray);
                 GUI.Box(progressRect, "", bgStyle);
 
                 Rect fillRect = new Rect(progressRect.x, progressRect.y, progressRect.width * Mathf.Clamp01(progress), progressRect.height);
-                GUIStyle fillStyle = new GUIStyle(GUI.skin.box);
+                GUIStyle fillStyle = new UnityHelpers.GUIStyle(GUI.skin.box);
                 fillStyle.normal.background = styleManager.CreateSolidTexture(Color.blue);
                 GUI.Box(fillRect, "", fillStyle);
             }
@@ -257,7 +257,7 @@ namespace shadcnui.GUIComponents
                     break;
             }
 
-            return new RectOffset(borderRadius, borderRadius, borderRadius, borderRadius);
+            return new UnityHelpers.RectOffset(borderRadius, borderRadius, borderRadius, borderRadius);
         }
     }
 }

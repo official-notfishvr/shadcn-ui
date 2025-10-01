@@ -1,7 +1,7 @@
 using System;
 using shadcnui;
 using UnityEngine;
-#if IL2CPP
+#if IL2CPP_MELONLOADER
 using UnhollowerBaseLib;
 #endif
 
@@ -21,7 +21,7 @@ namespace shadcnui.GUIComponents
             var styleManager = guiHelper.GetStyleManager();
             GUIStyle labelStyle = styleManager.GetLabelStyle(variant);
 
-            GUIStyle scaledStyle = new GUIStyle(labelStyle);
+            GUIStyle scaledStyle = new UnityHelpers.GUIStyle(labelStyle);
             scaledStyle.fontSize = Mathf.RoundToInt(labelStyle.fontSize * guiHelper.uiScale);
 
             if (disabled)
@@ -32,7 +32,7 @@ namespace shadcnui.GUIComponents
 
             GUILayoutOption[] autoScaledOptions = GetAutoScaledOptions(options);
 
-#if IL2CPP
+#if IL2CPP_MELONLOADER
             GUILayout.Label(text ?? "", scaledStyle, (Il2CppReferenceArray<GUILayoutOption>)autoScaledOptions);
 #else
             GUILayout.Label(text ?? "", scaledStyle, autoScaledOptions);
@@ -46,7 +46,7 @@ namespace shadcnui.GUIComponents
 
             Rect scaledRect = new Rect(rect.x * guiHelper.uiScale, rect.y * guiHelper.uiScale, rect.width * guiHelper.uiScale, rect.height * guiHelper.uiScale);
 
-            GUIStyle scaledStyle = new GUIStyle(labelStyle);
+            GUIStyle scaledStyle = new UnityHelpers.GUIStyle(labelStyle);
             scaledStyle.fontSize = Mathf.RoundToInt(labelStyle.fontSize * guiHelper.uiScale);
 
             if (disabled)

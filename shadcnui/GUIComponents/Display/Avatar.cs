@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using shadcnui;
 using UnityEngine;
-#if IL2CPP
+#if IL2CPP_MELONLOADER
 using UnhollowerBaseLib;
 #endif
 
@@ -29,7 +29,7 @@ namespace shadcnui.GUIComponents
 
             if (image != null)
             {
-#if IL2CPP
+#if IL2CPP_MELONLOADER
                 GUILayout.Label(image, avatarStyle, (Il2CppReferenceArray<GUILayoutOption>)layoutOptions);
 #else
                 GUILayout.Label(image, avatarStyle, layoutOptions);
@@ -37,7 +37,7 @@ namespace shadcnui.GUIComponents
             }
             else
             {
-#if IL2CPP
+#if IL2CPP_MELONLOADER
                 GUILayout.Label(new GUIContent(fallbackText ?? "A"), fallbackStyle, (Il2CppReferenceArray<GUILayoutOption>)layoutOptions);
 #else
                 GUILayout.Label(fallbackText ?? "A", fallbackStyle, layoutOptions);
@@ -85,15 +85,15 @@ namespace shadcnui.GUIComponents
             Color statusColor = isOnline ? Color.green : Color.gray;
             float indicatorSize = styleManager.GetStatusIndicatorSize(size);
 
-            GUIStyle statusStyle = new GUIStyle(GUI.skin.box);
+            GUIStyle statusStyle = new UnityHelpers.GUIStyle(GUI.skin.box);
             statusStyle.normal.background = styleManager.CreateSolidTexture(statusColor);
             statusStyle.fixedWidth = indicatorSize * guiHelper.uiScale;
             statusStyle.fixedHeight = indicatorSize * guiHelper.uiScale;
-            statusStyle.border = new RectOffset(0, 0, 0, 0);
-            statusStyle.padding = new RectOffset(0, 0, 0, 0);
-            statusStyle.margin = new RectOffset(0, 0, 0, 0);
+            statusStyle.border = new UnityHelpers.RectOffset(0, 0, 0, 0);
+            statusStyle.padding = new UnityHelpers.RectOffset(0, 0, 0, 0);
+            statusStyle.margin = new UnityHelpers.RectOffset(0, 0, 0, 0);
 
-#if IL2CPP
+#if IL2CPP_MELONLOADER
             GUILayout.Label(GUIContent.none, statusStyle, new Il2CppReferenceArray<GUILayoutOption>(new GUILayoutOption[0]));
 #else
             GUILayout.Label(GUIContent.none, statusStyle);
@@ -112,7 +112,7 @@ namespace shadcnui.GUIComponents
                     layoutComponents.AddSpace(4);
                     var styleManager = guiHelper.GetStyleManager();
                     GUIStyle nameStyle = styleManager?.GetLabelStyle(LabelVariant.Default) ?? GUI.skin.label;
-#if IL2CPP
+#if IL2CPP_MELONLOADER
                     GUILayout.Label(new GUIContent(name), nameStyle, (Il2CppReferenceArray<GUILayoutOption>)null);
 #else
                     GUILayout.Label(name, nameStyle);
@@ -132,7 +132,7 @@ namespace shadcnui.GUIComponents
                     var styleManager = guiHelper.GetStyleManager();
                     GUIStyle nameStyle = styleManager?.GetLabelStyle(LabelVariant.Default) ?? GUI.skin.label;
                     nameStyle.alignment = TextAnchor.MiddleLeft;
-#if IL2CPP
+#if IL2CPP_MELONLOADER
                     GUILayout.Label(new GUIContent(name), nameStyle, (Il2CppReferenceArray<GUILayoutOption>)null);
 #else
                     GUILayout.Label(name, nameStyle);
@@ -147,17 +147,17 @@ namespace shadcnui.GUIComponents
         {
             var styleManager = guiHelper.GetStyleManager();
 
-            GUIStyle customStyle = new GUIStyle(GUI.skin.box);
+            GUIStyle customStyle = new UnityHelpers.GUIStyle(GUI.skin.box);
             customStyle.normal.background = styleManager.CreateSolidTexture(backgroundColor);
             customStyle.normal.textColor = textColor;
             customStyle.alignment = TextAnchor.MiddleCenter;
             customStyle.fontSize = GetAvatarFontSize(size);
-            customStyle.padding = new RectOffset(0, 0, 0, 0);
+            customStyle.padding = new UnityHelpers.RectOffset(0, 0, 0, 0);
             customStyle.border = GetAvatarBorder(shape, size);
 
             if (image != null)
             {
-#if IL2CPP
+#if IL2CPP_MELONLOADER
                 GUILayout.Label(image, customStyle, (Il2CppReferenceArray<GUILayoutOption>)options);
 #else
                 GUILayout.Label(image, customStyle, options);
@@ -165,7 +165,7 @@ namespace shadcnui.GUIComponents
             }
             else
             {
-#if IL2CPP
+#if IL2CPP_MELONLOADER
                 GUILayout.Label(new GUIContent(fallbackText ?? "A"), customStyle, (Il2CppReferenceArray<GUILayoutOption>)options);
 #else
                 GUILayout.Label(fallbackText ?? "A", customStyle, options);
@@ -177,10 +177,10 @@ namespace shadcnui.GUIComponents
         {
             var styleManager = guiHelper.GetStyleManager();
 
-            GUIStyle borderedStyle = new GUIStyle(GUI.skin.box);
+            GUIStyle borderedStyle = new UnityHelpers.GUIStyle(GUI.skin.box);
             borderedStyle.normal.background = styleManager.CreateSolidTexture(borderColor);
             borderedStyle.alignment = TextAnchor.MiddleCenter;
-            borderedStyle.padding = new RectOffset(2, 2, 2, 2);
+            borderedStyle.padding = new UnityHelpers.RectOffset(2, 2, 2, 2);
 
             layoutComponents.BeginVerticalGroup(borderedStyle, options);
             DrawAvatar(image, fallbackText, size, shape, options);
@@ -236,7 +236,7 @@ namespace shadcnui.GUIComponents
                 var styleManager = guiHelper.GetStyleManager();
                 GUIStyle tooltipStyle = styleManager?.GetLabelStyle(LabelVariant.Muted) ?? GUI.skin.label;
 
-#if IL2CPP
+#if IL2CPP_MELONLOADER
                 GUILayout.Label(new GUIContent("?"), tooltipStyle, (Il2CppReferenceArray<GUILayoutOption>)options);
 #else
                 GUILayout.Label("?", tooltipStyle, options);
@@ -276,7 +276,7 @@ namespace shadcnui.GUIComponents
                 countStyle.normal.textColor = Color.white;
                 countStyle.normal.background = styleManager?.CreateSolidTexture(Color.gray) ?? GUI.skin.box.normal.background;
 
-#if IL2CPP
+#if IL2CPP_MELONLOADER
                 GUILayout.Label(new GUIContent(countText), countStyle, (Il2CppReferenceArray<GUILayoutOption>)options);
 #else
                 GUILayout.Label(countText, countStyle, options);
@@ -317,7 +317,7 @@ namespace shadcnui.GUIComponents
                     break;
             }
 
-            return new RectOffset(borderRadius, borderRadius, borderRadius, borderRadius);
+            return new UnityHelpers.RectOffset(borderRadius, borderRadius, borderRadius, borderRadius);
         }
 
         public struct AvatarData

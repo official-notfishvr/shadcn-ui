@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using shadcnui;
 using UnityEngine;
-#if IL2CPP
+#if IL2CPP_MELONLOADER
 using UnhollowerBaseLib;
 #endif
 
@@ -29,7 +29,7 @@ namespace shadcnui.GUIComponents
 
             if (icon != null)
             {
-#if IL2CPP
+#if IL2CPP_MELONLOADER
                 GUILayout.Label(icon, (Il2CppReferenceArray<GUILayoutOption>)new GUILayoutOption[] { GUILayout.Width(24 * guiHelper.uiScale), GUILayout.Height(24 * guiHelper.uiScale) });
 #else
                 GUILayout.Label(icon, GUILayout.Width(24 * guiHelper.uiScale), GUILayout.Height(24 * guiHelper.uiScale));
@@ -41,7 +41,7 @@ namespace shadcnui.GUIComponents
             if (!string.IsNullOrEmpty(title))
             {
                 GUIStyle titleStyle = styleManager.GetAlertTitleStyle(type);
-#if IL2CPP
+#if IL2CPP_MELONLOADER
                 GUILayout.Label(new GUIContent(title), titleStyle, (Il2CppReferenceArray<GUILayoutOption>)null);
 #else
                 GUILayout.Label(title, titleStyle);
@@ -51,7 +51,7 @@ namespace shadcnui.GUIComponents
             if (!string.IsNullOrEmpty(description))
             {
                 GUIStyle descStyle = styleManager.GetAlertDescriptionStyle(type);
-#if IL2CPP
+#if IL2CPP_MELONLOADER
                 GUILayout.Label(new GUIContent(description), descStyle, (Il2CppReferenceArray<GUILayoutOption>)null);
 #else
                 GUILayout.Label(description, descStyle);
@@ -66,11 +66,11 @@ namespace shadcnui.GUIComponents
         {
             var styleManager = guiHelper.GetStyleManager();
 
-            GUIStyle customStyle = new GUIStyle(GUI.skin.box);
+            GUIStyle customStyle = new UnityHelpers.GUIStyle(GUI.skin.box);
             customStyle.normal.background = styleManager.CreateSolidTexture(backgroundColor);
             customStyle.normal.textColor = textColor;
-            customStyle.border = new RectOffset(guiHelper.cornerRadius, guiHelper.cornerRadius, guiHelper.cornerRadius, guiHelper.cornerRadius);
-            customStyle.padding = new RectOffset(16, 16, 12, 12);
+            customStyle.border = new UnityHelpers.RectOffset(guiHelper.cornerRadius, guiHelper.cornerRadius, guiHelper.cornerRadius, guiHelper.cornerRadius);
+            customStyle.padding = new UnityHelpers.RectOffset(16, 16, 12, 12);
 
             layoutComponents.BeginVerticalGroup(customStyle, options);
 
@@ -78,7 +78,7 @@ namespace shadcnui.GUIComponents
             {
                 GUIStyle titleStyle = styleManager.GetAlertTitleStyle(AlertType.Info);
                 titleStyle.normal.textColor = textColor;
-#if IL2CPP
+#if IL2CPP_MELONLOADER
                 GUILayout.Label(new GUIContent(title), titleStyle, (Il2CppReferenceArray<GUILayoutOption>)null);
 #else
                 GUILayout.Label(title, titleStyle);
@@ -89,7 +89,7 @@ namespace shadcnui.GUIComponents
             {
                 GUIStyle descStyle = styleManager.GetAlertDescriptionStyle(AlertType.Info);
                 descStyle.normal.textColor = textColor;
-#if IL2CPP
+#if IL2CPP_MELONLOADER
                 GUILayout.Label(new GUIContent(description), descStyle, (Il2CppReferenceArray<GUILayoutOption>)null);
 #else
                 GUILayout.Label(description, descStyle);
@@ -111,12 +111,12 @@ namespace shadcnui.GUIComponents
             var styleManager = guiHelper.GetStyleManager();
             if (styleManager != null)
             {
-                GUIStyle bgStyle = new GUIStyle(GUI.skin.box);
+                GUIStyle bgStyle = new UnityHelpers.GUIStyle(GUI.skin.box);
                 bgStyle.normal.background = styleManager.CreateSolidTexture(Color.gray);
                 GUI.Box(progressRect, GUIContent.none, bgStyle);
 
                 Rect fillRect = new Rect(progressRect.x, progressRect.y, progressRect.width * Mathf.Clamp01(progress), progressRect.height);
-                GUIStyle fillStyle = new GUIStyle(GUI.skin.box);
+                GUIStyle fillStyle = new UnityHelpers.GUIStyle(GUI.skin.box);
                 fillStyle.normal.background = styleManager.CreateSolidTexture(GetProgressColor(type));
                 GUI.Box(fillRect, GUIContent.none, fillStyle);
             }
@@ -147,7 +147,7 @@ namespace shadcnui.GUIComponents
 
             var styleManager = guiHelper.GetStyleManager();
             GUIStyle countdownStyle = styleManager?.GetLabelStyle(LabelVariant.Muted) ?? GUI.skin.label;
-#if IL2CPP
+#if IL2CPP_MELONLOADER
             GUILayout.Label(new GUIContent(countdownText), countdownStyle, (Il2CppReferenceArray<GUILayoutOption>)null);
 #else
             GUILayout.Label(countdownText, countdownStyle);
@@ -181,7 +181,7 @@ namespace shadcnui.GUIComponents
                 layoutComponents.AddSpace(4);
                 var styleManager = guiHelper.GetStyleManager();
                 GUIStyle expandedStyle = styleManager?.GetLabelStyle(LabelVariant.Muted) ?? GUI.skin.label;
-#if IL2CPP
+#if IL2CPP_MELONLOADER
                 GUILayout.Label(new GUIContent(expandedContent), expandedStyle, (Il2CppReferenceArray<GUILayoutOption>)null);
 #else
                 GUILayout.Label(expandedContent, expandedStyle);
@@ -200,14 +200,14 @@ namespace shadcnui.GUIComponents
             var styleManager = guiHelper.GetStyleManager();
             if (styleManager != null)
             {
-                GUIStyle statusStyle = new GUIStyle(GUI.skin.box);
+                GUIStyle statusStyle = new UnityHelpers.GUIStyle(GUI.skin.box);
                 statusStyle.normal.background = styleManager.CreateSolidTexture(statusColor);
                 statusStyle.fixedWidth = 8 * guiHelper.uiScale;
                 statusStyle.fixedHeight = 8 * guiHelper.uiScale;
-                statusStyle.border = new RectOffset(0, 0, 0, 0);
-                statusStyle.padding = new RectOffset(0, 0, 0, 0);
-                statusStyle.margin = new RectOffset(0, 0, 0, 0);
-#if IL2CPP
+                statusStyle.border = new UnityHelpers.RectOffset(0, 0, 0, 0);
+                statusStyle.padding = new UnityHelpers.RectOffset(0, 0, 0, 0);
+                statusStyle.margin = new UnityHelpers.RectOffset(0, 0, 0, 0);
+#if IL2CPP_MELONLOADER
                 GUILayout.Label(GUIContent.none, statusStyle, (Il2CppReferenceArray<GUILayoutOption>)null);
 #else
                 GUILayout.Label(GUIContent.none, statusStyle);
