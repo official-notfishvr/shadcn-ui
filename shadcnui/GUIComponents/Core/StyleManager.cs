@@ -1340,7 +1340,7 @@ namespace shadcnui.GUIComponents
             tabsTriggerActiveStyle.active.background = CreateSolidTexture(theme.TabsTriggerActiveBg);
 
             tabsContentStyle = new GUIStyle();
-            tabsContentStyle.padding = GetSpacingOffset(0f, 8f);
+            tabsContentStyle.padding = GetSpacingOffset(15f, 15f);
         }
 
         /// <summary>

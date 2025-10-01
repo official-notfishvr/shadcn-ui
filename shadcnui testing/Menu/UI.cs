@@ -14,6 +14,7 @@ public class UI : MonoBehaviour
     private GUIHelper guiHelper;
     private Rect windowRect = new Rect(20, 20, 1450, 600);
     private bool showDemoWindow = false;
+    private bool useVerticalTabs = false;
     private Vector2 scrollPosition;
 
     private bool checkboxValue = false;
@@ -26,6 +27,8 @@ public class UI : MonoBehaviour
     private int glowButtonIndex = 0;
     private Tabs.TabConfig[] demoTabs;
     private int currentDemoTab = 0;
+    private bool verticalTabsOnRight = false;
+    private bool tabsOnBottom = false;
 
     private string passwordValue = "password123";
     private string inputTextAreaValue = "This is a text area in Input Components.";
@@ -197,33 +200,67 @@ public class UI : MonoBehaviour
         guiHelper.UpdateAnimations(showDemoWindow);
         if (guiHelper.BeginAnimatedGUI())
         {
-            currentDemoTab = guiHelper.Tabs(demoTabs.Select(tab => tab.Name).ToArray(), currentDemoTab, maxLines: 2);
+            useVerticalTabs = guiHelper.Toggle("Use Vertical Tabs", useVerticalTabs);
+            guiHelper.HorizontalSeparator();
 
-            guiHelper.BeginTabContent();
-            scrollPosition = guiHelper.DrawScrollView(
-                scrollPosition,
-                () =>
-                {
-#if IL2CPP
-                    GUILayout.BeginVertical(new Il2CppReferenceArray<GUILayoutOption>(new GUILayoutOption[] { GUILayout.Width(windowRect.width - 20) }));
-#else
-                    GUILayout.BeginVertical(GUILayout.Width(windowRect.width - 20));
-#endif
+            if (useVerticalTabs)
+            {
+                verticalTabsOnRight = guiHelper.Toggle("Tabs on Right", verticalTabsOnRight);
+                guiHelper.HorizontalSeparator();
 
-                    if (currentDemoTab >= 0 && currentDemoTab < demoTabs.Length)
+                var side = verticalTabsOnRight ? Tabs.TabSide.Right : Tabs.TabSide.Left;
+
+                currentDemoTab = guiHelper.VerticalTabs(
+                    demoTabs.Select(tab => tab.Name).ToArray(),
+                    currentDemoTab,
+                    () =>
                     {
-                        demoTabs[currentDemoTab].Content?.Invoke();
-                    }
-
-                    GUILayout.EndVertical();
-                },
-                GUILayout.Width(windowRect.width - 20),
-                GUILayout.ExpandHeight(true)
-            );
-            guiHelper.EndTabContent();
+                        guiHelper.BeginTabContent();
+                        scrollPosition = guiHelper.DrawScrollView(scrollPosition, DrawCurrentTabContent, GUILayout.ExpandHeight(true));
+                        guiHelper.EndTabContent();
+                    },
+                    tabWidth: 150,
+                    maxLines: 2,
+                    side: side
+                );
+            }
+            else
+            {
+                tabsOnBottom = guiHelper.Toggle("Tabs on Bottom", tabsOnBottom);
+                guiHelper.HorizontalSeparator();
+                var position = tabsOnBottom ? Tabs.TabPosition.Bottom : Tabs.TabPosition.Top;
+                currentDemoTab = guiHelper.Tabs(
+                    demoTabs.Select(tab => tab.Name).ToArray(),
+                    currentDemoTab,
+                    () =>
+                    {
+                        guiHelper.BeginTabContent();
+                        scrollPosition = guiHelper.DrawScrollView(scrollPosition, DrawCurrentTabContent, GUILayout.ExpandHeight(true));
+                        guiHelper.EndTabContent();
+                    },
+                    maxLines: 2,
+                    position: position
+                );
+            }
             guiHelper.EndAnimatedGUI();
         }
         GUI.DragWindow();
+    }
+
+    void DrawCurrentTabContent()
+    {
+#if IL2CPP
+        GUILayout.BeginVertical(new Il2CppReferenceArray<GUILayoutOption>(new GUILayoutOption[] { }));
+#else
+        GUILayout.BeginVertical();
+#endif
+
+        if (currentDemoTab >= 0 && currentDemoTab < demoTabs.Length)
+        {
+            demoTabs[currentDemoTab].Content?.Invoke();
+        }
+
+        GUILayout.EndVertical();
     }
 
     void DrawInputDemos()
@@ -262,19 +299,28 @@ public class UI : MonoBehaviour
     {
         guiHelper.BeginVerticalGroup(GUILayout.ExpandWidth(true), GUILayout.ExpandHeight(true));
 
+        tabsOnBottom = guiHelper.Toggle("Tabs on Bottom", tabsOnBottom);
         string[] tabNames = { "Account", "Password", "Notifications" };
-        selectedTab = guiHelper.Tabs(tabNames, selectedTab);
-        guiHelper.BeginTabContent();
+        var position = tabsOnBottom ? Tabs.TabPosition.Bottom : Tabs.TabPosition.Top;
+        selectedTab = guiHelper.Tabs(
+            tabNames,
+            selectedTab,
+            () =>
+            {
+                guiHelper.BeginTabContent();
 
-        if (selectedTab == 0)
-            guiHelper.Label("Make changes to your account here.");
-        else if (selectedTab == 1)
-            guiHelper.Label("Change your password here.");
-        else
-            guiHelper.Label("Manage your notification settings here.");
+                if (selectedTab == 0)
+                    guiHelper.Label("Make changes to your account here.");
+                else if (selectedTab == 1)
+                    guiHelper.Label("Change your password here.");
+                else
+                    guiHelper.Label("Manage your notification settings here.");
 
-        guiHelper.EndTabContent();
-        guiHelper.Label("Code: selectedTab = guiHelper.Tabs(tabNames, selectedTab); ... guiHelper.BeginTabContent(); ... guiHelper.EndTabContent();", LabelVariant.Muted);
+                guiHelper.EndTabContent();
+            },
+            position: position
+        );
+        guiHelper.Label("Code: selectedTab = guiHelper.Tabs(tabNames, selectedTab, content, position);", LabelVariant.Muted);
         guiHelper.HorizontalSeparator();
 
         guiHelper.Label("Tabs with Content (using TabConfig)");
@@ -285,18 +331,25 @@ public class UI : MonoBehaviour
 
         guiHelper.Label("Vertical Tabs");
         string[] verticalTabNames = { "Profile", "Settings", "Privacy" };
-        selectedVerticalTab = guiHelper.VerticalTabs(verticalTabNames, selectedVerticalTab, tabWidth: 100);
-        guiHelper.BeginTabContent();
+        selectedVerticalTab = guiHelper.VerticalTabs(
+            verticalTabNames,
+            selectedVerticalTab,
+            () =>
+            {
+                guiHelper.BeginTabContent();
 
-        if (selectedVerticalTab == 0)
-            guiHelper.Label("Profile content.");
-        else if (selectedVerticalTab == 1)
-            guiHelper.Label("Settings content.");
-        else
-            guiHelper.Label("Privacy content.");
+                if (selectedVerticalTab == 0)
+                    guiHelper.Label("Profile content.");
+                else if (selectedVerticalTab == 1)
+                    guiHelper.Label("Settings content.");
+                else
+                    guiHelper.Label("Privacy content.");
 
-        guiHelper.EndTabContent();
-        guiHelper.Label("Code: guiHelper.VerticalTabs(names, selected, tabWidth);", LabelVariant.Muted);
+                guiHelper.EndTabContent();
+            },
+            tabWidth: 100
+        );
+        guiHelper.Label("Code: guiHelper.VerticalTabs(names, selected, content, tabWidth);", LabelVariant.Muted);
         guiHelper.HorizontalSeparator();
         GUILayout.EndVertical();
     }
@@ -311,29 +364,29 @@ public class UI : MonoBehaviour
 
         outlineTextAreaValue = guiHelper.OutlineTextArea(outlineTextAreaValue, placeholder: "Outline Text Area");
         guiHelper.Label($"Outline Text Area Value: {outlineTextAreaValue}");
-        guiHelper.Label("Code: guiHelper.OutlineTextArea(text, placeholder);");
+        guiHelper.Label("Code: guiHelper.OutlineTextArea(text, placeholder);", LabelVariant.Muted);
         guiHelper.HorizontalSeparator();
 
         ghostTextAreaValue = guiHelper.GhostTextArea(ghostTextAreaValue, placeholder: "Ghost Text Area");
         guiHelper.Label($"Ghost Text Area Value: {ghostTextAreaValue}");
-        guiHelper.Label("Code: guiHelper.GhostTextArea(text, placeholder);");
+        guiHelper.Label("Code: guiHelper.GhostTextArea(text, placeholder);", LabelVariant.Muted);
         guiHelper.HorizontalSeparator();
 
         labeledTextAreaValue = guiHelper.LabeledTextArea("Your Message", labeledTextAreaValue, placeholder: "Type here...");
         guiHelper.Label($"Labeled Text Area Value: {labeledTextAreaValue}");
-        guiHelper.Label("Code: guiHelper.LabeledTextArea(label, text, placeholder);");
+        guiHelper.Label("Code: guiHelper.LabeledTextArea(label, text, placeholder);", LabelVariant.Muted);
         guiHelper.HorizontalSeparator();
 
         resizableTextAreaValue = guiHelper.ResizableTextArea(resizableTextAreaValue, ref resizableTextAreaHeight, placeholder: "Resize me!");
         guiHelper.Label($"Resizable Text Area Value: {resizableTextAreaValue} (Height: {resizableTextAreaHeight:F2})");
-        guiHelper.Label("Code: guiHelper.ResizableTextArea(text, ref height, placeholder);");
+        guiHelper.Label("Code: guiHelper.ResizableTextArea(text, ref height, placeholder);", LabelVariant.Muted);
         guiHelper.HorizontalSeparator();
         GUILayout.EndVertical();
     }
 
     void DrawAlertDemos()
     {
-        guiHelper.BeginVerticalGroup(GUILayout.Width(windowRect.width - 25), GUILayout.ExpandHeight(true));
+        guiHelper.BeginVerticalGroup(GUILayout.ExpandWidth(true), GUILayout.ExpandHeight(true));
         guiHelper.Label("Alert", LabelVariant.Default);
         guiHelper.MutedLabel("Displays a callout for user attention.");
         guiHelper.HorizontalSeparator();
