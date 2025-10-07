@@ -32,17 +32,10 @@ namespace shadcnui.GUIComponents
                 GUI.color = new Color(originalColor.r, originalColor.g, originalColor.b, 0.7f);
             }
 
-#if IL2CPP_MELONLOADER
             if (width > 0)
-                GUILayout.Label(text ?? "", labelStyle, new Il2CppReferenceArray<GUILayoutOption>(new GUILayoutOption[] { GUILayout.Width(width) }));
+                UnityHelpers.Label(text ?? "", labelStyle, GUILayout.Width(width));
             else
-                GUILayout.Label(text ?? "", labelStyle, new Il2CppReferenceArray<GUILayoutOption>(0));
-#else
-            if (width > 0)
-                GUILayout.Label(text ?? "", labelStyle, GUILayout.Width(width));
-            else
-                GUILayout.Label(text ?? "", labelStyle);
-#endif
+                UnityHelpers.Label(text ?? "", labelStyle);
 
             GUI.color = originalColor;
         }
@@ -60,17 +53,10 @@ namespace shadcnui.GUIComponents
 
             string newValue;
 
-#if IL2CPP_MELONLOADER
             if (width > 0)
-                newValue = GUILayout.TextField(value ?? "", inputStyle, new Il2CppReferenceArray<GUILayoutOption>(new GUILayoutOption[] { GUILayout.Width(width * guiHelper.uiScale), GUILayout.Height(36 * guiHelper.uiScale) }));
+                newValue = UnityHelpers.TextField(value ?? "", inputStyle, GUILayout.Width(width * guiHelper.uiScale), GUILayout.Height(36 * guiHelper.uiScale));
             else
-                newValue = GUILayout.TextField(value ?? "", inputStyle, new Il2CppReferenceArray<GUILayoutOption>(new GUILayoutOption[] { GUILayout.Height(36 * guiHelper.uiScale) }));
-#else
-            if (width > 0)
-                newValue = GUILayout.TextField(value ?? "", inputStyle, GUILayout.Width(width * guiHelper.uiScale), GUILayout.Height(36 * guiHelper.uiScale));
-            else
-                newValue = GUILayout.TextField(value ?? "", inputStyle, GUILayout.Height(36 * guiHelper.uiScale));
-#endif
+                newValue = UnityHelpers.TextField(value ?? "", inputStyle, GUILayout.Height(36 * guiHelper.uiScale));
 
             GUI.color = originalColor;
 
@@ -92,19 +78,10 @@ namespace shadcnui.GUIComponents
             var styleManager = guiHelper.GetStyleManager();
             if (styleManager == null)
             {
-#if IL2CPP_MELONLOADER
                 if (!string.IsNullOrEmpty(label))
-                    GUILayout.Label(label, GUI.skin.label, new Il2CppReferenceArray<GUILayoutOption>(0));
-#else
-                if (!string.IsNullOrEmpty(label))
-                    GUILayout.Label(label, GUI.skin.label, new GUILayoutOption[0]);
-#endif
+                    UnityHelpers.Label(label, GUI.skin.label, new GUILayoutOption[0]);
 
-#if IL2CPP_MELONLOADER
-                return GUILayout.PasswordField(value ?? "", maskChar, GUI.skin.textField, new Il2CppReferenceArray<GUILayoutOption>(0));
-#else
-                return GUILayout.PasswordField(value ?? "", maskChar, GUI.skin.textField, new GUILayoutOption[0]);
-#endif
+                return UnityHelpers.PasswordField(value ?? "", maskChar, GUI.skin.textField, new GUILayoutOption[0]);
             }
 
             if (!string.IsNullOrEmpty(label))
@@ -121,11 +98,7 @@ namespace shadcnui.GUIComponents
                 GUI.color = new Color(originalColor.r, originalColor.g, originalColor.b, 0.5f);
             }
 
-#if IL2CPP_MELONLOADER
-            string newValue = GUILayout.PasswordField(value ?? "", maskChar, passwordStyle, new Il2CppReferenceArray<GUILayoutOption>(new GUILayoutOption[] { GUILayout.Height(36 * guiHelper.uiScale) }));
-#else
-            string newValue = GUILayout.PasswordField(value ?? "", maskChar, passwordStyle, GUILayout.Height(36 * guiHelper.uiScale));
-#endif
+            string newValue = UnityHelpers.PasswordField(value ?? "", maskChar, passwordStyle, GUILayout.Height(36 * guiHelper.uiScale));
 
             GUI.color = originalColor;
             layoutComponents.AddSpace(10f);
@@ -143,18 +116,10 @@ namespace shadcnui.GUIComponents
             var styleManager = guiHelper.GetStyleManager();
             if (styleManager == null)
             {
-#if IL2CPP_MELONLOADER
                 if (!string.IsNullOrEmpty(label))
-                    GUILayout.Label(label, GUI.skin.label, new Il2CppReferenceArray<GUILayoutOption>(0));
-#else
-                if (!string.IsNullOrEmpty(label))
-                    GUILayout.Label(label, GUI.skin.label, new GUILayoutOption[0]);
-#endif
-#if IL2CPP_MELONLOADER
-                string result = GUILayout.TextArea(value ?? "", new Il2CppReferenceArray<GUILayoutOption>(new GUILayoutOption[] { GUILayout.Height(height) }));
-#else
-                string result = GUILayout.TextArea(value ?? "", GUILayout.Height(height));
-#endif
+                    UnityHelpers.Label(label, GUI.skin.label, new GUILayoutOption[0]);
+
+                string result = UnityHelpers.TextArea(value ?? "", GUILayout.Height(height));
                 if (result.Length > maxLength)
                     result = result.Substring(0, maxLength);
                 return result;
@@ -174,11 +139,7 @@ namespace shadcnui.GUIComponents
                 GUI.color = new Color(originalColor.r, originalColor.g, originalColor.b, 0.5f);
             }
 
-#if IL2CPP_MELONLOADER
-            string newValue = GUILayout.TextArea(value ?? "", maxLength, textAreaStyle, new Il2CppReferenceArray<GUILayoutOption>(new GUILayoutOption[] { GUILayout.Height(height * guiHelper.uiScale) }));
-#else
-            string newValue = GUILayout.TextArea(value ?? "", maxLength, textAreaStyle, GUILayout.Height(height * guiHelper.uiScale));
-#endif
+            string newValue = UnityHelpers.TextArea(value ?? "", maxLength, textAreaStyle, GUILayout.Height(height * guiHelper.uiScale));
 
             GUI.color = originalColor;
             layoutComponents.AddSpace(10f);
@@ -195,11 +156,8 @@ namespace shadcnui.GUIComponents
         {
             var styleManager = guiHelper.GetStyleManager();
             layoutComponents.AddSpace(10f * 0.5f);
-#if IL2CPP_MELONLOADER
-            GUILayout.Label(title, styleManager?.sectionHeaderStyle ?? GUI.skin.label, new Il2CppReferenceArray<GUILayoutOption>(0));
-#else
-            GUILayout.Label(title, styleManager?.sectionHeaderStyle ?? GUI.skin.label);
-#endif
+
+            UnityHelpers.Label(title, styleManager?.sectionHeaderStyle ?? GUI.skin.label);
             layoutComponents.AddSpace(2f);
         }
 

@@ -29,19 +29,11 @@ namespace shadcnui.GUIComponents
 
             if (image != null)
             {
-#if IL2CPP_MELONLOADER
-                GUILayout.Label(image, avatarStyle, (Il2CppReferenceArray<GUILayoutOption>)layoutOptions);
-#else
-                GUILayout.Label(image, avatarStyle, layoutOptions);
-#endif
+                UnityHelpers.Label(image, avatarStyle, layoutOptions);
             }
             else
             {
-#if IL2CPP_MELONLOADER
-                GUILayout.Label(new GUIContent(fallbackText ?? "A"), fallbackStyle, (Il2CppReferenceArray<GUILayoutOption>)layoutOptions);
-#else
-                GUILayout.Label(fallbackText ?? "A", fallbackStyle, layoutOptions);
-#endif
+                UnityHelpers.Label(fallbackText ?? "A", fallbackStyle, layoutOptions);
             }
         }
 
@@ -93,11 +85,7 @@ namespace shadcnui.GUIComponents
             statusStyle.padding = new UnityHelpers.RectOffset(0, 0, 0, 0);
             statusStyle.margin = new UnityHelpers.RectOffset(0, 0, 0, 0);
 
-#if IL2CPP_MELONLOADER
-            GUILayout.Label(GUIContent.none, statusStyle, new Il2CppReferenceArray<GUILayoutOption>(new GUILayoutOption[0]));
-#else
-            GUILayout.Label(GUIContent.none, statusStyle);
-#endif
+            UnityHelpers.Label(GUIContent.none, statusStyle);
         }
 
         public void AvatarWithName(Texture2D image, string fallbackText, string name, AvatarSize size = AvatarSize.Default, AvatarShape shape = AvatarShape.Circle, bool showNameBelow = false, params GUILayoutOption[] options)
@@ -112,11 +100,8 @@ namespace shadcnui.GUIComponents
                     layoutComponents.AddSpace(4);
                     var styleManager = guiHelper.GetStyleManager();
                     GUIStyle nameStyle = styleManager?.GetLabelStyle(LabelVariant.Default) ?? GUI.skin.label;
-#if IL2CPP_MELONLOADER
-                    GUILayout.Label(new GUIContent(name), nameStyle, (Il2CppReferenceArray<GUILayoutOption>)null);
-#else
-                    GUILayout.Label(name, nameStyle);
-#endif
+
+                    UnityHelpers.Label(name, nameStyle);
                 }
 
                 layoutComponents.EndVerticalGroup();
@@ -132,11 +117,8 @@ namespace shadcnui.GUIComponents
                     var styleManager = guiHelper.GetStyleManager();
                     GUIStyle nameStyle = styleManager?.GetLabelStyle(LabelVariant.Default) ?? GUI.skin.label;
                     nameStyle.alignment = TextAnchor.MiddleLeft;
-#if IL2CPP_MELONLOADER
-                    GUILayout.Label(new GUIContent(name), nameStyle, (Il2CppReferenceArray<GUILayoutOption>)null);
-#else
-                    GUILayout.Label(name, nameStyle);
-#endif
+
+                    UnityHelpers.Label(name, nameStyle);
                 }
 
                 layoutComponents.EndHorizontalGroup();
@@ -151,25 +133,17 @@ namespace shadcnui.GUIComponents
             customStyle.normal.background = styleManager.CreateSolidTexture(backgroundColor);
             customStyle.normal.textColor = textColor;
             customStyle.alignment = TextAnchor.MiddleCenter;
-            customStyle.fontSize = GetAvatarFontSize(size);
+            customStyle.fontSize = styleManager.GetAvatarFontSize(size);
             customStyle.padding = new UnityHelpers.RectOffset(0, 0, 0, 0);
-            customStyle.border = GetAvatarBorder(shape, size);
+            customStyle.border = styleManager.GetAvatarBorder(shape, size);
 
             if (image != null)
             {
-#if IL2CPP_MELONLOADER
-                GUILayout.Label(image, customStyle, (Il2CppReferenceArray<GUILayoutOption>)options);
-#else
-                GUILayout.Label(image, customStyle, options);
-#endif
+                UnityHelpers.Label(image, customStyle, options);
             }
             else
             {
-#if IL2CPP_MELONLOADER
-                GUILayout.Label(new GUIContent(fallbackText ?? "A"), customStyle, (Il2CppReferenceArray<GUILayoutOption>)options);
-#else
-                GUILayout.Label(fallbackText ?? "A", customStyle, options);
-#endif
+                UnityHelpers.Label(fallbackText ?? "A", customStyle, options);
             }
         }
 
@@ -236,11 +210,7 @@ namespace shadcnui.GUIComponents
                 var styleManager = guiHelper.GetStyleManager();
                 GUIStyle tooltipStyle = styleManager?.GetLabelStyle(LabelVariant.Muted) ?? GUI.skin.label;
 
-#if IL2CPP_MELONLOADER
-                GUILayout.Label(new GUIContent("?"), tooltipStyle, (Il2CppReferenceArray<GUILayoutOption>)options);
-#else
-                GUILayout.Label("?", tooltipStyle, options);
-#endif
+                UnityHelpers.Label("?", tooltipStyle, options);
             }
 
             layoutComponents.EndHorizontalGroup();
@@ -276,48 +246,10 @@ namespace shadcnui.GUIComponents
                 countStyle.normal.textColor = Color.white;
                 countStyle.normal.background = styleManager?.CreateSolidTexture(Color.gray) ?? GUI.skin.box.normal.background;
 
-#if IL2CPP_MELONLOADER
-                GUILayout.Label(new GUIContent(countText), countStyle, (Il2CppReferenceArray<GUILayoutOption>)options);
-#else
-                GUILayout.Label(countText, countStyle, options);
-#endif
+                UnityHelpers.Label(countText, countStyle, options);
             }
 
             layoutComponents.EndHorizontalGroup();
-        }
-
-        private int GetAvatarFontSize(AvatarSize size)
-        {
-            switch (size)
-            {
-                case AvatarSize.Small:
-                    return Mathf.RoundToInt((guiHelper.fontSize - 2) * guiHelper.uiScale);
-                case AvatarSize.Large:
-                    return Mathf.RoundToInt((guiHelper.fontSize + 4) * guiHelper.uiScale);
-                default:
-                    return Mathf.RoundToInt(guiHelper.fontSize * guiHelper.uiScale);
-            }
-        }
-
-        private RectOffset GetAvatarBorder(AvatarShape shape, AvatarSize size)
-        {
-            float scale = guiHelper.uiScale;
-            int borderRadius = 0;
-
-            switch (shape)
-            {
-                case AvatarShape.Circle:
-                    borderRadius = Mathf.RoundToInt(50 * scale);
-                    break;
-                case AvatarShape.Rounded:
-                    borderRadius = Mathf.RoundToInt(8 * scale);
-                    break;
-                case AvatarShape.Square:
-                    borderRadius = 0;
-                    break;
-            }
-
-            return new UnityHelpers.RectOffset(borderRadius, borderRadius, borderRadius, borderRadius);
         }
 
         public struct AvatarData

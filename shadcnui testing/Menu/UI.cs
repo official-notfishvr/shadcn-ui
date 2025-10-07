@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -113,13 +114,19 @@ public class UI : MonoBehaviour
     private System.Collections.Generic.List<DataTableRow> dataTableData;
 
     private bool fontInitialized = false;
+    private Texture2D img = new Texture2D(2, 2);
 
     void Start()
     {
         guiHelper = new GUIHelper();
+
+        byte[] imageData = LoadEmbeddedBytes("shadcnui_testing.Img.1.png");
+#if MONO
+        img.LoadImage(imageData);
+#endif
         /*
         // Custom Font Loading
-        byte[] fontData = LoadEmbeddedFontBytes("shadcnui_testing.Fonts.ProggyClean.ttf"); // {file name}.Fonts.{font name}.ttf // you need Directory.Build.targets to do it or fully find the name yourself
+        byte[] fontData = LoadEmbeddedBytes("shadcnui_testing.Fonts.ProggyClean.ttf"); // {file name}.Fonts.{font name}.ttf // you need Directory.Build.targets to do it or fully find the name yourself
         if (fontData != null)
         {
             guiHelper.GetStyleManager().SetCustomFont(fontData, "ProggyClean.ttf");
@@ -127,7 +134,6 @@ public class UI : MonoBehaviour
         */
         demoTabs = new Tabs.TabConfig[]
         {
-            new Tabs.TabConfig("Alert", DrawAlertDemos),
             new Tabs.TabConfig("Avatar", DrawAvatarDemos),
             new Tabs.TabConfig("Badge", DrawBadgeDemos),
             new Tabs.TabConfig("Button", DrawButtonDemos),
@@ -141,7 +147,6 @@ public class UI : MonoBehaviour
             new Tabs.TabConfig("Layout", DrawLayoutDemos),
             new Tabs.TabConfig("Progress", DrawProgressDemos),
             new Tabs.TabConfig("Separator", DrawSeparatorDemos),
-            new Tabs.TabConfig("Skeleton", DrawSkeletonDemos),
             new Tabs.TabConfig("Slider", DrawSliderDemos),
             new Tabs.TabConfig("Switch", DrawSwitchDemos),
             new Tabs.TabConfig("Table", DrawTableDemos),
@@ -152,10 +157,12 @@ public class UI : MonoBehaviour
             new Tabs.TabConfig("DropdownMenu", DrawDropdownMenuDemos),
             new Tabs.TabConfig("Popover", DrawPopoverDemos),
             new Tabs.TabConfig("Select", DrawSelectDemos),
+            new Tabs.TabConfig("Chart", DrawChartDemos),
+            new Tabs.TabConfig("MenuBar", DrawMenuBar),
         };
     }
 
-    private byte[] LoadEmbeddedFontBytes(string path)
+    private byte[] LoadEmbeddedBytes(string path)
     {
         try
         {
@@ -384,75 +391,6 @@ public class UI : MonoBehaviour
         GUILayout.EndVertical();
     }
 
-    void DrawAlertDemos()
-    {
-        guiHelper.BeginVerticalGroup(GUILayout.ExpandWidth(true), GUILayout.ExpandHeight(true));
-        guiHelper.Label("Alert", LabelVariant.Default);
-        guiHelper.MutedLabel("Displays a callout for user attention.");
-        guiHelper.HorizontalSeparator();
-
-        guiHelper.Label("Info Alert", LabelVariant.Default);
-        guiHelper.Alert("Heads up!", "You can use this component to show a message to the user.", AlertVariant.Default, AlertType.Info);
-        guiHelper.Label("Code: guiHelper.Alert(title, description, variant, type);", LabelVariant.Muted);
-        guiHelper.HorizontalSeparator();
-
-        guiHelper.Label("Destructive Alert", LabelVariant.Default);
-        guiHelper.Alert("Error", "Your session has expired. Please log in again.", AlertVariant.Destructive, AlertType.Error);
-        guiHelper.Label("Code: guiHelper.Alert(title, description, AlertVariant.Destructive, AlertType.Error);", LabelVariant.Muted);
-        guiHelper.HorizontalSeparator();
-
-        guiHelper.Label("Success Alert with Icon", LabelVariant.Default);
-        guiHelper.Alert("Success", "Your profile has been updated successfully.", AlertVariant.Default, AlertType.Success, null);
-        guiHelper.Label("Code: guiHelper.Alert(title, description, variant, type, iconTexture);", LabelVariant.Muted);
-        guiHelper.HorizontalSeparator();
-
-        guiHelper.Label("Custom Alert", LabelVariant.Default);
-        guiHelper.CustomAlert("Custom Title", "This is a custom alert with custom colors.", Color.magenta, Color.white);
-        guiHelper.Label("Code: guiHelper.CustomAlert(title, description, backgroundColor, textColor);", LabelVariant.Muted);
-        guiHelper.HorizontalSeparator();
-
-        guiHelper.Label("Alert with Progress", LabelVariant.Default);
-        guiHelper.AlertWithProgress("Downloading", "Please wait while the file downloads.", 0.75f);
-        guiHelper.Label("Code: guiHelper.AlertWithProgress(title, description, progress);", LabelVariant.Muted);
-        guiHelper.HorizontalSeparator();
-
-        guiHelper.Label("Animated Alert", LabelVariant.Default);
-        guiHelper.AnimatedAlert("New Update Available", "A new version of the application is ready to be installed.");
-        guiHelper.Label("Code: guiHelper.AnimatedAlert(title, description);", LabelVariant.Muted);
-        guiHelper.HorizontalSeparator();
-
-        guiHelper.Label("Alert with Countdown", LabelVariant.Default);
-        guiHelper.AlertWithCountdown(
-            "Session Timeout",
-            "Your session will expire in 10 seconds.",
-            10f,
-            () =>
-            {
-                Debug.Log("Countdown finished!");
-            }
-        );
-        guiHelper.Label("Code: guiHelper.AlertWithCountdown(title, description, countdownTime, onTimeout);", LabelVariant.Muted);
-        guiHelper.HorizontalSeparator();
-        /*
-        guiHelper.Label("Expandable Alert", LabelVariant.Default);
-        expandableAlertExpanded = guiHelper.ExpandableAlert("Details", "Click to see more information.", "This is the expanded content with more details about the alert.", ref expandableAlertExpanded);
-        guiHelper.Label($"Expandable Alert Expanded: {expandableAlertExpanded}");
-        guiHelper.Label("Code: guiHelper.ExpandableAlert(title, description, expandedContent, ref isExpanded);", LabelVariant.Muted);
-        guiHelper.HorizontalSeparator();
-        
-        guiHelper.Label("Alert with Status", LabelVariant.Default);
-        guiHelper.AlertWithStatus("Service Status", "All systems are operational.", true);
-        guiHelper.Label("Code: guiHelper.AlertWithStatus(title, description, isActive);", LabelVariant.Muted);
-        guiHelper.HorizontalSeparator();
-        
-        guiHelper.Label("Alert with Custom Icon", LabelVariant.Default);
-        guiHelper.AlertWithCustomIcon("Custom Icon Alert", "This alert uses a custom icon.", null, Color.yellow);
-        guiHelper.Label("Code: guiHelper.AlertWithCustomIcon(title, description, icon, iconColor);", LabelVariant.Muted);
-        guiHelper.HorizontalSeparator();
-        */
-        GUILayout.EndVertical();
-    }
-
     void DrawAvatarDemos()
     {
         guiHelper.BeginVerticalGroup(GUILayout.ExpandWidth(true), GUILayout.ExpandHeight(true));
@@ -462,60 +400,60 @@ public class UI : MonoBehaviour
 
         guiHelper.Label("Default Avatar", LabelVariant.Default);
         guiHelper.BeginHorizontalGroup();
-        guiHelper.Avatar(null, "AV");
-        guiHelper.Avatar(null, "SM", AvatarSize.Small);
-        guiHelper.Avatar(null, "LG", AvatarSize.Large);
+        guiHelper.Avatar(img, "AV");
+        guiHelper.Avatar(img, "SM", AvatarSize.Small);
+        guiHelper.Avatar(img, "LG", AvatarSize.Large);
         guiHelper.EndHorizontalGroup();
         guiHelper.Label("Code: guiHelper.Avatar(texture, fallbackText, size, shape);", LabelVariant.Muted);
         guiHelper.HorizontalSeparator();
 
         guiHelper.Label("Avatar Shapes", LabelVariant.Default);
         guiHelper.BeginHorizontalGroup();
-        guiHelper.Avatar(null, "CR", AvatarSize.Default, AvatarShape.Circle);
-        guiHelper.Avatar(null, "SQ", AvatarSize.Default, AvatarShape.Square);
-        guiHelper.Avatar(null, "RD", AvatarSize.Default, AvatarShape.Rounded);
+        guiHelper.Avatar(img, "CR", AvatarSize.Default, AvatarShape.Circle);
+        guiHelper.Avatar(img, "SQ", AvatarSize.Default, AvatarShape.Square);
+        guiHelper.Avatar(img, "RD", AvatarSize.Default, AvatarShape.Rounded);
         guiHelper.EndHorizontalGroup();
         guiHelper.Label("Code: guiHelper.Avatar(texture, fallbackText, size, shape);", LabelVariant.Muted);
         guiHelper.HorizontalSeparator();
 
         guiHelper.Label("Avatar with Status", LabelVariant.Default);
         guiHelper.BeginHorizontalGroup();
-        guiHelper.AvatarWithStatus(null, "ON", true);
-        guiHelper.AvatarWithStatus(null, "OFF", false);
+        guiHelper.AvatarWithStatus(img, "ON", true);
+        guiHelper.AvatarWithStatus(img, "OFF", false);
         guiHelper.EndHorizontalGroup();
         guiHelper.Label("Code: guiHelper.AvatarWithStatus(image, fallbackText, isOnline);", LabelVariant.Muted);
         guiHelper.HorizontalSeparator();
 
         guiHelper.Label("Avatar with Name", LabelVariant.Default);
         guiHelper.BeginHorizontalGroup();
-        guiHelper.AvatarWithName(null, "JD", "John Doe");
-        guiHelper.AvatarWithName(null, "JS", "Jane Smith", showNameBelow: true);
+        guiHelper.AvatarWithName(img, "JD", "John Doe");
+        guiHelper.AvatarWithName(img, "JS", "Jane Smith", showNameBelow: true);
         guiHelper.EndHorizontalGroup();
         guiHelper.Label("Code: guiHelper.AvatarWithName(image, fallbackText, name, showNameBelow);", LabelVariant.Muted);
         guiHelper.HorizontalSeparator();
 
         guiHelper.Label("Custom Avatar", LabelVariant.Default);
-        guiHelper.CustomAvatar(null, "CA", Color.blue, Color.white);
+        guiHelper.CustomAvatar(img, "CA", Color.blue, Color.white);
         guiHelper.Label("Code: guiHelper.CustomAvatar(image, fallbackText, backgroundColor, textColor);", LabelVariant.Muted);
         guiHelper.HorizontalSeparator();
 
         guiHelper.Label("Avatar with Border", LabelVariant.Default);
-        guiHelper.AvatarWithBorder(null, "BR", Color.red);
+        guiHelper.AvatarWithBorder(img, "BR", Color.red);
         guiHelper.Label("Code: guiHelper.AvatarWithBorder(image, fallbackText, borderColor);", LabelVariant.Muted);
         guiHelper.HorizontalSeparator();
 
         guiHelper.Label("Avatar with Hover", LabelVariant.Default);
-        guiHelper.AvatarWithHover(null, "HV", onClick: () => Debug.Log("Avatar Hover Clicked!"));
+        guiHelper.AvatarWithHover(img, "HV", onClick: () => Debug.Log("Avatar Hover Clicked!"));
         guiHelper.Label("Code: guiHelper.AvatarWithHover(image, fallbackText, onClick);", LabelVariant.Muted);
         guiHelper.HorizontalSeparator();
 
         guiHelper.Label("Avatar with Loading", LabelVariant.Default);
-        guiHelper.AvatarWithLoading(null, "LD", true);
+        guiHelper.AvatarWithLoading(img, "LD", true);
         guiHelper.Label("Code: guiHelper.AvatarWithLoading(image, fallbackText, isLoading);", LabelVariant.Muted);
         guiHelper.HorizontalSeparator();
 
         guiHelper.Label("Avatar with Tooltip", LabelVariant.Default);
-        guiHelper.AvatarWithTooltip(null, "TP", "This is a user avatar.");
+        guiHelper.AvatarWithTooltip(img, "TP", "This is a user avatar.");
         guiHelper.Label("Code: guiHelper.AvatarWithTooltip(image, fallbackText, tooltip);", LabelVariant.Muted);
         guiHelper.HorizontalSeparator();
 
@@ -1195,45 +1133,6 @@ public class UI : MonoBehaviour
         GUILayout.EndVertical();
     }
 
-    void DrawSkeletonDemos()
-    {
-        guiHelper.BeginVerticalGroup(GUILayout.ExpandWidth(true), GUILayout.ExpandHeight(true));
-        guiHelper.Label("Skeleton", LabelVariant.Default);
-        guiHelper.MutedLabel("Displays a loading skeleton.");
-        guiHelper.HorizontalSeparator();
-
-        guiHelper.Label("Default Skeleton", LabelVariant.Default);
-        guiHelper.BeginHorizontalGroup();
-        guiHelper.Skeleton(50, 50, SkeletonVariant.Circular);
-        guiHelper.BeginVerticalGroup();
-        guiHelper.Skeleton(200, 20, SkeletonVariant.Default, SkeletonSize.Default);
-        guiHelper.Skeleton(150, 20, SkeletonVariant.Default, SkeletonSize.Default);
-        guiHelper.EndVerticalGroup();
-        guiHelper.EndHorizontalGroup();
-        guiHelper.Label("Code: guiHelper.Skeleton(width, height, variant, size);", LabelVariant.Muted);
-        guiHelper.HorizontalSeparator();
-
-        guiHelper.Label("Skeleton Variants", LabelVariant.Default);
-        guiHelper.BeginHorizontalGroup();
-        guiHelper.Skeleton(100, 30, SkeletonVariant.Default);
-        guiHelper.Skeleton(100, 30, SkeletonVariant.Rounded);
-        guiHelper.Skeleton(30, 30, SkeletonVariant.Circular);
-        guiHelper.EndHorizontalGroup();
-        guiHelper.Label("Code: guiHelper.Skeleton(width, height, variant);", LabelVariant.Muted);
-        guiHelper.HorizontalSeparator();
-
-        guiHelper.Label("Skeleton Sizes", LabelVariant.Default);
-        guiHelper.BeginHorizontalGroup();
-        guiHelper.Skeleton(100, 20, SkeletonVariant.Default, SkeletonSize.Small);
-        guiHelper.Skeleton(100, 30, SkeletonVariant.Default, SkeletonSize.Default);
-        guiHelper.Skeleton(100, 40, SkeletonVariant.Default, SkeletonSize.Large);
-        guiHelper.EndHorizontalGroup();
-        guiHelper.Label("Code: guiHelper.Skeleton(width, height, variant, size);", LabelVariant.Muted);
-        guiHelper.HorizontalSeparator();
-
-        GUILayout.EndVertical();
-    }
-
     void DrawSliderDemos()
     {
         guiHelper.BeginVerticalGroup(GUILayout.ExpandWidth(true), GUILayout.ExpandHeight(true));
@@ -1682,5 +1581,195 @@ public class UI : MonoBehaviour
         guiHelper.HorizontalSeparator();
 
         GUILayout.EndVertical();
+    }
+
+    private void DrawMenuBar()
+    {
+        guiHelper.BeginVerticalGroup(GUILayout.ExpandWidth(true), GUILayout.ExpandHeight(true));
+        var menuItems = new List<MenuBar.MenuItem>
+        {
+            new MenuBar.MenuItem(
+                "File",
+                null,
+                false,
+                new List<MenuBar.MenuItem>
+                {
+                    new MenuBar.MenuItem("New", () => Debug.Log("New file"), false, null, "Ctrl+N"),
+                    new MenuBar.MenuItem("Open", () => Debug.Log("Open file"), false, null, "Ctrl+O"),
+                    new MenuBar.MenuItem("Save", () => Debug.Log("Save file"), false, null, "Ctrl+S"),
+                    MenuBar.MenuItem.Separator(),
+                    new MenuBar.MenuItem(
+                        "Recent",
+                        null,
+                        false,
+                        new List<MenuBar.MenuItem> { new MenuBar.MenuItem("Document1.txt", () => Debug.Log("Open Document1")), new MenuBar.MenuItem("Document2.txt", () => Debug.Log("Open Document2")), new MenuBar.MenuItem("Document3.txt", () => Debug.Log("Open Document3")) }
+                    ),
+                    MenuBar.MenuItem.Separator(),
+                    new MenuBar.MenuItem("Exit", () => Debug.Log("Exit application")),
+                }
+            ),
+            new MenuBar.MenuItem(
+                "Edit",
+                null,
+                false,
+                new List<MenuBar.MenuItem>
+                {
+                    new MenuBar.MenuItem("Cut", () => Debug.Log("Cut"), false, null, "Ctrl+X"),
+                    new MenuBar.MenuItem("Copy", () => Debug.Log("Copy"), false, null, "Ctrl+C"),
+                    new MenuBar.MenuItem("Paste", () => Debug.Log("Paste"), false, null, "Ctrl+V"),
+                    MenuBar.MenuItem.Separator(),
+                    MenuBar.MenuItem.Header("Advanced"),
+                    new MenuBar.MenuItem("Find and Replace", () => Debug.Log("Find and Replace"), false, null, "Ctrl+H"),
+                }
+            ),
+            new MenuBar.MenuItem(
+                "View",
+                null,
+                false,
+                new List<MenuBar.MenuItem>
+                {
+                    new MenuBar.MenuItem("Zoom In", () => Debug.Log("Zoom In"), false, null, "Ctrl++"),
+                    new MenuBar.MenuItem("Zoom Out", () => Debug.Log("Zoom Out"), false, null, "Ctrl+-"),
+                    new MenuBar.MenuItem("Reset Zoom", () => Debug.Log("Reset Zoom"), false, null, "Ctrl+0"),
+                }
+            ),
+            new MenuBar.MenuItem("Help", null, false, new List<MenuBar.MenuItem> { new MenuBar.MenuItem("Documentation", () => Debug.Log("Open documentation")), new MenuBar.MenuItem("About", () => Debug.Log("About dialog")) }),
+        };
+
+        guiHelper.MenuBar(menuItems);
+        guiHelper.EndVerticalGroup();
+    }
+
+    void DrawChartDemos()
+    {
+        guiHelper.BeginVerticalGroup(GUILayout.ExpandWidth(true), GUILayout.ExpandHeight(true));
+        guiHelper.Label("Chart", LabelVariant.Default);
+        guiHelper.MutedLabel("Beautiful charts built for Unity. Copy and paste into your apps.");
+        guiHelper.HorizontalSeparator();
+
+        var chartComponents = guiHelper.GetChartComponents();
+        if (chartComponents.Series.Count == 0)
+        {
+            var desktopSeries = new ChartSeries("desktop", "Desktop", new Color(0.149f, 0.388f, 0.922f));
+            desktopSeries.Data.Add(new ChartDataPoint("January", 186, new Color(0.149f, 0.388f, 0.922f)));
+            desktopSeries.Data.Add(new ChartDataPoint("February", 305, new Color(0.149f, 0.388f, 0.922f)));
+            desktopSeries.Data.Add(new ChartDataPoint("March", 237, new Color(0.149f, 0.388f, 0.922f)));
+            desktopSeries.Data.Add(new ChartDataPoint("April", 73, new Color(0.149f, 0.388f, 0.922f)));
+            desktopSeries.Data.Add(new ChartDataPoint("May", 209, new Color(0.149f, 0.388f, 0.922f)));
+            desktopSeries.Data.Add(new ChartDataPoint("June", 214, new Color(0.149f, 0.388f, 0.922f)));
+
+            var mobileSeries = new ChartSeries("mobile", "Mobile", new Color(0.376f, 0.647f, 0.980f));
+            mobileSeries.Data.Add(new ChartDataPoint("January", 80, new Color(0.376f, 0.647f, 0.980f)));
+            mobileSeries.Data.Add(new ChartDataPoint("February", 200, new Color(0.376f, 0.647f, 0.980f)));
+            mobileSeries.Data.Add(new ChartDataPoint("March", 120, new Color(0.376f, 0.647f, 0.980f)));
+            mobileSeries.Data.Add(new ChartDataPoint("April", 190, new Color(0.376f, 0.647f, 0.980f)));
+            mobileSeries.Data.Add(new ChartDataPoint("May", 130, new Color(0.376f, 0.647f, 0.980f)));
+            mobileSeries.Data.Add(new ChartDataPoint("June", 140, new Color(0.376f, 0.647f, 0.980f)));
+
+            guiHelper.AddChartSeries(desktopSeries);
+            guiHelper.AddChartSeries(mobileSeries);
+        }
+
+        guiHelper.BeginCard(600, 400);
+        guiHelper.CardHeader(() =>
+        {
+            guiHelper.CardTitle("Bar Chart");
+            guiHelper.CardDescription("Showing total visitors for the last 6 months");
+        });
+
+        guiHelper.CardContent(() =>
+        {
+            guiHelper.SetChartSize(new Vector2(600, 350));
+            guiHelper.BarChart(GUILayout.Width(600), GUILayout.Height(350));
+        });
+        guiHelper.EndCard();
+
+        guiHelper.Label("Code: guiHelper.BarChart(GUILayout.Width(600), GUILayout.Height(350));", LabelVariant.Muted);
+        guiHelper.HorizontalSeparator();
+
+        guiHelper.BeginCard(600, 350);
+        guiHelper.CardHeader(() =>
+        {
+            guiHelper.CardTitle("Line Chart");
+            guiHelper.CardDescription("Showing trend over time");
+        });
+
+        guiHelper.CardContent(() =>
+        {
+            guiHelper.SetChartSize(new Vector2(600, 300));
+            guiHelper.LineChart(GUILayout.Width(600), GUILayout.Height(300));
+        });
+        guiHelper.EndCard();
+
+        guiHelper.Label("Code: guiHelper.LineChart();", LabelVariant.Muted);
+        guiHelper.HorizontalSeparator();
+
+        guiHelper.BeginCard(600, 350);
+        guiHelper.CardHeader(() =>
+        {
+            guiHelper.CardTitle("Area Chart");
+            guiHelper.CardDescription("Showing stacked data over time");
+        });
+
+        guiHelper.CardContent(() =>
+        {
+            guiHelper.SetChartSize(new Vector2(600, 300));
+            guiHelper.AreaChart(GUILayout.Width(600), GUILayout.Height(300));
+        });
+        guiHelper.EndCard();
+
+        guiHelper.Label("Code: guiHelper.AreaChart();", LabelVariant.Muted);
+        guiHelper.HorizontalSeparator();
+
+        guiHelper.BeginCard(450, 450);
+        guiHelper.CardHeader(() =>
+        {
+            guiHelper.CardTitle("Pie Chart");
+            guiHelper.CardDescription("Distribution breakdown");
+        });
+
+        guiHelper.CardContent(() =>
+        {
+            guiHelper.SetChartSize(new Vector2(400, 400));
+            guiHelper.PieChart(GUILayout.Width(400), GUILayout.Height(400));
+        });
+        guiHelper.EndCard();
+
+        guiHelper.Label("Code: guiHelper.PieChart();", LabelVariant.Muted);
+        guiHelper.HorizontalSeparator();
+
+        guiHelper.Label("Chart Configuration", LabelVariant.Default);
+        guiHelper.BeginHorizontalGroup();
+        if (guiHelper.Button("Clear Data"))
+        {
+            guiHelper.ClearChartData();
+        }
+        if (guiHelper.Button("Reload Sample Data"))
+        {
+            guiHelper.ClearChartData();
+
+            var desktopSeries = new ChartSeries("desktop", "Desktop", new Color(0.149f, 0.388f, 0.922f));
+            desktopSeries.Data.Add(new ChartDataPoint("January", 186, new Color(0.149f, 0.388f, 0.922f)));
+            desktopSeries.Data.Add(new ChartDataPoint("February", 305, new Color(0.149f, 0.388f, 0.922f)));
+            desktopSeries.Data.Add(new ChartDataPoint("March", 237, new Color(0.149f, 0.388f, 0.922f)));
+            desktopSeries.Data.Add(new ChartDataPoint("April", 73, new Color(0.149f, 0.388f, 0.922f)));
+            desktopSeries.Data.Add(new ChartDataPoint("May", 209, new Color(0.149f, 0.388f, 0.922f)));
+            desktopSeries.Data.Add(new ChartDataPoint("June", 214, new Color(0.149f, 0.388f, 0.922f)));
+
+            var mobileSeries = new ChartSeries("mobile", "Mobile", new Color(0.376f, 0.647f, 0.980f));
+            mobileSeries.Data.Add(new ChartDataPoint("January", 80, new Color(0.376f, 0.647f, 0.980f)));
+            mobileSeries.Data.Add(new ChartDataPoint("February", 200, new Color(0.376f, 0.647f, 0.980f)));
+            mobileSeries.Data.Add(new ChartDataPoint("March", 120, new Color(0.376f, 0.647f, 0.980f)));
+            mobileSeries.Data.Add(new ChartDataPoint("April", 190, new Color(0.376f, 0.647f, 0.980f)));
+            mobileSeries.Data.Add(new ChartDataPoint("May", 130, new Color(0.376f, 0.647f, 0.980f)));
+            mobileSeries.Data.Add(new ChartDataPoint("June", 140, new Color(0.376f, 0.647f, 0.980f)));
+
+            guiHelper.AddChartSeries(desktopSeries);
+            guiHelper.AddChartSeries(mobileSeries);
+        }
+        guiHelper.EndHorizontalGroup();
+        guiHelper.Label("Code: guiHelper.ClearChartData(); guiHelper.AddChartSeries(series);", LabelVariant.Muted);
+
+        guiHelper.EndVerticalGroup();
     }
 }

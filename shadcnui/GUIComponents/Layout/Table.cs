@@ -41,11 +41,7 @@ namespace shadcnui.GUIComponents
             layoutComponents.BeginHorizontalGroup();
             for (int i = 0; i < headers.Length; i++)
             {
-#if IL2CPP_MELONLOADER
-                GUILayout.Label(headers[i], headerStyle, (Il2CppReferenceArray<GUILayoutOption>)null);
-#else
-                GUILayout.Label(headers[i], headerStyle);
-#endif
+                UnityHelpers.Label(headers[i], headerStyle);
             }
             layoutComponents.EndHorizontalGroup();
 
@@ -59,11 +55,7 @@ namespace shadcnui.GUIComponents
                 for (int col = 0; col < colCount; col++)
                 {
                     string cellValue = data[row, col] ?? "";
-#if IL2CPP_MELONLOADER
-                    GUILayout.Label(cellValue, cellStyle, (Il2CppReferenceArray<GUILayoutOption>)null);
-#else
-                    GUILayout.Label(cellValue, cellStyle);
-#endif
+                    UnityHelpers.Label(cellValue, cellStyle);
                 }
 
                 layoutComponents.EndHorizontalGroup();
@@ -111,12 +103,6 @@ namespace shadcnui.GUIComponents
             GUIStyle headerStyle = styleManager.GetTableHeaderStyle(variant, size);
             GUIStyle cellStyle = styleManager.GetTableCellStyle(variant, size);
 
-#if IL2CPP_MELONLOADER
-            var il2cppOptions = options != null ? (Il2CppReferenceArray<GUILayoutOption>)options : null;
-#else
-            var il2cppOptions = options;
-#endif
-
             layoutComponents.BeginVerticalGroup(tableStyle, options);
 
             layoutComponents.BeginHorizontalGroup();
@@ -133,11 +119,7 @@ namespace shadcnui.GUIComponents
                     }
                 }
 
-#if IL2CPP_MELONLOADER
-                if (GUILayout.Button(new GUIContent(headerText), headerStyle, il2cppOptions))
-#else
-                if (GUILayout.Button(headerText, headerStyle, options))
-#endif
+                if (UnityHelpers.Button(headerText, headerStyle, options))
                 {
                     if (onSort != null)
                     {
@@ -163,11 +145,8 @@ namespace shadcnui.GUIComponents
                 for (int col = 0; col < colCount; col++)
                 {
                     string cellValue = data[row, col] ?? "";
-#if IL2CPP_MELONLOADER
-                    GUILayout.Label(new GUIContent(cellValue), cellStyle, il2cppOptions);
-#else
-                    GUILayout.Label(cellValue, cellStyle);
-#endif
+
+                    UnityHelpers.Label(cellValue, cellStyle);
                 }
 
                 layoutComponents.EndHorizontalGroup();
@@ -192,27 +171,15 @@ namespace shadcnui.GUIComponents
             GUIStyle headerStyle = styleManager.GetTableHeaderStyle(variant, size);
             GUIStyle cellStyle = styleManager.GetTableCellStyle(variant, size);
 
-#if IL2CPP_MELONLOADER
-            var il2cppOptions = options != null ? (Il2CppReferenceArray<GUILayoutOption>)options : null;
-#else
-            var il2cppOptions = options;
-#endif
-
             layoutComponents.BeginVerticalGroup(tableStyle, options);
 
             layoutComponents.BeginHorizontalGroup();
-#if IL2CPP_MELONLOADER
-            GUILayout.Label(GUIContent.none, GUI.skin.label, null);
-#else
-            GUILayout.Label("", GUILayout.Width(20 * guiHelper.uiScale));
-#endif
+
+            UnityHelpers.Label("", GUILayout.Width(20 * guiHelper.uiScale));
+
             for (int i = 0; i < headers.Length; i++)
             {
-#if IL2CPP_MELONLOADER
-                GUILayout.Label(new GUIContent(headers[i]), headerStyle, null);
-#else
-                GUILayout.Label(headers[i], headerStyle);
-#endif
+                UnityHelpers.Label(headers[i], headerStyle);
             }
             layoutComponents.EndHorizontalGroup();
 
@@ -225,11 +192,8 @@ namespace shadcnui.GUIComponents
             for (int row = 0; row < rowCount; row++)
             {
                 layoutComponents.BeginHorizontalGroup();
-#if IL2CPP_MELONLOADER
-                bool newSelected = GUILayout.Toggle(selectedRows[row], "", GUI.skin.toggle, new Il2CppReferenceArray<GUILayoutOption>(new GUILayoutOption[] { GUILayout.Width(20 * guiHelper.uiScale) }));
-#else
-                bool newSelected = GUILayout.Toggle(selectedRows[row], "", GUILayout.Width(20 * guiHelper.uiScale));
-#endif
+
+                bool newSelected = UnityHelpers.Toggle(selectedRows[row], "", GUILayout.Width(20 * guiHelper.uiScale));
 
                 if (newSelected != selectedRows[row])
                 {
@@ -240,11 +204,7 @@ namespace shadcnui.GUIComponents
                 for (int col = 0; col < colCount; col++)
                 {
                     string cellValue = data[row, col] ?? "";
-#if IL2CPP_MELONLOADER
-                    GUILayout.Label(new GUIContent(cellValue), cellStyle, il2cppOptions);
-#else
-                    GUILayout.Label(cellValue, cellStyle);
-#endif
+                    UnityHelpers.Label(cellValue, cellStyle);
                 }
 
                 layoutComponents.EndHorizontalGroup();
@@ -273,11 +233,7 @@ namespace shadcnui.GUIComponents
             layoutComponents.BeginHorizontalGroup();
             for (int i = 0; i < headers.Length; i++)
             {
-#if IL2CPP_MELONLOADER
-                GUILayout.Label(headers[i], headerStyle, (Il2CppReferenceArray<GUILayoutOption>)null);
-#else
-                GUILayout.Label(headers[i], headerStyle);
-#endif
+                UnityHelpers.Label(headers[i], headerStyle);
             }
             layoutComponents.EndHorizontalGroup();
 
@@ -305,12 +261,6 @@ namespace shadcnui.GUIComponents
             if (headers == null || data == null)
                 return;
 
-#if IL2CPP_MELONLOADER
-            var il2cppOptions = options != null ? (Il2CppReferenceArray<GUILayoutOption>)options : null;
-#else
-            var il2cppOptions = options;
-#endif
-
             int totalRows = data.GetLength(0);
             int totalPages = Mathf.CeilToInt((float)totalRows / pageSize);
 
@@ -334,11 +284,7 @@ namespace shadcnui.GUIComponents
             layoutComponents.AddSpace(8);
             layoutComponents.BeginHorizontalGroup();
 
-#if IL2CPP_MELONLOADER
-            if (GUILayout.Button(new GUIContent("← Previous"), GUI.skin.button, null))
-#else
-            if (GUILayout.Button("← Previous", GUILayout.Width(80 * guiHelper.uiScale)))
-#endif
+            if (UnityHelpers.Button("← Previous", GUILayout.Width(80 * guiHelper.uiScale)))
             {
                 if (currentPage > 0)
                 {
@@ -353,19 +299,11 @@ namespace shadcnui.GUIComponents
             var styleManager = guiHelper.GetStyleManager();
             GUIStyle infoStyle = styleManager?.GetLabelStyle(LabelVariant.Muted) ?? GUI.skin.label;
 
-#if IL2CPP_MELONLOADER
-            GUILayout.Label(new GUIContent(pageInfo), infoStyle, null);
-#else
-            GUILayout.Label(pageInfo, infoStyle);
-#endif
+            UnityHelpers.Label(pageInfo, infoStyle);
 
             GUILayout.FlexibleSpace();
 
-#if IL2CPP_MELONLOADER
-            if (GUILayout.Button(new GUIContent("Next →"), GUI.skin.button, null))
-#else
-            if (GUILayout.Button("Next →", GUILayout.Width(80 * guiHelper.uiScale)))
-#endif
+            if (UnityHelpers.Button("Next →", GUILayout.Width(80 * guiHelper.uiScale)))
             {
                 if (currentPage < totalPages - 1)
                 {
@@ -382,19 +320,10 @@ namespace shadcnui.GUIComponents
             if (headers == null || data == null)
                 return;
 
-#if IL2CPP_MELONLOADER
-            var il2cppOptions = options != null ? (Il2CppReferenceArray<GUILayoutOption>)options : null;
-#else
-            var il2cppOptions = options;
-#endif
-
             layoutComponents.BeginHorizontalGroup();
 
-#if IL2CPP_MELONLOADER
-            GUILayout.Label(new GUIContent("Search:"), GUI.skin.label, null);
-#else
-            GUILayout.Label("Search:", GUILayout.Width(60 * guiHelper.uiScale));
-#endif
+            UnityHelpers.Label("Search:", GUILayout.Width(60 * guiHelper.uiScale));
+
 #if IL2CPP_MELONLOADER
             string newSearchQuery = GUILayout.TextField(searchQuery ?? "", GUI.skin.textField, new Il2CppReferenceArray<GUILayoutOption>(new GUILayoutOption[] { GUILayout.Width(200 * guiHelper.uiScale) }));
 #else
@@ -449,11 +378,7 @@ namespace shadcnui.GUIComponents
                 int columnIndex = i;
                 float width = columnWidths[i] * guiHelper.uiScale;
 
-#if IL2CPP_MELONLOADER
-                GUILayout.Label(headers[i], headerStyle, (Il2CppReferenceArray<GUILayoutOption>)new GUILayoutOption[] { GUILayout.Width(width) });
-#else
-                GUILayout.Label(headers[i], headerStyle, GUILayout.Width(width));
-#endif
+                UnityHelpers.Label(headers[i], headerStyle, GUILayout.Width(width));
             }
             layoutComponents.EndHorizontalGroup();
 
@@ -469,11 +394,7 @@ namespace shadcnui.GUIComponents
                     string cellValue = data[row, col] ?? "";
                     float width = columnWidths[col] * guiHelper.uiScale;
 
-#if IL2CPP_MELONLOADER
-                    GUILayout.Label(cellValue, cellStyle, (Il2CppReferenceArray<GUILayoutOption>)new GUILayoutOption[] { GUILayout.Width(width) });
-#else
-                    GUILayout.Label(cellValue, cellStyle, GUILayout.Width(width));
-#endif
+                    UnityHelpers.Label(cellValue, cellStyle, GUILayout.Width(width));
                 }
 
                 layoutComponents.EndHorizontalGroup();
@@ -489,11 +410,7 @@ namespace shadcnui.GUIComponents
             layoutComponents.BeginHorizontalGroup();
             for (int i = 0; i < headers.Length; i++)
             {
-#if IL2CPP_MELONLOADER
-                GUILayout.Label(new GUIContent(headers[i]), GUI.skin.label, null);
-#else
-                GUILayout.Label(headers[i], GUI.skin.label);
-#endif
+                UnityHelpers.Label(headers[i], GUI.skin.label);
             }
             layoutComponents.EndHorizontalGroup();
 
@@ -507,11 +424,8 @@ namespace shadcnui.GUIComponents
                 for (int col = 0; col < colCount; col++)
                 {
                     string cellValue = data[row, col] ?? "";
-#if IL2CPP_MELONLOADER
-                    GUILayout.Label(new GUIContent(cellValue), GUI.skin.label, null);
-#else
-                    GUILayout.Label(cellValue, GUI.skin.label);
-#endif
+
+                    UnityHelpers.Label(cellValue, GUI.skin.label);
                 }
 
                 layoutComponents.EndHorizontalGroup();
@@ -527,11 +441,7 @@ namespace shadcnui.GUIComponents
             layoutComponents.BeginHorizontalGroup();
             for (int i = 0; i < headers.Length; i++)
             {
-#if IL2CPP_MELONLOADER
-                GUILayout.Label(new GUIContent(headers[i]), GUI.skin.label, null);
-#else
-                GUILayout.Label(headers[i], GUI.skin.label);
-#endif
+                UnityHelpers.Label(headers[i], GUI.skin.label);
             }
             layoutComponents.EndHorizontalGroup();
 
@@ -546,11 +456,8 @@ namespace shadcnui.GUIComponents
                 {
                     object cellValue = data[row, col];
                     string cellText = cellValue?.ToString() ?? "";
-#if IL2CPP_MELONLOADER
-                    GUILayout.Label(new GUIContent(cellText), GUI.skin.label, null);
-#else
-                    GUILayout.Label(cellText, GUI.skin.label);
-#endif
+
+                    UnityHelpers.Label(cellText, GUI.skin.label);
                 }
 
                 layoutComponents.EndHorizontalGroup();

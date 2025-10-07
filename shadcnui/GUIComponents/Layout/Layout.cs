@@ -42,6 +42,15 @@ namespace shadcnui.GUIComponents
 #endif
         }
 
+        public void BeginHorizontalGroup(params GUILayoutOption[] options)
+        {
+#if IL2CPP_MELONLOADER
+            GUILayout.BeginHorizontal(GUIStyle.none, EmptyOptions);
+#else
+            GUILayout.BeginHorizontal();
+#endif
+        }
+
         public void BeginHorizontalGroup(GUIStyle style, params GUILayoutOption[] options)
         {
 #if IL2CPP_MELONLOADER

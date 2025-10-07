@@ -40,15 +40,7 @@ namespace shadcnui.GUIComponents
             if (options != null && options.Length > 0)
                 layoutOptions.AddRange(options);
 
-#if IL2CPP_BEPINEX || IL2CPP_MELONLOADER
-            var il2cppOptions = new Il2CppReferenceArray<GUILayoutOption>(layoutOptions.Count);
-            for (int i = 0; i < layoutOptions.Count; i++)
-                il2cppOptions[i] = layoutOptions[i];
-
-            GUILayout.Box(UnityHelpers.GUIContent.none, separatorStyle, il2cppOptions);
-#else
-            GUILayout.Box(UnityHelpers.GUIContent.none, separatorStyle, layoutOptions.ToArray());
-#endif
+            UnityHelpers.Box(UnityHelpers.GUIContent.none, separatorStyle, layoutOptions.ToArray());
         }
 
         public void HorizontalSeparator(params GUILayoutOption[] options)
@@ -101,11 +93,8 @@ namespace shadcnui.GUIComponents
             if (!string.IsNullOrEmpty(text))
             {
                 GUILayout.Space(8 * guiHelper.uiScale);
-#if IL2CPP_BEPINEX || IL2CPP_MELONLOADER
-                GUILayout.Label(new UnityHelpers.GUIContent(text), styleManager.GetLabelStyle(LabelVariant.Muted), new Il2CppReferenceArray<GUILayoutOption>(0));
-#else
-                GUILayout.Label(text, styleManager.GetLabelStyle(LabelVariant.Muted));
-#endif
+
+                UnityHelpers.Label(text, styleManager.GetLabelStyle(LabelVariant.Muted));
                 GUILayout.Space(8 * guiHelper.uiScale);
             }
 

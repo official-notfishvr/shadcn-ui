@@ -15,7 +15,8 @@
         <member name="P:BepInEx.Bootstrap.BaseChainloader`1.Plugins">
             <summary>
                 List of all <see cref="T:BepInEx.PluginInfo" /> instances loaded via the chainloader.
-            </summary>
+            </summary
+            >
         </member>
         <member name="P:BepInEx.Bootstrap.BaseChainloader`1.DependencyErrors">
             <summary>
@@ -78,7 +79,8 @@
             <summary>
                 A cacheable metadata item. Can be used with <see cref="M:BepInEx.Bootstrap.TypeLoader.LoadAssemblyCache``1(System.String)" /> and
                 <see cref="M:BepInEx.Bootstrap.TypeLoader.SaveAssemblyCache``1(System.String,System.Collections.Generic.Dictionary{System.String,System.Collections.Generic.List{``0}},System.Collections.Generic.Dictionary{System.String,System.String})" /> to cache plugin metadata.
-            </summary>
+            </summary
+            >
         </member>
         <member name="M:BepInEx.Bootstrap.ICacheable.Save(System.IO.BinaryWriter)">
             <summary>
@@ -126,7 +128,8 @@
         <member name="E:BepInEx.Bootstrap.TypeLoader.AssemblyResolve">
             <summary>
                 Event fired when <see cref="T:BepInEx.Bootstrap.TypeLoader" /> fails to resolve a type during type loading.
-            </summary>
+            </summary
+            >
         </member>
         <member name="M:BepInEx.Bootstrap.TypeLoader.FindPluginTypes``1(System.String,System.Func{Mono.Cecil.TypeDefinition,System.String,``0},System.Func{Mono.Cecil.AssemblyDefinition,System.Boolean},System.String)">
             <summary>
@@ -255,7 +258,8 @@
                 Section and key of a setting. Used as a unique key for identification within a
                 <see cref="T:BepInEx.Configuration.ConfigFile" />.
                 The same definition can be used in multiple config files, it will point to different settings then.
-            </summary>
+            </summary
+            >
             <inheritdoc />
         </member>
         <member name="M:BepInEx.Configuration.ConfigDefinition.#ctor(System.String,System.String)">
@@ -308,7 +312,8 @@
         <member name="T:BepInEx.Configuration.ConfigDescription">
             <summary>
                 Metadata of a <see cref="T:BepInEx.Configuration.ConfigEntryBase" />.
-            </summary>
+            </summary
+            >
         </member>
         <member name="M:BepInEx.Configuration.ConfigDescription.#ctor(System.String,BepInEx.Configuration.AcceptableValueBase,System.Object[])">
             <summary>
@@ -318,7 +323,8 @@
             <param name="acceptableValues">
                 Range of values that this setting can take. The setting's value will be automatically
                 clamped.
-            </param>
+            </param
+            >
             <param name="tags">Objects that can be used by user-made classes to add functionality.</param>
         </member>
         <member name="P:BepInEx.Configuration.ConfigDescription.Description">
@@ -344,7 +350,8 @@
         <member name="T:BepInEx.Configuration.ConfigEntry`1">
             <summary>
                 Provides access to a single setting inside of a <see cref="T:BepInEx.Configuration.ConfigFile" />.
-            </summary>
+            </summary
+            >
             <typeparam name="T">Type of the setting.</typeparam>
         </member>
         <member name="P:BepInEx.Configuration.ConfigEntry`1.Value">
@@ -364,7 +371,8 @@
             <summary>
                 Container for a single setting of a <see cref="T:BepInEx.Configuration.ConfigFile" />.
                 Each config entry is linked to one config file.
-            </summary>
+            </summary
+            >
         </member>
         <member name="M:BepInEx.Configuration.ConfigEntryBase.#ctor(BepInEx.Configuration.ConfigFile,BepInEx.Configuration.ConfigDefinition,System.Type,System.Object,BepInEx.Configuration.ConfigDescription)">
             <summary>
@@ -380,7 +388,8 @@
             <summary>
                 Category and name of this setting. Used as a unique key for identification within a
                 <see cref="T:BepInEx.Configuration.ConfigFile" />.
-            </summary>
+            </summary
+            >
         </member>
         <member name="P:BepInEx.Configuration.ConfigEntryBase.Description">
             <summary>
@@ -390,7 +399,8 @@
         <member name="P:BepInEx.Configuration.ConfigEntryBase.SettingType">
             <summary>
                 Type of the <see cref="P:BepInEx.Configuration.ConfigEntryBase.BoxedValue" /> that this setting holds.
-            </summary>
+            </summary
+            >
         </member>
         <member name="P:BepInEx.Configuration.ConfigEntryBase.DefaultValue">
             <summary>
@@ -457,20 +467,21 @@
             <summary>
                 Full path to the config file. The file might not exist until a setting is added and changed, or <see cref="M:BepInEx.Configuration.ConfigFile.Save" />
                 is called.
-            </summary>
+            </summary
+            >
         </member>
         <member name="P:BepInEx.Configuration.ConfigFile.SaveOnConfigSet">
             <summary>
                 If enabled, writes the config to disk every time a value is set.
                 If disabled, you have to manually use <see cref="M:BepInEx.Configuration.ConfigFile.Save" /> or the changes will be lost!
-            </summary>
+            </summary
+            >
         </member>
         <member name="P:BepInEx.Configuration.ConfigFile.Item(BepInEx.Configuration.ConfigDefinition)">
             <inheritdoc />
         </member>
         <member name="P:BepInEx.Configuration.ConfigFile.Item(System.String,System.String)">
-            <summary>
-            </summary>
+            <summary></summary>
             <param name="section"></param>
             <param name="key"></param>
         </member>
@@ -519,7 +530,8 @@
                 If you want to access and modify an existing setting then use
                 <see cref="M:BepInEx.Configuration.ConfigFile.AddSetting``1(BepInEx.Configuration.ConfigDefinition,``0,BepInEx.Configuration.ConfigDescription)" />
                 instead with no description.
-            </summary>
+            </summary
+            >
         </member>
         <member name="P:BepInEx.Configuration.ConfigFile.GenerateSettingDescriptions">
             <summary>
@@ -541,7 +553,8 @@
                 Access one of the existing settings. If the setting has not been added yet, null is returned.
                 If the setting exists but has a different type than T, an exception is thrown.
                 New settings should be added with <see cref="M:BepInEx.Configuration.ConfigFile.AddSetting``1(BepInEx.Configuration.ConfigDefinition,``0,BepInEx.Configuration.ConfigDescription)" />.
-            </summary>
+            </summary
+            >
             <typeparam name="T">Type of the value contained in this setting.</typeparam>
             <param name="configDefinition">Section and Key of the setting.</param>
         </member>
@@ -550,7 +563,8 @@
                 Access one of the existing settings. If the setting has not been added yet, null is returned.
                 If the setting exists but has a different type than T, an exception is thrown.
                 New settings should be added with <see cref="M:BepInEx.Configuration.ConfigFile.AddSetting``1(BepInEx.Configuration.ConfigDefinition,``0,BepInEx.Configuration.ConfigDescription)" />.
-            </summary>
+            </summary
+            >
             <typeparam name="T">Type of the value contained in this setting.</typeparam>
             <param name="section">Section/category/group of the setting. Settings are grouped by this.</param>
             <param name="key">Name of the setting.</param>
@@ -561,7 +575,8 @@
                 If the setting exists but has a different type than T, an exception is thrown.
                 New settings should be added with
                 <see cref="M:BepInEx.Configuration.ConfigFile.Bind``1(BepInEx.Configuration.ConfigDefinition,``0,BepInEx.Configuration.ConfigDescription)" />.
-            </summary>
+            </summary
+            >
             <typeparam name="T">Type of the value contained in this setting.</typeparam>
             <param name="configDefinition">Section and Key of the setting.</param>
             <param name="entry">The ConfigEntry value to return.</param>
@@ -572,7 +587,8 @@
                 If the setting exists but has a different type than T, an exception is thrown.
                 New settings should be added with
                 <see cref="M:BepInEx.Configuration.ConfigFile.Bind``1(BepInEx.Configuration.ConfigDefinition,``0,BepInEx.Configuration.ConfigDescription)" />.
-            </summary>
+            </summary
+            >
             <typeparam name="T">Type of the value contained in this setting.</typeparam>
             <param name="section">Section/category/group of the setting. Settings are grouped by this.</param>
             <param name="key">Name of the setting.</param>
@@ -669,13 +685,15 @@
         <member name="T:BepInEx.Configuration.ConfigWrapper`1">
             <summary>
                 Provides access to a single setting inside of a <see cref="T:BepInEx.Configuration.ConfigFile" />.
-            </summary>
+            </summary
+            >
             <typeparam name="T">Type of the setting.</typeparam>
         </member>
         <member name="P:BepInEx.Configuration.ConfigWrapper`1.ConfigEntry">
             <summary>
                 Entry of this setting in the <see cref="T:BepInEx.Configuration.ConfigFile" />.
-            </summary>
+            </summary
+            >
         </member>
         <member name="P:BepInEx.Configuration.ConfigWrapper`1.Definition">
             <summary>
@@ -834,7 +852,8 @@
                 Marks this <see cref="!:BaseUnityPlugin" /> as dependent on another plugin. The other plugin will be loaded before
                 this one.
                 If the other plugin doesn't exist, what happens depends on the <see cref="P:BepInEx.BepInDependency.Flags" /> parameter.
-            </summary>
+            </summary
+            >
             <param name="DependencyGUID">The GUID of the referenced plugin.</param>
             <param name="Flags">The flags associated with this dependency definition.</param>
         </member>
@@ -844,7 +863,8 @@
                 this one.
                 If the other plugin doesn't exist or is of a version not satisfying <see cref="P:BepInEx.BepInDependency.VersionRange" />, this plugin will
                 not load and an error will be logged instead.
-            </summary>
+            </summary
+            >
             <param name="guid">The GUID of the referenced plugin.</param>
             <param name="version">The version range of the referenced plugin.</param>
             <remarks>When version is supplied the dependency is always treated as HardDependency</remarks>
@@ -862,7 +882,8 @@
         <member name="P:BepInEx.BepInDependency.VersionRange">
             <summary>
                 The version <see cref="!:SemVer.Range">range</see> of the referenced plugin.
-            </summary>
+            </summary
+            >
         </member>
         <member name="T:BepInEx.BepInIncompatibility">
             <summary>
@@ -873,7 +894,8 @@
             <summary>
                 Marks this <see cref="!:BaseUnityPlugin" /> as incompatible with another plugin.
                 If the other plugin exists, this plugin will not be loaded and a warning will be shown.
-            </summary>
+            </summary
+            >
             <param name="IncompatibilityGUID">The GUID of the referenced plugin.</param>
         </member>
         <member name="P:BepInEx.BepInIncompatibility.IncompatibilityGUID">
@@ -957,7 +979,8 @@
             <summary>
                 Data class that represents information about a loadable BepInEx plugin.
                 Contains all metadata and additional info required for plugin loading by <see cref="!:Chainloader" />.
-            </summary>
+            </summary
+            >
         </member>
         <member name="P:BepInEx.PluginInfo.Metadata">
             <summary>
@@ -967,18 +990,21 @@
         <member name="P:BepInEx.PluginInfo.Processes">
             <summary>
                 Collection of <see cref="T:BepInEx.BepInProcess" /> attributes that describe what processes the plugin can run on.
-            </summary>
+            </summary
+            >
         </member>
         <member name="P:BepInEx.PluginInfo.Dependencies">
             <summary>
                 Collection of <see cref="T:BepInEx.BepInDependency" /> attributes that describe what plugins this plugin depends on.
-            </summary>
+            </summary
+            >
         </member>
         <member name="P:BepInEx.PluginInfo.Incompatibilities">
             <summary>
                 Collection of <see cref="T:BepInEx.BepInIncompatibility" /> attributes that describe what plugins this plugin
                 is incompatible with.
-            </summary>
+            </summary
+            >
         </member>
         <member name="P:BepInEx.PluginInfo.Location">
             <summary>
@@ -997,12 +1023,14 @@
             <summary>
                 Interpolated string handler for BepInEx <see cref="T:BepInEx.Logging.Logger" />. This allows to conditionally skip logging certain
                 messages and speed up logging in certain places.
-            </summary>
+            </summary
+            >
             <remarks>
                 The class isn't meant to be constructed manually.
                 Instead, use <see cref="M:BepInEx.Logging.ManualLogSource.Log(BepInEx.Logging.LogLevel,BepInEx.Core.Logging.Interpolation.BepInExLogInterpolatedStringHandler)" /> with
                 string interpolation.
-            </remarks>
+            </remarks
+            >
         </member>
         <member name="M:BepInEx.Core.Logging.Interpolation.BepInExLogInterpolatedStringHandler.#ctor(System.Int32,System.Int32,BepInEx.Logging.LogLevel,System.Boolean@)">
             <summary>
@@ -1114,7 +1142,8 @@
             <param name="delayedFlushing">
                 Whether to delay flushing to disk to improve performance. Useful to set this to false
                 when debugging crashes.
-            </param>
+            </param
+            >
             <param name="fileLimit">Maximum amount of concurrently opened log files. Can help with infinite game boot loops.</param>
         </member>
         <member name="P:BepInEx.Logging.DiskLogListener.DisplayedLogLevel">
@@ -1155,9 +1184,11 @@
                 As such, the filter should represent the log levels that the listener will always want to process.
                 It is up to the the implementation of <see cref="M:BepInEx.Logging.ILogListener.LogEvent(System.Object,BepInEx.Logging.LogEventArgs)" /> whether the messages are going to be processed or
                 discarded.
-            </remarks>
+            </remarks
+            >
             TODO: Right now the filter cannot be updated after the log listener has been attached to the logger.
-        </member>
+        </member
+        >
         <member name="M:BepInEx.Logging.ILogListener.LogEvent(System.Object,BepInEx.Logging.LogEventArgs)">
             <summary>
                 Handle an incoming log event.
@@ -1178,7 +1209,8 @@
         <member name="E:BepInEx.Logging.ILogSource.LogEvent">
             <summary>
                 Event that sends the log message. Call <see cref="M:System.EventHandler.Invoke(System.Object,System.EventArgs)" /> to send a log message.
-            </summary>
+            </summary
+            >
         </member>
         <member name="T:BepInEx.Logging.LogEventArgs">
             <summary>
@@ -1214,7 +1246,8 @@
         <member name="M:BepInEx.Logging.LogEventArgs.ToStringLine">
             <summary>
                 Like <see cref="M:BepInEx.Logging.LogEventArgs.ToString" /> but appends newline at the end.
-            </summary>
+            </summary
+            >
             <returns>Same output as <see cref="M:BepInEx.Logging.LogEventArgs.ToString" /> but with new line.</returns>
         </member>
         <member name="T:BepInEx.Logging.Logger">
@@ -1254,7 +1287,8 @@
         <member name="M:BepInEx.Logging.Logger.CreateLogSource(System.String)">
             <summary>
                 Creates a new log source with a name and attaches it to <see cref="P:BepInEx.Logging.Logger.Sources" />.
-            </summary>
+            </summary
+            >
             <param name="sourceName">Name of the log source to create.</param>
             <returns>An instance of <see cref="T:BepInEx.Logging.ManualLogSource" /> that allows to write logs.</returns>
         </member>
@@ -1367,79 +1401,92 @@
         <member name="M:BepInEx.Logging.ManualLogSource.LogFatal(System.Object)">
             <summary>
                 Logs a message with <see cref="F:BepInEx.Logging.LogLevel.Fatal" /> level.
-            </summary>
+            </summary
+            >
             <param name="data">Data to log.</param>
         </member>
         <member name="M:BepInEx.Logging.ManualLogSource.LogFatal(BepInEx.Core.Logging.Interpolation.BepInExFatalLogInterpolatedStringHandler)">
             <summary>
                 Logs an interpolated string with <see cref="F:BepInEx.Logging.LogLevel.Fatal" /> level.
-            </summary>
+            </summary
+            >
             <param name="logHandler">Handler for the interpolated string.</param>
         </member>
         <member name="M:BepInEx.Logging.ManualLogSource.LogError(System.Object)">
             <summary>
                 Logs a message with <see cref="F:BepInEx.Logging.LogLevel.Error" /> level.
-            </summary>
+            </summary
+            >
             <param name="data">Data to log.</param>
         </member>
         <member name="M:BepInEx.Logging.ManualLogSource.LogError(BepInEx.Core.Logging.Interpolation.BepInExErrorLogInterpolatedStringHandler)">
             <summary>
                 Logs an interpolated string with <see cref="F:BepInEx.Logging.LogLevel.Error" /> level.
-            </summary>
+            </summary
+            >
             <param name="logHandler">Handler for the interpolated string.</param>
         </member>
         <member name="M:BepInEx.Logging.ManualLogSource.LogWarning(System.Object)">
             <summary>
                 Logs a message with <see cref="F:BepInEx.Logging.LogLevel.Warning" /> level.
-            </summary>
+            </summary
+            >
             <param name="data">Data to log.</param>
         </member>
         <member name="M:BepInEx.Logging.ManualLogSource.LogWarning(BepInEx.Core.Logging.Interpolation.BepInExWarningLogInterpolatedStringHandler)">
             <summary>
                 Logs an interpolated string with <see cref="F:BepInEx.Logging.LogLevel.Warning" /> level.
-            </summary>
+            </summary
+            >
             <param name="logHandler">Handler for the interpolated string.</param>
         </member>
         <member name="M:BepInEx.Logging.ManualLogSource.LogMessage(System.Object)">
             <summary>
                 Logs a message with <see cref="F:BepInEx.Logging.LogLevel.Message" /> level.
-            </summary>
+            </summary
+            >
             <param name="data">Data to log.</param>
         </member>
         <member name="M:BepInEx.Logging.ManualLogSource.LogMessage(BepInEx.Core.Logging.Interpolation.BepInExMessageLogInterpolatedStringHandler)">
             <summary>
                 Logs an interpolated string with <see cref="F:BepInEx.Logging.LogLevel.Message" /> level.
-            </summary>
+            </summary
+            >
             <param name="logHandler">Handler for the interpolated string.</param>
         </member>
         <member name="M:BepInEx.Logging.ManualLogSource.LogInfo(System.Object)">
             <summary>
                 Logs a message with <see cref="F:BepInEx.Logging.LogLevel.Info" /> level.
-            </summary>
+            </summary
+            >
             <param name="data">Data to log.</param>
         </member>
         <member name="M:BepInEx.Logging.ManualLogSource.LogInfo(BepInEx.Core.Logging.Interpolation.BepInExInfoLogInterpolatedStringHandler)">
             <summary>
                 Logs an interpolated string with <see cref="F:BepInEx.Logging.LogLevel.Info" /> level.
-            </summary>
+            </summary
+            >
             <param name="logHandler">Handler for the interpolated string.</param>
         </member>
         <member name="M:BepInEx.Logging.ManualLogSource.LogDebug(System.Object)">
             <summary>
                 Logs a message with <see cref="F:BepInEx.Logging.LogLevel.Debug" /> level.
-            </summary>
+            </summary
+            >
             <param name="data">Data to log.</param>
         </member>
         <member name="M:BepInEx.Logging.ManualLogSource.LogDebug(BepInEx.Core.Logging.Interpolation.BepInExDebugLogInterpolatedStringHandler)">
             <summary>
                 Logs an interpolated string with <see cref="F:BepInEx.Logging.LogLevel.Debug" /> level.
-            </summary>
+            </summary
+            >
             <param name="logHandler">Handler for the interpolated string.</param>
         </member>
         <member name="T:BepInEx.Logging.TraceLogSource">
             <summary>
                 A source that routes all logs from the inbuilt .NET <see cref="T:System.Diagnostics.Trace" /> API to the BepInEx logging system.
-            </summary>
+            </summary
+            >
             <inheritdoc cref="T:System.Diagnostics.TraceListener" />
         </member>
         <member name="M:BepInEx.Logging.TraceLogSource.#ctor">
@@ -1466,13 +1513,15 @@
         <member name="M:BepInEx.Logging.TraceLogSource.Write(System.String)">
             <summary>
                 Writes a message to the underlying <see cref="T:BepInEx.Logging.ManualLogSource" /> instance.
-            </summary>
+            </summary
+            >
             <param name="message">The message to write.</param>
         </member>
         <member name="M:BepInEx.Logging.TraceLogSource.WriteLine(System.String)">
             <summary>
                 Writes a message and a newline to the underlying <see cref="T:BepInEx.Logging.ManualLogSource" /> instance.
-            </summary>
+            </summary
+            >
             <param name="message">The message to write.</param>
         </member>
         <member name="M:BepInEx.Logging.TraceLogSource.TraceEvent(System.Diagnostics.TraceEventCache,System.String,System.Diagnostics.TraceEventType,System.Int32,System.String,System.Object[])">
@@ -1574,7 +1623,8 @@
             <summary>
                 Whether current Common Language Runtime supports dynamic method generation using
                 <see cref="N:System.Reflection.Emit" /> namespace.
-            </summary>
+            </summary
+            >
         </member>
         <member name="P:BepInEx.Utility.UTF8NoBom">
             <summary>
@@ -1722,7 +1772,8 @@
                 On some versions of mono, using <see cref="M:System.Reflection.Assembly.GetName" /> fails because it runs on unmanaged side
                 which has problems with encoding.
                 Using <see cref="T:System.Reflection.AssemblyName" /> solves this by doing parsing on managed side instead.
-            </remarks>
+            </remarks
+            >
         </member>
         <member name="M:BepInEx.Utility.GetUniqueFilesInDirectories(System.Collections.Generic.IEnumerable{System.String},System.String)">
             <summary>

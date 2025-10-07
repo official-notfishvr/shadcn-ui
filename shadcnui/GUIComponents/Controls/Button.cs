@@ -45,11 +45,9 @@ namespace shadcnui.GUIComponents
             GUI.color = new Color(originalColor.r, originalColor.g, originalColor.b, originalColor.a * opacity);
 
             bool clicked;
-#if IL2CPP_MELONLOADER
-            clicked = GUILayout.Button(text ?? "Button", buttonStyle, (Il2CppReferenceArray<GUILayoutOption>)layoutOptions.ToArray());
-#else
-            clicked = GUILayout.Button(text ?? "Button", buttonStyle, layoutOptions.ToArray());
-#endif
+
+            clicked = UnityHelpers.Button(text ?? "Button", buttonStyle, layoutOptions.ToArray());
+
             GUI.color = originalColor;
             GUI.enabled = wasEnabled;
 
@@ -90,19 +88,11 @@ namespace shadcnui.GUIComponents
 
             if (horizontal)
             {
-#if IL2CPP_MELONLOADER
-                layoutComponents.BeginHorizontalGroup(GUIStyle.none, (Il2CppReferenceArray<GUILayoutOption>)null);
-#else
                 layoutComponents.BeginHorizontalGroup();
-#endif
             }
             else
             {
-#if IL2CPP_MELONLOADER
-                layoutComponents.BeginVerticalGroup(GUIStyle.none, (Il2CppReferenceArray<GUILayoutOption>)null);
-#else
                 layoutComponents.BeginVerticalGroup();
-#endif
             }
 
             drawButtons?.Invoke();

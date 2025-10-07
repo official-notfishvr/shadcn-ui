@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using shadcnui.GUIComponents;
+using shadcnui.GUIComponents.Core;
 using UnityEngine;
 #if IL2CPP_MELONLOADER
 using UnhollowerBaseLib;
@@ -8,6 +9,9 @@ using UnhollowerBaseLib;
 
 namespace shadcnui
 {
+    /// <summary>
+    /// Main GUI Helper class providing a comprehensive set of UI components
+    /// </summary>
     public class GUIHelper
     {
         #region Internal Settings
@@ -39,33 +43,62 @@ namespace shadcnui
         #endregion
 
         #region Component Instances
-        private GUIComponents.Input inputComponents;
-        private Button buttonComponents;
-        private Slider sliderComponents;
-        private Toggle toggleComponents;
-        private Layout layoutComponents;
-        private Card cardComponents;
+        #region Component Instances - Core System
         private StyleManager styleManager;
         private AnimationManager animationManager;
-        private Label labelComponents;
-        private Progress progressComponents;
+        #endregion
+
+        #region Component Instances - Layout & Structure
+        private Layout layoutComponents;
+        private Card cardComponents;
         private Separator separatorComponents;
-        private Tabs tabsComponents;
+        #endregion
+
+        #region Component Instances - Input & Form
+        private GUIComponents.Input inputComponents;
         private TextArea textAreaComponents;
         private Checkbox checkboxComponents;
         private Switch switchComponents;
+        private Slider sliderComponents;
+        #endregion
+
+        #region Component Instances - Buttons & Toggles
+        private Button buttonComponents;
+        private Toggle toggleComponents;
+        #endregion
+
+        #region Component Instances - Text & Labels
+        private Label labelComponents;
+        #endregion
+
+        #region Component Instances - Navigation
+        private Tabs tabsComponents;
+        private MenuBar menuBarComponents;
+        #endregion
+
+        #region Component Instances - Feedback & Status
+        private Progress progressComponents;
         private Badge badgeComponents;
-        private Alert alertComponents;
-        private GUIComponents.Avatar avatarComponents;
-        private Skeleton skeletonComponents;
+        #endregion
+
+        #region Component Instances - Data Display
         private Table tableComponents;
+        private GUIComponents.Avatar avatarComponents;
+        private Chart chartComponents;
+        private DataTable dataTableComponents;
+        #endregion
+
+        #region Component Instances - Interactive Controls
         private Calendar calendarComponents;
+        private DatePicker datePickerComponents;
+        private Select selectComponents;
+        #endregion
+
+        #region Component Instances - Overlays & Modals
+        private Dialog dialogComponents;
         private DropdownMenu dropdownMenuComponents;
         private Popover popoverComponents;
-        private Select selectComponents;
-        private DatePicker datePickerComponents;
-        private Dialog dialogComponents;
-        private DataTable dataTableComponents;
+        #endregion
         #endregion
 
         #region Public Style Access
@@ -76,6 +109,7 @@ namespace shadcnui
 
         public Calendar GetCalendarComponents() => calendarComponents;
 
+        public Chart GetChartComponents() => chartComponents;
         #endregion
 
         #region Static Compatibility
@@ -87,58 +121,103 @@ namespace shadcnui
         #region Initialization
         private bool initialized = false;
 
+        /// <summary>
+        /// Initialize a new instance of GUIHelper with all components
+        /// </summary>
         public GUIHelper()
         {
             InitializeComponents();
         }
 
+        /// <summary>
+        /// Initialize all GUI component instances with proper error handling
+        /// </summary>
         private void InitializeComponents()
         {
             try
             {
+                GUILogger.LogInfo("Initializing GUIHelper components", "GUIHelper.InitializeComponents");
+
+                // Core System
                 styleManager = new StyleManager(this);
                 animationManager = new AnimationManager(this);
+
+                // Input & Form
                 inputComponents = new GUIComponents.Input(this);
-                buttonComponents = new GUIComponents.Button(this);
-                sliderComponents = new Slider(this);
-                toggleComponents = new GUIComponents.Toggle(this);
-                layoutComponents = new Layout(this);
-                cardComponents = new Card(this);
-                labelComponents = new GUIComponents.Label(this);
-                progressComponents = new Progress(this);
-                separatorComponents = new GUIComponents.Separator(this);
-                tabsComponents = new GUIComponents.Tabs(this);
                 textAreaComponents = new GUIComponents.TextArea(this);
                 checkboxComponents = new GUIComponents.Checkbox(this);
                 switchComponents = new GUIComponents.Switch(this);
+                sliderComponents = new Slider(this);
+
+                // Buttons & Toggles
+                buttonComponents = new GUIComponents.Button(this);
+                toggleComponents = new GUIComponents.Toggle(this);
+
+                // Layout & Structure
+                layoutComponents = new Layout(this);
+                cardComponents = new Card(this);
+                separatorComponents = new GUIComponents.Separator(this);
+
+                // Text & Labels
+                labelComponents = new GUIComponents.Label(this);
+
+                // Navigation
+                tabsComponents = new GUIComponents.Tabs(this);
+                menuBarComponents = new MenuBar(this);
+
+                // Feedback & Status
+                progressComponents = new Progress(this);
                 badgeComponents = new GUIComponents.Badge(this);
-                alertComponents = new GUIComponents.Alert(this);
-                avatarComponents = new GUIComponents.Avatar(this);
-                skeletonComponents = new GUIComponents.Skeleton(this);
+
+                // Data Display
                 tableComponents = new GUIComponents.Table(this);
+                avatarComponents = new GUIComponents.Avatar(this);
+                chartComponents = new Chart(this);
+                dataTableComponents = new DataTable(this);
+
+                // Interactive Controls
                 calendarComponents = new GUIComponents.Calendar(this);
-                dropdownMenuComponents = new GUIComponents.DropdownMenu(this);
-                popoverComponents = new GUIComponents.Popover(this);
                 selectComponents = new Select(this);
                 datePickerComponents = new DatePicker(this);
+
+                // Overlays & Modals
                 dialogComponents = new Dialog(this);
-                dataTableComponents = new DataTable(this);
+                dropdownMenuComponents = new GUIComponents.DropdownMenu(this);
+                popoverComponents = new GUIComponents.Popover(this);
+
+                GUILogger.LogInfo("GUIHelper components initialized successfully", "GUIHelper.InitializeComponents");
             }
             catch (Exception ex)
             {
-                //Debug.LogError("Failed to initialize GUIHelper components: " + ex.Message);
+                GUILogger.LogException(ex, "InitializeComponents", "GUIHelper");
                 styleManager = null;
                 animationManager = null;
             }
         }
         #endregion
 
-        #region Core Methods
+        #region Core System Methods
+        /// <summary>
+        /// Create a new Settings instance
+        /// </summary>
+        /// <returns>New Settings instance</returns>
         public Settings CreateSetting()
         {
-            return new Settings(this);
+            try
+            {
+                return new Settings(this);
+            }
+            catch (Exception ex)
+            {
+                GUILogger.LogException(ex, "CreateSetting", "GUIHelper");
+                return null;
+            }
         }
 
+        /// <summary>
+        /// Update animation states for GUI components
+        /// </summary>
+        /// <param name="isOpen">Whether the GUI is currently open</param>
         public void UpdateAnimations(bool isOpen)
         {
             try
@@ -158,10 +237,14 @@ namespace shadcnui
             }
             catch (Exception ex)
             {
-                //Debug.LogError("Error updating animations: " + ex.Message);
+                GUILogger.LogException(ex, "UpdateAnimations", "GUIHelper");
             }
         }
 
+        /// <summary>
+        /// Begin animated GUI rendering with proper initialization and background setup
+        /// </summary>
+        /// <returns>True if GUI should continue rendering</returns>
         public bool BeginAnimatedGUI()
         {
             try
@@ -201,11 +284,14 @@ namespace shadcnui
             }
             catch (Exception ex)
             {
-                //Debug.LogError("Error in BeginAnimatedGUI: " + ex.Message);
+                GUILogger.LogException(ex, "BeginAnimatedGUI", "GUIHelper");
                 return true;
             }
         }
 
+        /// <summary>
+        /// End animated GUI rendering and cleanup
+        /// </summary>
         public void EndAnimatedGUI()
         {
             try
@@ -214,22 +300,33 @@ namespace shadcnui
             }
             catch (Exception ex)
             {
-                //Debug.LogError("Error in EndAnimatedGUI: " + ex.Message);
+                GUILogger.LogException(ex, "EndAnimatedGUI", "GUIHelper");
             }
         }
 
+        /// <summary>
+        /// Cleanup all GUI components and resources
+        /// </summary>
         public void Cleanup()
         {
             try
             {
+                GUILogger.LogInfo("Starting GUIHelper cleanup", "GUIHelper.Cleanup");
                 styleManager?.Cleanup();
                 animationManager?.Cleanup();
+                GUILogger.LogInfo("GUIHelper cleanup completed", "GUIHelper.Cleanup");
             }
             catch (Exception ex)
             {
-                //Debug.LogError("Cleanup error: " + ex.Message);
+                GUILogger.LogException(ex, "Cleanup", "GUIHelper");
             }
         }
+
+        internal float GetMenuAlpha() => menuAlpha;
+
+        internal Vector2 GetMousePos() => mousePos;
+
+        internal float GetParticleTime() => particleTime;
         #endregion
 
         #region Input Components
@@ -241,7 +338,7 @@ namespace shadcnui
             }
             catch (Exception ex)
             {
-                //Debug.LogError("Error drawing section header: " + ex.Message);
+                GUILogger.LogException(ex, "DrawSectionHeader", "GUIHelper");
             }
         }
 
@@ -253,7 +350,7 @@ namespace shadcnui
             }
             catch (Exception ex)
             {
-                //Debug.LogError("Error rendering label: " + ex.Message);
+                GUILogger.LogException(ex, "RenderLabel", "GUIHelper");
             }
         }
 
@@ -265,8 +362,8 @@ namespace shadcnui
             }
             catch (Exception ex)
             {
-                //Debug.LogError("Error drawing password field: " + ex.Message);
-                return "Error: " + ex.Message;
+                GUILogger.LogException(ex, "DrawPasswordField", "GUIHelper");
+                return password;
             }
         }
 
@@ -278,7 +375,7 @@ namespace shadcnui
             }
             catch (Exception ex)
             {
-                //Debug.LogError("Error drawing text area: " + ex.Message);
+                GUILogger.LogException(ex, "DrawTextArea", "GUIHelper");
             }
         }
         #endregion
@@ -307,7 +404,7 @@ namespace shadcnui
             }
             catch (Exception ex)
             {
-               // Debug.LogError("Error rendering color preset button: " + ex.Message);
+                GUILogger.LogException(ex, "RenderColorPresetButton", "GUIHelper");
                 return false;
             }
         }
@@ -320,7 +417,7 @@ namespace shadcnui
             }
             catch (Exception ex)
             {
-               // Debug.LogError("Error drawing button: " + ex.Message);
+                GUILogger.LogException(ex, "DrawButton", "GUIHelper");
                 return false;
             }
         }
@@ -361,7 +458,7 @@ namespace shadcnui
             }
             catch (Exception ex)
             {
-                //Debug.LogError("Error drawing colored button: " + ex.Message);
+                GUILogger.LogException(ex, "DrawColoredButton", "GUIHelper");
                 return false;
             }
         }
@@ -374,7 +471,7 @@ namespace shadcnui
             }
             catch (Exception ex)
             {
-               // Debug.LogError("Error drawing fixed button: " + ex.Message);
+                GUILogger.LogException(ex, "DrawFixedButton", "GUIHelper");
                 return false;
             }
         }
@@ -387,7 +484,7 @@ namespace shadcnui
             }
             catch (Exception ex)
             {
-                //Debug.LogError("Error drawing button variant: " + ex.Message);
+                GUILogger.LogException(ex, "Button", "GUIHelper");
                 return false;
             }
         }
@@ -400,7 +497,7 @@ namespace shadcnui
             }
             catch (Exception ex)
             {
-              //  Debug.LogError("Error drawing button variant in rect: " + ex.Message);
+                GUILogger.LogException(ex, "Button(Rect)", "GUIHelper");
                 return false;
             }
         }
@@ -453,7 +550,7 @@ namespace shadcnui
             }
             catch (Exception ex)
             {
-                //Debug.LogError("Error drawing button group: " + ex.Message);
+                GUILogger.LogException(ex, "ButtonGroup", "GUIHelper");
             }
         }
 
@@ -500,7 +597,7 @@ namespace shadcnui
             }
             catch (Exception ex)
             {
-                //Debug.LogError("Error drawing button variant: " + ex.Message);
+                GUILogger.LogException(ex, "drawing button variant", "GUIHelper");
                 return false;
             }
         }
@@ -520,7 +617,7 @@ namespace shadcnui
             }
             catch (Exception ex)
             {
-                //Debug.LogError("Error drawing toggle variant: " + ex.Message);
+                GUILogger.LogException(ex, "drawing toggle variant", "GUIHelper");
                 return value;
             }
         }
@@ -533,7 +630,7 @@ namespace shadcnui
             }
             catch (Exception ex)
             {
-              //  Debug.LogError("Error drawing toggle variant in rect: " + ex.Message);
+                GUILogger.LogException(ex, "drawing toggle variant in rect", "GUIHelper");
                 return false;
             }
         }
@@ -561,7 +658,7 @@ namespace shadcnui
             }
             catch (Exception ex)
             {
-                //Debug.LogError("Error drawing toggle group: " + ex.Message);
+                GUILogger.LogException(ex, "drawing toggle group", "GUIHelper");
                 return selectedIndex;
             }
         }
@@ -574,16 +671,13 @@ namespace shadcnui
             }
             catch (Exception ex)
             {
-               //
-               //Debug.LogError("Error drawing multi toggle group: " + ex.Message);
+                GUILogger.LogException(ex, "drawing multi toggle group", "GUIHelper");
                 return selectedStates;
             }
         }
         #endregion
 
         #region Card Components
-
-
         public void BeginCard(float width = -1, float height = -1)
         {
             try
@@ -592,7 +686,7 @@ namespace shadcnui
             }
             catch (Exception ex)
             {
-               // Debug.LogError("Error beginning card: " + ex.Message);
+                GUILogger.LogException(ex, "beginning card", "GUIHelper");
             }
         }
 
@@ -604,7 +698,7 @@ namespace shadcnui
             }
             catch (Exception ex)
             {
-               // Debug.LogError("Error ending card: " + ex.Message);
+                GUILogger.LogException(ex, "ending card", "GUIHelper");
             }
         }
 
@@ -616,7 +710,7 @@ namespace shadcnui
             }
             catch (Exception ex)
             {
-              //  Debug.LogError("Error drawing card: " + ex.Message);
+                GUILogger.LogException(ex, "drawing card", "GUIHelper");
             }
         }
 
@@ -628,7 +722,7 @@ namespace shadcnui
             }
             catch (Exception ex)
             {
-               // Debug.LogError("Error drawing card with image: " + ex.Message);
+                GUILogger.LogException(ex, "drawing card with image", "GUIHelper");
             }
         }
 
@@ -640,7 +734,7 @@ namespace shadcnui
             }
             catch (Exception ex)
             {
-               // Debug.LogError("Error drawing card with avatar: " + ex.Message);
+                GUILogger.LogException(ex, "drawing card with avatar", "GUIHelper");
             }
         }
 
@@ -652,7 +746,7 @@ namespace shadcnui
             }
             catch (Exception ex)
             {
-               // Debug.LogError("Error drawing card with header : " + ex.Message);
+                GUILogger.LogException(ex, "drawing card with header ", "GUIHelper");
             }
         }
 
@@ -664,7 +758,7 @@ namespace shadcnui
             }
             catch (Exception ex)
             {
-                //Debug.LogError("Error drawing simple card: " + ex.Message);
+                GUILogger.LogException(ex, "drawing simple card", "GUIHelper");
             }
         }
 
@@ -677,7 +771,6 @@ namespace shadcnui
         public void CardContent(Action content) => cardComponents?.CardContent(content);
 
         public void CardFooter(Action content) => cardComponents?.CardFooter(content);
-
         #endregion
 
         #region Slider Components
@@ -689,7 +782,7 @@ namespace shadcnui
             }
             catch (Exception ex)
             {
-              //  Debug.LogError("Error drawing slider: " + ex.Message);
+                GUILogger.LogException(ex, "drawing slider", "GUIHelper");
             }
         }
 
@@ -701,7 +794,7 @@ namespace shadcnui
             }
             catch (Exception ex)
             {
-                //Debug.LogError("Error drawing int slider: " + ex.Message);
+                GUILogger.LogException(ex, "drawing int slider", "GUIHelper");
             }
         }
         #endregion
@@ -715,7 +808,7 @@ namespace shadcnui
             }
             catch (Exception ex)
             {
-                //Debug.LogError("Error drawing scroll view: " + ex.Message);
+                GUILogger.LogException(ex, "drawing scroll view", "GUIHelper");
                 return new Vector3(0, 0, 0);
             }
         }
@@ -728,7 +821,7 @@ namespace shadcnui
             }
             catch (Exception ex)
             {
-                //Debug.LogError("Error beginning horizontal group: " + ex.Message);
+                GUILogger.LogException(ex, "beginning horizontal group", "GUIHelper");
             }
         }
 
@@ -740,7 +833,7 @@ namespace shadcnui
             }
             catch (Exception ex)
             {
-              //  Debug.LogError("Error ending horizontal group: " + ex.Message);
+                GUILogger.LogException(ex, "ending horizontal group", "GUIHelper");
             }
         }
 
@@ -752,7 +845,7 @@ namespace shadcnui
             }
             catch (Exception ex)
             {
-              //  Debug.LogError("Error beginning vertical group: " + ex.Message);
+                GUILogger.LogException(ex, "beginning vertical group", "GUIHelper");
             }
         }
 
@@ -764,7 +857,7 @@ namespace shadcnui
             }
             catch (Exception ex)
             {
-              //  Debug.LogError("Error ending vertical group: " + ex.Message);
+                GUILogger.LogException(ex, "ending vertical group", "GUIHelper");
             }
         }
 
@@ -776,17 +869,9 @@ namespace shadcnui
             }
             catch (Exception ex)
             {
-             //   Debug.LogError("Error adding space: " + ex.Message);
+                GUILogger.LogException(ex, "adding space", "GUIHelper");
             }
         }
-        #endregion
-
-        #region Utility Components
-        internal float GetMenuAlpha() => menuAlpha;
-
-        internal Vector2 GetMousePos() => mousePos;
-
-        internal float GetParticleTime() => particleTime;
         #endregion
 
         #region Label Components
@@ -798,7 +883,7 @@ namespace shadcnui
             }
             catch (Exception ex)
             {
-                //Debug.LogError("Error drawing label: " + ex.Message);
+                GUILogger.LogException(ex, "drawing label", "GUIHelper");
             }
         }
 
@@ -810,7 +895,7 @@ namespace shadcnui
             }
             catch (Exception ex)
             {
-                //Debug.LogError("Error drawing label in rect: " + ex.Message);
+                GUILogger.LogException(ex, "drawing label in rect", "GUIHelper");
             }
         }
 
@@ -822,7 +907,7 @@ namespace shadcnui
             }
             catch (Exception ex)
             {
-              //  Debug.LogError("Error drawing secondary label: " + ex.Message);
+                GUILogger.LogException(ex, "drawing secondary label", "GUIHelper");
             }
         }
 
@@ -834,7 +919,7 @@ namespace shadcnui
             }
             catch (Exception ex)
             {
-               // Debug.LogError("Error drawing muted label: " + ex.Message);
+                GUILogger.LogException(ex, "drawing muted label", "GUIHelper");
             }
         }
 
@@ -846,7 +931,7 @@ namespace shadcnui
             }
             catch (Exception ex)
             {
-                //Debug.LogError("Error drawing destructive label: " + ex.Message);
+                GUILogger.LogException(ex, "drawing destructive label", "GUIHelper");
             }
         }
         #endregion
@@ -860,7 +945,7 @@ namespace shadcnui
             }
             catch (Exception ex)
             {
-              //  Debug.LogError("Error drawing progress: " + ex.Message);
+                GUILogger.LogException(ex, "drawing progress", "GUIHelper");
             }
         }
 
@@ -872,7 +957,7 @@ namespace shadcnui
             }
             catch (Exception ex)
             {
-               // Debug.LogError("Error drawing progress in rect: " + ex.Message);
+                GUILogger.LogException(ex, "drawing progress in rect", "GUIHelper");
             }
         }
 
@@ -884,7 +969,7 @@ namespace shadcnui
             }
             catch (Exception ex)
             {
-              //  Debug.LogError("Error drawing labeled progress: " + ex.Message);
+                GUILogger.LogException(ex, "drawing labeled progress", "GUIHelper");
             }
         }
 
@@ -896,7 +981,637 @@ namespace shadcnui
             }
             catch (Exception ex)
             {
-               // Debug.LogError("Error drawing circular progress: " + ex.Message);
+                GUILogger.LogException(ex, "drawing circular progress", "GUIHelper");
+            }
+        }
+        #endregion
+
+        #region Avatar Components
+        public void Avatar(Texture2D image, string fallbackText, AvatarSize size = AvatarSize.Default, AvatarShape shape = AvatarShape.Circle, params GUILayoutOption[] options)
+        {
+            try
+            {
+                avatarComponents?.DrawAvatar(image, fallbackText, size, shape, options);
+            }
+            catch (Exception ex)
+            {
+                GUILogger.LogException(ex, "drawing avatar", "GUIHelper");
+            }
+        }
+
+        public void Avatar(Rect rect, Texture2D image, string fallbackText, AvatarSize size = AvatarSize.Default, AvatarShape shape = AvatarShape.Circle)
+        {
+            try
+            {
+                avatarComponents?.DrawAvatar(rect, image, fallbackText, size, shape);
+            }
+            catch (Exception ex)
+            {
+                GUILogger.LogException(ex, "drawing avatar in rect", "GUIHelper");
+            }
+        }
+
+        public void AvatarWithStatus(Texture2D image, string fallbackText, bool isOnline, AvatarSize size = AvatarSize.Default, AvatarShape shape = AvatarShape.Circle, params GUILayoutOption[] options)
+        {
+            try
+            {
+                avatarComponents?.AvatarWithStatus(image, fallbackText, isOnline, size, shape, options);
+            }
+            catch (Exception ex)
+            {
+                GUILogger.LogException(ex, "drawing avatar with status", "GUIHelper");
+            }
+        }
+
+        public void AvatarWithName(Texture2D image, string fallbackText, string name, AvatarSize size = AvatarSize.Default, AvatarShape shape = AvatarShape.Circle, bool showNameBelow = false, params GUILayoutOption[] options)
+        {
+            try
+            {
+                avatarComponents?.AvatarWithName(image, fallbackText, name, size, shape, showNameBelow, options);
+            }
+            catch (Exception ex)
+            {
+                GUILogger.LogException(ex, "drawing avatar with name", "GUIHelper");
+            }
+        }
+
+        public void CustomAvatar(Texture2D image, string fallbackText, Color backgroundColor, Color textColor, AvatarSize size = AvatarSize.Default, AvatarShape shape = AvatarShape.Circle, params GUILayoutOption[] options)
+        {
+            try
+            {
+                avatarComponents?.CustomAvatar(image, fallbackText, backgroundColor, textColor, size, shape, options);
+            }
+            catch (Exception ex)
+            {
+                GUILogger.LogException(ex, "drawing custom avatar", "GUIHelper");
+            }
+        }
+
+        public void AvatarWithBorder(Texture2D image, string fallbackText, Color borderColor, AvatarSize size = AvatarSize.Default, AvatarShape shape = AvatarShape.Circle, params GUILayoutOption[] options)
+        {
+            try
+            {
+                avatarComponents?.AvatarWithBorder(image, fallbackText, borderColor, size, shape, options);
+            }
+            catch (Exception ex)
+            {
+                GUILogger.LogException(ex, "drawing avatar with border", "GUIHelper");
+            }
+        }
+
+        public void AvatarWithHover(Texture2D image, string fallbackText, AvatarSize size = AvatarSize.Default, AvatarShape shape = AvatarShape.Circle, Action onClick = null, params GUILayoutOption[] options)
+        {
+            try
+            {
+                avatarComponents?.AvatarWithHover(image, fallbackText, size, shape, onClick, options);
+            }
+            catch (Exception ex)
+            {
+                GUILogger.LogException(ex, "drawing avatar with hover", "GUIHelper");
+            }
+        }
+
+        public void AvatarWithLoading(Texture2D image, string fallbackText, bool isLoading, AvatarSize size = AvatarSize.Default, AvatarShape shape = AvatarShape.Circle, params GUILayoutOption[] options)
+        {
+            try
+            {
+                avatarComponents?.AvatarWithLoading(image, fallbackText, isLoading, size, shape, options);
+            }
+            catch (Exception ex)
+            {
+                GUILogger.LogException(ex, "drawing avatar with loading", "GUIHelper");
+            }
+        }
+
+        public void AvatarWithTooltip(Texture2D image, string fallbackText, string tooltip, AvatarSize size = AvatarSize.Default, AvatarShape shape = AvatarShape.Circle, params GUILayoutOption[] options)
+        {
+            try
+            {
+                avatarComponents?.AvatarWithTooltip(image, fallbackText, tooltip, size, shape, options);
+            }
+            catch (Exception ex)
+            {
+                GUILogger.LogException(ex, "drawing avatar with tooltip", "GUIHelper");
+            }
+        }
+
+        public void AvatarGroup(GUIComponents.Avatar.AvatarData[] avatars, AvatarSize size = AvatarSize.Default, AvatarShape shape = AvatarShape.Circle, int maxVisible = 3, float overlap = -8f, params GUILayoutOption[] options)
+        {
+            try
+            {
+                avatarComponents?.AvatarGroup(avatars, size, shape, maxVisible, overlap, options);
+            }
+            catch (Exception ex)
+            {
+                GUILogger.LogException(ex, "drawing avatar group", "GUIHelper");
+            }
+        }
+        #endregion
+
+        #region Table Components
+        public void Table(string[] headers, string[,] data, TableVariant variant = TableVariant.Default, TableSize size = TableSize.Default, params GUILayoutOption[] options)
+        {
+            try
+            {
+                tableComponents?.DrawTable(headers, data, variant, size, options);
+            }
+            catch (Exception ex)
+            {
+                GUILogger.LogException(ex, "drawing table", "GUIHelper");
+            }
+        }
+
+        public void Table(Rect rect, string[] headers, string[,] data, TableVariant variant = TableVariant.Default, TableSize size = TableSize.Default)
+        {
+            try
+            {
+                tableComponents?.DrawTable(rect, headers, data, variant, size);
+            }
+            catch (Exception ex)
+            {
+                GUILogger.LogException(ex, "drawing table in rect", "GUIHelper");
+            }
+        }
+
+        public void SortableTable(string[] headers, string[,] data, ref int[] sortColumns, ref bool[] sortAscending, TableVariant variant = TableVariant.Default, TableSize size = TableSize.Default, Action<int, bool> onSort = null, params GUILayoutOption[] options)
+        {
+            try
+            {
+                tableComponents?.SortableTable(headers, data, ref sortColumns, ref sortAscending, variant, size, onSort, options);
+            }
+            catch (Exception ex)
+            {
+                GUILogger.LogException(ex, "drawing sortable table", "GUIHelper");
+            }
+        }
+
+        public void SelectableTable(string[] headers, string[,] data, ref bool[] selectedRows, TableVariant variant = TableVariant.Default, TableSize size = TableSize.Default, Action<int, bool> onSelectionChange = null, params GUILayoutOption[] options)
+        {
+            try
+            {
+                tableComponents?.SelectableTable(headers, data, ref selectedRows, variant, size, onSelectionChange, options);
+            }
+            catch (Exception ex)
+            {
+                GUILogger.LogException(ex, "drawing selectable table", "GUIHelper");
+            }
+        }
+
+        public void CustomTable(string[] headers, object[,] data, Action<object, int, int> cellRenderer, TableVariant variant = TableVariant.Default, TableSize size = TableSize.Default, params GUILayoutOption[] options)
+        {
+            try
+            {
+                tableComponents?.CustomTable(headers, data, cellRenderer, variant, size, options);
+            }
+            catch (Exception ex)
+            {
+                GUILogger.LogException(ex, "drawing custom table", "GUIHelper");
+            }
+        }
+
+        public void PaginatedTable(string[] headers, string[,] data, ref int currentPage, int pageSize, TableVariant variant = TableVariant.Default, TableSize size = TableSize.Default, Action<int> onPageChange = null, params GUILayoutOption[] options)
+        {
+            try
+            {
+                tableComponents?.PaginatedTable(headers, data, ref currentPage, pageSize, variant, size, onPageChange, options);
+            }
+            catch (Exception ex)
+            {
+                GUILogger.LogException(ex, "drawing paginated table", "GUIHelper");
+            }
+        }
+
+        public void SearchableTable(string[] headers, string[,] data, ref string searchQuery, ref string[,] filteredData, TableVariant variant = TableVariant.Default, TableSize size = TableSize.Default, Action<string> onSearch = null, params GUILayoutOption[] options)
+        {
+            try
+            {
+                tableComponents?.SearchableTable(headers, data, ref searchQuery, ref filteredData, variant, size, onSearch, options);
+            }
+            catch (Exception ex)
+            {
+                GUILogger.LogException(ex, "drawing searchable table", "GUIHelper");
+            }
+        }
+
+        public void ResizableTable(string[] headers, string[,] data, ref float[] columnWidths, TableVariant variant = TableVariant.Default, TableSize size = TableSize.Default, params GUILayoutOption[] options)
+        {
+            try
+            {
+                tableComponents?.ResizableTable(headers, data, ref columnWidths, variant, size, options);
+            }
+            catch (Exception ex)
+            {
+                GUILogger.LogException(ex, "drawing resizable table", "GUIHelper");
+            }
+        }
+        #endregion
+
+        #region Calendar Components
+        public void Calendar()
+        {
+            try
+            {
+                calendarComponents?.DrawCalendar();
+            }
+            catch (Exception ex)
+            {
+                GUILogger.LogException(ex, "drawing calendar", "GUIHelper");
+            }
+        }
+        #endregion
+
+        #region DropdownMenu Components
+        public void DropdownMenu()
+        {
+            try
+            {
+                dropdownMenuComponents?.DrawDropdownMenu();
+            }
+            catch (Exception ex)
+            {
+                GUILogger.LogException(ex, "drawing dropdown menu", "GUIHelper");
+            }
+        }
+
+        public void OpenDropdownMenu(List<DropdownMenuItem> items)
+        {
+            dropdownMenuComponents?.Open(items);
+        }
+
+        public void CloseDropdownMenu()
+        {
+            dropdownMenuComponents?.Close();
+        }
+
+        public bool IsDropdownMenuOpen()
+        {
+            return dropdownMenuComponents?.IsOpen ?? false;
+        }
+        #endregion
+
+        #region Popover Components
+        public void Popover(Action content)
+        {
+            try
+            {
+                popoverComponents?.DrawPopover(content);
+            }
+            catch (Exception ex)
+            {
+                GUILogger.LogException(ex, "drawing popover", "GUIHelper");
+            }
+        }
+
+        public void OpenPopover()
+        {
+            popoverComponents?.Open();
+        }
+
+        public void ClosePopover()
+        {
+            popoverComponents?.Close();
+        }
+
+        public bool IsPopoverOpen()
+        {
+            return popoverComponents?.IsOpen ?? false;
+        }
+        #endregion
+
+        #region Select Components
+        public int Select(string[] items, int selectedIndex)
+        {
+            try
+            {
+                return selectComponents?.DrawSelect(items, selectedIndex) ?? selectedIndex;
+            }
+            catch (Exception ex)
+            {
+                GUILogger.LogException(ex, "drawing select", "GUIHelper");
+                return selectedIndex;
+            }
+        }
+
+        public void OpenSelect()
+        {
+            selectComponents?.Open();
+        }
+
+        public void CloseSelect()
+        {
+            selectComponents?.Close();
+        }
+
+        public bool IsSelectOpen()
+        {
+            return selectComponents?.IsOpen ?? false;
+        }
+        #endregion
+
+        #region Dialog Components
+        public void DrawDialog(string dialogId, Action content, float width = 400, float height = 300)
+        {
+            dialogComponents?.DrawDialog(dialogId, content, width, height);
+        }
+
+        public void DrawDialog(string dialogId, string title, string description, Action content, Action footer = null, float width = 400, float height = 300)
+        {
+            dialogComponents?.DrawDialog(dialogId, title, description, content, footer, width, height);
+        }
+
+        public Rect GetLastRect()
+        {
+            return GUILayoutUtility.GetLastRect();
+        }
+
+        public void OpenDialog(string dialogId)
+        {
+            dialogComponents?.Open(dialogId);
+        }
+
+        public void CloseDialog()
+        {
+            dialogComponents?.Close();
+        }
+
+        public bool IsDialogOpen()
+        {
+            return dialogComponents?.IsOpen ?? false;
+        }
+
+        public bool DrawDialogTrigger(string label, ButtonVariant variant = ButtonVariant.Default, ButtonSize size = ButtonSize.Default)
+        {
+            try
+            {
+                return dialogComponents?.DrawDialogTrigger(label, variant, size) ?? false;
+            }
+            catch (Exception ex)
+            {
+                GUILogger.LogException(ex, "drawing dialog trigger", "GUIHelper");
+                return false;
+            }
+        }
+
+        public void DrawDialogHeader(string title, string description = null)
+        {
+            try
+            {
+                dialogComponents?.DrawDialogHeader(title, description);
+            }
+            catch (Exception ex)
+            {
+                GUILogger.LogException(ex, "drawing dialog header", "GUIHelper");
+            }
+        }
+
+        public void DrawDialogContent(Action content)
+        {
+            try
+            {
+                dialogComponents?.DrawDialogContent(content);
+            }
+            catch (Exception ex)
+            {
+                GUILogger.LogException(ex, "drawing dialog content", "GUIHelper");
+            }
+        }
+
+        public void DrawDialogFooter(Action footer)
+        {
+            try
+            {
+                dialogComponents?.DrawDialogFooter(footer);
+            }
+            catch (Exception ex)
+            {
+                GUILogger.LogException(ex, "drawing dialog footer", "GUIHelper");
+            }
+        }
+        #endregion
+
+        #region DatePicker Components
+        public DateTime? DatePicker(string placeholder, DateTime? selectedDate, string id = "datepicker", params GUILayoutOption[] options)
+        {
+            try
+            {
+                return datePickerComponents?.DrawDatePicker(placeholder, selectedDate, id, options) ?? selectedDate;
+            }
+            catch (Exception ex)
+            {
+                GUILogger.LogException(ex, "drawing date picker", "GUIHelper");
+                return selectedDate;
+            }
+        }
+
+        public DateTime? DatePickerWithLabel(string label, string placeholder, DateTime? selectedDate, string id = "datepicker", params GUILayoutOption[] options)
+        {
+            try
+            {
+                return datePickerComponents?.DrawDatePickerWithLabel(label, placeholder, selectedDate, id, options) ?? selectedDate;
+            }
+            catch (Exception ex)
+            {
+                GUILogger.LogException(ex, "drawing date picker with label", "GUIHelper");
+                return selectedDate;
+            }
+        }
+
+        public DateTime? DateRangePicker(string placeholder, DateTime? startDate, DateTime? endDate, string id = "daterange", params GUILayoutOption[] options)
+        {
+            try
+            {
+                return datePickerComponents?.DrawDateRangePicker(placeholder, startDate, endDate, id, options) ?? startDate;
+            }
+            catch (Exception ex)
+            {
+                GUILogger.LogException(ex, "drawing date range picker", "GUIHelper");
+                return startDate;
+            }
+        }
+
+        public void CloseDatePicker(string id)
+        {
+            try
+            {
+                datePickerComponents?.CloseDatePicker(id);
+            }
+            catch (Exception ex)
+            {
+                GUILogger.LogException(ex, "closing date picker", "GUIHelper");
+            }
+        }
+
+        public bool IsDatePickerOpen(string id)
+        {
+            try
+            {
+                return datePickerComponents?.IsDatePickerOpen(id) ?? false;
+            }
+            catch (Exception ex)
+            {
+                GUILogger.LogException(ex, "checking date picker state", "GUIHelper");
+                return false;
+            }
+        }
+        #endregion
+
+        #region DataTable Components
+        public void DrawDataTable(string id, List<DataTableColumn> columns, List<DataTableRow> data, bool showPagination = true, bool showSearch = true, bool showSelection = true, bool showColumnToggle = false, params GUILayoutOption[] options)
+        {
+            try
+            {
+                dataTableComponents?.DrawDataTable(id, columns, data, showPagination, showSearch, showSelection, showColumnToggle, options);
+            }
+            catch (Exception ex)
+            {
+                GUILogger.LogException(ex, "drawing data table", "GUIHelper");
+            }
+        }
+
+        public DataTableColumn CreateDataTableColumn(string id, string header, string accessorKey = null)
+        {
+            return new DataTableColumn(id, header, accessorKey);
+        }
+
+        public DataTableRow CreateDataTableRow(string id)
+        {
+            return new DataTableRow(id);
+        }
+
+        public List<string> GetSelectedRows(string tableId)
+        {
+            try
+            {
+                return dataTableComponents?.GetSelectedRows(tableId) ?? new List<string>();
+            }
+            catch (Exception ex)
+            {
+                GUILogger.LogException(ex, "getting selected rows", "GUIHelper");
+                return new List<string>();
+            }
+        }
+
+        public void ClearSelection(string tableId)
+        {
+            try
+            {
+                dataTableComponents?.ClearSelection(tableId);
+            }
+            catch (Exception ex)
+            {
+                GUILogger.LogException(ex, "clearing selection", "GUIHelper");
+            }
+        }
+        #endregion
+
+        #region Chart Components
+        public void Chart(ChartType chartType, params GUILayoutOption[] options)
+        {
+            try
+            {
+                chartComponents?.DrawChart(chartType, options);
+            }
+            catch (Exception ex)
+            {
+                GUILogger.LogException(ex, "drawing chart", "GUIHelper");
+            }
+        }
+
+        public void LineChart(params GUILayoutOption[] options)
+        {
+            Chart(ChartType.Line, options);
+        }
+
+        public void BarChart(params GUILayoutOption[] options)
+        {
+            Chart(ChartType.Bar, options);
+        }
+
+        public void AreaChart(params GUILayoutOption[] options)
+        {
+            Chart(ChartType.Area, options);
+        }
+
+        public void PieChart(params GUILayoutOption[] options)
+        {
+            Chart(ChartType.Pie, options);
+        }
+
+        public void ScatterChart(params GUILayoutOption[] options)
+        {
+            Chart(ChartType.Scatter, options);
+        }
+
+        public void AddChartSeries(ChartSeries series)
+        {
+            try
+            {
+                chartComponents?.AddSeries(series);
+            }
+            catch (Exception ex)
+            {
+                GUILogger.LogException(ex, "adding chart series", "GUIHelper");
+            }
+        }
+
+        public void ClearChartData()
+        {
+            try
+            {
+                chartComponents?.ClearSeries();
+            }
+            catch (Exception ex)
+            {
+                GUILogger.LogException(ex, "clearing chart data", "GUIHelper");
+            }
+        }
+
+        public void SetChartConfig(ChartConfig config)
+        {
+            try
+            {
+                chartComponents?.SetConfig(config);
+            }
+            catch (Exception ex)
+            {
+                GUILogger.LogException(ex, "setting chart config", "GUIHelper");
+            }
+        }
+
+        public void AddChartDataPoint(string seriesKey, ChartDataPoint dataPoint)
+        {
+            try
+            {
+                chartComponents?.AddDataPoint(seriesKey, dataPoint);
+            }
+            catch (Exception ex)
+            {
+                GUILogger.LogException(ex, "adding chart data point", "GUIHelper");
+            }
+        }
+
+        public void SetChartSeriesVisibility(string seriesKey, bool visible)
+        {
+            try
+            {
+                chartComponents?.SetSeriesVisibility(seriesKey, visible);
+            }
+            catch (Exception ex)
+            {
+                GUILogger.LogException(ex, "setting chart series visibility", "GUIHelper");
+            }
+        }
+
+        public void SetChartSize(Vector2 size)
+        {
+            try
+            {
+                if (chartComponents != null)
+                    chartComponents.ChartSize = size;
+            }
+            catch (Exception ex)
+            {
+                GUILogger.LogException(ex, "setting chart size", "GUIHelper");
             }
         }
         #endregion
@@ -910,7 +1625,7 @@ namespace shadcnui
             }
             catch (Exception ex)
             {
-                //Debug.LogError("Error drawing separator: " + ex.Message);
+                GUILogger.LogException(ex, "drawing separator", "GUIHelper");
             }
         }
 
@@ -922,7 +1637,7 @@ namespace shadcnui
             }
             catch (Exception ex)
             {
-               // Debug.LogError("Error drawing horizontal separator: " + ex.Message);
+                GUILogger.LogException(ex, "drawing horizontal separator", "GUIHelper");
             }
         }
 
@@ -934,7 +1649,7 @@ namespace shadcnui
             }
             catch (Exception ex)
             {
-              //  Debug.LogError("Error drawing vertical separator: " + ex.Message);
+                GUILogger.LogException(ex, "drawing vertical separator", "GUIHelper");
             }
         }
 
@@ -946,7 +1661,7 @@ namespace shadcnui
             }
             catch (Exception ex)
             {
-                //Debug.LogError("Error drawing separator in rect: " + ex.Message);
+                GUILogger.LogException(ex, "drawing separator in rect", "GUIHelper");
             }
         }
 
@@ -958,7 +1673,7 @@ namespace shadcnui
             }
             catch (Exception ex)
             {
-               // Debug.LogError("Error drawing separator with spacing: " + ex.Message);
+                GUILogger.LogException(ex, "drawing separator with spacing", "GUIHelper");
             }
         }
 
@@ -970,7 +1685,7 @@ namespace shadcnui
             }
             catch (Exception ex)
             {
-               // Debug.LogError("Error drawing labeled separator: " + ex.Message);
+                GUILogger.LogException(ex, "drawing labeled separator", "GUIHelper");
             }
         }
         #endregion
@@ -1001,7 +1716,7 @@ namespace shadcnui
             }
             catch (Exception ex)
             {
-               // Debug.LogError("Error beginning tab content: " + ex.Message);
+                GUILogger.LogException(ex, "beginning tab content", "GUIHelper");
             }
         }
 
@@ -1013,7 +1728,7 @@ namespace shadcnui
             }
             catch (Exception ex)
             {
-               // Debug.LogError("Error ending tab content: " + ex.Message);
+                GUILogger.LogException(ex, "ending tab content", "GUIHelper");
             }
         }
 
@@ -1025,7 +1740,7 @@ namespace shadcnui
             }
             catch (Exception ex)
             {
-              //  Debug.LogError("Error drawing tabs with content: " + ex.Message);
+                GUILogger.LogException(ex, "drawing tabs with content", "GUIHelper");
                 return -1;
             }
         }
@@ -1038,7 +1753,7 @@ namespace shadcnui
             }
             catch (Exception ex)
             {
-             //   Debug.LogError("Error drawing vertical tabs: " + ex.Message);
+                GUILogger.LogException(ex, "drawing vertical tabs", "GUIHelper");
                 return -1;
             }
         }
@@ -1053,7 +1768,7 @@ namespace shadcnui
             }
             catch (Exception ex)
             {
-              //  Debug.LogError("Error drawing text area: " + ex.Message);
+                GUILogger.LogException(ex, "drawing text area", "GUIHelper");
                 return "Error: " + ex.Message;
             }
         }
@@ -1066,7 +1781,7 @@ namespace shadcnui
             }
             catch (Exception ex)
             {
-              //  Debug.LogError("Error drawing text area in rect: " + ex.Message);
+                GUILogger.LogException(ex, "drawing text area in rect", "GUIHelper");
                 return "Error: " + ex.Message;
             }
         }
@@ -1079,7 +1794,7 @@ namespace shadcnui
             }
             catch (Exception ex)
             {
-              //  Debug.LogError("Error drawing outline text area: " + ex.Message);
+                GUILogger.LogException(ex, "drawing outline text area", "GUIHelper");
                 return "Error: " + ex.Message;
             }
         }
@@ -1092,7 +1807,7 @@ namespace shadcnui
             }
             catch (Exception ex)
             {
-              //  Debug.LogError("Error drawing ghost text area: " + ex.Message);
+                GUILogger.LogException(ex, "drawing ghost text area", "GUIHelper");
                 return "Error: " + ex.Message;
             }
         }
@@ -1105,7 +1820,7 @@ namespace shadcnui
             }
             catch (Exception ex)
             {
-              //  Debug.LogError("Error drawing labeled text area: " + ex.Message);
+                GUILogger.LogException(ex, "drawing labeled text area", "GUIHelper");
                 return "Error: " + ex.Message;
             }
         }
@@ -1118,7 +1833,7 @@ namespace shadcnui
             }
             catch (Exception ex)
             {
-               // Debug.LogError("Error drawing resizable text area: " + ex.Message);
+                GUILogger.LogException(ex, "drawing resizable text area", "GUIHelper");
                 return "Error: " + ex.Message;
             }
         }
@@ -1133,7 +1848,7 @@ namespace shadcnui
             }
             catch (Exception ex)
             {
-                //Debug.LogError("Error drawing checkbox: " + ex.Message);
+                GUILogger.LogException(ex, "drawing checkbox", "GUIHelper");
                 return false;
             }
         }
@@ -1146,7 +1861,7 @@ namespace shadcnui
             }
             catch (Exception ex)
             {
-              //  Debug.LogError("Error drawing checkbox in rect: " + ex.Message);
+                GUILogger.LogException(ex, "drawing checkbox in rect", "GUIHelper");
                 return false;
             }
         }
@@ -1159,7 +1874,7 @@ namespace shadcnui
             }
             catch (Exception ex)
             {
-                Debug.LogError("Error drawing checkbox with label: " + ex.Message);
+                GUILogger.LogException(ex, "CheckboxWithLabel", "GUIHelper");
                 return false;
             }
         }
@@ -1172,7 +1887,7 @@ namespace shadcnui
             }
             catch (Exception ex)
             {
-               // Debug.LogError("Error drawing checkbox group: " + ex.Message);
+                GUILogger.LogException(ex, "drawing checkbox group", "GUIHelper");
                 return values ?? new bool[0];
             }
         }
@@ -1185,7 +1900,7 @@ namespace shadcnui
             }
             catch (Exception ex)
             {
-                //Debug.LogError("Error drawing custom checkbox: " + ex.Message);
+                GUILogger.LogException(ex, "drawing custom checkbox", "GUIHelper");
                 return false;
             }
         }
@@ -1198,7 +1913,7 @@ namespace shadcnui
             }
             catch (Exception ex)
             {
-               // Debug.LogError("Error drawing checkbox with icon: " + ex.Message);
+                GUILogger.LogException(ex, "drawing checkbox with icon", "GUIHelper");
                 return false;
             }
         }
@@ -1211,7 +1926,7 @@ namespace shadcnui
             }
             catch (Exception ex)
             {
-                //Debug.LogError("Error drawing checkbox with description: " + ex.Message);
+                GUILogger.LogException(ex, "drawing checkbox with description", "GUIHelper");
                 return false;
             }
         }
@@ -1224,7 +1939,7 @@ namespace shadcnui
             }
             catch (Exception ex)
             {
-                //Debug.LogError("Error drawing validated checkbox: " + ex.Message);
+                GUILogger.LogException(ex, "drawing validated checkbox", "GUIHelper");
                 return false;
             }
         }
@@ -1237,7 +1952,7 @@ namespace shadcnui
             }
             catch (Exception ex)
             {
-               // Debug.LogError("Error drawing checkbox with tooltip: " + ex.Message);
+                GUILogger.LogException(ex, "drawing checkbox with tooltip", "GUIHelper");
                 return false;
             }
         }
@@ -1252,7 +1967,7 @@ namespace shadcnui
             }
             catch (Exception ex)
             {
-              //  Debug.LogError("Error drawing switch: " + ex.Message);
+                GUILogger.LogException(ex, "drawing switch", "GUIHelper");
                 return false;
             }
         }
@@ -1265,7 +1980,7 @@ namespace shadcnui
             }
             catch (Exception ex)
             {
-                //Debug.LogError("Error drawing switch in rect: " + ex.Message);
+                GUILogger.LogException(ex, "drawing switch in rect", "GUIHelper");
                 return false;
             }
         }
@@ -1278,7 +1993,7 @@ namespace shadcnui
             }
             catch (Exception ex)
             {
-              //  Debug.LogError("Error drawing switch with label: " + ex.Message);
+                GUILogger.LogException(ex, "drawing switch with label", "GUIHelper");
                 return false;
             }
         }
@@ -1291,7 +2006,7 @@ namespace shadcnui
             }
             catch (Exception ex)
             {
-              //  Debug.LogError("Error drawing switch with description: " + ex.Message);
+                GUILogger.LogException(ex, "drawing switch with description", "GUIHelper");
                 return false;
             }
         }
@@ -1304,7 +2019,7 @@ namespace shadcnui
             }
             catch (Exception ex)
             {
-                //Debug.LogError("Error drawing custom switch: " + ex.Message);
+                GUILogger.LogException(ex, "drawing custom switch", "GUIHelper");
                 return false;
             }
         }
@@ -1317,7 +2032,7 @@ namespace shadcnui
             }
             catch (Exception ex)
             {
-                //Debug.LogError("Error drawing switch with icon: " + ex.Message);
+                GUILogger.LogException(ex, "drawing switch with icon", "GUIHelper");
                 return false;
             }
         }
@@ -1330,7 +2045,7 @@ namespace shadcnui
             }
             catch (Exception ex)
             {
-              //  Debug.LogError("Error drawing validated switch: " + ex.Message);
+                GUILogger.LogException(ex, "drawing validated switch", "GUIHelper");
                 return false;
             }
         }
@@ -1343,7 +2058,7 @@ namespace shadcnui
             }
             catch (Exception ex)
             {
-               // Debug.LogError("Error drawing switch with tooltip: " + ex.Message);
+                GUILogger.LogException(ex, "drawing switch with tooltip", "GUIHelper");
                 return false;
             }
         }
@@ -1356,7 +2071,7 @@ namespace shadcnui
             }
             catch (Exception ex)
             {
-               // Debug.LogError("Error drawing switch group: " + ex.Message);
+                GUILogger.LogException(ex, "drawing switch group", "GUIHelper");
                 return values ?? new bool[0];
             }
         }
@@ -1369,7 +2084,7 @@ namespace shadcnui
             }
             catch (Exception ex)
             {
-              //  Debug.LogError("Error drawing switch with loading: " + ex.Message);
+                GUILogger.LogException(ex, "drawing switch with loading", "GUIHelper");
                 return false;
             }
         }
@@ -1384,7 +2099,7 @@ namespace shadcnui
             }
             catch (Exception ex)
             {
-               // Debug.LogError("Error drawing badge: " + ex.Message);
+                GUILogger.LogException(ex, "drawing badge", "GUIHelper");
             }
         }
 
@@ -1396,7 +2111,7 @@ namespace shadcnui
             }
             catch (Exception ex)
             {
-                //Debug.LogError("Error drawing badge in rect: " + ex.Message);
+                GUILogger.LogException(ex, "drawing badge in rect", "GUIHelper");
             }
         }
 
@@ -1408,7 +2123,7 @@ namespace shadcnui
             }
             catch (Exception ex)
             {
-                //Debug.LogError("Error drawing badge with icon: " + ex.Message);
+                GUILogger.LogException(ex, "drawing badge with icon", "GUIHelper");
             }
         }
 
@@ -1420,7 +2135,7 @@ namespace shadcnui
             }
             catch (Exception ex)
             {
-                //Debug.LogError("Error drawing custom badge: " + ex.Message);
+                GUILogger.LogException(ex, "drawing custom badge", "GUIHelper");
             }
         }
 
@@ -1432,7 +2147,7 @@ namespace shadcnui
             }
             catch (Exception ex)
             {
-               // Debug.LogError("Error drawing count badge: " + ex.Message);
+                GUILogger.LogException(ex, "drawing count badge", "GUIHelper");
             }
         }
 
@@ -1444,7 +2159,7 @@ namespace shadcnui
             }
             catch (Exception ex)
             {
-               // Debug.LogError("Error drawing status badge: " + ex.Message);
+                GUILogger.LogException(ex, "drawing status badge", "GUIHelper");
             }
         }
 
@@ -1456,7 +2171,7 @@ namespace shadcnui
             }
             catch (Exception ex)
             {
-               // Debug.LogError("Error drawing dismissible badge: " + ex.Message);
+                GUILogger.LogException(ex, "drawing dismissible badge", "GUIHelper");
                 return false;
             }
         }
@@ -1469,7 +2184,7 @@ namespace shadcnui
             }
             catch (Exception ex)
             {
-             //   Debug.LogError("Error drawing progress badge: " + ex.Message);
+                GUILogger.LogException(ex, "drawing progress badge", "GUIHelper");
             }
         }
 
@@ -1481,7 +2196,7 @@ namespace shadcnui
             }
             catch (Exception ex)
             {
-             //   Debug.LogError("Error drawing animated badge: " + ex.Message);
+                GUILogger.LogException(ex, "drawing animated badge", "GUIHelper");
             }
         }
 
@@ -1493,7 +2208,7 @@ namespace shadcnui
             }
             catch (Exception ex)
             {
-               // Debug.LogError("Error drawing badge with tooltip: " + ex.Message);
+                GUILogger.LogException(ex, "drawing badge with tooltip", "GUIHelper");
             }
         }
 
@@ -1505,7 +2220,7 @@ namespace shadcnui
             }
             catch (Exception ex)
             {
-               // Debug.LogError("Error drawing badge group: " + ex.Message);
+                GUILogger.LogException(ex, "drawing badge group", "GUIHelper");
             }
         }
 
@@ -1517,782 +2232,34 @@ namespace shadcnui
             }
             catch (Exception ex)
             {
-               // Debug.LogError("Error drawing rounded badge: " + ex.Message);
+                GUILogger.LogException(ex, "drawing rounded badge", "GUIHelper");
             }
         }
         #endregion
 
-        #region Alert Components
-        public void Alert(string title, string description, AlertVariant variant = AlertVariant.Default, AlertType type = AlertType.Info, params GUILayoutOption[] options)
+        #region MenuBar Components
+        public void MenuBar(List<MenuBar.MenuItem> items, params GUILayoutOption[] options)
         {
             try
             {
-                alertComponents?.DrawAlert(title, description, variant, type, null, options);
+                menuBarComponents?.DrawMenuBar(items, options);
             }
             catch (Exception ex)
             {
-               // Debug.LogError("Error drawing alert: " + ex.Message);
+                GUILogger.LogException(ex, "drawing menu bar", "GUIHelper");
             }
         }
 
-        public void AlertWithIcon(string title, string description, Texture2D icon, AlertVariant variant = AlertVariant.Default, AlertType type = AlertType.Info, params GUILayoutOption[] options)
+        public bool IsMenuBarDropdownOpen()
         {
-            try
-            {
-                alertComponents?.DrawAlert(title, description, variant, type, icon, options);
-            }
-            catch (Exception ex)
-            {
-               // Debug.LogError("Error drawing alert with icon: " + ex.Message);
-            }
-        }
-
-        public void CustomAlert(string title, string description, Color backgroundColor, Color textColor, params GUILayoutOption[] options)
-        {
-            try
-            {
-                alertComponents?.CustomAlert(title, description, backgroundColor, textColor, options);
-            }
-            catch (Exception ex)
-            {
-               // Debug.LogError("Error drawing custom alert: " + ex.Message);
-            }
-        }
-
-        public void AlertWithProgress(string title, string description, float progress, AlertVariant variant = AlertVariant.Default, AlertType type = AlertType.Info, params GUILayoutOption[] options)
-        {
-            try
-            {
-                alertComponents?.AlertWithProgress(title, description, progress, variant, type, options);
-            }
-            catch (Exception ex)
-            {
-              //  Debug.LogError("Error drawing alert with progress: " + ex.Message);
-            }
-        }
-
-        public void AnimatedAlert(string title, string description, AlertVariant variant = AlertVariant.Default, AlertType type = AlertType.Info, params GUILayoutOption[] options)
-        {
-            try
-            {
-                alertComponents?.AnimatedAlert(title, description, variant, type, options);
-            }
-            catch (Exception ex)
-            {
-                //Debug.LogError("Error drawing animated alert: " + ex.Message);
-            }
-        }
-
-        public void AlertWithCountdown(string title, string description, float countdownTime, Action onTimeout, AlertVariant variant = AlertVariant.Default, AlertType type = AlertType.Info, params GUILayoutOption[] options)
-        {
-            try
-            {
-                alertComponents?.AlertWithCountdown(title, description, countdownTime, onTimeout, variant, type, options);
-            }
-            catch (Exception ex)
-            {
-              //  Debug.LogError("Error drawing alert with countdown: " + ex.Message);
-            }
-        }
-
-        public bool ExpandableAlert(string title, string description, string expandedContent, ref bool isExpanded, AlertVariant variant = AlertVariant.Default, AlertType type = AlertType.Info, params GUILayoutOption[] options)
-        {
-            try
-            {
-                return alertComponents?.ExpandableAlert(title, description, expandedContent, ref isExpanded, variant, type, options) ?? false;
-            }
-            catch (Exception ex)
-            {
-              //  Debug.LogError("Error drawing expandable alert: " + ex.Message);
-                return false;
-            }
-        }
-
-        public void AlertWithStatus(string title, string description, bool isActive, AlertVariant variant = AlertVariant.Default, AlertType type = AlertType.Info, params GUILayoutOption[] options)
-        {
-            try
-            {
-                alertComponents?.AlertWithStatus(title, description, isActive, variant, type, options);
-            }
-            catch (Exception ex)
-            {
-               // Debug.LogError("Error drawing alert with status: " + ex.Message);
-            }
-        }
-
-        public void AlertWithCustomIcon(string title, string description, Texture2D icon, Color iconColor, AlertVariant variant = AlertVariant.Default, AlertType type = AlertType.Info, params GUILayoutOption[] options)
-        {
-            try
-            {
-                alertComponents?.DrawAlert(title, description, variant, type, icon, options);
-            }
-            catch (Exception ex)
-            {
-               // Debug.LogError("Error drawing alert with custom icon: " + ex.Message);
-            }
-        }
-        #endregion
-
-        #region Avatar Components
-        public void Avatar(Texture2D image, string fallbackText, AvatarSize size = AvatarSize.Default, AvatarShape shape = AvatarShape.Circle, params GUILayoutOption[] options)
-        {
-            try
-            {
-                avatarComponents?.DrawAvatar(image, fallbackText, size, shape, options);
-            }
-            catch (Exception ex)
-            {
-               // Debug.LogError("Error drawing avatar: " + ex.Message);
-            }
-        }
-
-        public void Avatar(Rect rect, Texture2D image, string fallbackText, AvatarSize size = AvatarSize.Default, AvatarShape shape = AvatarShape.Circle)
-        {
-            try
-            {
-                avatarComponents?.DrawAvatar(rect, image, fallbackText, size, shape);
-            }
-            catch (Exception ex)
-            {
-                //Debug.LogError("Error drawing avatar in rect: " + ex.Message);
-            }
-        }
-
-        public void AvatarWithStatus(Texture2D image, string fallbackText, bool isOnline, AvatarSize size = AvatarSize.Default, AvatarShape shape = AvatarShape.Circle, params GUILayoutOption[] options)
-        {
-            try
-            {
-                avatarComponents?.AvatarWithStatus(image, fallbackText, isOnline, size, shape, options);
-            }
-            catch (Exception ex)
-            {
-               // Debug.LogError("Error drawing avatar with status: " + ex.Message);
-            }
-        }
-
-        public void AvatarWithName(Texture2D image, string fallbackText, string name, AvatarSize size = AvatarSize.Default, AvatarShape shape = AvatarShape.Circle, bool showNameBelow = false, params GUILayoutOption[] options)
-        {
-            try
-            {
-                avatarComponents?.AvatarWithName(image, fallbackText, name, size, shape, showNameBelow, options);
-            }
-            catch (Exception ex)
-            {
-               // Debug.LogError("Error drawing avatar with name: " + ex.Message);
-            }
-        }
-
-        public void CustomAvatar(Texture2D image, string fallbackText, Color backgroundColor, Color textColor, AvatarSize size = AvatarSize.Default, AvatarShape shape = AvatarShape.Circle, params GUILayoutOption[] options)
-        {
-            try
-            {
-                avatarComponents?.CustomAvatar(image, fallbackText, backgroundColor, textColor, size, shape, options);
-            }
-            catch (Exception ex)
-            {
-               // Debug.LogError("Error drawing custom avatar: " + ex.Message);
-            }
-        }
-
-        public void AvatarWithBorder(Texture2D image, string fallbackText, Color borderColor, AvatarSize size = AvatarSize.Default, AvatarShape shape = AvatarShape.Circle, params GUILayoutOption[] options)
-        {
-            try
-            {
-                avatarComponents?.AvatarWithBorder(image, fallbackText, borderColor, size, shape, options);
-            }
-            catch (Exception ex)
-            {
-                //Debug.LogError("Error drawing avatar with border: " + ex.Message);
-            }
-        }
-
-        public void AvatarWithHover(Texture2D image, string fallbackText, AvatarSize size = AvatarSize.Default, AvatarShape shape = AvatarShape.Circle, Action onClick = null, params GUILayoutOption[] options)
-        {
-            try
-            {
-                avatarComponents?.AvatarWithHover(image, fallbackText, size, shape, onClick, options);
-            }
-            catch (Exception ex)
-            {
-                //Debug.LogError("Error drawing avatar with hover: " + ex.Message);
-            }
-        }
-
-        public void AvatarWithLoading(Texture2D image, string fallbackText, bool isLoading, AvatarSize size = AvatarSize.Default, AvatarShape shape = AvatarShape.Circle, params GUILayoutOption[] options)
-        {
-            try
-            {
-                avatarComponents?.AvatarWithLoading(image, fallbackText, isLoading, size, shape, options);
-            }
-            catch (Exception ex)
-            {
-              // Debug.LogError("Error drawing avatar with loading: " + ex.Message);
-            }
-        }
-
-        public void AvatarWithTooltip(Texture2D image, string fallbackText, string tooltip, AvatarSize size = AvatarSize.Default, AvatarShape shape = AvatarShape.Circle, params GUILayoutOption[] options)
-        {
-            try
-            {
-                avatarComponents?.AvatarWithTooltip(image, fallbackText, tooltip, size, shape, options);
-            }
-            catch (Exception ex)
-            {
-              //  Debug.LogError("Error drawing avatar with tooltip: " + ex.Message);
-            }
-        }
-
-        public void AvatarGroup(GUIComponents.Avatar.AvatarData[] avatars, AvatarSize size = AvatarSize.Default, AvatarShape shape = AvatarShape.Circle, int maxVisible = 3, float overlap = -8f, params GUILayoutOption[] options)
-        {
-            try
-            {
-                avatarComponents?.AvatarGroup(avatars, size, shape, maxVisible, overlap, options);
-            }
-            catch (Exception ex)
-            {
-              //  Debug.LogError("Error drawing avatar group: " + ex.Message);
-            }
-        }
-        #endregion
-
-        #region Skeleton Components
-        public void Skeleton(float width, float height, SkeletonVariant variant = SkeletonVariant.Default, SkeletonSize size = SkeletonSize.Default, params GUILayoutOption[] options)
-        {
-            try
-            {
-                skeletonComponents?.DrawSkeleton(width, height, variant, size, options);
-            }
-            catch (Exception ex)
-            {
-              //  Debug.LogError("Error drawing skeleton: " + ex.Message);
-            }
-        }
-
-        public void AnimatedSkeleton(float width, float height, SkeletonVariant variant = SkeletonVariant.Default, SkeletonSize size = SkeletonSize.Default, params GUILayoutOption[] options)
-        {
-            try
-            {
-                skeletonComponents?.AnimatedSkeleton(width, height, variant, size, options);
-            }
-            catch (Exception ex)
-            {
-                //Debug.LogError("Error drawing animated skeleton: " + ex.Message);
-            }
-        }
-
-        public void ShimmerSkeleton(float width, float height, SkeletonVariant variant = SkeletonVariant.Default, SkeletonSize size = SkeletonSize.Default, params GUILayoutOption[] options)
-        {
-            try
-            {
-                skeletonComponents?.ShimmerSkeleton(width, height, variant, size, options);
-            }
-            catch (Exception ex)
-            {
-               // Debug.LogError("Error drawing shimmer skeleton: " + ex.Message);
-            }
-        }
-
-        public void CustomSkeleton(float width, float height, Color backgroundColor, Color shimmerColor, SkeletonVariant variant = SkeletonVariant.Default, SkeletonSize size = SkeletonSize.Default, params GUILayoutOption[] options)
-        {
-            try
-            {
-                skeletonComponents?.CustomSkeleton(width, height, backgroundColor, shimmerColor, variant, size, options);
-            }
-            catch (Exception ex)
-            {
-               // Debug.LogError("Error drawing custom skeleton: " + ex.Message);
-            }
-        }
-
-        public void SkeletonText(float width, int lineCount, float lineHeight = 20f, SkeletonVariant variant = SkeletonVariant.Default, SkeletonSize size = SkeletonSize.Default, params GUILayoutOption[] options)
-        {
-            try
-            {
-                skeletonComponents?.SkeletonText(width, lineCount, options);
-            }
-            catch (Exception ex)
-            {
-              //  Debug.LogError("Error drawing skeleton text: " + ex.Message);
-            }
-        }
-
-        public void SkeletonAvatar(float size, SkeletonVariant variant = SkeletonVariant.Circular, params GUILayoutOption[] options)
-        {
-            try
-            {
-                skeletonComponents?.SkeletonAvatar(size, variant, options);
-            }
-            catch (Exception ex)
-            {
-                //Debug.LogError("Error drawing skeleton avatar: " + ex.Message);
-            }
-        }
-
-        public void SkeletonButton(float width = 120f, float height = 36f, SkeletonVariant variant = SkeletonVariant.Rounded, SkeletonSize size = SkeletonSize.Default, params GUILayoutOption[] options)
-        {
-            try
-            {
-                skeletonComponents?.SkeletonButton(width, height, variant, size, options);
-            }
-            catch (Exception ex)
-            {
-               // Debug.LogError("Error drawing skeleton button: " + ex.Message);
-            }
-        }
-
-        public void SkeletonCard(float width = 300f, float height = 200f, bool includeHeader = true, bool includeFooter = false, params GUILayoutOption[] options)
-        {
-            try
-            {
-                skeletonComponents?.SkeletonCard(width, height, includeHeader, includeFooter, options);
-            }
-            catch (Exception ex)
-            {
-               // Debug.LogError("Error drawing skeleton card: " + ex.Message);
-            }
-        }
-
-        public void SkeletonTable(int rowCount, int columnCount, float cellWidth = 100f, float cellHeight = 30f, params GUILayoutOption[] options)
-        {
-            try
-            {
-                skeletonComponents?.SkeletonTable(cellWidth, rowCount, columnCount, cellHeight, 0f, options);
-            }
-            catch (Exception ex)
-            {
-              //  Debug.LogError("Error drawing skeleton table: " + ex.Message);
-            }
-        }
-
-        public void SkeletonList(int itemCount, float itemHeight = 60f, params GUILayoutOption[] options)
-        {
-            try
-            {
-                skeletonComponents?.SkeletonList(100f, itemHeight, itemCount, 0f, options);
-            }
-            catch (Exception ex)
-            {
-              //  Debug.LogError("Error drawing skeleton list: " + ex.Message);
-            }
-        }
-
-        public void SkeletonWithProgress(float width, float height, float progress, SkeletonVariant variant = SkeletonVariant.Default, SkeletonSize size = SkeletonSize.Default, params GUILayoutOption[] options)
-        {
-            try
-            {
-                skeletonComponents?.SkeletonWithProgress(width, height, progress, variant, size, options);
-            }
-            catch (Exception ex)
-            {
-               // Debug.LogError("Error drawing skeleton with progress: " + ex.Message);
-            }
-        }
-
-        public void FadeSkeleton(float width, float height, float fadeTime, SkeletonVariant variant = SkeletonVariant.Default, SkeletonSize size = SkeletonSize.Default, params GUILayoutOption[] options)
-        {
-            try
-            {
-                skeletonComponents?.FadeSkeleton(width, height, fadeTime, variant, size, options);
-            }
-            catch (Exception ex)
-            {
-               // Debug.LogError("Error drawing fade skeleton: " + ex.Message);
-            }
-        }
-        #endregion
-
-        #region Table Components
-        public void Table(string[] headers, string[,] data, TableVariant variant = TableVariant.Default, TableSize size = TableSize.Default, params GUILayoutOption[] options)
-        {
-            try
-            {
-                tableComponents?.DrawTable(headers, data, variant, size, options);
-            }
-            catch (Exception ex)
-            {
-             //   Debug.LogError("Error drawing table: " + ex.Message);
-            }
-        }
-
-        public void Table(Rect rect, string[] headers, string[,] data, TableVariant variant = TableVariant.Default, TableSize size = TableSize.Default)
-        {
-            try
-            {
-                tableComponents?.DrawTable(rect, headers, data, variant, size);
-            }
-            catch (Exception ex)
-            {
-              //  Debug.LogError("Error drawing table in rect: " + ex.Message);
-            }
-        }
-
-        public void SortableTable(string[] headers, string[,] data, ref int[] sortColumns, ref bool[] sortAscending, TableVariant variant = TableVariant.Default, TableSize size = TableSize.Default, Action<int, bool> onSort = null, params GUILayoutOption[] options)
-        {
-            try
-            {
-                tableComponents?.SortableTable(headers, data, ref sortColumns, ref sortAscending, variant, size, onSort, options);
-            }
-            catch (Exception ex)
-            {
-              //  Debug.LogError("Error drawing sortable table: " + ex.Message);
-            }
-        }
-
-        public void SelectableTable(string[] headers, string[,] data, ref bool[] selectedRows, TableVariant variant = TableVariant.Default, TableSize size = TableSize.Default, Action<int, bool> onSelectionChange = null, params GUILayoutOption[] options)
-        {
-            try
-            {
-                tableComponents?.SelectableTable(headers, data, ref selectedRows, variant, size, onSelectionChange, options);
-            }
-            catch (Exception ex)
-            {
-              //  Debug.LogError("Error drawing selectable table: " + ex.Message);
-            }
-        }
-
-        public void CustomTable(string[] headers, object[,] data, Action<object, int, int> cellRenderer, TableVariant variant = TableVariant.Default, TableSize size = TableSize.Default, params GUILayoutOption[] options)
-        {
-            try
-            {
-                tableComponents?.CustomTable(headers, data, cellRenderer, variant, size, options);
-            }
-            catch (Exception ex)
-            {
-               // Debug.LogError("Error drawing custom table: " + ex.Message);
-            }
-        }
-
-        public void PaginatedTable(string[] headers, string[,] data, ref int currentPage, int pageSize, TableVariant variant = TableVariant.Default, TableSize size = TableSize.Default, Action<int> onPageChange = null, params GUILayoutOption[] options)
-        {
-            try
-            {
-                tableComponents?.PaginatedTable(headers, data, ref currentPage, pageSize, variant, size, onPageChange, options);
-            }
-            catch (Exception ex)
-            {
-               // Debug.LogError("Error drawing paginated table: " + ex.Message);
-            }
-        }
-
-        public void SearchableTable(string[] headers, string[,] data, ref string searchQuery, ref string[,] filteredData, TableVariant variant = TableVariant.Default, TableSize size = TableSize.Default, Action<string> onSearch = null, params GUILayoutOption[] options)
-        {
-            try
-            {
-                tableComponents?.SearchableTable(headers, data, ref searchQuery, ref filteredData, variant, size, onSearch, options);
-            }
-            catch (Exception ex)
-            {
-               // Debug.LogError("Error drawing searchable table: " + ex.Message);
-            }
-        }
-
-        public void ResizableTable(string[] headers, string[,] data, ref float[] columnWidths, TableVariant variant = TableVariant.Default, TableSize size = TableSize.Default, params GUILayoutOption[] options)
-        {
-            try
-            {
-                tableComponents?.ResizableTable(headers, data, ref columnWidths, variant, size, options);
-            }
-            catch (Exception ex)
-            {
-               // Debug.LogError("Error drawing resizable table: " + ex.Message);
-            }
-        }
-        #endregion
-
-        #region Calendar Components
-        public void Calendar()
-        {
-            try
-            {
-                calendarComponents?.DrawCalendar();
-            }
-            catch (Exception ex)
-            {
-               // Debug.LogError("Error drawing calendar: " + ex.Message);
-            }
-        }
-        #endregion
-
-        #region DropdownMenu Components
-        public void DropdownMenu()
-        {
-            try
-            {
-                dropdownMenuComponents?.DrawDropdownMenu();
-            }
-            catch (Exception ex)
-            {
-                //Debug.LogError("Error drawing dropdown menu: " + ex.Message);
-            }
-        }
-
-        public void OpenDropdownMenu(List<DropdownMenuItem> items)
-        {
-            dropdownMenuComponents?.Open(items);
-        }
-        #endregion
-
-        #region Popover Components
-        public void Popover(Action content)
-        {
-            try
-            {
-                popoverComponents?.DrawPopover(content);
-            }
-            catch (Exception ex)
-            {
-               // Debug.LogError("Error drawing popover: " + ex.Message);
-            }
-        }
-
-        public void OpenPopover()
-        {
-            popoverComponents?.Open();
-        }
-
-        public void ClosePopover()
-        {
-            popoverComponents?.Close();
-        }
-
-        public bool IsPopoverOpen()
-        {
-            return popoverComponents?.IsOpen ?? false;
-        }
-        #endregion
-
-        #region Select Components
-        public int Select(string[] items, int selectedIndex)
-        {
-            try
-            {
-                return selectComponents?.DrawSelect(items, selectedIndex) ?? selectedIndex;
-            }
-            catch (Exception ex)
-            {
-                //Debug.LogError("Error drawing select: " + ex.Message);
-                return selectedIndex;
-            }
-        }
-
-        public void OpenSelect()
-        {
-            selectComponents?.Open();
-        }
-
-        public void CloseSelect()
-        {
-            selectComponents?.Close();
-        }
-
-        public bool IsSelectOpen()
-        {
-            return selectComponents?.IsOpen ?? false;
-        }
-        #endregion
-
-        #region Dialog Components
-
-        public void DrawDialog(string dialogId, Action content, float width = 400, float height = 300) => dialogComponents?.DrawDialog(dialogId, content, width, height);
-
-        public void DrawDialog(string dialogId, string title, string description, Action content, Action footer = null, float width = 400, float height = 300) => dialogComponents?.DrawDialog(dialogId, title, description, content, footer, width, height);
-
-        public Rect GetLastRect() => GUILayoutUtility.GetLastRect();
-
-        public void OpenDialog(string dialogId) => dialogComponents?.Open(dialogId);
-
-        public void CloseDialog() => dialogComponents?.Close();
-
-        public bool IsDialogOpen() => dialogComponents?.IsOpen ?? false;
-
-        public void CloseDropdownMenu()
-        {
-            dropdownMenuComponents?.Close();
-        }
-
-        public bool IsDropdownMenuOpen()
-        {
-            return dropdownMenuComponents?.IsOpen ?? false;
-        }
-
-        public bool DrawDialogTrigger(string label, ButtonVariant variant = ButtonVariant.Default, ButtonSize size = ButtonSize.Default)
-        {
-            try
-            {
-                return dialogComponents?.DrawDialogTrigger(label, variant, size) ?? false;
-            }
-            catch (Exception ex)
-            {
-                //Debug.LogError("Error drawing dialog trigger: " + ex.Message);
-                return false;
-            }
-        }
-
-        public void DrawDialogHeader(string title, string description = null)
-        {
-            try
-            {
-                dialogComponents?.DrawDialogHeader(title, description);
-            }
-            catch (Exception ex)
-            {
-              //  Debug.LogError("Error drawing dialog header: " + ex.Message);
-            }
-        }
-
-        public void DrawDialogContent(Action content)
-        {
-            try
-            {
-                dialogComponents?.DrawDialogContent(content);
-            }
-            catch (Exception ex)
-            {
-              //  Debug.LogError("Error drawing dialog content: " + ex.Message);
-            }
-        }
-
-        public void DrawDialogFooter(Action footer)
-        {
-            try
-            {
-                dialogComponents?.DrawDialogFooter(footer);
-            }
-            catch (Exception ex)
-            {
-             //   Debug.LogError("Error drawing dialog footer: " + ex.Message);
-            }
-        }
-        #endregion
-
-        #region DatePicker Components
-        public DateTime? DatePicker(string placeholder, DateTime? selectedDate, string id = "datepicker", params GUILayoutOption[] options)
-        {
-            try
-            {
-                return datePickerComponents?.DrawDatePicker(placeholder, selectedDate, id, options) ?? selectedDate;
-            }
-            catch (Exception ex)
-            {
-              //  Debug.LogError("Error drawing date picker: " + ex.Message);
-                return selectedDate;
-            }
-        }
-
-        public DateTime? DatePickerWithLabel(string label, string placeholder, DateTime? selectedDate, string id = "datepicker", params GUILayoutOption[] options)
-        {
-            try
-            {
-                return datePickerComponents?.DrawDatePickerWithLabel(label, placeholder, selectedDate, id, options) ?? selectedDate;
-            }
-            catch (Exception ex)
-            {
-                //Debug.LogError("Error drawing date picker with label: " + ex.Message);
-                return selectedDate;
-            }
-        }
-
-        public DateTime? DateRangePicker(string placeholder, DateTime? startDate, DateTime? endDate, string id = "daterange", params GUILayoutOption[] options)
-        {
-            try
-            {
-                return datePickerComponents?.DrawDateRangePicker(placeholder, startDate, endDate, id, options) ?? startDate;
-            }
-            catch (Exception ex)
-            {
-               // Debug.LogError("Error drawing date range picker: " + ex.Message);
-                return startDate;
-            }
-        }
-
-        public void CloseDatePicker(string id)
-        {
-            try
-            {
-                datePickerComponents?.CloseDatePicker(id);
-            }
-            catch (Exception ex)
-            {
-                //Debug.LogError("Error closing date picker: " + ex.Message);
-            }
-        }
-
-        public bool IsDatePickerOpen(string id)
-        {
-            try
-            {
-                return datePickerComponents?.IsDatePickerOpen(id) ?? false;
-            }
-            catch (Exception ex)
-            {
-               // Debug.LogError("Error checking date picker state: " + ex.Message);
-                return false;
-            }
-        }
-        #endregion
-
-        #region DataTable Components
-        /// <summary>
-        /// Draws a data table with sorting, filtering, and pagination.
-        /// </summary>
-        public void DrawDataTable(string id, List<DataTableColumn> columns, List<DataTableRow> data, bool showPagination = true, bool showSearch = true, bool showSelection = true, bool showColumnToggle = false, params GUILayoutOption[] options)
-        {
-            try
-            {
-                dataTableComponents?.DrawDataTable(id, columns, data, showPagination, showSearch, showSelection, showColumnToggle, options);
-            }
-            catch (Exception ex)
-            {
-                //Debug.LogError("Error drawing data table: " + ex.Message);
-            }
-        }
-
-        /// <summary>
-        /// Creates a new DataTableColumn.
-        /// </summary>
-        public DataTableColumn CreateDataTableColumn(string id, string header, string accessorKey = null)
-        {
-            return new DataTableColumn(id, header, accessorKey);
-        }
-
-        /// <summary>
-        /// Creates a new DataTableRow.
-        /// </summary>
-        public DataTableRow CreateDataTableRow(string id)
-        {
-            return new DataTableRow(id);
+            return menuBarComponents?.IsDropdownOpen ?? false;
         }
 
-        /// <summary>
-        /// Gets the selected rows from a data table.
-        /// </summary>
-        public List<string> GetSelectedRows(string tableId)
+        public void CloseMenuBarDropdown()
         {
-            try
-            {
-                return dataTableComponents?.GetSelectedRows(tableId) ?? new List<string>();
-            }
-            catch (Exception ex)
-            {
-              //  Debug.LogError("Error getting selected rows: " + ex.Message);
-                return new List<string>();
-            }
+            menuBarComponents?.CloseDropdown();
         }
 
-        /// <summary>
-        /// Clears the selection for a data table.
-        /// </summary>
-        public void ClearSelection(string tableId)
-        {
-            try
-            {
-                dataTableComponents?.ClearSelection(tableId);
-            }
-            catch (Exception ex)
-            {
-               // Debug.LogError("Error clearing selection: " + ex.Message);
-            }
-        }
         #endregion
     }
 }

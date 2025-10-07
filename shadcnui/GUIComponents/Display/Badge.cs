@@ -25,11 +25,7 @@ namespace shadcnui.GUIComponents
 
             GUIStyle badgeStyle = styleManager.GetBadgeStyle(variant, size);
 
-#if IL2CPP_MELONLOADER
-            GUILayout.Label(text ?? "Badge", badgeStyle, (Il2CppReferenceArray<GUILayoutOption>)options);
-#else
-            GUILayout.Label(text ?? "Badge", badgeStyle, options);
-#endif
+            UnityHelpers.Label(text ?? "Badge", badgeStyle, options);
         }
 
         public void DrawBadge(Rect rect, string text, BadgeVariant variant = BadgeVariant.Default, BadgeSize size = BadgeSize.Default)
@@ -40,7 +36,7 @@ namespace shadcnui.GUIComponents
 
             Rect scaledRect = new Rect(rect.x * guiHelper.uiScale, rect.y * guiHelper.uiScale, rect.width * guiHelper.uiScale, rect.height * guiHelper.uiScale);
 
-            GUI.Label(scaledRect, text ?? "Badge", badgeStyle);
+            UnityHelpers.Label(scaledRect, text ?? "Badge", badgeStyle);
         }
 
         public void BadgeWithIcon(string text, Texture2D icon, BadgeVariant variant = BadgeVariant.Default, BadgeSize size = BadgeSize.Default, params GUILayoutOption[] options)
@@ -49,11 +45,7 @@ namespace shadcnui.GUIComponents
 
             if (icon != null)
             {
-#if IL2CPP_MELONLOADER
-                GUILayout.Label(icon, GUI.skin.label, (Il2CppReferenceArray<GUILayoutOption>)new GUILayoutOption[] { GUILayout.Width(16 * guiHelper.uiScale), GUILayout.Height(16 * guiHelper.uiScale) });
-#else
-                GUILayout.Label(icon, GUILayout.Width(16 * guiHelper.uiScale), GUILayout.Height(16 * guiHelper.uiScale));
-#endif
+                UnityHelpers.Label(icon, GUILayout.Width(16 * guiHelper.uiScale), GUILayout.Height(16 * guiHelper.uiScale));
                 layoutComponents.AddSpace(4);
             }
 
@@ -74,11 +66,7 @@ namespace shadcnui.GUIComponents
             customStyle.border = new UnityHelpers.RectOffset(4, 4, 2, 2);
             customStyle.alignment = TextAnchor.MiddleCenter;
 
-#if IL2CPP_MELONLOADER
-            GUILayout.Label(text ?? "Badge", customStyle, (Il2CppReferenceArray<GUILayoutOption>)options);
-#else
-            GUILayout.Label(text ?? "Badge", customStyle, options);
-#endif
+            UnityHelpers.Label(text ?? "Badge", customStyle, options);
         }
 
         public void CountBadge(int count, BadgeVariant variant = BadgeVariant.Default, BadgeSize size = BadgeSize.Default, int maxCount = 99, params GUILayoutOption[] options)
@@ -105,11 +93,8 @@ namespace shadcnui.GUIComponents
                     margin = new UnityHelpers.RectOffset(0, 0, 0, 0),
                 };
 
-#if IL2CPP_MELONLOADER
-                GUILayout.Label(GUIContent.none, dotStyle, (Il2CppReferenceArray<GUILayoutOption>)null);
-#else
-                GUILayout.Label("", dotStyle);
-#endif
+                UnityHelpers.Label("", dotStyle);
+
                 layoutComponents.AddSpace(4);
             }
 
@@ -125,11 +110,9 @@ namespace shadcnui.GUIComponents
             DrawBadge(text, variant, size, options);
 
             layoutComponents.AddSpace(4);
-#if IL2CPP_MELONLOADER
-            bool closeClicked = GUILayout.Button("×", GUI.skin.button, new Il2CppReferenceArray<GUILayoutOption>(new GUILayoutOption[] { GUILayout.Width(16 * guiHelper.uiScale), GUILayout.Height(16 * guiHelper.uiScale) }));
-#else
-            bool closeClicked = GUILayout.Button("×", GUI.skin.button, new GUILayoutOption[] { GUILayout.Width(16 * guiHelper.uiScale), GUILayout.Height(16 * guiHelper.uiScale) });
-#endif
+
+            bool closeClicked = UnityHelpers.Button("×", GUI.skin.button, new GUILayoutOption[] { GUILayout.Width(16 * guiHelper.uiScale), GUILayout.Height(16 * guiHelper.uiScale) });
+
             if (closeClicked && onDismiss != null)
             {
                 onDismiss.Invoke();
@@ -194,11 +177,8 @@ namespace shadcnui.GUIComponents
                 Color originalColor = GUI.color;
                 GUI.color = new Color(originalColor.r, originalColor.g, originalColor.b, 0.6f);
 
-#if IL2CPP_MELONLOADER
-                GUILayout.Label("?", tooltipStyle, (Il2CppReferenceArray<GUILayoutOption>)null);
-#else
-                GUILayout.Label("?", tooltipStyle);
-#endif
+                UnityHelpers.Label("?", tooltipStyle);
+
                 GUI.color = originalColor;
             }
 
@@ -253,11 +233,7 @@ namespace shadcnui.GUIComponents
             GUIStyle roundedStyle = new UnityHelpers.GUIStyle(badgeStyle);
             roundedStyle.border = new UnityHelpers.RectOffset(Mathf.RoundToInt(cornerRadius * guiHelper.uiScale), Mathf.RoundToInt(cornerRadius * guiHelper.uiScale), Mathf.RoundToInt(cornerRadius * guiHelper.uiScale), Mathf.RoundToInt(cornerRadius * guiHelper.uiScale));
 
-#if IL2CPP_MELONLOADER
-            GUILayout.Label(text ?? "Badge", roundedStyle, (Il2CppReferenceArray<GUILayoutOption>)options);
-#else
-            GUILayout.Label(text ?? "Badge", roundedStyle, options);
-#endif
+            UnityHelpers.Label(text ?? "Badge", roundedStyle, options);
         }
 
         private int GetBadgeFontSize(BadgeSize size)

@@ -3,7 +3,7 @@
         <AssemblyName>shadcnui testing</AssemblyName>
         <GenerateAssemblyInfo>False</GenerateAssemblyInfo>
         <TargetFramework>netstandard2.1</TargetFramework>
-        <LangVersion>8.0</LangVersion>
+        <LangVersion>10.0</LangVersion>
         <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
         <Configurations>IL2CPP_Melonloader;IL2CPP_BepInEx;Mono_Melonloader;Mono_BepInEx</Configurations>
     </PropertyGroup>

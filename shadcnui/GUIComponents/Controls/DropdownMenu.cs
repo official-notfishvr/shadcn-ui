@@ -25,11 +25,7 @@ namespace shadcnui.GUIComponents
         public DropdownMenuItem(DropdownMenuItemType type, string text = null, Action onClick = null, bool isSelected = false, Texture2D icon = null)
         {
             Type = type;
-#if IL2CPP_MELONLOADER
-            Content = new GUIContent(text, icon, "");
-#else
             Content = new UnityHelpers.GUIContent(text, icon);
-#endif
             OnClick = onClick;
             IsSelected = isSelected;
             SubItems = new List<DropdownMenuItem>();
@@ -71,31 +67,21 @@ namespace shadcnui.GUIComponents
                 return;
 
             var styleManager = guiHelper.GetStyleManager();
-#if IL2CPP_MELONLOADER
-            layoutComponents.BeginVerticalGroup(styleManager.dropdownMenuContentStyle, (Il2CppReferenceArray<GUILayoutOption>)new GUILayoutOption[] { GUILayout.ExpandWidth(true), GUILayout.MinHeight(0), GUILayout.MaxHeight(200) });
-#else
+
             layoutComponents.BeginVerticalGroup(styleManager.dropdownMenuContentStyle, GUILayout.ExpandWidth(true), GUILayout.MinHeight(0), GUILayout.MaxHeight(200));
-#endif
             scrollPosition = layoutComponents.DrawScrollView(
                 scrollPosition,
                 () =>
                 {
                     if (menuStack.Count > 1)
                     {
-#if IL2CPP_MELONLOADER
-                        if (GUILayout.Button("<- Back", styleManager.dropdownMenuItemStyle, new Il2CppReferenceArray<GUILayoutOption>(new GUILayoutOption[0])))
-#else
-                        if (GUILayout.Button("<- Back", styleManager.dropdownMenuItemStyle))
-#endif
+                        if (UnityHelpers.Button("<- Back", styleManager.dropdownMenuItemStyle))
                         {
                             menuStack.Pop();
                             return;
                         }
-#if IL2CPP_MELONLOADER
-                        GUILayout.Box("", styleManager.dropdownMenuSeparatorStyle, new Il2CppReferenceArray<GUILayoutOption>(new GUILayoutOption[0]));
-#else
-                        GUILayout.Box("", styleManager.dropdownMenuSeparatorStyle);
-#endif
+
+                        UnityHelpers.Box("", styleManager.dropdownMenuSeparatorStyle);
                     }
 
                     var currentItems = menuStack.Peek();
@@ -104,12 +90,8 @@ namespace shadcnui.GUIComponents
                         DrawMenuItem(item);
                     }
                 },
-#if IL2CPP_MELONLOADER
-                (Il2CppReferenceArray<GUILayoutOption>)new GUILayoutOption[] { GUILayout.ExpandWidth(true), GUILayout.ExpandHeight(true) }
-#else
                 GUILayout.ExpandWidth(true),
                 GUILayout.ExpandHeight(true)
-#endif
             );
             layoutComponents.EndVerticalGroup();
         }

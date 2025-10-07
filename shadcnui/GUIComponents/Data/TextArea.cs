@@ -42,11 +42,8 @@ namespace shadcnui.GUIComponents
             GUI.SetNextControlName("textarea_" + text?.GetHashCode());
 
             string result;
-#if IL2CPP_MELONLOADER
-            result = GUILayout.TextArea(text ?? (string.IsNullOrEmpty(placeholder) ? "" : placeholder), textAreaStyle, (Il2CppReferenceArray<GUILayoutOption>)layoutOptions.ToArray());
-#else
-            result = GUILayout.TextArea(text ?? (string.IsNullOrEmpty(placeholder) ? "" : placeholder), textAreaStyle, layoutOptions.ToArray());
-#endif
+
+            result = UnityHelpers.TextArea(text ?? (string.IsNullOrEmpty(placeholder) ? "" : placeholder), textAreaStyle, layoutOptions.ToArray());
 
             GUI.enabled = wasEnabled;
 
@@ -102,11 +99,7 @@ namespace shadcnui.GUIComponents
 
             if (!string.IsNullOrEmpty(label))
             {
-#if IL2CPP_MELONLOADER
-                GUILayout.Label(new GUIContent(label), styleManager.GetLabelStyle(LabelVariant.Default), (Il2CppReferenceArray<GUILayoutOption>)null);
-#else
-                GUILayout.Label(label, styleManager.GetLabelStyle(LabelVariant.Default));
-#endif
+                UnityHelpers.Label(label, styleManager.GetLabelStyle(LabelVariant.Default));
                 layoutComponents.AddSpace(4);
             }
 
@@ -124,11 +117,7 @@ namespace shadcnui.GUIComponents
 
                 var countStyle = new UnityHelpers.GUIStyle(styleManager.GetLabelStyle(LabelVariant.Muted)) { normal = { textColor = countColor } };
 
-#if IL2CPP_MELONLOADER
-                GUILayout.Label(new GUIContent(countText), countStyle, (Il2CppReferenceArray<GUILayoutOption>)null);
-#else
-                GUILayout.Label(countText, countStyle);
-#endif
+                UnityHelpers.Label(countText, countStyle);
 
                 layoutComponents.EndHorizontalGroup();
             }
@@ -153,11 +142,8 @@ namespace shadcnui.GUIComponents
             GUILayout.FlexibleSpace();
 
             var styleManager = guiHelper.GetStyleManager();
-#if IL2CPP_MELONLOADER
-            if (GUILayout.Button("⋮⋮⋮", styleManager.GetLabelStyle(LabelVariant.Muted), new Il2CppReferenceArray<GUILayoutOption>(new GUILayoutOption[] { GUILayout.Width(20 * guiHelper.uiScale), GUILayout.Height(10 * guiHelper.uiScale) })))
-#else
-            if (GUILayout.Button("⋮⋮⋮", styleManager.GetLabelStyle(LabelVariant.Muted), new GUILayoutOption[] { GUILayout.Width(20 * guiHelper.uiScale), GUILayout.Height(10 * guiHelper.uiScale) }))
-#endif
+
+            if (UnityHelpers.Button("⋮⋮⋮", styleManager.GetLabelStyle(LabelVariant.Muted), new GUILayoutOption[] { GUILayout.Width(20 * guiHelper.uiScale), GUILayout.Height(10 * guiHelper.uiScale) }))
             {
                 height = height >= maxHeight ? minHeight : height + 20f;
             }
