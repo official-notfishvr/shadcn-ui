@@ -17,6 +17,7 @@ namespace shadcnui.GUIComponents
             Left,
             Right,
         }
+
         public enum TabPosition
         {
             Top,
@@ -67,18 +68,8 @@ namespace shadcnui.GUIComponents
                                 tabOptions.AddRange(options);
 
                             bool clicked = false;
-#if IL2CPP_MELONLOADER
-                            clicked = GUILayout.Button(tabNames[i] ?? $"Tab {i + 1}", triggerStyle, tabOptions.ToArray());
-#elif IL2CPP_BEPINEX
-                            var optionsArray = new Il2CppReferenceArray<GUILayoutOption>(tabOptions.Count);
-                            for (int j = 0; j < tabOptions.Count; j++)
-                            {
-                                optionsArray[j] = tabOptions[j];
-                            }
-                            clicked = GUILayout.Button(tabNames[i] ?? $"Tab {i + 1}", triggerStyle, optionsArray);
-#else
-                            clicked = GUILayout.Button(tabNames[i] ?? $"Tab {i + 1}", triggerStyle, tabOptions.ToArray());
-#endif
+
+                            clicked = UnityHelpers.Button(tabNames[i] ?? $"Tab {i + 1}", triggerStyle, tabOptions.ToArray());
                             if (clicked && i != selectedIndex)
                             {
                                 newSelectedIndex = i;
@@ -91,14 +82,16 @@ namespace shadcnui.GUIComponents
                             }
                         }
                     }
-                    catch (Exception)
-                    {
-                    }
+                    catch (Exception) { }
                     finally
                     {
                         if (horizontalStarted)
                         {
-                            try { layoutComponents.EndHorizontalGroup(); } catch { }
+                            try
+                            {
+                                layoutComponents.EndHorizontalGroup();
+                            }
+                            catch { }
                         }
                     }
                 }
@@ -197,18 +190,9 @@ namespace shadcnui.GUIComponents
                                     tabOptions.AddRange(options);
 
                                 bool clicked = false;
-#if IL2CPP_MELONLOADER
-                                clicked = GUILayout.Button(tabNames[i] ?? $"Tab {i + 1}", triggerStyle, tabOptions.ToArray());
-#elif IL2CPP_BEPINEX
-                                var optionsArray = new Il2CppReferenceArray<GUILayoutOption>(tabOptions.Count);
-                                for (int j = 0; j < tabOptions.Count; j++)
-                                {
-                                    optionsArray[j] = tabOptions[j];
-                                }
-                                clicked = GUILayout.Button(tabNames[i] ?? $"Tab {i + 1}", triggerStyle, optionsArray);
-#else
-                                clicked = GUILayout.Button(tabNames[i] ?? $"Tab {i + 1}", triggerStyle, tabOptions.ToArray());
-#endif
+
+                                clicked = UnityHelpers.Button(tabNames[i] ?? $"Tab {i + 1}", triggerStyle, tabOptions.ToArray());
+
                                 if (clicked && i != selectedIndex)
                                 {
                                     newSelectedIndex = i;
@@ -220,26 +204,30 @@ namespace shadcnui.GUIComponents
                                 }
                             }
                         }
-                        catch (Exception)
-                        {
-                        }
+                        catch (Exception) { }
                         finally
                         {
                             if (verticalStarted)
                             {
-                                try { layoutComponents.EndVerticalGroup(); } catch { }
+                                try
+                                {
+                                    layoutComponents.EndVerticalGroup();
+                                }
+                                catch { }
                             }
                         }
                     }
                 }
-                catch (Exception)
-                {
-                }
+                catch (Exception) { }
                 finally
                 {
                     if (outerHorizontalStarted)
                     {
-                        try { layoutComponents.EndHorizontalGroup(); } catch { }
+                        try
+                        {
+                            layoutComponents.EndHorizontalGroup();
+                        }
+                        catch { }
                     }
                 }
             };
@@ -261,15 +249,16 @@ namespace shadcnui.GUIComponents
                     drawTabs();
                 }
             }
-            catch (Exception)
-            {
-
-            }
+            catch (Exception) { }
             finally
             {
                 if (mainHorizontalStarted)
                 {
-                    try { layoutComponents.EndHorizontalGroup(); } catch { }
+                    try
+                    {
+                        layoutComponents.EndHorizontalGroup();
+                    }
+                    catch { }
                 }
             }
 

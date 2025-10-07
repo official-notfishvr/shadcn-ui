@@ -188,11 +188,8 @@ namespace shadcnui.GUIComponents
             inputStyle.stretchWidth = true;
 
             string placeholder = string.IsNullOrEmpty(state.FilterText) ? "Filter..." : "";
-#if IL2CPP_MELONLOADER
-            string newFilterText = GUILayout.TextField(state.FilterText, inputStyle, new Il2CppReferenceArray<GUILayoutOption>(0));
-#else
-            string newFilterText = GUILayout.TextField(state.FilterText, inputStyle);
-#endif
+
+            string newFilterText = UnityHelpers.TextField(state.FilterText, inputStyle);
             if (newFilterText != state.FilterText)
             {
                 state.FilterText = newFilterText;
@@ -225,11 +222,7 @@ namespace shadcnui.GUIComponents
                 checkboxStyle.fixedHeight = 16;
                 checkboxStyle.margin = new UnityHelpers.RectOffset(0, 8, 0, 0);
 
-#if IL2CPP_MELONLOADER
-                bool newSelectAll = GUILayout.Toggle(state.SelectAll, new GUIContent(""), checkboxStyle, Layout.EmptyOptions);
-#else
-                bool newSelectAll = GUILayout.Toggle(state.SelectAll, "", checkboxStyle);
-#endif
+                bool newSelectAll = UnityHelpers.Toggle(state.SelectAll, "", checkboxStyle);
                 if (newSelectAll != state.SelectAll)
                 {
                     state.SelectAll = newSelectAll;
@@ -316,11 +309,7 @@ namespace shadcnui.GUIComponents
                 rowStyle.padding = new UnityHelpers.RectOffset(12, 12, 8, 8);
                 rowStyle.margin = new UnityHelpers.RectOffset(0, 0, 0, 0);
 
-#if IL2CPP_MELONLOADER
-                GUILayout.BeginHorizontal(rowStyle, new Il2CppReferenceArray<GUILayoutOption>(new GUILayoutOption[] { GUILayout.ExpandWidth(true), GUILayout.Height(40) }));
-#else
-                GUILayout.BeginHorizontal(rowStyle, GUILayout.ExpandWidth(true), GUILayout.Height(40));
-#endif
+                _layoutComponents.BeginHorizontalGroup(rowStyle, GUILayout.ExpandWidth(true), GUILayout.Height(40));
 
                 if (showSelection)
                 {
@@ -329,11 +318,8 @@ namespace shadcnui.GUIComponents
                     checkboxStyle.fixedHeight = 16;
                     checkboxStyle.margin = new UnityHelpers.RectOffset(0, 8, 0, 0);
 
-#if IL2CPP_MELONLOADER
-                    bool newSelected = GUILayout.Toggle(isSelected, new GUIContent(""), checkboxStyle, new Il2CppReferenceArray<GUILayoutOption>(new GUILayoutOption[] { GUILayout.Width(24) }));
-#else
-                    bool newSelected = GUILayout.Toggle(isSelected, "", checkboxStyle, GUILayout.Width(24));
-#endif
+                    bool newSelected = UnityHelpers.Toggle(isSelected, "", checkboxStyle, GUILayout.Width(24));
+
                     if (newSelected != isSelected)
                     {
                         if (newSelected)
@@ -376,11 +362,7 @@ namespace shadcnui.GUIComponents
                         displayText = $"[{column.AccessorKey}]";
                     }
 
-#if IL2CPP_MELONLOADER
-                    GUILayout.Label(new GUIContent(displayText), cellStyle, new Il2CppReferenceArray<GUILayoutOption>(new GUILayoutOption[] { GUILayout.Width(column.Width) }));
-#else
-                    GUILayout.Label(displayText, cellStyle, GUILayout.Width(column.Width));
-#endif
+                    UnityHelpers.Label(displayText, cellStyle, GUILayout.Width(column.Width));
                 }
 
                 GUILayout.EndHorizontal();
@@ -421,20 +403,12 @@ namespace shadcnui.GUIComponents
 
             GUILayout.FlexibleSpace();
 
-#if IL2CPP_MELONLOADER
-            if (GUILayout.Button("‹‹", _styleManager.buttonOutlineStyle, new Il2CppReferenceArray<GUILayoutOption>(new GUILayoutOption[] { GUILayout.Width(32) })))
-#else
-            if (GUILayout.Button("‹‹", _styleManager.buttonOutlineStyle, GUILayout.Width(32)))
-#endif
+            if (UnityHelpers.Button("‹‹", _styleManager.buttonOutlineStyle, GUILayout.Width(32)))
             {
                 state.CurrentPage = 0;
             }
 
-#if IL2CPP_MELONLOADER
-            if (GUILayout.Button("‹", _styleManager.buttonOutlineStyle, new Il2CppReferenceArray<GUILayoutOption>(new GUILayoutOption[] { GUILayout.Width(32) })))
-#else
-            if (GUILayout.Button("‹", _styleManager.buttonOutlineStyle, GUILayout.Width(32)))
-#endif
+            if (UnityHelpers.Button("‹", _styleManager.buttonOutlineStyle, GUILayout.Width(32)))
             {
                 if (state.CurrentPage > 0)
                     state.CurrentPage--;
@@ -442,21 +416,13 @@ namespace shadcnui.GUIComponents
 
             _guiHelper.Label($"Page {state.CurrentPage + 1} of {totalPages}", LabelVariant.Default);
 
-#if IL2CPP_MELONLOADER
-            if (GUILayout.Button("›", _styleManager.buttonOutlineStyle, new Il2CppReferenceArray<GUILayoutOption>(new GUILayoutOption[] { GUILayout.Width(32) })))
-#else
-            if (GUILayout.Button("›", _styleManager.buttonOutlineStyle, GUILayout.Width(32)))
-#endif
+            if (UnityHelpers.Button("›", _styleManager.buttonOutlineStyle, GUILayout.Width(32)))
             {
                 if (state.CurrentPage < totalPages - 1)
                     state.CurrentPage++;
             }
 
-#if IL2CPP_MELONLOADER
-            if (GUILayout.Button("››", _styleManager.buttonOutlineStyle, new Il2CppReferenceArray<GUILayoutOption>(new GUILayoutOption[] { GUILayout.Width(32) })))
-#else
-            if (GUILayout.Button("››", _styleManager.buttonOutlineStyle, GUILayout.Width(32)))
-#endif
+            if (UnityHelpers.Button("››", _styleManager.buttonOutlineStyle, GUILayout.Width(32)))
             {
                 state.CurrentPage = totalPages - 1;
             }

@@ -24,11 +24,7 @@ namespace shadcnui.GUIComponents
             var styleManager = guiHelper.GetStyleManager();
             if (styleManager == null)
             {
-#if IL2CPP_MELONLOADER
-                return GUILayout.Toggle(value, text ?? "Switch", GUI.skin.toggle, new Il2CppReferenceArray<GUILayoutOption>(0));
-#else
-                return GUILayout.Toggle(value, text ?? "Switch", GUI.skin.toggle, new GUILayoutOption[0]);
-#endif
+                return UnityHelpers.Toggle(value, text ?? "Switch", GUI.skin.toggle, new GUILayoutOption[0]);
             }
 
             GUIStyle switchStyle = styleManager.GetSwitchStyle(variant, size);
@@ -38,11 +34,8 @@ namespace shadcnui.GUIComponents
                 GUI.enabled = false;
 
             bool newValue;
-#if IL2CPP_MELONLOADER
-            newValue = GUILayout.Toggle(value, text ?? "Switch", switchStyle, (Il2CppReferenceArray<GUILayoutOption>)options);
-#else
-            newValue = GUILayout.Toggle(value, text ?? "Switch", switchStyle, options);
-#endif
+
+            newValue = UnityHelpers.Toggle(value, text ?? "Switch", switchStyle, options);
 
             GUI.enabled = wasEnabled;
 
@@ -99,11 +92,7 @@ namespace shadcnui.GUIComponents
                 GUI.color = new Color(originalColor.r, originalColor.g, originalColor.b, 0.7f);
             }
 
-#if IL2CPP_MELONLOADER
-            GUILayout.Label(label ?? "", labelStyle, (Il2CppReferenceArray<GUILayoutOption>)null);
-#else
-            GUILayout.Label(label ?? "", labelStyle);
-#endif
+            UnityHelpers.Label(label ?? "", labelStyle);
 
             GUI.color = originalColor;
             layoutComponents.EndHorizontalGroup();
@@ -129,11 +118,8 @@ namespace shadcnui.GUIComponents
                 }
 
                 layoutComponents.AddSpace(2);
-#if IL2CPP_MELONLOADER
-                GUILayout.Label(description, descStyle, (Il2CppReferenceArray<GUILayoutOption>)null);
-#else
-                GUILayout.Label(description, descStyle);
-#endif
+
+                UnityHelpers.Label(description, descStyle);
 
                 GUI.color = originalColor;
             }
@@ -158,11 +144,8 @@ namespace shadcnui.GUIComponents
                 GUI.enabled = false;
 
             bool newValue;
-#if IL2CPP_MELONLOADER
-            newValue = GUILayout.Toggle(value, text ?? "Switch", customStyle, options != null && options.Length > 0 ? new Il2CppReferenceArray<GUILayoutOption>(options) : new Il2CppReferenceArray<GUILayoutOption>(0));
-#else
-            newValue = GUILayout.Toggle(value, text ?? "Switch", customStyle, options);
-#endif
+
+            newValue = UnityHelpers.Toggle(value, text ?? "Switch", customStyle, options);
 
             GUI.enabled = wasEnabled;
 
@@ -185,11 +168,8 @@ namespace shadcnui.GUIComponents
             if (iconToShow != null)
             {
                 GUILayout.Space(4 * guiHelper.uiScale);
-#if IL2CPP_MELONLOADER
-                GUILayout.Label(iconToShow, GUI.skin.label, new Il2CppReferenceArray<GUILayoutOption>(new GUILayoutOption[] { GUILayout.Width(16 * guiHelper.uiScale), GUILayout.Height(16 * guiHelper.uiScale) }));
-#else
-                GUILayout.Label(iconToShow, GUILayout.Width(16 * guiHelper.uiScale), GUILayout.Height(16 * guiHelper.uiScale));
-#endif
+
+                UnityHelpers.Label(iconToShow, GUILayout.Width(16 * guiHelper.uiScale), GUILayout.Height(16 * guiHelper.uiScale));
             }
 
             if (!string.IsNullOrEmpty(text))
@@ -204,11 +184,7 @@ namespace shadcnui.GUIComponents
                     GUI.color = new Color(originalColor.r, originalColor.g, originalColor.b, 0.7f);
                 }
 
-#if IL2CPP_MELONLOADER
-                GUILayout.Label(text, labelStyle, (Il2CppReferenceArray<GUILayoutOption>)null);
-#else
-                GUILayout.Label(text, labelStyle);
-#endif
+                UnityHelpers.Label(text, labelStyle);
 
                 GUI.color = originalColor;
             }
@@ -230,11 +206,7 @@ namespace shadcnui.GUIComponents
                 GUIStyle errorStyle = styleManager?.GetLabelStyle(LabelVariant.Destructive) ?? GUI.skin.label;
 
                 layoutComponents.AddSpace(2);
-#if IL2CPP_MELONLOADER
-                GUILayout.Label(validationMessage, errorStyle, (Il2CppReferenceArray<GUILayoutOption>)null);
-#else
-                GUILayout.Label(validationMessage, errorStyle);
-#endif
+                UnityHelpers.Label(validationMessage, errorStyle);
             }
 
             layoutComponents.EndVerticalGroup();
@@ -258,11 +230,7 @@ namespace shadcnui.GUIComponents
                 Color originalColor = GUI.color;
                 GUI.color = new Color(originalColor.r, originalColor.g, originalColor.b, 0.6f);
 
-#if IL2CPP_MELONLOADER
-                GUILayout.Label("?", tooltipStyle, (Il2CppReferenceArray<GUILayoutOption>)null);
-#else
-                GUILayout.Label("?", tooltipStyle);
-#endif
+                UnityHelpers.Label("?", tooltipStyle);
                 GUI.color = originalColor;
             }
 
@@ -340,11 +308,7 @@ namespace shadcnui.GUIComponents
                 Color originalColor = GUI.color;
                 GUI.color = new Color(originalColor.r, originalColor.g, originalColor.b, alpha);
 
-#if IL2CPP_MELONLOADER
-                GUILayout.Label("...", loadingStyle, (Il2CppReferenceArray<GUILayoutOption>)null);
-#else
-                GUILayout.Label("...", loadingStyle);
-#endif
+                UnityHelpers.Label("...", loadingStyle);
                 GUI.color = originalColor;
             }
 

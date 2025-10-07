@@ -79,24 +79,20 @@ namespace shadcnui.GUIComponents
         public Color BadgeSecondaryBg { get; set; }
         public Color BadgeDestructiveBg { get; set; }
 
-        // Alert
-        public Color AlertDefaultBg { get; set; }
-        public Color AlertDefaultFg { get; set; }
-        public Color AlertDestructiveBg { get; set; }
-        public Color AlertDestructiveFg { get; set; }
-
         // Avatar
         public Color AvatarBg { get; set; }
         public Color AvatarFallbackBg { get; set; }
         public Color AvatarFallbackFg { get; set; }
 
-        // Skeleton
-        public Color SkeletonBg { get; set; }
-
         // Table
         public Color TableBg { get; set; }
         public Color TableHeaderBg { get; set; }
         public Color TableCellBg { get; set; }
+
+        // Chart
+        public Color ChartBg { get; set; }
+        public Color ChartGridColor { get; set; }
+        public Color ChartAxisColor { get; set; }
 
         public static Theme Dark = new Theme
         {
@@ -172,24 +168,20 @@ namespace shadcnui.GUIComponents
             BadgeSecondaryBg = new Color(0.118f, 0.161f, 0.231f),
             BadgeDestructiveBg = new Color(0.937f, 0.266f, 0.266f),
 
-            // Alert colors
-            AlertDefaultBg = new Color(0.012f, 0.027f, 0.071f, 0.8f),
-            AlertDefaultFg = new Color(0.980f, 0.988f, 0.996f),
-            AlertDestructiveBg = new Color(0.937f, 0.266f, 0.266f, 0.1f),
-            AlertDestructiveFg = new Color(0.937f, 0.266f, 0.266f),
-
             // Avatar colors
             AvatarBg = new Color(0.118f, 0.161f, 0.231f),
             AvatarFallbackBg = new Color(0.118f, 0.161f, 0.231f),
             AvatarFallbackFg = new Color(0.980f, 0.988f, 0.996f),
 
-            // Skeleton colors
-            SkeletonBg = new Color(0.059f, 0.071f, 0.165f, 0.3f),
-
             // Table colors
             TableBg = new Color(0.012f, 0.027f, 0.071f),
             TableHeaderBg = new Color(0.118f, 0.161f, 0.231f),
             TableCellBg = new Color(0.012f, 0.027f, 0.071f),
+
+            // Chart colors
+            ChartBg = new Color(0.059f, 0.071f, 0.165f), // hsl(222.2 47.4% 11.2%)
+            ChartGridColor = new Color(0.118f, 0.161f, 0.231f, 0.2f),
+            ChartAxisColor = new Color(0.639f, 0.651f, 0.667f, 0.6f),
         };
 
         public static Theme Light = new Theme
@@ -265,24 +257,20 @@ namespace shadcnui.GUIComponents
             BadgeSecondaryBg = new Color(0.945f, 0.961f, 0.976f),
             BadgeDestructiveBg = new Color(0.937f, 0.266f, 0.266f),
 
-            // Alert colors
-            AlertDefaultBg = new Color(1.0f, 1.0f, 1.0f),
-            AlertDefaultFg = new Color(0.020f, 0.024f, 0.031f),
-            AlertDestructiveBg = new Color(0.937f, 0.266f, 0.266f, 0.1f),
-            AlertDestructiveFg = new Color(0.937f, 0.266f, 0.266f),
-
             // Avatar colors
             AvatarBg = new Color(0.945f, 0.961f, 0.976f),
             AvatarFallbackBg = new Color(0.945f, 0.961f, 0.976f),
             AvatarFallbackFg = new Color(0.020f, 0.024f, 0.031f),
 
-            // Skeleton colors
-            SkeletonBg = new Color(0.886f, 0.898f, 0.918f, 0.5f),
-
             // Table colors
             TableBg = new Color(1.0f, 1.0f, 1.0f),
             TableHeaderBg = new Color(0.945f, 0.961f, 0.976f),
             TableCellBg = new Color(1.0f, 1.0f, 1.0f),
+
+            // Chart colors
+            ChartBg = new Color(1.0f, 1.0f, 1.0f), // hsl(0 0% 100%)
+            ChartGridColor = new Color(0.886f, 0.898f, 0.918f, 0.4f),
+            ChartAxisColor = new Color(0.396f, 0.447f, 0.525f, 0.7f),
         };
     }
 }

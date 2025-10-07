@@ -27,8 +27,9 @@
         </member>
         <member name="E:BepInEx.Unity.IL2CPP.IL2CPPChainloader.PluginLoad">
             <summary>
-                Occurs after a plugin is instantiated and just before <see cref="M:BepInEx.Unity.IL2CPP.BasePlugin.Load"/> is called.
-            </summary>
+                Occurs after a plugin is instantiated and just before <see cref="M:BepInEx.Unity.IL2CPP.BasePlugin.Load" /> is called.
+            </summary
+            >
         </member>
         <member name="M:Doorstop.Entrypoint.Start">
             <summary>

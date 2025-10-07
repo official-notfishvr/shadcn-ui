@@ -1,7 +1,7 @@
+using UnityEngine;
 #if IL2CPP_MELONLOADER
 using UnhollowerBaseLib;
 #endif
-using UnityEngine;
 
 namespace shadcnui
 {
@@ -269,7 +269,6 @@ namespace shadcnui
                 get { return _font.name; }
             }
 
-
             public Font(string name)
             {
 #if IL2CPP_BEPINEX || IL2CPP_MELONLOADER
@@ -347,7 +346,7 @@ namespace shadcnui
 #if IL2CPP_BEPINEX || IL2CPP_MELONLOADER
                 _guiContent = new UnityEngine.GUIContent(text, image, "");
 #else
-        _guiContent = new UnityEngine.GUIContent(text, image);
+                _guiContent = new UnityEngine.GUIContent(text, image);
 #endif
             }
 
@@ -378,5 +377,185 @@ namespace shadcnui
             }
         }
 
+        public static bool Button(string text, GUIStyle style, params GUILayoutOption[] options)
+        {
+#if IL2CPP_MELONLOADER
+            return GUILayout.Button(text, style, (Il2CppReferenceArray<GUILayoutOption>)options);
+#else
+            return GUILayout.Button(text, style, options);
+#endif
+        }
+
+        public static void Label(UnityEngine.GUIContent content, GUIStyle style)
+        {
+#if IL2CPP_MELONLOADER
+            GUILayout.Label(content, style, (Il2CppReferenceArray<GUILayoutOption>)null);
+#else
+            GUILayout.Label(content, style);
+#endif
+        }
+
+        public static void Label(string text, params GUILayoutOption[] options)
+        {
+#if IL2CPP_MELONLOADER
+            GUILayout.Label(text, (Il2CppReferenceArray<GUILayoutOption>)options);
+#else
+            GUILayout.Label(text, options);
+#endif
+        }
+
+        public static void Label(string text, GUIStyle style)
+        {
+#if IL2CPP_MELONLOADER
+            GUILayout.Label(text, style, (Il2CppReferenceArray<GUILayoutOption>)null);
+#else
+            GUILayout.Label(text, style);
+#endif
+        }
+
+        public static bool Button(string text, params GUILayoutOption[] options)
+        {
+#if IL2CPP_MELONLOADER
+            return GUILayout.Button(text, (Il2CppReferenceArray<GUILayoutOption>)options);
+#else
+            return GUILayout.Button(text, options);
+#endif
+        }
+
+        public static bool Button(string text, GUIStyle style)
+        {
+#if IL2CPP_MELONLOADER
+            return GUILayout.Button(text, style, (Il2CppReferenceArray<GUILayoutOption>)null);
+#else
+            return GUILayout.Button(text, style);
+#endif
+        }
+
+        public static bool Toggle(bool value, string text, params GUILayoutOption[] options)
+        {
+#if IL2CPP_MELONLOADER
+            return GUILayout.Toggle(value, text, (Il2CppReferenceArray<GUILayoutOption>)options);
+#else
+            return GUILayout.Toggle(value, text, options);
+#endif
+        }
+
+        public static bool Toggle(bool value, string text, GUIStyle style)
+        {
+#if IL2CPP_MELONLOADER
+            return GUILayout.Toggle(value, text, style, (Il2CppReferenceArray<GUILayoutOption>)null);
+#else
+            return GUILayout.Toggle(value, text, style);
+#endif
+        }
+
+        public static bool Toggle(bool value, string text, GUIStyle style, params GUILayoutOption[] options)
+        {
+#if IL2CPP_MELONLOADER
+            return GUILayout.Toggle(value, text, style, (Il2CppReferenceArray<GUILayoutOption>)options);
+#else
+            return GUILayout.Toggle(value, text, style, options);
+#endif
+        }
+
+        public static bool Toggle(Rect position, bool value, string text, GUIStyle style)
+        {
+            return GUI.Toggle(position, value, text, style);
+        }
+
+        public static void Label(string text, GUIStyle style, params GUILayoutOption[] options)
+        {
+#if IL2CPP_MELONLOADER
+            GUILayout.Label(text, style, (Il2CppReferenceArray<GUILayoutOption>)options);
+#else
+            GUILayout.Label(text, style, options);
+#endif
+        }
+
+        public static void Label(Rect position, string text, GUIStyle style)
+        {
+            GUI.Label(position, text, style);
+        }
+
+        public static void Label(Texture image, params GUILayoutOption[] options)
+        {
+#if IL2CPP_MELONLOADER
+            GUILayout.Label(image, (Il2CppReferenceArray<GUILayoutOption>)options);
+#else
+            GUILayout.Label(image, options);
+#endif
+        }
+
+        public static void Label(Texture image, GUIStyle style, params GUILayoutOption[] options)
+        {
+#if IL2CPP_MELONLOADER
+            GUILayout.Label(image, style, (Il2CppReferenceArray<GUILayoutOption>)options);
+#else
+            GUILayout.Label(image, style, options);
+#endif
+        }
+
+        public static void Box(string text, GUIStyle style, params GUILayoutOption[] options)
+        {
+#if IL2CPP_MELONLOADER
+            GUILayout.Box(text, style, (Il2CppReferenceArray<GUILayoutOption>)options);
+#else
+            GUILayout.Box(text, style, options);
+#endif
+        }
+
+        public static void Box(GUIContent content, GUIStyle style, params GUILayoutOption[] options)
+        {
+#if IL2CPP_MELONLOADER
+            GUILayout.Box(content, style, (Il2CppReferenceArray<GUILayoutOption>)options);
+#else
+            GUILayout.Box(content, style, options);
+#endif
+        }
+
+        public static string TextField(string text, GUIStyle style, params GUILayoutOption[] options)
+        {
+#if IL2CPP_MELONLOADER
+            return GUILayout.TextField(text, style, (Il2CppReferenceArray<GUILayoutOption>)options);
+#else
+            return GUILayout.TextField(text, style, options);
+#endif
+        }
+
+        public static string PasswordField(string password, char maskChar, GUIStyle style, params GUILayoutOption[] options)
+        {
+#if IL2CPP_MELONLOADER
+            return GUILayout.PasswordField(password, maskChar, style, (Il2CppReferenceArray<GUILayoutOption>)options);
+#else
+            return GUILayout.PasswordField(password, maskChar, style, options);
+#endif
+        }
+
+        public static string TextArea(string text, params GUILayoutOption[] options)
+        {
+#if IL2CPP_MELONLOADER
+            return GUILayout.TextArea(text, (Il2CppReferenceArray<GUILayoutOption>)options);
+#else
+            return GUILayout.TextArea(text, options);
+#endif
+        }
+
+        public static string TextArea(string text, GUIStyle style, params GUILayoutOption[] options)
+        {
+#if IL2CPP_MELONLOADER
+            return GUILayout.TextArea(text, style, (Il2CppReferenceArray<GUILayoutOption>)options);
+#else
+            return GUILayout.TextArea(text, style, options);
+#endif
+        }
+
+        public static string TextArea(string text, int maxLength, GUIStyle style, params GUILayoutOption[] options)
+        {
+#if IL2CPP_MELONLOADER
+            return GUILayout.TextArea(text, maxLength, style, (Il2CppReferenceArray<GUILayoutOption>)options);
+#else
+            return GUILayout.TextArea(text, maxLength, style, options);
+#endif
+        }
     }
 }

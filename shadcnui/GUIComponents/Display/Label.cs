@@ -32,11 +32,7 @@ namespace shadcnui.GUIComponents
 
             GUILayoutOption[] autoScaledOptions = GetAutoScaledOptions(options);
 
-#if IL2CPP_MELONLOADER
-            GUILayout.Label(text ?? "", scaledStyle, (Il2CppReferenceArray<GUILayoutOption>)autoScaledOptions);
-#else
-            GUILayout.Label(text ?? "", scaledStyle, autoScaledOptions);
-#endif
+            UnityHelpers.Label(text ?? "", scaledStyle, autoScaledOptions);
         }
 
         public void DrawLabel(Rect rect, string text, LabelVariant variant = LabelVariant.Default, bool disabled = false)

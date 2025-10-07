@@ -30,14 +30,7 @@ namespace shadcnui.GUIComponents
                 GUI.enabled = false;
 
             bool newValue;
-#if IL2CPP_MELONLOADER
-            if (options != null && options.Length > 0)
-                newValue = GUILayout.Toggle(value, text, toggleStyle, (Il2CppReferenceArray<GUILayoutOption>)options);
-            else
-                newValue = GUILayout.Toggle(value, text, toggleStyle, (Il2CppReferenceArray<GUILayoutOption>)null);
-#else
-            newValue = options != null && options.Length > 0 ? GUILayout.Toggle(value, text, toggleStyle, options) : GUILayout.Toggle(value, text, toggleStyle);
-#endif
+            newValue = options != null && options.Length > 0 ? UnityHelpers.Toggle(value, text, toggleStyle, options) : UnityHelpers.Toggle(value, text, toggleStyle);
 
             GUI.enabled = wasEnabled;
 
@@ -58,7 +51,7 @@ namespace shadcnui.GUIComponents
             if (disabled)
                 GUI.enabled = false;
 
-            bool newValue = GUI.Toggle(rect, value, text, toggleStyle);
+            bool newValue = UnityHelpers.Toggle(rect, value, text, toggleStyle);
 
             GUI.enabled = wasEnabled;
 
@@ -76,19 +69,11 @@ namespace shadcnui.GUIComponents
 
             if (horizontal)
             {
-#if IL2CPP_MELONLOADER
-                layoutComponents.BeginHorizontalGroup(GUIStyle.none, (Il2CppReferenceArray<GUILayoutOption>)null);
-#else
                 layoutComponents.BeginHorizontalGroup();
-#endif
             }
             else
             {
-#if IL2CPP_MELONLOADER
-                layoutComponents.BeginVerticalGroup(GUIStyle.none, (Il2CppReferenceArray<GUILayoutOption>)null);
-#else
                 layoutComponents.BeginVerticalGroup();
-#endif
             }
 
             for (int i = 0; i < texts.Length; i++)
@@ -121,19 +106,11 @@ namespace shadcnui.GUIComponents
 
             if (horizontal)
             {
-#if IL2CPP_MELONLOADER
-                layoutComponents.BeginHorizontalGroup(GUIStyle.none, (Il2CppReferenceArray<GUILayoutOption>)null);
-#else
                 layoutComponents.BeginHorizontalGroup();
-#endif
             }
             else
             {
-#if IL2CPP_MELONLOADER
-                layoutComponents.BeginVerticalGroup(GUIStyle.none, (Il2CppReferenceArray<GUILayoutOption>)null);
-#else
                 layoutComponents.BeginVerticalGroup();
-#endif
             }
 
             for (int i = 0; i < texts.Length; i++)

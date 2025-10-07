@@ -78,21 +78,15 @@ namespace shadcnui.GUIComponents
             if (!string.IsNullOrEmpty(label))
             {
                 layoutComponents.BeginHorizontalGroup();
-#if IL2CPP_MELONLOADER
-                GUILayout.Label(new GUIContent(label), styleManager.GetLabelStyle(LabelVariant.Default), new Il2CppReferenceArray<UnityEngine.GUILayoutOption>(0));
-#else
-                GUILayout.Label(label, styleManager.GetLabelStyle(LabelVariant.Default));
-#endif
+
+                UnityHelpers.Label(label, styleManager.GetLabelStyle(LabelVariant.Default));
 
                 if (showPercentage)
                 {
                     GUILayout.FlexibleSpace();
                     string percentText = (value * 100f).ToString("F0") + "%";
-#if IL2CPP_MELONLOADER
-                    GUILayout.Label(new GUIContent(percentText), styleManager.GetLabelStyle(LabelVariant.Muted), new Il2CppReferenceArray<UnityEngine.GUILayoutOption>(0));
-#else
-                    GUILayout.Label(percentText, styleManager.GetLabelStyle(LabelVariant.Muted));
-#endif
+
+                    UnityHelpers.Label(percentText, styleManager.GetLabelStyle(LabelVariant.Muted));
                 }
 
                 layoutComponents.EndHorizontalGroup();
