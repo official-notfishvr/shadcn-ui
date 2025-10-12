@@ -1,3 +1,4 @@
+using shadcnui.GUIComponents.Core;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -6,12 +7,12 @@ using UnityEngine;
 using UnhollowerBaseLib;
 #endif
 
-namespace shadcnui.GUIComponents
+namespace shadcnui.GUIComponents.Data
 {
     public class Calendar
     {
         private GUIHelper guiHelper;
-        private Layout layoutComponents;
+        private shadcnui.GUIComponents.Layout.Layout layoutComponents;
         private DateTime displayedMonth;
 
         public DateTime? SelectedDate { get; set; }
@@ -28,7 +29,7 @@ namespace shadcnui.GUIComponents
         public Calendar(GUIHelper helper)
         {
             this.guiHelper = helper;
-            this.layoutComponents = new Layout(helper);
+            this.layoutComponents = new shadcnui.GUIComponents.Layout.Layout(helper);
             this.displayedMonth = DateTime.Today;
 
             this.Ranges = new List<(DateTime Start, DateTime End)>();

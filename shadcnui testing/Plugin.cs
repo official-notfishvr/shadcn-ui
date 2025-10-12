@@ -2,6 +2,8 @@ using System;
 using System.IO;
 using shadcnui;
 using UnityEngine;
+using shadcnui_testing.Menu;
+
 #if IL2CPP_BEPINEX
 using BepInEx.Unity.IL2CPP;
 using BepInEx;
@@ -13,7 +15,7 @@ using BepInEx.Logging;
 using MelonLoader;
 #endif
 
-namespace shadcnui
+namespace shadcnui_testing
 {
 #if IL2CPP_BEPINEX // BepInEx6 il2cpp
     [System.ComponentModel.Description(PluginInfo.Description)]

@@ -1,3 +1,4 @@
+using shadcnui.GUIComponents.Core;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -6,7 +7,7 @@ using UnityEngine;
 using UnhollowerBaseLib;
 #endif
 
-namespace shadcnui.GUIComponents
+namespace shadcnui.GUIComponents.Data
 {
     public class DataTableColumn
     {
@@ -86,7 +87,7 @@ namespace shadcnui.GUIComponents
     {
         private readonly GUIHelper _guiHelper;
         private readonly StyleManager _styleManager;
-        private readonly Layout _layoutComponents;
+        private readonly shadcnui.GUIComponents.Layout.Layout _layoutComponents;
 
         private Dictionary<string, DataTableState> _tableStates = new Dictionary<string, DataTableState>();
 
@@ -94,7 +95,7 @@ namespace shadcnui.GUIComponents
         {
             _guiHelper = helper;
             _styleManager = helper.GetStyleManager();
-            _layoutComponents = new Layout(helper);
+            _layoutComponents = new shadcnui.GUIComponents.Layout.Layout(helper);
         }
 
         public void DrawDataTable(string id, List<DataTableColumn> columns, List<DataTableRow> data, bool showPagination = true, bool showSearch = true, bool showSelection = true, bool showColumnToggle = false, params GUILayoutOption[] options)

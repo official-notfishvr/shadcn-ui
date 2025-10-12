@@ -7,18 +7,18 @@ using UnityEngine;
 using UnhollowerBaseLib;
 #endif
 
-namespace shadcnui.GUIComponents
+namespace shadcnui.GUIComponents.Core
 {
     public class AnimationManager
     {
         private GUIHelper guiHelper;
-        private Layout layoutComponents;
+        private shadcnui.GUIComponents.Layout.Layout layoutComponents;
         private bool _layoutGroupStarted = false;
 
         public AnimationManager(GUIHelper helper)
         {
             guiHelper = helper;
-            layoutComponents = new Layout(helper);
+            layoutComponents = new shadcnui.GUIComponents.Layout.Layout(helper);
         }
 
         public void UpdateAnimations(bool isOpen, ref float menuAlpha, ref float menuScale, ref float titleGlow, ref float backgroundPulse, ref int hoveredButton, float[] buttonGlowEffects, float[] inputFieldGlow, ref int focusedField, ref float particleTime, ref Vector2 mousePos)

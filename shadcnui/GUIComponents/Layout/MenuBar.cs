@@ -1,8 +1,9 @@
+using shadcnui.GUIComponents.Core;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace shadcnui.GUIComponents
+namespace shadcnui.GUIComponents.Layout
 {
     public class MenuBar
     {

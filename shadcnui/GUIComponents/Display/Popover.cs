@@ -1,21 +1,22 @@
+using shadcnui.GUIComponents.Core;
 using System;
 using UnityEngine;
 #if IL2CPP_MELONLOADER
 using UnhollowerBaseLib;
 #endif
 
-namespace shadcnui.GUIComponents
+namespace shadcnui.GUIComponents.Display
 {
     public class Popover
     {
         private GUIHelper guiHelper;
         private bool isOpen;
-        private Layout _layoutComponents;
+        private shadcnui.GUIComponents.Layout.Layout _layoutComponents;
 
         public Popover(GUIHelper helper)
         {
             this.guiHelper = helper;
-            _layoutComponents = new Layout(helper);
+            _layoutComponents = new shadcnui.GUIComponents.Layout.Layout(helper);
         }
 
         public bool IsOpen => isOpen;

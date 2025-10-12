@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace shadcnui.GUIComponents
+namespace shadcnui.GUIComponents.Core
 {
     public class Theme
     {

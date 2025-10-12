@@ -1,14 +1,16 @@
 using System;
 using System.Collections.Generic;
-using shadcnui.GUIComponents;
-using shadcnui.GUIComponents.Core;
+using shadcnui.GUIComponents.Controls;
+using shadcnui.GUIComponents.Data;
+using shadcnui.GUIComponents.Display;
+using shadcnui.GUIComponents.Layout;
 using UnityEngine;
-using static shadcnui.GUIComponents.Tabs;
+using static shadcnui.GUIComponents.Layout.Tabs;
 #if IL2CPP_MELONLOADER
 using UnhollowerBaseLib;
 #endif
 
-namespace shadcnui
+namespace shadcnui.GUIComponents.Core
 {
     /// <summary>
     /// Main GUI Helper class providing a comprehensive set of UI components
@@ -50,13 +52,13 @@ namespace shadcnui
         #endregion
 
         #region Component Instances - Layout & Structure
-        private Layout layoutComponents;
+        private shadcnui.GUIComponents.Layout.Layout layoutComponents;
         private Card cardComponents;
         private Separator separatorComponents;
         #endregion
 
         #region Component Instances - Input & Form
-        private GUIComponents.Input inputComponents;
+        private shadcnui.GUIComponents.Controls.Input inputComponents;
         private TextArea textAreaComponents;
         private Checkbox checkboxComponents;
         private Switch switchComponents;
@@ -84,7 +86,7 @@ namespace shadcnui
 
         #region Component Instances - Data Display
         private Table tableComponents;
-        private GUIComponents.Avatar avatarComponents;
+        private shadcnui.GUIComponents.Display.Avatar avatarComponents;
         private Chart chartComponents;
         private DataTable dataTableComponents;
         #endregion
@@ -144,47 +146,47 @@ namespace shadcnui
                 animationManager = new AnimationManager(this);
 
                 // Input & Form
-                inputComponents = new GUIComponents.Input(this);
-                textAreaComponents = new GUIComponents.TextArea(this);
-                checkboxComponents = new GUIComponents.Checkbox(this);
-                switchComponents = new GUIComponents.Switch(this);
+                inputComponents = new shadcnui.GUIComponents.Controls.Input(this);
+                textAreaComponents = new TextArea(this);
+                checkboxComponents = new Checkbox(this);
+                switchComponents = new Switch(this);
                 sliderComponents = new Slider(this);
 
                 // Buttons & Toggles
-                buttonComponents = new GUIComponents.Button(this);
-                toggleComponents = new GUIComponents.Toggle(this);
+                buttonComponents = new Button(this);
+                toggleComponents = new Toggle(this);
 
                 // Layout & Structure
-                layoutComponents = new Layout(this);
+                layoutComponents = new shadcnui.GUIComponents.Layout.Layout(this);
                 cardComponents = new Card(this);
-                separatorComponents = new GUIComponents.Separator(this);
+                separatorComponents = new Separator(this);
 
                 // Text & Labels
-                labelComponents = new GUIComponents.Label(this);
+                labelComponents = new Label(this);
 
                 // Navigation
-                tabsComponents = new GUIComponents.Tabs(this);
+                tabsComponents = new Tabs(this);
                 menuBarComponents = new MenuBar(this);
 
                 // Feedback & Status
                 progressComponents = new Progress(this);
-                badgeComponents = new GUIComponents.Badge(this);
+                badgeComponents = new Badge(this);
 
                 // Data Display
-                tableComponents = new GUIComponents.Table(this);
-                avatarComponents = new GUIComponents.Avatar(this);
+                tableComponents = new Table(this);
+                avatarComponents = new shadcnui.GUIComponents.Display.Avatar(this);
                 chartComponents = new Chart(this);
                 dataTableComponents = new DataTable(this);
 
                 // Interactive Controls
-                calendarComponents = new GUIComponents.Calendar(this);
+                calendarComponents = new Calendar(this);
                 selectComponents = new Select(this);
                 datePickerComponents = new DatePicker(this);
 
                 // Overlays & Modals
                 dialogComponents = new Dialog(this);
-                dropdownMenuComponents = new GUIComponents.DropdownMenu(this);
-                popoverComponents = new GUIComponents.Popover(this);
+                dropdownMenuComponents = new DropdownMenu(this);
+                popoverComponents = new Popover(this);
 
                 GUILogger.LogInfo("GUIHelper components initialized successfully", "GUIHelper.InitializeComponents");
             }
@@ -1014,7 +1016,7 @@ namespace shadcnui
             }
         }
 
-        public void AvatarGroup(GUIComponents.Avatar.AvatarData[] avatars, AvatarSize size = AvatarSize.Default, AvatarShape shape = AvatarShape.Circle, int maxVisible = 3, float overlap = -8f, params GUILayoutOption[] options)
+        public void AvatarGroup(shadcnui.GUIComponents.Display.Avatar.AvatarData[] avatars, AvatarSize size = AvatarSize.Default, AvatarShape shape = AvatarShape.Circle, int maxVisible = 3, float overlap = -8f, params GUILayoutOption[] options)
         {
             try
             {
@@ -1529,7 +1531,7 @@ namespace shadcnui
             }
         }
 
-        public int DrawTabs(string[] tabNames, int selectedIndex, Action content, int maxLines = 1, Tabs.TabPosition position = shadcnui.GUIComponents.Tabs.TabPosition.Top, params GUILayoutOption[] options)
+        public int DrawTabs(string[] tabNames, int selectedIndex, Action content, int maxLines = 1, TabPosition position = TabPosition.Top, params GUILayoutOption[] options)
         {
             try
             {
@@ -1617,7 +1619,7 @@ namespace shadcnui
             }
         }
 
-        public int VerticalTabs(string[] tabNames, int selectedIndex, Action content, float tabWidth = 120f, int maxLines = 1, Tabs.TabSide side = shadcnui.GUIComponents.Tabs.TabSide.Left, params GUILayoutOption[] options)
+        public int VerticalTabs(string[] tabNames, int selectedIndex, Action content, float tabWidth = 120f, int maxLines = 1, TabSide side = TabSide.Left, params GUILayoutOption[] options)
         {
             try
             {

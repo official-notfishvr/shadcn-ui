@@ -1,4 +1,4 @@
-﻿namespace shadcnui
+﻿namespace shadcnui_testing
 {
     public class PluginInfo
     {
