@@ -1,3 +1,4 @@
+using shadcnui.GUIComponents.Core;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
@@ -5,12 +6,12 @@ using UnityEngine;
 using UnhollowerBaseLib;
 #endif
 
-namespace shadcnui.GUIComponents
+namespace shadcnui.GUIComponents.Controls
 {
     public class Select
     {
         private GUIHelper guiHelper;
-        private Layout _layoutComponents;
+        private shadcnui.GUIComponents.Layout.Layout _layoutComponents;
         private bool isOpen;
         private int selectedIndex;
         private Vector2 scrollPosition;
@@ -18,7 +19,7 @@ namespace shadcnui.GUIComponents
         public Select(GUIHelper helper)
         {
             this.guiHelper = helper;
-            _layoutComponents = new Layout(helper);
+            _layoutComponents = new shadcnui.GUIComponents.Layout.Layout(helper);
         }
 
         public bool IsOpen => isOpen;

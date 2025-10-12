@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using shadcnui;
 using UnityEngine;
 
-namespace shadcnui
+namespace shadcnui.GUIComponents.Core
 {
     public class Settings
     {

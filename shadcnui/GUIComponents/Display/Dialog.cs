@@ -1,16 +1,17 @@
+using shadcnui.GUIComponents.Core;
 using System;
 using UnityEngine;
 #if IL2CPP_MELONLOADER
 using UnhollowerBaseLib;
 #endif
 
-namespace shadcnui.GUIComponents
+namespace shadcnui.GUIComponents.Display
 {
     public class Dialog
     {
         private readonly GUIHelper _guiHelper;
         private readonly StyleManager _styleManager;
-        private readonly Layout _layoutComponents;
+        private readonly shadcnui.GUIComponents.Layout.Layout _layoutComponents;
 
         private bool _isOpen = false;
         private string _dialogId;
@@ -19,7 +20,7 @@ namespace shadcnui.GUIComponents
         {
             _guiHelper = helper;
             _styleManager = helper.GetStyleManager();
-            _layoutComponents = new Layout(helper);
+            _layoutComponents = new shadcnui.GUIComponents.Layout.Layout(helper);
         }
 
         public bool IsOpen => _isOpen;

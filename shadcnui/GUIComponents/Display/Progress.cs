@@ -1,21 +1,22 @@
 using System;
 using shadcnui;
+using shadcnui.GUIComponents.Core;
 using UnityEngine;
 #if IL2CPP_MELONLOADER
 using UnhollowerBaseLib;
 #endif
 
-namespace shadcnui.GUIComponents
+namespace shadcnui.GUIComponents.Display
 {
     public class Progress
     {
         private GUIHelper guiHelper;
-        private Layout layoutComponents;
+        private shadcnui.GUIComponents.Layout.Layout layoutComponents;
 
         public Progress(GUIHelper helper)
         {
             guiHelper = helper;
-            layoutComponents = new Layout(helper);
+            layoutComponents = new shadcnui.GUIComponents.Layout.Layout(helper);
         }
 
         public void DrawProgress(float value, float width = -1, float height = -1, params GUILayoutOption[] options)

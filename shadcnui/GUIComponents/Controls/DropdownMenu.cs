@@ -1,8 +1,9 @@
+using shadcnui.GUIComponents.Core;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace shadcnui.GUIComponents
+namespace shadcnui.GUIComponents.Controls
 {
     public enum DropdownMenuItemType
     {
@@ -43,7 +44,7 @@ namespace shadcnui.GUIComponents
     public class DropdownMenu
     {
         private readonly GUIHelper _guiHelper;
-        private readonly Layout _layoutComponents;
+        private readonly shadcnui.GUIComponents.Layout.Layout _layoutComponents;
         private bool _isOpen;
         private Vector2 _scrollPosition;
         private readonly Stack<List<DropdownMenuItem>> _menuStack = new Stack<List<DropdownMenuItem>>();
@@ -51,7 +52,7 @@ namespace shadcnui.GUIComponents
         public DropdownMenu(GUIHelper helper)
         {
             _guiHelper = helper;
-            _layoutComponents = new Layout(helper);
+            _layoutComponents = new shadcnui.GUIComponents.Layout.Layout(helper);
         }
 
         public bool IsOpen => _isOpen;
@@ -134,7 +135,7 @@ namespace shadcnui.GUIComponents
             {
                 case DropdownMenuItemType.Header:
 #if IL2CPP_MELONLOADER
-                    GUILayout.Label(item.Content, styleManager.dropdownMenuHeaderStyle, shadcnui.GUIComponents.Layout.EmptyOptions);
+                    GUILayout.Label(item.Content, styleManager.dropdownMenuHeaderStyle, shadcnui.GUIComponents.Layout.Layout.EmptyOptions);
 #else
                     GUILayout.Label(item.Content, styleManager.dropdownMenuHeaderStyle);
 #endif
@@ -147,7 +148,7 @@ namespace shadcnui.GUIComponents
                     {
                         if (
 #if IL2CPP_MELONLOADER
-                            GUILayout.Button(item.Content, styleManager.dropdownMenuItemStyle, shadcnui.GUIComponents.Layout.EmptyOptions)
+                            GUILayout.Button(item.Content, styleManager.dropdownMenuItemStyle, shadcnui.GUIComponents.Layout.Layout.EmptyOptions)
 #else
                             GUILayout.Button(item.Content, styleManager.dropdownMenuItemStyle)
 #endif
@@ -160,7 +161,7 @@ namespace shadcnui.GUIComponents
                     {
                         if (
 #if IL2CPP_MELONLOADER
-                            GUILayout.Button(item.Content, styleManager.dropdownMenuItemStyle, shadcnui.GUIComponents.Layout.EmptyOptions)
+                            GUILayout.Button(item.Content, styleManager.dropdownMenuItemStyle, shadcnui.GUIComponents.Layout.Layout.EmptyOptions)
 #else
                             GUILayout.Button(item.Content, styleManager.dropdownMenuItemStyle)
 #endif

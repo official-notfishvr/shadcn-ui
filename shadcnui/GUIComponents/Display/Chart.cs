@@ -1,9 +1,10 @@
+using shadcnui.GUIComponents.Core;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
-namespace shadcnui.GUIComponents
+namespace shadcnui.GUIComponents.Display
 {
     public enum ChartType
     {
@@ -70,13 +71,13 @@ namespace shadcnui.GUIComponents
     public class Chart
     {
         private readonly GUIHelper _guiHelper;
-        private readonly Layout _layoutComponents;
+        private readonly shadcnui.GUIComponents.Layout.Layout _layoutComponents;
         private Rect _chartRect;
 
         public Chart(GUIHelper helper)
         {
             _guiHelper = helper;
-            _layoutComponents = new Layout(helper);
+            _layoutComponents = new shadcnui.GUIComponents.Layout.Layout(helper);
         }
 
         public void DrawChart(ChartConfig config)

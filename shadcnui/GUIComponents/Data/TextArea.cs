@@ -1,21 +1,22 @@
 using System;
 using shadcnui;
+using shadcnui.GUIComponents.Core;
 using UnityEngine;
 #if IL2CPP_MELONLOADER
 using UnhollowerBaseLib;
 #endif
 
-namespace shadcnui.GUIComponents
+namespace shadcnui.GUIComponents.Data
 {
     public class TextArea
     {
         private GUIHelper guiHelper;
-        private Layout layoutComponents;
+        private shadcnui.GUIComponents.Layout.Layout layoutComponents;
 
         public TextArea(GUIHelper helper)
         {
             guiHelper = helper;
-            layoutComponents = new Layout(helper);
+            layoutComponents = new shadcnui.GUIComponents.Layout.Layout(helper);
         }
 
         public string DrawTextArea(string text, TextAreaVariant variant = TextAreaVariant.Default, string placeholder = "", bool disabled = false, float minHeight = 60f, int maxLength = -1, params GUILayoutOption[] options)

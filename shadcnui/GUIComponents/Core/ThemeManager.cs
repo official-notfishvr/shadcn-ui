@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 
-namespace shadcnui.GUIComponents
+namespace shadcnui.GUIComponents.Core
 {
     public class ThemeManager
     {

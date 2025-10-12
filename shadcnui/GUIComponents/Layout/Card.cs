@@ -1,3 +1,4 @@
+using shadcnui.GUIComponents.Core;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
@@ -5,7 +6,7 @@ using UnityEngine;
 using UnhollowerBaseLib;
 #endif
 
-namespace shadcnui.GUIComponents
+namespace shadcnui.GUIComponents.Layout
 {
     public class Card
     {

@@ -1,22 +1,23 @@
 using System;
 using System.Collections.Generic;
 using shadcnui;
+using shadcnui.GUIComponents.Core;
 using UnityEngine;
 #if IL2CPP_MELONLOADER
 using UnhollowerBaseLib;
 #endif
 
-namespace shadcnui.GUIComponents
+namespace shadcnui.GUIComponents.Controls
 {
     public class Switch
     {
         private GUIHelper guiHelper;
-        private Layout layoutComponents;
+        private shadcnui.GUIComponents.Layout.Layout layoutComponents;
 
         public Switch(GUIHelper helper)
         {
             guiHelper = helper;
-            layoutComponents = new Layout(helper);
+            layoutComponents = new shadcnui.GUIComponents.Layout.Layout(helper);
         }
 
         public bool DrawSwitch(string text, bool value, SwitchVariant variant = SwitchVariant.Default, SwitchSize size = SwitchSize.Default, Action<bool> onToggle = null, bool disabled = false, params GUILayoutOption[] options)

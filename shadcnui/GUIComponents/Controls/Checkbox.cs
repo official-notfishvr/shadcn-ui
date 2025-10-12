@@ -1,22 +1,23 @@
 using System;
 using System.Collections.Generic;
 using shadcnui;
+using shadcnui.GUIComponents.Core;
 using UnityEngine;
 #if IL2CPP_MELONLOADER
 using UnhollowerBaseLib;
 #endif
 
-namespace shadcnui.GUIComponents
+namespace shadcnui.GUIComponents.Controls
 {
     public class Checkbox
     {
         private GUIHelper guiHelper;
-        private Layout layoutComponents;
+        private shadcnui.GUIComponents.Layout.Layout layoutComponents;
 
         public Checkbox(GUIHelper helper)
         {
             guiHelper = helper;
-            layoutComponents = new Layout(helper);
+            layoutComponents = new shadcnui.GUIComponents.Layout.Layout(helper);
         }
 
         public bool DrawCheckbox(string text, bool value, CheckboxVariant variant = CheckboxVariant.Default, CheckboxSize size = CheckboxSize.Default, Action<bool> onToggle = null, bool disabled = false, params GUILayoutOption[] options)

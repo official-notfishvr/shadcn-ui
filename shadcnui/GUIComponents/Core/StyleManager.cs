@@ -11,7 +11,7 @@ using Object = UnityEngine.Object;
 using UnhollowerBaseLib;
 #endif
 
-namespace shadcnui.GUIComponents
+namespace shadcnui.GUIComponents.Core
 {
     #region Enums
     public enum ButtonVariant

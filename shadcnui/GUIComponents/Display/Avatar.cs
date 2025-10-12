@@ -1,22 +1,23 @@
 using System;
 using System.Collections.Generic;
 using shadcnui;
+using shadcnui.GUIComponents.Core;
 using UnityEngine;
 #if IL2CPP_MELONLOADER
 using UnhollowerBaseLib;
 #endif
 
-namespace shadcnui.GUIComponents
+namespace shadcnui.GUIComponents.Display
 {
     public class Avatar
     {
         private GUIHelper guiHelper;
-        private Layout layoutComponents;
+        private shadcnui.GUIComponents.Layout.Layout layoutComponents;
 
         public Avatar(GUIHelper helper)
         {
             guiHelper = helper;
-            layoutComponents = new Layout(helper);
+            layoutComponents = new shadcnui.GUIComponents.Layout.Layout(helper);
         }
 
         public void DrawAvatar(Texture2D image, string fallbackText, AvatarSize size = AvatarSize.Default, AvatarShape shape = AvatarShape.Circle, params GUILayoutOption[] options)

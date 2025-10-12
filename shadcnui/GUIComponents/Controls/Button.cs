@@ -1,19 +1,20 @@
 using System;
 using System.Collections.Generic;
 using shadcnui;
+using shadcnui.GUIComponents.Core;
 using UnityEngine;
 
-namespace shadcnui.GUIComponents
+namespace shadcnui.GUIComponents.Controls
 {
     public class Button
     {
         private readonly GUIHelper _guiHelper;
-        private readonly Layout _layoutComponents;
+        private readonly shadcnui.GUIComponents.Layout.Layout _layoutComponents;
 
         public Button(GUIHelper helper)
         {
             _guiHelper = helper;
-            _layoutComponents = new Layout(helper);
+            _layoutComponents = new shadcnui.GUIComponents.Layout.Layout(helper);
         }
 
         public bool Draw(ButtonConfig config)

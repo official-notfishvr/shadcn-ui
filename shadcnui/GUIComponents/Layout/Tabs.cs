@@ -1,9 +1,10 @@
 using System;
 using System.Collections.Generic;
 using shadcnui;
+using shadcnui.GUIComponents.Core;
 using UnityEngine;
 
-namespace shadcnui.GUIComponents
+namespace shadcnui.GUIComponents.Layout
 {
     public class Tabs
     {

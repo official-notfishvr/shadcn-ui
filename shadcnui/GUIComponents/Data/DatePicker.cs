@@ -1,3 +1,4 @@
+using shadcnui.GUIComponents.Core;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
@@ -5,13 +6,13 @@ using UnityEngine;
 using UnhollowerBaseLib;
 #endif
 
-namespace shadcnui.GUIComponents
+namespace shadcnui.GUIComponents.Data
 {
     public class DatePicker
     {
         private readonly GUIHelper _guiHelper;
         private readonly StyleManager _styleManager;
-        private readonly Layout _layoutComponents;
+        private readonly shadcnui.GUIComponents.Layout.Layout _layoutComponents;
 
         private Dictionary<string, bool> _openStates = new Dictionary<string, bool>();
         private Dictionary<string, DateTime> _displayDates = new Dictionary<string, DateTime>();
@@ -20,7 +21,7 @@ namespace shadcnui.GUIComponents
         {
             _guiHelper = helper;
             _styleManager = helper.GetStyleManager();
-            _layoutComponents = new Layout(helper);
+            _layoutComponents = new shadcnui.GUIComponents.Layout.Layout(helper);
         }
 
         public DateTime? DrawDatePicker(string placeholder, DateTime? selectedDate, string id = "datepicker", params GUILayoutOption[] options)
