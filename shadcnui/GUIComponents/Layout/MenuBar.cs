@@ -1,30 +1,27 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using UnityEngine;
-#if IL2CPP_MELONLOADER
-using UnhollowerBaseLib;
-#endif
 
 namespace shadcnui.GUIComponents
 {
     public class MenuBar
     {
-        private GUIHelper guiHelper;
-        private Layout layoutComponents;
-        private int activeMenuIndex = -1;
-        private bool isDropdownOpen = false;
-        private Stack<MenuData> menuStack = new Stack<MenuData>();
-        private Rect menuBarRect;
+        private readonly GUIHelper _guiHelper;
+        private readonly Layout _layoutComponents;
+        private int _activeMenuIndex = -1;
+        private bool _isDropdownOpen = false;
+        private readonly Stack<MenuData> _menuStack = new Stack<MenuData>();
+        private Rect _menuBarRect;
 
         public MenuBar(GUIHelper helper)
         {
-            guiHelper = helper;
-            layoutComponents = new Layout(helper);
+            _guiHelper = helper;
+            _layoutComponents = new Layout(helper);
         }
 
-        public bool IsDropdownOpen => isDropdownOpen;
+        public bool IsDropdownOpen => _isDropdownOpen;
 
-        public struct MenuItem
+        public class MenuItem
         {
             public string Text;
             public Action OnClick;
@@ -33,6 +30,8 @@ namespace shadcnui.GUIComponents
             public string Shortcut;
             public bool IsSeparator;
             public bool IsHeader;
+
+            public MenuItem() { }
 
             public MenuItem(string text, Action onClick = null, bool disabled = false, List<MenuItem> subItems = null, string shortcut = "")
             {
@@ -56,42 +55,47 @@ namespace shadcnui.GUIComponents
             }
         }
 
-        private struct MenuData
+        public class MenuBarConfig
         {
-            public List<MenuItem> Items;
-            public int ParentIndex;
+            public List<MenuItem> Items { get; set; }
+            public GUILayoutOption[] Options { get; set; }
 
-            public MenuData(List<MenuItem> items, int parentIndex)
+            public MenuBarConfig(List<MenuItem> items)
             {
                 Items = items;
-                ParentIndex = parentIndex;
+                Options = Array.Empty<GUILayoutOption>();
             }
         }
 
-        public void DrawMenuBar(List<MenuItem> items, params GUILayoutOption[] options)
+        public void Draw(MenuBarConfig config)
+        {
+            Draw(config.Items, config.Options);
+        }
+
+        public void Draw(List<MenuItem> items, params GUILayoutOption[] options)
         {
             if (items == null || items.Count == 0)
                 return;
 
-            var styleManager = guiHelper.GetStyleManager();
+            var styleManager = _guiHelper.GetStyleManager();
 
-            layoutComponents.BeginHorizontalGroup(styleManager.menuBarStyle, options);
-            menuBarRect = GUILayoutUtility.GetRect(GUIContent.none, GUIStyle.none, options);
+            _layoutComponents.BeginHorizontalGroup(styleManager.menuBarStyle, options);
+            _menuBarRect = GUILayoutUtility.GetRect(GUIContent.none, GUIStyle.none, options);
 
-            for (int i = 0; i < items.Count; i++)
+            for (var i = 0; i < items.Count; i++)
             {
                 var item = items[i];
                 if (item.IsSeparator || item.IsHeader)
                     continue;
 
-                bool isActive = (i == activeMenuIndex) && isDropdownOpen;
-                GUIStyle itemStyle = isActive ? styleManager.menuBarItemStyle : styleManager.menuBarItemStyle;
+                var isActive = (i == _activeMenuIndex) && _isDropdownOpen;
+                var itemStyle = isActive ? styleManager.menuBarItemStyle : styleManager.menuBarItemStyle;
 
-                bool wasEnabled = GUI.enabled;
+                var wasEnabled = GUI.enabled;
                 if (item.Disabled)
                     GUI.enabled = false;
 
-                bool clicked = UnityHelpers.Button(item.Text, itemStyle, GUILayout.ExpandWidth(false));
+                var clicked = UnityHelpers.Button(item.Text, itemStyle, GUILayout.ExpandWidth(false));
 
                 GUI.enabled = wasEnabled;
 
@@ -99,10 +103,10 @@ namespace shadcnui.GUIComponents
                 {
                     if (item.SubItems.Count > 0)
                     {
-                        activeMenuIndex = i;
-                        menuStack.Clear();
-                        menuStack.Push(new MenuData(item.SubItems, i));
-                        isDropdownOpen = true;
+                        _activeMenuIndex = i;
+                        _menuStack.Clear();
+                        _menuStack.Push(new MenuData(item.SubItems, i));
+                        _isDropdownOpen = true;
                     }
                     else
                     {
@@ -112,9 +116,9 @@ namespace shadcnui.GUIComponents
                 }
             }
 
-            layoutComponents.EndHorizontalGroup();
+            _layoutComponents.EndHorizontalGroup();
 
-            if (isDropdownOpen && menuStack.Count > 0)
+            if (_isDropdownOpen && _menuStack.Count > 0)
             {
                 DrawDropdownMenu();
             }
@@ -124,19 +128,19 @@ namespace shadcnui.GUIComponents
 
         private void DrawDropdownMenu()
         {
-            var styleManager = guiHelper.GetStyleManager();
-            var currentMenu = menuStack.Peek();
+            var styleManager = _guiHelper.GetStyleManager();
+            var currentMenu = _menuStack.Peek();
 
-            layoutComponents.BeginVerticalGroup(styleManager.menuDropdownStyle, GUILayout.Width(200 * guiHelper.uiScale));
+            _layoutComponents.BeginVerticalGroup(styleManager.menuDropdownStyle, GUILayout.Width(200 * _guiHelper.uiScale));
 
-            if (menuStack.Count > 1)
+            if (_menuStack.Count > 1)
             {
-                if (UnityHelpers.Button("← Back", styleManager.menuBarItemStyle))
+                if (UnityHelpers.Button("<- Back", styleManager.menuBarItemStyle))
                 {
-                    menuStack.Pop();
-                    if (menuStack.Count == 1)
+                    _menuStack.Pop();
+                    if (_menuStack.Count == 1)
                     {
-                        activeMenuIndex = menuStack.Peek().ParentIndex;
+                        _activeMenuIndex = _menuStack.Peek().ParentIndex;
                     }
                     return;
                 }
@@ -149,12 +153,12 @@ namespace shadcnui.GUIComponents
                 DrawMenuItem(item);
             }
 
-            layoutComponents.EndVerticalGroup();
+            _layoutComponents.EndVerticalGroup();
         }
 
         private void DrawMenuItem(MenuItem item)
         {
-            var styleManager = guiHelper.GetStyleManager();
+            var styleManager = _guiHelper.GetStyleManager();
 
             if (item.IsHeader)
             {
@@ -168,27 +172,27 @@ namespace shadcnui.GUIComponents
                 return;
             }
 
-            bool wasEnabled = GUI.enabled;
+            var wasEnabled = GUI.enabled;
             if (item.Disabled)
                 GUI.enabled = false;
 
             if (item.SubItems.Count > 0)
             {
-                layoutComponents.BeginHorizontalGroup();
+                _layoutComponents.BeginHorizontalGroup();
                 UnityHelpers.Label(item.Text, styleManager.menuBarItemStyle);
                 GUILayout.FlexibleSpace();
                 UnityHelpers.Label("›", styleManager.menuBarItemStyle);
-                layoutComponents.EndHorizontalGroup();
+                _layoutComponents.EndHorizontalGroup();
 
-                Rect itemRect = GUILayoutUtility.GetLastRect();
+                var itemRect = GUILayoutUtility.GetLastRect();
                 if (GUI.Button(itemRect, "", GUIStyle.none))
                 {
-                    menuStack.Push(new MenuData(item.SubItems, activeMenuIndex));
+                    _menuStack.Push(new MenuData(item.SubItems, _activeMenuIndex));
                 }
             }
             else
             {
-                layoutComponents.BeginHorizontalGroup();
+                _layoutComponents.BeginHorizontalGroup();
                 UnityHelpers.Label(item.Text, styleManager.menuBarItemStyle);
 
                 if (!string.IsNullOrEmpty(item.Shortcut))
@@ -197,9 +201,9 @@ namespace shadcnui.GUIComponents
                     UnityHelpers.Label(item.Shortcut, styleManager.menuBarItemStyle);
                 }
 
-                layoutComponents.EndHorizontalGroup();
+                _layoutComponents.EndHorizontalGroup();
 
-                Rect itemRect = GUILayoutUtility.GetLastRect();
+                var itemRect = GUILayoutUtility.GetLastRect();
                 if (GUI.Button(itemRect, "", GUIStyle.none))
                 {
                     item.OnClick?.Invoke();
@@ -212,10 +216,10 @@ namespace shadcnui.GUIComponents
 
         private void HandleClickOutside()
         {
-            if (Event.current.type == EventType.MouseDown && isDropdownOpen)
+            if (Event.current.type == EventType.MouseDown && _isDropdownOpen)
             {
-                Vector2 mousePos = Event.current.mousePosition;
-                if (!menuBarRect.Contains(mousePos))
+                var mousePos = Event.current.mousePosition;
+                if (!_menuBarRect.Contains(mousePos))
                 {
                     CloseDropdown();
                     Event.current.Use();
@@ -225,9 +229,21 @@ namespace shadcnui.GUIComponents
 
         public void CloseDropdown()
         {
-            activeMenuIndex = -1;
-            isDropdownOpen = false;
-            menuStack.Clear();
+            _activeMenuIndex = -1;
+            _isDropdownOpen = false;
+            _menuStack.Clear();
+        }
+
+        private struct MenuData
+        {
+            public List<MenuItem> Items;
+            public int ParentIndex;
+
+            public MenuData(List<MenuItem> items, int parentIndex)
+            {
+                Items = items;
+                ParentIndex = parentIndex;
+            }
         }
     }
 }

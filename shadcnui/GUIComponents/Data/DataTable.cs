@@ -213,7 +213,7 @@ namespace shadcnui.GUIComponents
             headerStyle.padding = new UnityHelpers.RectOffset(12, 12, 12, 12);
             headerStyle.margin = new UnityHelpers.RectOffset(0, 0, 0, 0);
 
-            _layoutComponents.BeginHorizontalGroup();
+            _layoutComponents.BeginHorizontalGroup(headerStyle);
 
             if (showSelection)
             {
@@ -249,12 +249,7 @@ namespace shadcnui.GUIComponents
                         columnHeaderStyle.normal.textColor = theme.PrimaryColor;
                     }
 
-                    var buttonStyle = new UnityHelpers.GUIStyle(columnHeaderStyle);
-                    buttonStyle.normal.background = null;
-                    buttonStyle.hover.background = _styleManager.CreateSolidTexture(new Color(0, 0, 0, 0.05f));
-                    buttonStyle.active.background = _styleManager.CreateSolidTexture(new Color(0, 0, 0, 0.1f));
-
-                    if (_guiHelper.Button(headerText + sortIcon, ButtonVariant.Ghost))
+                    if (_guiHelper.Button(headerText + sortIcon, ButtonVariant.Ghost, ButtonSize.Small))
                     {
                         if (state.SortColumn == column.Id)
                         {
@@ -313,12 +308,7 @@ namespace shadcnui.GUIComponents
 
                 if (showSelection)
                 {
-                    var checkboxStyle = new UnityHelpers.GUIStyle(GUI.skin.toggle);
-                    checkboxStyle.fixedWidth = 16;
-                    checkboxStyle.fixedHeight = 16;
-                    checkboxStyle.margin = new UnityHelpers.RectOffset(0, 8, 0, 0);
-
-                    bool newSelected = UnityHelpers.Toggle(isSelected, "", checkboxStyle, GUILayout.Width(24));
+                    bool newSelected = _guiHelper.Checkbox(row.Id, isSelected, CheckboxVariant.Default, CheckboxSize.Default, null, false, GUILayout.Width(16), GUILayout.Height(16));
 
                     if (newSelected != isSelected)
                     {
@@ -397,32 +387,45 @@ namespace shadcnui.GUIComponents
         {
             int totalPages = Mathf.CeilToInt((float)totalItems / state.PageSize);
 
-            _layoutComponents.BeginHorizontalGroup();
+            var paginationStyle = new UnityHelpers.GUIStyle();
+            paginationStyle.padding = new UnityHelpers.RectOffset(16, 16, 16, 16);
+            paginationStyle.alignment = TextAnchor.MiddleRight;
 
-            _guiHelper.Label($"Showing {state.CurrentPage * state.PageSize + 1}-{Mathf.Min((state.CurrentPage + 1) * state.PageSize, totalItems)} of {totalItems}", LabelVariant.Muted);
+            _layoutComponents.BeginHorizontalGroup(paginationStyle);
 
-            GUILayout.FlexibleSpace();
+            var theme = _styleManager.GetTheme();
+            var labelStyle = new UnityHelpers.GUIStyle(_styleManager.labelMutedStyle);
+            labelStyle.alignment = TextAnchor.MiddleLeft;
+            labelStyle.padding = new UnityHelpers.RectOffset(0, 16, 0, 0);
 
-            if (UnityHelpers.Button("‹‹", _styleManager.buttonOutlineStyle, GUILayout.Width(32)))
+            int from = state.CurrentPage * state.PageSize + 1;
+            int to = Mathf.Min((state.CurrentPage + 1) * state.PageSize, totalItems);
+            UnityHelpers.Label($"{from}-{to} of {totalItems}", labelStyle);
+
+            var buttonStyle = new UnityHelpers.GUIStyle(_styleManager.buttonOutlineStyle);
+            buttonStyle.fixedWidth = 32;
+
+            if (_guiHelper.Button("‹‹", ButtonVariant.Outline, ButtonSize.Small))
             {
                 state.CurrentPage = 0;
             }
-
-            if (UnityHelpers.Button("‹", _styleManager.buttonOutlineStyle, GUILayout.Width(32)))
+            if (_guiHelper.Button("‹", ButtonVariant.Outline, ButtonSize.Small))
             {
                 if (state.CurrentPage > 0)
                     state.CurrentPage--;
             }
 
-            _guiHelper.Label($"Page {state.CurrentPage + 1} of {totalPages}", LabelVariant.Default);
+            var pageLabelStyle = new UnityHelpers.GUIStyle(_styleManager.labelDefaultStyle);
+            pageLabelStyle.alignment = TextAnchor.MiddleCenter;
+            pageLabelStyle.padding = new UnityHelpers.RectOffset(8, 8, 0, 0);
+            UnityHelpers.Label($"{state.CurrentPage + 1} / {totalPages}", pageLabelStyle);
 
-            if (UnityHelpers.Button("›", _styleManager.buttonOutlineStyle, GUILayout.Width(32)))
+            if (_guiHelper.Button("›", ButtonVariant.Outline, ButtonSize.Small))
             {
                 if (state.CurrentPage < totalPages - 1)
                     state.CurrentPage++;
             }
-
-            if (UnityHelpers.Button("››", _styleManager.buttonOutlineStyle, GUILayout.Width(32)))
+            if (_guiHelper.Button("››", ButtonVariant.Outline, ButtonSize.Small))
             {
                 state.CurrentPage = totalPages - 1;
             }

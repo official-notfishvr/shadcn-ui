@@ -1,6 +1,7 @@
 using UnityEngine;
 #if IL2CPP_MELONLOADER
 using UnhollowerBaseLib;
+using shadcnui.GUIComponents;
 #endif
 
 namespace shadcnui
@@ -425,7 +426,7 @@ namespace shadcnui
         public static bool Button(string text, GUIStyle style)
         {
 #if IL2CPP_MELONLOADER
-            return GUILayout.Button(text, style, (Il2CppReferenceArray<GUILayoutOption>)null);
+            return GUILayout.Button(text, (UnityEngine.GUIStyle)style, new Il2CppReferenceArray<GUILayoutOption>(shadcnui.GUIComponents.Layout.EmptyOptions));
 #else
             return GUILayout.Button(text, style);
 #endif
@@ -498,7 +499,7 @@ namespace shadcnui
         public static void Box(string text, GUIStyle style, params GUILayoutOption[] options)
         {
 #if IL2CPP_MELONLOADER
-            GUILayout.Box(text, style, (Il2CppReferenceArray<GUILayoutOption>)options);
+            GUILayout.Box(text, style, new Il2CppReferenceArray<GUILayoutOption>(options));
 #else
             GUILayout.Box(text, style, options);
 #endif

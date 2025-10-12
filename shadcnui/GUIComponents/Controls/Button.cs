@@ -1,32 +1,27 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using shadcnui;
 using UnityEngine;
-#if IL2CPP_MELONLOADER
-using UnhollowerBaseLib;
-#endif
 
 namespace shadcnui.GUIComponents
 {
     public class Button
     {
-        private GUIHelper guiHelper;
-        private Layout layoutComponents;
+        private readonly GUIHelper _guiHelper;
+        private readonly Layout _layoutComponents;
 
         public Button(GUIHelper helper)
         {
-            guiHelper = helper;
-            layoutComponents = new Layout(helper);
+            _guiHelper = helper;
+            _layoutComponents = new Layout(helper);
         }
 
-        public bool DrawButton(string text, ButtonVariant variant = ButtonVariant.Default, ButtonSize size = ButtonSize.Default, Action onClick = null, bool disabled = false, float opacity = 1f, params GUILayoutOption[] options)
+        public bool Draw(ButtonConfig config)
         {
-            var styleManager = guiHelper.GetStyleManager();
-            GUIStyle buttonStyle = styleManager.GetButtonStyle(variant, size);
+            var styleManager = _guiHelper.GetStyleManager();
+            var buttonStyle = styleManager.GetButtonStyle(config.Variant, config.Size);
 
-            List<GUILayoutOption> layoutOptions = new List<GUILayoutOption>(options);
+            var layoutOptions = new List<GUILayoutOption>(config.Options ?? Array.Empty<GUILayoutOption>());
 
             if (buttonStyle.fixedWidth > 0)
             {
@@ -37,75 +32,62 @@ namespace shadcnui.GUIComponents
                 layoutOptions.Add(GUILayout.Height(buttonStyle.fixedHeight));
             }
 
-            bool wasEnabled = GUI.enabled;
-            if (disabled)
+            var wasEnabled = GUI.enabled;
+            if (config.Disabled)
                 GUI.enabled = false;
 
-            Color originalColor = GUI.color;
-            GUI.color = new Color(originalColor.r, originalColor.g, originalColor.b, originalColor.a * opacity);
+            var originalColor = GUI.color;
+            GUI.color = new Color(originalColor.r, originalColor.g, originalColor.b, originalColor.a * config.Opacity);
 
-            bool clicked;
-
-            clicked = UnityHelpers.Button(text ?? "Button", buttonStyle, layoutOptions.ToArray());
+            var clicked = UnityHelpers.Button(config.Text ?? "Button", buttonStyle, layoutOptions.ToArray());
 
             GUI.color = originalColor;
             GUI.enabled = wasEnabled;
 
-            if (clicked && !disabled && onClick != null)
-                onClick();
+            if (clicked && !config.Disabled)
+                config.OnClick?.Invoke();
 
-            return clicked && !disabled;
+            return clicked && !config.Disabled;
         }
 
-        public bool DrawButton(Rect rect, string text, ButtonVariant variant = ButtonVariant.Default, ButtonSize size = ButtonSize.Default, Action onClick = null, bool disabled = false, float opacity = 1f)
+        public bool Draw(string text, ButtonVariant variant = ButtonVariant.Default, ButtonSize size = ButtonSize.Default, Action onClick = null, bool disabled = false, float opacity = 1f, params GUILayoutOption[] options)
         {
-            var styleManager = guiHelper.GetStyleManager();
-            GUIStyle buttonStyle = styleManager.GetButtonStyle(variant, size);
-
-            Rect scaledRect = new Rect(rect.x * guiHelper.uiScale, rect.y * guiHelper.uiScale, rect.width * guiHelper.uiScale, rect.height * guiHelper.uiScale);
-
-            bool wasEnabled = GUI.enabled;
-            if (disabled)
-                GUI.enabled = false;
-
-            Color originalColor = GUI.color;
-            GUI.color = new Color(originalColor.r, originalColor.g, originalColor.b, originalColor.a * opacity);
-
-            bool clicked = GUI.Button(scaledRect, text ?? "Button", buttonStyle);
-
-            GUI.color = originalColor;
-            GUI.enabled = wasEnabled;
-
-            if (clicked && !disabled && onClick != null)
-                onClick();
-
-            return clicked && !disabled;
+            var config = new ButtonConfig(text)
+            {
+                Variant = variant,
+                Size = size,
+                OnClick = onClick,
+                Disabled = disabled,
+                Opacity = opacity,
+                Options = options,
+            };
+            return Draw(config);
         }
 
         public void ButtonGroup(Action drawButtons, bool horizontal = true, float spacing = 5f)
         {
-            float scaledSpacing = spacing * guiHelper.uiScale;
+            var scaledSpacing = spacing * _guiHelper.uiScale;
 
             if (horizontal)
             {
-                layoutComponents.BeginHorizontalGroup();
+                _layoutComponents.BeginHorizontalGroup();
             }
             else
             {
-                layoutComponents.BeginVerticalGroup();
+                _layoutComponents.BeginVerticalGroup();
             }
 
             drawButtons?.Invoke();
 
             if (horizontal)
-                layoutComponents.EndHorizontalGroup();
+                _layoutComponents.EndHorizontalGroup();
             else
-                layoutComponents.EndVerticalGroup();
+                _layoutComponents.EndVerticalGroup();
 
-            layoutComponents.AddSpace(scaledSpacing);
+            _layoutComponents.AddSpace(scaledSpacing);
         }
 
-        public void RenderButtonSet(ButtonConfig[] buttons, bool horizontal = true, float spacing = 8f)
+        public void DrawButtonSet(ButtonConfig[] buttons, bool horizontal = true, float spacing = 8f)
         {
             if (buttons == null || buttons.Length == 0)
                 return;
@@ -113,17 +95,17 @@ namespace shadcnui.GUIComponents
             ButtonGroup(
                 () =>
                 {
-                    for (int i = 0; i < buttons.Length; i++)
+                    for (var i = 0; i < buttons.Length; i++)
                     {
                         var config = buttons[i];
-                        DrawButton(config.Text, config.Variant, config.Size, config.OnClick, config.Disabled, 1f, config.Options); // Added 1f for opacity
+                        Draw(config);
 
                         if (i < buttons.Length - 1)
                         {
                             if (horizontal)
-                                layoutComponents.AddSpace(spacing);
+                                _layoutComponents.AddSpace(spacing);
                             else
-                                layoutComponents.AddSpace(spacing);
+                                _layoutComponents.AddSpace(spacing);
                         }
                     }
                 },
@@ -131,25 +113,27 @@ namespace shadcnui.GUIComponents
                 0f
             );
         }
+    }
 
-        public struct ButtonConfig
+    public class ButtonConfig
+    {
+        public string Text { get; set; }
+        public ButtonVariant Variant { get; set; }
+        public ButtonSize Size { get; set; }
+        public Action OnClick { get; set; }
+        public bool Disabled { get; set; }
+        public float Opacity { get; set; }
+        public GUILayoutOption[] Options { get; set; }
+
+        public ButtonConfig(string text)
         {
-            public string Text;
-            public ButtonVariant Variant;
-            public ButtonSize Size;
-            public Action OnClick;
-            public bool Disabled;
-            public GUILayoutOption[] Options;
-
-            public ButtonConfig(string text, ButtonVariant variant = ButtonVariant.Default, ButtonSize size = ButtonSize.Default, Action onClick = null, bool disabled = false, params GUILayoutOption[] options)
-            {
-                Text = text;
-                Variant = variant;
-                Size = size;
-                OnClick = onClick;
-                Disabled = disabled;
-                Options = options;
-            }
+            Text = text;
+            Variant = ButtonVariant.Default;
+            Size = ButtonSize.Default;
+            OnClick = null;
+            Disabled = false;
+            Opacity = 1f;
+            Options = Array.Empty<GUILayoutOption>();
         }
     }
 }

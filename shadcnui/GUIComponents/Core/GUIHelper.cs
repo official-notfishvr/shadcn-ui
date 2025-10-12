@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using shadcnui.GUIComponents;
 using shadcnui.GUIComponents.Core;
 using UnityEngine;
+using static shadcnui.GUIComponents.Tabs;
 #if IL2CPP_MELONLOADER
 using UnhollowerBaseLib;
 #endif
@@ -381,39 +382,11 @@ namespace shadcnui
         #endregion
 
         #region Button Components
-        public bool RenderColorPresetButton(string colorName, Color presetColor)
-        {
-            try
-            {
-                var styleManager = GetStyleManager();
-
-                GUIStyle customButtonStyle = new UnityHelpers.GUIStyle(GUI.skin.button);
-                customButtonStyle.normal.background = styleManager.CreateSolidTexture(presetColor);
-                customButtonStyle.hover.background = styleManager.CreateSolidTexture(presetColor * 1.2f);
-                customButtonStyle.active.background = styleManager.CreateSolidTexture(presetColor * 0.8f);
-                customButtonStyle.normal.textColor = Color.white;
-                customButtonStyle.alignment = TextAnchor.MiddleCenter;
-                customButtonStyle.fontSize = fontSize;
-                customButtonStyle.padding = new UnityHelpers.RectOffset(10, 10, 5, 5);
-
-#if IL2CPP_MELONLOADER
-                return GUILayout.Button(colorName ?? "Color", customButtonStyle, new Il2CppReferenceArray<GUILayoutOption>(0));
-#else
-                return GUILayout.Button(colorName ?? "Color", customButtonStyle);
-#endif
-            }
-            catch (Exception ex)
-            {
-                GUILogger.LogException(ex, "RenderColorPresetButton", "GUIHelper");
-                return false;
-            }
-        }
-
         public bool DrawButton(float windowWidth, string text, Action onClick, float opacity = 1f)
         {
             try
             {
-                return buttonComponents?.DrawButton(text, ButtonVariant.Default, ButtonSize.Default, onClick, false, opacity, new GUILayoutOption[] { GUILayout.Width(windowWidth) }) ?? false;
+                return buttonComponents?.Draw(text, ButtonVariant.Default, ButtonSize.Default, onClick, false, opacity, new GUILayoutOption[] { GUILayout.Width(windowWidth) }) ?? false;
             }
             catch (Exception ex)
             {
@@ -422,52 +395,11 @@ namespace shadcnui
             }
         }
 
-        public bool DrawColoredButton(float windowWidth, string text, Color color, Action onClick)
-        {
-            try
-            {
-                var styleManager = GetStyleManager();
-                if (styleManager == null)
-                {
-#if IL2CPP_MELONLOADER
-                    return GUILayout.Button(text ?? "Button", new Il2CppReferenceArray<GUILayoutOption>(new GUILayoutOption[] { GUILayout.Width(windowWidth) }));
-#else
-                    return GUILayout.Button(text ?? "Button", GUILayout.Width(windowWidth));
-#endif
-                }
-
-                GUIStyle customButtonStyle = new UnityHelpers.GUIStyle(GUI.skin.button);
-                customButtonStyle.normal.background = styleManager.CreateSolidTexture(color);
-                customButtonStyle.hover.background = styleManager.CreateSolidTexture(color * 1.2f);
-                customButtonStyle.active.background = styleManager.CreateSolidTexture(color * 0.8f);
-                customButtonStyle.normal.textColor = Color.white;
-                customButtonStyle.alignment = TextAnchor.MiddleCenter;
-                customButtonStyle.fontSize = fontSize;
-                customButtonStyle.padding = new UnityHelpers.RectOffset(10, 10, 5, 5);
-
-#if IL2CPP_MELONLOADER
-                bool clicked = GUILayout.Button(text ?? "Button", customButtonStyle, new Il2CppReferenceArray<GUILayoutOption>(new GUILayoutOption[] { GUILayout.Width(windowWidth) }));
-#else
-                bool clicked = GUILayout.Button(text ?? "Button", customButtonStyle, GUILayout.Width(windowWidth));
-#endif
-
-                if (clicked)
-                    onClick?.Invoke();
-
-                return clicked;
-            }
-            catch (Exception ex)
-            {
-                GUILogger.LogException(ex, "DrawColoredButton", "GUIHelper");
-                return false;
-            }
-        }
-
         public bool DrawFixedButton(string text, float width, float height, Action onClick = null, float opacity = 1f)
         {
             try
             {
-                return buttonComponents?.DrawButton(text, ButtonVariant.Default, ButtonSize.Default, onClick, false, opacity, new GUILayoutOption[] { GUILayout.Width(width), GUILayout.Height(height) }) ?? false;
+                return buttonComponents?.Draw(text, ButtonVariant.Default, ButtonSize.Default, onClick, false, opacity, new GUILayoutOption[] { GUILayout.Width(width), GUILayout.Height(height) }) ?? false;
             }
             catch (Exception ex)
             {
@@ -480,24 +412,11 @@ namespace shadcnui
         {
             try
             {
-                return buttonComponents?.DrawButton(text, variant, size, onClick, disabled, opacity, options ?? new GUILayoutOption[0]) ?? false;
+                return buttonComponents?.Draw(text, variant, size, onClick, disabled, opacity, options ?? Array.Empty<GUILayoutOption>()) ?? false;
             }
             catch (Exception ex)
             {
                 GUILogger.LogException(ex, "Button", "GUIHelper");
-                return false;
-            }
-        }
-
-        public bool Button(Rect rect, string text, ButtonVariant variant = ButtonVariant.Default, ButtonSize size = ButtonSize.Default, Action onClick = null, bool disabled = false, float opacity = 1f)
-        {
-            try
-            {
-                return buttonComponents?.DrawButton(rect, text, variant, size, onClick, disabled, opacity) ?? false;
-            }
-            catch (Exception ex)
-            {
-                GUILogger.LogException(ex, "Button(Rect)", "GUIHelper");
                 return false;
             }
         }
@@ -1221,31 +1140,16 @@ namespace shadcnui
         #endregion
 
         #region DropdownMenu Components
-        public void DropdownMenu()
+        public void DropdownMenu(DropdownMenuConfig config)
         {
             try
             {
-                dropdownMenuComponents?.DrawDropdownMenu();
+                dropdownMenuComponents?.Draw(config);
             }
             catch (Exception ex)
             {
                 GUILogger.LogException(ex, "drawing dropdown menu", "GUIHelper");
             }
-        }
-
-        public void OpenDropdownMenu(List<DropdownMenuItem> items)
-        {
-            dropdownMenuComponents?.Open(items);
-        }
-
-        public void CloseDropdownMenu()
-        {
-            dropdownMenuComponents?.Close();
-        }
-
-        public bool IsDropdownMenuOpen()
-        {
-            return dropdownMenuComponents?.IsOpen ?? false;
         }
         #endregion
 
@@ -1317,11 +1221,6 @@ namespace shadcnui
         public void DrawDialog(string dialogId, string title, string description, Action content, Action footer = null, float width = 400, float height = 300)
         {
             dialogComponents?.DrawDialog(dialogId, title, description, content, footer, width, height);
-        }
-
-        public Rect GetLastRect()
-        {
-            return GUILayoutUtility.GetLastRect();
         }
 
         public void OpenDialog(string dialogId)
@@ -1505,11 +1404,11 @@ namespace shadcnui
         #endregion
 
         #region Chart Components
-        public void Chart(ChartType chartType, params GUILayoutOption[] options)
+        public void Chart(ChartConfig config)
         {
             try
             {
-                chartComponents?.DrawChart(chartType, options);
+                chartComponents?.DrawChart(config);
             }
             catch (Exception ex)
             {
@@ -1517,101 +1416,16 @@ namespace shadcnui
             }
         }
 
-        public void LineChart(params GUILayoutOption[] options)
-        {
-            Chart(ChartType.Line, options);
-        }
-
-        public void BarChart(params GUILayoutOption[] options)
-        {
-            Chart(ChartType.Bar, options);
-        }
-
-        public void AreaChart(params GUILayoutOption[] options)
-        {
-            Chart(ChartType.Area, options);
-        }
-
-        public void PieChart(params GUILayoutOption[] options)
-        {
-            Chart(ChartType.Pie, options);
-        }
-
-        public void ScatterChart(params GUILayoutOption[] options)
-        {
-            Chart(ChartType.Scatter, options);
-        }
-
-        public void AddChartSeries(ChartSeries series)
+        public void Chart(List<ChartSeries> chartSeries, ChartType chartType, Vector2 size, params GUILayoutOption[] options)
         {
             try
             {
-                chartComponents?.AddSeries(series);
+                var config = new ChartConfig(chartSeries, chartType) { Size = size, Options = options };
+                chartComponents?.DrawChart(config);
             }
             catch (Exception ex)
             {
-                GUILogger.LogException(ex, "adding chart series", "GUIHelper");
-            }
-        }
-
-        public void ClearChartData()
-        {
-            try
-            {
-                chartComponents?.ClearSeries();
-            }
-            catch (Exception ex)
-            {
-                GUILogger.LogException(ex, "clearing chart data", "GUIHelper");
-            }
-        }
-
-        public void SetChartConfig(ChartConfig config)
-        {
-            try
-            {
-                chartComponents?.SetConfig(config);
-            }
-            catch (Exception ex)
-            {
-                GUILogger.LogException(ex, "setting chart config", "GUIHelper");
-            }
-        }
-
-        public void AddChartDataPoint(string seriesKey, ChartDataPoint dataPoint)
-        {
-            try
-            {
-                chartComponents?.AddDataPoint(seriesKey, dataPoint);
-            }
-            catch (Exception ex)
-            {
-                GUILogger.LogException(ex, "adding chart data point", "GUIHelper");
-            }
-        }
-
-        public void SetChartSeriesVisibility(string seriesKey, bool visible)
-        {
-            try
-            {
-                chartComponents?.SetSeriesVisibility(seriesKey, visible);
-            }
-            catch (Exception ex)
-            {
-                GUILogger.LogException(ex, "setting chart series visibility", "GUIHelper");
-            }
-        }
-
-        public void SetChartSize(Vector2 size)
-        {
-            try
-            {
-                if (chartComponents != null)
-                    chartComponents.ChartSize = size;
-            }
-            catch (Exception ex)
-            {
-                GUILogger.LogException(ex, "setting chart size", "GUIHelper");
+                GUILogger.LogException(ex, "drawing chart", "GUIHelper");
             }
         }
         #endregion
@@ -1691,21 +1505,53 @@ namespace shadcnui
         #endregion
 
         #region Tabs Components
-        public int Tabs(string[] tabNames, int selectedIndex, Action<int> onTabChange, int maxLines = 1, params GUILayoutOption[] options)
+        public int DrawTabs(string[] tabNames, int selectedIndex, Action<int> onTabChange, int maxLines = 1, params GUILayoutOption[] options)
         {
             try
             {
-                return tabsComponents?.DrawTabs(tabNames, selectedIndex, onTabChange, maxLines, options) ?? selectedIndex;
+                var config = new Tabs.TabsConfig(tabNames, selectedIndex)
+                {
+                    OnTabChange = onTabChange,
+                    MaxLines = maxLines,
+                    Options = options,
+                };
+                var result = tabsComponents?.Draw(config);
+                if (result.HasValue)
+                {
+                    return result.Value;
+                }
+                return selectedIndex;
             }
             catch (Exception ex)
             {
+                GUILogger.LogException(ex, "drawing tabs", "GUIHelper");
                 return -1;
             }
         }
 
-        public int Tabs(string[] tabNames, int selectedIndex, Action content, int maxLines = 1, Tabs.TabPosition position = shadcnui.GUIComponents.Tabs.TabPosition.Top)
+        public int DrawTabs(string[] tabNames, int selectedIndex, Action content, int maxLines = 1, Tabs.TabPosition position = shadcnui.GUIComponents.Tabs.TabPosition.Top, params GUILayoutOption[] options)
         {
-            return tabsComponents?.DrawTabButtons(tabNames, selectedIndex, content, null, maxLines, position) ?? selectedIndex;
+            try
+            {
+                var config = new Tabs.TabsConfig(tabNames, selectedIndex)
+                {
+                    Content = content,
+                    MaxLines = maxLines,
+                    Position = position,
+                    Options = options,
+                };
+                var result = tabsComponents?.Draw(config);
+                if (result.HasValue)
+                {
+                    return result.Value;
+                }
+                return selectedIndex;
+            }
+            catch (Exception ex)
+            {
+                GUILogger.LogException(ex, "drawing tabs with content", "GUIHelper");
+                return selectedIndex;
+            }
         }
 
         public void BeginTabContent()
@@ -1732,11 +1578,37 @@ namespace shadcnui
             }
         }
 
-        public int TabsWithContent(Tabs.TabConfig[] tabConfigs, int selectedIndex, Action<int> onTabChange = null)
+        public int TabsWithContent(Tabs.TabConfig[] tabConfigs, int selectedIndex, Action<int> onTabChange = null, params GUILayoutOption[] options)
         {
             try
             {
-                return tabsComponents?.TabsWithContent(tabConfigs, selectedIndex, onTabChange) ?? selectedIndex;
+                if (tabConfigs == null || tabConfigs.Length == 0)
+                    return selectedIndex;
+
+                var tabNames = new string[tabConfigs.Length];
+                for (var i = 0; i < tabConfigs.Length; i++)
+                {
+                    tabNames[i] = tabConfigs[i].Name;
+                }
+
+                var config = new Tabs.TabsConfig(tabNames, selectedIndex)
+                {
+                    OnTabChange = onTabChange,
+                    MaxLines = 1,
+                    Position = Tabs.TabPosition.Top,
+                    Options = options,
+                };
+
+                var newSelectedIndex = tabsComponents?.Draw(config) ?? selectedIndex;
+
+                if (newSelectedIndex >= 0 && newSelectedIndex < tabConfigs.Length)
+                {
+                    BeginTabContent();
+                    tabConfigs[newSelectedIndex].Content?.Invoke();
+                    EndTabContent();
+                }
+
+                return newSelectedIndex;
             }
             catch (Exception ex)
             {
@@ -1745,11 +1617,22 @@ namespace shadcnui
             }
         }
 
-        public int VerticalTabs(string[] tabNames, int selectedIndex, Action content, float tabWidth = 120f, int maxLines = 1, Tabs.TabSide side = shadcnui.GUIComponents.Tabs.TabSide.Left)
+        public int VerticalTabs(string[] tabNames, int selectedIndex, Action content, float tabWidth = 120f, int maxLines = 1, Tabs.TabSide side = shadcnui.GUIComponents.Tabs.TabSide.Left, params GUILayoutOption[] options)
         {
             try
             {
-                return tabsComponents?.VerticalTabs(tabNames, selectedIndex, content, null, tabWidth, maxLines, side) ?? selectedIndex;
+                var position = side == Tabs.TabSide.Left ? Tabs.TabPosition.Left : Tabs.TabPosition.Right;
+
+                var config = new Tabs.TabsConfig(tabNames, selectedIndex)
+                {
+                    Content = content,
+                    TabWidth = tabWidth,
+                    MaxLines = maxLines,
+                    Side = side,
+                    Position = position,
+                    Options = options,
+                };
+                return tabsComponents?.Draw(config) ?? selectedIndex;
             }
             catch (Exception ex)
             {
@@ -2238,11 +2121,11 @@ namespace shadcnui
         #endregion
 
         #region MenuBar Components
-        public void MenuBar(List<MenuBar.MenuItem> items, params GUILayoutOption[] options)
+        public void MenuBar(MenuBar.MenuBarConfig config)
         {
             try
             {
-                menuBarComponents?.DrawMenuBar(items, options);
+                menuBarComponents?.Draw(config);
             }
             catch (Exception ex)
             {
@@ -2250,16 +2133,18 @@ namespace shadcnui
             }
         }
 
-        public bool IsMenuBarDropdownOpen()
+        public void MenuBar(List<MenuBar.MenuItem> items, params GUILayoutOption[] options)
         {
-            return menuBarComponents?.IsDropdownOpen ?? false;
+            MenuBar.MenuBarConfig config = new MenuBar.MenuBarConfig(items) { Options = options };
+            try
+            {
+                menuBarComponents?.Draw(config);
+            }
+            catch (Exception ex)
+            {
+                GUILogger.LogException(ex, "drawing menu bar", "GUIHelper");
+            }
         }
-
-        public void CloseMenuBarDropdown()
-        {
-            menuBarComponents?.CloseDropdown();
-        }
-
         #endregion
     }
 }
