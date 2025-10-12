@@ -426,7 +426,7 @@ namespace shadcnui
         public static bool Button(string text, GUIStyle style)
         {
 #if IL2CPP_MELONLOADER
-            return GUILayout.Button(text, (UnityEngine.GUIStyle)style, new Il2CppReferenceArray<GUILayoutOption>(shadcnui.GUIComponents.Layout.EmptyOptions));
+            return GUILayout.Button(text, (UnityEngine.GUIStyle)style, new Il2CppReferenceArray<GUILayoutOption>(shadcnui.GUIComponents.Layout.Layout.EmptyOptions));
 #else
             return GUILayout.Button(text, style);
 #endif
