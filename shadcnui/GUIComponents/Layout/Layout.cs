@@ -24,7 +24,7 @@ namespace shadcnui.GUIComponents
         public Vector2 DrawScrollView(Vector2 scrollPosition, Action drawContent, params GUILayoutOption[] options)
         {
 #if IL2CPP_MELONLOADER
-            scrollPosition = GUILayout.BeginScrollView(scrollPosition, (Il2CppReferenceArray<GUILayoutOption>)options);
+            scrollPosition = GUILayout.BeginScrollView(scrollPosition, new Il2CppReferenceArray<GUILayoutOption>(options));
 #else
             scrollPosition = GUILayout.BeginScrollView(scrollPosition, options);
 #endif
@@ -54,7 +54,7 @@ namespace shadcnui.GUIComponents
         public void BeginHorizontalGroup(GUIStyle style, params GUILayoutOption[] options)
         {
 #if IL2CPP_MELONLOADER
-            GUILayout.BeginHorizontal(style, (Il2CppReferenceArray<GUILayoutOption>)options);
+            GUILayout.BeginHorizontal(style, new Il2CppReferenceArray<GUILayoutOption>(options));
 #else
             GUILayout.BeginHorizontal(style, options);
 #endif
@@ -79,7 +79,7 @@ namespace shadcnui.GUIComponents
         {
             GUIStyle boxStyle = GUIStyle.none;
 #if IL2CPP_MELONLOADER
-            GUILayout.BeginVertical(boxStyle, (Il2CppReferenceArray<GUILayoutOption>)options);
+            GUILayout.BeginVertical(boxStyle, new Il2CppReferenceArray<GUILayoutOption>(options));
 #else
             GUILayout.BeginVertical(boxStyle, options);
 #endif
@@ -88,7 +88,7 @@ namespace shadcnui.GUIComponents
         public void BeginVerticalGroup(GUIStyle style, params GUILayoutOption[] options)
         {
 #if IL2CPP_MELONLOADER
-            GUILayout.BeginVertical(style, (Il2CppReferenceArray<GUILayoutOption>)options);
+            GUILayout.BeginVertical(style, new Il2CppReferenceArray<GUILayoutOption>(options));
 #else
             GUILayout.BeginVertical(style, options);
 #endif

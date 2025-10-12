@@ -1,9 +1,6 @@
 using System;
 using System.Collections.Generic;
 using UnityEngine;
-#if IL2CPP_MELONLOADER
-using UnhollowerBaseLib;
-#endif
 
 namespace shadcnui.GUIComponents
 {
@@ -32,59 +29,92 @@ namespace shadcnui.GUIComponents
         }
     }
 
+    public class DropdownMenuConfig
+    {
+        public List<DropdownMenuItem> Items { get; set; }
+        public GUILayoutOption[] Options { get; set; }
+
+        public DropdownMenuConfig(List<DropdownMenuItem> items)
+        {
+            Items = items;
+        }
+    }
+
     public class DropdownMenu
     {
-        private GUIHelper guiHelper;
-        private Layout layoutComponents;
-        private bool isOpen;
-        private Vector2 scrollPosition;
-        private Stack<List<DropdownMenuItem>> menuStack = new Stack<List<DropdownMenuItem>>();
+        private readonly GUIHelper _guiHelper;
+        private readonly Layout _layoutComponents;
+        private bool _isOpen;
+        private Vector2 _scrollPosition;
+        private readonly Stack<List<DropdownMenuItem>> _menuStack = new Stack<List<DropdownMenuItem>>();
 
         public DropdownMenu(GUIHelper helper)
         {
-            this.guiHelper = helper;
-            layoutComponents = new Layout(helper);
+            _guiHelper = helper;
+            _layoutComponents = new Layout(helper);
         }
 
-        public bool IsOpen => isOpen;
+        public bool IsOpen => _isOpen;
 
         public void Open(List<DropdownMenuItem> rootItems)
         {
-            menuStack.Clear();
-            menuStack.Push(rootItems);
-            isOpen = true;
+            _menuStack.Clear();
+            _menuStack.Push(rootItems);
+            _isOpen = true;
         }
 
         public void Close()
         {
-            menuStack.Clear();
-            isOpen = false;
+            _menuStack.Clear();
+            _isOpen = false;
         }
 
-        public void DrawDropdownMenu()
+        public void Draw(DropdownMenuConfig config)
         {
-            if (!isOpen || menuStack.Count == 0)
+            if (config?.Items == null || config.Items.Count == 0)
+            {
+                Close();
+                return;
+            }
+
+            if (!_isOpen)
+            {
+                Open(config.Items);
+            }
+
+            DrawDropdownMenu(config.Options);
+        }
+
+        private void DrawDropdownMenu(GUILayoutOption[] options)
+        {
+            if (!_isOpen || _menuStack.Count == 0)
                 return;
 
-            var styleManager = guiHelper.GetStyleManager();
+            var styleManager = _guiHelper.GetStyleManager();
 
-            layoutComponents.BeginVerticalGroup(styleManager.dropdownMenuContentStyle, GUILayout.ExpandWidth(true), GUILayout.MinHeight(0), GUILayout.MaxHeight(200));
-            scrollPosition = layoutComponents.DrawScrollView(
-                scrollPosition,
+            var layoutOptions = new List<GUILayoutOption> { GUILayout.ExpandWidth(true), GUILayout.MinHeight(0), GUILayout.MaxHeight(200) };
+            if (options != null)
+            {
+                layoutOptions.AddRange(options);
+            }
+
+            _layoutComponents.BeginVerticalGroup(styleManager.dropdownMenuContentStyle, layoutOptions.ToArray());
+            _scrollPosition = _layoutComponents.DrawScrollView(
+                _scrollPosition,
                 () =>
                 {
-                    if (menuStack.Count > 1)
+                    if (_menuStack.Count > 1)
                     {
                         if (UnityHelpers.Button("<- Back", styleManager.dropdownMenuItemStyle))
                         {
-                            menuStack.Pop();
+                            _menuStack.Pop();
                             return;
                         }
 
                         UnityHelpers.Box("", styleManager.dropdownMenuSeparatorStyle);
                     }
 
-                    var currentItems = menuStack.Peek();
+                    var currentItems = _menuStack.Peek();
                     foreach (var item in currentItems)
                     {
                         DrawMenuItem(item);
@@ -93,48 +123,48 @@ namespace shadcnui.GUIComponents
                 GUILayout.ExpandWidth(true),
                 GUILayout.ExpandHeight(true)
             );
-            layoutComponents.EndVerticalGroup();
+            _layoutComponents.EndVerticalGroup();
         }
 
         private void DrawMenuItem(DropdownMenuItem item)
         {
-            var styleManager = guiHelper.GetStyleManager();
+            var styleManager = _guiHelper.GetStyleManager();
 
             switch (item.Type)
             {
                 case DropdownMenuItemType.Header:
 #if IL2CPP_MELONLOADER
-                    GUILayout.Label(item.Content, styleManager.dropdownMenuHeaderStyle, new Il2CppReferenceArray<GUILayoutOption>(new GUILayoutOption[0]));
+                    GUILayout.Label(item.Content, styleManager.dropdownMenuHeaderStyle, shadcnui.GUIComponents.Layout.EmptyOptions);
 #else
                     GUILayout.Label(item.Content, styleManager.dropdownMenuHeaderStyle);
 #endif
                     break;
                 case DropdownMenuItemType.Separator:
-#if IL2CPP_MELONLOADER
-                    GUILayout.Box("", styleManager.dropdownMenuSeparatorStyle, new Il2CppReferenceArray<GUILayoutOption>(new GUILayoutOption[0]));
-#else
-                    GUILayout.Box("", styleManager.dropdownMenuSeparatorStyle);
-#endif
+                    UnityHelpers.Box("", styleManager.dropdownMenuSeparatorStyle);
                     break;
                 case DropdownMenuItemType.Item:
                     if (item.SubItems != null && item.SubItems.Count > 0)
                     {
+                        if (
 #if IL2CPP_MELONLOADER
-                        if (GUILayout.Button(item.Content, styleManager.dropdownMenuItemStyle, new Il2CppReferenceArray<GUILayoutOption>(new GUILayoutOption[0])))
+                            GUILayout.Button(item.Content, styleManager.dropdownMenuItemStyle, shadcnui.GUIComponents.Layout.EmptyOptions)
 #else
-                        if (GUILayout.Button(item.Content, styleManager.dropdownMenuItemStyle))
+                            GUILayout.Button(item.Content, styleManager.dropdownMenuItemStyle)
 #endif
+                        )
                         {
-                            menuStack.Push(item.SubItems);
+                            _menuStack.Push(item.SubItems);
                         }
                     }
                     else
                     {
+                        if (
 #if IL2CPP_MELONLOADER
-                        if (GUILayout.Button(item.Content, styleManager.dropdownMenuItemStyle, new Il2CppReferenceArray<GUILayoutOption>(new GUILayoutOption[0])))
+                            GUILayout.Button(item.Content, styleManager.dropdownMenuItemStyle, shadcnui.GUIComponents.Layout.EmptyOptions)
 #else
-                        if (GUILayout.Button(item.Content, styleManager.dropdownMenuItemStyle))
+                            GUILayout.Button(item.Content, styleManager.dropdownMenuItemStyle)
 #endif
+                        )
                         {
                             item.OnClick?.Invoke();
                             Close();

@@ -94,6 +94,8 @@ public class UI : MonoBehaviour
     private int selectDemoCurrentSelection = 0;
     private string inputFieldValue = "Default Input";
     private Vector2 scrollAreaScrollPosition = Vector2.zero;
+    private List<ChartSeries> chartSeries;
+    private bool dropdownOpen = false;
 
     private System.Collections.Generic.List<DropdownMenuItem> dropdownMenuItems;
 
@@ -102,14 +104,11 @@ public class UI : MonoBehaviour
     private DateTime? calendarRangeEnd;
     private System.Collections.Generic.List<DateTime> calendarDisabledDates = new System.Collections.Generic.List<DateTime>();
 
-    // Dialog state
     private bool dialogOpen = false;
 
-    // DatePicker state
     private DateTime? selectedDate;
     private DateTime? selectedDateWithLabel;
 
-    // DataTable state
     private System.Collections.Generic.List<DataTableColumn> dataTableColumns;
     private System.Collections.Generic.List<DataTableRow> dataTableData;
 
@@ -222,9 +221,7 @@ public class UI : MonoBehaviour
                     currentDemoTab,
                     () =>
                     {
-                        guiHelper.BeginTabContent();
-                        scrollPosition = guiHelper.DrawScrollView(scrollPosition, DrawCurrentTabContent, GUILayout.ExpandHeight(true));
-                        guiHelper.EndTabContent();
+                        scrollPosition = guiHelper.DrawScrollView(scrollPosition, DrawCurrentTabContent, GUILayout.Height(400));
                     },
                     tabWidth: 150,
                     maxLines: 2,
@@ -236,14 +233,12 @@ public class UI : MonoBehaviour
                 tabsOnBottom = guiHelper.Toggle("Tabs on Bottom", tabsOnBottom);
                 guiHelper.HorizontalSeparator();
                 var position = tabsOnBottom ? Tabs.TabPosition.Bottom : Tabs.TabPosition.Top;
-                currentDemoTab = guiHelper.Tabs(
+                currentDemoTab = guiHelper.DrawTabs(
                     demoTabs.Select(tab => tab.Name).ToArray(),
                     currentDemoTab,
                     () =>
                     {
-                        guiHelper.BeginTabContent();
-                        scrollPosition = guiHelper.DrawScrollView(scrollPosition, DrawCurrentTabContent, GUILayout.ExpandHeight(true));
-                        guiHelper.EndTabContent();
+                        scrollPosition = guiHelper.DrawScrollView(scrollPosition, DrawCurrentTabContent, GUILayout.Height(400));
                     },
                     maxLines: 2,
                     position: position
@@ -309,7 +304,7 @@ public class UI : MonoBehaviour
         tabsOnBottom = guiHelper.Toggle("Tabs on Bottom", tabsOnBottom);
         string[] tabNames = { "Account", "Password", "Notifications" };
         var position = tabsOnBottom ? Tabs.TabPosition.Bottom : Tabs.TabPosition.Top;
-        selectedTab = guiHelper.Tabs(
+        selectedTab = guiHelper.DrawTabs(
             tabNames,
             selectedTab,
             () =>
@@ -332,7 +327,7 @@ public class UI : MonoBehaviour
 
         guiHelper.Label("Tabs with Content (using TabConfig)");
         Tabs.TabConfig[] tabConfigs = new Tabs.TabConfig[] { new Tabs.TabConfig("Tab A", () => guiHelper.Label("Content for Tab A.")), new Tabs.TabConfig("Tab B", () => guiHelper.Label("Content for Tab B.")), new Tabs.TabConfig("Tab C", () => guiHelper.Label("Content for Tab C.")) };
-        guiHelper.TabsWithContent(tabConfigs, selectedTab);
+        guiHelper.TabsWithContent(tabConfigs, selectedTab, null);
         guiHelper.Label("Code: guiHelper.TabsWithContent(tabConfigs, selectedTab);", LabelVariant.Muted);
         guiHelper.HorizontalSeparator();
 
@@ -602,29 +597,81 @@ public class UI : MonoBehaviour
 
         if (guiHelper.Button("Open Dropdown Menu"))
         {
+            dropdownOpen = !dropdownOpen;
+        }
+
+        if (dropdownOpen)
+        {
             dropdownMenuItems = new System.Collections.Generic.List<DropdownMenuItem>()
             {
                 new DropdownMenuItem(DropdownMenuItemType.Header, "My Account"),
-                new DropdownMenuItem(DropdownMenuItemType.Item, "Profile", () => Debug.Log("Profile selected")),
-                new DropdownMenuItem(DropdownMenuItemType.Item, "Billing", () => Debug.Log("Billing selected")),
-                new DropdownMenuItem(DropdownMenuItemType.Item, "Settings", () => Debug.Log("Settings selected")),
+                new DropdownMenuItem(
+                    DropdownMenuItemType.Item,
+                    "Profile",
+                    () =>
+                    {
+                        Debug.Log("Profile selected");
+                        dropdownOpen = false;
+                    }
+                ),
+                new DropdownMenuItem(
+                    DropdownMenuItemType.Item,
+                    "Billing",
+                    () =>
+                    {
+                        Debug.Log("Billing selected");
+                        dropdownOpen = false;
+                    }
+                ),
+                new DropdownMenuItem(
+                    DropdownMenuItemType.Item,
+                    "Settings",
+                    () =>
+                    {
+                        Debug.Log("Settings selected");
+                        dropdownOpen = false;
+                    }
+                ),
                 new DropdownMenuItem(DropdownMenuItemType.Separator),
                 new DropdownMenuItem(DropdownMenuItemType.Item, "Team")
                 {
-                    SubItems = new System.Collections.Generic.List<DropdownMenuItem>() { new DropdownMenuItem(DropdownMenuItemType.Item, "Email", () => Debug.Log("Invite by Email")), new DropdownMenuItem(DropdownMenuItemType.Item, "Phone", () => Debug.Log("Invite by Phone")) },
+                    SubItems = new System.Collections.Generic.List<DropdownMenuItem>()
+                    {
+                        new DropdownMenuItem(
+                            DropdownMenuItemType.Item,
+                            "Email",
+                            () =>
+                            {
+                                Debug.Log("Invite by Email");
+                                dropdownOpen = false;
+                            }
+                        ),
+                        new DropdownMenuItem(
+                            DropdownMenuItemType.Item,
+                            "Phone",
+                            () =>
+                            {
+                                Debug.Log("Invite by Phone");
+                                dropdownOpen = false;
+                            }
+                        ),
+                    },
                 },
                 new DropdownMenuItem(DropdownMenuItemType.Separator),
-                new DropdownMenuItem(DropdownMenuItemType.Item, "Log out", () => Debug.Log("Log out selected")),
+                new DropdownMenuItem(
+                    DropdownMenuItemType.Item,
+                    "Log out",
+                    () =>
+                    {
+                        Debug.Log("Log out selected");
+                        dropdownOpen = false;
+                    }
+                ),
             };
-            guiHelper.OpenDropdownMenu(dropdownMenuItems);
+            guiHelper.DropdownMenu(new DropdownMenuConfig(dropdownMenuItems));
         }
 
-        if (guiHelper.IsDropdownMenuOpen())
-        {
-            guiHelper.DropdownMenu();
-        }
-
-        guiHelper.Label("Code: guiHelper.DropdownMenu(items);", LabelVariant.Muted);
+        guiHelper.Label("Code: guiHelper.DropdownMenu(new DropdownMenuConfig(items));", LabelVariant.Muted);
         guiHelper.HorizontalSeparator();
 
         GUILayout.EndVertical();
@@ -716,20 +763,9 @@ public class UI : MonoBehaviour
         guiHelper.Label("Code: guiHelper.Button(label, disabled: true);", LabelVariant.Muted);
         guiHelper.HorizontalSeparator();
 
-        guiHelper.Label("Render Color Preset Button", LabelVariant.Default);
-        guiHelper.RenderColorPresetButton("Red Button", Color.red);
-        guiHelper.RenderColorPresetButton("Blue Button", Color.blue);
-        guiHelper.Label("Code: guiHelper.RenderColorPresetButton(name, color);", LabelVariant.Muted);
-        guiHelper.HorizontalSeparator();
-
         guiHelper.Label("Draw Button (Simple)", LabelVariant.Default);
         guiHelper.DrawButton(200, "Simple Draw Button", () => Debug.Log("Simple Draw Button Clicked!"));
         guiHelper.Label("Code: guiHelper.DrawButton(width, text, onClick);", LabelVariant.Muted);
-        guiHelper.HorizontalSeparator();
-
-        guiHelper.Label("Draw Colored Button", LabelVariant.Default);
-        guiHelper.DrawColoredButton(200, "Colored Draw Button", Color.magenta, () => Debug.Log("Colored Draw Button Clicked!"));
-        guiHelper.Label("Code: guiHelper.DrawColoredButton(width, text, color, onClick);", LabelVariant.Muted);
         guiHelper.HorizontalSeparator();
 
         guiHelper.Label("Draw Fixed Button", LabelVariant.Default);
@@ -1636,7 +1672,7 @@ public class UI : MonoBehaviour
             new MenuBar.MenuItem("Help", null, false, new List<MenuBar.MenuItem> { new MenuBar.MenuItem("Documentation", () => Debug.Log("Open documentation")), new MenuBar.MenuItem("About", () => Debug.Log("About dialog")) }),
         };
 
-        guiHelper.MenuBar(menuItems);
+        guiHelper.MenuBar(new MenuBar.MenuBarConfig(menuItems));
         guiHelper.EndVerticalGroup();
     }
 
@@ -1647,9 +1683,9 @@ public class UI : MonoBehaviour
         guiHelper.MutedLabel("Beautiful charts built for Unity. Copy and paste into your apps.");
         guiHelper.HorizontalSeparator();
 
-        var chartComponents = guiHelper.GetChartComponents();
-        if (chartComponents.Series.Count == 0)
+        if (chartSeries == null)
         {
+            chartSeries = new List<ChartSeries>();
             var desktopSeries = new ChartSeries("desktop", "Desktop", new Color(0.149f, 0.388f, 0.922f));
             desktopSeries.Data.Add(new ChartDataPoint("January", 186, new Color(0.149f, 0.388f, 0.922f)));
             desktopSeries.Data.Add(new ChartDataPoint("February", 305, new Color(0.149f, 0.388f, 0.922f)));
@@ -1666,8 +1702,8 @@ public class UI : MonoBehaviour
             mobileSeries.Data.Add(new ChartDataPoint("May", 130, new Color(0.376f, 0.647f, 0.980f)));
             mobileSeries.Data.Add(new ChartDataPoint("June", 140, new Color(0.376f, 0.647f, 0.980f)));
 
-            guiHelper.AddChartSeries(desktopSeries);
-            guiHelper.AddChartSeries(mobileSeries);
+            chartSeries.Add(desktopSeries);
+            chartSeries.Add(mobileSeries);
         }
 
         guiHelper.BeginCard(600, 400);
@@ -1679,12 +1715,11 @@ public class UI : MonoBehaviour
 
         guiHelper.CardContent(() =>
         {
-            guiHelper.SetChartSize(new Vector2(600, 350));
-            guiHelper.BarChart(GUILayout.Width(600), GUILayout.Height(350));
+            guiHelper.Chart(new ChartConfig(chartSeries, ChartType.Bar) { Size = new Vector2(600, 350) });
         });
         guiHelper.EndCard();
 
-        guiHelper.Label("Code: guiHelper.BarChart(GUILayout.Width(600), GUILayout.Height(350));", LabelVariant.Muted);
+        guiHelper.Label("Code: guiHelper.Chart(config, series, ChartType.Bar, size);", LabelVariant.Muted);
         guiHelper.HorizontalSeparator();
 
         guiHelper.BeginCard(600, 350);
@@ -1696,12 +1731,11 @@ public class UI : MonoBehaviour
 
         guiHelper.CardContent(() =>
         {
-            guiHelper.SetChartSize(new Vector2(600, 300));
-            guiHelper.LineChart(GUILayout.Width(600), GUILayout.Height(300));
+            guiHelper.Chart(new ChartConfig(chartSeries, ChartType.Line) { Size = new Vector2(600, 300) });
         });
         guiHelper.EndCard();
 
-        guiHelper.Label("Code: guiHelper.LineChart();", LabelVariant.Muted);
+        guiHelper.Label("Code: guiHelper.Chart(config, series, ChartType.Line, size);", LabelVariant.Muted);
         guiHelper.HorizontalSeparator();
 
         guiHelper.BeginCard(600, 350);
@@ -1713,12 +1747,11 @@ public class UI : MonoBehaviour
 
         guiHelper.CardContent(() =>
         {
-            guiHelper.SetChartSize(new Vector2(600, 300));
-            guiHelper.AreaChart(GUILayout.Width(600), GUILayout.Height(300));
+            guiHelper.Chart(new ChartConfig(chartSeries, ChartType.Area) { Size = new Vector2(600, 300) });
         });
         guiHelper.EndCard();
 
-        guiHelper.Label("Code: guiHelper.AreaChart();", LabelVariant.Muted);
+        guiHelper.Label("Code: guiHelper.Chart(config, series, ChartType.Area, size);", LabelVariant.Muted);
         guiHelper.HorizontalSeparator();
 
         guiHelper.BeginCard(450, 450);
@@ -1730,45 +1763,25 @@ public class UI : MonoBehaviour
 
         guiHelper.CardContent(() =>
         {
-            guiHelper.SetChartSize(new Vector2(400, 400));
-            guiHelper.PieChart(GUILayout.Width(400), GUILayout.Height(400));
+            guiHelper.Chart(new ChartConfig(chartSeries, ChartType.Pie) { Size = new Vector2(400, 400) });
         });
         guiHelper.EndCard();
 
-        guiHelper.Label("Code: guiHelper.PieChart();", LabelVariant.Muted);
+        guiHelper.Label("Code: guiHelper.Chart(config, series, ChartType.Pie, size);", LabelVariant.Muted);
         guiHelper.HorizontalSeparator();
 
         guiHelper.Label("Chart Configuration", LabelVariant.Default);
         guiHelper.BeginHorizontalGroup();
         if (guiHelper.Button("Clear Data"))
         {
-            guiHelper.ClearChartData();
+            chartSeries.Clear();
         }
         if (guiHelper.Button("Reload Sample Data"))
         {
-            guiHelper.ClearChartData();
-
-            var desktopSeries = new ChartSeries("desktop", "Desktop", new Color(0.149f, 0.388f, 0.922f));
-            desktopSeries.Data.Add(new ChartDataPoint("January", 186, new Color(0.149f, 0.388f, 0.922f)));
-            desktopSeries.Data.Add(new ChartDataPoint("February", 305, new Color(0.149f, 0.388f, 0.922f)));
-            desktopSeries.Data.Add(new ChartDataPoint("March", 237, new Color(0.149f, 0.388f, 0.922f)));
-            desktopSeries.Data.Add(new ChartDataPoint("April", 73, new Color(0.149f, 0.388f, 0.922f)));
-            desktopSeries.Data.Add(new ChartDataPoint("May", 209, new Color(0.149f, 0.388f, 0.922f)));
-            desktopSeries.Data.Add(new ChartDataPoint("June", 214, new Color(0.149f, 0.388f, 0.922f)));
-
-            var mobileSeries = new ChartSeries("mobile", "Mobile", new Color(0.376f, 0.647f, 0.980f));
-            mobileSeries.Data.Add(new ChartDataPoint("January", 80, new Color(0.376f, 0.647f, 0.980f)));
-            mobileSeries.Data.Add(new ChartDataPoint("February", 200, new Color(0.376f, 0.647f, 0.980f)));
-            mobileSeries.Data.Add(new ChartDataPoint("March", 120, new Color(0.376f, 0.647f, 0.980f)));
-            mobileSeries.Data.Add(new ChartDataPoint("April", 190, new Color(0.376f, 0.647f, 0.980f)));
-            mobileSeries.Data.Add(new ChartDataPoint("May", 130, new Color(0.376f, 0.647f, 0.980f)));
-            mobileSeries.Data.Add(new ChartDataPoint("June", 140, new Color(0.376f, 0.647f, 0.980f)));
-
-            guiHelper.AddChartSeries(desktopSeries);
-            guiHelper.AddChartSeries(mobileSeries);
+            chartSeries = null;
         }
         guiHelper.EndHorizontalGroup();
-        guiHelper.Label("Code: guiHelper.ClearChartData(); guiHelper.AddChartSeries(series);", LabelVariant.Muted);
+        guiHelper.Label("Code: chartSeries.Clear();", LabelVariant.Muted);
 
         guiHelper.EndVerticalGroup();
     }
