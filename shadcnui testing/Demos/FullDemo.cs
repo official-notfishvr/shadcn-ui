@@ -3,8 +3,8 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
-using shadcnui.GUIComponents.Core;
 using shadcnui.GUIComponents.Controls;
+using shadcnui.GUIComponents.Core;
 using shadcnui.GUIComponents.Data;
 using shadcnui.GUIComponents.Display;
 using shadcnui.GUIComponents.Layout;
@@ -15,7 +15,7 @@ using UnhollowerBaseLib;
 
 namespace shadcnui_testing.Menu
 {
-    public class UI : MonoBehaviour
+    public class FullDemo : MonoBehaviour
     {
         private GUIHelper guiHelper;
         private Rect windowRect = new Rect(20, 20, 1450, 600);
@@ -85,7 +85,6 @@ namespace shadcnui_testing.Menu
         private bool optionBValue = true;
 
         private bool expandableAlertExpanded = false;
-        private bool dismissibleBadgeDismissed = false;
 
         private string outlineTextAreaValue = "Outline Text Area";
         private string ghostTextAreaValue = "Ghost Text Area";
@@ -138,31 +137,31 @@ namespace shadcnui_testing.Menu
             */
             demoTabs = new Tabs.TabConfig[]
             {
-            new Tabs.TabConfig("Avatar", DrawAvatarDemos),
-            new Tabs.TabConfig("Badge", DrawBadgeDemos),
-            new Tabs.TabConfig("Button", DrawButtonDemos),
-            new Tabs.TabConfig("Card", DrawCardDemos),
-            new Tabs.TabConfig("Checkbox", DrawCheckboxDemos),
-            new Tabs.TabConfig("DataTable", DrawDataTableDemos),
-            new Tabs.TabConfig("DatePicker", DrawDatePickerDemos),
-            new Tabs.TabConfig("Dialog", DrawDialogDemos),
-            new Tabs.TabConfig("Input", DrawInputDemos),
-            new Tabs.TabConfig("Label", DrawLabelDemos),
-            new Tabs.TabConfig("Layout", DrawLayoutDemos),
-            new Tabs.TabConfig("Progress", DrawProgressDemos),
-            new Tabs.TabConfig("Separator", DrawSeparatorDemos),
-            new Tabs.TabConfig("Slider", DrawSliderDemos),
-            new Tabs.TabConfig("Switch", DrawSwitchDemos),
-            new Tabs.TabConfig("Table", DrawTableDemos),
-            new Tabs.TabConfig("Tabs", DrawTabsDemos),
-            new Tabs.TabConfig("Text Area", DrawTextAreaDemos),
-            new Tabs.TabConfig("Toggle", DrawToggleDemos),
-            new Tabs.TabConfig("Calendar", DrawCalendarDemos),
-            new Tabs.TabConfig("DropdownMenu", DrawDropdownMenuDemos),
-            new Tabs.TabConfig("Popover", DrawPopoverDemos),
-            new Tabs.TabConfig("Select", DrawSelectDemos),
-            new Tabs.TabConfig("Chart", DrawChartDemos),
-            new Tabs.TabConfig("MenuBar", DrawMenuBar),
+                new Tabs.TabConfig("Avatar", DrawAvatarDemos),
+                new Tabs.TabConfig("Badge", DrawBadgeDemos),
+                new Tabs.TabConfig("Button", DrawButtonDemos),
+                new Tabs.TabConfig("Card", DrawCardDemos),
+                new Tabs.TabConfig("Checkbox", DrawCheckboxDemos),
+                new Tabs.TabConfig("DataTable", DrawDataTableDemos),
+                new Tabs.TabConfig("DatePicker", DrawDatePickerDemos),
+                new Tabs.TabConfig("Dialog", DrawDialogDemos),
+                new Tabs.TabConfig("Input", DrawInputDemos),
+                new Tabs.TabConfig("Label", DrawLabelDemos),
+                new Tabs.TabConfig("Layout", DrawLayoutDemos),
+                new Tabs.TabConfig("Progress", DrawProgressDemos),
+                new Tabs.TabConfig("Separator", DrawSeparatorDemos),
+                new Tabs.TabConfig("Slider", DrawSliderDemos),
+                new Tabs.TabConfig("Switch", DrawSwitchDemos),
+                new Tabs.TabConfig("Table", DrawTableDemos),
+                new Tabs.TabConfig("Tabs", DrawTabsDemos),
+                new Tabs.TabConfig("Text Area", DrawTextAreaDemos),
+                new Tabs.TabConfig("Toggle", DrawToggleDemos),
+                new Tabs.TabConfig("Calendar", DrawCalendarDemos),
+                new Tabs.TabConfig("DropdownMenu", DrawDropdownMenuDemos),
+                new Tabs.TabConfig("Popover", DrawPopoverDemos),
+                new Tabs.TabConfig("Select", DrawSelectDemos),
+                new Tabs.TabConfig("Chart", DrawChartDemos),
+                new Tabs.TabConfig("MenuBar", DrawMenuBar),
             };
         }
 
@@ -257,7 +256,7 @@ namespace shadcnui_testing.Menu
         void DrawCurrentTabContent()
         {
 #if IL2CPP_MELONLOADER
-        GUILayout.BeginVertical(new Il2CppReferenceArray<GUILayoutOption>(new GUILayoutOption[] { }));
+            GUILayout.BeginVertical(new Il2CppReferenceArray<GUILayoutOption>(new GUILayoutOption[] { }));
 #else
             GUILayout.BeginVertical();
 #endif
@@ -432,29 +431,9 @@ namespace shadcnui_testing.Menu
             guiHelper.Label("Code: guiHelper.AvatarWithName(image, fallbackText, name, showNameBelow);", LabelVariant.Muted);
             guiHelper.HorizontalSeparator();
 
-            guiHelper.Label("Custom Avatar", LabelVariant.Default);
-            guiHelper.CustomAvatar(img, "CA", Color.blue, Color.white);
-            guiHelper.Label("Code: guiHelper.CustomAvatar(image, fallbackText, backgroundColor, textColor);", LabelVariant.Muted);
-            guiHelper.HorizontalSeparator();
-
             guiHelper.Label("Avatar with Border", LabelVariant.Default);
             guiHelper.AvatarWithBorder(img, "BR", Color.red);
             guiHelper.Label("Code: guiHelper.AvatarWithBorder(image, fallbackText, borderColor);", LabelVariant.Muted);
-            guiHelper.HorizontalSeparator();
-
-            guiHelper.Label("Avatar with Hover", LabelVariant.Default);
-            guiHelper.AvatarWithHover(img, "HV", onClick: () => Debug.Log("Avatar Hover Clicked!"));
-            guiHelper.Label("Code: guiHelper.AvatarWithHover(image, fallbackText, onClick);", LabelVariant.Muted);
-            guiHelper.HorizontalSeparator();
-
-            guiHelper.Label("Avatar with Loading", LabelVariant.Default);
-            guiHelper.AvatarWithLoading(img, "LD", true);
-            guiHelper.Label("Code: guiHelper.AvatarWithLoading(image, fallbackText, isLoading);", LabelVariant.Muted);
-            guiHelper.HorizontalSeparator();
-
-            guiHelper.Label("Avatar with Tooltip", LabelVariant.Default);
-            guiHelper.AvatarWithTooltip(img, "TP", "This is a user avatar.");
-            guiHelper.Label("Code: guiHelper.AvatarWithTooltip(image, fallbackText, tooltip);", LabelVariant.Muted);
             guiHelper.HorizontalSeparator();
 
             GUILayout.EndVertical();
@@ -491,11 +470,6 @@ namespace shadcnui_testing.Menu
             guiHelper.Label("Code: guiHelper.BadgeWithIcon(text, icon);", LabelVariant.Muted);
             guiHelper.HorizontalSeparator();
 
-            guiHelper.Label("Custom Badge", LabelVariant.Default);
-            guiHelper.CustomBadge("Custom", Color.yellow, Color.black);
-            guiHelper.Label("Code: guiHelper.CustomBadge(text, backgroundColor, textColor);", LabelVariant.Muted);
-            guiHelper.HorizontalSeparator();
-
             guiHelper.Label("Count Badge", LabelVariant.Default);
             guiHelper.CountBadge(5);
             guiHelper.CountBadge(105, maxCount: 99);
@@ -508,18 +482,6 @@ namespace shadcnui_testing.Menu
             guiHelper.Label("Code: guiHelper.StatusBadge(text, isActive);", LabelVariant.Muted);
             guiHelper.HorizontalSeparator();
 
-            guiHelper.Label("Dismissible Badge", LabelVariant.Default);
-            if (!dismissibleBadgeDismissed)
-            {
-                dismissibleBadgeDismissed = guiHelper.DismissibleBadge("Dismissible", onDismiss: () => dismissibleBadgeDismissed = true);
-            }
-            else
-            {
-                guiHelper.Button("Reset Dismissible Badge", onClick: () => dismissibleBadgeDismissed = false);
-            }
-            guiHelper.Label("Code: guiHelper.DismissibleBadge(text, onDismiss);", LabelVariant.Muted);
-            guiHelper.HorizontalSeparator();
-
             guiHelper.Label("Progress Badge", LabelVariant.Default);
             guiHelper.ProgressBadge("Loading", 0.7f);
             guiHelper.Label("Code: guiHelper.ProgressBadge(text, progress);", LabelVariant.Muted);
@@ -528,16 +490,6 @@ namespace shadcnui_testing.Menu
             guiHelper.Label("Animated Badge", LabelVariant.Default);
             guiHelper.AnimatedBadge("Animating");
             guiHelper.Label("Code: guiHelper.AnimatedBadge(text);", LabelVariant.Muted);
-            guiHelper.HorizontalSeparator();
-
-            guiHelper.Label("Badge with Tooltip", LabelVariant.Default);
-            guiHelper.BadgeWithTooltip("Info", "This is a helpful tooltip.");
-            guiHelper.Label("Code: guiHelper.BadgeWithTooltip(text, tooltip);", LabelVariant.Muted);
-            guiHelper.HorizontalSeparator();
-
-            guiHelper.Label("Badge Group", LabelVariant.Default);
-            guiHelper.BadgeGroup(new string[] { "Tag1", "Tag2", "Tag3" }, new BadgeVariant[] { BadgeVariant.Default, BadgeVariant.Secondary, BadgeVariant.Destructive });
-            guiHelper.Label("Code: guiHelper.BadgeGroup(texts, variants);", LabelVariant.Muted);
             guiHelper.HorizontalSeparator();
 
             guiHelper.Label("Rounded Badge", LabelVariant.Default);
@@ -608,71 +560,71 @@ namespace shadcnui_testing.Menu
             if (dropdownOpen)
             {
                 dropdownMenuItems = new System.Collections.Generic.List<DropdownMenuItem>()
-            {
-                new DropdownMenuItem(DropdownMenuItemType.Header, "My Account"),
-                new DropdownMenuItem(
-                    DropdownMenuItemType.Item,
-                    "Profile",
-                    () =>
-                    {
-                        Debug.Log("Profile selected");
-                        dropdownOpen = false;
-                    }
-                ),
-                new DropdownMenuItem(
-                    DropdownMenuItemType.Item,
-                    "Billing",
-                    () =>
-                    {
-                        Debug.Log("Billing selected");
-                        dropdownOpen = false;
-                    }
-                ),
-                new DropdownMenuItem(
-                    DropdownMenuItemType.Item,
-                    "Settings",
-                    () =>
-                    {
-                        Debug.Log("Settings selected");
-                        dropdownOpen = false;
-                    }
-                ),
-                new DropdownMenuItem(DropdownMenuItemType.Separator),
-                new DropdownMenuItem(DropdownMenuItemType.Item, "Team")
                 {
-                    SubItems = new System.Collections.Generic.List<DropdownMenuItem>()
+                    new DropdownMenuItem(DropdownMenuItemType.Header, "My Account"),
+                    new DropdownMenuItem(
+                        DropdownMenuItemType.Item,
+                        "Profile",
+                        () =>
+                        {
+                            Debug.Log("Profile selected");
+                            dropdownOpen = false;
+                        }
+                    ),
+                    new DropdownMenuItem(
+                        DropdownMenuItemType.Item,
+                        "Billing",
+                        () =>
+                        {
+                            Debug.Log("Billing selected");
+                            dropdownOpen = false;
+                        }
+                    ),
+                    new DropdownMenuItem(
+                        DropdownMenuItemType.Item,
+                        "Settings",
+                        () =>
+                        {
+                            Debug.Log("Settings selected");
+                            dropdownOpen = false;
+                        }
+                    ),
+                    new DropdownMenuItem(DropdownMenuItemType.Separator),
+                    new DropdownMenuItem(DropdownMenuItemType.Item, "Team")
                     {
-                        new DropdownMenuItem(
-                            DropdownMenuItemType.Item,
-                            "Email",
-                            () =>
-                            {
-                                Debug.Log("Invite by Email");
-                                dropdownOpen = false;
-                            }
-                        ),
-                        new DropdownMenuItem(
-                            DropdownMenuItemType.Item,
-                            "Phone",
-                            () =>
-                            {
-                                Debug.Log("Invite by Phone");
-                                dropdownOpen = false;
-                            }
-                        ),
+                        SubItems = new System.Collections.Generic.List<DropdownMenuItem>()
+                        {
+                            new DropdownMenuItem(
+                                DropdownMenuItemType.Item,
+                                "Email",
+                                () =>
+                                {
+                                    Debug.Log("Invite by Email");
+                                    dropdownOpen = false;
+                                }
+                            ),
+                            new DropdownMenuItem(
+                                DropdownMenuItemType.Item,
+                                "Phone",
+                                () =>
+                                {
+                                    Debug.Log("Invite by Phone");
+                                    dropdownOpen = false;
+                                }
+                            ),
+                        },
                     },
-                },
-                new DropdownMenuItem(DropdownMenuItemType.Separator),
-                new DropdownMenuItem(
-                    DropdownMenuItemType.Item,
-                    "Log out",
-                    () =>
-                    {
-                        Debug.Log("Log out selected");
-                        dropdownOpen = false;
-                    }
-                ),
-            };
+                    new DropdownMenuItem(DropdownMenuItemType.Separator),
+                    new DropdownMenuItem(
+                        DropdownMenuItemType.Item,
+                        "Log out",
+                        () =>
+                        {
+                            Debug.Log("Log out selected");
+                            dropdownOpen = false;
+                        }
+                    ),
+                };
                 guiHelper.DropdownMenu(new DropdownMenuConfig(dropdownMenuItems));
             }
 
@@ -1004,48 +956,6 @@ namespace shadcnui_testing.Menu
             guiHelper.Label("Code: guiHelper.Checkbox(label, value, size);", LabelVariant.Muted);
             guiHelper.HorizontalSeparator();
 
-            guiHelper.Label("Checkbox with Label");
-            guiHelper.CheckboxWithLabel("Remember me", ref checkboxWithLabelValue);
-            guiHelper.Label($"Checkbox with Label: {checkboxWithLabelValue}");
-            guiHelper.Label("Code: guiHelper.CheckboxWithLabel(label, ref value);", LabelVariant.Muted);
-            guiHelper.HorizontalSeparator();
-
-            guiHelper.Label("Checkbox Group");
-            checkboxGroupValues = guiHelper.CheckboxGroup(new string[] { "Option 1", "Option 2", "Option 3" }, checkboxGroupValues);
-            guiHelper.Label($"Checkbox Group Values: {string.Join(", ", checkboxGroupValues)}");
-            guiHelper.Label("Code: guiHelper.CheckboxGroup(labels, values);", LabelVariant.Muted);
-            guiHelper.HorizontalSeparator();
-
-            guiHelper.Label("Checkbox with Icon");
-            guiHelper.CheckboxWithIcon("Enable notifications", ref checkboxWithIconValue, null);
-            guiHelper.Label($"Checkbox with Icon: {checkboxWithIconValue}");
-            guiHelper.Label("Code: guiHelper.CheckboxWithIcon(label, ref value, icon);", LabelVariant.Muted);
-            guiHelper.HorizontalSeparator();
-
-            guiHelper.Label("Checkbox with Description");
-            guiHelper.CheckboxWithDescription("Email marketing", "Send me marketing emails about new products and features.", ref checkboxWithDescriptionValue);
-            guiHelper.Label($"Checkbox with Description: {checkboxWithDescriptionValue}");
-            guiHelper.Label("Code: guiHelper.CheckboxWithDescription(label, description, ref value);", LabelVariant.Muted);
-            guiHelper.HorizontalSeparator();
-
-            guiHelper.Label("Validated Checkbox");
-            guiHelper.ValidatedCheckbox("I agree to the terms", ref validatedCheckboxValue, false, "You must agree to the terms.");
-            guiHelper.Label($"Validated Checkbox: {validatedCheckboxValue}");
-            guiHelper.Label("Code: guiHelper.ValidatedCheckbox(label, ref value, isValid, validationMessage);", LabelVariant.Muted);
-            guiHelper.HorizontalSeparator();
-
-            guiHelper.Label("Checkbox with Tooltip");
-            guiHelper.CheckboxWithTooltip("Show advanced settings", ref checkboxWithTooltipValue, "This will reveal additional configuration options.");
-            guiHelper.Label($"Checkbox with Tooltip: {checkboxWithTooltipValue}");
-            guiHelper.Label("Code: guiHelper.CheckboxWithTooltip(label, ref value, tooltip);", LabelVariant.Muted);
-            guiHelper.HorizontalSeparator();
-
-            guiHelper.Label("Custom Checkbox");
-            customCheckboxValue = guiHelper.CustomCheckbox("Custom Checkbox", customCheckboxValue, Color.cyan, Color.black);
-            guiHelper.Label($"Custom Checkbox: {customCheckboxValue}");
-            guiHelper.Label("Code: guiHelper.CustomCheckbox(label, value, checkColor, backgroundColor);", LabelVariant.Muted);
-            guiHelper.HorizontalSeparator();
-
             GUILayout.EndVertical();
         }
 
@@ -1227,54 +1137,6 @@ namespace shadcnui_testing.Menu
             guiHelper.Label("Code: guiHelper.Switch(label, value, size);", LabelVariant.Muted);
             guiHelper.HorizontalSeparator();
 
-            guiHelper.Label("Switch with Label");
-            switchWithLabelValue = guiHelper.SwitchWithLabel("Enable notifications", switchWithLabelValue);
-            guiHelper.Label($"Switch with Label: {switchWithLabelValue}");
-            guiHelper.Label("Code: guiHelper.SwitchWithLabel(label, value);", LabelVariant.Muted);
-            guiHelper.HorizontalSeparator();
-
-            guiHelper.Label("Switch Group");
-            switchGroupValues = guiHelper.SwitchGroup(new string[] { "Option A", "Option B", "Option C" }, switchGroupValues);
-            guiHelper.Label($"Switch Group Values: {string.Join(", ", switchGroupValues)}");
-            guiHelper.Label("Code: guiHelper.SwitchGroup(labels, values);", LabelVariant.Muted);
-            guiHelper.HorizontalSeparator();
-
-            guiHelper.Label("Switch with Description");
-            switchWithDescriptionValue = guiHelper.SwitchWithDescription("Auto-update", "Automatically download and install updates.", switchWithDescriptionValue);
-            guiHelper.Label($"Switch with Description: {switchWithDescriptionValue}");
-            guiHelper.Label("Code: guiHelper.SwitchWithDescription(label, description, value);", LabelVariant.Muted);
-            guiHelper.HorizontalSeparator();
-
-            guiHelper.Label("Validated Switch");
-            validatedSwitchValue = guiHelper.ValidatedSwitch("Accept privacy policy", validatedSwitchValue, false, "You must accept the privacy policy.");
-            guiHelper.Label($"Validated Switch: {validatedSwitchValue}");
-            guiHelper.Label("Code: guiHelper.ValidatedSwitch(label, value, isValid, validationMessage);", LabelVariant.Muted);
-            guiHelper.HorizontalSeparator();
-
-            guiHelper.Label("Switch with Tooltip");
-            switchWithTooltipValue = guiHelper.SwitchWithTooltip("Show advanced options", switchWithTooltipValue, "Toggle to reveal more settings.");
-            guiHelper.Label($"Switch with Tooltip: {switchWithTooltipValue}");
-            guiHelper.Label("Code: guiHelper.SwitchWithTooltip(label, value, tooltip);", LabelVariant.Muted);
-            guiHelper.HorizontalSeparator();
-
-            guiHelper.Label("Switch with Icon");
-            switchWithIconValue = guiHelper.SwitchWithIcon("Enable sound", switchWithIconValue, null, null);
-            guiHelper.Label($"Switch with Icon: {switchWithIconValue}");
-            guiHelper.Label("Code: guiHelper.SwitchWithIcon(label, value, onIcon, offIcon);", LabelVariant.Muted);
-            guiHelper.HorizontalSeparator();
-
-            guiHelper.Label("Switch with Loading");
-            switchWithLoadingValue = guiHelper.SwitchWithLoading("Syncing data", switchWithLoadingValue, true);
-            guiHelper.Label($"Switch with Loading: {switchWithLoadingValue}");
-            guiHelper.Label("Code: guiHelper.SwitchWithLoading(label, value, isLoading);", LabelVariant.Muted);
-            guiHelper.HorizontalSeparator();
-
-            guiHelper.Label("Custom Switch");
-            customSwitchValue = guiHelper.CustomSwitch("Custom Switch", customSwitchValue, Color.green, Color.red, Color.white);
-            guiHelper.Label($"Custom Switch: {customSwitchValue}");
-            guiHelper.Label("Code: guiHelper.CustomSwitch(label, value, onColor, offColor, thumbColor);", LabelVariant.Muted);
-            guiHelper.HorizontalSeparator();
-
             GUILayout.EndVertical();
         }
 
@@ -1289,10 +1151,10 @@ namespace shadcnui_testing.Menu
             string[] headers = { "Invoice", "Status", "Method", "Amount" };
             string[,] data =
             {
-            { "INV001", "Paid", "Credit Card", "$250.00" },
-            { "INV002", "Pending", "PayPal", "$150.00" },
-            { "INV003", "Unpaid", "Bank Transfer", "$350.00" },
-        };
+                { "INV001", "Paid", "Credit Card", "$250.00" },
+                { "INV002", "Pending", "PayPal", "$150.00" },
+                { "INV003", "Unpaid", "Bank Transfer", "$350.00" },
+            };
             guiHelper.Table(headers, data);
             guiHelper.Label("Code: guiHelper.Table(headers, data, variant, size);", LabelVariant.Muted);
             guiHelper.HorizontalSeparator();
@@ -1353,19 +1215,6 @@ namespace shadcnui_testing.Menu
             largeSizeToggle = guiHelper.Toggle("Large", largeSizeToggle, size: ToggleSize.Large);
             GUILayout.EndHorizontal();
             guiHelper.Label("Code: guiHelper.Toggle(text, value, size);", LabelVariant.Muted);
-            guiHelper.HorizontalSeparator();
-
-            guiHelper.Label("Toggle Group", LabelVariant.Default);
-            string[] toggleLabels = { "Left", "Center", "Right" };
-            selectedToggle = guiHelper.ToggleGroup(toggleLabels, selectedToggle);
-            guiHelper.Label($"Selected alignment: {toggleLabels[selectedToggle]}");
-            guiHelper.Label("Code: selectedToggle = guiHelper.ToggleGroup(labels, selectedIndex);", LabelVariant.Muted);
-            guiHelper.HorizontalSeparator();
-
-            guiHelper.Label("Multi Toggle Group", LabelVariant.Default);
-            multiToggleGroupValues = guiHelper.MultiToggleGroup(new string[] { "Red", "Green", "Blue" }, multiToggleGroupValues);
-            guiHelper.Label($"Multi Toggle Group Values: {string.Join(", ", multiToggleGroupValues)}");
-            guiHelper.Label("Code: guiHelper.MultiToggleGroup(labels, values);", LabelVariant.Muted);
             guiHelper.HorizontalSeparator();
 
             GUILayout.EndVertical();
@@ -1588,11 +1437,11 @@ namespace shadcnui_testing.Menu
             simpleColumns.Add(priceColumn);
 
             var simpleData = new System.Collections.Generic.List<DataTableRow>
-        {
-            guiHelper.CreateDataTableRow("p1").SetData("product", "Laptop").SetData("price", "$999"),
-            guiHelper.CreateDataTableRow("p2").SetData("product", "Mouse").SetData("price", "$25"),
-            guiHelper.CreateDataTableRow("p3").SetData("product", "Keyboard").SetData("price", "$75"),
-        };
+            {
+                guiHelper.CreateDataTableRow("p1").SetData("product", "Laptop").SetData("price", "$999"),
+                guiHelper.CreateDataTableRow("p2").SetData("product", "Mouse").SetData("price", "$25"),
+                guiHelper.CreateDataTableRow("p3").SetData("product", "Keyboard").SetData("price", "$75"),
+            };
 
             guiHelper.DrawDataTable("simple-table", simpleColumns, simpleData, showPagination: false, showSearch: false, showSelection: false, showColumnToggle: false, GUILayout.Height(120));
 
@@ -1628,54 +1477,54 @@ namespace shadcnui_testing.Menu
         {
             guiHelper.BeginVerticalGroup(GUILayout.ExpandWidth(true), GUILayout.ExpandHeight(true));
             var menuItems = new List<MenuBar.MenuItem>
-        {
-            new MenuBar.MenuItem(
-                "File",
-                null,
-                false,
-                new List<MenuBar.MenuItem>
-                {
-                    new MenuBar.MenuItem("New", () => Debug.Log("New file"), false, null, "Ctrl+N"),
-                    new MenuBar.MenuItem("Open", () => Debug.Log("Open file"), false, null, "Ctrl+O"),
-                    new MenuBar.MenuItem("Save", () => Debug.Log("Save file"), false, null, "Ctrl+S"),
-                    MenuBar.MenuItem.Separator(),
-                    new MenuBar.MenuItem(
-                        "Recent",
-                        null,
-                        false,
-                        new List<MenuBar.MenuItem> { new MenuBar.MenuItem("Document1.txt", () => Debug.Log("Open Document1")), new MenuBar.MenuItem("Document2.txt", () => Debug.Log("Open Document2")), new MenuBar.MenuItem("Document3.txt", () => Debug.Log("Open Document3")) }
-                    ),
-                    MenuBar.MenuItem.Separator(),
-                    new MenuBar.MenuItem("Exit", () => Debug.Log("Exit application")),
-                }
-            ),
-            new MenuBar.MenuItem(
-                "Edit",
-                null,
-                false,
-                new List<MenuBar.MenuItem>
-                {
-                    new MenuBar.MenuItem("Cut", () => Debug.Log("Cut"), false, null, "Ctrl+X"),
-                    new MenuBar.MenuItem("Copy", () => Debug.Log("Copy"), false, null, "Ctrl+C"),
-                    new MenuBar.MenuItem("Paste", () => Debug.Log("Paste"), false, null, "Ctrl+V"),
-                    MenuBar.MenuItem.Separator(),
-                    MenuBar.MenuItem.Header("Advanced"),
-                    new MenuBar.MenuItem("Find and Replace", () => Debug.Log("Find and Replace"), false, null, "Ctrl+H"),
-                }
-            ),
-            new MenuBar.MenuItem(
-                "View",
-                null,
-                false,
-                new List<MenuBar.MenuItem>
-                {
-                    new MenuBar.MenuItem("Zoom In", () => Debug.Log("Zoom In"), false, null, "Ctrl++"),
-                    new MenuBar.MenuItem("Zoom Out", () => Debug.Log("Zoom Out"), false, null, "Ctrl+-"),
-                    new MenuBar.MenuItem("Reset Zoom", () => Debug.Log("Reset Zoom"), false, null, "Ctrl+0"),
-                }
-            ),
-            new MenuBar.MenuItem("Help", null, false, new List<MenuBar.MenuItem> { new MenuBar.MenuItem("Documentation", () => Debug.Log("Open documentation")), new MenuBar.MenuItem("About", () => Debug.Log("About dialog")) }),
-        };
+            {
+                new MenuBar.MenuItem(
+                    "File",
+                    null,
+                    false,
+                    new List<MenuBar.MenuItem>
+                    {
+                        new MenuBar.MenuItem("New", () => Debug.Log("New file"), false, null, "Ctrl+N"),
+                        new MenuBar.MenuItem("Open", () => Debug.Log("Open file"), false, null, "Ctrl+O"),
+                        new MenuBar.MenuItem("Save", () => Debug.Log("Save file"), false, null, "Ctrl+S"),
+                        MenuBar.MenuItem.Separator(),
+                        new MenuBar.MenuItem(
+                            "Recent",
+                            null,
+                            false,
+                            new List<MenuBar.MenuItem> { new MenuBar.MenuItem("Document1.txt", () => Debug.Log("Open Document1")), new MenuBar.MenuItem("Document2.txt", () => Debug.Log("Open Document2")), new MenuBar.MenuItem("Document3.txt", () => Debug.Log("Open Document3")) }
+                        ),
+                        MenuBar.MenuItem.Separator(),
+                        new MenuBar.MenuItem("Exit", () => Debug.Log("Exit application")),
+                    }
+                ),
+                new MenuBar.MenuItem(
+                    "Edit",
+                    null,
+                    false,
+                    new List<MenuBar.MenuItem>
+                    {
+                        new MenuBar.MenuItem("Cut", () => Debug.Log("Cut"), false, null, "Ctrl+X"),
+                        new MenuBar.MenuItem("Copy", () => Debug.Log("Copy"), false, null, "Ctrl+C"),
+                        new MenuBar.MenuItem("Paste", () => Debug.Log("Paste"), false, null, "Ctrl+V"),
+                        MenuBar.MenuItem.Separator(),
+                        MenuBar.MenuItem.Header("Advanced"),
+                        new MenuBar.MenuItem("Find and Replace", () => Debug.Log("Find and Replace"), false, null, "Ctrl+H"),
+                    }
+                ),
+                new MenuBar.MenuItem(
+                    "View",
+                    null,
+                    false,
+                    new List<MenuBar.MenuItem>
+                    {
+                        new MenuBar.MenuItem("Zoom In", () => Debug.Log("Zoom In"), false, null, "Ctrl++"),
+                        new MenuBar.MenuItem("Zoom Out", () => Debug.Log("Zoom Out"), false, null, "Ctrl+-"),
+                        new MenuBar.MenuItem("Reset Zoom", () => Debug.Log("Reset Zoom"), false, null, "Ctrl+0"),
+                    }
+                ),
+                new MenuBar.MenuItem("Help", null, false, new List<MenuBar.MenuItem> { new MenuBar.MenuItem("Documentation", () => Debug.Log("Open documentation")), new MenuBar.MenuItem("About", () => Debug.Log("About dialog")) }),
+            };
 
             guiHelper.MenuBar(new MenuBar.MenuBarConfig(menuItems));
             guiHelper.EndVerticalGroup();

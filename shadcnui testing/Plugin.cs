@@ -1,9 +1,8 @@
 using System;
 using System.IO;
 using shadcnui;
-using UnityEngine;
 using shadcnui_testing.Menu;
-
+using UnityEngine;
 #if IL2CPP_BEPINEX
 using BepInEx.Unity.IL2CPP;
 using BepInEx;
@@ -14,10 +13,9 @@ using BepInEx.Logging;
 #elif MELONLOADER
 using MelonLoader;
 #endif
-
 namespace shadcnui_testing
 {
-#if IL2CPP_BEPINEX // BepInEx6 il2cpp
+#if IL2CPP_BEPINEX
     [System.ComponentModel.Description(PluginInfo.Description)]
     [BepInPlugin(PluginInfo.GUID, PluginInfo.Name, PluginInfo.Version)]
     public class Plugin : BasePlugin
@@ -35,8 +33,7 @@ namespace shadcnui_testing
         private static void LoadMenu()
         {
             GameObject Loader = new GameObject("Loader");
-            Loader.AddComponent<UI>();
-
+            Loader.AddComponent<DemoSelector>();
             UnityEngine.Object.DontDestroyOnLoad(Loader);
         }
     }
@@ -58,8 +55,7 @@ namespace shadcnui_testing
         private static void LoadMenu()
         {
             GameObject Loader = new GameObject("Loader");
-            Loader.AddComponent<UI>();
-
+            Loader.AddComponent<DemoSelector>();
             UnityEngine.Object.DontDestroyOnLoad(Loader);
         }
     }
@@ -77,8 +73,7 @@ namespace shadcnui_testing
         private static void LoadMenu()
         {
             GameObject Loader = new GameObject("Loader");
-            Loader.AddComponent<UI>();
-
+            Loader.AddComponent<DemoSelector>();
             UnityEngine.Object.DontDestroyOnLoad(Loader);
         }
     }

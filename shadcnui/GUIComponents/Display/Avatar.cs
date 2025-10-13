@@ -126,28 +126,6 @@ namespace shadcnui.GUIComponents.Display
             }
         }
 
-        public void CustomAvatar(Texture2D image, string fallbackText, Color backgroundColor, Color textColor, AvatarSize size = AvatarSize.Default, AvatarShape shape = AvatarShape.Circle, params GUILayoutOption[] options)
-        {
-            var styleManager = guiHelper.GetStyleManager();
-
-            GUIStyle customStyle = new UnityHelpers.GUIStyle(GUI.skin.box);
-            customStyle.normal.background = styleManager.CreateSolidTexture(backgroundColor);
-            customStyle.normal.textColor = textColor;
-            customStyle.alignment = TextAnchor.MiddleCenter;
-            customStyle.fontSize = styleManager.GetAvatarFontSize(size);
-            customStyle.padding = new UnityHelpers.RectOffset(0, 0, 0, 0);
-            customStyle.border = styleManager.GetAvatarBorder(shape, size);
-
-            if (image != null)
-            {
-                UnityHelpers.Label(image, customStyle, options);
-            }
-            else
-            {
-                UnityHelpers.Label(fallbackText ?? "A", customStyle, options);
-            }
-        }
-
         public void AvatarWithBorder(Texture2D image, string fallbackText, Color borderColor, AvatarSize size = AvatarSize.Default, AvatarShape shape = AvatarShape.Circle, params GUILayoutOption[] options)
         {
             var styleManager = guiHelper.GetStyleManager();
@@ -160,97 +138,6 @@ namespace shadcnui.GUIComponents.Display
             layoutComponents.BeginVerticalGroup(borderedStyle, options);
             DrawAvatar(image, fallbackText, size, shape, options);
             layoutComponents.EndVerticalGroup();
-        }
-
-        public void AvatarWithHover(Texture2D image, string fallbackText, AvatarSize size = AvatarSize.Default, AvatarShape shape = AvatarShape.Circle, Action onClick = null, params GUILayoutOption[] options)
-        {
-            var styleManager = guiHelper.GetStyleManager();
-            bool clicked = guiHelper.Button("", ButtonVariant.Ghost, ButtonSize.Icon, onClick: onClick, options: options);
-
-            Rect lastRect = GUILayoutUtility.GetLastRect();
-            if (image != null)
-            {
-                GUI.Label(lastRect, image, styleManager.GetAvatarStyle(size, shape));
-            }
-            else
-            {
-                GUI.Label(lastRect, new GUIContent(fallbackText ?? "A"), styleManager.GetAvatarStyle(size, shape));
-            }
-        }
-
-        public void AvatarWithLoading(Texture2D image, string fallbackText, bool isLoading, AvatarSize size = AvatarSize.Default, AvatarShape shape = AvatarShape.Circle, params GUILayoutOption[] options)
-        {
-            if (isLoading)
-            {
-                float time = Time.time * 2f;
-                float alpha = (Mathf.Sin(time) + 1f) * 0.5f * 0.3f + 0.7f;
-
-                Color originalColor = GUI.color;
-                GUI.color = new Color(originalColor.r, originalColor.g, originalColor.b, alpha);
-
-                DrawAvatar(image, fallbackText, size, shape, options);
-
-                GUI.color = originalColor;
-            }
-            else
-            {
-                DrawAvatar(image, fallbackText, size, shape, options);
-            }
-        }
-
-        public void AvatarWithTooltip(Texture2D image, string fallbackText, string tooltip, AvatarSize size = AvatarSize.Default, AvatarShape shape = AvatarShape.Circle, params GUILayoutOption[] options)
-        {
-            layoutComponents.BeginHorizontalGroup();
-
-            DrawAvatar(image, fallbackText, size, shape, options);
-
-            if (!string.IsNullOrEmpty(tooltip))
-            {
-                layoutComponents.AddSpace(4);
-
-                var styleManager = guiHelper.GetStyleManager();
-                GUIStyle tooltipStyle = styleManager?.GetLabelStyle(LabelVariant.Muted) ?? GUI.skin.label;
-
-                UnityHelpers.Label("?", tooltipStyle, options);
-            }
-
-            layoutComponents.EndHorizontalGroup();
-        }
-
-        public void AvatarGroup(AvatarData[] avatars, AvatarSize size = AvatarSize.Default, AvatarShape shape = AvatarShape.Circle, int maxVisible = 3, float overlap = -8f, params GUILayoutOption[] options)
-        {
-            if (avatars == null || avatars.Length == 0)
-                return;
-
-            layoutComponents.BeginHorizontalGroup();
-
-            int visibleCount = Mathf.Min(avatars.Length, maxVisible);
-
-            for (int i = 0; i < visibleCount; i++)
-            {
-                var avatar = avatars[i];
-
-                if (i > 0)
-                    layoutComponents.AddSpace(overlap);
-
-                DrawAvatar(avatar.Image, avatar.FallbackText, size, shape, options);
-            }
-
-            if (avatars.Length > maxVisible)
-            {
-                layoutComponents.AddSpace(overlap);
-                int remainingCount = avatars.Length - maxVisible;
-                string countText = $"+{remainingCount}";
-
-                var styleManager = guiHelper.GetStyleManager();
-                GUIStyle countStyle = styleManager?.GetAvatarStyle(size, shape) ?? GUI.skin.box;
-                countStyle.normal.textColor = Color.white;
-                countStyle.normal.background = styleManager?.CreateSolidTexture(Color.gray) ?? GUI.skin.box.normal.background;
-
-                UnityHelpers.Label(countText, countStyle, options);
-            }
-
-            layoutComponents.EndHorizontalGroup();
         }
 
         public struct AvatarData

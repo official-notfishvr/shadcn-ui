@@ -1,7 +1,7 @@
-using shadcnui.GUIComponents.Core;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using shadcnui.GUIComponents.Core;
 using UnityEngine;
 
 namespace shadcnui.GUIComponents.Display
@@ -384,10 +384,7 @@ namespace shadcnui.GUIComponents.Display
 
         private float GetMaxValue(IEnumerable<ChartSeries> series)
         {
-            var values = series
-                .Where(s => s?.Data != null)
-                .SelectMany(s => s.Data)
-                .Select(d => d.Value);
+            var values = series.Where(s => s?.Data != null).SelectMany(s => s.Data).Select(d => d.Value);
             var maxValue = values.DefaultIfEmpty(0f).Max();
             return maxValue <= 0f ? 1f : maxValue;
         }

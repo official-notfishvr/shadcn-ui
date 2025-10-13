@@ -55,21 +55,6 @@ namespace shadcnui.GUIComponents.Display
             layoutComponents.EndHorizontalGroup();
         }
 
-        public void CustomBadge(string text, Color backgroundColor, Color textColor, BadgeSize size = BadgeSize.Default, params GUILayoutOption[] options)
-        {
-            var styleManager = guiHelper.GetStyleManager();
-
-            GUIStyle customStyle = new UnityHelpers.GUIStyle(GUI.skin.box);
-            customStyle.normal.background = styleManager.CreateSolidTexture(backgroundColor);
-            customStyle.normal.textColor = textColor;
-            customStyle.fontSize = GetBadgeFontSize(size);
-            customStyle.padding = GetBadgePadding(size);
-            customStyle.border = new UnityHelpers.RectOffset(4, 4, 2, 2);
-            customStyle.alignment = TextAnchor.MiddleCenter;
-
-            UnityHelpers.Label(text ?? "Badge", customStyle, options);
-        }
-
         public void CountBadge(int count, BadgeVariant variant = BadgeVariant.Default, BadgeSize size = BadgeSize.Default, int maxCount = 99, params GUILayoutOption[] options)
         {
             string displayText = count > maxCount ? $"{maxCount}+" : count.ToString();
@@ -102,26 +87,6 @@ namespace shadcnui.GUIComponents.Display
             DrawBadge(text, variant, size, options);
 
             layoutComponents.EndHorizontalGroup();
-        }
-
-        public bool DismissibleBadge(string text, BadgeVariant variant = BadgeVariant.Default, BadgeSize size = BadgeSize.Default, Action onDismiss = null, params GUILayoutOption[] options)
-        {
-            layoutComponents.BeginHorizontalGroup();
-
-            DrawBadge(text, variant, size, options);
-
-            layoutComponents.AddSpace(4);
-
-            bool closeClicked = UnityHelpers.Button("×", GUI.skin.button, new GUILayoutOption[] { GUILayout.Width(16 * guiHelper.uiScale), GUILayout.Height(16 * guiHelper.uiScale) });
-
-            if (closeClicked && onDismiss != null)
-            {
-                onDismiss.Invoke();
-            }
-
-            layoutComponents.EndHorizontalGroup();
-
-            return closeClicked;
         }
 
         public void ProgressBadge(string text, float progress, BadgeVariant variant = BadgeVariant.Default, BadgeSize size = BadgeSize.Default, params GUILayoutOption[] options)
@@ -162,69 +127,6 @@ namespace shadcnui.GUIComponents.Display
             GUI.color = originalColor;
         }
 
-        public void BadgeWithTooltip(string text, string tooltip, BadgeVariant variant = BadgeVariant.Default, BadgeSize size = BadgeSize.Default, params GUILayoutOption[] options)
-        {
-            layoutComponents.BeginHorizontalGroup();
-
-            DrawBadge(text, variant, size, options);
-
-            if (!string.IsNullOrEmpty(tooltip))
-            {
-                layoutComponents.AddSpace(4);
-
-                var styleManager = guiHelper.GetStyleManager();
-                GUIStyle tooltipStyle = styleManager?.GetLabelStyle(LabelVariant.Muted) ?? GUI.skin.label;
-
-                Color originalColor = GUI.color;
-                GUI.color = new Color(originalColor.r, originalColor.g, originalColor.b, 0.6f);
-
-                UnityHelpers.Label("?", tooltipStyle);
-
-                GUI.color = originalColor;
-            }
-
-            layoutComponents.EndHorizontalGroup();
-        }
-
-        public void BadgeGroup(string[] texts, BadgeVariant[] variants, BadgeSize size = BadgeSize.Default, bool horizontal = true, float spacing = 5f)
-        {
-            if (texts == null || texts.Length == 0)
-                return;
-
-            if (variants == null || variants.Length != texts.Length)
-            {
-                variants = new BadgeVariant[texts.Length];
-                for (int i = 0; i < variants.Length; i++)
-                {
-                    variants[i] = BadgeVariant.Default;
-                }
-            }
-
-            if (horizontal)
-            {
-                layoutComponents.BeginHorizontalGroup();
-            }
-            else
-            {
-                layoutComponents.BeginVerticalGroup();
-            }
-
-            for (int i = 0; i < texts.Length; i++)
-            {
-                DrawBadge(texts[i], variants[i], size);
-
-                if (i < texts.Length - 1)
-                {
-                    layoutComponents.AddSpace(spacing);
-                }
-            }
-
-            if (horizontal)
-                layoutComponents.EndHorizontalGroup();
-            else
-                layoutComponents.EndVerticalGroup();
-        }
-
         public void RoundedBadge(string text, BadgeVariant variant = BadgeVariant.Default, BadgeSize size = BadgeSize.Default, float cornerRadius = 12f, params GUILayoutOption[] options)
         {
             var styleManager = guiHelper.GetStyleManager();
@@ -235,33 +137,6 @@ namespace shadcnui.GUIComponents.Display
             roundedStyle.border = new UnityHelpers.RectOffset(Mathf.RoundToInt(cornerRadius * guiHelper.uiScale), Mathf.RoundToInt(cornerRadius * guiHelper.uiScale), Mathf.RoundToInt(cornerRadius * guiHelper.uiScale), Mathf.RoundToInt(cornerRadius * guiHelper.uiScale));
 
             UnityHelpers.Label(text ?? "Badge", roundedStyle, options);
-        }
-
-        private int GetBadgeFontSize(BadgeSize size)
-        {
-            switch (size)
-            {
-                case BadgeSize.Small:
-                    return Mathf.RoundToInt((guiHelper.fontSize - 2) * guiHelper.uiScale);
-                case BadgeSize.Large:
-                    return Mathf.RoundToInt((guiHelper.fontSize + 2) * guiHelper.uiScale);
-                default:
-                    return Mathf.RoundToInt(guiHelper.fontSize * guiHelper.uiScale);
-            }
-        }
-
-        private RectOffset GetBadgePadding(BadgeSize size)
-        {
-            float scale = guiHelper.uiScale;
-            switch (size)
-            {
-                case BadgeSize.Small:
-                    return new UnityHelpers.RectOffset(Mathf.RoundToInt(6 * scale), Mathf.RoundToInt(6 * scale), Mathf.RoundToInt(2 * scale), Mathf.RoundToInt(2 * scale));
-                case BadgeSize.Large:
-                    return new UnityHelpers.RectOffset(Mathf.RoundToInt(12 * scale), Mathf.RoundToInt(12 * scale), Mathf.RoundToInt(4 * scale), Mathf.RoundToInt(4 * scale));
-                default:
-                    return new UnityHelpers.RectOffset(Mathf.RoundToInt(8 * scale), Mathf.RoundToInt(8 * scale), Mathf.RoundToInt(3 * scale), Mathf.RoundToInt(3 * scale));
-            }
         }
     }
 }
