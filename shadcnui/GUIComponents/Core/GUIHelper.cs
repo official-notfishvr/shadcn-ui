@@ -388,7 +388,7 @@ namespace shadcnui.GUIComponents.Core
         {
             try
             {
-                return buttonComponents?.Draw(text, ButtonVariant.Default, ButtonSize.Default, onClick, false, opacity, new GUILayoutOption[] { GUILayout.Width(windowWidth) }) ?? false;
+                return buttonComponents?.DrawButton(text, ButtonVariant.Default, ButtonSize.Default, onClick, false, opacity, new GUILayoutOption[] { GUILayout.Width(windowWidth) }) ?? false;
             }
             catch (Exception ex)
             {
@@ -401,7 +401,7 @@ namespace shadcnui.GUIComponents.Core
         {
             try
             {
-                return buttonComponents?.Draw(text, ButtonVariant.Default, ButtonSize.Default, onClick, false, opacity, new GUILayoutOption[] { GUILayout.Width(width), GUILayout.Height(height) }) ?? false;
+                return buttonComponents?.DrawButton(text, ButtonVariant.Default, ButtonSize.Default, onClick, false, opacity, new GUILayoutOption[] { GUILayout.Width(width), GUILayout.Height(height) }) ?? false;
             }
             catch (Exception ex)
             {
@@ -414,7 +414,7 @@ namespace shadcnui.GUIComponents.Core
         {
             try
             {
-                return buttonComponents?.Draw(text, variant, size, onClick, disabled, opacity, options ?? Array.Empty<GUILayoutOption>()) ?? false;
+                return buttonComponents?.DrawButton(text, variant, size, onClick, disabled, opacity, options ?? Array.Empty<GUILayoutOption>()) ?? false;
             }
             catch (Exception ex)
             {
@@ -569,32 +569,6 @@ namespace shadcnui.GUIComponents.Core
         public bool LargeToggle(string text, bool value, Action<bool> onToggle = null, ToggleVariant variant = ToggleVariant.Default, params GUILayoutOption[] options)
         {
             return Toggle(text, value, variant, ToggleSize.Large, onToggle, false, options);
-        }
-
-        public int ToggleGroup(string[] texts, int selectedIndex, Action<int> onSelectionChange = null, ToggleVariant variant = ToggleVariant.Default, ToggleSize size = ToggleSize.Default, bool horizontal = true, float spacing = 5f)
-        {
-            try
-            {
-                return toggleComponents?.ToggleGroup(texts, selectedIndex, onSelectionChange, variant, size, horizontal, spacing) ?? selectedIndex;
-            }
-            catch (Exception ex)
-            {
-                GUILogger.LogException(ex, "drawing toggle group", "GUIHelper");
-                return selectedIndex;
-            }
-        }
-
-        public bool[] MultiToggleGroup(string[] texts, bool[] selectedStates, Action<int, bool> onToggleChange = null, ToggleVariant variant = ToggleVariant.Default, ToggleSize size = ToggleSize.Default, bool horizontal = true, float spacing = 5f)
-        {
-            try
-            {
-                return toggleComponents?.MultiToggleGroup(texts, selectedStates, onToggleChange, variant, size, horizontal, spacing) ?? selectedStates;
-            }
-            catch (Exception ex)
-            {
-                GUILogger.LogException(ex, "drawing multi toggle group", "GUIHelper");
-                return selectedStates;
-            }
         }
         #endregion
 
@@ -956,18 +930,6 @@ namespace shadcnui.GUIComponents.Core
             }
         }
 
-        public void CustomAvatar(Texture2D image, string fallbackText, Color backgroundColor, Color textColor, AvatarSize size = AvatarSize.Default, AvatarShape shape = AvatarShape.Circle, params GUILayoutOption[] options)
-        {
-            try
-            {
-                avatarComponents?.CustomAvatar(image, fallbackText, backgroundColor, textColor, size, shape, options);
-            }
-            catch (Exception ex)
-            {
-                GUILogger.LogException(ex, "drawing custom avatar", "GUIHelper");
-            }
-        }
-
         public void AvatarWithBorder(Texture2D image, string fallbackText, Color borderColor, AvatarSize size = AvatarSize.Default, AvatarShape shape = AvatarShape.Circle, params GUILayoutOption[] options)
         {
             try
@@ -980,53 +942,6 @@ namespace shadcnui.GUIComponents.Core
             }
         }
 
-        public void AvatarWithHover(Texture2D image, string fallbackText, AvatarSize size = AvatarSize.Default, AvatarShape shape = AvatarShape.Circle, Action onClick = null, params GUILayoutOption[] options)
-        {
-            try
-            {
-                avatarComponents?.AvatarWithHover(image, fallbackText, size, shape, onClick, options);
-            }
-            catch (Exception ex)
-            {
-                GUILogger.LogException(ex, "drawing avatar with hover", "GUIHelper");
-            }
-        }
-
-        public void AvatarWithLoading(Texture2D image, string fallbackText, bool isLoading, AvatarSize size = AvatarSize.Default, AvatarShape shape = AvatarShape.Circle, params GUILayoutOption[] options)
-        {
-            try
-            {
-                avatarComponents?.AvatarWithLoading(image, fallbackText, isLoading, size, shape, options);
-            }
-            catch (Exception ex)
-            {
-                GUILogger.LogException(ex, "drawing avatar with loading", "GUIHelper");
-            }
-        }
-
-        public void AvatarWithTooltip(Texture2D image, string fallbackText, string tooltip, AvatarSize size = AvatarSize.Default, AvatarShape shape = AvatarShape.Circle, params GUILayoutOption[] options)
-        {
-            try
-            {
-                avatarComponents?.AvatarWithTooltip(image, fallbackText, tooltip, size, shape, options);
-            }
-            catch (Exception ex)
-            {
-                GUILogger.LogException(ex, "drawing avatar with tooltip", "GUIHelper");
-            }
-        }
-
-        public void AvatarGroup(shadcnui.GUIComponents.Display.Avatar.AvatarData[] avatars, AvatarSize size = AvatarSize.Default, AvatarShape shape = AvatarShape.Circle, int maxVisible = 3, float overlap = -8f, params GUILayoutOption[] options)
-        {
-            try
-            {
-                avatarComponents?.AvatarGroup(avatars, size, shape, maxVisible, overlap, options);
-            }
-            catch (Exception ex)
-            {
-                GUILogger.LogException(ex, "drawing avatar group", "GUIHelper");
-            }
-        }
         #endregion
 
         #region Table Components
@@ -1750,97 +1665,6 @@ namespace shadcnui.GUIComponents.Core
                 return false;
             }
         }
-
-        public bool CheckboxWithLabel(string label, ref bool value, CheckboxVariant variant = CheckboxVariant.Default, CheckboxSize size = CheckboxSize.Default, Action<bool> onToggle = null, bool disabled = false)
-        {
-            try
-            {
-                return checkboxComponents?.CheckboxWithLabel(label, ref value, variant, size, onToggle, disabled) ?? value;
-            }
-            catch (Exception ex)
-            {
-                GUILogger.LogException(ex, "CheckboxWithLabel", "GUIHelper");
-                return false;
-            }
-        }
-
-        public bool[] CheckboxGroup(string[] labels, bool[] values, CheckboxVariant variant = CheckboxVariant.Default, CheckboxSize size = CheckboxSize.Default, Action<int, bool> onToggleChange = null, bool disabled = false, bool horizontal = false, float spacing = 5f)
-        {
-            try
-            {
-                return checkboxComponents?.CheckboxGroup(labels, values, variant, size, onToggleChange, disabled, horizontal, spacing) ?? values;
-            }
-            catch (Exception ex)
-            {
-                GUILogger.LogException(ex, "drawing checkbox group", "GUIHelper");
-                return values ?? new bool[0];
-            }
-        }
-
-        public bool CustomCheckbox(string text, bool value, Color checkColor, Color backgroundColor, Action<bool> onToggle = null, bool disabled = false, params GUILayoutOption[] options)
-        {
-            try
-            {
-                return checkboxComponents?.CustomCheckbox(text, value, checkColor, backgroundColor, onToggle, disabled, options) ?? value;
-            }
-            catch (Exception ex)
-            {
-                GUILogger.LogException(ex, "drawing custom checkbox", "GUIHelper");
-                return false;
-            }
-        }
-
-        public bool CheckboxWithIcon(string text, ref bool value, Texture2D icon, CheckboxVariant variant = CheckboxVariant.Default, CheckboxSize size = CheckboxSize.Default, Action<bool> onToggle = null, bool disabled = false)
-        {
-            try
-            {
-                return checkboxComponents?.CheckboxWithIcon(text, ref value, icon, variant, size, onToggle, disabled) ?? value;
-            }
-            catch (Exception ex)
-            {
-                GUILogger.LogException(ex, "drawing checkbox with icon", "GUIHelper");
-                return false;
-            }
-        }
-
-        public bool CheckboxWithDescription(string label, string description, ref bool value, CheckboxVariant variant = CheckboxVariant.Default, CheckboxSize size = CheckboxSize.Default, Action<bool> onToggle = null, bool disabled = false)
-        {
-            try
-            {
-                return checkboxComponents?.CheckboxWithDescription(label, description, ref value, variant, size, onToggle, disabled) ?? value;
-            }
-            catch (Exception ex)
-            {
-                GUILogger.LogException(ex, "drawing checkbox with description", "GUIHelper");
-                return false;
-            }
-        }
-
-        public bool ValidatedCheckbox(string text, ref bool value, bool isValid, string validationMessage, CheckboxVariant variant = CheckboxVariant.Default, CheckboxSize size = CheckboxSize.Default, Action<bool> onToggle = null, bool disabled = false)
-        {
-            try
-            {
-                return checkboxComponents?.ValidatedCheckbox(text, ref value, isValid, validationMessage, variant, size, onToggle, disabled) ?? value;
-            }
-            catch (Exception ex)
-            {
-                GUILogger.LogException(ex, "drawing validated checkbox", "GUIHelper");
-                return false;
-            }
-        }
-
-        public bool CheckboxWithTooltip(string text, ref bool value, string tooltip, CheckboxVariant variant = CheckboxVariant.Default, CheckboxSize size = CheckboxSize.Default, Action<bool> onToggle = null, bool disabled = false)
-        {
-            try
-            {
-                return checkboxComponents?.CheckboxWithTooltip(text, ref value, tooltip, variant, size, onToggle, disabled) ?? value;
-            }
-            catch (Exception ex)
-            {
-                GUILogger.LogException(ex, "drawing checkbox with tooltip", "GUIHelper");
-                return false;
-            }
-        }
         #endregion
 
         #region Switch Components
@@ -1870,109 +1694,6 @@ namespace shadcnui.GUIComponents.Core
             }
         }
 
-        public bool SwitchWithLabel(string label, bool value, SwitchVariant variant = SwitchVariant.Default, SwitchSize size = SwitchSize.Default, Action<bool> onToggle = null, bool disabled = false)
-        {
-            try
-            {
-                return switchComponents?.SwitchWithLabel(label, ref value, variant, size, onToggle, disabled) ?? value;
-            }
-            catch (Exception ex)
-            {
-                GUILogger.LogException(ex, "drawing switch with label", "GUIHelper");
-                return false;
-            }
-        }
-
-        public bool SwitchWithDescription(string label, string description, bool value, SwitchVariant variant = SwitchVariant.Default, SwitchSize size = SwitchSize.Default, Action<bool> onToggle = null, bool disabled = false)
-        {
-            try
-            {
-                return switchComponents?.SwitchWithDescription(label, description, ref value, variant, size, onToggle, disabled) ?? value;
-            }
-            catch (Exception ex)
-            {
-                GUILogger.LogException(ex, "drawing switch with description", "GUIHelper");
-                return false;
-            }
-        }
-
-        public bool CustomSwitch(string text, bool value, Color onColor, Color offColor, Color thumbColor, Action<bool> onToggle = null, bool disabled = false, params GUILayoutOption[] options)
-        {
-            try
-            {
-                return switchComponents?.CustomSwitch(text, value, onColor, offColor, thumbColor, onToggle, disabled, options) ?? value;
-            }
-            catch (Exception ex)
-            {
-                GUILogger.LogException(ex, "drawing custom switch", "GUIHelper");
-                return false;
-            }
-        }
-
-        public bool SwitchWithIcon(string text, bool value, Texture2D onIcon, Texture2D offIcon, SwitchVariant variant = SwitchVariant.Default, SwitchSize size = SwitchSize.Default, Action<bool> onToggle = null, bool disabled = false)
-        {
-            try
-            {
-                return switchComponents?.SwitchWithIcon(text, value, onIcon, offIcon, variant, size, onToggle, disabled) ?? value;
-            }
-            catch (Exception ex)
-            {
-                GUILogger.LogException(ex, "drawing switch with icon", "GUIHelper");
-                return false;
-            }
-        }
-
-        public bool ValidatedSwitch(string text, bool value, bool isValid, string validationMessage, SwitchVariant variant = SwitchVariant.Default, SwitchSize size = SwitchSize.Default, Action<bool> onToggle = null, bool disabled = false)
-        {
-            try
-            {
-                return switchComponents?.ValidatedSwitch(text, ref value, isValid, validationMessage, variant, size, onToggle, disabled) ?? value;
-            }
-            catch (Exception ex)
-            {
-                GUILogger.LogException(ex, "drawing validated switch", "GUIHelper");
-                return false;
-            }
-        }
-
-        public bool SwitchWithTooltip(string text, bool value, string tooltip, SwitchVariant variant = SwitchVariant.Default, SwitchSize size = SwitchSize.Default, Action<bool> onToggle = null, bool disabled = false)
-        {
-            try
-            {
-                return switchComponents?.SwitchWithTooltip(text, ref value, tooltip, variant, size, onToggle, disabled) ?? value;
-            }
-            catch (Exception ex)
-            {
-                GUILogger.LogException(ex, "drawing switch with tooltip", "GUIHelper");
-                return false;
-            }
-        }
-
-        public bool[] SwitchGroup(string[] labels, bool[] values, SwitchVariant variant = SwitchVariant.Default, SwitchSize size = SwitchSize.Default, Action<int, bool> onToggleChange = null, bool disabled = false, bool horizontal = false, float spacing = 5f)
-        {
-            try
-            {
-                return switchComponents?.SwitchGroup(labels, values, variant, size, onToggleChange, disabled, horizontal, spacing) ?? values;
-            }
-            catch (Exception ex)
-            {
-                GUILogger.LogException(ex, "drawing switch group", "GUIHelper");
-                return values ?? new bool[0];
-            }
-        }
-
-        public bool SwitchWithLoading(string text, bool value, bool isLoading, SwitchVariant variant = SwitchVariant.Default, SwitchSize size = SwitchSize.Default, Action<bool> onToggle = null, bool disabled = false)
-        {
-            try
-            {
-                return switchComponents?.SwitchWithLoading(text, value, isLoading, variant, size, onToggle, disabled) ?? value;
-            }
-            catch (Exception ex)
-            {
-                GUILogger.LogException(ex, "drawing switch with loading", "GUIHelper");
-                return false;
-            }
-        }
         #endregion
 
         #region Badge Components
@@ -2012,18 +1733,6 @@ namespace shadcnui.GUIComponents.Core
             }
         }
 
-        public void CustomBadge(string text, Color backgroundColor, Color textColor, BadgeSize size = BadgeSize.Default, params GUILayoutOption[] options)
-        {
-            try
-            {
-                badgeComponents?.CustomBadge(text, backgroundColor, textColor, size, options);
-            }
-            catch (Exception ex)
-            {
-                GUILogger.LogException(ex, "drawing custom badge", "GUIHelper");
-            }
-        }
-
         public void CountBadge(int count, BadgeVariant variant = BadgeVariant.Default, BadgeSize size = BadgeSize.Default, int maxCount = 99, params GUILayoutOption[] options)
         {
             try
@@ -2048,19 +1757,6 @@ namespace shadcnui.GUIComponents.Core
             }
         }
 
-        public bool DismissibleBadge(string text, BadgeVariant variant = BadgeVariant.Default, BadgeSize size = BadgeSize.Default, Action onDismiss = null, params GUILayoutOption[] options)
-        {
-            try
-            {
-                return badgeComponents?.DismissibleBadge(text, variant, size, onDismiss, options) ?? false;
-            }
-            catch (Exception ex)
-            {
-                GUILogger.LogException(ex, "drawing dismissible badge", "GUIHelper");
-                return false;
-            }
-        }
-
         public void ProgressBadge(string text, float progress, BadgeVariant variant = BadgeVariant.Default, BadgeSize size = BadgeSize.Default, params GUILayoutOption[] options)
         {
             try
@@ -2082,30 +1778,6 @@ namespace shadcnui.GUIComponents.Core
             catch (Exception ex)
             {
                 GUILogger.LogException(ex, "drawing animated badge", "GUIHelper");
-            }
-        }
-
-        public void BadgeWithTooltip(string text, string tooltip, BadgeVariant variant = BadgeVariant.Default, BadgeSize size = BadgeSize.Default, params GUILayoutOption[] options)
-        {
-            try
-            {
-                badgeComponents?.BadgeWithTooltip(text, tooltip, variant, size, options);
-            }
-            catch (Exception ex)
-            {
-                GUILogger.LogException(ex, "drawing badge with tooltip", "GUIHelper");
-            }
-        }
-
-        public void BadgeGroup(string[] texts, BadgeVariant[] variants, BadgeSize size = BadgeSize.Default, bool horizontal = true, float spacing = 5f)
-        {
-            try
-            {
-                badgeComponents?.BadgeGroup(texts, variants, size, horizontal, spacing);
-            }
-            catch (Exception ex)
-            {
-                GUILogger.LogException(ex, "drawing badge group", "GUIHelper");
             }
         }
 

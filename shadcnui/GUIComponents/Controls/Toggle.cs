@@ -3,8 +3,8 @@ using System.Collections.Generic;
 using System.Text;
 using shadcnui;
 using shadcnui.GUIComponents.Core;
-using static shadcnui.GUIComponents.Layout.Layout;
 using UnityEngine;
+using static shadcnui.GUIComponents.Layout.Layout;
 #if IL2CPP_MELONLOADER
 using UnhollowerBaseLib;
 #endif
@@ -63,74 +63,6 @@ namespace shadcnui.GUIComponents.Controls
             }
 
             return newValue;
-        }
-
-        public int ToggleGroup(string[] texts, int selectedIndex, Action<int> onSelectionChange = null, ToggleVariant variant = ToggleVariant.Default, ToggleSize size = ToggleSize.Default, bool horizontal = true, float spacing = 5f)
-        {
-            int newSelectedIndex = selectedIndex;
-
-            if (horizontal)
-            {
-                layoutComponents.BeginHorizontalGroup();
-            }
-            else
-            {
-                layoutComponents.BeginVerticalGroup();
-            }
-
-            for (int i = 0; i < texts.Length; i++)
-            {
-                bool isSelected = (i == selectedIndex);
-                if (DrawToggle(texts[i], isSelected, variant, size) && !isSelected)
-                {
-                    newSelectedIndex = i;
-                    onSelectionChange?.Invoke(i);
-                }
-
-                if (horizontal && i < texts.Length - 1)
-                    layoutComponents.AddSpace(spacing);
-            }
-
-            if (horizontal)
-                layoutComponents.EndHorizontalGroup();
-            else
-                layoutComponents.EndVerticalGroup();
-
-            layoutComponents.AddSpace(spacing);
-
-            return newSelectedIndex;
-        }
-
-        public bool[] MultiToggleGroup(string[] texts, bool[] selectedStates, Action<int, bool> onToggleChange = null, ToggleVariant variant = ToggleVariant.Default, ToggleSize size = ToggleSize.Default, bool horizontal = true, float spacing = 5f)
-        {
-            bool[] newStates = new bool[selectedStates.Length];
-            Array.Copy(selectedStates, newStates, selectedStates.Length);
-
-            if (horizontal)
-            {
-                layoutComponents.BeginHorizontalGroup();
-            }
-            else
-            {
-                layoutComponents.BeginVerticalGroup();
-            }
-
-            for (int i = 0; i < texts.Length; i++)
-            {
-                newStates[i] = DrawToggle(texts[i], selectedStates[i], variant, size, (value) => onToggleChange?.Invoke(i, value));
-
-                if (horizontal && i < texts.Length - 1)
-                    layoutComponents.AddSpace(spacing);
-            }
-
-            if (horizontal)
-                layoutComponents.EndHorizontalGroup();
-            else
-                layoutComponents.EndVerticalGroup();
-
-            layoutComponents.AddSpace(spacing);
-
-            return newStates;
         }
     }
 }

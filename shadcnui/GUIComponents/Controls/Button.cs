@@ -17,7 +17,7 @@ namespace shadcnui.GUIComponents.Controls
             _layoutComponents = new shadcnui.GUIComponents.Layout.Layout(helper);
         }
 
-        public bool Draw(ButtonConfig config)
+        public bool DrawButton(ButtonConfig config)
         {
             var styleManager = _guiHelper.GetStyleManager();
             var buttonStyle = styleManager.GetButtonStyle(config.Variant, config.Size);
@@ -25,13 +25,9 @@ namespace shadcnui.GUIComponents.Controls
             var layoutOptions = new List<GUILayoutOption>(config.Options ?? Array.Empty<GUILayoutOption>());
 
             if (buttonStyle.fixedWidth > 0)
-            {
                 layoutOptions.Add(GUILayout.Width(buttonStyle.fixedWidth));
-            }
             if (buttonStyle.fixedHeight > 0)
-            {
                 layoutOptions.Add(GUILayout.Height(buttonStyle.fixedHeight));
-            }
 
             var wasEnabled = GUI.enabled;
             if (config.Disabled)
@@ -51,7 +47,7 @@ namespace shadcnui.GUIComponents.Controls
             return clicked && !config.Disabled;
         }
 
-        public bool Draw(string text, ButtonVariant variant = ButtonVariant.Default, ButtonSize size = ButtonSize.Default, Action onClick = null, bool disabled = false, float opacity = 1f, params GUILayoutOption[] options)
+        public bool DrawButton(string text, ButtonVariant variant = ButtonVariant.Default, ButtonSize size = ButtonSize.Default, Action onClick = null, bool disabled = false, float opacity = 1f, params GUILayoutOption[] options)
         {
             var config = new ButtonConfig(text)
             {
@@ -62,7 +58,7 @@ namespace shadcnui.GUIComponents.Controls
                 Opacity = opacity,
                 Options = options,
             };
-            return Draw(config);
+            return DrawButton(config);
         }
 
         public void ButtonGroup(Action drawButtons, bool horizontal = true, float spacing = 5f)
@@ -70,13 +66,9 @@ namespace shadcnui.GUIComponents.Controls
             var scaledSpacing = spacing * _guiHelper.uiScale;
 
             if (horizontal)
-            {
                 _layoutComponents.BeginHorizontalGroup();
-            }
             else
-            {
                 _layoutComponents.BeginVerticalGroup();
-            }
 
             drawButtons?.Invoke();
 
@@ -86,33 +78,6 @@ namespace shadcnui.GUIComponents.Controls
                 _layoutComponents.EndVerticalGroup();
 
             _layoutComponents.AddSpace(scaledSpacing);
-        }
-
-        public void DrawButtonSet(ButtonConfig[] buttons, bool horizontal = true, float spacing = 8f)
-        {
-            if (buttons == null || buttons.Length == 0)
-                return;
-
-            ButtonGroup(
-                () =>
-                {
-                    for (var i = 0; i < buttons.Length; i++)
-                    {
-                        var config = buttons[i];
-                        Draw(config);
-
-                        if (i < buttons.Length - 1)
-                        {
-                            if (horizontal)
-                                _layoutComponents.AddSpace(spacing);
-                            else
-                                _layoutComponents.AddSpace(spacing);
-                        }
-                    }
-                },
-                horizontal,
-                0f
-            );
         }
     }
 
