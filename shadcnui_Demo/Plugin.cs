@@ -1,7 +1,8 @@
 using System;
 using System.IO;
+using System.Reflection;
 using shadcnui;
-using shadcnui_testing.Menu;
+using shadcnui_Demo.Menu;
 using UnityEngine;
 #if IL2CPP_BEPINEX
 using BepInEx.Unity.IL2CPP;
@@ -13,8 +14,34 @@ using BepInEx.Logging;
 #elif MELONLOADER
 using MelonLoader;
 #endif
-namespace shadcnui_testing
+
+namespace shadcnui_Demo
 {
+    // Embed the UI lib
+    public static class AssemblyLoader
+    {
+        static AssemblyLoader()
+        {
+            AppDomain.CurrentDomain.AssemblyResolve += (sender, args) =>
+            {
+                if (args.Name.Contains("shadcnui"))
+                {
+                    using (var stream = Assembly.GetExecutingAssembly().GetManifestResourceStream("shadcnui_Demo.shadcnui.dll"))
+                    {
+                        if (stream == null)
+                            return null;
+                        byte[] assemblyData = new byte[stream.Length];
+                        stream.Read(assemblyData, 0, assemblyData.Length);
+                        return Assembly.Load(assemblyData);
+                    }
+                }
+                return null;
+            };
+        }
+
+        public static void Init() { }
+    }
+
 #if IL2CPP_BEPINEX
     [System.ComponentModel.Description(PluginInfo.Description)]
     [BepInPlugin(PluginInfo.GUID, PluginInfo.Name, PluginInfo.Version)]
@@ -26,6 +53,7 @@ namespace shadcnui_testing
 
         public override void Load()
         {
+            AssemblyLoader.Init();
             instance = this;
             GorillaTagger.OnPlayerSpawned(LoadMenu);
         }
@@ -48,6 +76,7 @@ namespace shadcnui_testing
 
         private void Awake()
         {
+            AssemblyLoader.Init();
             instance = this;
             GorillaTagger.OnPlayerSpawned(LoadMenu);
         }
@@ -66,6 +95,7 @@ namespace shadcnui_testing
 
         public override void OnInitializeMelon()
         {
+            AssemblyLoader.Init();
             base.OnInitializeMelon();
             GorillaTagger.OnPlayerSpawned(LoadMenu);
         }

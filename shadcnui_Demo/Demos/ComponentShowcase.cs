@@ -8,7 +8,7 @@ using shadcnui.GUIComponents.Display;
 using shadcnui.GUIComponents.Layout;
 using UnityEngine;
 
-namespace shadcnui_testing.Menu
+namespace shadcnui_Demo.Menu
 {
     public class ComponentShowcase : MonoBehaviour
     {

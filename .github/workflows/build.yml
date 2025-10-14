@@ -18,6 +18,7 @@ env:
 jobs:
   build:
     runs-on: windows-latest
+    if: github.event_name != 'schedule'
     strategy:
       matrix:
         configuration: [IL2CPP_Melonloader, IL2CPP_BepInEx, Mono_Melonloader, Mono_BepInEx]
@@ -49,12 +50,12 @@ jobs:
           if-no-files-found: error
           retention-days: 30
 
-      - name: Upload shadcnui testing.dll
+      - name: Upload shadcnui_Demo.dll
         uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: shadcnui-testing-build-${{ matrix.configuration }}
-          path: shadcnui testing/bin/${{ matrix.configuration }}/netstandard2.1/shadcnui testing.dll
+          name: shadcnui_Demo-build-${{ matrix.configuration }}
+          path: shadcnui_Demo/bin/${{ matrix.configuration }}/netstandard2.1/shadcnui_Demo.dll
           if-no-files-found: error
           retention-days: 30
 
@@ -80,14 +81,14 @@ jobs:
           $config = "${{ matrix.configuration }}"
           
           $dll_path = "./artifacts/shadcnui-build-$config/shadcnui.dll"
-          $testing_dll_path = "./artifacts/shadcnui-testing-build-$config/shadcnui testing.dll"
+          $testing_dll_path = "./artifacts/shadcnui_Demo-build-$config/shadcnui_Demo.dll"
           
           if (Test-Path $dll_path) {
             gh release upload ${{ github.event.release.tag_name }} "$dll_path#shadcnui-$config.dll" --clobber
           }
           
           if (Test-Path $testing_dll_path) {
-            gh release upload ${{ github.event.release.tag_name }} "$testing_dll_path#shadcnui-testing-$config.dll" --clobber
+            gh release upload ${{ github.event.release.tag_name }} "$testing_dll_path#shadcnui_Demo-$config.dll" --clobber
           }
 
   nightly_build:
@@ -124,11 +125,11 @@ jobs:
           if-no-files-found: error
           retention-days: 14
 
-      - name: Upload shadcnui testing.dll
+      - name: Upload shadcnui_Demo.dll
         uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: shadcnui-testing-nightly-${{ github.run_number }}-${{ matrix.configuration }}
-          path: shadcnui testing/bin/${{ matrix.configuration }}/netstandard2.1/shadcnui testing.dll
+          name: shadcnui_Demo-nightly-${{ github.run_number }}-${{ matrix.configuration }}
+          path: shadcnui_Demo/bin/${{ matrix.configuration }}/netstandard2.1/shadcnui_Demo.dll
           if-no-files-found: error
           retention-days: 14
