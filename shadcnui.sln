@@ -1,36 +1,36 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 17
-VisualStudioVersion = 17.6.33829.357
+# Visual Studio Version 18
+VisualStudioVersion = 18.0.11109.219 d18.0-oob
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "shadcnui", "shadcnui\shadcnui.csproj", "{EF8EE12E-D6B5-4140-A69E-BADFF5B5B662}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "shadcnui testing", "shadcnui testing\shadcnui testing.csproj", "{18BE5919-3283-D8AD-6500-C7819137842A}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "shadcnui_Demo", "shadcnui_Demo\shadcnui_Demo.csproj", "{18BE5919-3283-D8AD-6500-C7819137842A}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
-		IL2CPP_Melonloader|Any CPU = IL2CPP_Melonloader|Any CPU
 		IL2CPP_BepInEx|Any CPU = IL2CPP_BepInEx|Any CPU
-		Mono_Melonloader|Any CPU = Mono_Melonloader|Any CPU
+		IL2CPP_Melonloader|Any CPU = IL2CPP_Melonloader|Any CPU
 		Mono_BepInEx|Any CPU = Mono_BepInEx|Any CPU
+		Mono_Melonloader|Any CPU = Mono_Melonloader|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{EF8EE12E-D6B5-4140-A69E-BADFF5B5B662}.IL2CPP_Melonloader|Any CPU.ActiveCfg = IL2CPP_Melonloader|Any CPU
-		{EF8EE12E-D6B5-4140-A69E-BADFF5B5B662}.IL2CPP_Melonloader|Any CPU.Build.0 = IL2CPP_Melonloader|Any CPU
 		{EF8EE12E-D6B5-4140-A69E-BADFF5B5B662}.IL2CPP_BepInEx|Any CPU.ActiveCfg = IL2CPP_BepInEx|Any CPU
 		{EF8EE12E-D6B5-4140-A69E-BADFF5B5B662}.IL2CPP_BepInEx|Any CPU.Build.0 = IL2CPP_BepInEx|Any CPU
-		{EF8EE12E-D6B5-4140-A69E-BADFF5B5B662}.Mono_Melonloader|Any CPU.ActiveCfg = Mono_Melonloader|Any CPU
-		{EF8EE12E-D6B5-4140-A69E-BADFF5B5B662}.Mono_Melonloader|Any CPU.Build.0 = Mono_Melonloader|Any CPU
+		{EF8EE12E-D6B5-4140-A69E-BADFF5B5B662}.IL2CPP_Melonloader|Any CPU.ActiveCfg = IL2CPP_Melonloader|Any CPU
+		{EF8EE12E-D6B5-4140-A69E-BADFF5B5B662}.IL2CPP_Melonloader|Any CPU.Build.0 = IL2CPP_Melonloader|Any CPU
 		{EF8EE12E-D6B5-4140-A69E-BADFF5B5B662}.Mono_BepInEx|Any CPU.ActiveCfg = Mono_BepInEx|Any CPU
 		{EF8EE12E-D6B5-4140-A69E-BADFF5B5B662}.Mono_BepInEx|Any CPU.Build.0 = Mono_BepInEx|Any CPU
-		{18BE5919-3283-D8AD-6500-C7819137842A}.IL2CPP_Melonloader|Any CPU.ActiveCfg = IL2CPP_Melonloader|Any CPU
-		{18BE5919-3283-D8AD-6500-C7819137842A}.IL2CPP_Melonloader|Any CPU.Build.0 = IL2CPP_Melonloader|Any CPU
+		{EF8EE12E-D6B5-4140-A69E-BADFF5B5B662}.Mono_Melonloader|Any CPU.ActiveCfg = Mono_Melonloader|Any CPU
+		{EF8EE12E-D6B5-4140-A69E-BADFF5B5B662}.Mono_Melonloader|Any CPU.Build.0 = Mono_Melonloader|Any CPU
 		{18BE5919-3283-D8AD-6500-C7819137842A}.IL2CPP_BepInEx|Any CPU.ActiveCfg = IL2CPP_BepInEx|Any CPU
 		{18BE5919-3283-D8AD-6500-C7819137842A}.IL2CPP_BepInEx|Any CPU.Build.0 = IL2CPP_BepInEx|Any CPU
-		{18BE5919-3283-D8AD-6500-C7819137842A}.Mono_Melonloader|Any CPU.ActiveCfg = Mono_Melonloader|Any CPU
-		{18BE5919-3283-D8AD-6500-C7819137842A}.Mono_Melonloader|Any CPU.Build.0 = Mono_Melonloader|Any CPU
+		{18BE5919-3283-D8AD-6500-C7819137842A}.IL2CPP_Melonloader|Any CPU.ActiveCfg = IL2CPP_Melonloader|Any CPU
+		{18BE5919-3283-D8AD-6500-C7819137842A}.IL2CPP_Melonloader|Any CPU.Build.0 = IL2CPP_Melonloader|Any CPU
 		{18BE5919-3283-D8AD-6500-C7819137842A}.Mono_BepInEx|Any CPU.ActiveCfg = Mono_BepInEx|Any CPU
 		{18BE5919-3283-D8AD-6500-C7819137842A}.Mono_BepInEx|Any CPU.Build.0 = Mono_BepInEx|Any CPU
+		{18BE5919-3283-D8AD-6500-C7819137842A}.Mono_Melonloader|Any CPU.ActiveCfg = Mono_Melonloader|Any CPU
+		{18BE5919-3283-D8AD-6500-C7819137842A}.Mono_Melonloader|Any CPU.Build.0 = Mono_Melonloader|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

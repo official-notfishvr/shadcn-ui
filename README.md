@@ -21,6 +21,66 @@ To use `shadcnui` in your C# project:
 4.  **Reference the library:**
     In your target C# project, add a reference to the compiled `shadcnui.dll` (found in `shadcnui/bin/Debug/` or `shadcnui/bin/Release/` after building).
 
+## Embedding the Library
+
+To embed `shadcnui.dll` into your project for a single-file distribution, follow these steps:
+
+1.  **Copy the DLL:**
+    Copy `shadcnui.dll` to a folder in your project, for example, a `Libs` folder.
+
+2.  **Modify your `.csproj` file:**
+    Add the following to your `.csproj` file, replacing `Libs/shadcnui.dll` with the actual path to the DLL.
+
+    ```xml
+    <ItemGroup>
+        <Reference Include="shadcnui">
+            <HintPath>Libs/shadcnui.dll</HintPath>
+            <Private>false</Private> <!-- Do not copy to output -->
+        </Reference>
+        <EmbeddedResource Include="Libs/shadcnui.dll" />
+    </ItemGroup>
+    ```
+
+3.  **Add an Assembly Loader:**
+    Add the following `AssemblyLoader` class to your project.
+
+    ```csharp
+    using System;
+    using System.Reflection;
+
+    namespace YourProjectNamespace
+    {
+        public static class AssemblyLoader
+        {
+            static AssemblyLoader()
+            {
+                AppDomain.CurrentDomain.AssemblyResolve += (sender, args) =>
+                {
+                    if (args.Name.Contains("shadcnui"))
+                    {
+                        // The resource name is YourProjectNamespace.Libs.shadcnui.dll
+                        // The name is constructed from the default namespace and the path to the file.
+                        using (var stream = Assembly.GetExecutingAssembly().GetManifestResourceStream("YourProjectNamespace.Libs.shadcnui.dll"))
+                        {
+                            if (stream == null) return null;
+                            byte[] assemblyData = new byte[stream.Length];
+                            stream.Read(assemblyData, 0, assemblyData.Length);
+                            return Assembly.Load(assemblyData);
+                        }
+                    }
+                    return null;
+                };
+            }
+            public static void Init() { }
+        }
+    }
+    ```
+    **Important:** The resource name in `GetManifestResourceStream` is crucial. It is formed by combining the default namespace of your project and the path to the DLL file (with path separators replaced by dots). For example, if your project's default namespace is `MyPlugin` and you placed `shadcnui.dll` in a `Libs` folder, the resource name will be `MyPlugin.Libs.shadcnui.dll`.
+
+4.  **Initialize the Loader:**
+    Call `AssemblyLoader.Init()` at your project's entry point.
+
+
 ## Usage
 
 Once referenced, you can integrate `shadcnui` components into your application. This library is designed with Unity's IMGUI system in mind, leveraging `GUILayout` for flexible UI layouts.

@@ -1,6 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
     <PropertyGroup>
-        <AssemblyName>shadcnui testing</AssemblyName>
+        <AssemblyName>shadcnui_Demo</AssemblyName>
         <GenerateAssemblyInfo>False</GenerateAssemblyInfo>
         <TargetFramework>netstandard2.1</TargetFramework>
         <LangVersion>10.0</LangVersion>
@@ -13,6 +13,13 @@
     <ItemGroup>
         <ProjectReference Include="..\shadcnui\shadcnui.csproj" />
     </ItemGroup>
+    <!-- Embed the UI lib -->
+    <Target Name="EmbedDependency" AfterTargets="ResolveAssemblyReferences">
+        <ItemGroup>
+            <EmbeddedResource Include="@(ReferenceCopyLocalPaths)" Condition="'%(ReferenceCopyLocalPaths.Filename)' == 'shadcnui' and '%(ReferenceCopyLocalPaths.Extension)' == '.dll'" />
+            <ReferenceCopyLocalPaths Remove="@(ReferenceCopyLocalPaths)" Condition="'%(ReferenceCopyLocalPaths.Filename)' == 'shadcnui'" />
+        </ItemGroup>
+    </Target>
     <ItemGroup>
         <Reference Include="Unity.Addressables">
             <HintPath>$(ReferencePath)Unity.Addressables.dll</HintPath>

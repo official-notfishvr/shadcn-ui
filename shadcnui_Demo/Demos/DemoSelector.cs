@@ -3,7 +3,7 @@ using shadcnui.GUIComponents.Controls;
 using shadcnui.GUIComponents.Core;
 using UnityEngine;
 
-namespace shadcnui_testing.Menu
+namespace shadcnui_Demo.Menu
 {
     public class DemoSelector : MonoBehaviour
     {
