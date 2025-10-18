@@ -8,17 +8,9 @@ using UnhollowerBaseLib;
 
 namespace shadcnui.GUIComponents.Display
 {
-    public class Progress
+    public class Progress : BaseComponent
     {
-        private GUIHelper guiHelper;
-        private shadcnui.GUIComponents.Layout.Layout layoutComponents;
-
-        public Progress(GUIHelper helper)
-        {
-            guiHelper = helper;
-            layoutComponents = new shadcnui.GUIComponents.Layout.Layout(helper);
-        }
-
+        public Progress(GUIHelper helper) : base(helper) { }
         public void DrawProgress(float value, float width = -1, float height = -1, params GUILayoutOption[] options)
         {
             var styleManager = guiHelper.GetStyleManager();

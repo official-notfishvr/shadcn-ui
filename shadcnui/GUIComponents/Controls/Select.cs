@@ -8,19 +8,13 @@ using UnhollowerBaseLib;
 
 namespace shadcnui.GUIComponents.Controls
 {
-    public class Select
+    public class Select : BaseComponent
     {
-        private GUIHelper guiHelper;
-        private shadcnui.GUIComponents.Layout.Layout _layoutComponents;
         private bool isOpen;
         private int selectedIndex;
         private Vector2 scrollPosition;
 
-        public Select(GUIHelper helper)
-        {
-            this.guiHelper = helper;
-            _layoutComponents = new shadcnui.GUIComponents.Layout.Layout(helper);
-        }
+        public Select(GUIHelper helper) : base(helper) { }
 
         public bool IsOpen => isOpen;
 
@@ -39,9 +33,9 @@ namespace shadcnui.GUIComponents.Controls
             if (!isOpen)
                 return selectedIndex;
 
-            _layoutComponents.BeginVerticalGroup(guiHelper.GetStyleManager().GetSelectStyle(SelectVariant.Default, SelectSize.Default), GUILayout.MaxWidth(300), GUILayout.MaxHeight(200));
+            layoutComponents.BeginVerticalGroup(guiHelper.GetStyleManager().GetSelectStyle(SelectVariant.Default, SelectSize.Default), GUILayout.MaxWidth(300), GUILayout.MaxHeight(200));
 
-            scrollPosition = _layoutComponents.DrawScrollView(
+            scrollPosition = layoutComponents.DrawScrollView(
                 scrollPosition,
                 () =>
                 {

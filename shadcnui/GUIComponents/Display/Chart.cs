@@ -68,21 +68,15 @@ namespace shadcnui.GUIComponents.Display
         }
     }
 
-    public class Chart
+    public class Chart : BaseComponent
     {
-        private readonly GUIHelper _guiHelper;
-        private readonly shadcnui.GUIComponents.Layout.Layout _layoutComponents;
         private Rect _chartRect;
 
-        public Chart(GUIHelper helper)
-        {
-            _guiHelper = helper;
-            _layoutComponents = new shadcnui.GUIComponents.Layout.Layout(helper);
-        }
+        public Chart(GUIHelper helper) : base(helper) { }
 
         public void DrawChart(ChartConfig config)
         {
-            var styleManager = _guiHelper.GetStyleManager();
+            var styleManager = guiHelper.GetStyleManager();
 
             var layoutOptions = new List<GUILayoutOption>(config.Options);
             if (layoutOptions.Count == 0)
@@ -91,11 +85,11 @@ namespace shadcnui.GUIComponents.Display
                 layoutOptions.Add(GUILayout.Height(config.Size.y));
             }
 
-            _layoutComponents.BeginVerticalGroup(styleManager.cardStyle, layoutOptions.ToArray());
+            layoutComponents.BeginVerticalGroup(styleManager.cardStyle, layoutOptions.ToArray());
 
             DrawChartContent(config);
 
-            _layoutComponents.EndVerticalGroup();
+            layoutComponents.EndVerticalGroup();
         }
 
         private void DrawChartContent(ChartConfig config)
@@ -241,7 +235,7 @@ namespace shadcnui.GUIComponents.Display
 
         private void DrawGrid()
         {
-            var theme = _guiHelper.GetStyleManager().GetTheme();
+            var theme = guiHelper.GetStyleManager().GetTheme();
 
             for (var i = 1; i < 5; i++)
             {
@@ -254,8 +248,8 @@ namespace shadcnui.GUIComponents.Display
         {
             try
             {
-                var theme = _guiHelper.GetStyleManager().GetTheme();
-                var styleManager = _guiHelper.GetStyleManager();
+                var theme = guiHelper.GetStyleManager().GetTheme();
+                var styleManager = guiHelper.GetStyleManager();
 
                 DrawLine(new Vector2(_chartRect.x + 40, _chartRect.y + _chartRect.height - 20), new Vector2(_chartRect.x + _chartRect.width - 20, _chartRect.y + _chartRect.height - 20), new Color(theme.ChartAxisColor.r, theme.ChartAxisColor.g, theme.ChartAxisColor.b, 0.5f));
 

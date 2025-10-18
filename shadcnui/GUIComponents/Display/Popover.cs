@@ -7,18 +7,11 @@ using UnhollowerBaseLib;
 
 namespace shadcnui.GUIComponents.Display
 {
-    public class Popover
+    public class Popover : BaseComponent
     {
-        private GUIHelper guiHelper;
         private bool isOpen;
-        private shadcnui.GUIComponents.Layout.Layout _layoutComponents;
 
-        public Popover(GUIHelper helper)
-        {
-            this.guiHelper = helper;
-            _layoutComponents = new shadcnui.GUIComponents.Layout.Layout(helper);
-        }
-
+        public Popover(GUIHelper helper) : base(helper) { }
         public bool IsOpen => isOpen;
 
         public void Open()
@@ -36,7 +29,7 @@ namespace shadcnui.GUIComponents.Display
             if (!isOpen)
                 return;
 
-            _layoutComponents.BeginVerticalGroup(guiHelper.GetStyleManager().popoverContentStyle, GUILayout.MaxWidth(300), GUILayout.MaxHeight(200));
+            layoutComponents.BeginVerticalGroup(guiHelper.GetStyleManager().popoverContentStyle, GUILayout.MaxWidth(300), GUILayout.MaxHeight(200));
 
             content?.Invoke();
             GUILayout.EndVertical();

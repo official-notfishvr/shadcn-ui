@@ -8,15 +8,9 @@ using UnhollowerBaseLib;
 
 namespace shadcnui.GUIComponents.Display
 {
-    public class Label
+    public class Label : BaseComponent
     {
-        private GUIHelper guiHelper;
-
-        public Label(GUIHelper helper)
-        {
-            guiHelper = helper;
-        }
-
+        public Label(GUIHelper helper) : base(helper) { }
         public void DrawLabel(string text, LabelVariant variant = LabelVariant.Default, bool disabled = false, params GUILayoutOption[] options)
         {
             var styleManager = guiHelper.GetStyleManager();

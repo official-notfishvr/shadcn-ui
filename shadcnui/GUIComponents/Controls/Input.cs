@@ -10,17 +10,11 @@ using UnhollowerBaseLib;
 
 namespace shadcnui.GUIComponents.Controls
 {
-    public class Input
+    public class Input : BaseComponent
     {
-        private GUIHelper guiHelper;
-        private shadcnui.GUIComponents.Layout.Layout layoutComponents;
         private static float horizontalPadding = 10f;
 
-        public Input(GUIHelper helper)
-        {
-            guiHelper = helper;
-            layoutComponents = new shadcnui.GUIComponents.Layout.Layout(helper);
-        }
+        public Input(GUIHelper helper) : base(helper) { }
 
         public void DrawLabel(string text, LabelVariant variant = LabelVariant.Default, int width = -1, bool disabled = false)
         {

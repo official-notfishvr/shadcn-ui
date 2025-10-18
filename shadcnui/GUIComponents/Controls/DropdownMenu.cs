@@ -41,19 +41,13 @@ namespace shadcnui.GUIComponents.Controls
         }
     }
 
-    public class DropdownMenu
+    public class DropdownMenu : BaseComponent
     {
-        private readonly GUIHelper _guiHelper;
-        private readonly shadcnui.GUIComponents.Layout.Layout _layoutComponents;
         private bool _isOpen;
         private Vector2 _scrollPosition;
         private readonly Stack<List<DropdownMenuItem>> _menuStack = new Stack<List<DropdownMenuItem>>();
 
-        public DropdownMenu(GUIHelper helper)
-        {
-            _guiHelper = helper;
-            _layoutComponents = new shadcnui.GUIComponents.Layout.Layout(helper);
-        }
+        public DropdownMenu(GUIHelper helper) : base(helper) { }
 
         public bool IsOpen => _isOpen;
 
@@ -91,7 +85,7 @@ namespace shadcnui.GUIComponents.Controls
             if (!_isOpen || _menuStack.Count == 0)
                 return;
 
-            var styleManager = _guiHelper.GetStyleManager();
+            var styleManager = guiHelper.GetStyleManager();
 
             var layoutOptions = new List<GUILayoutOption> { GUILayout.ExpandWidth(true), GUILayout.MinHeight(0), GUILayout.MaxHeight(200) };
             if (options != null)
@@ -99,8 +93,8 @@ namespace shadcnui.GUIComponents.Controls
                 layoutOptions.AddRange(options);
             }
 
-            _layoutComponents.BeginVerticalGroup(styleManager.dropdownMenuContentStyle, layoutOptions.ToArray());
-            _scrollPosition = _layoutComponents.DrawScrollView(
+            layoutComponents.BeginVerticalGroup(styleManager.dropdownMenuContentStyle, layoutOptions.ToArray());
+            _scrollPosition = layoutComponents.DrawScrollView(
                 _scrollPosition,
                 () =>
                 {
@@ -124,12 +118,12 @@ namespace shadcnui.GUIComponents.Controls
                 GUILayout.ExpandWidth(true),
                 GUILayout.ExpandHeight(true)
             );
-            _layoutComponents.EndVerticalGroup();
+            layoutComponents.EndVerticalGroup();
         }
 
         private void DrawMenuItem(DropdownMenuItem item)
         {
-            var styleManager = _guiHelper.GetStyleManager();
+            var styleManager = guiHelper.GetStyleManager();
 
             switch (item.Type)
             {

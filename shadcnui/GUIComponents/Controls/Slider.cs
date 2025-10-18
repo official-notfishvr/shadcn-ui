@@ -10,17 +10,9 @@ using UnhollowerBaseLib;
 
 namespace shadcnui.GUIComponents.Controls
 {
-    public class Slider
+    public class Slider : BaseComponent
     {
-        private GUIHelper guiHelper;
-        private shadcnui.GUIComponents.Layout.Layout layoutComponents;
-
-        public Slider(GUIHelper helper)
-        {
-            guiHelper = helper;
-            layoutComponents = new shadcnui.GUIComponents.Layout.Layout(helper);
-        }
-
+        public Slider(GUIHelper helper) : base(helper) { }
         public void DrawSlider(float windowWidth, string label, ref float value, float minValue, float maxValue)
         {
             var styleManager = guiHelper.GetStyleManager();

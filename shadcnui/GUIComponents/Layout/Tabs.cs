@@ -6,7 +6,7 @@ using UnityEngine;
 
 namespace shadcnui.GUIComponents.Layout
 {
-    public class Tabs
+    public class Tabs : BaseComponent
     {
         public enum TabSide
         {
@@ -21,15 +21,7 @@ namespace shadcnui.GUIComponents.Layout
             Left,
             Right,
         }
-
-        private readonly GUIHelper _guiHelper;
-        private readonly Layout _layoutComponents;
-
-        public Tabs(GUIHelper helper)
-        {
-            _guiHelper = helper;
-            _layoutComponents = new Layout(helper);
-        }
+        public Tabs(GUIHelper helper) : base(helper) { }
 
         public class TabsConfig
         {
@@ -99,7 +91,7 @@ namespace shadcnui.GUIComponents.Layout
                 return config.SelectedIndex;
             }
 
-            var styleManager = _guiHelper.GetStyleManager();
+            var styleManager = guiHelper.GetStyleManager();
             var selectedIndex = Mathf.Clamp(config.SelectedIndex, 0, config.TabNames.Length - 1);
             var newSelectedIndex = selectedIndex;
 
@@ -111,7 +103,7 @@ namespace shadcnui.GUIComponents.Layout
                     var horizontalStarted = false;
                     try
                     {
-                        _layoutComponents.BeginHorizontalGroup(styleManager.GetTabsListStyle());
+                        layoutComponents.BeginHorizontalGroup(styleManager.GetTabsListStyle());
                         horizontalStarted = true;
 
                         for (var i = line * tabsPerLine; i < (line + 1) * tabsPerLine && i < config.TabNames.Length; i++)
@@ -120,7 +112,7 @@ namespace shadcnui.GUIComponents.Layout
                             var triggerStyle = styleManager.GetTabsTriggerStyle(isActive);
 
                             var tabOptions = new List<GUILayoutOption>();
-                            tabOptions.Add(GUILayout.Height(Mathf.RoundToInt(36 * _guiHelper.uiScale)));
+                            tabOptions.Add(GUILayout.Height(Mathf.RoundToInt(36 * guiHelper.uiScale)));
 
                             if (config.Options != null && config.Options.Length > 0)
                                 tabOptions.AddRange(config.Options);
@@ -134,7 +126,7 @@ namespace shadcnui.GUIComponents.Layout
 
                             if (i < (line + 1) * tabsPerLine - 1 && i < config.TabNames.Length - 1)
                             {
-                                _layoutComponents.AddSpace(2);
+                                layoutComponents.AddSpace(2);
                             }
                         }
                     }
@@ -145,7 +137,7 @@ namespace shadcnui.GUIComponents.Layout
                         {
                             try
                             {
-                                _layoutComponents.EndHorizontalGroup();
+                                layoutComponents.EndHorizontalGroup();
                             }
                             catch { }
                         }
@@ -161,7 +153,7 @@ namespace shadcnui.GUIComponents.Layout
                     var verticalStarted = false;
                     try
                     {
-                        _layoutComponents.BeginVerticalGroup(GUILayout.Width(config.TabWidth * _guiHelper.uiScale));
+                        layoutComponents.BeginVerticalGroup(GUILayout.Width(config.TabWidth * guiHelper.uiScale));
                         verticalStarted = true;
 
                         for (var i = col * tabsPerColumn; i < (col + 1) * tabsPerColumn && i < config.TabNames.Length; i++)
@@ -171,8 +163,8 @@ namespace shadcnui.GUIComponents.Layout
 
                             var tabOptions = new List<GUILayoutOption>();
 
-                            tabOptions.Add(GUILayout.Width(config.TabWidth * _guiHelper.uiScale));
-                            tabOptions.Add(GUILayout.Height(Mathf.RoundToInt(36 * _guiHelper.uiScale)));
+                            tabOptions.Add(GUILayout.Width(config.TabWidth * guiHelper.uiScale));
+                            tabOptions.Add(GUILayout.Height(Mathf.RoundToInt(36 * guiHelper.uiScale)));
                             tabOptions.Add(GUILayout.ExpandWidth(false));
                             tabOptions.Add(GUILayout.ExpandHeight(false));
 
@@ -189,7 +181,7 @@ namespace shadcnui.GUIComponents.Layout
 
                             if (i < (col + 1) * tabsPerColumn - 1 && i < config.TabNames.Length - 1)
                             {
-                                _layoutComponents.AddSpace(2);
+                                layoutComponents.AddSpace(2);
                             }
                         }
                     }
@@ -200,7 +192,7 @@ namespace shadcnui.GUIComponents.Layout
                         {
                             try
                             {
-                                _layoutComponents.EndVerticalGroup();
+                                layoutComponents.EndVerticalGroup();
                             }
                             catch { }
                         }
@@ -223,7 +215,7 @@ namespace shadcnui.GUIComponents.Layout
                 var mainHorizontalStarted = false;
                 try
                 {
-                    _layoutComponents.BeginHorizontalGroup();
+                    layoutComponents.BeginHorizontalGroup();
                     mainHorizontalStarted = true;
 
                     drawVerticalTabButtons();
@@ -236,7 +228,7 @@ namespace shadcnui.GUIComponents.Layout
                     {
                         try
                         {
-                            _layoutComponents.EndHorizontalGroup();
+                            layoutComponents.EndHorizontalGroup();
                         }
                         catch { }
                     }
@@ -247,7 +239,7 @@ namespace shadcnui.GUIComponents.Layout
                 var mainHorizontalStarted = false;
                 try
                 {
-                    _layoutComponents.BeginHorizontalGroup();
+                    layoutComponents.BeginHorizontalGroup();
                     mainHorizontalStarted = true;
 
                     config.Content?.Invoke();
@@ -260,7 +252,7 @@ namespace shadcnui.GUIComponents.Layout
                     {
                         try
                         {
-                            _layoutComponents.EndHorizontalGroup();
+                            layoutComponents.EndHorizontalGroup();
                         }
                         catch { }
                     }
@@ -272,13 +264,13 @@ namespace shadcnui.GUIComponents.Layout
 
         public void BeginTabContent(params GUILayoutOption[] options)
         {
-            var styleManager = _guiHelper.GetStyleManager();
-            _layoutComponents.BeginVerticalGroup(styleManager.GetTabsContentStyle(), options);
+            var styleManager = guiHelper.GetStyleManager();
+            layoutComponents.BeginVerticalGroup(styleManager.GetTabsContentStyle(), options);
         }
 
         public void EndTabContent()
         {
-            _layoutComponents.EndVerticalGroup();
+            layoutComponents.EndVerticalGroup();
         }
 
         public int TabsWithContent(TabConfig[] tabConfigs, int selectedIndex, Action<int> onTabChange = null)

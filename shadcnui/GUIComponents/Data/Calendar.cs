@@ -9,10 +9,8 @@ using UnhollowerBaseLib;
 
 namespace shadcnui.GUIComponents.Data
 {
-    public class Calendar
+    public class Calendar : BaseComponent
     {
-        private GUIHelper guiHelper;
-        private shadcnui.GUIComponents.Layout.Layout layoutComponents;
         private DateTime displayedMonth;
 
         public DateTime? SelectedDate { get; set; }
@@ -26,10 +24,8 @@ namespace shadcnui.GUIComponents.Data
         private bool showMonthDropdown;
         private bool showYearDropdown;
 
-        public Calendar(GUIHelper helper)
-        {
-            this.guiHelper = helper;
-            this.layoutComponents = new shadcnui.GUIComponents.Layout.Layout(helper);
+        public Calendar(GUIHelper helper) : base(helper) 
+        { 
             this.displayedMonth = DateTime.Today;
 
             this.Ranges = new List<(DateTime Start, DateTime End)>();

@@ -1,7 +1,8 @@
-using System;
-using System.Collections.Generic;
 using shadcnui;
 using shadcnui.GUIComponents.Core;
+using System;
+using System.Collections.Generic;
+using System.Runtime.Remoting.Messaging;
 using UnityEngine;
 #if IL2CPP_MELONLOADER
 using UnhollowerBaseLib;
@@ -9,20 +10,12 @@ using UnhollowerBaseLib;
 
 namespace shadcnui.GUIComponents.Controls
 {
-    public class Checkbox
+    public class Checkbox : BaseComponent
     {
-        private GUIHelper guiHelper;
-        private shadcnui.GUIComponents.Layout.Layout layoutComponents;
-
-        public Checkbox(GUIHelper helper)
-        {
-            guiHelper = helper;
-            layoutComponents = new shadcnui.GUIComponents.Layout.Layout(helper);
-        }
+        public Checkbox(GUIHelper helper) : base(helper) { }
 
         public bool DrawCheckbox(string text, bool value, CheckboxVariant variant = CheckboxVariant.Default, CheckboxSize size = CheckboxSize.Default, Action<bool> onToggle = null, bool disabled = false, params GUILayoutOption[] options)
         {
-            var styleManager = guiHelper.GetStyleManager();
             if (styleManager == null)
             {
                 return UnityHelpers.Toggle(value, text ?? "Checkbox", GUI.skin.toggle, new GUILayoutOption[0]);
@@ -40,7 +33,6 @@ namespace shadcnui.GUIComponents.Controls
 
         public bool DrawCheckbox(Rect rect, string text, bool value, CheckboxVariant variant = CheckboxVariant.Default, CheckboxSize size = CheckboxSize.Default, Action<bool> onToggle = null, bool disabled = false)
         {
-            var styleManager = guiHelper.GetStyleManager();
             if (styleManager == null)
             {
                 return GUI.Toggle(rect, value, text ?? "Checkbox");

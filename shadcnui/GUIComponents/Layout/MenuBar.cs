@@ -5,21 +5,14 @@ using UnityEngine;
 
 namespace shadcnui.GUIComponents.Layout
 {
-    public class MenuBar
+    public class MenuBar : BaseComponent
     {
-        private readonly GUIHelper _guiHelper;
-        private readonly Layout _layoutComponents;
         private int _activeMenuIndex = -1;
         private bool _isDropdownOpen = false;
         private readonly Stack<MenuData> _menuStack = new Stack<MenuData>();
         private Rect _menuBarRect;
 
-        public MenuBar(GUIHelper helper)
-        {
-            _guiHelper = helper;
-            _layoutComponents = new Layout(helper);
-        }
-
+        public MenuBar(GUIHelper helper) : base(helper) { }
         public bool IsDropdownOpen => _isDropdownOpen;
 
         public class MenuItem
@@ -78,9 +71,9 @@ namespace shadcnui.GUIComponents.Layout
             if (items == null || items.Count == 0)
                 return;
 
-            var styleManager = _guiHelper.GetStyleManager();
+            var styleManager = guiHelper.GetStyleManager();
 
-            _layoutComponents.BeginHorizontalGroup(styleManager.menuBarStyle, options);
+            layoutComponents.BeginHorizontalGroup(styleManager.menuBarStyle, options);
             _menuBarRect = GUILayoutUtility.GetRect(GUIContent.none, GUIStyle.none, options);
 
             for (var i = 0; i < items.Count; i++)
@@ -117,7 +110,7 @@ namespace shadcnui.GUIComponents.Layout
                 }
             }
 
-            _layoutComponents.EndHorizontalGroup();
+            layoutComponents.EndHorizontalGroup();
 
             if (_isDropdownOpen && _menuStack.Count > 0)
             {
@@ -129,10 +122,10 @@ namespace shadcnui.GUIComponents.Layout
 
         private void DrawDropdownMenu()
         {
-            var styleManager = _guiHelper.GetStyleManager();
+            var styleManager = guiHelper.GetStyleManager();
             var currentMenu = _menuStack.Peek();
 
-            _layoutComponents.BeginVerticalGroup(styleManager.menuDropdownStyle, GUILayout.Width(200 * _guiHelper.uiScale));
+            layoutComponents.BeginVerticalGroup(styleManager.menuDropdownStyle, GUILayout.Width(200 * guiHelper.uiScale));
 
             if (_menuStack.Count > 1)
             {
@@ -154,12 +147,12 @@ namespace shadcnui.GUIComponents.Layout
                 DrawMenuItem(item);
             }
 
-            _layoutComponents.EndVerticalGroup();
+            layoutComponents.EndVerticalGroup();
         }
 
         private void DrawMenuItem(MenuItem item)
         {
-            var styleManager = _guiHelper.GetStyleManager();
+            var styleManager = guiHelper.GetStyleManager();
 
             if (item.IsHeader)
             {
@@ -179,11 +172,11 @@ namespace shadcnui.GUIComponents.Layout
 
             if (item.SubItems.Count > 0)
             {
-                _layoutComponents.BeginHorizontalGroup();
+                layoutComponents.BeginHorizontalGroup();
                 UnityHelpers.Label(item.Text, styleManager.menuBarItemStyle);
                 GUILayout.FlexibleSpace();
                 UnityHelpers.Label("›", styleManager.menuBarItemStyle);
-                _layoutComponents.EndHorizontalGroup();
+                layoutComponents.EndHorizontalGroup();
 
                 var itemRect = GUILayoutUtility.GetLastRect();
                 if (GUI.Button(itemRect, "", GUIStyle.none))
@@ -193,7 +186,7 @@ namespace shadcnui.GUIComponents.Layout
             }
             else
             {
-                _layoutComponents.BeginHorizontalGroup();
+                layoutComponents.BeginHorizontalGroup();
                 UnityHelpers.Label(item.Text, styleManager.menuBarItemStyle);
 
                 if (!string.IsNullOrEmpty(item.Shortcut))
@@ -202,7 +195,7 @@ namespace shadcnui.GUIComponents.Layout
                     UnityHelpers.Label(item.Shortcut, styleManager.menuBarItemStyle);
                 }
 
-                _layoutComponents.EndHorizontalGroup();
+                layoutComponents.EndHorizontalGroup();
 
                 var itemRect = GUILayoutUtility.GetLastRect();
                 if (GUI.Button(itemRect, "", GUIStyle.none))
