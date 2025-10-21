@@ -85,10 +85,11 @@ namespace shadcnui.GUIComponents.Data
 
     public class DataTable : BaseComponent
     {
-
         private Dictionary<string, DataTableState> _tableStates = new Dictionary<string, DataTableState>();
 
-        public DataTable(GUIHelper helper) : base(helper) { }
+        public DataTable(GUIHelper helper)
+            : base(helper) { }
+
         public void DrawDataTable(string id, List<DataTableColumn> columns, List<DataTableRow> data, bool showPagination = true, bool showSearch = true, bool showSelection = true, bool showColumnToggle = false, params GUILayoutOption[] options)
         {
             if (!_tableStates.ContainsKey(id))
@@ -103,19 +104,12 @@ namespace shadcnui.GUIComponents.Data
             var state = _tableStates[id];
             state.ShowColumnToggle = showColumnToggle;
 
-            var containerStyle = new UnityHelpers.GUIStyle(styleManager.cardStyle);
-            containerStyle.padding = new UnityHelpers.RectOffset(0, 0, 0, 0);
+            var theme = styleManager?.GetTheme();
+            var tableStyle = styleManager?.GetTableStyle(TableVariant.Default, TableSize.Default) ?? GUI.skin.box;
 
-            layoutComponents.BeginVerticalGroup(containerStyle);
+            layoutComponents.BeginVerticalGroup(tableStyle, options);
 
             DrawToolbar(id, state, columns, showSearch, showColumnToggle);
-
-            var tableContainerStyle = new UnityHelpers.GUIStyle();
-            var theme = ThemeManager.Instance.CurrentTheme;
-            tableContainerStyle.normal.background = styleManager.CreateSolidTexture(theme.ButtonOutlineBorder);
-            tableContainerStyle.padding = new UnityHelpers.RectOffset(1, 1, 1, 1);
-
-            layoutComponents.BeginVerticalGroup(tableContainerStyle);
 
             var filteredData = FilterData(data, state.FilterText, columns);
             var sortedData = SortData(filteredData, state.SortColumn, state.SortAscending, columns);
@@ -123,10 +117,8 @@ namespace shadcnui.GUIComponents.Data
 
             var visibleColumns = columns.Where(c => state.ColumnVisibility.ContainsKey(c.Id) ? state.ColumnVisibility[c.Id] : c.IsVisible).ToList();
 
-            DrawTableHeader(id, visibleColumns, state, showSelection);
+            DrawTableHeader(id, visibleColumns, state, showSelection, data);
             DrawTableBody(id, visibleColumns, paginatedData, state, showSelection);
-
-            GUILayout.EndVertical();
 
             if (showPagination && sortedData.Count > state.PageSize)
             {
@@ -141,10 +133,6 @@ namespace shadcnui.GUIComponents.Data
             if (!showSearch && !showColumnToggle)
                 return;
 
-            var toolbarStyle = new UnityHelpers.GUIStyle();
-            toolbarStyle.padding = new UnityHelpers.RectOffset(16, 16, 16, 16);
-
-            layoutComponents.BeginVerticalGroup();
             layoutComponents.BeginHorizontalGroup();
 
             if (showSearch)
@@ -160,76 +148,71 @@ namespace shadcnui.GUIComponents.Data
             }
 
             layoutComponents.EndHorizontalGroup();
-            GUILayout.EndVertical();
+
+            layoutComponents.AddSpace(8);
         }
 
         private void DrawSearchInput(string id, DataTableState state)
         {
-            var searchContainerStyle = new UnityHelpers.GUIStyle();
-            searchContainerStyle.fixedWidth = 250;
+            var styleManager = guiHelper.GetStyleManager();
+            var labelStyle = styleManager?.GetLabelStyle(LabelVariant.Default) ?? GUI.skin.label;
 
-            layoutComponents.BeginHorizontalGroup();
+            UnityHelpers.Label("Search:", labelStyle, GUILayout.Width(60 * guiHelper.uiScale));
 
-            var iconStyle = new UnityHelpers.GUIStyle(styleManager.labelMutedStyle);
-            iconStyle.alignment = TextAnchor.MiddleCenter;
-            iconStyle.fixedWidth = 20;
-            guiHelper.Label("🔍", LabelVariant.Muted);
+            var inputStyle = styleManager?.GetInputStyle(InputVariant.Default) ?? GUI.skin.textField;
 
-            var inputStyle = new UnityHelpers.GUIStyle(styleManager.inputDefaultStyle);
-            inputStyle.margin.left = 0;
-            inputStyle.stretchWidth = true;
+#if IL2CPP_MELONLOADER
+            string newFilterText = GUILayout.TextField(state.FilterText ?? "", inputStyle, new Il2CppReferenceArray<GUILayoutOption>(new GUILayoutOption[] { GUILayout.Width(200 * guiHelper.uiScale) }));
+#else
+            string newFilterText = GUILayout.TextField(state.FilterText ?? "", inputStyle, GUILayout.Width(200 * guiHelper.uiScale));
+#endif
 
-            string placeholder = string.IsNullOrEmpty(state.FilterText) ? "Filter..." : "";
-
-            string newFilterText = UnityHelpers.TextField(state.FilterText, inputStyle);
             if (newFilterText != state.FilterText)
             {
                 state.FilterText = newFilterText;
                 state.CurrentPage = 0;
             }
-
-            layoutComponents.EndHorizontalGroup();
         }
 
         private void DrawColumnToggle(string id, DataTableState state, List<DataTableColumn> columns)
         {
-            if (guiHelper.Button("Columns ▼", ButtonVariant.Outline)) { }
+            guiHelper.Button("Columns ▼", ButtonVariant.Outline, ButtonSize.Small);
         }
 
-        private void DrawTableHeader(string id, List<DataTableColumn> columns, DataTableState state, bool showSelection)
+        private void DrawTableHeader(string id, List<DataTableColumn> columns, DataTableState state, bool showSelection, List<DataTableRow> allData)
         {
-            var theme = styleManager.GetTheme();
+            var styleManager = guiHelper.GetStyleManager();
+            var headerStyle = styleManager?.GetTableHeaderStyle(TableVariant.Default, TableSize.Default) ?? GUI.skin.label;
 
-            var headerStyle = new UnityHelpers.GUIStyle();
-            headerStyle.normal.background = styleManager.CreateSolidTexture(theme.SecondaryColor);
-            headerStyle.padding = new UnityHelpers.RectOffset(12, 12, 12, 12);
-            headerStyle.margin = new UnityHelpers.RectOffset(0, 0, 0, 0);
-
-            layoutComponents.BeginHorizontalGroup(headerStyle);
+            layoutComponents.BeginHorizontalGroup();
 
             if (showSelection)
             {
-                var checkboxStyle = new UnityHelpers.GUIStyle(GUI.skin.toggle);
-                checkboxStyle.fixedWidth = 16;
-                checkboxStyle.fixedHeight = 16;
-                checkboxStyle.margin = new UnityHelpers.RectOffset(0, 8, 0, 0);
+                bool allSelected = allData.Count > 0 && allData.All(row => state.SelectedRows.Contains(row.Id));
+                bool newSelectAll = guiHelper.Toggle("", allSelected, ToggleVariant.Default, ToggleSize.Default, null, false, GUILayout.Width(20 * guiHelper.uiScale));
 
-                bool newSelectAll = UnityHelpers.Toggle(state.SelectAll, "", checkboxStyle);
-                if (newSelectAll != state.SelectAll)
+                if (newSelectAll != allSelected)
                 {
+                    if (newSelectAll)
+                    {
+                        foreach (var row in allData)
+                        {
+                            if (!state.SelectedRows.Contains(row.Id))
+                            {
+                                state.SelectedRows.Add(row.Id);
+                            }
+                        }
+                    }
+                    else
+                    {
+                        state.SelectedRows.Clear();
+                    }
                     state.SelectAll = newSelectAll;
                 }
             }
 
             foreach (var column in columns)
             {
-                var columnHeaderStyle = new UnityHelpers.GUIStyle(GUI.skin.label);
-                columnHeaderStyle.fontStyle = FontStyle.Bold;
-                columnHeaderStyle.fontSize = 12;
-                columnHeaderStyle.alignment = TextAnchor.MiddleLeft;
-                columnHeaderStyle.normal.textColor = theme.TextColor != Color.clear ? theme.TextColor : Color.black;
-                columnHeaderStyle.padding = new UnityHelpers.RectOffset(4, 4, 0, 0);
-
                 if (column.Sortable)
                 {
                     string headerText = column.Header;
@@ -238,10 +221,9 @@ namespace shadcnui.GUIComponents.Data
                     if (state.SortColumn == column.Id)
                     {
                         sortIcon = state.SortAscending ? " ↑" : " ↓";
-                        columnHeaderStyle.normal.textColor = theme.PrimaryColor;
                     }
 
-                    if (guiHelper.Button(headerText + sortIcon, ButtonVariant.Ghost, ButtonSize.Small))
+                    if (guiHelper.Button(headerText + sortIcon, ButtonVariant.Ghost, ButtonSize.Default, null, false, 1f, GUILayout.Width(column.Width * guiHelper.uiScale)))
                     {
                         if (state.SortColumn == column.Id)
                         {
@@ -256,7 +238,7 @@ namespace shadcnui.GUIComponents.Data
                 }
                 else
                 {
-                    guiHelper.Label(column.Header, LabelVariant.Default);
+                    UnityHelpers.Label(column.Header, headerStyle, GUILayout.Width(column.Width * guiHelper.uiScale));
                 }
             }
 
@@ -271,36 +253,19 @@ namespace shadcnui.GUIComponents.Data
                 return;
             }
 
-            var theme = styleManager.GetTheme();
+            var styleManager = guiHelper.GetStyleManager();
+            var cellStyle = styleManager?.GetTableCellStyle(TableVariant.Default, TableSize.Default) ?? GUI.skin.label;
 
             for (int i = 0; i < data.Count; i++)
             {
                 var row = data[i];
                 bool isSelected = state.SelectedRows.Contains(row.Id);
-                bool isEven = i % 2 == 0;
 
-                var rowStyle = new UnityHelpers.GUIStyle();
-                if (isSelected)
-                {
-                    rowStyle.normal.background = styleManager.CreateSolidTexture(new Color(theme.PrimaryColor.r, theme.PrimaryColor.g, theme.PrimaryColor.b, 0.1f));
-                }
-                else if (isEven)
-                {
-                    rowStyle.normal.background = styleManager.CreateSolidTexture(theme.BackgroundColor);
-                }
-                else
-                {
-                    rowStyle.normal.background = styleManager.CreateSolidTexture(new Color(theme.SecondaryColor.r, theme.SecondaryColor.g, theme.SecondaryColor.b, 0.3f));
-                }
-
-                rowStyle.padding = new UnityHelpers.RectOffset(12, 12, 8, 8);
-                rowStyle.margin = new UnityHelpers.RectOffset(0, 0, 0, 0);
-
-                layoutComponents.BeginHorizontalGroup(rowStyle, GUILayout.ExpandWidth(true), GUILayout.Height(40));
+                layoutComponents.BeginHorizontalGroup();
 
                 if (showSelection)
                 {
-                    bool newSelected = guiHelper.Checkbox(row.Id, isSelected, CheckboxVariant.Default, CheckboxSize.Default, null, false, GUILayout.Width(16), GUILayout.Height(16));
+                    bool newSelected = guiHelper.Toggle("", isSelected, ToggleVariant.Default, ToggleSize.Default, null, false, GUILayout.Width(20 * guiHelper.uiScale));
 
                     if (newSelected != isSelected)
                     {
@@ -330,21 +295,16 @@ namespace shadcnui.GUIComponents.Data
                         cellText = row.GetValue<string>(column.AccessorKey, "");
                     }
 
-                    var cellStyle = new UnityHelpers.GUIStyle(GUI.skin.label);
-                    cellStyle.alignment = column.Alignment;
-                    cellStyle.fontSize = 14;
-                    cellStyle.normal.textColor = theme.TextColor != Color.clear && theme.TextColor.a > 0 ? theme.TextColor : Color.white;
-                    cellStyle.wordWrap = false;
-                    cellStyle.clipping = TextClipping.Clip;
-                    cellStyle.padding = new UnityHelpers.RectOffset(4, 4, 0, 0);
+                    var customCellStyle = new UnityHelpers.GUIStyle(cellStyle);
+                    customCellStyle.alignment = column.Alignment;
 
                     string displayText = cellText ?? "";
                     if (string.IsNullOrEmpty(displayText))
                     {
-                        displayText = $"[{column.AccessorKey}]";
+                        displayText = "";
                     }
 
-                    UnityHelpers.Label(displayText, cellStyle, GUILayout.Width(column.Width));
+                    UnityHelpers.Label(displayText, customCellStyle, GUILayout.Width(column.Width * guiHelper.uiScale));
                 }
 
                 GUILayout.EndHorizontal();
@@ -353,73 +313,44 @@ namespace shadcnui.GUIComponents.Data
 
         private void DrawEmptyState()
         {
-            var emptyStyle = new UnityHelpers.GUIStyle();
-            emptyStyle.padding = new UnityHelpers.RectOffset(24, 24, 48, 48);
-            emptyStyle.alignment = TextAnchor.MiddleCenter;
+            var styleManager = guiHelper.GetStyleManager();
+            var labelStyle = styleManager?.GetLabelStyle(LabelVariant.Muted) ?? GUI.skin.label;
 
-            layoutComponents.BeginVerticalGroup();
+            layoutComponents.BeginHorizontalGroup();
+            GUILayout.FlexibleSpace();
+            UnityHelpers.Label("No results.", labelStyle);
+            GUILayout.FlexibleSpace();
+            layoutComponents.EndHorizontalGroup();
 
-            var emptyTextStyle = new UnityHelpers.GUIStyle(styleManager.labelMutedStyle);
-            emptyTextStyle.fontSize = 16;
-            emptyTextStyle.alignment = TextAnchor.MiddleCenter;
-
-            guiHelper.Label("No results.", LabelVariant.Default);
-            GUILayout.Space(8);
-
-            var emptySubtextStyle = new UnityHelpers.GUIStyle(styleManager.labelMutedStyle);
-            emptySubtextStyle.fontSize = 14;
-            emptySubtextStyle.alignment = TextAnchor.MiddleCenter;
-
-            guiHelper.Label("No data to display.", LabelVariant.Muted);
-
-            GUILayout.EndVertical();
+            layoutComponents.AddSpace(8);
         }
 
         private void DrawPagination(string id, DataTableState state, int totalItems)
         {
             int totalPages = Mathf.CeilToInt((float)totalItems / state.PageSize);
 
-            var paginationStyle = new UnityHelpers.GUIStyle();
-            paginationStyle.padding = new UnityHelpers.RectOffset(16, 16, 16, 16);
-            paginationStyle.alignment = TextAnchor.MiddleRight;
+            layoutComponents.AddSpace(8);
+            layoutComponents.BeginHorizontalGroup();
 
-            layoutComponents.BeginHorizontalGroup(paginationStyle);
-
-            var theme = styleManager.GetTheme();
-            var labelStyle = new UnityHelpers.GUIStyle(styleManager.labelMutedStyle);
-            labelStyle.alignment = TextAnchor.MiddleLeft;
-            labelStyle.padding = new UnityHelpers.RectOffset(0, 16, 0, 0);
-
-            int from = state.CurrentPage * state.PageSize + 1;
-            int to = Mathf.Min((state.CurrentPage + 1) * state.PageSize, totalItems);
-            UnityHelpers.Label($"{from}-{to} of {totalItems}", labelStyle);
-
-            var buttonStyle = new UnityHelpers.GUIStyle(styleManager.buttonOutlineStyle);
-            buttonStyle.fixedWidth = 32;
-
-            if (guiHelper.Button("‹‹", ButtonVariant.Outline, ButtonSize.Small))
-            {
-                state.CurrentPage = 0;
-            }
-            if (guiHelper.Button("‹", ButtonVariant.Outline, ButtonSize.Small))
+            if (guiHelper.Button("← Previous", ButtonVariant.Default, ButtonSize.Default, null, false, 1f, GUILayout.Width(80 * guiHelper.uiScale)))
             {
                 if (state.CurrentPage > 0)
                     state.CurrentPage--;
             }
 
-            var pageLabelStyle = new UnityHelpers.GUIStyle(styleManager.labelDefaultStyle);
-            pageLabelStyle.alignment = TextAnchor.MiddleCenter;
-            pageLabelStyle.padding = new UnityHelpers.RectOffset(8, 8, 0, 0);
-            UnityHelpers.Label($"{state.CurrentPage + 1} / {totalPages}", pageLabelStyle);
+            GUILayout.FlexibleSpace();
 
-            if (guiHelper.Button("›", ButtonVariant.Outline, ButtonSize.Small))
+            var styleManager = guiHelper.GetStyleManager();
+            var labelStyle = styleManager?.GetLabelStyle(LabelVariant.Muted) ?? GUI.skin.label;
+            string pageInfo = $"Page {state.CurrentPage + 1} of {totalPages}";
+            UnityHelpers.Label(pageInfo, labelStyle);
+
+            GUILayout.FlexibleSpace();
+
+            if (guiHelper.Button("Next →", ButtonVariant.Default, ButtonSize.Default, null, false, 1f, GUILayout.Width(80 * guiHelper.uiScale)))
             {
                 if (state.CurrentPage < totalPages - 1)
                     state.CurrentPage++;
-            }
-            if (guiHelper.Button("››", ButtonVariant.Outline, ButtonSize.Small))
-            {
-                state.CurrentPage = totalPages - 1;
             }
 
             layoutComponents.EndHorizontalGroup();

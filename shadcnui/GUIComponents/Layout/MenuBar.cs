@@ -12,7 +12,9 @@ namespace shadcnui.GUIComponents.Layout
         private readonly Stack<MenuData> _menuStack = new Stack<MenuData>();
         private Rect _menuBarRect;
 
-        public MenuBar(GUIHelper helper) : base(helper) { }
+        public MenuBar(GUIHelper helper)
+            : base(helper) { }
+
         public bool IsDropdownOpen => _isDropdownOpen;
 
         public class MenuItem

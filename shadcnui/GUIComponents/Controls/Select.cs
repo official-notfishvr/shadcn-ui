@@ -14,7 +14,8 @@ namespace shadcnui.GUIComponents.Controls
         private int selectedIndex;
         private Vector2 scrollPosition;
 
-        public Select(GUIHelper helper) : base(helper) { }
+        public Select(GUIHelper helper)
+            : base(helper) { }
 
         public bool IsOpen => isOpen;
 
@@ -33,7 +34,10 @@ namespace shadcnui.GUIComponents.Controls
             if (!isOpen)
                 return selectedIndex;
 
-            layoutComponents.BeginVerticalGroup(guiHelper.GetStyleManager().GetSelectStyle(SelectVariant.Default, SelectSize.Default), GUILayout.MaxWidth(300), GUILayout.MaxHeight(200));
+            GUIStyle selectStyle = styleManager?.GetSelectStyle(SelectVariant.Default, SelectSize.Default) ?? GUI.skin.box;
+            GUIStyle itemStyle = styleManager?.GetSelectItemStyle() ?? GUI.skin.button;
+
+            layoutComponents.BeginVerticalGroup(selectStyle, GUILayout.MaxWidth(300), GUILayout.MaxHeight(200));
 
             scrollPosition = layoutComponents.DrawScrollView(
                 scrollPosition,
@@ -41,8 +45,6 @@ namespace shadcnui.GUIComponents.Controls
                 {
                     for (int i = 0; i < items.Length; i++)
                     {
-                        GUIStyle itemStyle = guiHelper.GetStyleManager().GetSelectItemStyle();
-
                         if (UnityHelpers.Button(items[i], itemStyle))
                         {
                             selectedIndex = i;

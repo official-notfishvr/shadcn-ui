@@ -1,8 +1,8 @@
-using shadcnui;
-using shadcnui.GUIComponents.Core;
 using System;
 using System.Collections.Generic;
 using System.Runtime.Remoting.Messaging;
+using shadcnui;
+using shadcnui.GUIComponents.Core;
 using UnityEngine;
 #if IL2CPP_MELONLOADER
 using UnhollowerBaseLib;
@@ -12,7 +12,8 @@ namespace shadcnui.GUIComponents.Controls
 {
     public class Checkbox : BaseComponent
     {
-        public Checkbox(GUIHelper helper) : base(helper) { }
+        public Checkbox(GUIHelper helper)
+            : base(helper) { }
 
         public bool DrawCheckbox(string text, bool value, CheckboxVariant variant = CheckboxVariant.Default, CheckboxSize size = CheckboxSize.Default, Action<bool> onToggle = null, bool disabled = false, params GUILayoutOption[] options)
         {

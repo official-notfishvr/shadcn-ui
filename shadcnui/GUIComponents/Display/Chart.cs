@@ -72,7 +72,8 @@ namespace shadcnui.GUIComponents.Display
     {
         private Rect _chartRect;
 
-        public Chart(GUIHelper helper) : base(helper) { }
+        public Chart(GUIHelper helper)
+            : base(helper) { }
 
         public void DrawChart(ChartConfig config)
         {

@@ -12,7 +12,8 @@ namespace shadcnui.GUIComponents.Layout
 {
     public class Table : BaseComponent
     {
-        public Table(GUIHelper helper) : base(helper) { }
+        public Table(GUIHelper helper)
+            : base(helper) { }
 
         public void DrawTable(string[] headers, string[,] data, TableVariant variant = TableVariant.Default, TableSize size = TableSize.Default, params GUILayoutOption[] options)
         {

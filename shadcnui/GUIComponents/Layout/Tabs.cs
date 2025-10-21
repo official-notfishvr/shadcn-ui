@@ -21,7 +21,9 @@ namespace shadcnui.GUIComponents.Layout
             Left,
             Right,
         }
-        public Tabs(GUIHelper helper) : base(helper) { }
+
+        public Tabs(GUIHelper helper)
+            : base(helper) { }
 
         public class TabsConfig
         {

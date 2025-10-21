@@ -10,7 +10,8 @@ namespace shadcnui.GUIComponents.Data
 {
     public class TextArea : BaseComponent
     {
-        public TextArea(GUIHelper helper) : base(helper) { }
+        public TextArea(GUIHelper helper)
+            : base(helper) { }
 
         public string DrawTextArea(string text, TextAreaVariant variant = TextAreaVariant.Default, string placeholder = "", bool disabled = false, float minHeight = 60f, int maxLength = -1, params GUILayoutOption[] options)
         {

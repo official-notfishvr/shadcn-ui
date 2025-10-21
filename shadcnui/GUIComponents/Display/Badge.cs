@@ -11,7 +11,9 @@ namespace shadcnui.GUIComponents.Display
 {
     public class Badge : BaseComponent
     {
-        public Badge(GUIHelper helper) : base(helper) { }
+        public Badge(GUIHelper helper)
+            : base(helper) { }
+
         public void DrawBadge(string text, BadgeVariant variant = BadgeVariant.Default, BadgeSize size = BadgeSize.Default, params GUILayoutOption[] options)
         {
             var styleManager = guiHelper.GetStyleManager();

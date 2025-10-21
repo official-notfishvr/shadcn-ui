@@ -11,7 +11,8 @@ namespace shadcnui.GUIComponents.Display
 {
     public class Avatar : BaseComponent
     {
-        public Avatar(GUIHelper helper) : base(helper) { }
+        public Avatar(GUIHelper helper)
+            : base(helper) { }
 
         public void DrawAvatar(Texture2D image, string fallbackText, AvatarSize size = AvatarSize.Default, AvatarShape shape = AvatarShape.Circle, params GUILayoutOption[] options)
         {

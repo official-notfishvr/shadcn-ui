@@ -13,7 +13,8 @@ namespace shadcnui.GUIComponents.Layout
 {
     public class Separator : BaseComponent
     {
-        public Separator(GUIHelper helper) : base(helper) { }
+        public Separator(GUIHelper helper)
+            : base(helper) { }
 
         public void DrawSeparator(SeparatorOrientation orientation = SeparatorOrientation.Horizontal, bool decorative = true, params GUILayoutOption[] options)
         {

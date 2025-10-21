@@ -1,20 +1,20 @@
-using shadcnui;
-using shadcnui.GUIComponents.Core;
 using System;
 using System.Collections.Generic;
 using System.Runtime.Remoting.Messaging;
+using shadcnui;
+using shadcnui.GUIComponents.Core;
 using UnityEngine;
 
 namespace shadcnui.GUIComponents.Controls
 {
     public class Button : BaseComponent
     {
-        public Button(GUIHelper helper) : base(helper) { }
+        public Button(GUIHelper helper)
+            : base(helper) { }
 
         public bool DrawButton(ButtonConfig config)
         {
-            
-            var buttonStyle = styleManager.GetButtonStyle(config.Variant, config.Size);
+            GUIStyle buttonStyle = styleManager?.GetButtonStyle(config.Variant, config.Size) ?? GUI.skin.button;
 
             var layoutOptions = new List<GUILayoutOption>(config.Options ?? Array.Empty<GUILayoutOption>());
 

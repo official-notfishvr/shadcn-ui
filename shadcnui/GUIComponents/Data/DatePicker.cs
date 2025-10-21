@@ -13,7 +13,8 @@ namespace shadcnui.GUIComponents.Data
         private Dictionary<string, bool> _openStates = new Dictionary<string, bool>();
         private Dictionary<string, DateTime> _displayDates = new Dictionary<string, DateTime>();
 
-        public DatePicker(GUIHelper helper) : base(helper) { }
+        public DatePicker(GUIHelper helper)
+            : base(helper) { }
 
         public DateTime? DrawDatePicker(string placeholder, DateTime? selectedDate, string id = "datepicker", params GUILayoutOption[] options)
         {

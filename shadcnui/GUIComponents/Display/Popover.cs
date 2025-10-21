@@ -11,7 +11,9 @@ namespace shadcnui.GUIComponents.Display
     {
         private bool isOpen;
 
-        public Popover(GUIHelper helper) : base(helper) { }
+        public Popover(GUIHelper helper)
+            : base(helper) { }
+
         public bool IsOpen => isOpen;
 
         public void Open()

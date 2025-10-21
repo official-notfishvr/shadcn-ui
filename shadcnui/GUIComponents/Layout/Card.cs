@@ -10,7 +10,8 @@ namespace shadcnui.GUIComponents.Layout
 {
     public class Card : BaseComponent
     {
-        public Card(GUIHelper helper) : base(helper) { }
+        public Card(GUIHelper helper)
+            : base(helper) { }
 
         public void BeginCard(float width = -1, float height = -1)
         {

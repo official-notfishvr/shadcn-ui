@@ -10,7 +10,9 @@ namespace shadcnui.GUIComponents.Display
 {
     public class Progress : BaseComponent
     {
-        public Progress(GUIHelper helper) : base(helper) { }
+        public Progress(GUIHelper helper)
+            : base(helper) { }
+
         public void DrawProgress(float value, float width = -1, float height = -1, params GUILayoutOption[] options)
         {
             var styleManager = guiHelper.GetStyleManager();

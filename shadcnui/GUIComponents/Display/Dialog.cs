@@ -12,7 +12,8 @@ namespace shadcnui.GUIComponents.Display
         private bool _isOpen = false;
         private string _dialogId;
 
-        public Dialog(GUIHelper helper) : base(helper) { }
+        public Dialog(GUIHelper helper)
+            : base(helper) { }
 
         public bool IsOpen => _isOpen;
 

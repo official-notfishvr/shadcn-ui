@@ -47,7 +47,8 @@ namespace shadcnui.GUIComponents.Controls
         private Vector2 _scrollPosition;
         private readonly Stack<List<DropdownMenuItem>> _menuStack = new Stack<List<DropdownMenuItem>>();
 
-        public DropdownMenu(GUIHelper helper) : base(helper) { }
+        public DropdownMenu(GUIHelper helper)
+            : base(helper) { }
 
         public bool IsOpen => _isOpen;
 
@@ -93,20 +94,24 @@ namespace shadcnui.GUIComponents.Controls
                 layoutOptions.AddRange(options);
             }
 
-            layoutComponents.BeginVerticalGroup(styleManager.dropdownMenuContentStyle, layoutOptions.ToArray());
+            GUIStyle contentStyle = styleManager?.dropdownMenuContentStyle ?? GUI.skin.box;
+            GUIStyle itemStyle = styleManager?.dropdownMenuItemStyle ?? GUI.skin.button;
+            GUIStyle separatorStyle = styleManager?.dropdownMenuSeparatorStyle ?? GUI.skin.box;
+
+            layoutComponents.BeginVerticalGroup(contentStyle, layoutOptions.ToArray());
             _scrollPosition = layoutComponents.DrawScrollView(
                 _scrollPosition,
                 () =>
                 {
                     if (_menuStack.Count > 1)
                     {
-                        if (UnityHelpers.Button("<- Back", styleManager.dropdownMenuItemStyle))
+                        if (UnityHelpers.Button("<- Back", itemStyle))
                         {
                             _menuStack.Pop();
                             return;
                         }
 
-                        UnityHelpers.Box("", styleManager.dropdownMenuSeparatorStyle);
+                        UnityHelpers.Box("", separatorStyle);
                     }
 
                     var currentItems = _menuStack.Peek();
@@ -124,27 +129,30 @@ namespace shadcnui.GUIComponents.Controls
         private void DrawMenuItem(DropdownMenuItem item)
         {
             var styleManager = guiHelper.GetStyleManager();
+            GUIStyle headerStyle = styleManager?.dropdownMenuHeaderStyle ?? GUI.skin.label;
+            GUIStyle separatorStyle = styleManager?.dropdownMenuSeparatorStyle ?? GUI.skin.box;
+            GUIStyle itemStyle = styleManager?.dropdownMenuItemStyle ?? GUI.skin.button;
 
             switch (item.Type)
             {
                 case DropdownMenuItemType.Header:
 #if IL2CPP_MELONLOADER
-                    GUILayout.Label(item.Content, styleManager.dropdownMenuHeaderStyle, shadcnui.GUIComponents.Layout.Layout.EmptyOptions);
+                    GUILayout.Label(item.Content, headerStyle, shadcnui.GUIComponents.Layout.Layout.EmptyOptions);
 #else
-                    GUILayout.Label(item.Content, styleManager.dropdownMenuHeaderStyle);
+                    GUILayout.Label(item.Content, headerStyle);
 #endif
                     break;
                 case DropdownMenuItemType.Separator:
-                    UnityHelpers.Box("", styleManager.dropdownMenuSeparatorStyle);
+                    UnityHelpers.Box("", separatorStyle);
                     break;
                 case DropdownMenuItemType.Item:
                     if (item.SubItems != null && item.SubItems.Count > 0)
                     {
                         if (
 #if IL2CPP_MELONLOADER
-                            GUILayout.Button(item.Content, styleManager.dropdownMenuItemStyle, shadcnui.GUIComponents.Layout.Layout.EmptyOptions)
+                            GUILayout.Button(item.Content, itemStyle, shadcnui.GUIComponents.Layout.Layout.EmptyOptions)
 #else
-                            GUILayout.Button(item.Content, styleManager.dropdownMenuItemStyle)
+                            GUILayout.Button(item.Content, itemStyle)
 #endif
                         )
                         {
@@ -155,9 +163,9 @@ namespace shadcnui.GUIComponents.Controls
                     {
                         if (
 #if IL2CPP_MELONLOADER
-                            GUILayout.Button(item.Content, styleManager.dropdownMenuItemStyle, shadcnui.GUIComponents.Layout.Layout.EmptyOptions)
+                            GUILayout.Button(item.Content, itemStyle, shadcnui.GUIComponents.Layout.Layout.EmptyOptions)
 #else
-                            GUILayout.Button(item.Content, styleManager.dropdownMenuItemStyle)
+                            GUILayout.Button(item.Content, itemStyle)
 #endif
                         )
                         {

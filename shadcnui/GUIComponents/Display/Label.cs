@@ -10,7 +10,9 @@ namespace shadcnui.GUIComponents.Display
 {
     public class Label : BaseComponent
     {
-        public Label(GUIHelper helper) : base(helper) { }
+        public Label(GUIHelper helper)
+            : base(helper) { }
+
         public void DrawLabel(string text, LabelVariant variant = LabelVariant.Default, bool disabled = false, params GUILayoutOption[] options)
         {
             var styleManager = guiHelper.GetStyleManager();

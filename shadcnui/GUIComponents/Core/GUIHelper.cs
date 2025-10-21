@@ -17,6 +17,8 @@ namespace shadcnui.GUIComponents.Core
     /// </summary>
     public class GUIHelper
     {
+        private readonly Dictionary<Type, BaseComponent> _componentInstances;
+
         #region Internal Settings
         internal bool animationsEnabled = false;
         internal float animationSpeed = 12f;
@@ -53,54 +55,6 @@ namespace shadcnui.GUIComponents.Core
 
         #region Component Instances - Layout & Structure
         private shadcnui.GUIComponents.Layout.Layout layoutComponents;
-        private Card cardComponents;
-        private Separator separatorComponents;
-        #endregion
-
-        #region Component Instances - Input & Form
-        private shadcnui.GUIComponents.Controls.Input inputComponents;
-        private TextArea textAreaComponents;
-        private Checkbox checkboxComponents;
-        private Switch switchComponents;
-        private Slider sliderComponents;
-        #endregion
-
-        #region Component Instances - Buttons & Toggles
-        private Button buttonComponents;
-        private Toggle toggleComponents;
-        #endregion
-
-        #region Component Instances - Text & Labels
-        private Label labelComponents;
-        #endregion
-
-        #region Component Instances - Navigation
-        private Tabs tabsComponents;
-        private MenuBar menuBarComponents;
-        #endregion
-
-        #region Component Instances - Feedback & Status
-        private Progress progressComponents;
-        private Badge badgeComponents;
-        #endregion
-
-        #region Component Instances - Data Display
-        private Table tableComponents;
-        private shadcnui.GUIComponents.Display.Avatar avatarComponents;
-        private Chart chartComponents;
-        private DataTable dataTableComponents;
-        #endregion
-
-        #region Component Instances - Interactive Controls
-        private Calendar calendarComponents;
-        private DatePicker datePickerComponents;
-        private Select selectComponents;
-        #endregion
-
-        #region Component Instances - Overlays & Modals
-        private Dialog dialogComponents;
-        private DropdownMenu dropdownMenuComponents;
-        private Popover popoverComponents;
         #endregion
         #endregion
 
@@ -110,9 +64,20 @@ namespace shadcnui.GUIComponents.Core
         /// </summary>
         public StyleManager GetStyleManager() => styleManager;
 
-        public Calendar GetCalendarComponents() => calendarComponents;
+        public Calendar GetCalendarComponents() => Get<Calendar>();
 
-        public Chart GetChartComponents() => chartComponents;
+        public Chart GetChartComponents() => Get<Chart>();
+
+        public T Get<T>()
+            where T : BaseComponent
+        {
+            if (_componentInstances.TryGetValue(typeof(T), out BaseComponent component))
+            {
+                return (T)component;
+            }
+            GUILogger.LogWarning($"Component of type {typeof(T).Name} not found.", "GUIHelper.Get<T>");
+            return null;
+        }
         #endregion
 
         #region Static Compatibility
@@ -129,6 +94,7 @@ namespace shadcnui.GUIComponents.Core
         /// </summary>
         public GUIHelper()
         {
+            _componentInstances = new Dictionary<Type, BaseComponent>();
             InitializeComponents();
         }
 
@@ -146,47 +112,47 @@ namespace shadcnui.GUIComponents.Core
                 animationManager = new AnimationManager(this);
 
                 // Input & Form
-                inputComponents = new shadcnui.GUIComponents.Controls.Input(this);
-                textAreaComponents = new TextArea(this);
-                checkboxComponents = new Checkbox(this);
-                switchComponents = new Switch(this);
-                sliderComponents = new Slider(this);
+                _componentInstances.Add(typeof(shadcnui.GUIComponents.Controls.Input), new shadcnui.GUIComponents.Controls.Input(this));
+                _componentInstances.Add(typeof(TextArea), new TextArea(this));
+                _componentInstances.Add(typeof(Checkbox), new Checkbox(this));
+                _componentInstances.Add(typeof(Switch), new Switch(this));
+                _componentInstances.Add(typeof(Slider), new Slider(this));
 
                 // Buttons & Toggles
-                buttonComponents = new Button(this);
-                toggleComponents = new Toggle(this);
+                _componentInstances.Add(typeof(Button), new Button(this));
+                _componentInstances.Add(typeof(Toggle), new Toggle(this));
 
                 // Layout & Structure
                 layoutComponents = new shadcnui.GUIComponents.Layout.Layout(this);
-                cardComponents = new Card(this);
-                separatorComponents = new Separator(this);
+                _componentInstances.Add(typeof(Card), new Card(this));
+                _componentInstances.Add(typeof(Separator), new Separator(this));
 
                 // Text & Labels
-                labelComponents = new Label(this);
+                _componentInstances.Add(typeof(Label), new Label(this));
 
                 // Navigation
-                tabsComponents = new Tabs(this);
-                menuBarComponents = new MenuBar(this);
+                _componentInstances.Add(typeof(Tabs), new Tabs(this));
+                _componentInstances.Add(typeof(MenuBar), new MenuBar(this));
 
                 // Feedback & Status
-                progressComponents = new Progress(this);
-                badgeComponents = new Badge(this);
+                _componentInstances.Add(typeof(Progress), new Progress(this));
+                _componentInstances.Add(typeof(Badge), new Badge(this));
 
                 // Data Display
-                tableComponents = new Table(this);
-                avatarComponents = new shadcnui.GUIComponents.Display.Avatar(this);
-                chartComponents = new Chart(this);
-                dataTableComponents = new DataTable(this);
+                _componentInstances.Add(typeof(Table), new Table(this));
+                _componentInstances.Add(typeof(shadcnui.GUIComponents.Display.Avatar), new shadcnui.GUIComponents.Display.Avatar(this));
+                _componentInstances.Add(typeof(Chart), new Chart(this));
+                _componentInstances.Add(typeof(DataTable), new DataTable(this));
 
                 // Interactive Controls
-                calendarComponents = new Calendar(this);
-                selectComponents = new Select(this);
-                datePickerComponents = new DatePicker(this);
+                _componentInstances.Add(typeof(Calendar), new Calendar(this));
+                _componentInstances.Add(typeof(Select), new Select(this));
+                _componentInstances.Add(typeof(DatePicker), new DatePicker(this));
 
                 // Overlays & Modals
-                dialogComponents = new Dialog(this);
-                dropdownMenuComponents = new DropdownMenu(this);
-                popoverComponents = new Popover(this);
+                _componentInstances.Add(typeof(Dialog), new Dialog(this));
+                _componentInstances.Add(typeof(DropdownMenu), new DropdownMenu(this));
+                _componentInstances.Add(typeof(Popover), new Popover(this));
 
                 GUILogger.LogInfo("GUIHelper components initialized successfully", "GUIHelper.InitializeComponents");
             }
@@ -337,7 +303,7 @@ namespace shadcnui.GUIComponents.Core
         {
             try
             {
-                inputComponents?.DrawSectionHeader(title);
+                Get<shadcnui.GUIComponents.Controls.Input>()?.DrawSectionHeader(title);
             }
             catch (Exception ex)
             {
@@ -349,7 +315,7 @@ namespace shadcnui.GUIComponents.Core
         {
             try
             {
-                inputComponents?.RenderLabel(text, width);
+                Get<shadcnui.GUIComponents.Controls.Input>()?.RenderLabel(text, width);
             }
             catch (Exception ex)
             {
@@ -361,7 +327,7 @@ namespace shadcnui.GUIComponents.Core
         {
             try
             {
-                return inputComponents?.DrawPasswordField(windowWidth, label, ref password, maskChar) ?? password;
+                return Get<shadcnui.GUIComponents.Controls.Input>()?.DrawPasswordField(windowWidth, label, ref password, maskChar) ?? password;
             }
             catch (Exception ex)
             {
@@ -374,7 +340,7 @@ namespace shadcnui.GUIComponents.Core
         {
             try
             {
-                inputComponents?.DrawTextArea(windowWidth, label, ref text, maxLength, height);
+                Get<shadcnui.GUIComponents.Controls.Input>()?.DrawTextArea(windowWidth, label, ref text, maxLength, height);
             }
             catch (Exception ex)
             {
@@ -388,7 +354,7 @@ namespace shadcnui.GUIComponents.Core
         {
             try
             {
-                return buttonComponents?.DrawButton(text, ButtonVariant.Default, ButtonSize.Default, onClick, false, opacity, new GUILayoutOption[] { GUILayout.Width(windowWidth) }) ?? false;
+                return Get<Button>()?.DrawButton(text, ButtonVariant.Default, ButtonSize.Default, onClick, false, opacity, new GUILayoutOption[] { GUILayout.Width(windowWidth) }) ?? false;
             }
             catch (Exception ex)
             {
@@ -401,7 +367,7 @@ namespace shadcnui.GUIComponents.Core
         {
             try
             {
-                return buttonComponents?.DrawButton(text, ButtonVariant.Default, ButtonSize.Default, onClick, false, opacity, new GUILayoutOption[] { GUILayout.Width(width), GUILayout.Height(height) }) ?? false;
+                return Get<Button>()?.DrawButton(text, ButtonVariant.Default, ButtonSize.Default, onClick, false, opacity, new GUILayoutOption[] { GUILayout.Width(width), GUILayout.Height(height) }) ?? false;
             }
             catch (Exception ex)
             {
@@ -414,7 +380,7 @@ namespace shadcnui.GUIComponents.Core
         {
             try
             {
-                return buttonComponents?.DrawButton(text, variant, size, onClick, disabled, opacity, options ?? Array.Empty<GUILayoutOption>()) ?? false;
+                return Get<Button>()?.DrawButton(text, variant, size, onClick, disabled, opacity, options ?? Array.Empty<GUILayoutOption>()) ?? false;
             }
             catch (Exception ex)
             {
@@ -467,7 +433,7 @@ namespace shadcnui.GUIComponents.Core
         {
             try
             {
-                buttonComponents?.ButtonGroup(drawButtons, horizontal, spacing);
+                Get<Button>()?.ButtonGroup(drawButtons, horizontal, spacing);
             }
             catch (Exception ex)
             {
@@ -529,7 +495,7 @@ namespace shadcnui.GUIComponents.Core
         {
             try
             {
-                bool newValue = toggleComponents?.DrawToggle(text, value, variant, size, onToggle, disabled, options) ?? value;
+                bool newValue = Get<Toggle>()?.DrawToggle(text, value, variant, size, onToggle, disabled, options) ?? value;
                 if (newValue != value)
                 {
                     onToggle?.Invoke(newValue);
@@ -547,7 +513,7 @@ namespace shadcnui.GUIComponents.Core
         {
             try
             {
-                return toggleComponents?.DrawToggle(rect, text, value, variant, size, onToggle, disabled) ?? value;
+                return Get<Toggle>()?.DrawToggle(rect, text, value, variant, size, onToggle, disabled) ?? value;
             }
             catch (Exception ex)
             {
@@ -577,7 +543,7 @@ namespace shadcnui.GUIComponents.Core
         {
             try
             {
-                cardComponents?.BeginCard(width, height);
+                Get<Card>()?.BeginCard(width, height);
             }
             catch (Exception ex)
             {
@@ -589,7 +555,7 @@ namespace shadcnui.GUIComponents.Core
         {
             try
             {
-                cardComponents?.EndCard();
+                Get<Card>()?.EndCard();
             }
             catch (Exception ex)
             {
@@ -601,7 +567,7 @@ namespace shadcnui.GUIComponents.Core
         {
             try
             {
-                cardComponents?.DrawCard(title, description, content, footerContent, width, height);
+                Get<Card>()?.DrawCard(title, description, content, footerContent, width, height);
             }
             catch (Exception ex)
             {
@@ -613,7 +579,7 @@ namespace shadcnui.GUIComponents.Core
         {
             try
             {
-                cardComponents?.DrawCardWithImage(image, title, description, content, footerContent, width, height);
+                Get<Card>()?.DrawCardWithImage(image, title, description, content, footerContent, width, height);
             }
             catch (Exception ex)
             {
@@ -625,7 +591,7 @@ namespace shadcnui.GUIComponents.Core
         {
             try
             {
-                cardComponents?.DrawCardWithAvatar(avatar, title, subtitle, content, footerContent, width, height);
+                Get<Card>()?.DrawCardWithAvatar(avatar, title, subtitle, content, footerContent, width, height);
             }
             catch (Exception ex)
             {
@@ -637,7 +603,7 @@ namespace shadcnui.GUIComponents.Core
         {
             try
             {
-                cardComponents?.DrawCardWithHeader(title, description, header, content, footerContent, width, height);
+                Get<Card>()?.DrawCardWithHeader(title, description, header, content, footerContent, width, height);
             }
             catch (Exception ex)
             {
@@ -649,7 +615,7 @@ namespace shadcnui.GUIComponents.Core
         {
             try
             {
-                cardComponents?.DrawSimpleCard(content, width, height);
+                Get<Card>()?.DrawSimpleCard(content, width, height);
             }
             catch (Exception ex)
             {
@@ -657,15 +623,15 @@ namespace shadcnui.GUIComponents.Core
             }
         }
 
-        public void CardHeader(Action content) => cardComponents?.CardHeader(content);
+        public void CardHeader(Action content) => Get<Card>()?.CardHeader(content);
 
-        public void CardTitle(string title) => cardComponents?.CardTitle(title);
+        public void CardTitle(string title) => Get<Card>()?.CardTitle(title);
 
-        public void CardDescription(string description) => cardComponents?.CardDescription(description);
+        public void CardDescription(string description) => Get<Card>()?.CardDescription(description);
 
-        public void CardContent(Action content) => cardComponents?.CardContent(content);
+        public void CardContent(Action content) => Get<Card>()?.CardContent(content);
 
-        public void CardFooter(Action content) => cardComponents?.CardFooter(content);
+        public void CardFooter(Action content) => Get<Card>()?.CardFooter(content);
         #endregion
 
         #region Slider Components
@@ -673,7 +639,7 @@ namespace shadcnui.GUIComponents.Core
         {
             try
             {
-                sliderComponents?.DrawSlider(windowWidth, label, ref value, minValue, maxValue);
+                Get<Slider>()?.DrawSlider(windowWidth, label, ref value, minValue, maxValue);
             }
             catch (Exception ex)
             {
@@ -685,7 +651,7 @@ namespace shadcnui.GUIComponents.Core
         {
             try
             {
-                sliderComponents?.DrawIntSlider(windowWidth, label, ref value, minValue, maxValue);
+                Get<Slider>()?.DrawIntSlider(windowWidth, label, ref value, minValue, maxValue);
             }
             catch (Exception ex)
             {
@@ -695,6 +661,7 @@ namespace shadcnui.GUIComponents.Core
         #endregion
 
         #region Layout Components
+
         public Vector2 DrawScrollView(Vector2 scrollPosition, System.Action drawContent, params GUILayoutOption[] options)
         {
             try
@@ -704,6 +671,7 @@ namespace shadcnui.GUIComponents.Core
             catch (Exception ex)
             {
                 GUILogger.LogException(ex, "drawing scroll view", "GUIHelper");
+
                 return new Vector3(0, 0, 0);
             }
         }
@@ -767,6 +735,7 @@ namespace shadcnui.GUIComponents.Core
                 GUILogger.LogException(ex, "adding space", "GUIHelper");
             }
         }
+
         #endregion
 
         #region Label Components
@@ -774,7 +743,7 @@ namespace shadcnui.GUIComponents.Core
         {
             try
             {
-                labelComponents?.DrawLabel(text, variant, disabled, options);
+                Get<Label>()?.DrawLabel(text, variant, disabled, options);
             }
             catch (Exception ex)
             {
@@ -786,7 +755,7 @@ namespace shadcnui.GUIComponents.Core
         {
             try
             {
-                labelComponents?.DrawLabel(rect, text, variant, disabled);
+                Get<Label>()?.DrawLabel(rect, text, variant, disabled);
             }
             catch (Exception ex)
             {
@@ -798,7 +767,7 @@ namespace shadcnui.GUIComponents.Core
         {
             try
             {
-                labelComponents?.SecondaryLabel(text, options);
+                Get<Label>()?.SecondaryLabel(text, options);
             }
             catch (Exception ex)
             {
@@ -810,7 +779,7 @@ namespace shadcnui.GUIComponents.Core
         {
             try
             {
-                labelComponents?.MutedLabel(text, options);
+                Get<Label>()?.MutedLabel(text, options);
             }
             catch (Exception ex)
             {
@@ -822,7 +791,7 @@ namespace shadcnui.GUIComponents.Core
         {
             try
             {
-                labelComponents?.DestructiveLabel(text, options);
+                Get<Label>()?.DestructiveLabel(text, options);
             }
             catch (Exception ex)
             {
@@ -836,7 +805,7 @@ namespace shadcnui.GUIComponents.Core
         {
             try
             {
-                progressComponents?.DrawProgress(value, width, height, options);
+                Get<Progress>()?.DrawProgress(value, width, height, options);
             }
             catch (Exception ex)
             {
@@ -848,7 +817,7 @@ namespace shadcnui.GUIComponents.Core
         {
             try
             {
-                progressComponents?.DrawProgress(rect, value);
+                Get<Progress>()?.DrawProgress(rect, value);
             }
             catch (Exception ex)
             {
@@ -860,7 +829,7 @@ namespace shadcnui.GUIComponents.Core
         {
             try
             {
-                progressComponents?.LabeledProgress(label, value, width, height, showPercentage, options);
+                Get<Progress>()?.LabeledProgress(label, value, width, height, showPercentage, options);
             }
             catch (Exception ex)
             {
@@ -872,7 +841,7 @@ namespace shadcnui.GUIComponents.Core
         {
             try
             {
-                progressComponents?.CircularProgress(value, size, options);
+                Get<Progress>()?.CircularProgress(value, size, options);
             }
             catch (Exception ex)
             {
@@ -886,7 +855,7 @@ namespace shadcnui.GUIComponents.Core
         {
             try
             {
-                avatarComponents?.DrawAvatar(image, fallbackText, size, shape, options);
+                Get<shadcnui.GUIComponents.Display.Avatar>()?.DrawAvatar(image, fallbackText, size, shape, options);
             }
             catch (Exception ex)
             {
@@ -898,7 +867,7 @@ namespace shadcnui.GUIComponents.Core
         {
             try
             {
-                avatarComponents?.DrawAvatar(rect, image, fallbackText, size, shape);
+                Get<shadcnui.GUIComponents.Display.Avatar>()?.DrawAvatar(rect, image, fallbackText, size, shape);
             }
             catch (Exception ex)
             {
@@ -910,7 +879,7 @@ namespace shadcnui.GUIComponents.Core
         {
             try
             {
-                avatarComponents?.AvatarWithStatus(image, fallbackText, isOnline, size, shape, options);
+                Get<shadcnui.GUIComponents.Display.Avatar>()?.AvatarWithStatus(image, fallbackText, isOnline, size, shape, options);
             }
             catch (Exception ex)
             {
@@ -922,7 +891,7 @@ namespace shadcnui.GUIComponents.Core
         {
             try
             {
-                avatarComponents?.AvatarWithName(image, fallbackText, name, size, shape, showNameBelow, options);
+                Get<shadcnui.GUIComponents.Display.Avatar>()?.AvatarWithName(image, fallbackText, name, size, shape, showNameBelow, options);
             }
             catch (Exception ex)
             {
@@ -934,7 +903,7 @@ namespace shadcnui.GUIComponents.Core
         {
             try
             {
-                avatarComponents?.AvatarWithBorder(image, fallbackText, borderColor, size, shape, options);
+                Get<shadcnui.GUIComponents.Display.Avatar>()?.AvatarWithBorder(image, fallbackText, borderColor, size, shape, options);
             }
             catch (Exception ex)
             {
@@ -949,7 +918,7 @@ namespace shadcnui.GUIComponents.Core
         {
             try
             {
-                tableComponents?.DrawTable(headers, data, variant, size, options);
+                Get<Table>()?.DrawTable(headers, data, variant, size, options);
             }
             catch (Exception ex)
             {
@@ -961,7 +930,7 @@ namespace shadcnui.GUIComponents.Core
         {
             try
             {
-                tableComponents?.DrawTable(rect, headers, data, variant, size);
+                Get<Table>()?.DrawTable(rect, headers, data, variant, size);
             }
             catch (Exception ex)
             {
@@ -973,7 +942,7 @@ namespace shadcnui.GUIComponents.Core
         {
             try
             {
-                tableComponents?.SortableTable(headers, data, ref sortColumns, ref sortAscending, variant, size, onSort, options);
+                Get<Table>()?.SortableTable(headers, data, ref sortColumns, ref sortAscending, variant, size, onSort, options);
             }
             catch (Exception ex)
             {
@@ -985,7 +954,7 @@ namespace shadcnui.GUIComponents.Core
         {
             try
             {
-                tableComponents?.SelectableTable(headers, data, ref selectedRows, variant, size, onSelectionChange, options);
+                Get<Table>()?.SelectableTable(headers, data, ref selectedRows, variant, size, onSelectionChange, options);
             }
             catch (Exception ex)
             {
@@ -997,7 +966,7 @@ namespace shadcnui.GUIComponents.Core
         {
             try
             {
-                tableComponents?.CustomTable(headers, data, cellRenderer, variant, size, options);
+                Get<Table>()?.CustomTable(headers, data, cellRenderer, variant, size, options);
             }
             catch (Exception ex)
             {
@@ -1009,7 +978,7 @@ namespace shadcnui.GUIComponents.Core
         {
             try
             {
-                tableComponents?.PaginatedTable(headers, data, ref currentPage, pageSize, variant, size, onPageChange, options);
+                Get<Table>()?.PaginatedTable(headers, data, ref currentPage, pageSize, variant, size, onPageChange, options);
             }
             catch (Exception ex)
             {
@@ -1021,7 +990,7 @@ namespace shadcnui.GUIComponents.Core
         {
             try
             {
-                tableComponents?.SearchableTable(headers, data, ref searchQuery, ref filteredData, variant, size, onSearch, options);
+                Get<Table>()?.SearchableTable(headers, data, ref searchQuery, ref filteredData, variant, size, onSearch, options);
             }
             catch (Exception ex)
             {
@@ -1033,7 +1002,7 @@ namespace shadcnui.GUIComponents.Core
         {
             try
             {
-                tableComponents?.ResizableTable(headers, data, ref columnWidths, variant, size, options);
+                Get<Table>()?.ResizableTable(headers, data, ref columnWidths, variant, size, options);
             }
             catch (Exception ex)
             {
@@ -1047,7 +1016,7 @@ namespace shadcnui.GUIComponents.Core
         {
             try
             {
-                calendarComponents?.DrawCalendar();
+                Get<Calendar>()?.DrawCalendar();
             }
             catch (Exception ex)
             {
@@ -1061,7 +1030,7 @@ namespace shadcnui.GUIComponents.Core
         {
             try
             {
-                dropdownMenuComponents?.Draw(config);
+                Get<DropdownMenu>()?.Draw(config);
             }
             catch (Exception ex)
             {
@@ -1075,7 +1044,7 @@ namespace shadcnui.GUIComponents.Core
         {
             try
             {
-                popoverComponents?.DrawPopover(content);
+                Get<Popover>()?.DrawPopover(content);
             }
             catch (Exception ex)
             {
@@ -1085,17 +1054,17 @@ namespace shadcnui.GUIComponents.Core
 
         public void OpenPopover()
         {
-            popoverComponents?.Open();
+            Get<Popover>()?.Open();
         }
 
         public void ClosePopover()
         {
-            popoverComponents?.Close();
+            Get<Popover>()?.Close();
         }
 
         public bool IsPopoverOpen()
         {
-            return popoverComponents?.IsOpen ?? false;
+            return Get<Popover>()?.IsOpen ?? false;
         }
         #endregion
 
@@ -1104,7 +1073,7 @@ namespace shadcnui.GUIComponents.Core
         {
             try
             {
-                return selectComponents?.DrawSelect(items, selectedIndex) ?? selectedIndex;
+                return Get<Select>()?.DrawSelect(items, selectedIndex) ?? selectedIndex;
             }
             catch (Exception ex)
             {
@@ -1115,51 +1084,51 @@ namespace shadcnui.GUIComponents.Core
 
         public void OpenSelect()
         {
-            selectComponents?.Open();
+            Get<Select>()?.Open();
         }
 
         public void CloseSelect()
         {
-            selectComponents?.Close();
+            Get<Select>()?.Close();
         }
 
         public bool IsSelectOpen()
         {
-            return selectComponents?.IsOpen ?? false;
+            return Get<Select>()?.IsOpen ?? false;
         }
         #endregion
 
         #region Dialog Components
         public void DrawDialog(string dialogId, Action content, float width = 400, float height = 300)
         {
-            dialogComponents?.DrawDialog(dialogId, content, width, height);
+            Get<Dialog>()?.DrawDialog(dialogId, content, width, height);
         }
 
         public void DrawDialog(string dialogId, string title, string description, Action content, Action footer = null, float width = 400, float height = 300)
         {
-            dialogComponents?.DrawDialog(dialogId, title, description, content, footer, width, height);
+            Get<Dialog>()?.DrawDialog(dialogId, title, description, content, footer, width, height);
         }
 
         public void OpenDialog(string dialogId)
         {
-            dialogComponents?.Open(dialogId);
+            Get<Dialog>()?.Open(dialogId);
         }
 
         public void CloseDialog()
         {
-            dialogComponents?.Close();
+            Get<Dialog>()?.Close();
         }
 
         public bool IsDialogOpen()
         {
-            return dialogComponents?.IsOpen ?? false;
+            return Get<Dialog>()?.IsOpen ?? false;
         }
 
         public bool DrawDialogTrigger(string label, ButtonVariant variant = ButtonVariant.Default, ButtonSize size = ButtonSize.Default)
         {
             try
             {
-                return dialogComponents?.DrawDialogTrigger(label, variant, size) ?? false;
+                return Get<Dialog>()?.DrawDialogTrigger(label, variant, size) ?? false;
             }
             catch (Exception ex)
             {
@@ -1172,7 +1141,7 @@ namespace shadcnui.GUIComponents.Core
         {
             try
             {
-                dialogComponents?.DrawDialogHeader(title, description);
+                Get<Dialog>()?.DrawDialogHeader(title, description);
             }
             catch (Exception ex)
             {
@@ -1184,7 +1153,7 @@ namespace shadcnui.GUIComponents.Core
         {
             try
             {
-                dialogComponents?.DrawDialogContent(content);
+                Get<Dialog>()?.DrawDialogContent(content);
             }
             catch (Exception ex)
             {
@@ -1196,7 +1165,7 @@ namespace shadcnui.GUIComponents.Core
         {
             try
             {
-                dialogComponents?.DrawDialogFooter(footer);
+                Get<Dialog>()?.DrawDialogFooter(footer);
             }
             catch (Exception ex)
             {
@@ -1210,7 +1179,7 @@ namespace shadcnui.GUIComponents.Core
         {
             try
             {
-                return datePickerComponents?.DrawDatePicker(placeholder, selectedDate, id, options) ?? selectedDate;
+                return Get<DatePicker>()?.DrawDatePicker(placeholder, selectedDate, id, options) ?? selectedDate;
             }
             catch (Exception ex)
             {
@@ -1223,7 +1192,7 @@ namespace shadcnui.GUIComponents.Core
         {
             try
             {
-                return datePickerComponents?.DrawDatePickerWithLabel(label, placeholder, selectedDate, id, options) ?? selectedDate;
+                return Get<DatePicker>()?.DrawDatePickerWithLabel(label, placeholder, selectedDate, id, options) ?? selectedDate;
             }
             catch (Exception ex)
             {
@@ -1236,7 +1205,7 @@ namespace shadcnui.GUIComponents.Core
         {
             try
             {
-                return datePickerComponents?.DrawDateRangePicker(placeholder, startDate, endDate, id, options) ?? startDate;
+                return Get<DatePicker>()?.DrawDateRangePicker(placeholder, startDate, endDate, id, options) ?? startDate;
             }
             catch (Exception ex)
             {
@@ -1249,7 +1218,7 @@ namespace shadcnui.GUIComponents.Core
         {
             try
             {
-                datePickerComponents?.CloseDatePicker(id);
+                Get<DatePicker>()?.CloseDatePicker(id);
             }
             catch (Exception ex)
             {
@@ -1261,7 +1230,7 @@ namespace shadcnui.GUIComponents.Core
         {
             try
             {
-                return datePickerComponents?.IsDatePickerOpen(id) ?? false;
+                return Get<DatePicker>()?.IsDatePickerOpen(id) ?? false;
             }
             catch (Exception ex)
             {
@@ -1276,7 +1245,7 @@ namespace shadcnui.GUIComponents.Core
         {
             try
             {
-                dataTableComponents?.DrawDataTable(id, columns, data, showPagination, showSearch, showSelection, showColumnToggle, options);
+                Get<DataTable>()?.DrawDataTable(id, columns, data, showPagination, showSearch, showSelection, showColumnToggle, options);
             }
             catch (Exception ex)
             {
@@ -1298,7 +1267,7 @@ namespace shadcnui.GUIComponents.Core
         {
             try
             {
-                return dataTableComponents?.GetSelectedRows(tableId) ?? new List<string>();
+                return Get<DataTable>()?.GetSelectedRows(tableId) ?? new List<string>();
             }
             catch (Exception ex)
             {
@@ -1311,7 +1280,7 @@ namespace shadcnui.GUIComponents.Core
         {
             try
             {
-                dataTableComponents?.ClearSelection(tableId);
+                Get<DataTable>()?.ClearSelection(tableId);
             }
             catch (Exception ex)
             {
@@ -1325,7 +1294,7 @@ namespace shadcnui.GUIComponents.Core
         {
             try
             {
-                chartComponents?.DrawChart(config);
+                Get<Chart>()?.DrawChart(config);
             }
             catch (Exception ex)
             {
@@ -1338,7 +1307,7 @@ namespace shadcnui.GUIComponents.Core
             try
             {
                 var config = new ChartConfig(chartSeries, chartType) { Size = size, Options = options };
-                chartComponents?.DrawChart(config);
+                Get<Chart>()?.DrawChart(config);
             }
             catch (Exception ex)
             {
@@ -1352,7 +1321,7 @@ namespace shadcnui.GUIComponents.Core
         {
             try
             {
-                separatorComponents?.DrawSeparator(orientation, decorative, options);
+                Get<Separator>()?.DrawSeparator(orientation, decorative, options);
             }
             catch (Exception ex)
             {
@@ -1364,7 +1333,7 @@ namespace shadcnui.GUIComponents.Core
         {
             try
             {
-                separatorComponents?.HorizontalSeparator(options);
+                Get<Separator>()?.HorizontalSeparator(options);
             }
             catch (Exception ex)
             {
@@ -1376,7 +1345,7 @@ namespace shadcnui.GUIComponents.Core
         {
             try
             {
-                separatorComponents?.VerticalSeparator(options);
+                Get<Separator>()?.VerticalSeparator(options);
             }
             catch (Exception ex)
             {
@@ -1388,7 +1357,7 @@ namespace shadcnui.GUIComponents.Core
         {
             try
             {
-                separatorComponents?.DrawSeparator(rect, orientation);
+                Get<Separator>()?.DrawSeparator(rect, orientation);
             }
             catch (Exception ex)
             {
@@ -1400,7 +1369,7 @@ namespace shadcnui.GUIComponents.Core
         {
             try
             {
-                separatorComponents?.SeparatorWithSpacing(orientation, spacingBefore, spacingAfter, options);
+                Get<Separator>()?.SeparatorWithSpacing(orientation, spacingBefore, spacingAfter, options);
             }
             catch (Exception ex)
             {
@@ -1412,7 +1381,7 @@ namespace shadcnui.GUIComponents.Core
         {
             try
             {
-                separatorComponents?.LabeledSeparator(text, options);
+                Get<Separator>()?.LabeledSeparator(text, options);
             }
             catch (Exception ex)
             {
@@ -1432,7 +1401,7 @@ namespace shadcnui.GUIComponents.Core
                     MaxLines = maxLines,
                     Options = options,
                 };
-                var result = tabsComponents?.Draw(config);
+                var result = Get<Tabs>()?.Draw(config);
                 if (result.HasValue)
                 {
                     return result.Value;
@@ -1457,7 +1426,7 @@ namespace shadcnui.GUIComponents.Core
                     Position = position,
                     Options = options,
                 };
-                var result = tabsComponents?.Draw(config);
+                var result = Get<Tabs>()?.Draw(config);
                 if (result.HasValue)
                 {
                     return result.Value;
@@ -1475,7 +1444,7 @@ namespace shadcnui.GUIComponents.Core
         {
             try
             {
-                tabsComponents?.BeginTabContent();
+                Get<Tabs>()?.BeginTabContent();
             }
             catch (Exception ex)
             {
@@ -1487,7 +1456,7 @@ namespace shadcnui.GUIComponents.Core
         {
             try
             {
-                tabsComponents?.EndTabContent();
+                Get<Tabs>()?.EndTabContent();
             }
             catch (Exception ex)
             {
@@ -1516,7 +1485,7 @@ namespace shadcnui.GUIComponents.Core
                     Options = options,
                 };
 
-                var newSelectedIndex = tabsComponents?.Draw(config) ?? selectedIndex;
+                var newSelectedIndex = Get<Tabs>()?.Draw(config) ?? selectedIndex;
 
                 if (newSelectedIndex >= 0 && newSelectedIndex < tabConfigs.Length)
                 {
@@ -1549,7 +1518,7 @@ namespace shadcnui.GUIComponents.Core
                     Position = position,
                     Options = options,
                 };
-                return tabsComponents?.Draw(config) ?? selectedIndex;
+                return Get<Tabs>()?.Draw(config) ?? selectedIndex;
             }
             catch (Exception ex)
             {
@@ -1564,7 +1533,7 @@ namespace shadcnui.GUIComponents.Core
         {
             try
             {
-                return textAreaComponents?.DrawTextArea(text, variant, placeholder, disabled, minHeight, maxLength, options) ?? text;
+                return Get<TextArea>()?.DrawTextArea(text, variant, placeholder, disabled, minHeight, maxLength, options) ?? text;
             }
             catch (Exception ex)
             {
@@ -1577,7 +1546,7 @@ namespace shadcnui.GUIComponents.Core
         {
             try
             {
-                return textAreaComponents?.DrawTextArea(rect, text, variant, placeholder, disabled, maxLength) ?? text;
+                return Get<TextArea>()?.DrawTextArea(rect, text, variant, placeholder, disabled, maxLength) ?? text;
             }
             catch (Exception ex)
             {
@@ -1590,7 +1559,7 @@ namespace shadcnui.GUIComponents.Core
         {
             try
             {
-                return textAreaComponents?.OutlineTextArea(text, placeholder, disabled, minHeight, maxLength, options) ?? text;
+                return Get<TextArea>()?.OutlineTextArea(text, placeholder, disabled, minHeight, maxLength, options) ?? text;
             }
             catch (Exception ex)
             {
@@ -1603,7 +1572,7 @@ namespace shadcnui.GUIComponents.Core
         {
             try
             {
-                return textAreaComponents?.GhostTextArea(text, placeholder, disabled, minHeight, maxLength, options) ?? text;
+                return Get<TextArea>()?.GhostTextArea(text, placeholder, disabled, minHeight, maxLength, options) ?? text;
             }
             catch (Exception ex)
             {
@@ -1616,7 +1585,7 @@ namespace shadcnui.GUIComponents.Core
         {
             try
             {
-                return textAreaComponents?.LabeledTextArea(label, text, variant, placeholder, disabled, minHeight, maxLength, showCharCount, options) ?? text;
+                return Get<TextArea>()?.LabeledTextArea(label, text, variant, placeholder, disabled, minHeight, maxLength, showCharCount, options) ?? text;
             }
             catch (Exception ex)
             {
@@ -1629,7 +1598,7 @@ namespace shadcnui.GUIComponents.Core
         {
             try
             {
-                return textAreaComponents?.ResizableTextArea(text, ref height, variant, placeholder, disabled, minHeight, maxHeight, maxLength, options) ?? text;
+                return Get<TextArea>()?.ResizableTextArea(text, ref height, variant, placeholder, disabled, minHeight, maxHeight, maxLength, options) ?? text;
             }
             catch (Exception ex)
             {
@@ -1644,7 +1613,7 @@ namespace shadcnui.GUIComponents.Core
         {
             try
             {
-                return checkboxComponents?.DrawCheckbox(text, value, variant, size, onToggle, disabled, options) ?? value;
+                return Get<Checkbox>()?.DrawCheckbox(text, value, variant, size, onToggle, disabled, options) ?? value;
             }
             catch (Exception ex)
             {
@@ -1657,7 +1626,7 @@ namespace shadcnui.GUIComponents.Core
         {
             try
             {
-                return checkboxComponents?.DrawCheckbox(rect, text, value, variant, size, onToggle, disabled) ?? value;
+                return Get<Checkbox>()?.DrawCheckbox(rect, text, value, variant, size, onToggle, disabled) ?? value;
             }
             catch (Exception ex)
             {
@@ -1672,7 +1641,7 @@ namespace shadcnui.GUIComponents.Core
         {
             try
             {
-                return switchComponents?.DrawSwitch(text, value, variant, size, onToggle, disabled, options) ?? value;
+                return Get<Switch>()?.DrawSwitch(text, value, variant, size, onToggle, disabled, options) ?? value;
             }
             catch (Exception ex)
             {
@@ -1685,7 +1654,7 @@ namespace shadcnui.GUIComponents.Core
         {
             try
             {
-                return switchComponents?.DrawSwitch(rect, text, value, variant, size, onToggle, disabled) ?? value;
+                return Get<Switch>()?.DrawSwitch(rect, text, value, variant, size, onToggle, disabled) ?? value;
             }
             catch (Exception ex)
             {
@@ -1701,7 +1670,7 @@ namespace shadcnui.GUIComponents.Core
         {
             try
             {
-                badgeComponents?.DrawBadge(text, variant, size, options);
+                Get<Badge>()?.DrawBadge(text, variant, size, options);
             }
             catch (Exception ex)
             {
@@ -1713,7 +1682,7 @@ namespace shadcnui.GUIComponents.Core
         {
             try
             {
-                badgeComponents?.DrawBadge(rect, text, variant, size);
+                Get<Badge>()?.DrawBadge(rect, text, variant, size);
             }
             catch (Exception ex)
             {
@@ -1725,7 +1694,7 @@ namespace shadcnui.GUIComponents.Core
         {
             try
             {
-                badgeComponents?.BadgeWithIcon(text, icon, variant, size, options);
+                Get<Badge>()?.BadgeWithIcon(text, icon, variant, size, options);
             }
             catch (Exception ex)
             {
@@ -1737,7 +1706,7 @@ namespace shadcnui.GUIComponents.Core
         {
             try
             {
-                badgeComponents?.CountBadge(count, variant, size, maxCount, options);
+                Get<Badge>()?.CountBadge(count, variant, size, maxCount, options);
             }
             catch (Exception ex)
             {
@@ -1749,7 +1718,7 @@ namespace shadcnui.GUIComponents.Core
         {
             try
             {
-                badgeComponents?.StatusBadge(text, isActive, variant, size, options);
+                Get<Badge>()?.StatusBadge(text, isActive, variant, size, options);
             }
             catch (Exception ex)
             {
@@ -1761,7 +1730,7 @@ namespace shadcnui.GUIComponents.Core
         {
             try
             {
-                badgeComponents?.ProgressBadge(text, progress, variant, size, options);
+                Get<Badge>()?.ProgressBadge(text, progress, variant, size, options);
             }
             catch (Exception ex)
             {
@@ -1773,7 +1742,7 @@ namespace shadcnui.GUIComponents.Core
         {
             try
             {
-                badgeComponents?.AnimatedBadge(text, variant, size, options);
+                Get<Badge>()?.AnimatedBadge(text, variant, size, options);
             }
             catch (Exception ex)
             {
@@ -1785,7 +1754,7 @@ namespace shadcnui.GUIComponents.Core
         {
             try
             {
-                badgeComponents?.RoundedBadge(text, variant, size, cornerRadius, options);
+                Get<Badge>()?.RoundedBadge(text, variant, size, cornerRadius, options);
             }
             catch (Exception ex)
             {
@@ -1799,7 +1768,7 @@ namespace shadcnui.GUIComponents.Core
         {
             try
             {
-                menuBarComponents?.Draw(config);
+                Get<MenuBar>()?.Draw(config);
             }
             catch (Exception ex)
             {
@@ -1812,7 +1781,7 @@ namespace shadcnui.GUIComponents.Core
             MenuBar.MenuBarConfig config = new MenuBar.MenuBarConfig(items) { Options = options };
             try
             {
-                menuBarComponents?.Draw(config);
+                Get<MenuBar>()?.Draw(config);
             }
             catch (Exception ex)
             {

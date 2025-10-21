@@ -11,7 +11,8 @@ namespace shadcnui.GUIComponents.Controls
 {
     public class Switch : BaseComponent
     {
-        public Switch(GUIHelper helper) : base(helper) { }
+        public Switch(GUIHelper helper)
+            : base(helper) { }
 
         public bool DrawSwitch(string text, bool value, SwitchVariant variant = SwitchVariant.Default, SwitchSize size = SwitchSize.Default, Action<bool> onToggle = null, bool disabled = false, params GUILayoutOption[] options)
         {
