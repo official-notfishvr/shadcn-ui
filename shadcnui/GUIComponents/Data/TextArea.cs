@@ -8,16 +8,10 @@ using UnhollowerBaseLib;
 
 namespace shadcnui.GUIComponents.Data
 {
-    public class TextArea
+    public class TextArea : BaseComponent
     {
-        private GUIHelper guiHelper;
-        private shadcnui.GUIComponents.Layout.Layout layoutComponents;
-
         public TextArea(GUIHelper helper)
-        {
-            guiHelper = helper;
-            layoutComponents = new shadcnui.GUIComponents.Layout.Layout(helper);
-        }
+            : base(helper) { }
 
         public string DrawTextArea(string text, TextAreaVariant variant = TextAreaVariant.Default, string placeholder = "", bool disabled = false, float minHeight = 60f, int maxLength = -1, params GUILayoutOption[] options)
         {

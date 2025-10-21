@@ -481,6 +481,7 @@
         <Compile Include="GUIComponents\Controls\Switch.cs" />
         <Compile Include="GUIComponents\Controls\Toggle.cs" />
         <Compile Include="GUIComponents\Core\AnimationManager.cs" />
+        <Compile Include="GUIComponents\Core\BaseComponent.cs" />
         <Compile Include="GUIComponents\Core\GUIHelper.cs" />
         <Compile Include="GUIComponents\Core\GUILogger.cs" />
         <Compile Include="GUIComponents\Core\Settings.cs" />

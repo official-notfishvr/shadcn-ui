@@ -11,14 +11,10 @@ using Il2CppInterop.Runtime.InteropTypes.Arrays;
 
 namespace shadcnui.GUIComponents.Layout
 {
-    public class Separator
+    public class Separator : BaseComponent
     {
-        private GUIHelper guiHelper;
-
         public Separator(GUIHelper helper)
-        {
-            guiHelper = helper;
-        }
+            : base(helper) { }
 
         public void DrawSeparator(SeparatorOrientation orientation = SeparatorOrientation.Horizontal, bool decorative = true, params GUILayoutOption[] options)
         {

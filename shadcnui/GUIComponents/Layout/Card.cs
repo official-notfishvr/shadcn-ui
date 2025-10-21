@@ -8,74 +8,68 @@ using UnhollowerBaseLib;
 
 namespace shadcnui.GUIComponents.Layout
 {
-    public class Card
+    public class Card : BaseComponent
     {
-        private readonly GUIHelper _guiHelper;
-        private readonly Layout _layoutComponents;
-
         public Card(GUIHelper helper)
-        {
-            _guiHelper = helper;
-            _layoutComponents = new Layout(helper);
-        }
+            : base(helper) { }
 
         public void BeginCard(float width = -1, float height = -1)
         {
-            var styleManager = _guiHelper.GetStyleManager();
+            var styleManager = guiHelper.GetStyleManager();
             var options = new List<GUILayoutOption>();
             if (width > 0)
             {
-                options.Add(GUILayout.Width(width * _guiHelper.uiScale));
+                options.Add(GUILayout.Width(width * guiHelper.uiScale));
             }
             if (height > 0)
             {
-                options.Add(GUILayout.Height(height * _guiHelper.uiScale));
+                options.Add(GUILayout.Height(height * guiHelper.uiScale));
             }
 
-            _layoutComponents.BeginVerticalGroup(styleManager.cardStyle, options.ToArray());
+            layoutComponents.BeginVerticalGroup(styleManager.cardStyle, options.ToArray());
         }
 
         public void EndCard()
         {
-            _layoutComponents.EndVerticalGroup();
+            layoutComponents.EndVerticalGroup();
         }
 
         public void CardHeader(Action content)
         {
-            var styleManager = _guiHelper.GetStyleManager();
-            _layoutComponents.BeginVerticalGroup(styleManager.cardHeaderStyle);
+            var styleManager = guiHelper.GetStyleManager();
+            layoutComponents.BeginVerticalGroup(styleManager.cardHeaderStyle);
             content();
-            _layoutComponents.EndVerticalGroup();
+            layoutComponents.EndVerticalGroup();
         }
 
         public void CardTitle(string title)
         {
-            var styleManager = _guiHelper.GetStyleManager();
+            var styleManager = guiHelper.GetStyleManager();
 
             UnityHelpers.Label(title, styleManager.cardTitleStyle);
         }
 
         public void CardDescription(string description)
         {
-            var styleManager = _guiHelper.GetStyleManager();
+            var styleManager = guiHelper.GetStyleManager();
 
             UnityHelpers.Label(description, styleManager.cardDescriptionStyle);
         }
 
         public void CardContent(Action content)
         {
-            var styleManager = _guiHelper.GetStyleManager();
-            _layoutComponents.BeginVerticalGroup(styleManager.cardContentStyle);
+            var styleManager = guiHelper.GetStyleManager();
+            layoutComponents.BeginVerticalGroup(styleManager.cardContentStyle);
             content();
-            _layoutComponents.EndVerticalGroup();
+            layoutComponents.EndVerticalGroup();
         }
 
         public void CardFooter(Action content)
         {
-            var styleManager = _guiHelper.GetStyleManager();
-            _layoutComponents.BeginHorizontalGroup(styleManager.cardFooterStyle);
+            var styleManager = guiHelper.GetStyleManager();
+            layoutComponents.BeginHorizontalGroup(styleManager.cardFooterStyle);
             content();
-            _layoutComponents.EndHorizontalGroup();
+            layoutComponents.EndHorizontalGroup();
         }
 
         public void DrawCard(string title, string description, string content, Action footerContent = null, float width = -1, float height = -1)
@@ -97,7 +91,7 @@ namespace shadcnui.GUIComponents.Layout
             {
                 CardContent(() =>
                 {
-                    var styleManager = _guiHelper.GetStyleManager();
+                    var styleManager = guiHelper.GetStyleManager();
                     UnityHelpers.Label(content, styleManager.labelDefaultStyle);
                 });
             }
@@ -112,7 +106,7 @@ namespace shadcnui.GUIComponents.Layout
 
         public void CardImage(Texture2D image, float height = 150)
         {
-            var styleManager = _guiHelper.GetStyleManager();
+            var styleManager = guiHelper.GetStyleManager();
 #if IL2CPP_MELONLOADER
             var rect = GUILayoutUtility.GetRect(0, height, new Il2CppReferenceArray<GUILayoutOption>(new GUILayoutOption[] { GUILayout.ExpandWidth(true) }));
 #else
@@ -142,7 +136,7 @@ namespace shadcnui.GUIComponents.Layout
             {
                 CardContent(() =>
                 {
-                    var styleManager = _guiHelper.GetStyleManager();
+                    var styleManager = guiHelper.GetStyleManager();
 
                     UnityHelpers.Label(content, styleManager.labelDefaultStyle);
                 });
@@ -158,14 +152,14 @@ namespace shadcnui.GUIComponents.Layout
 
         public void CardWithAvatar(Texture2D avatar, string title, string subtitle)
         {
-            var styleManager = _guiHelper.GetStyleManager();
-            _layoutComponents.BeginHorizontalGroup(styleManager.cardHeaderStyle);
-            _guiHelper.Avatar(avatar, "");
-            _layoutComponents.BeginVerticalGroup();
+            var styleManager = guiHelper.GetStyleManager();
+            layoutComponents.BeginHorizontalGroup(styleManager.cardHeaderStyle);
+            guiHelper.Avatar(avatar, "");
+            layoutComponents.BeginVerticalGroup();
             CardTitle(title);
             CardDescription(subtitle);
-            _layoutComponents.EndVerticalGroup();
-            _layoutComponents.EndHorizontalGroup();
+            layoutComponents.EndVerticalGroup();
+            layoutComponents.EndHorizontalGroup();
         }
 
         public void DrawCardWithAvatar(Texture2D avatar, string title, string subtitle, string content, Action footerContent = null, float width = -1, float height = -1)
@@ -178,7 +172,7 @@ namespace shadcnui.GUIComponents.Layout
             {
                 CardContent(() =>
                 {
-                    var styleManager = _guiHelper.GetStyleManager();
+                    var styleManager = guiHelper.GetStyleManager();
 
                     UnityHelpers.Label(content, styleManager.labelDefaultStyle);
                 });
@@ -194,15 +188,15 @@ namespace shadcnui.GUIComponents.Layout
 
         public void CardHeader(string title, string description, Action Actions)
         {
-            var styleManager = _guiHelper.GetStyleManager();
-            _layoutComponents.BeginHorizontalGroup(styleManager.cardHeaderStyle);
-            _layoutComponents.BeginVerticalGroup();
+            var styleManager = guiHelper.GetStyleManager();
+            layoutComponents.BeginHorizontalGroup(styleManager.cardHeaderStyle);
+            layoutComponents.BeginVerticalGroup();
             CardTitle(title);
             CardDescription(description);
-            _layoutComponents.EndVerticalGroup();
+            layoutComponents.EndVerticalGroup();
             GUILayout.FlexibleSpace();
             Actions();
-            _layoutComponents.EndHorizontalGroup();
+            layoutComponents.EndHorizontalGroup();
         }
 
         public void DrawCardWithHeader(string title, string description, Action header, string content, Action footerContent = null, float width = -1, float height = -1)
@@ -215,7 +209,7 @@ namespace shadcnui.GUIComponents.Layout
             {
                 CardContent(() =>
                 {
-                    var styleManager = _guiHelper.GetStyleManager();
+                    var styleManager = guiHelper.GetStyleManager();
 
                     UnityHelpers.Label(content, styleManager.labelDefaultStyle);
                 });
@@ -234,7 +228,7 @@ namespace shadcnui.GUIComponents.Layout
             BeginCard(width, height);
             CardContent(() =>
             {
-                var styleManager = _guiHelper.GetStyleManager();
+                var styleManager = guiHelper.GetStyleManager();
 
                 UnityHelpers.Label(content, styleManager.labelDefaultStyle);
             });

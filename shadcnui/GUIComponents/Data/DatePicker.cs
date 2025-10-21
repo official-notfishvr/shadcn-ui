@@ -8,21 +8,13 @@ using UnhollowerBaseLib;
 
 namespace shadcnui.GUIComponents.Data
 {
-    public class DatePicker
+    public class DatePicker : BaseComponent
     {
-        private readonly GUIHelper _guiHelper;
-        private readonly StyleManager _styleManager;
-        private readonly shadcnui.GUIComponents.Layout.Layout _layoutComponents;
-
         private Dictionary<string, bool> _openStates = new Dictionary<string, bool>();
         private Dictionary<string, DateTime> _displayDates = new Dictionary<string, DateTime>();
 
         public DatePicker(GUIHelper helper)
-        {
-            _guiHelper = helper;
-            _styleManager = helper.GetStyleManager();
-            _layoutComponents = new shadcnui.GUIComponents.Layout.Layout(helper);
-        }
+            : base(helper) { }
 
         public DateTime? DrawDatePicker(string placeholder, DateTime? selectedDate, string id = "datepicker", params GUILayoutOption[] options)
         {
@@ -36,9 +28,9 @@ namespace shadcnui.GUIComponents.Data
             DateTime displayDate = _displayDates[id];
             string buttonText = selectedDate?.ToString("MMM dd, yyyy") ?? placeholder;
 
-            _layoutComponents.BeginVerticalGroup();
+            layoutComponents.BeginVerticalGroup();
 
-            if (UnityHelpers.Button($"📅 {buttonText}", _styleManager.selectTriggerStyle, options))
+            if (UnityHelpers.Button($"📅 {buttonText}", styleManager.selectTriggerStyle, options))
             {
                 _openStates[id] = !isOpen;
                 if (selectedDate.HasValue)
@@ -57,23 +49,23 @@ namespace shadcnui.GUIComponents.Data
                 }
             }
 
-            _layoutComponents.EndVerticalGroup();
+            layoutComponents.EndVerticalGroup();
 
             return selectedDate;
         }
 
         public DateTime? DrawDatePickerWithLabel(string label, string placeholder, DateTime? selectedDate, string id = "datepicker", params GUILayoutOption[] options)
         {
-            _layoutComponents.BeginVerticalGroup();
+            layoutComponents.BeginVerticalGroup();
             if (!string.IsNullOrEmpty(label))
             {
-                UnityHelpers.Label(label, _styleManager.labelDefaultStyle);
+                UnityHelpers.Label(label, styleManager.labelDefaultStyle);
                 GUILayout.Space(4);
             }
 
             DateTime? result = DrawDatePicker(placeholder, selectedDate, id, options);
 
-            _layoutComponents.EndVerticalGroup();
+            layoutComponents.EndVerticalGroup();
             return result;
         }
 
@@ -87,9 +79,9 @@ namespace shadcnui.GUIComponents.Data
 
             string buttonText = startDate.HasValue && endDate.HasValue ? $"{startDate.Value.ToString("MMM dd")} - {endDate.Value.ToString("MMM dd, yyyy")}" : placeholder;
 
-            _layoutComponents.BeginVerticalGroup();
+            layoutComponents.BeginVerticalGroup();
 
-            if (UnityHelpers.Button($"📅 {buttonText}", _styleManager.selectTriggerStyle, options))
+            if (UnityHelpers.Button($"📅 {buttonText}", styleManager.selectTriggerStyle, options))
             {
                 _openStates[id] = !_openStates[id];
             }
@@ -99,14 +91,14 @@ namespace shadcnui.GUIComponents.Data
                 DrawCalendarPopover(id, startDate, _displayDates[id]);
             }
 
-            _layoutComponents.EndVerticalGroup();
+            layoutComponents.EndVerticalGroup();
 
             return startDate;
         }
 
         private DateTime? DrawCalendarPopover(string id, DateTime? selectedDate, DateTime displayDate)
         {
-            _layoutComponents.BeginVerticalGroup(_styleManager.popoverContentStyle, GUILayout.Width(280));
+            layoutComponents.BeginVerticalGroup(styleManager.popoverContentStyle, GUILayout.Width(280));
 
             DrawCalendarHeader(id, displayDate);
             DrawWeekdayHeaders();
@@ -118,16 +110,16 @@ namespace shadcnui.GUIComponents.Data
                 DrawCalendarFooter(id);
             }
 
-            _layoutComponents.EndVerticalGroup();
+            layoutComponents.EndVerticalGroup();
 
             return newSelectedDate;
         }
 
         private void DrawCalendarHeader(string id, DateTime displayDate)
         {
-            _layoutComponents.BeginHorizontalGroup();
+            layoutComponents.BeginHorizontalGroup();
 
-            if (UnityHelpers.Button("‹", _styleManager.buttonGhostStyle, GUILayout.Width(32), GUILayout.Height(32)))
+            if (UnityHelpers.Button("‹", styleManager.buttonGhostStyle, GUILayout.Width(32), GUILayout.Height(32)))
             {
                 _displayDates[id] = displayDate.AddMonths(-1);
             }
@@ -135,15 +127,15 @@ namespace shadcnui.GUIComponents.Data
             GUILayout.FlexibleSpace();
             string currentMonthYear = displayDate.ToString("MMMM yyyy");
 
-            UnityHelpers.Label(currentMonthYear, _styleManager.datePickerTitleStyle);
+            UnityHelpers.Label(currentMonthYear, styleManager.datePickerTitleStyle);
             GUILayout.FlexibleSpace();
 
-            if (UnityHelpers.Button("›", _styleManager.buttonGhostStyle, GUILayout.Width(32), GUILayout.Height(32)))
+            if (UnityHelpers.Button("›", styleManager.buttonGhostStyle, GUILayout.Width(32), GUILayout.Height(32)))
             {
                 _displayDates[id] = displayDate.AddMonths(1);
             }
 
-            _layoutComponents.EndHorizontalGroup();
+            layoutComponents.EndHorizontalGroup();
             GUILayout.Space(8);
         }
 
@@ -151,12 +143,12 @@ namespace shadcnui.GUIComponents.Data
         {
             string[] weekdays = { "Su", "Mo", "Tu", "We", "Th", "Fr", "Sa" };
 
-            _layoutComponents.BeginHorizontalGroup();
+            layoutComponents.BeginHorizontalGroup();
             foreach (string day in weekdays)
             {
-                UnityHelpers.Label(day, _styleManager.datePickerWeekdayStyle, GUILayout.Width(36), GUILayout.Height(24));
+                UnityHelpers.Label(day, styleManager.datePickerWeekdayStyle, GUILayout.Width(36), GUILayout.Height(24));
             }
-            _layoutComponents.EndHorizontalGroup();
+            layoutComponents.EndHorizontalGroup();
             GUILayout.Space(4);
         }
 
@@ -171,7 +163,7 @@ namespace shadcnui.GUIComponents.Data
 
             for (int week = 0; week < 6; week++)
             {
-                _layoutComponents.BeginHorizontalGroup();
+                layoutComponents.BeginHorizontalGroup();
 
                 for (int dayOfWeek = 0; dayOfWeek < 7; dayOfWeek++)
                 {
@@ -188,7 +180,7 @@ namespace shadcnui.GUIComponents.Data
                     }
                 }
 
-                _layoutComponents.EndHorizontalGroup();
+                layoutComponents.EndHorizontalGroup();
 
                 if (week < 5)
                     GUILayout.Space(2);
@@ -200,34 +192,34 @@ namespace shadcnui.GUIComponents.Data
         private GUIStyle GetDayStyle(bool isCurrentMonth, bool isSelected, bool isToday)
         {
             if (isSelected)
-                return _styleManager.datePickerDaySelectedStyle;
+                return styleManager.datePickerDaySelectedStyle;
 
             if (isToday)
-                return _styleManager.datePickerDayTodayStyle;
+                return styleManager.datePickerDayTodayStyle;
 
             if (!isCurrentMonth)
-                return _styleManager.datePickerDayOutsideMonthStyle;
+                return styleManager.datePickerDayOutsideMonthStyle;
 
-            return _styleManager.datePickerDayStyle;
+            return styleManager.datePickerDayStyle;
         }
 
         private void DrawCalendarFooter(string id)
         {
-            _layoutComponents.BeginHorizontalGroup();
+            layoutComponents.BeginHorizontalGroup();
 
-            if (UnityHelpers.Button("Today", _styleManager.buttonOutlineStyle, GUILayout.Height(32)))
+            if (UnityHelpers.Button("Today", styleManager.buttonOutlineStyle, GUILayout.Height(32)))
             {
                 _displayDates[id] = DateTime.Today;
             }
 
             GUILayout.FlexibleSpace();
 
-            if (UnityHelpers.Button("Clear", _styleManager.buttonGhostStyle, GUILayout.Height(32)))
+            if (UnityHelpers.Button("Clear", styleManager.buttonGhostStyle, GUILayout.Height(32)))
             {
                 _openStates[id] = false;
             }
 
-            _layoutComponents.EndHorizontalGroup();
+            layoutComponents.EndHorizontalGroup();
         }
 
         public void CloseDatePicker(string id)

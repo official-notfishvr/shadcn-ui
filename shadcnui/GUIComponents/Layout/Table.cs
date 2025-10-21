@@ -10,16 +10,10 @@ using UnhollowerBaseLib;
 
 namespace shadcnui.GUIComponents.Layout
 {
-    public class Table
+    public class Table : BaseComponent
     {
-        private GUIHelper guiHelper;
-        private Layout layoutComponents;
-
         public Table(GUIHelper helper)
-        {
-            guiHelper = helper;
-            layoutComponents = new Layout(helper);
-        }
+            : base(helper) { }
 
         public void DrawTable(string[] headers, string[,] data, TableVariant variant = TableVariant.Default, TableSize size = TableSize.Default, params GUILayoutOption[] options)
         {

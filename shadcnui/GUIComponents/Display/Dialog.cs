@@ -7,21 +7,13 @@ using UnhollowerBaseLib;
 
 namespace shadcnui.GUIComponents.Display
 {
-    public class Dialog
+    public class Dialog : BaseComponent
     {
-        private readonly GUIHelper _guiHelper;
-        private readonly StyleManager _styleManager;
-        private readonly shadcnui.GUIComponents.Layout.Layout _layoutComponents;
-
         private bool _isOpen = false;
         private string _dialogId;
 
         public Dialog(GUIHelper helper)
-        {
-            _guiHelper = helper;
-            _styleManager = helper.GetStyleManager();
-            _layoutComponents = new shadcnui.GUIComponents.Layout.Layout(helper);
-        }
+            : base(helper) { }
 
         public bool IsOpen => _isOpen;
 
@@ -44,16 +36,16 @@ namespace shadcnui.GUIComponents.Display
 
             DrawOverlay();
 
-            _layoutComponents.BeginVerticalGroup(_styleManager.dialogContentStyle, GUILayout.Width(width), GUILayout.Height(height));
+            layoutComponents.BeginVerticalGroup(styleManager.dialogContentStyle, GUILayout.Width(width), GUILayout.Height(height));
 
-            _layoutComponents.BeginHorizontalGroup();
+            layoutComponents.BeginHorizontalGroup();
             GUILayout.FlexibleSpace();
 
-            if (UnityHelpers.Button("×", _styleManager.buttonGhostStyle, GUILayout.Width(24), GUILayout.Height(24)))
+            if (UnityHelpers.Button("×", styleManager.buttonGhostStyle, GUILayout.Width(24), GUILayout.Height(24)))
             {
                 Close();
             }
-            _layoutComponents.EndHorizontalGroup();
+            layoutComponents.EndHorizontalGroup();
 
             content?.Invoke();
 
@@ -67,25 +59,25 @@ namespace shadcnui.GUIComponents.Display
 
             DrawOverlay();
 
-            _layoutComponents.BeginVerticalGroup(_styleManager.dialogContentStyle, GUILayout.Width(width), GUILayout.Height(height));
+            layoutComponents.BeginVerticalGroup(styleManager.dialogContentStyle, GUILayout.Width(width), GUILayout.Height(height));
 
-            _layoutComponents.BeginHorizontalGroup();
-            _layoutComponents.BeginVerticalGroup();
+            layoutComponents.BeginHorizontalGroup();
+            layoutComponents.BeginVerticalGroup();
             if (!string.IsNullOrEmpty(title))
             {
-                UnityHelpers.Label(title, _styleManager.dialogTitleStyle);
+                UnityHelpers.Label(title, styleManager.dialogTitleStyle);
             }
             if (!string.IsNullOrEmpty(description))
             {
-                UnityHelpers.Label(description, _styleManager.dialogDescriptionStyle);
+                UnityHelpers.Label(description, styleManager.dialogDescriptionStyle);
             }
-            _layoutComponents.EndVerticalGroup();
+            layoutComponents.EndVerticalGroup();
             GUILayout.FlexibleSpace();
-            if (UnityHelpers.Button("×", _styleManager.buttonGhostStyle, GUILayout.Width(24), GUILayout.Height(24)))
+            if (UnityHelpers.Button("×", styleManager.buttonGhostStyle, GUILayout.Width(24), GUILayout.Height(24)))
             {
                 Close();
             }
-            _layoutComponents.EndHorizontalGroup();
+            layoutComponents.EndHorizontalGroup();
 
             GUILayout.Space(16);
 
@@ -94,10 +86,10 @@ namespace shadcnui.GUIComponents.Display
             if (footer != null)
             {
                 GUILayout.Space(16);
-                _layoutComponents.BeginHorizontalGroup();
+                layoutComponents.BeginHorizontalGroup();
                 GUILayout.FlexibleSpace();
                 footer?.Invoke();
-                _layoutComponents.EndHorizontalGroup();
+                layoutComponents.EndHorizontalGroup();
             }
 
             GUILayout.EndVertical();
@@ -105,36 +97,36 @@ namespace shadcnui.GUIComponents.Display
 
         public bool DrawDialogTrigger(string label, ButtonVariant variant = ButtonVariant.Default, ButtonSize size = ButtonSize.Default)
         {
-            return _guiHelper.Button(label, variant, size, null);
+            return guiHelper.Button(label, variant, size, null);
         }
 
         public void DrawDialogHeader(string title, string description = null)
         {
-            _layoutComponents.BeginVerticalGroup();
+            layoutComponents.BeginVerticalGroup();
             if (!string.IsNullOrEmpty(title))
             {
-                UnityHelpers.Label(title, _styleManager.dialogTitleStyle);
+                UnityHelpers.Label(title, styleManager.dialogTitleStyle);
             }
             if (!string.IsNullOrEmpty(description))
             {
-                UnityHelpers.Label(description, _styleManager.dialogDescriptionStyle);
+                UnityHelpers.Label(description, styleManager.dialogDescriptionStyle);
             }
-            _layoutComponents.EndVerticalGroup();
+            layoutComponents.EndVerticalGroup();
         }
 
         public void DrawDialogContent(Action content)
         {
-            _layoutComponents.BeginVerticalGroup();
+            layoutComponents.BeginVerticalGroup();
             content?.Invoke();
-            _layoutComponents.EndVerticalGroup();
+            layoutComponents.EndVerticalGroup();
         }
 
         public void DrawDialogFooter(Action footer)
         {
-            _layoutComponents.BeginHorizontalGroup();
+            layoutComponents.BeginHorizontalGroup();
             GUILayout.FlexibleSpace();
             footer?.Invoke();
-            _layoutComponents.EndHorizontalGroup();
+            layoutComponents.EndHorizontalGroup();
         }
 
         private void DrawOverlay()

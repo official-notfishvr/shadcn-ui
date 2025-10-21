@@ -1,26 +1,20 @@
 using System;
 using System.Collections.Generic;
+using System.Runtime.Remoting.Messaging;
 using shadcnui;
 using shadcnui.GUIComponents.Core;
 using UnityEngine;
 
 namespace shadcnui.GUIComponents.Controls
 {
-    public class Button
+    public class Button : BaseComponent
     {
-        private readonly GUIHelper _guiHelper;
-        private readonly shadcnui.GUIComponents.Layout.Layout _layoutComponents;
-
         public Button(GUIHelper helper)
-        {
-            _guiHelper = helper;
-            _layoutComponents = new shadcnui.GUIComponents.Layout.Layout(helper);
-        }
+            : base(helper) { }
 
         public bool DrawButton(ButtonConfig config)
         {
-            var styleManager = _guiHelper.GetStyleManager();
-            var buttonStyle = styleManager.GetButtonStyle(config.Variant, config.Size);
+            GUIStyle buttonStyle = styleManager?.GetButtonStyle(config.Variant, config.Size) ?? GUI.skin.button;
 
             var layoutOptions = new List<GUILayoutOption>(config.Options ?? Array.Empty<GUILayoutOption>());
 
@@ -63,21 +57,21 @@ namespace shadcnui.GUIComponents.Controls
 
         public void ButtonGroup(Action drawButtons, bool horizontal = true, float spacing = 5f)
         {
-            var scaledSpacing = spacing * _guiHelper.uiScale;
+            var scaledSpacing = spacing * guiHelper.uiScale;
 
             if (horizontal)
-                _layoutComponents.BeginHorizontalGroup();
+                layoutComponents.BeginHorizontalGroup();
             else
-                _layoutComponents.BeginVerticalGroup();
+                layoutComponents.BeginVerticalGroup();
 
             drawButtons?.Invoke();
 
             if (horizontal)
-                _layoutComponents.EndHorizontalGroup();
+                layoutComponents.EndHorizontalGroup();
             else
-                _layoutComponents.EndVerticalGroup();
+                layoutComponents.EndVerticalGroup();
 
-            _layoutComponents.AddSpace(scaledSpacing);
+            layoutComponents.AddSpace(scaledSpacing);
         }
     }
 

@@ -8,19 +8,14 @@ using UnhollowerBaseLib;
 
 namespace shadcnui.GUIComponents.Controls
 {
-    public class Select
+    public class Select : BaseComponent
     {
-        private GUIHelper guiHelper;
-        private shadcnui.GUIComponents.Layout.Layout _layoutComponents;
         private bool isOpen;
         private int selectedIndex;
         private Vector2 scrollPosition;
 
         public Select(GUIHelper helper)
-        {
-            this.guiHelper = helper;
-            _layoutComponents = new shadcnui.GUIComponents.Layout.Layout(helper);
-        }
+            : base(helper) { }
 
         public bool IsOpen => isOpen;
 
@@ -39,16 +34,17 @@ namespace shadcnui.GUIComponents.Controls
             if (!isOpen)
                 return selectedIndex;
 
-            _layoutComponents.BeginVerticalGroup(guiHelper.GetStyleManager().GetSelectStyle(SelectVariant.Default, SelectSize.Default), GUILayout.MaxWidth(300), GUILayout.MaxHeight(200));
+            GUIStyle selectStyle = styleManager?.GetSelectStyle(SelectVariant.Default, SelectSize.Default) ?? GUI.skin.box;
+            GUIStyle itemStyle = styleManager?.GetSelectItemStyle() ?? GUI.skin.button;
 
-            scrollPosition = _layoutComponents.DrawScrollView(
+            layoutComponents.BeginVerticalGroup(selectStyle, GUILayout.MaxWidth(300), GUILayout.MaxHeight(200));
+
+            scrollPosition = layoutComponents.DrawScrollView(
                 scrollPosition,
                 () =>
                 {
                     for (int i = 0; i < items.Length; i++)
                     {
-                        GUIStyle itemStyle = guiHelper.GetStyleManager().GetSelectItemStyle();
-
                         if (UnityHelpers.Button(items[i], itemStyle))
                         {
                             selectedIndex = i;

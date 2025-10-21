@@ -9,10 +9,8 @@ using UnhollowerBaseLib;
 
 namespace shadcnui.GUIComponents.Data
 {
-    public class Calendar
+    public class Calendar : BaseComponent
     {
-        private GUIHelper guiHelper;
-        private shadcnui.GUIComponents.Layout.Layout layoutComponents;
         private DateTime displayedMonth;
 
         public DateTime? SelectedDate { get; set; }
@@ -27,9 +25,8 @@ namespace shadcnui.GUIComponents.Data
         private bool showYearDropdown;
 
         public Calendar(GUIHelper helper)
+            : base(helper)
         {
-            this.guiHelper = helper;
-            this.layoutComponents = new shadcnui.GUIComponents.Layout.Layout(helper);
             this.displayedMonth = DateTime.Today;
 
             this.Ranges = new List<(DateTime Start, DateTime End)>();
@@ -49,7 +46,9 @@ namespace shadcnui.GUIComponents.Data
         {
             layoutComponents.BeginHorizontalGroup();
 
-            if (UnityHelpers.Button("<", styleManager.buttonGhostStyle))
+            GUIStyle buttonGhostStyle = styleManager?.buttonGhostStyle ?? GUI.skin.button;
+
+            if (UnityHelpers.Button("<", buttonGhostStyle))
             {
                 displayedMonth = displayedMonth.AddMonths(-1);
             }
@@ -57,7 +56,7 @@ namespace shadcnui.GUIComponents.Data
             if (showMonthDropdown) { }
             else
             {
-                if (UnityHelpers.Button(displayedMonth.ToString("MMMM"), styleManager.buttonGhostStyle))
+                if (UnityHelpers.Button(displayedMonth.ToString("MMMM"), buttonGhostStyle))
                 {
                     showMonthDropdown = true;
                 }
@@ -66,13 +65,13 @@ namespace shadcnui.GUIComponents.Data
             if (showYearDropdown) { }
             else
             {
-                if (UnityHelpers.Button(displayedMonth.ToString("yyyy"), styleManager.buttonGhostStyle))
+                if (UnityHelpers.Button(displayedMonth.ToString("yyyy"), buttonGhostStyle))
                 {
                     showYearDropdown = true;
                 }
             }
 
-            if (UnityHelpers.Button(">", styleManager.buttonGhostStyle))
+            if (UnityHelpers.Button(">", buttonGhostStyle))
             {
                 displayedMonth = displayedMonth.AddMonths(1);
             }
@@ -83,9 +82,10 @@ namespace shadcnui.GUIComponents.Data
         private void DrawWeekdays(StyleManager styleManager)
         {
             layoutComponents.BeginHorizontalGroup();
+            GUIStyle weekdayStyle = styleManager?.calendarWeekdayStyle ?? GUI.skin.label;
             for (int i = 0; i < 7; i++)
             {
-                UnityHelpers.Label(((DayOfWeek)i).ToString().Substring(0, 2), styleManager.calendarWeekdayStyle);
+                UnityHelpers.Label(((DayOfWeek)i).ToString().Substring(0, 2), weekdayStyle);
             }
             layoutComponents.EndHorizontalGroup();
         }
@@ -103,29 +103,29 @@ namespace shadcnui.GUIComponents.Data
                 {
                     if ((i == 0 && j < firstDayOfMonth) || dayCounter > daysInMonth)
                     {
-                        UnityHelpers.Label("", styleManager.calendarDayOutsideMonthStyle);
+                        UnityHelpers.Label("", styleManager?.calendarDayOutsideMonthStyle ?? GUI.skin.label);
                     }
                     else
                     {
                         var currentDay = new DateTime(displayedMonth.Year, displayedMonth.Month, dayCounter);
                         bool isDisabled = DisabledDates.Contains(currentDay.Date);
 
-                        GUIStyle dayStyle = styleManager.calendarDayStyle;
+                        GUIStyle dayStyle = styleManager?.calendarDayStyle ?? GUI.skin.button;
                         if (isDisabled)
                         {
-                            dayStyle = styleManager.calendarDayDisabledStyle;
+                            dayStyle = styleManager?.calendarDayDisabledStyle ?? GUI.skin.button;
                         }
                         else if (SelectedDate.HasValue && SelectedDate.Value.Date == currentDay.Date)
                         {
-                            dayStyle = styleManager.calendarDaySelectedStyle;
+                            dayStyle = styleManager?.calendarDaySelectedStyle ?? GUI.skin.button;
                         }
                         else if (Ranges.Any(r => currentDay.Date >= r.Start.Date && currentDay.Date <= r.End.Date))
                         {
-                            dayStyle = styleManager.calendarDayInRangeStyle;
+                            dayStyle = styleManager?.calendarDayInRangeStyle ?? GUI.skin.button;
                         }
                         else if (currentDay.Date == DateTime.Today)
                         {
-                            dayStyle = styleManager.calendarDayTodayStyle;
+                            dayStyle = styleManager?.calendarDayTodayStyle ?? GUI.skin.button;
                         }
 
                         if (UnityHelpers.Button(dayCounter.ToString(), dayStyle))
