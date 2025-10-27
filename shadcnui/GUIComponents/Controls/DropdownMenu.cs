@@ -94,9 +94,9 @@ namespace shadcnui.GUIComponents.Controls
                 layoutOptions.AddRange(options);
             }
 
-            GUIStyle contentStyle = styleManager?.dropdownMenuContentStyle ?? GUI.skin.box;
-            GUIStyle itemStyle = styleManager?.dropdownMenuItemStyle ?? GUI.skin.button;
-            GUIStyle separatorStyle = styleManager?.dropdownMenuSeparatorStyle ?? GUI.skin.box;
+            GUIStyle contentStyle = styleManager.GetDropdownMenuContentStyle();
+            GUIStyle itemStyle = styleManager.GetDropdownMenuItemStyle();
+            GUIStyle separatorStyle = styleManager.GetDropdownMenuSeparatorStyle();
 
             layoutComponents.BeginVerticalGroup(contentStyle, layoutOptions.ToArray());
             _scrollPosition = layoutComponents.DrawScrollView(
@@ -129,14 +129,14 @@ namespace shadcnui.GUIComponents.Controls
         private void DrawMenuItem(DropdownMenuItem item)
         {
             var styleManager = guiHelper.GetStyleManager();
-            GUIStyle headerStyle = styleManager?.dropdownMenuHeaderStyle ?? GUI.skin.label;
-            GUIStyle separatorStyle = styleManager?.dropdownMenuSeparatorStyle ?? GUI.skin.box;
-            GUIStyle itemStyle = styleManager?.dropdownMenuItemStyle ?? GUI.skin.button;
+            GUIStyle headerStyle = styleManager.GetDropdownMenuHeaderStyle();
+            GUIStyle separatorStyle = styleManager.GetDropdownMenuSeparatorStyle();
+            GUIStyle itemStyle = styleManager.GetDropdownMenuItemStyle();
 
             switch (item.Type)
             {
                 case DropdownMenuItemType.Header:
-#if IL2CPP_MELONLOADER
+#if IL2CPP_MELONLOADER_PRE57
                     GUILayout.Label(item.Content, headerStyle, shadcnui.GUIComponents.Layout.Layout.EmptyOptions);
 #else
                     GUILayout.Label(item.Content, headerStyle);
@@ -149,7 +149,7 @@ namespace shadcnui.GUIComponents.Controls
                     if (item.SubItems != null && item.SubItems.Count > 0)
                     {
                         if (
-#if IL2CPP_MELONLOADER
+#if IL2CPP_MELONLOADER_PRE57
                             GUILayout.Button(item.Content, itemStyle, shadcnui.GUIComponents.Layout.Layout.EmptyOptions)
 #else
                             GUILayout.Button(item.Content, itemStyle)
@@ -162,7 +162,7 @@ namespace shadcnui.GUIComponents.Controls
                     else
                     {
                         if (
-#if IL2CPP_MELONLOADER
+#if IL2CPP_MELONLOADER_PRE57
                             GUILayout.Button(item.Content, itemStyle, shadcnui.GUIComponents.Layout.Layout.EmptyOptions)
 #else
                             GUILayout.Button(item.Content, itemStyle)

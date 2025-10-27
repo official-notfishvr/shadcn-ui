@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using shadcnui.GUIComponents.Core;
 using UnityEngine;
-#if IL2CPP_MELONLOADER
+#if IL2CPP_MELONLOADER_PRE57
 using UnhollowerBaseLib;
 #endif
 
@@ -161,7 +161,7 @@ namespace shadcnui.GUIComponents.Data
 
             var inputStyle = styleManager?.GetInputStyle(InputVariant.Default) ?? GUI.skin.textField;
 
-#if IL2CPP_MELONLOADER
+#if IL2CPP_MELONLOADER_PRE57
             string newFilterText = GUILayout.TextField(state.FilterText ?? "", inputStyle, new Il2CppReferenceArray<GUILayoutOption>(new GUILayoutOption[] { GUILayout.Width(200 * guiHelper.uiScale) }));
 #else
             string newFilterText = GUILayout.TextField(state.FilterText ?? "", inputStyle, GUILayout.Width(200 * guiHelper.uiScale));

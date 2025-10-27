@@ -1,7 +1,7 @@
 using System;
 using shadcnui.GUIComponents.Core;
 using UnityEngine;
-#if IL2CPP_MELONLOADER
+#if IL2CPP_MELONLOADER_PRE57
 using UnhollowerBaseLib;
 #endif
 
@@ -34,14 +34,15 @@ namespace shadcnui.GUIComponents.Display
             if (!_isOpen || _dialogId != dialogId)
                 return;
 
+            var styleManager = guiHelper.GetStyleManager();
             DrawOverlay();
 
-            layoutComponents.BeginVerticalGroup(styleManager.dialogContentStyle, GUILayout.Width(width), GUILayout.Height(height));
+            layoutComponents.BeginVerticalGroup(styleManager.GetDialogContentStyle(), GUILayout.Width(width), GUILayout.Height(height));
 
             layoutComponents.BeginHorizontalGroup();
             GUILayout.FlexibleSpace();
 
-            if (UnityHelpers.Button("×", styleManager.buttonGhostStyle, GUILayout.Width(24), GUILayout.Height(24)))
+            if (UnityHelpers.Button("Ã—", styleManager.GetButtonStyle(ButtonVariant.Ghost, ButtonSize.Default), GUILayout.Width(24), GUILayout.Height(24)))
             {
                 Close();
             }
@@ -57,23 +58,24 @@ namespace shadcnui.GUIComponents.Display
             if (!_isOpen || _dialogId != dialogId)
                 return;
 
+            var styleManager = guiHelper.GetStyleManager();
             DrawOverlay();
 
-            layoutComponents.BeginVerticalGroup(styleManager.dialogContentStyle, GUILayout.Width(width), GUILayout.Height(height));
+            layoutComponents.BeginVerticalGroup(styleManager.GetDialogContentStyle(), GUILayout.Width(width), GUILayout.Height(height));
 
             layoutComponents.BeginHorizontalGroup();
             layoutComponents.BeginVerticalGroup();
             if (!string.IsNullOrEmpty(title))
             {
-                UnityHelpers.Label(title, styleManager.dialogTitleStyle);
+                UnityHelpers.Label(title, styleManager.GetDialogTitleStyle());
             }
             if (!string.IsNullOrEmpty(description))
             {
-                UnityHelpers.Label(description, styleManager.dialogDescriptionStyle);
+                UnityHelpers.Label(description, styleManager.GetDialogDescriptionStyle());
             }
             layoutComponents.EndVerticalGroup();
             GUILayout.FlexibleSpace();
-            if (UnityHelpers.Button("×", styleManager.buttonGhostStyle, GUILayout.Width(24), GUILayout.Height(24)))
+            if (UnityHelpers.Button("Ã—", styleManager.GetButtonStyle(ButtonVariant.Ghost, ButtonSize.Default), GUILayout.Width(24), GUILayout.Height(24)))
             {
                 Close();
             }
@@ -102,14 +104,15 @@ namespace shadcnui.GUIComponents.Display
 
         public void DrawDialogHeader(string title, string description = null)
         {
+            var styleManager = guiHelper.GetStyleManager();
             layoutComponents.BeginVerticalGroup();
             if (!string.IsNullOrEmpty(title))
             {
-                UnityHelpers.Label(title, styleManager.dialogTitleStyle);
+                UnityHelpers.Label(title, styleManager.GetDialogTitleStyle());
             }
             if (!string.IsNullOrEmpty(description))
             {
-                UnityHelpers.Label(description, styleManager.dialogDescriptionStyle);
+                UnityHelpers.Label(description, styleManager.GetDialogDescriptionStyle());
             }
             layoutComponents.EndVerticalGroup();
         }

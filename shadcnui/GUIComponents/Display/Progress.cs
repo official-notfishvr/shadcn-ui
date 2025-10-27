@@ -2,7 +2,7 @@ using System;
 using shadcnui;
 using shadcnui.GUIComponents.Core;
 using UnityEngine;
-#if IL2CPP_MELONLOADER
+#if IL2CPP_MELONLOADER_PRE57
 using UnhollowerBaseLib;
 #endif
 
@@ -32,7 +32,7 @@ namespace shadcnui.GUIComponents.Display
             if (options != null && options.Length > 0)
                 layoutOptions.AddRange(options);
 
-#if IL2CPP_MELONLOADER
+#if IL2CPP_MELONLOADER_PRE57
             Rect progressRect = GUILayoutUtility.GetRect(GUIContent.none, styleManager.GetProgressBarStyle(), (Il2CppReferenceArray<GUILayoutOption>)layoutOptions.ToArray());
 #else
             Rect progressRect = GUILayoutUtility.GetRect(GUIContent.none, styleManager.GetProgressBarStyle(), layoutOptions.ToArray());
@@ -104,7 +104,7 @@ namespace shadcnui.GUIComponents.Display
             if (options != null && options.Length > 0)
                 layoutOptions.AddRange(options);
 
-#if IL2CPP_MELONLOADER
+#if IL2CPP_MELONLOADER_PRE57
             Rect circleRect = GUILayoutUtility.GetRect(GUIContent.none, GUIStyle.none, (Il2CppReferenceArray<GUILayoutOption>)layoutOptions.ToArray());
 #else
             Rect circleRect = GUILayoutUtility.GetRect(GUIContent.none, GUIStyle.none, layoutOptions.ToArray());

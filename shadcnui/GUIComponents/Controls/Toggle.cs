@@ -5,7 +5,7 @@ using shadcnui;
 using shadcnui.GUIComponents.Core;
 using UnityEngine;
 using static shadcnui.GUIComponents.Layout.Layout;
-#if IL2CPP_MELONLOADER
+#if IL2CPP_MELONLOADER_PRE57
 using UnhollowerBaseLib;
 #endif
 

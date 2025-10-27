@@ -1,5 +1,5 @@
 using UnityEngine;
-#if IL2CPP_MELONLOADER
+#if IL2CPP_MELONLOADER_PRE57
 using UnhollowerBaseLib;
 using shadcnui.GUIComponents;
 #endif
@@ -272,7 +272,7 @@ namespace shadcnui
 
             public Font(string name)
             {
-#if IL2CPP_BEPINEX || IL2CPP_MELONLOADER
+#if IL2CPP_BEPINEX || IL2CPP_MELONLOADER_PRE57 || IL2CPP_MELONLOADER
                 _font = UnityEngine.Font.CreateDynamicFontFromOSFont(name, 14);
 #else
                 _font = new UnityEngine.Font(name);
@@ -344,7 +344,7 @@ namespace shadcnui
 
             public GUIContent(string text, Texture image)
             {
-#if IL2CPP_BEPINEX || IL2CPP_MELONLOADER
+#if IL2CPP_BEPINEX || IL2CPP_MELONLOADER_PRE57 || IL2CPP_MELONLOADER
                 _guiContent = new UnityEngine.GUIContent(text, image, "");
 #else
                 _guiContent = new UnityEngine.GUIContent(text, image);
@@ -380,7 +380,7 @@ namespace shadcnui
 
         public static bool Button(string text, GUIStyle style, params GUILayoutOption[] options)
         {
-#if IL2CPP_MELONLOADER
+#if IL2CPP_MELONLOADER_PRE57
             return GUILayout.Button(text, style, (Il2CppReferenceArray<GUILayoutOption>)options);
 #else
             return GUILayout.Button(text, style, options);
@@ -389,7 +389,7 @@ namespace shadcnui
 
         public static void Label(UnityEngine.GUIContent content, GUIStyle style)
         {
-#if IL2CPP_MELONLOADER
+#if IL2CPP_MELONLOADER_PRE57
             GUILayout.Label(content, style, (Il2CppReferenceArray<GUILayoutOption>)null);
 #else
             GUILayout.Label(content, style);
@@ -398,7 +398,7 @@ namespace shadcnui
 
         public static void Label(string text, params GUILayoutOption[] options)
         {
-#if IL2CPP_MELONLOADER
+#if IL2CPP_MELONLOADER_PRE57
             GUILayout.Label(text, (Il2CppReferenceArray<GUILayoutOption>)options);
 #else
             GUILayout.Label(text, options);
@@ -407,7 +407,7 @@ namespace shadcnui
 
         public static void Label(string text, GUIStyle style)
         {
-#if IL2CPP_MELONLOADER
+#if IL2CPP_MELONLOADER_PRE57
             GUILayout.Label(text, style, (Il2CppReferenceArray<GUILayoutOption>)null);
 #else
             GUILayout.Label(text, style);
@@ -416,7 +416,7 @@ namespace shadcnui
 
         public static bool Button(string text, params GUILayoutOption[] options)
         {
-#if IL2CPP_MELONLOADER
+#if IL2CPP_MELONLOADER_PRE57
             return GUILayout.Button(text, (Il2CppReferenceArray<GUILayoutOption>)options);
 #else
             return GUILayout.Button(text, options);
@@ -425,7 +425,7 @@ namespace shadcnui
 
         public static bool Button(string text, GUIStyle style)
         {
-#if IL2CPP_MELONLOADER
+#if IL2CPP_MELONLOADER_PRE57
             return GUILayout.Button(text, (UnityEngine.GUIStyle)style, new Il2CppReferenceArray<GUILayoutOption>(shadcnui.GUIComponents.Layout.Layout.EmptyOptions));
 #else
             return GUILayout.Button(text, style);
@@ -434,7 +434,7 @@ namespace shadcnui
 
         public static bool Toggle(bool value, string text, params GUILayoutOption[] options)
         {
-#if IL2CPP_MELONLOADER
+#if IL2CPP_MELONLOADER_PRE57
             return GUILayout.Toggle(value, text, (Il2CppReferenceArray<GUILayoutOption>)options);
 #else
             return GUILayout.Toggle(value, text, options);
@@ -443,7 +443,7 @@ namespace shadcnui
 
         public static bool Toggle(bool value, string text, GUIStyle style)
         {
-#if IL2CPP_MELONLOADER
+#if IL2CPP_MELONLOADER_PRE57
             return GUILayout.Toggle(value, text, style, (Il2CppReferenceArray<GUILayoutOption>)null);
 #else
             return GUILayout.Toggle(value, text, style);
@@ -452,7 +452,7 @@ namespace shadcnui
 
         public static bool Toggle(bool value, string text, GUIStyle style, params GUILayoutOption[] options)
         {
-#if IL2CPP_MELONLOADER
+#if IL2CPP_MELONLOADER_PRE57
             return GUILayout.Toggle(value, text, style, (Il2CppReferenceArray<GUILayoutOption>)options);
 #else
             return GUILayout.Toggle(value, text, style, options);
@@ -466,7 +466,7 @@ namespace shadcnui
 
         public static void Label(string text, GUIStyle style, params GUILayoutOption[] options)
         {
-#if IL2CPP_MELONLOADER
+#if IL2CPP_MELONLOADER_PRE57
             GUILayout.Label(text, style, (Il2CppReferenceArray<GUILayoutOption>)options);
 #else
             GUILayout.Label(text, style, options);
@@ -480,7 +480,7 @@ namespace shadcnui
 
         public static void Label(Texture image, params GUILayoutOption[] options)
         {
-#if IL2CPP_MELONLOADER
+#if IL2CPP_MELONLOADER_PRE57
             GUILayout.Label(image, (Il2CppReferenceArray<GUILayoutOption>)options);
 #else
             GUILayout.Label(image, options);
@@ -489,7 +489,7 @@ namespace shadcnui
 
         public static void Label(Texture image, GUIStyle style, params GUILayoutOption[] options)
         {
-#if IL2CPP_MELONLOADER
+#if IL2CPP_MELONLOADER_PRE57
             GUILayout.Label(image, style, (Il2CppReferenceArray<GUILayoutOption>)options);
 #else
             GUILayout.Label(image, style, options);
@@ -498,7 +498,7 @@ namespace shadcnui
 
         public static void Box(string text, GUIStyle style, params GUILayoutOption[] options)
         {
-#if IL2CPP_MELONLOADER
+#if IL2CPP_MELONLOADER_PRE57
             GUILayout.Box(text, style, new Il2CppReferenceArray<GUILayoutOption>(options));
 #else
             GUILayout.Box(text, style, options);
@@ -507,7 +507,7 @@ namespace shadcnui
 
         public static void Box(GUIContent content, GUIStyle style, params GUILayoutOption[] options)
         {
-#if IL2CPP_MELONLOADER
+#if IL2CPP_MELONLOADER_PRE57
             GUILayout.Box(content, style, (Il2CppReferenceArray<GUILayoutOption>)options);
 #else
             GUILayout.Box(content, style, options);
@@ -516,7 +516,7 @@ namespace shadcnui
 
         public static string TextField(string text, GUIStyle style, params GUILayoutOption[] options)
         {
-#if IL2CPP_MELONLOADER
+#if IL2CPP_MELONLOADER_PRE57
             return GUILayout.TextField(text, style, (Il2CppReferenceArray<GUILayoutOption>)options);
 #else
             return GUILayout.TextField(text, style, options);
@@ -525,7 +525,7 @@ namespace shadcnui
 
         public static string PasswordField(string password, char maskChar, GUIStyle style, params GUILayoutOption[] options)
         {
-#if IL2CPP_MELONLOADER
+#if IL2CPP_MELONLOADER_PRE57
             return GUILayout.PasswordField(password, maskChar, style, (Il2CppReferenceArray<GUILayoutOption>)options);
 #else
             return GUILayout.PasswordField(password, maskChar, style, options);
@@ -534,7 +534,7 @@ namespace shadcnui
 
         public static string TextArea(string text, params GUILayoutOption[] options)
         {
-#if IL2CPP_MELONLOADER
+#if IL2CPP_MELONLOADER_PRE57
             return GUILayout.TextArea(text, (Il2CppReferenceArray<GUILayoutOption>)options);
 #else
             return GUILayout.TextArea(text, options);
@@ -543,7 +543,7 @@ namespace shadcnui
 
         public static string TextArea(string text, GUIStyle style, params GUILayoutOption[] options)
         {
-#if IL2CPP_MELONLOADER
+#if IL2CPP_MELONLOADER_PRE57
             return GUILayout.TextArea(text, style, (Il2CppReferenceArray<GUILayoutOption>)options);
 #else
             return GUILayout.TextArea(text, style, options);
@@ -552,7 +552,7 @@ namespace shadcnui
 
         public static string TextArea(string text, int maxLength, GUIStyle style, params GUILayoutOption[] options)
         {
-#if IL2CPP_MELONLOADER
+#if IL2CPP_MELONLOADER_PRE57
             return GUILayout.TextArea(text, maxLength, style, (Il2CppReferenceArray<GUILayoutOption>)options);
 #else
             return GUILayout.TextArea(text, maxLength, style, options);

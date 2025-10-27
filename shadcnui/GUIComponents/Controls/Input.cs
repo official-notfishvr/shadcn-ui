@@ -4,7 +4,7 @@ using System.Text;
 using shadcnui;
 using shadcnui.GUIComponents.Core;
 using UnityEngine;
-#if IL2CPP_MELONLOADER
+#if IL2CPP_MELONLOADER_PRE57
 using UnhollowerBaseLib;
 #endif
 
@@ -153,7 +153,7 @@ namespace shadcnui.GUIComponents.Controls
             var styleManager = guiHelper.GetStyleManager();
             layoutComponents.AddSpace(10f * 0.5f);
 
-            UnityHelpers.Label(title, styleManager?.sectionHeaderStyle ?? GUI.skin.label);
+            UnityHelpers.Label(title, styleManager?.GetSectionHeaderStyle() ?? GUI.skin.label);
             layoutComponents.AddSpace(2f);
         }
 

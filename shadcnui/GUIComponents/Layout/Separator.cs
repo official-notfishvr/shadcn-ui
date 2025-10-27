@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using shadcnui;
 using shadcnui.GUIComponents.Core;
 using UnityEngine;
-#if IL2CPP_MELONLOADER
+#if IL2CPP_MELONLOADER_PRE57
 using UnhollowerBaseLib;
 #elif IL2CPP_BEPINEX
 using Il2CppInterop.Runtime.InteropTypes.Arrays;
@@ -79,7 +79,7 @@ namespace shadcnui.GUIComponents.Layout
         {
             var styleManager = guiHelper.GetStyleManager();
 
-#if IL2CPP_BEPINEX || IL2CPP_MELONLOADER
+#if IL2CPP_BEPINEX || IL2CPP_MELONLOADER_PRE57
             GUILayout.BeginHorizontal(new Il2CppReferenceArray<GUILayoutOption>(0));
 #else
             GUILayout.BeginHorizontal();

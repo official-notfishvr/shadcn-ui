@@ -86,7 +86,7 @@ namespace shadcnui.GUIComponents.Display
                 layoutOptions.Add(GUILayout.Height(config.Size.y));
             }
 
-            layoutComponents.BeginVerticalGroup(styleManager.cardStyle, layoutOptions.ToArray());
+            layoutComponents.BeginVerticalGroup(styleManager.GetCardStyle(), layoutOptions.ToArray());
 
             DrawChartContent(config);
 
@@ -96,7 +96,7 @@ namespace shadcnui.GUIComponents.Display
         private void DrawChartContent(ChartConfig config)
         {
             var chartArea = GUILayoutUtility.GetRect(config.Size.x, config.Size.y,
-#if IL2CPP_MELONLOADER
+#if IL2CPP_MELONLOADER_PRE57
                 new UnhollowerBaseLib.Il2CppReferenceArray<UnityEngine.GUILayoutOption>(new GUILayoutOption[] { GUILayout.ExpandWidth(true), GUILayout.ExpandHeight(true) })
 #else
                 GUILayout.ExpandWidth(true), GUILayout.ExpandHeight(true)

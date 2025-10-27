@@ -1,7 +1,7 @@
 using System;
 using shadcnui.GUIComponents.Core;
 using UnityEngine;
-#if IL2CPP_MELONLOADER
+#if IL2CPP_MELONLOADER_PRE57
 using UnhollowerBaseLib;
 #endif
 
@@ -31,7 +31,7 @@ namespace shadcnui.GUIComponents.Display
             if (!isOpen)
                 return;
 
-            layoutComponents.BeginVerticalGroup(guiHelper.GetStyleManager().popoverContentStyle, GUILayout.MaxWidth(300), GUILayout.MaxHeight(200));
+            layoutComponents.BeginVerticalGroup(guiHelper.GetStyleManager().GetPopoverContentStyle(), GUILayout.MaxWidth(300), GUILayout.MaxHeight(200));
 
             content?.Invoke();
             GUILayout.EndVertical();

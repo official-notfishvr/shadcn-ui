@@ -11,12 +11,20 @@
         <LangVersion>10.0</LangVersion>
         <FileAlignment>512</FileAlignment>
         <Deterministic>true</Deterministic>
-        <Configurations>IL2CPP_MELONLOADER;IL2CPP_BEPINEX;Mono_Melonloader;Mono_BepInEx</Configurations>
+        <Configurations>IL2CPP_MELONLOADER_PRE57;IL2CPP_MELONLOADER;IL2CPP_BEPINEX;Mono_Melonloader;Mono_BepInEx</Configurations>
     </PropertyGroup>
-    <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'IL2CPP_Melonloader|AnyCPU' ">
+    <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'IL2CPP_MELONLOADER_PRE57|AnyCPU' ">
         <DebugType>pdbonly</DebugType>
         <Optimize>true</Optimize>
-        <OutputPath>bin\IL2CPP_Melonloader\</OutputPath>
+        <OutputPath>bin\IL2CPP_MELONLOADER_PRE57\</OutputPath>
+        <DefineConstants>TRACE;IL2CPP_MELONLOADER_PRE57</DefineConstants>
+        <ErrorReport>prompt</ErrorReport>
+        <WarningLevel>4</WarningLevel>
+    </PropertyGroup>
+    <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'IL2CPP_MELONLOADER|AnyCPU' ">
+        <DebugType>pdbonly</DebugType>
+        <Optimize>true</Optimize>
+        <OutputPath>bin\IL2CPP_MELONLOADER\</OutputPath>
         <DefineConstants>TRACE;IL2CPP_MELONLOADER</DefineConstants>
         <ErrorReport>prompt</ErrorReport>
         <WarningLevel>4</WarningLevel>
@@ -431,7 +439,7 @@
         </Reference>
     </ItemGroup>
     <Choose>
-        <When Condition=" '$(Configuration)' == 'IL2CPP_MELONLOADER' OR '$(Configuration)' == 'IL2CPP_BEPINEX' ">
+        <When Condition=" '$(Configuration)' == 'IL2CPP_MELONLOADER_PRE57'">
             <ItemGroup>
                 <Reference Include="UnhollowerBaseLib">
                     <HintPath>$(ReferencePath)UnhollowerBaseLib.dll</HintPath>
@@ -442,10 +450,33 @@
                 <Reference Include="Il2Cppmscorlib">
                     <HintPath>$(ReferencePath)Il2Cppmscorlib.dll</HintPath>
                 </Reference>
+                <Reference Include="MelonLoader">
+                    <HintPath>$(ReferencePath)MelonLoader.dll</HintPath>
+                </Reference>
+            </ItemGroup>
+        </When>
+        <When Condition=" '$(Configuration)' == 'IL2CPP_MELONLOADER'">
+            <ItemGroup>
+                <Reference Include="Il2Cppmscorlib">
+                    <HintPath>$(ReferencePath)Il2Cppmscorlib.dll</HintPath>
+                </Reference>
+                <Reference Include="MelonLoader">
+                    <HintPath>$(ReferencePath)MelonLoader.dll</HintPath>
+                </Reference>
+                <Reference Include="Il2CppInterop.Runtime">
+                    <HintPath>$(ReferencePath)Il2CppInterop.Runtime.dll</HintPath>
+                </Reference>
+            </ItemGroup>
+        </When>
+        <When Condition=" '$(Configuration)' == 'IL2CPP_BEPINEX' ">
+            <ItemGroup>
+                <Reference Include="Il2Cppmscorlib">
+                    <HintPath>$(ReferencePath)Il2Cppmscorlib.dll</HintPath>
+                </Reference>
             </ItemGroup>
         </When>
     </Choose>
-    <ItemGroup Condition=" '$(Configuration)' == 'IL2CPP_BepInEx' ">
+    <ItemGroup Condition=" '$(Configuration)' == 'IL2CPP_BEPINEX' ">
         <Reference Include="BepInEx.Core">
             <HintPath>$(ReferencePath)\BepInEx.Core.dll</HintPath>
         </Reference>

@@ -75,7 +75,7 @@ namespace shadcnui.GUIComponents.Layout
 
             var styleManager = guiHelper.GetStyleManager();
 
-            layoutComponents.BeginHorizontalGroup(styleManager.menuBarStyle, options);
+            layoutComponents.BeginHorizontalGroup(styleManager.GetMenuBarStyle(), options);
             _menuBarRect = GUILayoutUtility.GetRect(GUIContent.none, GUIStyle.none, options);
 
             for (var i = 0; i < items.Count; i++)
@@ -85,7 +85,7 @@ namespace shadcnui.GUIComponents.Layout
                     continue;
 
                 var isActive = (i == _activeMenuIndex) && _isDropdownOpen;
-                var itemStyle = isActive ? styleManager.menuBarItemStyle : styleManager.menuBarItemStyle;
+                var itemStyle = styleManager.GetMenuBarItemStyle();
 
                 var wasEnabled = GUI.enabled;
                 if (item.Disabled)
@@ -127,11 +127,11 @@ namespace shadcnui.GUIComponents.Layout
             var styleManager = guiHelper.GetStyleManager();
             var currentMenu = _menuStack.Peek();
 
-            layoutComponents.BeginVerticalGroup(styleManager.menuDropdownStyle, GUILayout.Width(200 * guiHelper.uiScale));
+            layoutComponents.BeginVerticalGroup(styleManager.GetMenuDropdownStyle(), GUILayout.Width(200 * guiHelper.uiScale));
 
             if (_menuStack.Count > 1)
             {
-                if (UnityHelpers.Button("<- Back", styleManager.menuBarItemStyle))
+                if (UnityHelpers.Button("<- Back", styleManager.GetMenuBarItemStyle()))
                 {
                     _menuStack.Pop();
                     if (_menuStack.Count == 1)
@@ -158,7 +158,7 @@ namespace shadcnui.GUIComponents.Layout
 
             if (item.IsHeader)
             {
-                UnityHelpers.Label(item.Text, styleManager.menuBarItemStyle);
+                UnityHelpers.Label(item.Text, styleManager.GetMenuBarItemStyle());
                 return;
             }
 
@@ -175,9 +175,9 @@ namespace shadcnui.GUIComponents.Layout
             if (item.SubItems.Count > 0)
             {
                 layoutComponents.BeginHorizontalGroup();
-                UnityHelpers.Label(item.Text, styleManager.menuBarItemStyle);
+                UnityHelpers.Label(item.Text, styleManager.GetMenuBarItemStyle());
                 GUILayout.FlexibleSpace();
-                UnityHelpers.Label("›", styleManager.menuBarItemStyle);
+                UnityHelpers.Label("â€º", styleManager.GetMenuBarItemStyle());
                 layoutComponents.EndHorizontalGroup();
 
                 var itemRect = GUILayoutUtility.GetLastRect();
@@ -189,12 +189,12 @@ namespace shadcnui.GUIComponents.Layout
             else
             {
                 layoutComponents.BeginHorizontalGroup();
-                UnityHelpers.Label(item.Text, styleManager.menuBarItemStyle);
+                UnityHelpers.Label(item.Text, styleManager.GetMenuBarItemStyle());
 
                 if (!string.IsNullOrEmpty(item.Shortcut))
                 {
                     GUILayout.FlexibleSpace();
-                    UnityHelpers.Label(item.Shortcut, styleManager.menuBarItemStyle);
+                    UnityHelpers.Label(item.Shortcut, styleManager.GetMenuBarItemStyle());
                 }
 
                 layoutComponents.EndHorizontalGroup();

@@ -1,0 +1,675 @@
+{
+  "runtimeTarget": {
+    "name": ".NETCoreApp,Version=v6.0/win-x64",
+    "signature": ""
+  },
+  "compilationOptions": {},
+  "targets": {
+    ".NETCoreApp,Version=v6.0": {},
+    ".NETCoreApp,Version=v6.0/win-x64": {
+      "MelonLoader/0.7.2": {
+        "dependencies": {
+          "AsmResolver.DotNet": "6.0.0-beta.3",
+          "AssetRipper.Primitives": "3.2.0",
+          "AssetsTools.NET": "3.0.0-preview3",
+          "HarmonyX": "2.10.2",
+          "Iced": "1.21.0",
+          "Il2CppInterop.Common": "1.5.1",
+          "Il2CppInterop.Generator": "1.5.1",
+          "Il2CppInterop.HarmonySupport": "1.5.1",
+          "Il2CppInterop.Runtime": "1.5.1",
+          "IndexRange": "1.1.0",
+          "Microsoft.Diagnostics.NETCore.Client": "0.2.621003",
+          "Microsoft.Diagnostics.Runtime": "3.1.512801",
+          "Microsoft.Extensions.Configuration": "9.0.10",
+          "Microsoft.Extensions.Options": "9.0.10",
+          "Microsoft.Extensions.Primitives": "9.0.10",
+          "Mono.Cecil": "0.11.6",
+          "MonoMod": "22.7.31.1",
+          "MonoMod.RuntimeDetour": "22.7.31.1",
+          "MonoMod.Utils": "22.7.31.1",
+          "Newtonsoft.Json": "13.0.4",
+          "Samboy063.Tomlet": "6.1.0",
+          "System.Configuration.ConfigurationManager": "9.0.10",
+          "System.Security.Permissions": "9.0.10",
+          "bHapticsLib": "1.0.6"
+        },
+        "runtime": {
+          "MelonLoader.dll": {}
+        }
+      },
+      "AsmResolver/6.0.0-beta.3": {
+        "runtime": {
+          "lib/net6.0/AsmResolver.dll": {
+            "assemblyVersion": "6.0.0.0",
+            "fileVersion": "6.0.0.0"
+          }
+        }
+      },
+      "AsmResolver.DotNet/6.0.0-beta.3": {
+        "dependencies": {
+          "AsmResolver.PE": "6.0.0-beta.3"
+        },
+        "runtime": {
+          "lib/net6.0/AsmResolver.DotNet.dll": {
+            "assemblyVersion": "6.0.0.0",
+            "fileVersion": "6.0.0.0"
+          }
+        }
+      },
+      "AsmResolver.PE/6.0.0-beta.3": {
+        "dependencies": {
+          "AsmResolver.PE.File": "6.0.0-beta.3"
+        },
+        "runtime": {
+          "lib/net6.0/AsmResolver.PE.dll": {
+            "assemblyVersion": "6.0.0.0",
+            "fileVersion": "6.0.0.0"
+          }
+        }
+      },
+      "AsmResolver.PE.File/6.0.0-beta.3": {
+        "dependencies": {
+          "AsmResolver": "6.0.0-beta.3"
+        },
+        "runtime": {
+          "lib/net6.0/AsmResolver.PE.File.dll": {
+            "assemblyVersion": "6.0.0.0",
+            "fileVersion": "6.0.0.0"
+          }
+        }
+      },
+      "AssetRipper.Primitives/3.2.0": {
+        "runtime": {
+          "lib/net6.0/AssetRipper.Primitives.dll": {
+            "assemblyVersion": "3.2.0.0",
+            "fileVersion": "3.2.0.0"
+          }
+        }
+      },
+      "AssetsTools.NET/3.0.0-preview3": {
+        "runtime": {
+          "lib/netstandard2.0/AssetsTools.NET.dll": {
+            "assemblyVersion": "3.0.0.0",
+            "fileVersion": "3.0.0.0"
+          }
+        }
+      },
+      "bHapticsLib/1.0.6": {
+        "dependencies": {
+          "WebSocketDotNet": "1.0.0"
+        },
+        "runtime": {
+          "lib/net5.0/bHapticsLib.dll": {
+            "assemblyVersion": "1.0.6.0",
+            "fileVersion": "1.0.6.0"
+          }
+        }
+      },
+      "HarmonyX/2.10.2": {
+        "dependencies": {
+          "MonoMod.RuntimeDetour": "22.7.31.1"
+        },
+        "runtime": {
+          "lib/netstandard2.0/0Harmony.dll": {
+            "assemblyVersion": "2.10.2.0",
+            "fileVersion": "2.10.2.0"
+          }
+        }
+      },
+      "Iced/1.21.0": {
+        "runtime": {
+          "lib/netstandard2.1/Iced.dll": {
+            "assemblyVersion": "1.21.0.0",
+            "fileVersion": "1.21.0.0"
+          }
+        }
+      },
+      "Il2CppInterop.Common/1.5.1": {
+        "dependencies": {
+          "Iced": "1.21.0",
+          "Microsoft.Extensions.Logging.Abstractions": "6.0.4"
+        },
+        "runtime": {
+          "lib/netstandard2.0/Il2CppInterop.Common.dll": {
+            "assemblyVersion": "1.5.1.0",
+            "fileVersion": "1.5.1.0"
+          }
+        }
+      },
+      "Il2CppInterop.Generator/1.5.1": {
+        "dependencies": {
+          "AsmResolver.DotNet": "6.0.0-beta.3",
+          "Il2CppInterop.Common": "1.5.1",
+          "MonoMod.Backports": "1.1.2"
+        },
+        "runtime": {
+          "lib/netstandard2.1/Il2CppInterop.Generator.dll": {
+            "assemblyVersion": "1.5.1.0",
+            "fileVersion": "1.5.1.0"
+          }
+        }
+      },
+      "Il2CppInterop.HarmonySupport/1.5.1": {
+        "dependencies": {
+          "HarmonyX": "2.10.2",
+          "Il2CppInterop.Runtime": "1.5.1"
+        },
+        "runtime": {
+          "lib/net6.0/Il2CppInterop.HarmonySupport.dll": {
+            "assemblyVersion": "1.5.1.0",
+            "fileVersion": "1.5.1.0"
+          }
+        }
+      },
+      "Il2CppInterop.Runtime/1.5.1": {
+        "dependencies": {
+          "Iced": "1.21.0",
+          "Il2CppInterop.Common": "1.5.1"
+        },
+        "runtime": {
+          "lib/net6.0/Il2CppInterop.Runtime.dll": {
+            "assemblyVersion": "1.5.1.0",
+            "fileVersion": "1.5.1.0"
+          }
+        }
+      },
+      "IndexRange/1.1.0": {
+        "dependencies": {
+          "Microsoft.Bcl.Memory": "9.0.0"
+        },
+        "runtime": {
+          "lib/netstandard2.1/IndexRange.dll": {
+            "assemblyVersion": "1.1.0.0",
+            "fileVersion": "1.1.0.0"
+          }
+        }
+      },
+      "Microsoft.Bcl.AsyncInterfaces/6.0.0": {
+        "runtime": {
+          "lib/netstandard2.1/Microsoft.Bcl.AsyncInterfaces.dll": {
+            "assemblyVersion": "6.0.0.0",
+            "fileVersion": "6.0.21.52210"
+          }
+        }
+      },
+      "Microsoft.Bcl.Memory/9.0.0": {
+        "runtime": {
+          "lib/netstandard2.1/Microsoft.Bcl.Memory.dll": {
+            "assemblyVersion": "9.0.0.0",
+            "fileVersion": "9.0.24.52809"
+          }
+        }
+      },
+      "Microsoft.Diagnostics.NETCore.Client/0.2.621003": {
+        "dependencies": {
+          "Microsoft.Bcl.AsyncInterfaces": "6.0.0",
+          "Microsoft.Extensions.Logging.Abstractions": "6.0.4"
+        },
+        "runtime": {
+          "lib/netstandard2.0/Microsoft.Diagnostics.NETCore.Client.dll": {
+            "assemblyVersion": "0.2.12.21003",
+            "fileVersion": "0.2.12.21003"
+          }
+        }
+      },
+      "Microsoft.Diagnostics.Runtime/3.1.512801": {
+        "dependencies": {
+          "Microsoft.Diagnostics.NETCore.Client": "0.2.621003"
+        },
+        "runtime": {
+          "lib/net6.0/Microsoft.Diagnostics.Runtime.dll": {
+            "assemblyVersion": "3.1.10.12801",
+            "fileVersion": "3.1.10.12801"
+          }
+        }
+      },
+      "Microsoft.Extensions.Configuration/9.0.10": {
+        "dependencies": {
+          "Microsoft.Extensions.Configuration.Abstractions": "9.0.10",
+          "Microsoft.Extensions.Primitives": "9.0.10"
+        },
+        "runtime": {
+          "lib/netstandard2.0/Microsoft.Extensions.Configuration.dll": {
+            "assemblyVersion": "9.0.0.0",
+            "fileVersion": "9.0.1025.47515"
+          }
+        }
+      },
+      "Microsoft.Extensions.Configuration.Abstractions/9.0.10": {
+        "dependencies": {
+          "Microsoft.Extensions.Primitives": "9.0.10"
+        },
+        "runtime": {
+          "lib/netstandard2.0/Microsoft.Extensions.Configuration.Abstractions.dll": {
+            "assemblyVersion": "9.0.0.0",
+            "fileVersion": "9.0.1025.47515"
+          }
+        }
+      },
+      "Microsoft.Extensions.DependencyInjection.Abstractions/9.0.10": {
+        "runtime": {
+          "lib/netstandard2.1/Microsoft.Extensions.DependencyInjection.Abstractions.dll": {
+            "assemblyVersion": "9.0.0.0",
+            "fileVersion": "9.0.1025.47515"
+          }
+        }
+      },
+      "Microsoft.Extensions.Logging.Abstractions/6.0.4": {
+        "runtime": {
+          "lib/net6.0/Microsoft.Extensions.Logging.Abstractions.dll": {
+            "assemblyVersion": "6.0.0.0",
+            "fileVersion": "6.0.1823.26907"
+          }
+        }
+      },
+      "Microsoft.Extensions.Options/9.0.10": {
+        "dependencies": {
+          "Microsoft.Extensions.DependencyInjection.Abstractions": "9.0.10",
+          "Microsoft.Extensions.Primitives": "9.0.10"
+        },
+        "runtime": {
+          "lib/netstandard2.1/Microsoft.Extensions.Options.dll": {
+            "assemblyVersion": "9.0.0.0",
+            "fileVersion": "9.0.1025.47515"
+          }
+        }
+      },
+      "Microsoft.Extensions.Primitives/9.0.10": {
+        "runtime": {
+          "lib/netstandard2.0/Microsoft.Extensions.Primitives.dll": {
+            "assemblyVersion": "9.0.0.0",
+            "fileVersion": "9.0.1025.47515"
+          }
+        }
+      },
+      "Mono.Cecil/0.11.6": {
+        "runtime": {
+          "lib/netstandard2.0/Mono.Cecil.Mdb.dll": {
+            "assemblyVersion": "0.11.6.0",
+            "fileVersion": "0.11.6.0"
+          },
+          "lib/netstandard2.0/Mono.Cecil.Pdb.dll": {
+            "assemblyVersion": "0.11.6.0",
+            "fileVersion": "0.11.6.0"
+          },
+          "lib/netstandard2.0/Mono.Cecil.Rocks.dll": {
+            "assemblyVersion": "0.11.6.0",
+            "fileVersion": "0.11.6.0"
+          },
+          "lib/netstandard2.0/Mono.Cecil.dll": {
+            "assemblyVersion": "0.11.6.0",
+            "fileVersion": "0.11.6.0"
+          }
+        }
+      },
+      "MonoMod/22.7.31.1": {
+        "dependencies": {
+          "Mono.Cecil": "0.11.6",
+          "MonoMod.Utils": "22.7.31.1"
+        },
+        "runtime": {
+          "lib/net5.0/MonoMod.dll": {
+            "assemblyVersion": "22.7.31.1",
+            "fileVersion": "22.7.31.1"
+          }
+        }
+      },
+      "MonoMod.Backports/1.1.2": {
+        "dependencies": {
+          "MonoMod.ILHelpers": "1.1.0"
+        },
+        "runtime": {
+          "lib/net6.0/MonoMod.Backports.dll": {
+            "assemblyVersion": "1.1.2.0",
+            "fileVersion": "1.1.2.0"
+          }
+        }
+      },
+      "MonoMod.ILHelpers/1.1.0": {
+        "runtime": {
+          "lib/net6.0/MonoMod.ILHelpers.dll": {
+            "assemblyVersion": "1.1.0.0",
+            "fileVersion": "0.0.0.0"
+          }
+        }
+      },
+      "MonoMod.RuntimeDetour/22.7.31.1": {
+        "dependencies": {
+          "Mono.Cecil": "0.11.6",
+          "MonoMod.Utils": "22.7.31.1"
+        },
+        "runtime": {
+          "lib/net5.0/MonoMod.RuntimeDetour.dll": {
+            "assemblyVersion": "22.7.31.1",
+            "fileVersion": "22.7.31.1"
+          }
+        }
+      },
+      "MonoMod.Utils/22.7.31.1": {
+        "dependencies": {
+          "Mono.Cecil": "0.11.6"
+        },
+        "runtime": {
+          "lib/net5.0/MonoMod.Utils.dll": {
+            "assemblyVersion": "22.7.31.1",
+            "fileVersion": "22.7.31.1"
+          }
+        }
+      },
+      "Newtonsoft.Json/13.0.4": {
+        "runtime": {
+          "lib/net6.0/Newtonsoft.Json.dll": {
+            "assemblyVersion": "13.0.0.0",
+            "fileVersion": "13.0.4.30916"
+          }
+        }
+      },
+      "Samboy063.Tomlet/6.1.0": {
+        "runtime": {
+          "lib/net6.0/Tomlet.dll": {
+            "assemblyVersion": "6.1.0.0",
+            "fileVersion": "6.1.0.0"
+          }
+        }
+      },
+      "System.Configuration.ConfigurationManager/9.0.10": {
+        "dependencies": {
+          "System.Security.Cryptography.ProtectedData": "9.0.10"
+        },
+        "runtime": {
+          "lib/netstandard2.0/System.Configuration.ConfigurationManager.dll": {
+            "assemblyVersion": "9.0.0.0",
+            "fileVersion": "9.0.1025.47515"
+          }
+        }
+      },
+      "System.Security.Cryptography.ProtectedData/9.0.10": {
+        "runtime": {
+          "lib/netstandard2.0/System.Security.Cryptography.ProtectedData.dll": {
+            "assemblyVersion": "9.0.0.0",
+            "fileVersion": "9.0.1025.47515"
+          }
+        }
+      },
+      "System.Security.Permissions/9.0.10": {
+        "runtime": {
+          "lib/netstandard2.0/System.Security.Permissions.dll": {
+            "assemblyVersion": "9.0.0.0",
+            "fileVersion": "9.0.1025.47515"
+          }
+        }
+      },
+      "WebSocketDotNet/1.0.0": {
+        "dependencies": {
+          "IndexRange": "1.1.0"
+        },
+        "runtime": {
+          "lib/net6.0/WebSocketDotNet.dll": {
+            "assemblyVersion": "1.0.0.0",
+            "fileVersion": "1.0.0.0"
+          }
+        }
+      }
+    }
+  },
+  "libraries": {
+    "MelonLoader/0.7.2": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "AsmResolver/6.0.0-beta.3": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-e9fNRMqqFqdwKsaUz9XeWAJxS1bRVA6OIrRkjeN3fWjfNIeDKWivZWQhl2S9Sxga1Qymo4ZCZ3agm4XY05UOHQ==",
+      "path": "asmresolver/6.0.0-beta.3",
+      "hashPath": "asmresolver.6.0.0-beta.3.nupkg.sha512"
+    },
+    "AsmResolver.DotNet/6.0.0-beta.3": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-NJS6okCAVtUc5HOZ3rD3uKo+Bl7m1n+cxFv0z5wInCmfKckwZaKc2ZQsF9D8tpNy8SG86vu30OgCjDbSwsGbkA==",
+      "path": "asmresolver.dotnet/6.0.0-beta.3",
+      "hashPath": "asmresolver.dotnet.6.0.0-beta.3.nupkg.sha512"
+    },
+    "AsmResolver.PE/6.0.0-beta.3": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-mboFQ4uLoy4+E6uZJKtVDGPTdA/jUIlKw3VNiLw92YeiKzbId7zlt1ODSQR3DccbIsMG9g7CrlZ25uXTybYlig==",
+      "path": "asmresolver.pe/6.0.0-beta.3",
+      "hashPath": "asmresolver.pe.6.0.0-beta.3.nupkg.sha512"
+    },
+    "AsmResolver.PE.File/6.0.0-beta.3": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-gAEMcjfngmJx4Iix4YgFCdY//C6lG7ZMy5xurqlisyDUpduFF/5U3Vi2+Bt+OCqvIpyzCSS/HOFZRNP0Tfi7+g==",
+      "path": "asmresolver.pe.file/6.0.0-beta.3",
+      "hashPath": "asmresolver.pe.file.6.0.0-beta.3.nupkg.sha512"
+    },
+    "AssetRipper.Primitives/3.2.0": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-UtDpl72yG5/KUj3BsNP7k2sF13nqqeaJ4sTANZZd/gb+t9YULYYzcyNfxuvdptenlsQIUBmMwTVHUn6TZ61Jqg==",
+      "path": "assetripper.primitives/3.2.0",
+      "hashPath": "assetripper.primitives.3.2.0.nupkg.sha512"
+    },
+    "AssetsTools.NET/3.0.0-preview3": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-qfQy5PTYdbB8A2Ks5ciQoe5D4fTYbloz2vrmMq933PIWmAVMdXdYREYzTeNpvEk9mDrfybhr3OWE5cV8gVew5Q==",
+      "path": "assetstools.net/3.0.0-preview3",
+      "hashPath": "assetstools.net.3.0.0-preview3.nupkg.sha512"
+    },
+    "bHapticsLib/1.0.6": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-vR4lFYAlz+xrgd0xAbPg9gGdkYq9KybnO+oyCo74OfaRt6EMYRFt5KUKZOu0oCaRrQcm32E3gPiQrla9t4AmkA==",
+      "path": "bhapticslib/1.0.6",
+      "hashPath": "bhapticslib.1.0.6.nupkg.sha512"
+    },
+    "HarmonyX/2.10.2": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-/5WwkxXX8mPsRuigQt957rJGx1f0dDQxk+bvk4yYITKFjXas9Em+O71zEP8X0ym8OFQQ2XH/2SxS4NC7vEC+Xg==",
+      "path": "harmonyx/2.10.2",
+      "hashPath": "harmonyx.2.10.2.nupkg.sha512"
+    },
+    "Iced/1.21.0": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-dv5+81Q1TBQvVMSOOOmRcjJmvWcX3BZPZsIq31+RLc5cNft0IHAyNlkdb7ZarOWG913PyBoFDsDXoCIlKmLclg==",
+      "path": "iced/1.21.0",
+      "hashPath": "iced.1.21.0.nupkg.sha512"
+    },
+    "Il2CppInterop.Common/1.5.1": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-zhdgWvokrijvzE1doZKQ5GgLE+NMfv8eAicS6qruyhL4ImoshU/kyXkTmjn/1fiKFhmEaifpXJFSTNdpymUkvw==",
+      "path": "il2cppinterop.common/1.5.1",
+      "hashPath": "il2cppinterop.common.1.5.1.nupkg.sha512"
+    },
+    "Il2CppInterop.Generator/1.5.1": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-pDiiRu/vQAqr5dgclWaL5xwJYKo4ZZFciyPzgEClhFJj/kONQUsTzysRN/cu3/OClBKQebUq1UG6wBSTn4WnDg==",
+      "path": "il2cppinterop.generator/1.5.1",
+      "hashPath": "il2cppinterop.generator.1.5.1.nupkg.sha512"
+    },
+    "Il2CppInterop.HarmonySupport/1.5.1": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-xPRjfk5e+S3LkpUNXbCnxK2Bd7I2y+xh6Dd0OzFv+TToE02EMlZvtar+OHutWxBToMgk6qdT68+dVj5Q/khKcg==",
+      "path": "il2cppinterop.harmonysupport/1.5.1",
+      "hashPath": "il2cppinterop.harmonysupport.1.5.1.nupkg.sha512"
+    },
+    "Il2CppInterop.Runtime/1.5.1": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-6K5RIapelXpzFj1hcZau44y3fCdF4r06Npmklt/QjvIpL765BeEHy7ixTHvoz0EcLPPWYPzQrtAgvdqV7Gk/hA==",
+      "path": "il2cppinterop.runtime/1.5.1",
+      "hashPath": "il2cppinterop.runtime.1.5.1.nupkg.sha512"
+    },
+    "IndexRange/1.1.0": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-fG+2WP1e3Fg3ZVq85XAdiwG9t0twi3r0LvOrTjtbH/31Rd5gLnV5APOD2JHAowbZYDgj9D3rXRbUvIL+ew0WZQ==",
+      "path": "indexrange/1.1.0",
+      "hashPath": "indexrange.1.1.0.nupkg.sha512"
+    },
+    "Microsoft.Bcl.AsyncInterfaces/6.0.0": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-UcSjPsst+DfAdJGVDsu346FX0ci0ah+lw3WRtn18NUwEqRt70HaOQ7lI72vy3+1LxtqI3T5GWwV39rQSrCzAeg==",
+      "path": "microsoft.bcl.asyncinterfaces/6.0.0",
+      "hashPath": "microsoft.bcl.asyncinterfaces.6.0.0.nupkg.sha512"
+    },
+    "Microsoft.Bcl.Memory/9.0.0": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-bTUtGfpGyJnohQzjdXbtc7MqNzkv7CWUSRz54+ucNm0i32rZiIU0VdVPHDBShOl1qhVKRjW8mnEBz3d2vH93tQ==",
+      "path": "microsoft.bcl.memory/9.0.0",
+      "hashPath": "microsoft.bcl.memory.9.0.0.nupkg.sha512"
+    },
+    "Microsoft.Diagnostics.NETCore.Client/0.2.621003": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-22YdSeB53xk4Pd1Xz92HigUy8ySJMzd8hpEZHlFWeaefzYox4VJnW+gJEzGrxbSvl3oGCpiIFKqh8the0xhzSA==",
+      "path": "microsoft.diagnostics.netcore.client/0.2.621003",
+      "hashPath": "microsoft.diagnostics.netcore.client.0.2.621003.nupkg.sha512"
+    },
+    "Microsoft.Diagnostics.Runtime/3.1.512801": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-0lMUDr2oxNZa28D6NH5BuSQEe5T9tZziIkvkD44YkkCGQXPJqvFjLq5ZQq1hYLl3RjQJrY+hR0jFgap+EWPDTw==",
+      "path": "microsoft.diagnostics.runtime/3.1.512801",
+      "hashPath": "microsoft.diagnostics.runtime.3.1.512801.nupkg.sha512"
+    },
+    "Microsoft.Extensions.Configuration/9.0.10": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-UAm3SLGAMlJdowbN+/xnh2UGJkdJoXVm4MsdhZ60dAMS8jteoyCx5WfIab5DKv0TCYpdhVecLJVUjEO3abs9UQ==",
+      "path": "microsoft.extensions.configuration/9.0.10",
+      "hashPath": "microsoft.extensions.configuration.9.0.10.nupkg.sha512"
+    },
+    "Microsoft.Extensions.Configuration.Abstractions/9.0.10": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-ad3JxmFj0uxuFa1CT6oxTCC1lQ0xeRuOvzBRFT/I/ofIXVOnNsH/v2GZkAJWhlpZqKUvSexQZzp3EEAB2CdtJg==",
+      "path": "microsoft.extensions.configuration.abstractions/9.0.10",
+      "hashPath": "microsoft.extensions.configuration.abstractions.9.0.10.nupkg.sha512"
+    },
+    "Microsoft.Extensions.DependencyInjection.Abstractions/9.0.10": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-r9waLiOPe9ZF1PvzUT+RDoHvpMmY8MW+lb4lqjYGObwKpnyPMLI3odVvlmshwuZcdoHynsGWOrCPA0hxZ63lIA==",
+      "path": "microsoft.extensions.dependencyinjection.abstractions/9.0.10",
+      "hashPath": "microsoft.extensions.dependencyinjection.abstractions.9.0.10.nupkg.sha512"
+    },
+    "Microsoft.Extensions.Logging.Abstractions/6.0.4": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-K14wYgwOfKVELrUh5eBqlC8Wvo9vvhS3ZhIvcswV2uS/ubkTRPSQsN557EZiYUSSoZNxizG+alN4wjtdyLdcyw==",
+      "path": "microsoft.extensions.logging.abstractions/6.0.4",
+      "hashPath": "microsoft.extensions.logging.abstractions.6.0.4.nupkg.sha512"
+    },
+    "Microsoft.Extensions.Options/9.0.10": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-zMNABt8eBv0B0XrWjFy9nZNgddavaOeq3ZdaD5IlHhRH65MrU7HM+Hd8GjWE3e2VDGFPZFfSAc6XVXC17f9fOA==",
+      "path": "microsoft.extensions.options/9.0.10",
+      "hashPath": "microsoft.extensions.options.9.0.10.nupkg.sha512"
+    },
+    "Microsoft.Extensions.Primitives/9.0.10": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-3pl8D1O5ZwMpDkZAT2uXrhQ6NipkwEgDLMFuURiHTf72TvkoMP61QYH3Vk1yrzVHnHBdNZk3cQACz8Zc7YGNhQ==",
+      "path": "microsoft.extensions.primitives/9.0.10",
+      "hashPath": "microsoft.extensions.primitives.9.0.10.nupkg.sha512"
+    },
+    "Mono.Cecil/0.11.6": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-f33RkDtZO8VlGXCtmQIviOtxgnUdym9xx/b1p9h91CRGOsJFxCFOFK1FDbVt1OCf1aWwYejUFa2MOQyFWTFjbA==",
+      "path": "mono.cecil/0.11.6",
+      "hashPath": "mono.cecil.0.11.6.nupkg.sha512"
+    },
+    "MonoMod/22.7.31.1": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-NcfQBxRnQt9TkYPcyMvNRmCgfxvcqPoJbSpyZlYcG8mVtshR5CsQdwqKO5S1696gkVB50pCLSwskBWjzvsZuTg==",
+      "path": "monomod/22.7.31.1",
+      "hashPath": "monomod.22.7.31.1.nupkg.sha512"
+    },
+    "MonoMod.Backports/1.1.2": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-baYlNy8n8kmaNhNvqmZ/dIPOeO1r9//dG1i2WbunMWtWZ2EKtIgmXaS+ZzphzTsikkGnoD4Jwr5g0TVdpDjgpw==",
+      "path": "monomod.backports/1.1.2",
+      "hashPath": "monomod.backports.1.1.2.nupkg.sha512"
+    },
+    "MonoMod.ILHelpers/1.1.0": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-L2FWjhTrv7tcIxshfZ+M3OcaNr4cNw0IwiVZEgwqRnZ5QAN3+RrNJ8ZwCzwXUWyPDqooJxMcjjg8PsSYUiNBjQ==",
+      "path": "monomod.ilhelpers/1.1.0",
+      "hashPath": "monomod.ilhelpers.1.1.0.nupkg.sha512"
+    },
+    "MonoMod.RuntimeDetour/22.7.31.1": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-nxVJTvQbWAujaogt5XX3eAy7d22t66Z88aWg9sirPLO9rR/6yNCHAyZpgxXrOsIobZVW0IEZPqNMOBhgke25/w==",
+      "path": "monomod.runtimedetour/22.7.31.1",
+      "hashPath": "monomod.runtimedetour.22.7.31.1.nupkg.sha512"
+    },
+    "MonoMod.Utils/22.7.31.1": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-nI0E1oadXS1iMbfwfCzYF08C1jRQR9cnnHv66a4BSPd4sGu2p6g4BmctCWsdAB6oGKkSJUhcfHfxcfTsDyB94Q==",
+      "path": "monomod.utils/22.7.31.1",
+      "hashPath": "monomod.utils.22.7.31.1.nupkg.sha512"
+    },
+    "Newtonsoft.Json/13.0.4": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-pdgNNMai3zv51W5aq268sujXUyx7SNdE2bj1wZcWjAQrKMFZV260lbqYop1d2GM67JI1huLRwxo9ZqnfF/lC6A==",
+      "path": "newtonsoft.json/13.0.4",
+      "hashPath": "newtonsoft.json.13.0.4.nupkg.sha512"
+    },
+    "Samboy063.Tomlet/6.1.0": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-WCtdC9i8+QxrHGxOH0Jg3Aob/TQ5aq2QJVPXrRwFijzu0xkNlA2oYz/npSZalhOqrEnU60OXc3XOu/exX9Yanw==",
+      "path": "samboy063.tomlet/6.1.0",
+      "hashPath": "samboy063.tomlet.6.1.0.nupkg.sha512"
+    },
+    "System.Configuration.ConfigurationManager/9.0.10": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-5CBhl5dWmckKEtvk8F6GXtmHxNBoqAC8xILxIntNm7AzHiXQ09CXSLhncIJ/cQWaiNYzLjHZCgtMfx9tkCKHdA==",
+      "path": "system.configuration.configurationmanager/9.0.10",
+      "hashPath": "system.configuration.configurationmanager.9.0.10.nupkg.sha512"
+    },
+    "System.Security.Cryptography.ProtectedData/9.0.10": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-iC0InhfWdk0nHlbcTAAUyWt9X4+CsaZz9elQy0otFcsUkd/Wm+DmEwjqyH9PgFl1XcSowzhv67njCstABTc3Hw==",
+      "path": "system.security.cryptography.protecteddata/9.0.10",
+      "hashPath": "system.security.cryptography.protecteddata.9.0.10.nupkg.sha512"
+    },
+    "System.Security.Permissions/9.0.10": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-uqzXSkn2nx9nplIdayurMtbLcQQdOGd7TmIQ+X5P65+QWT2S+1aUZfJuH2f+Blr/4W6wxMkiX9aKzLk7lfMZFQ==",
+      "path": "system.security.permissions/9.0.10",
+      "hashPath": "system.security.permissions.9.0.10.nupkg.sha512"
+    },
+    "WebSocketDotNet/1.0.0": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-QbnWXQ8d0qPlweDjiYJa33kiXAV/tz7WHqm0wUjIQagd0XWVQrXTPgWNIAtoUKXJ2Qeu03M4Y6+P1MuWfun0eQ==",
+      "path": "websocketdotnet/1.0.0",
+      "hashPath": "websocketdotnet.1.0.0.nupkg.sha512"
+    }
+  }
+}

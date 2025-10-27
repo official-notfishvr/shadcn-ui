@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using shadcnui.GUIComponents.Core;
 using UnityEngine;
-#if IL2CPP_MELONLOADER
+#if IL2CPP_MELONLOADER_PRE57
 using UnhollowerBaseLib;
 #endif
 
@@ -24,13 +24,14 @@ namespace shadcnui.GUIComponents.Data
                 _displayDates[id] = selectedDate ?? DateTime.Today;
             }
 
+            var styleManager = guiHelper.GetStyleManager();
             bool isOpen = _openStates[id];
             DateTime displayDate = _displayDates[id];
             string buttonText = selectedDate?.ToString("MMM dd, yyyy") ?? placeholder;
 
             layoutComponents.BeginVerticalGroup();
 
-            if (UnityHelpers.Button($"📅 {buttonText}", styleManager.selectTriggerStyle, options))
+            if (UnityHelpers.Button($"{buttonText}", styleManager.GetSelectTriggerStyle(), options))
             {
                 _openStates[id] = !isOpen;
                 if (selectedDate.HasValue)
@@ -56,10 +57,11 @@ namespace shadcnui.GUIComponents.Data
 
         public DateTime? DrawDatePickerWithLabel(string label, string placeholder, DateTime? selectedDate, string id = "datepicker", params GUILayoutOption[] options)
         {
+            var styleManager = guiHelper.GetStyleManager();
             layoutComponents.BeginVerticalGroup();
             if (!string.IsNullOrEmpty(label))
             {
-                UnityHelpers.Label(label, styleManager.labelDefaultStyle);
+                UnityHelpers.Label(label, styleManager.GetLabelStyle(LabelVariant.Default));
                 GUILayout.Space(4);
             }
 
@@ -77,11 +79,12 @@ namespace shadcnui.GUIComponents.Data
                 _displayDates[id] = startDate ?? DateTime.Today;
             }
 
+            var styleManager = guiHelper.GetStyleManager();
             string buttonText = startDate.HasValue && endDate.HasValue ? $"{startDate.Value.ToString("MMM dd")} - {endDate.Value.ToString("MMM dd, yyyy")}" : placeholder;
 
             layoutComponents.BeginVerticalGroup();
 
-            if (UnityHelpers.Button($"📅 {buttonText}", styleManager.selectTriggerStyle, options))
+            if (UnityHelpers.Button($"{buttonText}", styleManager.GetSelectTriggerStyle(), options))
             {
                 _openStates[id] = !_openStates[id];
             }
@@ -98,7 +101,8 @@ namespace shadcnui.GUIComponents.Data
 
         private DateTime? DrawCalendarPopover(string id, DateTime? selectedDate, DateTime displayDate)
         {
-            layoutComponents.BeginVerticalGroup(styleManager.popoverContentStyle, GUILayout.Width(280));
+            var styleManager = guiHelper.GetStyleManager();
+            layoutComponents.BeginVerticalGroup(styleManager.GetPopoverContentStyle(), GUILayout.Width(280));
 
             DrawCalendarHeader(id, displayDate);
             DrawWeekdayHeaders();
@@ -117,9 +121,10 @@ namespace shadcnui.GUIComponents.Data
 
         private void DrawCalendarHeader(string id, DateTime displayDate)
         {
+            var styleManager = guiHelper.GetStyleManager();
             layoutComponents.BeginHorizontalGroup();
 
-            if (UnityHelpers.Button("‹", styleManager.buttonGhostStyle, GUILayout.Width(32), GUILayout.Height(32)))
+            if (UnityHelpers.Button("â€¹", styleManager.GetButtonStyle(ButtonVariant.Ghost, ButtonSize.Default), GUILayout.Width(32), GUILayout.Height(32)))
             {
                 _displayDates[id] = displayDate.AddMonths(-1);
             }
@@ -127,10 +132,10 @@ namespace shadcnui.GUIComponents.Data
             GUILayout.FlexibleSpace();
             string currentMonthYear = displayDate.ToString("MMMM yyyy");
 
-            UnityHelpers.Label(currentMonthYear, styleManager.datePickerTitleStyle);
+            UnityHelpers.Label(currentMonthYear, styleManager.GetDatePickerTitleStyle());
             GUILayout.FlexibleSpace();
 
-            if (UnityHelpers.Button("›", styleManager.buttonGhostStyle, GUILayout.Width(32), GUILayout.Height(32)))
+            if (UnityHelpers.Button("â€º", styleManager.GetButtonStyle(ButtonVariant.Ghost, ButtonSize.Default), GUILayout.Width(32), GUILayout.Height(32)))
             {
                 _displayDates[id] = displayDate.AddMonths(1);
             }
@@ -141,12 +146,13 @@ namespace shadcnui.GUIComponents.Data
 
         private void DrawWeekdayHeaders()
         {
+            var styleManager = guiHelper.GetStyleManager();
             string[] weekdays = { "Su", "Mo", "Tu", "We", "Th", "Fr", "Sa" };
 
             layoutComponents.BeginHorizontalGroup();
             foreach (string day in weekdays)
             {
-                UnityHelpers.Label(day, styleManager.datePickerWeekdayStyle, GUILayout.Width(36), GUILayout.Height(24));
+                UnityHelpers.Label(day, styleManager.GetDatePickerWeekdayStyle(), GUILayout.Width(36), GUILayout.Height(24));
             }
             layoutComponents.EndHorizontalGroup();
             GUILayout.Space(4);
@@ -191,30 +197,33 @@ namespace shadcnui.GUIComponents.Data
 
         private GUIStyle GetDayStyle(bool isCurrentMonth, bool isSelected, bool isToday)
         {
+            var styleManager = guiHelper.GetStyleManager();
+
             if (isSelected)
-                return styleManager.datePickerDaySelectedStyle;
+                return styleManager.GetDatePickerDaySelectedStyle();
 
             if (isToday)
-                return styleManager.datePickerDayTodayStyle;
+                return styleManager.GetDatePickerDayTodayStyle();
 
             if (!isCurrentMonth)
-                return styleManager.datePickerDayOutsideMonthStyle;
+                return styleManager.GetDatePickerDayOutsideMonthStyle();
 
-            return styleManager.datePickerDayStyle;
+            return styleManager.GetDatePickerDayStyle();
         }
 
         private void DrawCalendarFooter(string id)
         {
+            var styleManager = guiHelper.GetStyleManager();
             layoutComponents.BeginHorizontalGroup();
 
-            if (UnityHelpers.Button("Today", styleManager.buttonOutlineStyle, GUILayout.Height(32)))
+            if (UnityHelpers.Button("Today", styleManager.GetButtonStyle(ButtonVariant.Outline, ButtonSize.Default), GUILayout.Height(32)))
             {
                 _displayDates[id] = DateTime.Today;
             }
 
             GUILayout.FlexibleSpace();
 
-            if (UnityHelpers.Button("Clear", styleManager.buttonGhostStyle, GUILayout.Height(32)))
+            if (UnityHelpers.Button("Clear", styleManager.GetButtonStyle(ButtonVariant.Ghost, ButtonSize.Default), GUILayout.Height(32)))
             {
                 _openStates[id] = false;
             }

@@ -1,0 +1,118 @@
+{
+  "runtimeTarget": {
+    "name": ".NETCoreApp,Version=v6.0/win-x64",
+    "signature": ""
+  },
+  "compilationOptions": {},
+  "targets": {
+    ".NETCoreApp,Version=v6.0": {},
+    ".NETCoreApp,Version=v6.0/win-x64": {
+      "UnityEngine.Il2CppImageConversionManager/0.7.2": {
+        "dependencies": {
+          "Il2CppInterop.ReferenceLibs": "1.0.0",
+          "Il2CppInterop.Runtime": "1.5.1"
+        },
+        "runtime": {
+          "UnityEngine.Il2CppImageConversionManager.dll": {}
+        }
+      },
+      "Iced/1.17.0": {
+        "runtime": {
+          "lib/netstandard2.1/Iced.dll": {
+            "assemblyVersion": "1.17.0.0",
+            "fileVersion": "1.17.0.0"
+          }
+        }
+      },
+      "Il2CppInterop.Common/1.5.1": {
+        "dependencies": {
+          "Iced": "1.17.0",
+          "Microsoft.Extensions.Logging.Abstractions": "6.0.1"
+        },
+        "runtime": {
+          "lib/netstandard2.0/Il2CppInterop.Common.dll": {
+            "assemblyVersion": "1.5.1.0",
+            "fileVersion": "1.5.1.0"
+          }
+        }
+      },
+      "Il2CppInterop.ReferenceLibs/1.0.0": {
+        "dependencies": {
+          "Il2CppInterop.Runtime": "1.5.1"
+        },
+        "runtime": {
+          "lib/net6.0/Il2Cppmscorlib.dll": {
+            "assemblyVersion": "4.0.0.0",
+            "fileVersion": "0.0.0.0"
+          },
+          "lib/net6.0/UnityEngine.CoreModule-nstrip.dll": {
+            "assemblyVersion": "0.0.0.0",
+            "fileVersion": "0.0.0.0"
+          }
+        }
+      },
+      "Il2CppInterop.Runtime/1.5.1": {
+        "dependencies": {
+          "Iced": "1.17.0",
+          "Il2CppInterop.Common": "1.5.1"
+        },
+        "runtime": {
+          "lib/net6.0/Il2CppInterop.Runtime.dll": {
+            "assemblyVersion": "1.5.1.0",
+            "fileVersion": "1.5.1.0"
+          }
+        }
+      },
+      "Microsoft.Extensions.Logging.Abstractions/6.0.1": {
+        "runtime": {
+          "lib/net6.0/Microsoft.Extensions.Logging.Abstractions.dll": {
+            "assemblyVersion": "6.0.0.0",
+            "fileVersion": "6.0.322.12309"
+          }
+        }
+      }
+    }
+  },
+  "libraries": {
+    "UnityEngine.Il2CppImageConversionManager/0.7.2": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "Iced/1.17.0": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-8x+HCVTl/HHTGpscH3vMBhV8sknN/muZFw9s3TsI8SA6+c43cOTCi2+jE4KsU8pNLbJ++iF2ZFcpcXHXtDglnw==",
+      "path": "iced/1.17.0",
+      "hashPath": "iced.1.17.0.nupkg.sha512"
+    },
+    "Il2CppInterop.Common/1.5.1": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-zhdgWvokrijvzE1doZKQ5GgLE+NMfv8eAicS6qruyhL4ImoshU/kyXkTmjn/1fiKFhmEaifpXJFSTNdpymUkvw==",
+      "path": "il2cppinterop.common/1.5.1",
+      "hashPath": "il2cppinterop.common.1.5.1.nupkg.sha512"
+    },
+    "Il2CppInterop.ReferenceLibs/1.0.0": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-fVzPUGItD6g5/KXyCLHfjFyPSDECBgx1V8JhF6K3zWm4XdIHePLLribDLxnizsKWa/lbQdZK8vyXuzPxu3Zrtw==",
+      "path": "il2cppinterop.referencelibs/1.0.0",
+      "hashPath": "il2cppinterop.referencelibs.1.0.0.nupkg.sha512"
+    },
+    "Il2CppInterop.Runtime/1.5.1": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-6K5RIapelXpzFj1hcZau44y3fCdF4r06Npmklt/QjvIpL765BeEHy7ixTHvoz0EcLPPWYPzQrtAgvdqV7Gk/hA==",
+      "path": "il2cppinterop.runtime/1.5.1",
+      "hashPath": "il2cppinterop.runtime.1.5.1.nupkg.sha512"
+    },
+    "Microsoft.Extensions.Logging.Abstractions/6.0.1": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-dzB2Cgg+JmrouhjkcQGzSFjjvpwlq353i8oBQO2GWNjCXSzhbtBRUf28HSauWe7eib3wYOdb3tItdjRwAdwCSg==",
+      "path": "microsoft.extensions.logging.abstractions/6.0.1",
+      "hashPath": "microsoft.extensions.logging.abstractions.6.0.1.nupkg.sha512"
+    }
+  }
+}

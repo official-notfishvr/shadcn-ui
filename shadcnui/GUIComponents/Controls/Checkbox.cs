@@ -4,7 +4,7 @@ using System.Runtime.Remoting.Messaging;
 using shadcnui;
 using shadcnui.GUIComponents.Core;
 using UnityEngine;
-#if IL2CPP_MELONLOADER
+#if IL2CPP_MELONLOADER_PRE57
 using UnhollowerBaseLib;
 #endif
 

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using shadcnui.GUIComponents.Core;
 using UnityEngine;
-#if IL2CPP_MELONLOADER
+#if IL2CPP_MELONLOADER_PRE57
 using UnhollowerBaseLib;
 #endif
 
@@ -46,7 +46,7 @@ namespace shadcnui.GUIComponents.Data
         {
             layoutComponents.BeginHorizontalGroup();
 
-            GUIStyle buttonGhostStyle = styleManager?.buttonGhostStyle ?? GUI.skin.button;
+            GUIStyle buttonGhostStyle = styleManager.GetButtonStyle(ButtonVariant.Ghost, ButtonSize.Default);
 
             if (UnityHelpers.Button("<", buttonGhostStyle))
             {
@@ -82,7 +82,7 @@ namespace shadcnui.GUIComponents.Data
         private void DrawWeekdays(StyleManager styleManager)
         {
             layoutComponents.BeginHorizontalGroup();
-            GUIStyle weekdayStyle = styleManager?.calendarWeekdayStyle ?? GUI.skin.label;
+            GUIStyle weekdayStyle = styleManager.GetCalendarWeekdayStyle();
             for (int i = 0; i < 7; i++)
             {
                 UnityHelpers.Label(((DayOfWeek)i).ToString().Substring(0, 2), weekdayStyle);
@@ -103,29 +103,29 @@ namespace shadcnui.GUIComponents.Data
                 {
                     if ((i == 0 && j < firstDayOfMonth) || dayCounter > daysInMonth)
                     {
-                        UnityHelpers.Label("", styleManager?.calendarDayOutsideMonthStyle ?? GUI.skin.label);
+                        UnityHelpers.Label("", styleManager.GetCalendarDayOutsideMonthStyle());
                     }
                     else
                     {
                         var currentDay = new DateTime(displayedMonth.Year, displayedMonth.Month, dayCounter);
                         bool isDisabled = DisabledDates.Contains(currentDay.Date);
 
-                        GUIStyle dayStyle = styleManager?.calendarDayStyle ?? GUI.skin.button;
+                        GUIStyle dayStyle = styleManager.GetCalendarDayStyle();
                         if (isDisabled)
                         {
-                            dayStyle = styleManager?.calendarDayDisabledStyle ?? GUI.skin.button;
+                            dayStyle = styleManager.GetCalendarDayDisabledStyle();
                         }
                         else if (SelectedDate.HasValue && SelectedDate.Value.Date == currentDay.Date)
                         {
-                            dayStyle = styleManager?.calendarDaySelectedStyle ?? GUI.skin.button;
+                            dayStyle = styleManager.GetCalendarDaySelectedStyle();
                         }
                         else if (Ranges.Any(r => currentDay.Date >= r.Start.Date && currentDay.Date <= r.End.Date))
                         {
-                            dayStyle = styleManager?.calendarDayInRangeStyle ?? GUI.skin.button;
+                            dayStyle = styleManager.GetCalendarDayInRangeStyle();
                         }
                         else if (currentDay.Date == DateTime.Today)
                         {
-                            dayStyle = styleManager?.calendarDayTodayStyle ?? GUI.skin.button;
+                            dayStyle = styleManager.GetCalendarDayTodayStyle();
                         }
 
                         if (UnityHelpers.Button(dayCounter.ToString(), dayStyle))

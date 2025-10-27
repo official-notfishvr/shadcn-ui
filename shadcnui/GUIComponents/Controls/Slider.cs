@@ -4,7 +4,7 @@ using System.Text;
 using shadcnui;
 using shadcnui.GUIComponents.Core;
 using UnityEngine;
-#if IL2CPP_MELONLOADER
+#if IL2CPP_MELONLOADER_PRE57
 using UnhollowerBaseLib;
 #endif
 
@@ -18,8 +18,8 @@ namespace shadcnui.GUIComponents.Controls
         public void DrawSlider(float windowWidth, string label, ref float value, float minValue, float maxValue)
         {
             var styleManager = guiHelper.GetStyleManager();
-            GUIStyle labelStyle = styleManager?.glowLabelStyle ?? GUI.skin.label;
-#if IL2CPP_MELONLOADER
+            GUIStyle labelStyle = styleManager?.GetGlowLabelStyle() ?? GUI.skin.label;
+#if IL2CPP_MELONLOADER_PRE57
             GUILayout.Label(label + ": " + value.ToString("F2"), labelStyle, (Il2CppReferenceArray<GUILayoutOption>)null);
             value = GUILayout.HorizontalSlider(value, minValue, maxValue, (Il2CppReferenceArray<GUILayoutOption>)null);
 #else
@@ -32,8 +32,8 @@ namespace shadcnui.GUIComponents.Controls
         public void DrawIntSlider(float windowWidth, string label, ref int value, int minValue, int maxValue)
         {
             var styleManager = guiHelper.GetStyleManager();
-            GUIStyle labelStyle = styleManager?.glowLabelStyle ?? GUI.skin.label;
-#if IL2CPP_MELONLOADER
+            GUIStyle labelStyle = styleManager?.GetGlowLabelStyle() ?? GUI.skin.label;
+#if IL2CPP_MELONLOADER_PRE57
             GUILayout.Label(label + ": " + value.ToString(), labelStyle, (Il2CppReferenceArray<GUILayoutOption>)null);
             value = (int)GUILayout.HorizontalSlider(value, minValue, maxValue, (Il2CppReferenceArray<GUILayoutOption>)null);
 #else

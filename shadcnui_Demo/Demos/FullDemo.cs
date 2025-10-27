@@ -9,7 +9,7 @@ using shadcnui.GUIComponents.Data;
 using shadcnui.GUIComponents.Display;
 using shadcnui.GUIComponents.Layout;
 using UnityEngine;
-#if IL2CPP_MELONLOADER
+#if IL2CPP_MELONLOADER_PRE57
 using UnhollowerBaseLib;
 #endif
 
@@ -255,7 +255,7 @@ namespace shadcnui_Demo.Menu
 
         void DrawCurrentTabContent()
         {
-#if IL2CPP_MELONLOADER
+#if IL2CPP_MELONLOADER_PRE57
             GUILayout.BeginVertical(new Il2CppReferenceArray<GUILayoutOption>(new GUILayoutOption[] { }));
 #else
             GUILayout.BeginVertical();

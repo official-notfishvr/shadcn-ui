@@ -7,20 +7,41 @@
         <BepInExAssemblyPath>$(GamePath)\BepInEx\core</BepInExAssemblyPath>
         <PluginsPath>$(GamePath)\BepInEx\plugins</PluginsPath>
     </PropertyGroup>
-    <PropertyGroup Condition="'$(Configuration)' == 'IL2CPP_BepInEx'">
-        <DefineConstants>IL2CPP_BEPINEX;BEPINEX</DefineConstants>
-        <ReferencePath>$(SolutionDir)References\IL2CPP_BepInEx\</ReferencePath>
-    </PropertyGroup>
-    <PropertyGroup Condition="'$(Configuration)' == 'IL2CPP_MELONLOADER'">
-        <DefineConstants>IL2CPP_MELONLOADER;MELONLOADER</DefineConstants>
-        <ReferencePath>$(SolutionDir)References\IL2CPP_MELONLOADER\</ReferencePath>
-    </PropertyGroup>
-    <PropertyGroup Condition="'$(Configuration)' == 'Mono_Melonloader'">
-        <DefineConstants>MONO;MELONLOADER</DefineConstants>
-        <ReferencePath>$(SolutionDir)References\Mono\</ReferencePath>
-    </PropertyGroup>
-    <PropertyGroup Condition="'$(Configuration)' == 'Mono_BepInEx'">
-        <DefineConstants>MONO;BEPINEX</DefineConstants>
-        <ReferencePath>$(SolutionDir)References\Mono\</ReferencePath>
+    <Choose>
+        <When Condition=" '$(Configuration)' == 'IL2CPP_MELONLOADER_PRE57' ">
+            <PropertyGroup>
+                <DefineConstants>IL2CPP_MELONLOADER_PRE57;MELONLOADER</DefineConstants>
+                <ReferencePath>$(SolutionDir)References\IL2CPP_MELONLOADER_PRE57\</ReferencePath>
+            </PropertyGroup>
+        </When>
+        <When Condition=" '$(Configuration)' == 'IL2CPP_MELONLOADER' ">
+            <PropertyGroup>
+                <DefineConstants>IL2CPP_MELONLOADER;MELONLOADER</DefineConstants>
+                <ReferencePath>$(SolutionDir)References\IL2CPP_MELONLOADER\</ReferencePath>
+            </PropertyGroup>
+        </When>
+        <When Condition=" '$(Configuration)' == 'IL2CPP_BepInEx' ">
+            <PropertyGroup>
+                <DefineConstants>IL2CPP_BEPINEX;BEPINEX</DefineConstants>
+                <ReferencePath>$(SolutionDir)References\IL2CPP_BepInEx\</ReferencePath>
+            </PropertyGroup>
+        </When>
+        <When Condition=" '$(Configuration)' == 'Mono_Melonloader' ">
+            <PropertyGroup>
+                <DefineConstants>MONO;MELONLOADER</DefineConstants>
+                <ReferencePath>$(SolutionDir)References\Mono\</ReferencePath>
+            </PropertyGroup>
+        </When>
+        <When Condition=" '$(Configuration)' == 'Mono_BepInEx' ">
+            <PropertyGroup>
+                <DefineConstants>MONO;BEPINEX</DefineConstants>
+                <ReferencePath>$(SolutionDir)References\Mono\</ReferencePath>
+            </PropertyGroup>
+        </When>
+    </Choose>
+    <PropertyGroup>
+        <DebugType>pdbonly</DebugType>
+        <Optimize>true</Optimize>
+        <OutputPath>bin\$(Configuration)\</OutputPath>
     </PropertyGroup>
 </Project>

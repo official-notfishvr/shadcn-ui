@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 using shadcnui;
 using shadcnui.GUIComponents.Core;
 using UnityEngine;
-#if IL2CPP_MELONLOADER
+#if IL2CPP_MELONLOADER_PRE57
 using UnhollowerBaseLib;
 #endif
 
@@ -319,7 +319,7 @@ namespace shadcnui.GUIComponents.Layout
 
             UnityHelpers.Label("Search:", GUILayout.Width(60 * guiHelper.uiScale));
 
-#if IL2CPP_MELONLOADER
+#if IL2CPP_MELONLOADER_PRE57
             string newSearchQuery = GUILayout.TextField(searchQuery ?? "", GUI.skin.textField, new Il2CppReferenceArray<GUILayoutOption>(new GUILayoutOption[] { GUILayout.Width(200 * guiHelper.uiScale) }));
 #else
             string newSearchQuery = GUILayout.TextField(searchQuery ?? "", GUILayout.Width(200 * guiHelper.uiScale));
