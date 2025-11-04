@@ -51,16 +51,19 @@ namespace shadcnui.GUIComponents.Display
 
         public void AvatarWithStatus(Texture2D image, string fallbackText, bool isOnline, AvatarSize size = AvatarSize.Default, AvatarShape shape = AvatarShape.Circle, params GUILayoutOption[] options)
         {
-            layoutComponents.BeginHorizontalGroup();
+            var styleManager = guiHelper.GetStyleManager();
+            layoutComponents.BeginVerticalGroup();
             DrawAvatar(image, fallbackText, size, shape, options);
-
-            if (isOnline)
+            var avatarRect = GUILayoutUtility.GetLastRect();
+            if (isOnline && styleManager != null)
             {
-                layoutComponents.AddSpace(-8);
-                DrawStatusIndicator(isOnline, size);
+                float indicatorSize = styleManager.GetStatusIndicatorSize(size) * guiHelper.uiScale;
+                float x = avatarRect.x + avatarRect.width - indicatorSize * 0.9f;
+                float y = avatarRect.y + avatarRect.height - indicatorSize * 0.9f;
+                Rect dotRect = new Rect(x, y, indicatorSize, indicatorSize);
+                DrawStatusDot(dotRect, true);
             }
-
-            layoutComponents.EndHorizontalGroup();
+            layoutComponents.EndVerticalGroup();
         }
 
         private void DrawStatusIndicator(bool isOnline, AvatarSize size)
@@ -81,6 +84,17 @@ namespace shadcnui.GUIComponents.Display
             statusStyle.margin = new UnityHelpers.RectOffset(0, 0, 0, 0);
 
             UnityHelpers.Label(GUIContent.none, statusStyle);
+        }
+
+        private void DrawStatusDot(Rect rect, bool isOnline)
+        {
+            var styleManager = guiHelper.GetStyleManager();
+            if (styleManager == null)
+                return;
+            Color statusColor = isOnline ? Color.green : Color.gray;
+            GUIStyle statusStyle = new UnityHelpers.GUIStyle(GUI.skin.box);
+            statusStyle.normal.background = styleManager.CreateSolidTexture(statusColor);
+            GUI.Box(rect, GUIContent.none, statusStyle);
         }
 
         public void AvatarWithName(Texture2D image, string fallbackText, string name, AvatarSize size = AvatarSize.Default, AvatarShape shape = AvatarShape.Circle, bool showNameBelow = false, params GUILayoutOption[] options)

@@ -1,5 +1,9 @@
 using System;
+using System.IO;
 using UnityEngine;
+#if IL2CPP_MELONLOADER
+using MelonLoader;
+#endif
 
 namespace shadcnui.GUIComponents.Core
 {
@@ -14,16 +18,36 @@ namespace shadcnui.GUIComponents.Core
         }
 
         private static LogLevel _minLogLevel = LogLevel.Warning;
-        private static bool _enableUnityDebugLog = false;
+        private static string _logFilePath;
+        private static bool _fileLoggingEnabled = false;
+        private static readonly object _fileLock = new object();
 
         public static void SetLogLevel(LogLevel level)
         {
             _minLogLevel = level;
         }
 
-        public static void SetUnityDebugLog(bool enabled)
+        public static void EnableFileLogging(string filePath = null)
         {
-            _enableUnityDebugLog = enabled;
+            if (filePath == null)
+            {
+                filePath = Path.Combine(Application.persistentDataPath, "logs", "GUILogger.log");
+            }
+
+            _logFilePath = filePath;
+            string directory = Path.GetDirectoryName(_logFilePath);
+
+            if (!Directory.Exists(directory))
+            {
+                Directory.CreateDirectory(directory);
+            }
+
+            _fileLoggingEnabled = true;
+        }
+
+        public static void DisableFileLogging()
+        {
+            _fileLoggingEnabled = false;
         }
 
         public static void LogDebug(string message, string component = "GUIHelper")
@@ -65,20 +89,53 @@ namespace shadcnui.GUIComponents.Core
             string levelStr = level.ToString().ToUpper();
             string formattedMessage = $"[{timestamp}] [{levelStr}] [{component}] {message}";
 
-            if (_enableUnityDebugLog)
+#if IL2CPP_MELONLOADER
+            switch (level)
             {
-                switch (level)
+                case LogLevel.Debug:
+                case LogLevel.Info:
+                    MelonLogger.Msg(formattedMessage);
+                    break;
+                case LogLevel.Warning:
+                    MelonLogger.Warning(formattedMessage);
+                    break;
+                case LogLevel.Error:
+                    MelonLogger.Error(formattedMessage);
+                    break;
+            }
+#else
+            switch (level)
+            {
+                case LogLevel.Debug:
+                case LogLevel.Info:
+                    Debug.Log(formattedMessage);
+                    break;
+                case LogLevel.Warning:
+                    Debug.LogWarning(formattedMessage);
+                    break;
+                case LogLevel.Error:
+                    Debug.LogError(formattedMessage);
+                    break;
+            }
+#endif
+
+            if (_fileLoggingEnabled && !string.IsNullOrEmpty(_logFilePath))
+            {
+                WriteToFile(formattedMessage);
+            }
+        }
+
+        private static void WriteToFile(string message)
+        {
+            lock (_fileLock)
+            {
+                try
                 {
-                    case LogLevel.Debug:
-                    case LogLevel.Info:
-                        Debug.Log(formattedMessage);
-                        break;
-                    case LogLevel.Warning:
-                        Debug.LogWarning(formattedMessage);
-                        break;
-                    case LogLevel.Error:
-                        Debug.LogError(formattedMessage);
-                        break;
+                    File.AppendAllText(_logFilePath, message + Environment.NewLine);
+                }
+                catch (Exception ex)
+                {
+                    Debug.LogError($"Failed to write to log file: {ex.Message}");
                 }
             }
         }

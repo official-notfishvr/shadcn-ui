@@ -12,6 +12,13 @@ namespace shadcnui.GUIComponents.Data
     {
         private Dictionary<string, bool> _openStates = new Dictionary<string, bool>();
         private Dictionary<string, DateTime> _displayDates = new Dictionary<string, DateTime>();
+        private Dictionary<string, DateTime> _focusedDates = new Dictionary<string, DateTime>();
+        private bool _weekStartsMonday = true;
+
+        public void SetWeekStartsMonday(bool value)
+        {
+            _weekStartsMonday = value;
+        }
 
         public DatePicker(GUIHelper helper)
             : base(helper) { }
@@ -22,6 +29,7 @@ namespace shadcnui.GUIComponents.Data
             {
                 _openStates[id] = false;
                 _displayDates[id] = selectedDate ?? DateTime.Today;
+                _focusedDates[id] = selectedDate ?? DateTime.Today;
             }
 
             var styleManager = guiHelper.GetStyleManager();
@@ -42,7 +50,7 @@ namespace shadcnui.GUIComponents.Data
 
             if (_openStates[id])
             {
-                DateTime? newSelectedDate = DrawCalendarPopover(id, selectedDate, displayDate);
+                DateTime? newSelectedDate = DrawCalendarPopover(id, selectedDate, displayDate, null, null);
                 if (newSelectedDate != selectedDate)
                 {
                     _openStates[id] = false;
@@ -91,7 +99,7 @@ namespace shadcnui.GUIComponents.Data
 
             if (_openStates[id])
             {
-                DrawCalendarPopover(id, startDate, _displayDates[id]);
+                DrawCalendarPopover(id, startDate, _displayDates[id], null, null);
             }
 
             layoutComponents.EndVerticalGroup();
@@ -99,14 +107,83 @@ namespace shadcnui.GUIComponents.Data
             return startDate;
         }
 
-        private DateTime? DrawCalendarPopover(string id, DateTime? selectedDate, DateTime displayDate)
+        public DateTime? DrawDatePicker(string placeholder, DateTime? selectedDate, DateTime? minDate, DateTime? maxDate, string id = "datepicker", params GUILayoutOption[] options)
+        {
+            if (!_openStates.ContainsKey(id))
+            {
+                _openStates[id] = false;
+                _displayDates[id] = selectedDate ?? DateTime.Today;
+                _focusedDates[id] = selectedDate ?? DateTime.Today;
+            }
+
+            var styleManager = guiHelper.GetStyleManager();
+            bool isOpen = _openStates[id];
+            DateTime displayDate = _displayDates[id];
+            string buttonText = selectedDate?.ToString("MMM dd, yyyy") ?? placeholder;
+
+            layoutComponents.BeginVerticalGroup();
+
+            if (UnityHelpers.Button($"{buttonText}", styleManager.GetSelectTriggerStyle(), options))
+            {
+                _openStates[id] = !isOpen;
+                if (selectedDate.HasValue)
+                {
+                    _displayDates[id] = selectedDate.Value;
+                }
+            }
+
+            if (_openStates[id])
+            {
+                DateTime? newSelectedDate = DrawCalendarPopover(id, selectedDate, displayDate, minDate, maxDate);
+                if (newSelectedDate != selectedDate)
+                {
+                    _openStates[id] = false;
+                    return newSelectedDate;
+                }
+            }
+
+            layoutComponents.EndVerticalGroup();
+
+            return selectedDate;
+        }
+
+        public DateTime? DrawDateRangePicker(string placeholder, DateTime? startDate, DateTime? endDate, DateTime? minDate, DateTime? maxDate, string id = "daterange", params GUILayoutOption[] options)
+        {
+            if (!_openStates.ContainsKey(id))
+            {
+                _openStates[id] = false;
+                _displayDates[id] = startDate ?? DateTime.Today;
+            }
+
+            var styleManager = guiHelper.GetStyleManager();
+            string buttonText = startDate.HasValue && endDate.HasValue ? $"{startDate.Value.ToString("MMM dd")} - {endDate.Value.ToString("MMM dd, yyyy")}" : placeholder;
+
+            layoutComponents.BeginVerticalGroup();
+
+            if (UnityHelpers.Button($"{buttonText}", styleManager.GetSelectTriggerStyle(), options))
+            {
+                _openStates[id] = !_openStates[id];
+            }
+
+            if (_openStates[id])
+            {
+                DrawCalendarPopover(id, startDate, _displayDates[id], minDate, maxDate);
+            }
+
+            layoutComponents.EndVerticalGroup();
+
+            return startDate;
+        }
+
+        private DateTime? DrawCalendarPopover(string id, DateTime? selectedDate, DateTime displayDate, DateTime? minDate, DateTime? maxDate)
         {
             var styleManager = guiHelper.GetStyleManager();
             layoutComponents.BeginVerticalGroup(styleManager.GetPopoverContentStyle(), GUILayout.Width(280));
 
             DrawCalendarHeader(id, displayDate);
             DrawWeekdayHeaders();
-            DateTime? newSelectedDate = DrawCalendarGrid(selectedDate, displayDate);
+            DateTime? newSelectedDate = DrawCalendarGrid(id, selectedDate, displayDate, minDate, maxDate);
+            HandleCalendarKeyboard(id, ref newSelectedDate);
 
             if (newSelectedDate.HasValue)
             {
@@ -124,7 +201,12 @@ namespace shadcnui.GUIComponents.Data
             var styleManager = guiHelper.GetStyleManager();
             layoutComponents.BeginHorizontalGroup();
 
-            if (UnityHelpers.Button("â€¹", styleManager.GetButtonStyle(ButtonVariant.Ghost, ButtonSize.Default), GUILayout.Width(32), GUILayout.Height(32)))
+            if (UnityHelpers.Button("«", styleManager.GetButtonStyle(ButtonVariant.Ghost, ButtonSize.Default), GUILayout.Width(32), GUILayout.Height(32)))
+            {
+                _displayDates[id] = displayDate.AddYears(-1);
+            }
+
+            if (UnityHelpers.Button("‹", styleManager.GetButtonStyle(ButtonVariant.Ghost, ButtonSize.Default), GUILayout.Width(32), GUILayout.Height(32)))
             {
                 _displayDates[id] = displayDate.AddMonths(-1);
             }
@@ -135,9 +217,14 @@ namespace shadcnui.GUIComponents.Data
             UnityHelpers.Label(currentMonthYear, styleManager.GetDatePickerTitleStyle());
             GUILayout.FlexibleSpace();
 
-            if (UnityHelpers.Button("â€º", styleManager.GetButtonStyle(ButtonVariant.Ghost, ButtonSize.Default), GUILayout.Width(32), GUILayout.Height(32)))
+            if (UnityHelpers.Button("›", styleManager.GetButtonStyle(ButtonVariant.Ghost, ButtonSize.Default), GUILayout.Width(32), GUILayout.Height(32)))
             {
                 _displayDates[id] = displayDate.AddMonths(1);
+            }
+
+            if (UnityHelpers.Button("»", styleManager.GetButtonStyle(ButtonVariant.Ghost, ButtonSize.Default), GUILayout.Width(32), GUILayout.Height(32)))
+            {
+                _displayDates[id] = displayDate.AddYears(1);
             }
 
             layoutComponents.EndHorizontalGroup();
@@ -147,7 +234,7 @@ namespace shadcnui.GUIComponents.Data
         private void DrawWeekdayHeaders()
         {
             var styleManager = guiHelper.GetStyleManager();
-            string[] weekdays = { "Su", "Mo", "Tu", "We", "Th", "Fr", "Sa" };
+            string[] weekdays = _weekStartsMonday ? new[] { "Mo", "Tu", "We", "Th", "Fr", "Sa", "Su" } : new[] { "Su", "Mo", "Tu", "We", "Th", "Fr", "Sa" };
 
             layoutComponents.BeginHorizontalGroup();
             foreach (string day in weekdays)
@@ -158,11 +245,15 @@ namespace shadcnui.GUIComponents.Data
             GUILayout.Space(4);
         }
 
-        private DateTime? DrawCalendarGrid(DateTime? selectedDate, DateTime displayDate)
+        private DateTime? DrawCalendarGrid(string id, DateTime? selectedDate, DateTime displayDate, DateTime? minDate, DateTime? maxDate)
         {
             DateTime firstDayOfMonth = new DateTime(displayDate.Year, displayDate.Month, 1);
             int daysInMonth = DateTime.DaysInMonth(displayDate.Year, displayDate.Month);
             int firstDayOfWeek = (int)firstDayOfMonth.DayOfWeek;
+            if (_weekStartsMonday)
+            {
+                firstDayOfWeek = (firstDayOfWeek == 0) ? 6 : firstDayOfWeek - 1;
+            }
 
             DateTime firstDisplayDate = firstDayOfMonth.AddDays(-firstDayOfWeek);
             DateTime? newSelectedDate = selectedDate;
@@ -180,10 +271,18 @@ namespace shadcnui.GUIComponents.Data
 
                     GUIStyle dayStyle = GetDayStyle(isCurrentMonth, isSelected, isToday);
 
+                    bool withinRange = (!minDate.HasValue || currentDate.Date >= minDate.Value.Date) && (!maxDate.HasValue || currentDate.Date <= maxDate.Value.Date);
+                    bool wasEnabled = GUI.enabled;
+                    if (!withinRange)
+                        GUI.enabled = false;
+
                     if (UnityHelpers.Button(currentDate.Day.ToString(), dayStyle, GUILayout.Width(36), GUILayout.Height(32)))
                     {
                         newSelectedDate = currentDate;
+                        _focusedDates[id] = currentDate;
                     }
+
+                    GUI.enabled = wasEnabled;
                 }
 
                 layoutComponents.EndHorizontalGroup();
@@ -193,6 +292,52 @@ namespace shadcnui.GUIComponents.Data
             }
 
             return newSelectedDate;
+        }
+
+        private void HandleCalendarKeyboard(string id, ref DateTime? selected)
+        {
+            if (Event.current.type != EventType.KeyDown)
+                return;
+
+            if (!_focusedDates.ContainsKey(id))
+                _focusedDates[id] = _displayDates.ContainsKey(id) ? _displayDates[id] : DateTime.Today;
+
+            DateTime focus = _focusedDates[id];
+            bool used = false;
+            switch (Event.current.keyCode)
+            {
+                case KeyCode.LeftArrow:
+                    focus = focus.AddDays(-1);
+                    used = true;
+                    break;
+                case KeyCode.RightArrow:
+                    focus = focus.AddDays(1);
+                    used = true;
+                    break;
+                case KeyCode.UpArrow:
+                    focus = focus.AddDays(-7);
+                    used = true;
+                    break;
+                case KeyCode.DownArrow:
+                    focus = focus.AddDays(7);
+                    used = true;
+                    break;
+                case KeyCode.Return:
+                    selected = focus;
+                    used = true;
+                    break;
+                case KeyCode.Escape:
+                    _openStates[id] = false;
+                    used = true;
+                    break;
+            }
+
+            if (used)
+            {
+                _focusedDates[id] = focus;
+                _displayDates[id] = new DateTime(focus.Year, focus.Month, 1);
+                Event.current.Use();
+            }
         }
 
         private GUIStyle GetDayStyle(bool isCurrentMonth, bool isSelected, bool isToday)
