@@ -128,9 +128,16 @@ namespace shadcnui.GUIComponents.Display
             GUIStyle badgeStyle = styleManager.GetBadgeStyle(variant, size);
 
             GUIStyle roundedStyle = new UnityHelpers.GUIStyle(badgeStyle);
-            roundedStyle.border = new UnityHelpers.RectOffset(Mathf.RoundToInt(cornerRadius * guiHelper.uiScale), Mathf.RoundToInt(cornerRadius * guiHelper.uiScale), Mathf.RoundToInt(cornerRadius * guiHelper.uiScale), Mathf.RoundToInt(cornerRadius * guiHelper.uiScale));
+            int r = Mathf.RoundToInt(cornerRadius * guiHelper.uiScale);
+            roundedStyle.border = new UnityHelpers.RectOffset(r, r, r, r);
+            roundedStyle.padding = new UnityHelpers.RectOffset(badgeStyle.padding.left + 4, badgeStyle.padding.right + 4, badgeStyle.padding.top + 2, badgeStyle.padding.bottom + 2);
 
             UnityHelpers.Label(text ?? "Badge", roundedStyle, options);
+        }
+
+        public void PillBadge(string text, BadgeVariant variant = BadgeVariant.Default, BadgeSize size = BadgeSize.Default, params GUILayoutOption[] options)
+        {
+            RoundedBadge(text, variant, size, 999f, options);
         }
     }
 }

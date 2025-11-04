@@ -134,10 +134,10 @@ namespace shadcnui.GUIComponents.Display
 
         private void DrawOverlay()
         {
-            if (Event.current.type == EventType.MouseDown)
-            {
-                Close();
-            }
+            Color prev = GUI.color;
+            GUI.color = ThemeManager.Instance.CurrentTheme.OverlayColor;
+            GUI.DrawTexture(new Rect(0, 0, Screen.width, Screen.height), Texture2D.whiteTexture);
+            GUI.color = prev;
         }
     }
 }

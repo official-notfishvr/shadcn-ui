@@ -64,24 +64,32 @@ namespace shadcnui.GUIComponents.Core
 
         public bool BeginAnimatedGUI(float menuAlpha, float backgroundPulse, Vector2 mousePos)
         {
-            float currentAlpha = guiHelper.fadeTransitionsEnabled ? menuAlpha : 1f;
-            GUI.color = new Color(1f, 1f, 1f, currentAlpha);
+            try
+            {
+                float currentAlpha = guiHelper.fadeTransitionsEnabled ? menuAlpha : 1f;
+                GUI.color = new Color(1f, 1f, 1f, currentAlpha);
 
-            if (guiHelper.particleEffectsEnabled)
-                RenderBackgroundParticles(currentAlpha);
+                if (guiHelper.particleEffectsEnabled)
+                    RenderBackgroundParticles(currentAlpha);
 
-            float pulseAlpha = guiHelper.animationsEnabled ? backgroundPulse : guiHelper.backgroundAlpha;
-            GUI.color = new Color(1f, 1f, 1f, currentAlpha * pulseAlpha);
+                float pulseAlpha = guiHelper.animationsEnabled ? backgroundPulse : guiHelper.backgroundAlpha;
+                GUI.color = new Color(1f, 1f, 1f, currentAlpha * pulseAlpha);
 
-            var styleManager = guiHelper.GetStyleManager();
+                var styleManager = guiHelper.GetStyleManager();
 #if IL2CPP_MELONLOADER_PRE57
-            layoutComponents.BeginVerticalGroup(styleManager.animatedBoxStyle, (Il2CppReferenceArray<GUILayoutOption>)null);
+                layoutComponents.BeginVerticalGroup(styleManager.animatedBoxStyle, (Il2CppReferenceArray<GUILayoutOption>)null);
 #else
-            layoutComponents.BeginVerticalGroup(styleManager.GetAnimatedBoxStyle());
+                layoutComponents.BeginVerticalGroup(styleManager.GetAnimatedBoxStyle());
 #endif
-            GUI.color = new Color(1f, 1f, 1f, currentAlpha);
-            _layoutGroupStarted = true;
-            return true;
+                GUI.color = new Color(1f, 1f, 1f, currentAlpha);
+                _layoutGroupStarted = true;
+                return true;
+            }
+            catch (Exception ex)
+            {
+                GUILogger.LogException(ex, "AnimationManager", "AnimationManager");
+                return false;
+            }
         }
 
         public void EndAnimatedGUI()

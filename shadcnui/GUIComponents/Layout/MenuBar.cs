@@ -76,7 +76,6 @@ namespace shadcnui.GUIComponents.Layout
             var styleManager = guiHelper.GetStyleManager();
 
             layoutComponents.BeginHorizontalGroup(styleManager.GetMenuBarStyle(), options);
-            _menuBarRect = GUILayoutUtility.GetRect(GUIContent.none, GUIStyle.none, options);
 
             for (var i = 0; i < items.Count; i++)
             {
@@ -84,7 +83,6 @@ namespace shadcnui.GUIComponents.Layout
                 if (item.IsSeparator || item.IsHeader)
                     continue;
 
-                var isActive = (i == _activeMenuIndex) && _isDropdownOpen;
                 var itemStyle = styleManager.GetMenuBarItemStyle();
 
                 var wasEnabled = GUI.enabled;
@@ -113,6 +111,7 @@ namespace shadcnui.GUIComponents.Layout
             }
 
             layoutComponents.EndHorizontalGroup();
+            _menuBarRect = GUILayoutUtility.GetLastRect();
 
             if (_isDropdownOpen && _menuStack.Count > 0)
             {
@@ -127,7 +126,7 @@ namespace shadcnui.GUIComponents.Layout
             var styleManager = guiHelper.GetStyleManager();
             var currentMenu = _menuStack.Peek();
 
-            layoutComponents.BeginVerticalGroup(styleManager.GetMenuDropdownStyle(), GUILayout.Width(200 * guiHelper.uiScale));
+            layoutComponents.BeginVerticalGroup(styleManager.GetMenuDropdownStyle(), GUILayout.Width(220 * guiHelper.uiScale));
 
             if (_menuStack.Count > 1)
             {
@@ -138,6 +137,7 @@ namespace shadcnui.GUIComponents.Layout
                     {
                         _activeMenuIndex = _menuStack.Peek().ParentIndex;
                     }
+                    layoutComponents.EndVerticalGroup();
                     return;
                 }
 
@@ -174,14 +174,7 @@ namespace shadcnui.GUIComponents.Layout
 
             if (item.SubItems.Count > 0)
             {
-                layoutComponents.BeginHorizontalGroup();
-                UnityHelpers.Label(item.Text, styleManager.GetMenuBarItemStyle());
-                GUILayout.FlexibleSpace();
-                UnityHelpers.Label("â€º", styleManager.GetMenuBarItemStyle());
-                layoutComponents.EndHorizontalGroup();
-
-                var itemRect = GUILayoutUtility.GetLastRect();
-                if (GUI.Button(itemRect, "", GUIStyle.none))
+                if (GUILayout.Button(item.Text, styleManager.GetMenuBarItemStyle(), GUILayout.ExpandWidth(true)))
                 {
                     _menuStack.Push(new MenuData(item.SubItems, _activeMenuIndex));
                 }

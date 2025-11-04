@@ -19,16 +19,16 @@ namespace shadcnui.GUIComponents.Core
         private readonly IComponentResolver _componentResolver;
 
         #region Internal Settings
-        internal bool animationsEnabled = false;
-        internal float animationSpeed = 12f;
+        internal bool animationsEnabled = true;
+        internal float animationSpeed = 14f;
         internal bool glowEffectsEnabled = true;
         internal bool particleEffectsEnabled = false;
-        internal float backgroundAlpha = 0.9f;
-        internal int fontSize = 12;
-        internal int cornerRadius = 14;
+        internal float backgroundAlpha = 0.85f;
+        internal int fontSize = 14;
+        internal int cornerRadius = 16;
         internal bool hoverEffectsEnabled = true;
         internal bool fadeTransitionsEnabled = true;
-        internal float glowIntensity = 16.5f;
+        internal float glowIntensity = 12.0f;
         internal bool smoothAnimationsEnabled = true;
         public float uiScale = 1f;
         #endregion
