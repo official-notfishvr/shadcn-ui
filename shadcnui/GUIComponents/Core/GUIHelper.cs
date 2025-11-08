@@ -74,7 +74,6 @@ namespace shadcnui.GUIComponents.Core
                 _componentInstances[typeof(TextArea)] = new TextArea(this);
                 _componentInstances[typeof(Checkbox)] = new Checkbox(this);
                 _componentInstances[typeof(Switch)] = new Switch(this);
-                _componentInstances[typeof(Slider)] = new Slider(this);
                 _componentInstances[typeof(Button)] = new Button(this);
                 _componentInstances[typeof(Toggle)] = new Toggle(this);
 
@@ -127,19 +126,6 @@ namespace shadcnui.GUIComponents.Core
 
         public Chart GetChartComponents() => GetComponent<Chart>();
 
-        public Settings CreateSetting()
-        {
-            try
-            {
-                return new Settings(this);
-            }
-            catch (Exception ex)
-            {
-                GUILogger.LogException(ex, "CreateSetting", "GUIHelper");
-                return null;
-            }
-        }
-
         public void UpdateAnimations(bool isOpen)
         {
             try
@@ -172,6 +158,11 @@ namespace shadcnui.GUIComponents.Core
                     styleManager.InitializeGUI();
                     initialized = true;
                 }
+
+                if (styleManager.ScanForCorruption())
+                    styleManager.MarkStylesCorruption();
+
+                styleManager.RefreshStylesIfCorruption();
 
                 float currentMenuAlpha = menuAlpha;
                 float currentBackgroundPulse = backgroundPulse;
@@ -367,32 +358,6 @@ namespace shadcnui.GUIComponents.Core
         public void CardContent(Action content) => GetComponent<Card>()?.CardContent(content);
 
         public void CardFooter(Action content) => GetComponent<Card>()?.CardFooter(content);
-        #endregion
-
-        #region Slider Components
-        public void DrawSlider(float windowWidth, string label, ref float value, float minValue, float maxValue)
-        {
-            try
-            {
-                GetComponent<Slider>()?.DrawSlider(windowWidth, label, ref value, minValue, maxValue);
-            }
-            catch (Exception ex)
-            {
-                GUILogger.LogException(ex, "DrawSlider", "GUIHelper");
-            }
-        }
-
-        public void DrawIntSlider(float windowWidth, string label, ref int value, int minValue, int maxValue)
-        {
-            try
-            {
-                GetComponent<Slider>()?.DrawIntSlider(windowWidth, label, ref value, minValue, maxValue);
-            }
-            catch (Exception ex)
-            {
-                GUILogger.LogException(ex, "DrawIntSlider", "GUIHelper");
-            }
-        }
         #endregion
 
         #region Layout Components

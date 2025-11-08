@@ -12,8 +12,6 @@ namespace shadcnui.GUIComponents.Controls
 {
     public class Input : BaseComponent
     {
-        private static float horizontalPadding = 10f;
-
         public Input(GUIHelper helper)
             : base(helper) { }
 

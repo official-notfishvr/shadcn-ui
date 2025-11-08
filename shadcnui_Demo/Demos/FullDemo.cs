@@ -25,12 +25,8 @@ namespace shadcnui_Demo.Menu
 
         private bool checkboxValue = false;
         private bool switchValue = false;
-        private float sliderValue = 50f;
         private string textAreaValue = "";
         private int selectedTab = 0;
-        private int selectedToggle = 0;
-        private float progressValue = 0.3f;
-        private int glowButtonIndex = 0;
         private Tabs.TabConfig[] demoTabs;
         private int currentDemoTab = 0;
         private bool verticalTabsOnRight = false;
@@ -38,11 +34,6 @@ namespace shadcnui_Demo.Menu
 
         private string passwordValue = "password123";
         private string inputTextAreaValue = "This is a text area in Input Components.";
-        private string glowInputFieldText = "Glow Input";
-        private int glowInputFieldIdx = 0;
-        private bool drawToggleValue = false;
-        private bool drawCheckboxValue = false;
-        private int selectionGridValue = 0;
 
         private bool defaultSwitchVariant = false;
         private bool outlineSwitchVariant = false;
@@ -50,14 +41,7 @@ namespace shadcnui_Demo.Menu
         private bool defaultSwitchSize = false;
         private bool smallSwitchSize = false;
         private bool largeSwitchSize = false;
-        private bool switchWithLabelValue = false;
         private bool[] switchGroupValues = { false, true, false };
-        private bool switchWithDescriptionValue = false;
-        private bool validatedSwitchValue = false;
-        private bool switchWithTooltipValue = false;
-        private bool switchWithIconValue = false;
-        private bool switchWithLoadingValue = false;
-        private bool customSwitchValue = false;
         private bool defaultVariant = false;
         private bool largeSize = false;
         private bool smallSize = false;
@@ -73,18 +57,10 @@ namespace shadcnui_Demo.Menu
         private bool defaultToggleValue = false;
         private bool[] multiToggleGroupValues = { false, true, false };
 
-        private bool checkboxWithLabelValue = false;
         private bool[] checkboxGroupValues = { false, true, false };
-        private bool checkboxWithIconValue = false;
-        private bool checkboxWithDescriptionValue = false;
-        private bool validatedCheckboxValue = false;
-        private bool checkboxWithTooltipValue = false;
-        private bool customCheckboxValue = false;
 
         private bool optionAValue = false;
         private bool optionBValue = true;
-
-        private bool expandableAlertExpanded = false;
 
         private string outlineTextAreaValue = "Outline Text Area";
         private string ghostTextAreaValue = "Ghost Text Area";
@@ -92,11 +68,8 @@ namespace shadcnui_Demo.Menu
         private float resizableTextAreaHeight = 100f;
         private string resizableTextAreaValue = "Resizable Text Area";
 
-        private int intSliderValue = 50;
-        private float visualProgressBarValue = 0.7f;
         private int selectedVerticalTab = 0;
         private int selectDemoCurrentSelection = 0;
-        private string inputFieldValue = "Default Input";
         private Vector2 scrollAreaScrollPosition = Vector2.zero;
         private List<ChartSeries> chartSeries;
         private bool dropdownOpen = false;
@@ -104,11 +77,7 @@ namespace shadcnui_Demo.Menu
         private System.Collections.Generic.List<DropdownMenuItem> dropdownMenuItems;
 
         private DateTime? calendarSelectedDate;
-        private DateTime? calendarRangeStart;
-        private DateTime? calendarRangeEnd;
         private System.Collections.Generic.List<DateTime> calendarDisabledDates = new System.Collections.Generic.List<DateTime>();
-
-        private bool dialogOpen = false;
 
         private DateTime? selectedDate;
         private DateTime? selectedDateWithLabel;
@@ -116,7 +85,6 @@ namespace shadcnui_Demo.Menu
         private System.Collections.Generic.List<DataTableColumn> dataTableColumns;
         private System.Collections.Generic.List<DataTableRow> dataTableData;
 
-        private bool fontInitialized = false;
         private Texture2D img = new Texture2D(2, 2);
 
         void Start()
@@ -150,7 +118,6 @@ namespace shadcnui_Demo.Menu
                 new Tabs.TabConfig("Layout", DrawLayoutDemos),
                 new Tabs.TabConfig("Progress", DrawProgressDemos),
                 new Tabs.TabConfig("Separator", DrawSeparatorDemos),
-                new Tabs.TabConfig("Slider", DrawSliderDemos),
                 new Tabs.TabConfig("Switch", DrawSwitchDemos),
                 new Tabs.TabConfig("Table", DrawTableDemos),
                 new Tabs.TabConfig("Tabs", DrawTabsDemos),
@@ -1022,12 +989,6 @@ namespace shadcnui_Demo.Menu
             guiHelper.MutedLabel("Displays an indicator showing the completion progress of a task.");
             guiHelper.HorizontalSeparator();
 
-            guiHelper.Label("Default Progress Bar", LabelVariant.Default);
-            guiHelper.Progress(progressValue, 300);
-            guiHelper.DrawSlider(300, "Progress", ref progressValue, 0, 1);
-            guiHelper.Label("Code: guiHelper.Progress(value, width);", LabelVariant.Muted);
-            guiHelper.HorizontalSeparator();
-
             guiHelper.Label("Labeled Progress Bar", LabelVariant.Default);
             guiHelper.LabeledProgress("Download", 0.75f, 300, showPercentage: true);
             guiHelper.Label("Code: guiHelper.LabeledProgress(label, value, width, showPercentage);", LabelVariant.Muted);
@@ -1079,28 +1040,6 @@ namespace shadcnui_Demo.Menu
             guiHelper.Label("Labeled Separator", LabelVariant.Default);
             guiHelper.LabeledSeparator("OR");
             guiHelper.Label("Code: guiHelper.LabeledSeparator(\"OR\");");
-            guiHelper.HorizontalSeparator();
-
-            GUILayout.EndVertical();
-        }
-
-        void DrawSliderDemos()
-        {
-            guiHelper.BeginVerticalGroup(GUILayout.ExpandWidth(true), GUILayout.ExpandHeight(true));
-            guiHelper.Label("Slider", LabelVariant.Default);
-            guiHelper.MutedLabel("A control that allows the user to select a value from a range.");
-            guiHelper.HorizontalSeparator();
-
-            guiHelper.Label("Default Slider", LabelVariant.Default);
-            guiHelper.DrawSlider(300, "Volume", ref sliderValue, 0, 100);
-            guiHelper.Label($"Current Value: {sliderValue:F2}");
-            guiHelper.Label("Code: guiHelper.DrawSlider(width, label, ref value, min, max);", LabelVariant.Muted);
-            guiHelper.HorizontalSeparator();
-
-            guiHelper.Label("Integer Slider", LabelVariant.Default);
-            guiHelper.DrawIntSlider(300, "Integer Value", ref intSliderValue, 0, 100);
-            guiHelper.Label($"Current Integer Value: {intSliderValue}");
-            guiHelper.Label("Code: guiHelper.DrawIntSlider(width, label, ref value, min, max);", LabelVariant.Muted);
             guiHelper.HorizontalSeparator();
 
             GUILayout.EndVertical();

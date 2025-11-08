@@ -11,7 +11,6 @@ namespace shadcnui.GUIComponents.Controls
     public class Select : BaseComponent
     {
         private bool isOpen;
-        private int selectedIndex;
         private Vector2 scrollPosition;
 
         public Select(GUIHelper helper)

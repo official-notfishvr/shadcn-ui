@@ -289,7 +289,6 @@ namespace shadcnui.GUIComponents.Core
         private GUIStyle buttonSecondaryStyle;
         private GUIStyle buttonGhostStyle;
         private GUIStyle buttonLinkStyle;
-        private GUIStyle buttonIconStyle;
         #endregion
 
         #region GUIStyle - Toggle
@@ -357,13 +356,6 @@ namespace shadcnui.GUIComponents.Core
         private GUIStyle badgeOutlineStyle;
         #endregion
 
-        #region GUIStyle - Alert
-        private GUIStyle alertDefaultStyle;
-        private GUIStyle alertDestructiveStyle;
-        private GUIStyle alertTitleStyle;
-        private GUIStyle alertDescriptionStyle;
-        #endregion
-
         #region GUIStyle - Avatar
         private GUIStyle avatarStyle;
         #endregion
@@ -375,15 +367,6 @@ namespace shadcnui.GUIComponents.Core
         private GUIStyle tableStripedStyle;
         private GUIStyle tableBorderedStyle;
         private GUIStyle tableHoverStyle;
-        #endregion
-
-        #region GUIStyle - Slider
-        private GUIStyle sliderDefaultStyle;
-        private GUIStyle sliderRangeStyle;
-        private GUIStyle sliderVerticalStyle;
-        private GUIStyle sliderDisabledStyle;
-        private GUIStyle sliderLabelStyle;
-        private GUIStyle sliderValueStyle;
         #endregion
 
         #region GUIStyle - Calendar
@@ -564,7 +547,7 @@ namespace shadcnui.GUIComponents.Core
             }
         }
 
-        private void SetupAllStyles()
+        internal void SetupAllStyles()
         {
             try
             {
@@ -597,6 +580,336 @@ namespace shadcnui.GUIComponents.Core
             {
                 GUILogger.LogException(ex, "SetupAllStyles", "StyleManager");
             }
+        }
+        #endregion
+
+        #region Fix GUI Styles
+        private bool _stylesCorruption = false;
+        private float _lastScanTime = 0f;
+        private float _scanInterval = 5f;
+        private Dictionary<string, int> _styleHealthChecks = new Dictionary<string, int>();
+
+        private readonly string[] _stylesToMonitor = new[]
+        {
+            "tabsTriggerActive",
+            "buttonDefault",
+            "buttonDestructive",
+            "buttonOutline",
+            "buttonSecondary",
+            "buttonGhost",
+            "buttonLink",
+            "toggleDefault",
+            "toggleOutline",
+            "inputDefault",
+            "inputOutline",
+            "inputGhost",
+            "inputFocused",
+            "inputDisabled",
+            "labelDefault",
+            "labelSecondary",
+            "labelMuted",
+            "labelDestructive",
+            "cardStyle",
+            "cardHeader",
+            "cardTitle",
+            "cardDescription",
+            "cardContent",
+            "cardFooter",
+            "progressBar",
+            "progressBarBg",
+            "progressBarFill",
+            "checkboxDefault",
+            "checkboxOutline",
+            "checkboxGhost",
+            "switchDefault",
+            "switchOutline",
+            "switchGhost",
+            "badgeDefault",
+            "badgeSecondary",
+            "badgeDestructive",
+            "badgeOutline",
+            "separator",
+            "separatorVertical",
+            "textArea",
+            "textAreaFocused",
+            "textAreaOutline",
+            "textAreaGhost",
+            "passwordField",
+            "tabsList",
+            "tabsTrigger",
+            "tabsContent",
+            "table",
+            "tableHeader",
+            "tableCell",
+            "tableStriped",
+            "tableBordered",
+            "tableHover",
+            "calendar",
+            "calendarHeader",
+            "calendarTitle",
+            "calendarWeekday",
+            "calendarDay",
+            "calendarDaySelected",
+            "calendarDayOutsideMonth",
+            "calendarDayToday",
+            "calendarDayDisabled",
+            "calendarDayInRange",
+            "dialogOverlay",
+            "dialogContent",
+            "dialogTitle",
+            "dialogDescription",
+            "dropdownMenuContent",
+            "dropdownMenuItem",
+            "dropdownMenuSeparator",
+            "dropdownMenuHeader",
+            "popover",
+            "selectTrigger",
+            "selectContent",
+            "selectItem",
+            "chartContainer",
+            "chartContent",
+            "chartAxis",
+            "chartGrid",
+            "menuBar",
+            "menuBarItem",
+            "menuDropdown",
+            "animatedBox",
+            "animatedButton",
+            "animatedInput",
+            "glowLabel",
+            "title",
+            "colorPreset",
+            "sectionHeader",
+            "avatar",
+            "datePickerStyle",
+            "datePickerHeader",
+            "datePickerTitle",
+            "datePickerWeekday",
+            "datePickerDay",
+            "datePickerDaySelected",
+            "datePickerDayOutsideMonth",
+            "datePickerDayToday",
+            "datePickerDayDisabled",
+            "datePickerDayInRange",
+            "scrollAreaStyle",
+            "scrollAreaThumb",
+            "scrollAreaTrack",
+        };
+
+        private GUIStyle GetStyleByName(string name) =>
+            name switch
+            {
+                "tabsTriggerActive" => tabsTriggerActiveStyle,
+                "buttonDefault" => buttonDefaultStyle,
+                "buttonDestructive" => buttonDestructiveStyle,
+                "buttonOutline" => buttonOutlineStyle,
+                "buttonSecondary" => buttonSecondaryStyle,
+                "buttonGhost" => buttonGhostStyle,
+                "buttonLink" => buttonLinkStyle,
+                "toggleDefault" => toggleDefaultStyle,
+                "toggleOutline" => toggleOutlineStyle,
+                "inputDefault" => inputDefaultStyle,
+                "inputOutline" => inputOutlineStyle,
+                "inputGhost" => inputGhostStyle,
+                "inputFocused" => inputFocusedStyle,
+                "inputDisabled" => inputDisabledStyle,
+                "labelDefault" => labelDefaultStyle,
+                "labelSecondary" => labelSecondaryStyle,
+                "labelMuted" => labelMutedStyle,
+                "labelDestructive" => labelDestructiveStyle,
+                "cardStyle" => cardStyle,
+                "cardHeader" => cardHeaderStyle,
+                "cardTitle" => cardTitleStyle,
+                "cardDescription" => cardDescriptionStyle,
+                "cardContent" => cardContentStyle,
+                "cardFooter" => cardFooterStyle,
+                "progressBar" => progressBarStyle,
+                "progressBarBg" => progressBarBackgroundStyle,
+                "progressBarFill" => progressBarFillStyle,
+                "checkboxDefault" => checkboxDefaultStyle,
+                "checkboxOutline" => checkboxOutlineStyle,
+                "checkboxGhost" => checkboxGhostStyle,
+                "switchDefault" => switchDefaultStyle,
+                "switchOutline" => switchOutlineStyle,
+                "switchGhost" => switchGhostStyle,
+                "badgeDefault" => badgeDefaultStyle,
+                "badgeSecondary" => badgeSecondaryStyle,
+                "badgeDestructive" => badgeDestructiveStyle,
+                "badgeOutline" => badgeOutlineStyle,
+                "separator" => separatorHorizontalStyle,
+                "separatorVertical" => separatorVerticalStyle,
+                "textArea" => textAreaStyle,
+                "textAreaFocused" => textAreaFocusedStyle,
+                "textAreaOutline" => textAreaOutlineStyle,
+                "textAreaGhost" => textAreaGhostStyle,
+                "passwordField" => passwordFieldStyle,
+                "tabsList" => tabsListStyle,
+                "tabsTrigger" => tabsTriggerStyle,
+                "tabsContent" => tabsContentStyle,
+                "table" => tableStyle,
+                "tableHeader" => tableHeaderStyle,
+                "tableCell" => tableCellStyle,
+                "tableStriped" => tableStripedStyle,
+                "tableBordered" => tableBorderedStyle,
+                "tableHover" => tableHoverStyle,
+                "calendar" => calendarStyle,
+                "calendarHeader" => calendarHeaderStyle,
+                "calendarTitle" => calendarTitleStyle,
+                "calendarWeekday" => calendarWeekdayStyle,
+                "calendarDay" => calendarDayStyle,
+                "calendarDaySelected" => calendarDaySelectedStyle,
+                "calendarDayOutsideMonth" => calendarDayOutsideMonthStyle,
+                "calendarDayToday" => calendarDayTodayStyle,
+                "calendarDayDisabled" => calendarDayDisabledStyle,
+                "calendarDayInRange" => calendarDayInRangeStyle,
+                "dialogOverlay" => dialogOverlayStyle,
+                "dialogContent" => dialogContentStyle,
+                "dialogTitle" => dialogTitleStyle,
+                "dialogDescription" => dialogDescriptionStyle,
+                "dropdownMenuContent" => dropdownMenuContentStyle,
+                "dropdownMenuItem" => dropdownMenuItemStyle,
+                "dropdownMenuSeparator" => dropdownMenuSeparatorStyle,
+                "dropdownMenuHeader" => dropdownMenuHeaderStyle,
+                "popover" => popoverContentStyle,
+                "selectTrigger" => selectTriggerStyle,
+                "selectContent" => selectContentStyle,
+                "selectItem" => selectItemStyle,
+                "chartContainer" => chartContainerStyle,
+                "chartContent" => chartContentStyle,
+                "chartAxis" => chartAxisStyle,
+                "chartGrid" => chartGridStyle,
+                "menuBar" => menuBarStyle,
+                "menuBarItem" => menuBarItemStyle,
+                "menuDropdown" => menuDropdownStyle,
+                "animatedBox" => animatedBoxStyle,
+                "animatedButton" => animatedButtonStyle,
+                "animatedInput" => animatedInputStyle,
+                "glowLabel" => glowLabelStyle,
+                "title" => titleStyle,
+                "colorPreset" => colorPresetStyle,
+                "sectionHeader" => sectionHeaderStyle,
+                "avatar" => avatarStyle,
+                "datePickerStyle" => datePickerStyle,
+                "datePickerHeader" => datePickerHeaderStyle,
+                "datePickerTitle" => datePickerTitleStyle,
+                "datePickerWeekday" => datePickerWeekdayStyle,
+                "datePickerDay" => datePickerDayStyle,
+                "datePickerDaySelected" => datePickerDaySelectedStyle,
+                "datePickerDayOutsideMonth" => datePickerDayOutsideMonthStyle,
+                "datePickerDayToday" => datePickerDayTodayStyle,
+                "datePickerDayDisabled" => datePickerDayDisabledStyle,
+                "datePickerDayInRange" => datePickerDayInRangeStyle,
+                "scrollAreaStyle" => scrollAreaStyle,
+                "scrollAreaThumb" => scrollAreaThumbStyle,
+                "scrollAreaTrack" => scrollAreaTrackStyle,
+                _ => null,
+            };
+
+        private int GetStyleHealth(GUIStyle style)
+        {
+            if (style == null)
+                return 0;
+            unchecked
+            {
+                int hash = 17;
+                hash = hash * 31 + (style.normal.background?.GetInstanceID() ?? 0);
+                hash = hash * 31 + (style.hover.background?.GetInstanceID() ?? 0);
+                hash = hash * 31 + (style.active.background?.GetInstanceID() ?? 0);
+                hash = hash * 31 + style.fontSize;
+                hash = hash * 31 + style.padding.left + style.padding.right + style.padding.top + style.padding.bottom;
+                hash = hash * 31 + (style.normal.textColor.GetHashCode());
+                return hash;
+            }
+        }
+
+        public void MarkStylesCorruption()
+        {
+            _stylesCorruption = true;
+        }
+
+        public void RefreshStylesIfCorruption()
+        {
+            if (!_stylesCorruption)
+                return;
+
+            try
+            {
+                buttonStyleCache.Clear();
+                toggleStyleCache.Clear();
+                inputStyleCache.Clear();
+                labelStyleCache.Clear();
+                textAreaStyleCache.Clear();
+                checkboxStyleCache.Clear();
+                switchStyleCache.Clear();
+                badgeStyleCache.Clear();
+                avatarStyleCache.Clear();
+                tableStyleCache.Clear();
+                calendarStyleCache.Clear();
+                dropdownMenuStyleCache.Clear();
+                scrollAreaStyleCache.Clear();
+                selectStyleCache.Clear();
+                chartStyleCache.Clear();
+
+                SetupAnimatedStyles();
+                SetupCardStyles();
+                SetupButtonVariantStyles();
+                SetupToggleVariantStyles();
+                SetupInputVariantStyles();
+                SetupLabelVariantStyles();
+                SetupProgressBarStyles();
+                SetupSeparatorStyles();
+                SetupTabsStyles();
+                SetupTextAreaVariantStyles();
+                SetupCheckboxStyles();
+                SetupSwitchStyles();
+                SetupBadgeStyles();
+                SetupAvatarStyles();
+                SetupTableStyles();
+                SetupCalendarStyles();
+                SetupDropdownMenuStyles();
+                SetupPopoverStyles();
+                SetupScrollAreaStyles();
+                SetupSelectStyles();
+                SetupDatePickerStyles();
+                SetupDialogStyles();
+                SetupChartStyles();
+                SetupMenuBarStyles();
+
+                _styleHealthChecks.Clear();
+                foreach (var styleName in _stylesToMonitor)
+                {
+                    _styleHealthChecks[styleName] = GetStyleHealth(GetStyleByName(styleName));
+                }
+
+                _stylesCorruption = false;
+            }
+            catch (Exception ex)
+            {
+                GUILogger.LogException(ex, "RefreshStylesIfCorruption", "StyleManager");
+            }
+        }
+
+        public bool ScanForCorruption()
+        {
+            if (Time.realtimeSinceStartup - _lastScanTime < _scanInterval)
+                return false;
+
+            _lastScanTime = Time.realtimeSinceStartup;
+
+            foreach (var styleName in _stylesToMonitor)
+            {
+                int currentHealth = GetStyleHealth(GetStyleByName(styleName));
+
+                if (_styleHealthChecks.ContainsKey(styleName) && _styleHealthChecks[styleName] != currentHealth)
+                {
+                    _styleHealthChecks[styleName] = currentHealth;
+                    return true;
+                }
+
+                _styleHealthChecks[styleName] = currentHealth;
+            }
+
+            return false;
         }
         #endregion
 
@@ -1792,15 +2105,7 @@ namespace shadcnui.GUIComponents.Core
         #region Style Getters - Public Only
         public GUIStyle GetAnimatedBoxStyle() => animatedBoxStyle ?? GUI.skin.box;
 
-        public GUIStyle GetAnimatedButtonStyle() => animatedButtonStyle ?? GUI.skin.button;
-
-        public GUIStyle GetAnimatedInputStyle() => animatedInputStyle ?? GUI.skin.textField;
-
         public GUIStyle GetGlowLabelStyle() => glowLabelStyle ?? GUI.skin.label;
-
-        public GUIStyle GetTitleStyle() => titleStyle ?? GUI.skin.label;
-
-        public GUIStyle GetColorPresetStyle() => colorPresetStyle ?? GUI.skin.button;
 
         public GUIStyle GetSectionHeaderStyle() => sectionHeaderStyle ?? GUI.skin.label;
 
@@ -2021,12 +2326,6 @@ namespace shadcnui.GUIComponents.Core
             return sizedStyle;
         }
 
-        public GUIStyle GetAlertStyle(bool isDestructive = false) => isDestructive ? (alertDestructiveStyle ?? GUI.skin.box) : (alertDefaultStyle ?? GUI.skin.box);
-
-        public GUIStyle GetAlertTitleStyle() => alertTitleStyle ?? GUI.skin.label;
-
-        public GUIStyle GetAlertDescriptionStyle() => alertDescriptionStyle ?? GUI.skin.label;
-
         public GUIStyle GetAvatarStyle(AvatarSize size, AvatarShape shape)
         {
             if (avatarStyleCache.TryGetValue((size, shape), out var cachedStyle))
@@ -2044,14 +2343,6 @@ namespace shadcnui.GUIComponents.Core
             avatarStyleCache[(size, shape)] = sizedStyle;
             return sizedStyle;
         }
-
-        public int GetAvatarFontSize(AvatarSize size) =>
-            size switch
-            {
-                AvatarSize.Small => GetScaledFontSize(0.75f),
-                AvatarSize.Large => GetScaledFontSize(1.25f),
-                _ => GetScaledFontSize(1.0f),
-            };
 
         public RectOffset GetAvatarBorder(AvatarShape shape, AvatarSize size)
         {
@@ -2091,43 +2382,6 @@ namespace shadcnui.GUIComponents.Core
 
         public GUIStyle GetTableCellStyle(TableVariant variant, TableSize size) => tableCellStyle ?? GUI.skin.label;
 
-        public GUIStyle GetSliderStyle(bool isRange = false, bool isVertical = false, bool isDisabled = false)
-        {
-            if (isDisabled)
-                return sliderDisabledStyle ?? GUI.skin.horizontalSlider;
-            if (isRange)
-                return sliderRangeStyle ?? GUI.skin.horizontalSlider;
-            if (isVertical)
-                return sliderVerticalStyle ?? GUI.skin.verticalSlider;
-            return sliderDefaultStyle ?? GUI.skin.horizontalSlider;
-        }
-
-        public GUIStyle GetSliderLabelStyle() => sliderLabelStyle ?? GUI.skin.label;
-
-        public GUIStyle GetSliderValueStyle() => sliderValueStyle ?? GUI.skin.label;
-
-        public GUIStyle GetCalendarStyle(CalendarVariant variant, CalendarSize size)
-        {
-            if (calendarStyleCache.TryGetValue((variant, size), out var cachedStyle))
-                return cachedStyle;
-            GUIStyle sizedStyle = new UnityHelpers.GUIStyle(calendarStyle);
-            switch (size)
-            {
-                case CalendarSize.Small:
-                    sizedStyle.fontSize = guiHelper.fontSize - 2;
-                    break;
-                case CalendarSize.Large:
-                    sizedStyle.fontSize = guiHelper.fontSize + 2;
-                    break;
-            }
-            calendarStyleCache[(variant, size)] = sizedStyle;
-            return sizedStyle;
-        }
-
-        public GUIStyle GetCalendarHeaderStyle() => calendarHeaderStyle ?? GUIStyle.none;
-
-        public GUIStyle GetCalendarTitleStyle() => calendarTitleStyle ?? GUI.skin.label;
-
         public GUIStyle GetCalendarWeekdayStyle() => calendarWeekdayStyle ?? GUI.skin.label;
 
         public GUIStyle GetCalendarDayStyle() => calendarDayStyle ?? GUI.skin.button;
@@ -2142,10 +2396,6 @@ namespace shadcnui.GUIComponents.Core
 
         public GUIStyle GetCalendarDayInRangeStyle() => calendarDayInRangeStyle ?? GUI.skin.button;
 
-        public GUIStyle GetDatePickerStyle() => datePickerStyle ?? GUI.skin.box;
-
-        public GUIStyle GetDatePickerHeaderStyle() => datePickerHeaderStyle ?? GUIStyle.none;
-
         public GUIStyle GetDatePickerTitleStyle() => datePickerTitleStyle ?? GUI.skin.label;
 
         public GUIStyle GetDatePickerWeekdayStyle() => datePickerWeekdayStyle ?? GUI.skin.label;
@@ -2157,12 +2407,6 @@ namespace shadcnui.GUIComponents.Core
         public GUIStyle GetDatePickerDayOutsideMonthStyle() => datePickerDayOutsideMonthStyle ?? GUI.skin.button;
 
         public GUIStyle GetDatePickerDayTodayStyle() => datePickerDayTodayStyle ?? GUI.skin.button;
-
-        public GUIStyle GetDatePickerDayDisabledStyle() => datePickerDayDisabledStyle ?? GUI.skin.button;
-
-        public GUIStyle GetDatePickerDayInRangeStyle() => datePickerDayInRangeStyle ?? GUI.skin.button;
-
-        public GUIStyle GetDialogOverlayStyle() => dialogOverlayStyle ?? GUIStyle.none;
 
         public GUIStyle GetDialogContentStyle() => dialogContentStyle ?? GUI.skin.box;
 
@@ -2178,41 +2422,9 @@ namespace shadcnui.GUIComponents.Core
 
         public GUIStyle GetDropdownMenuHeaderStyle() => dropdownMenuHeaderStyle ?? GUI.skin.label;
 
-        public GUIStyle GetDropdownMenuStyle(DropdownMenuVariant variant, DropdownMenuSize size)
-        {
-            if (dropdownMenuStyleCache.TryGetValue((variant, size), out var cachedStyle))
-                return cachedStyle;
-            dropdownMenuStyleCache[(variant, size)] = dropdownMenuContentStyle;
-            return dropdownMenuContentStyle;
-        }
-
         public GUIStyle GetPopoverContentStyle() => popoverContentStyle ?? GUI.skin.box;
 
-        public GUIStyle GetScrollAreaStyle(ScrollAreaVariant variant, ScrollAreaSize size)
-        {
-            if (scrollAreaStyleCache.TryGetValue((variant, size), out var cachedStyle))
-                return cachedStyle;
-            GUIStyle sizedStyle = new UnityHelpers.GUIStyle(scrollAreaStyle);
-            switch (size)
-            {
-                case ScrollAreaSize.Small:
-                    sizedStyle.fixedWidth = 10;
-                    break;
-                case ScrollAreaSize.Large:
-                    sizedStyle.fixedWidth = 20;
-                    break;
-            }
-            scrollAreaStyleCache[(variant, size)] = sizedStyle;
-            return sizedStyle;
-        }
-
-        public GUIStyle GetScrollAreaThumbStyle() => scrollAreaThumbStyle ?? GUIStyle.none;
-
-        public GUIStyle GetScrollAreaTrackStyle() => scrollAreaTrackStyle ?? GUIStyle.none;
-
         public GUIStyle GetSelectTriggerStyle() => selectTriggerStyle ?? GUI.skin.button;
-
-        public GUIStyle GetSelectContentStyle() => selectContentStyle ?? GUI.skin.box;
 
         public GUIStyle GetSelectItemStyle() => selectItemStyle ?? GUI.skin.button;
 
@@ -2234,31 +2446,7 @@ namespace shadcnui.GUIComponents.Core
             return sizedStyle;
         }
 
-        public GUIStyle GetChartContainerStyle() => chartContainerStyle ?? GUI.skin.box;
-
-        public GUIStyle GetChartContentStyle() => chartContentStyle ?? GUIStyle.none;
-
         public GUIStyle GetChartAxisStyle() => chartAxisStyle ?? GUI.skin.label;
-
-        public GUIStyle GetChartGridStyle() => chartGridStyle ?? GUIStyle.none;
-
-        public GUIStyle GetChartStyle(ChartVariant variant, ChartSize size)
-        {
-            if (chartStyleCache.TryGetValue((variant, size), out var cachedStyle))
-                return cachedStyle;
-            GUIStyle sizedStyle = new UnityHelpers.GUIStyle(chartContainerStyle);
-            switch (size)
-            {
-                case ChartSize.Small:
-                    sizedStyle.padding = GetSpacingOffset(12f, 12f);
-                    break;
-                case ChartSize.Large:
-                    sizedStyle.padding = GetSpacingOffset(24f, 24f);
-                    break;
-            }
-            chartStyleCache[(variant, size)] = sizedStyle;
-            return sizedStyle;
-        }
 
         public GUIStyle GetMenuBarStyle() => menuBarStyle ?? GUIStyle.none;
 
@@ -2266,19 +2454,8 @@ namespace shadcnui.GUIComponents.Core
 
         public GUIStyle GetMenuDropdownStyle() => menuDropdownStyle ?? GUI.skin.box;
 
-        public Texture2D GetGlowTexture() => glowTexture;
-
         public Texture2D GetParticleTexture() => particleTexture;
 
-        public Texture2D GetInputBackgroundTexture() => inputBackgroundTexture;
-
-        public Texture2D GetInputFocusedTexture() => inputFocusedTexture;
-
-        public Texture2D GetTransparentTexture() => transparentTexture;
-
-        public Texture2D GetProgressBarBackgroundTexture() => progressBarBackgroundTexture;
-
-        public Texture2D GetProgressBarFillTexture() => progressBarFillTexture;
         #endregion
 
         #region Helpers
