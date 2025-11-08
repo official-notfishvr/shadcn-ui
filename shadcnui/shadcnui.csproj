@@ -508,14 +508,12 @@
         <Compile Include="GUIComponents\Controls\DropdownMenu.cs" />
         <Compile Include="GUIComponents\Controls\Input.cs" />
         <Compile Include="GUIComponents\Controls\Select.cs" />
-        <Compile Include="GUIComponents\Controls\Slider.cs" />
         <Compile Include="GUIComponents\Controls\Switch.cs" />
         <Compile Include="GUIComponents\Controls\Toggle.cs" />
         <Compile Include="GUIComponents\Core\AnimationManager.cs" />
         <Compile Include="GUIComponents\Core\BaseComponent.cs" />
         <Compile Include="GUIComponents\Core\GUIHelper.cs" />
         <Compile Include="GUIComponents\Core\GUILogger.cs" />
-        <Compile Include="GUIComponents\Core\Settings.cs" />
         <Compile Include="GUIComponents\Core\StyleManager.cs" />
         <Compile Include="GUIComponents\Core\Theme.cs" />
         <Compile Include="GUIComponents\Core\ThemeManager.cs" />

@@ -20,7 +20,6 @@ namespace shadcnui_Demo.Menu
         private int currentDemoTab = 0;
         private Tabs.TabConfig[] demoTabs;
 
-        private float masterVolume = 50f;
         private string searchQuery = "";
         private bool showAdvanced = false;
 
@@ -33,8 +32,6 @@ namespace shadcnui_Demo.Menu
 
         private bool sw1 = false;
         private bool sw2 = true;
-
-        private float brightness = 75f;
 
         private bool compactView = false;
         private bool emailNotif = true;
@@ -258,11 +255,6 @@ namespace shadcnui_Demo.Menu
             guiHelper.Label("Switches", LabelVariant.Default);
             sw1 = guiHelper.Switch("Two-Factor Auth", sw1);
             sw2 = guiHelper.Switch("Public Profile", sw2);
-            guiHelper.HorizontalSeparator();
-
-            guiHelper.Label("Sliders", LabelVariant.Default);
-            guiHelper.DrawSlider(400, "Master Volume", ref masterVolume, 0, 100);
-            guiHelper.DrawSlider(400, "Brightness", ref brightness, 0, 100);
             guiHelper.HorizontalSeparator();
 
             guiHelper.Label("Actions", LabelVariant.Default);
