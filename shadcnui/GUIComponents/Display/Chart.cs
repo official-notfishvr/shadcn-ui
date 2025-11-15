@@ -241,7 +241,7 @@ namespace shadcnui.GUIComponents.Display
             for (var i = 1; i < 5; i++)
             {
                 var y = _chartRect.y + (_chartRect.height / 5) * i;
-                DrawLine(new Vector2(_chartRect.x + 40, y), new Vector2(_chartRect.x + _chartRect.width - 20, y), new Color(theme.ChartGridColor.r, theme.ChartGridColor.g, theme.ChartGridColor.b, 0.3f));
+                DrawLine(new Vector2(_chartRect.x + 40, y), new Vector2(_chartRect.x + _chartRect.width - 20, y), new Color(theme.Border.r, theme.Border.g, theme.Border.b, 0.3f));
             }
         }
 
@@ -252,7 +252,7 @@ namespace shadcnui.GUIComponents.Display
                 var theme = guiHelper.GetStyleManager().GetTheme();
                 var styleManager = guiHelper.GetStyleManager();
 
-                DrawLine(new Vector2(_chartRect.x + 40, _chartRect.y + _chartRect.height - 20), new Vector2(_chartRect.x + _chartRect.width - 20, _chartRect.y + _chartRect.height - 20), new Color(theme.ChartAxisColor.r, theme.ChartAxisColor.g, theme.ChartAxisColor.b, 0.5f));
+                DrawLine(new Vector2(_chartRect.x + 40, _chartRect.y + _chartRect.height - 20), new Vector2(_chartRect.x + _chartRect.width - 20, _chartRect.y + _chartRect.height - 20), new Color(theme.Muted.r, theme.Muted.g, theme.Muted.b, 0.5f));
 
                 if (series.Count > 0 && series[0].Data.Count > 0 && _chartRect.width > 60)
                 {
@@ -268,7 +268,7 @@ namespace shadcnui.GUIComponents.Display
                             if (labelRect.width > 0 && labelRect.height > 0)
                             {
                                 var originalColor = GUI.color;
-                                GUI.color = theme.MutedColor;
+                                GUI.color = theme.Muted;
                                 GUI.Label(labelRect, label, styleManager.GetChartAxisStyle());
                                 GUI.color = originalColor;
                             }

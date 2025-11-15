@@ -135,7 +135,7 @@ namespace shadcnui.GUIComponents.Display
         private void DrawOverlay()
         {
             Color prev = GUI.color;
-            GUI.color = ThemeManager.Instance.CurrentTheme.OverlayColor;
+            GUI.color = ThemeManager.Instance.CurrentTheme.Overlay;
             GUI.DrawTexture(new Rect(0, 0, Screen.width, Screen.height), Texture2D.whiteTexture);
             GUI.color = prev;
         }

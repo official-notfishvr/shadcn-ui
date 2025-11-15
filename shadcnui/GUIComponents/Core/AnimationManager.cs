@@ -21,7 +21,7 @@ namespace shadcnui.GUIComponents.Core
             layoutComponents = new shadcnui.GUIComponents.Layout.Layout(helper);
         }
 
-        public void UpdateAnimations(bool isOpen, ref float menuAlpha, ref float menuScale, ref float titleGlow, ref float backgroundPulse, ref int hoveredButton, float[] buttonGlowEffects, float[] inputFieldGlow, ref int focusedField, ref float particleTime, ref Vector2 mousePos)
+        public void UpdateAnimations(bool isOpen, ref float menuAlpha, ref float menuScale, ref float backgroundPulse, ref float particleTime, ref Vector2 mousePos)
         {
             if (!guiHelper.animationsEnabled)
                 return;
@@ -34,27 +34,7 @@ namespace shadcnui.GUIComponents.Core
             float targetScale = isOpen ? guiHelper.uiScale : (guiHelper.uiScale * 0.8f);
             menuScale = Mathf.Lerp(menuScale, targetScale, Time.deltaTime * speed * 0.83f);
 
-            titleGlow = Mathf.Sin(Time.time * 2f) * 0.5f + 0.5f;
-
-            backgroundPulse = Mathf.Sin(Time.time * 1.5f) * 0.1f + guiHelper.backgroundAlpha;
-
-            if (guiHelper.hoverEffectsEnabled)
-            {
-                for (int i = 0; i < buttonGlowEffects.Length; i++)
-                {
-                    float target = (hoveredButton == i) ? guiHelper.glowIntensity : 0f;
-                    buttonGlowEffects[i] = Mathf.Lerp(buttonGlowEffects[i], target, Time.deltaTime * speed);
-                }
-            }
-
-            if (guiHelper.glowEffectsEnabled)
-            {
-                for (int i = 0; i < inputFieldGlow.Length; i++)
-                {
-                    float target = (focusedField == i) ? guiHelper.glowIntensity : 0f;
-                    inputFieldGlow[i] = Mathf.Lerp(inputFieldGlow[i], target, Time.deltaTime * speed * 0.67f);
-                }
-            }
+            backgroundPulse = guiHelper.backgroundAlpha;
 
             if (guiHelper.particleEffectsEnabled)
                 particleTime += Time.deltaTime;
@@ -67,13 +47,18 @@ namespace shadcnui.GUIComponents.Core
             try
             {
                 float currentAlpha = guiHelper.fadeTransitionsEnabled ? menuAlpha : 1f;
-                GUI.color = new Color(1f, 1f, 1f, currentAlpha);
+
+                float pulseAlpha = guiHelper.animationsEnabled ? backgroundPulse : guiHelper.backgroundAlpha;
+                Color bgColor = ThemeManager.Instance.CurrentTheme.BackgroundColor;
+                Color backgroundColor = new Color(bgColor.r, bgColor.g, bgColor.b, currentAlpha * pulseAlpha);
+
+                GUI.color = backgroundColor;
+                GUI.DrawTexture(new Rect(0, 0, Screen.width, Screen.height), Texture2D.whiteTexture);
 
                 if (guiHelper.particleEffectsEnabled)
                     RenderBackgroundParticles(currentAlpha);
 
-                float pulseAlpha = guiHelper.animationsEnabled ? backgroundPulse : guiHelper.backgroundAlpha;
-                GUI.color = new Color(1f, 1f, 1f, currentAlpha * pulseAlpha);
+                GUI.color = new Color(1f, 1f, 1f, currentAlpha);
 
                 var styleManager = guiHelper.GetStyleManager();
 #if IL2CPP_MELONLOADER_PRE57
@@ -112,17 +97,26 @@ namespace shadcnui.GUIComponents.Core
             var particleTime = guiHelper.GetParticleTime();
 
             int particleCount = 12;
+            float scale = guiHelper.uiScale;
+
             for (int i = 0; i < particleCount; i++)
             {
-                float x = 30 + Mathf.Sin(particleTime * 0.5f + i * 0.8f) * 25 + i * 35;
-                float y = 40 + Mathf.Cos(particleTime * 0.3f + i * 1.2f) * 20 + i * 20;
-                float alpha = (Mathf.Sin(particleTime * 2f + i) * 0.3f + 0.4f) * menuAlpha * guiHelper.glowIntensity;
+                float screenWidth = Screen.width;
+                float screenHeight = Screen.height;
 
-                Color particleColor = new Color(ThemeManager.Instance.CurrentTheme.AccentColor.r, ThemeManager.Instance.CurrentTheme.AccentColor.g, ThemeManager.Instance.CurrentTheme.AccentColor.b, alpha);
+                float x = (screenWidth / particleCount) * i + Mathf.Sin(particleTime * 0.5f + i * 0.8f) * 25;
+                float y = screenHeight / 2 + Mathf.Cos(particleTime * 0.3f + i * 1.2f) * (screenHeight / 4);
+
+                float alpha = (Mathf.Sin(particleTime * 2f + i) * 0.3f + 0.4f) * menuAlpha * guiHelper.glowIntensity;
+                alpha = Mathf.Clamp01(alpha);
+
+                Color particleColor = new Color(ThemeManager.Instance.CurrentTheme.Accent.r, ThemeManager.Instance.CurrentTheme.Accent.g, ThemeManager.Instance.CurrentTheme.Accent.b, alpha);
 
                 GUI.color = particleColor;
-                GUI.DrawTexture(new Rect(x * guiHelper.uiScale, y * guiHelper.uiScale, 4 * guiHelper.uiScale, 4 * guiHelper.uiScale), particleTexture);
+                GUI.DrawTexture(new Rect(x, y, 4 * scale, 4 * scale), particleTexture);
             }
+
+            GUI.color = Color.white;
         }
 
         public void Cleanup() { }
