@@ -317,12 +317,16 @@ namespace shadcnui.GUIComponents.Layout
 
             layoutComponents.BeginHorizontalGroup();
 
-            UnityHelpers.Label("Search:", GUILayout.Width(60 * guiHelper.uiScale));
+            var styleManager = guiHelper.GetStyleManager();
+            var labelStyle = styleManager?.GetLabelStyle(LabelVariant.Default) ?? GUI.skin.label;
+            var inputStyle = styleManager?.GetInputStyle(InputVariant.Default) ?? GUI.skin.textField;
+
+            UnityHelpers.Label("Search:", labelStyle, GUILayout.Width(60 * guiHelper.uiScale));
 
 #if IL2CPP_MELONLOADER_PRE57
-            string newSearchQuery = GUILayout.TextField(searchQuery ?? "", GUI.skin.textField, new Il2CppReferenceArray<GUILayoutOption>(new GUILayoutOption[] { GUILayout.Width(200 * guiHelper.uiScale) }));
+            string newSearchQuery = GUILayout.TextField(searchQuery ?? "", inputStyle, new Il2CppReferenceArray<GUILayoutOption>(new GUILayoutOption[] { GUILayout.Width(200 * guiHelper.uiScale) }));
 #else
-            string newSearchQuery = GUILayout.TextField(searchQuery ?? "", GUILayout.Width(200 * guiHelper.uiScale));
+            string newSearchQuery = GUILayout.TextField(searchQuery ?? "", inputStyle, GUILayout.Width(200 * guiHelper.uiScale));
 #endif
 
             if (newSearchQuery != searchQuery)

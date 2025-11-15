@@ -73,16 +73,6 @@ namespace shadcnui.GUIComponents.Core
         Ghost,
     }
 
-    public enum ProgressVariant
-    {
-        Default,
-    }
-
-    public enum TabsVariant
-    {
-        Default,
-    }
-
     public enum CheckboxVariant
     {
         Default,
@@ -937,13 +927,13 @@ namespace shadcnui.GUIComponents.Core
 
         public Color GetHoverColor(Color baseColor, bool isDark = true) => isDark ? Color.Lerp(baseColor, Color.white, 0.15f) : Color.Lerp(baseColor, Color.black, 0.08f);
 
-        public Color GetFocusColor(Color baseColor) => Color.Lerp(baseColor, ThemeManager.Instance.CurrentTheme.AccentColor, 0.25f);
+        public Color GetFocusColor(Color baseColor) => Color.Lerp(baseColor, ThemeManager.Instance.CurrentTheme.Accent, 0.25f);
 
-        public Color GetOverlayColor() => ThemeManager.Instance.CurrentTheme.OverlayColor;
+        public Color GetOverlayColor() => ThemeManager.Instance.CurrentTheme.Overlay;
 
-        public Color GetShadowColor() => ThemeManager.Instance.CurrentTheme.ShadowColor;
+        public Color GetShadowColor() => ThemeManager.Instance.CurrentTheme.Shadow;
 
-        public Color GetBorderColor() => ThemeManager.Instance.CurrentTheme.BorderColor;
+        public Color GetBorderColor() => ThemeManager.Instance.CurrentTheme.Border;
         #endregion
 
         #region Texture Creation
@@ -980,7 +970,7 @@ namespace shadcnui.GUIComponents.Core
         private Texture2D CreateShadowTexture(int width, int height, float intensity = 0.22f, float blur = 3.5f)
         {
             var texture = new Texture2D(width, height);
-            Color themeShadow = ThemeManager.Instance.CurrentTheme.ShadowColor;
+            Color themeShadow = ThemeManager.Instance.CurrentTheme.Shadow;
             for (int x = 0; x < width; x++)
             for (int y = 0; y < height; y++)
             {
@@ -1133,7 +1123,7 @@ namespace shadcnui.GUIComponents.Core
         private Texture2D CreateOutlineTexture()
         {
             var theme = ThemeManager.Instance.CurrentTheme;
-            var keyColor = theme.BorderColor;
+            var keyColor = theme.Border;
             if (outlineTextureCache.TryGetValue(keyColor, out var cachedTexture))
                 return cachedTexture;
             Texture2D texture = new Texture2D(4, 4);
@@ -1159,45 +1149,45 @@ namespace shadcnui.GUIComponents.Core
                 for (int i = 0; i < 100; i++)
                 {
                     float t = i / 99f;
-                    gradientTexture.SetPixel(0, i, Color.Lerp(theme.PrimaryColor, theme.SecondaryColor, t));
+                    gradientTexture.SetPixel(0, i, Color.Lerp(theme.Base, theme.Secondary, t));
                 }
                 gradientTexture.Apply();
 
-                cardBackgroundTexture = CreateRoundedRectWithShadowTexture(128, 128, 12, theme.CardBg, 0.16f, 11);
-                inputBackgroundTexture = CreateRoundedRectTexture(128, 128, 8, theme.InputBg);
-                inputFocusedTexture = CreateRoundedRectTexture(128, 128, 8, theme.InputBg);
-                outlineTexture = CreateRoundedRectTexture(128, 128, 8, theme.ButtonOutlineBorder);
+                cardBackgroundTexture = CreateRoundedRectWithShadowTexture(128, 128, 12, theme.Elevated, 0.16f, 11);
+                inputBackgroundTexture = CreateRoundedRectTexture(128, 128, 8, theme.Base);
+                inputFocusedTexture = CreateRoundedRectTexture(128, 128, 8, theme.Base);
+                outlineTexture = CreateRoundedRectTexture(128, 128, 8, theme.Border);
                 transparentTexture = CreateSolidTexture(Color.clear);
-                glowTexture = CreateGlowTexture(theme.AccentColor, 32);
-                particleTexture = CreateSolidTexture(Color.Lerp(theme.AccentColor, theme.TextColor, 0.5f));
-                progressBarBackgroundTexture = CreateRoundedRectTexture(128, 128, 6, theme.SecondaryColor);
-                progressBarFillTexture = CreateRoundedRectTexture(128, 128, 6, theme.PrimaryColor);
-                separatorTexture = CreateSolidTexture(theme.SeparatorColor);
-                tabsBackgroundTexture = CreateRoundedRectTexture(128, 128, 6, theme.TabsBg);
-                tabsActiveTexture = CreateRoundedRectTexture(128, 128, 6, theme.BackgroundColor);
-                checkboxTexture = CreateRoundedRectTexture(16, 16, 4, theme.CheckboxBg);
-                checkboxCheckedTexture = CreateRoundedRectTexture(16, 16, 4, theme.CheckboxCheckedBg);
-                switchTexture = CreateRoundedRectTexture(32, 16, 8, theme.SwitchBg);
-                switchOnTexture = CreateRoundedRectTexture(32, 16, 8, theme.SwitchOnBg);
-                switchOffTexture = CreateRoundedRectTexture(32, 16, 8, theme.SwitchOffBg);
-                badgeTexture = CreateRoundedRectTexture(64, 24, 12, theme.BadgeBg);
-                avatarTexture = CreateRoundedRectTexture(40, 40, 20, theme.AvatarBg);
-                tableTexture = CreateSolidTexture(theme.TableBg);
-                tableHeaderTexture = CreateSolidTexture(theme.TableHeaderBg);
-                tableCellTexture = CreateSolidTexture(theme.TableCellBg);
-                calendarBackgroundTexture = CreateRoundedRectTexture(256, 256, 8, theme.CardBg);
-                calendarHeaderTexture = CreateSolidTexture(theme.CardBg);
-                calendarDayTexture = CreateRoundedRectTexture(32, 32, 4, theme.CardBg);
-                calendarDaySelectedTexture = CreateRoundedRectTexture(32, 32, 4, theme.PrimaryColor);
-                dropdownMenuContentTexture = CreateRoundedRectWithShadowTexture(128, 128, 8, theme.CardBg, 0.14f, 10);
-                popoverContentTexture = CreateRoundedRectWithShadowTexture(128, 128, 8, theme.CardBg, 0.14f, 10);
-                scrollAreaThumbTexture = CreateRoundedRectTexture(8, 8, 4, theme.ButtonOutlineBorder);
-                scrollAreaTrackTexture = CreateRoundedRectTexture(8, 8, 4, theme.SecondaryColor);
-                selectTriggerTexture = CreateRoundedRectTexture(128, 40, 8, theme.InputBg);
-                selectContentTexture = CreateRoundedRectWithShadowTexture(128, 128, 8, theme.CardBg, 0.14f, 10);
-                chartContainerTexture = CreateRoundedRectWithShadowTexture(256, 256, 8, theme.ChartBg, 0.12f, 8);
-                chartGridTexture = CreateSolidTexture(theme.ChartGridColor);
-                chartAxisTexture = CreateSolidTexture(theme.ChartAxisColor);
+                glowTexture = CreateGlowTexture(theme.Accent, 32);
+                particleTexture = CreateSolidTexture(Color.Lerp(theme.Accent, theme.Text, 0.5f));
+                progressBarBackgroundTexture = CreateRoundedRectTexture(128, 128, 6, theme.Secondary);
+                progressBarFillTexture = CreateRoundedRectTexture(128, 128, 6, theme.Base);
+                separatorTexture = CreateSolidTexture(theme.Border);
+                tabsBackgroundTexture = CreateRoundedRectTexture(128, 128, 6, theme.Secondary);
+                tabsActiveTexture = CreateRoundedRectTexture(128, 128, 6, theme.Base);
+                checkboxTexture = CreateRoundedRectTexture(16, 16, 4, theme.Secondary);
+                checkboxCheckedTexture = CreateRoundedRectTexture(16, 16, 4, theme.Accent);
+                switchTexture = CreateRoundedRectTexture(32, 16, 8, theme.Secondary);
+                switchOnTexture = CreateRoundedRectTexture(32, 16, 8, theme.Accent);
+                switchOffTexture = CreateRoundedRectTexture(32, 16, 8, theme.Secondary);
+                badgeTexture = CreateRoundedRectTexture(64, 24, 12, theme.Elevated);
+                avatarTexture = CreateRoundedRectTexture(40, 40, 20, theme.Secondary);
+                tableTexture = CreateSolidTexture(theme.Base);
+                tableHeaderTexture = CreateSolidTexture(theme.Secondary);
+                tableCellTexture = CreateSolidTexture(theme.Base);
+                calendarBackgroundTexture = CreateRoundedRectTexture(256, 256, 8, theme.Elevated);
+                calendarHeaderTexture = CreateSolidTexture(theme.Elevated);
+                calendarDayTexture = CreateRoundedRectTexture(32, 32, 4, theme.Elevated);
+                calendarDaySelectedTexture = CreateRoundedRectTexture(32, 32, 4, theme.Base);
+                dropdownMenuContentTexture = CreateRoundedRectWithShadowTexture(128, 128, 8, theme.Elevated, 0.14f, 10);
+                popoverContentTexture = CreateRoundedRectWithShadowTexture(128, 128, 8, theme.Elevated, 0.14f, 10);
+                scrollAreaThumbTexture = CreateRoundedRectTexture(8, 8, 4, theme.Border);
+                scrollAreaTrackTexture = CreateRoundedRectTexture(8, 8, 4, theme.Secondary);
+                selectTriggerTexture = CreateRoundedRectTexture(128, 40, 8, theme.Base);
+                selectContentTexture = CreateRoundedRectWithShadowTexture(128, 128, 8, theme.Elevated, 0.14f, 10);
+                chartContainerTexture = CreateRoundedRectWithShadowTexture(256, 256, 8, theme.Elevated, 0.12f, 8);
+                chartGridTexture = CreateSolidTexture(theme.Border);
+                chartAxisTexture = CreateSolidTexture(theme.Muted);
 
                 GUILogger.LogInfo("Custom textures created successfully", "StyleManager.CreateCustomTextures");
             }
@@ -1220,21 +1210,21 @@ namespace shadcnui.GUIComponents.Core
                 animatedBoxStyle.padding = new UnityHelpers.RectOffset(15, 15, 15, 15);
                 animatedButtonStyle = CreateStyleWithFont(GUI.skin.button, guiHelper.fontSize, FontStyle.Bold);
                 animatedButtonStyle.alignment = TextAnchor.MiddleCenter;
-                animatedButtonStyle.normal.textColor = Color.Lerp(Color.white, theme.AccentColor, 0.4f);
-                animatedButtonStyle.hover.textColor = theme.AccentColor;
+                animatedButtonStyle.normal.textColor = Color.Lerp(Color.white, theme.Accent, 0.4f);
+                animatedButtonStyle.hover.textColor = theme.Accent;
                 colorPresetStyle = CreateStyleWithFont(GUI.skin.button, Mathf.RoundToInt(guiHelper.fontSize * 0.9f), FontStyle.Bold);
                 colorPresetStyle.alignment = TextAnchor.MiddleCenter;
                 animatedInputStyle = CreateStyleWithFont(GUI.skin.textField, guiHelper.fontSize + 1);
                 animatedInputStyle.padding = new UnityHelpers.RectOffset(8, 8, 4, 4);
-                animatedInputStyle.normal.textColor = theme.TextColor;
-                animatedInputStyle.focused.textColor = theme.AccentColor;
+                animatedInputStyle.normal.textColor = theme.Text;
+                animatedInputStyle.focused.textColor = theme.Accent;
                 glowLabelStyle = CreateStyleWithFont(GUI.skin.label, guiHelper.fontSize);
-                glowLabelStyle.normal.textColor = Color.Lerp(theme.TextColor, theme.AccentColor, 0.25f);
+                glowLabelStyle.normal.textColor = Color.Lerp(theme.Text, theme.Accent, 0.25f);
                 titleStyle = CreateStyleWithFont(GUI.skin.label, guiHelper.fontSize + 4, FontStyle.Bold);
                 titleStyle.alignment = TextAnchor.MiddleCenter;
-                titleStyle.normal.textColor = theme.AccentColor;
+                titleStyle.normal.textColor = theme.Accent;
                 sectionHeaderStyle = CreateStyleWithFont(GUI.skin.label, guiHelper.fontSize + 2, FontStyle.Bold);
-                sectionHeaderStyle.normal.textColor = Color.Lerp(theme.AccentColor, theme.TextColor, 0.4f);
+                sectionHeaderStyle.normal.textColor = Color.Lerp(theme.Accent, theme.Text, 0.4f);
             }
             catch (Exception ex)
             {
@@ -1250,23 +1240,24 @@ namespace shadcnui.GUIComponents.Core
             {
                 var theme = ThemeManager.Instance.CurrentTheme;
                 cardStyle = new UnityHelpers.GUIStyle(GUI.skin.box);
-                cardStyle.normal.background = cardBackgroundTexture;
+                int cardRadius = GetScaledBorderRadius(12f);
+                cardStyle.normal.background = CreateRoundedRectWithShadowTexture(256, 256, cardRadius, theme.Elevated, 0.2f, 12);
                 cardStyle.border = new UnityHelpers.RectOffset(12, 12, 12, 12);
-                cardStyle.padding = GetSpacingOffset(24f, 24f);
-                cardStyle.margin = GetSpacingOffset(0f, 0f);
+                cardStyle.padding = GetSpacingOffset(28f, 28f);
+                cardStyle.margin = GetSpacingOffset(8f, 8f);
                 cardHeaderStyle = new UnityHelpers.GUIStyle();
-                cardHeaderStyle.padding = GetSpacingOffset(0f, 16f);
-                cardTitleStyle = CreateStyleWithFont(GUI.skin.label, GetScaledFontSize(1.5f), FontStyle.Bold);
-                cardTitleStyle.normal.textColor = theme.CardTitle;
+                cardHeaderStyle.padding = GetSpacingOffset(0f, 20f);
+                cardTitleStyle = CreateStyleWithFont(GUI.skin.label, GetScaledFontSize(1.75f), FontStyle.Bold);
+                cardTitleStyle.normal.textColor = theme.Text;
                 cardTitleStyle.wordWrap = true;
-                cardDescriptionStyle = CreateStyleWithFont(GUI.skin.label, GetScaledFontSize(1.0f));
-                cardDescriptionStyle.normal.textColor = theme.CardDescription;
+                cardDescriptionStyle = CreateStyleWithFont(GUI.skin.label, GetScaledFontSize(0.95f));
+                cardDescriptionStyle.normal.textColor = theme.Muted;
                 cardDescriptionStyle.wordWrap = true;
-                cardDescriptionStyle.margin = GetSpacingOffset(0f, 4f);
+                cardDescriptionStyle.margin = GetSpacingOffset(0f, 6f);
                 cardContentStyle = new UnityHelpers.GUIStyle();
-                cardContentStyle.padding = GetSpacingOffset(0f, 0f);
+                cardContentStyle.padding = GetSpacingOffset(0f, 12f);
                 cardFooterStyle = new UnityHelpers.GUIStyle();
-                cardFooterStyle.padding = GetSpacingOffset(0f, 16f);
+                cardFooterStyle.padding = GetSpacingOffset(0f, 20f);
             }
             catch (Exception ex)
             {
@@ -1281,11 +1272,11 @@ namespace shadcnui.GUIComponents.Core
             try
             {
                 var theme = ThemeManager.Instance.CurrentTheme;
-                buttonDefaultStyle = CreateButtonStyle(theme.ButtonPrimaryBg, theme.ButtonPrimaryFg, theme.ButtonPrimaryActiveBg, theme.ButtonPrimaryActiveFg);
+                buttonDefaultStyle = CreateButtonStyle(theme.ButtonPrimaryBg, theme.ButtonPrimaryFg, Color.Lerp(theme.ButtonPrimaryBg, Color.black, 0.2f), theme.ButtonPrimaryFg);
                 buttonDestructiveStyle = CreateButtonStyle(theme.ButtonDestructiveBg, theme.ButtonDestructiveFg, Color.Lerp(theme.ButtonDestructiveBg, Color.black, 0.25f), theme.ButtonDestructiveFg);
-                buttonOutlineStyle = CreateButtonStyle(theme.ButtonOutlineBorder, theme.ButtonOutlineFg, Color.Lerp(theme.ButtonOutlineHoverBg, Color.black, 0.08f), theme.ButtonOutlineHoverFg);
+                buttonOutlineStyle = CreateButtonStyle(theme.Border, theme.ButtonOutlineFg, Color.Lerp(theme.Border, Color.black, 0.08f), theme.ButtonOutlineFg);
                 buttonSecondaryStyle = CreateButtonStyle(theme.ButtonSecondaryBg, theme.ButtonSecondaryFg, Color.Lerp(theme.ButtonSecondaryBg, Color.black, 0.1f), theme.ButtonSecondaryFg);
-                buttonGhostStyle = CreateButtonStyle(Color.clear, theme.ButtonGhostFg, Color.Lerp(theme.ButtonGhostHoverBg, Color.black, 0.12f), theme.ButtonGhostHoverFg);
+                buttonGhostStyle = CreateButtonStyle(Color.clear, theme.ButtonGhostFg, Color.Lerp(theme.Secondary, Color.black, 0.12f), theme.ButtonGhostFg);
                 buttonLinkStyle = CreateLinkButtonStyle(theme);
             }
             catch (Exception ex)
@@ -1296,20 +1287,20 @@ namespace shadcnui.GUIComponents.Core
 
         private GUIStyle CreateButtonStyle(Color normalBg, Color normalFg, Color activeBg, Color activeFg)
         {
-            GUIStyle style = CreateStyleWithFont(GUI.skin.button, GetScaledFontSize(0.875f));
+            GUIStyle style = CreateStyleWithFont(GUI.skin.button, GetScaledFontSize(0.875f), FontStyle.Bold);
             style.alignment = TextAnchor.MiddleCenter;
-            style.padding = GetSpacingOffset(16f, 8f);
+            style.padding = GetSpacingOffset(18f, 10f);
             style.border = GetBorderOffset(8f);
-            style.fixedHeight = GetScaledHeight(40f);
-            int btnTexH = GetScaledHeight(40f);
+            style.fixedHeight = GetScaledHeight(42f);
+            int btnTexH = GetScaledHeight(42f);
             int btnRadius = GetScaledBorderRadius(8f);
-            style.normal.background = CreateRoundedRectWithShadowTexture(128, btnTexH, btnRadius, normalBg, 0.1f, 7);
-            style.hover.background = CreateRoundedRectWithShadowTexture(128, btnTexH, btnRadius, GetHoverColor(normalBg), 0.12f, 8);
+            style.normal.background = CreateRoundedRectWithShadowTexture(128, btnTexH, btnRadius, normalBg, 0.15f, 9);
+            style.hover.background = CreateRoundedRectWithShadowTexture(128, btnTexH, btnRadius, GetHoverColor(normalBg, false), 0.2f, 11);
             style.normal.textColor = normalFg;
             style.hover.textColor = normalFg;
-            style.active.background = CreateRoundedRectWithShadowTexture(128, btnTexH, btnRadius, activeBg, 0.14f, 7);
+            style.active.background = CreateRoundedRectWithShadowTexture(128, btnTexH, btnRadius, activeBg, 0.18f, 8);
             style.active.textColor = activeFg;
-            style.focused.background = CreateRoundedRectWithShadowTexture(128, btnTexH, btnRadius, Color.Lerp(normalBg, ThemeManager.Instance.CurrentTheme.AccentColor, 0.15f), 0.12f, 8);
+            style.focused.background = CreateRoundedRectWithShadowTexture(128, btnTexH, btnRadius, Color.Lerp(normalBg, ThemeManager.Instance.CurrentTheme.Accent, 0.2f), 0.16f, 10);
             style.focused.textColor = normalFg;
             return style;
         }
@@ -1323,9 +1314,9 @@ namespace shadcnui.GUIComponents.Core
             style.normal.background = transparentTexture;
             style.hover.background = transparentTexture;
             style.normal.textColor = theme.ButtonLinkColor;
-            style.hover.textColor = theme.ButtonLinkHoverColor;
+            style.hover.textColor = Color.Lerp(theme.ButtonLinkColor, Color.white, 0.2f);
             style.active.background = transparentTexture;
-            style.active.textColor = Color.Lerp(theme.ButtonLinkHoverColor, Color.black, 0.25f);
+            style.active.textColor = Color.Lerp(theme.ButtonLinkColor, Color.black, 0.25f);
             return style;
         }
         #endregion
@@ -1336,11 +1327,11 @@ namespace shadcnui.GUIComponents.Core
             try
             {
                 var theme = ThemeManager.Instance.CurrentTheme;
-                toggleDefaultStyle = CreateToggleStyle(theme.ToggleBg, theme.ToggleFg, theme.ToggleOnBg, theme.ToggleOnFg);
+                toggleDefaultStyle = CreateToggleStyle(theme.Secondary, theme.Text, theme.Accent, theme.Text);
                 toggleOutlineStyle = new UnityHelpers.GUIStyle(toggleDefaultStyle);
                 if (customFont != null)
                     toggleOutlineStyle.font = customFont;
-                toggleOutlineStyle.normal.background = CreateOutlineButtonTexture(Color.Lerp(theme.PrimaryColor, Color.black, 0.15f), theme.AccentColor);
+                toggleOutlineStyle.normal.background = CreateOutlineButtonTexture(Color.Lerp(theme.Base, Color.black, 0.15f), theme.Accent);
                 toggleOutlineStyle.border = new UnityHelpers.RectOffset(2, 2, 2, 2);
             }
             catch (Exception ex)
@@ -1355,8 +1346,8 @@ namespace shadcnui.GUIComponents.Core
             style.alignment = TextAnchor.MiddleCenter;
             style.normal.textColor = normalFg;
             style.normal.background = CreateSolidTexture(normalBg);
-            style.hover.background = CreateSolidTexture(ThemeManager.Instance.CurrentTheme.ToggleHoverBg);
-            style.hover.textColor = ThemeManager.Instance.CurrentTheme.ToggleHoverFg;
+            style.hover.background = CreateSolidTexture(ThemeManager.Instance.CurrentTheme.Secondary);
+            style.hover.textColor = ThemeManager.Instance.CurrentTheme.Text;
             style.active.background = CreateSolidTexture(Color.Lerp(normalBg, Color.black, 0.15f));
             style.active.textColor = Color.Lerp(normalFg, Color.white, 0.5f);
             style.onNormal.background = CreateSolidTexture(onBg);
@@ -1375,12 +1366,12 @@ namespace shadcnui.GUIComponents.Core
             try
             {
                 var theme = ThemeManager.Instance.CurrentTheme;
-                inputDefaultStyle = CreateInputStyle(inputBackgroundTexture, theme.InputFg, theme.InputFocusedFg);
+                inputDefaultStyle = CreateInputStyle(inputBackgroundTexture, theme.Text, theme.Text);
                 inputOutlineStyle = new UnityHelpers.GUIStyle(inputDefaultStyle);
                 if (customFont != null)
                     inputOutlineStyle.font = customFont;
-                inputOutlineStyle.normal.background = CreateRoundedRectTexture(128, 40, 8, theme.InputBg);
-                inputOutlineStyle.focused.background = CreateRoundedRectTexture(128, 40, 8, theme.InputBg);
+                inputOutlineStyle.normal.background = CreateRoundedRectTexture(128, 40, 8, theme.Base);
+                inputOutlineStyle.focused.background = CreateRoundedRectTexture(128, 40, 8, theme.Base);
                 inputGhostStyle = new UnityHelpers.GUIStyle(inputDefaultStyle);
                 if (customFont != null)
                     inputGhostStyle.font = customFont;
@@ -1394,8 +1385,8 @@ namespace shadcnui.GUIComponents.Core
                 inputDisabledStyle = new UnityHelpers.GUIStyle(inputDefaultStyle);
                 if (customFont != null)
                     inputDisabledStyle.font = customFont;
-                inputDisabledStyle.normal.textColor = theme.InputDisabledFg;
-                inputDisabledStyle.normal.background = CreateRoundedRectTexture(128, 40, 8, theme.InputDisabledBg);
+                inputDisabledStyle.normal.textColor = theme.Muted;
+                inputDisabledStyle.normal.background = CreateRoundedRectTexture(128, 40, 8, theme.Secondary);
                 passwordFieldStyle = CreateStyleWithFont(inputDefaultStyle, guiHelper.fontSize + 2);
                 textAreaStyle = CreateStyleWithFont(inputDefaultStyle, guiHelper.fontSize);
                 textAreaStyle.wordWrap = true;
@@ -1427,7 +1418,7 @@ namespace shadcnui.GUIComponents.Core
             style.focused.textColor = focusedColor;
             int inpRadius = GetScaledBorderRadius(8f);
             var theme = ThemeManager.Instance.CurrentTheme;
-            Color focusTint = Color.Lerp(theme.AccentColor, theme.OverlayColor, 0.3f);
+            Color focusTint = Color.Lerp(theme.Accent, theme.Overlay, 0.3f);
             style.onFocused.background = CreateRoundedRectTexture(128, GetScaledHeight(40f), inpRadius, focusTint);
             return style;
         }
@@ -1439,16 +1430,20 @@ namespace shadcnui.GUIComponents.Core
             try
             {
                 var theme = ThemeManager.Instance.CurrentTheme;
-                labelDefaultStyle = CreateStyleWithFont(GUI.skin.label, GetScaledFontSize(1.0f));
-                labelDefaultStyle.normal.textColor = theme.TextColor;
-                labelDefaultStyle.padding = GetSpacingOffset(0f, 2f);
+                labelDefaultStyle = CreateStyleWithFont(GUI.skin.label, GetScaledFontSize(1.0f), FontStyle.Normal);
+                labelDefaultStyle.normal.textColor = theme.Text;
+                labelDefaultStyle.padding = GetSpacingOffset(0f, 3f);
                 labelDefaultStyle.wordWrap = true;
-                labelSecondaryStyle = CreateStyleWithFont(GUI.skin.label, GetScaledFontSize(0.875f));
-                labelSecondaryStyle.normal.textColor = Color.Lerp(theme.TextColor, theme.MutedColor, 0.35f);
-                labelMutedStyle = CreateStyleWithFont(GUI.skin.label, GetScaledFontSize(0.875f));
-                labelMutedStyle.normal.textColor = theme.MutedColor;
+                labelDefaultStyle.alignment = TextAnchor.UpperLeft;
+                labelSecondaryStyle = CreateStyleWithFont(GUI.skin.label, GetScaledFontSize(0.9f));
+                labelSecondaryStyle.normal.textColor = Color.Lerp(theme.Text, theme.Muted, 0.4f);
+                labelSecondaryStyle.wordWrap = true;
+                labelMutedStyle = CreateStyleWithFont(GUI.skin.label, GetScaledFontSize(0.85f));
+                labelMutedStyle.normal.textColor = theme.Muted;
+                labelMutedStyle.wordWrap = true;
                 labelDestructiveStyle = CreateStyleWithFont(GUI.skin.label, GetScaledFontSize(1.0f), FontStyle.Bold);
-                labelDestructiveStyle.normal.textColor = theme.ButtonDestructiveBg;
+                labelDestructiveStyle.normal.textColor = theme.Destructive;
+                labelDestructiveStyle.wordWrap = true;
             }
             catch (Exception ex)
             {
@@ -1462,15 +1457,20 @@ namespace shadcnui.GUIComponents.Core
         {
             try
             {
+                var theme = ThemeManager.Instance.CurrentTheme;
                 progressBarStyle = new UnityHelpers.GUIStyle(GUI.skin.box);
-                progressBarStyle.normal.background = progressBarBackgroundTexture;
-                progressBarStyle.border = GetBorderOffset(6f);
+                int progRadius = GetScaledBorderRadius(8f);
+                progressBarStyle.normal.background = CreateRoundedRectTexture(256, 12, progRadius, theme.Secondary);
+                progressBarStyle.border = GetBorderOffset(8f);
                 progressBarStyle.padding = GetSpacingOffset(0f, 0f);
-                progressBarStyle.margin = GetSpacingOffset(0f, 2f);
+                progressBarStyle.margin = GetSpacingOffset(0f, 4f);
+                progressBarStyle.fixedHeight = GetScaledHeight(12f);
                 progressBarBackgroundStyle = new UnityHelpers.GUIStyle();
-                progressBarBackgroundStyle.normal.background = progressBarBackgroundTexture;
+                progressBarBackgroundStyle.normal.background = CreateRoundedRectTexture(256, 12, progRadius, theme.Secondary);
+                progressBarBackgroundStyle.fixedHeight = GetScaledHeight(12f);
                 progressBarFillStyle = new UnityHelpers.GUIStyle();
-                progressBarFillStyle.normal.background = progressBarFillTexture;
+                progressBarFillStyle.normal.background = CreateRoundedRectTexture(256, 12, progRadius, theme.Accent);
+                progressBarFillStyle.fixedHeight = GetScaledHeight(12f);
             }
             catch (Exception ex)
             {
@@ -1486,13 +1486,15 @@ namespace shadcnui.GUIComponents.Core
             {
                 var theme = ThemeManager.Instance.CurrentTheme;
                 separatorHorizontalStyle = new UnityHelpers.GUIStyle();
-                separatorHorizontalStyle.normal.background = CreateSolidTexture(theme.BorderColor);
-                separatorHorizontalStyle.fixedHeight = Mathf.RoundToInt(1 * guiHelper.uiScale);
+                separatorHorizontalStyle.normal.background = CreateSolidTexture(Color.Lerp(theme.Border, Color.black, 0.1f));
+                separatorHorizontalStyle.fixedHeight = Mathf.RoundToInt(1.5f * guiHelper.uiScale);
                 separatorHorizontalStyle.stretchWidth = true;
+                separatorHorizontalStyle.margin = GetSpacingOffset(0f, 6f);
                 separatorVerticalStyle = new UnityHelpers.GUIStyle();
-                separatorVerticalStyle.normal.background = CreateSolidTexture(theme.BorderColor);
-                separatorVerticalStyle.fixedWidth = Mathf.RoundToInt(1 * guiHelper.uiScale);
+                separatorVerticalStyle.normal.background = CreateSolidTexture(Color.Lerp(theme.Border, Color.black, 0.1f));
+                separatorVerticalStyle.fixedWidth = Mathf.RoundToInt(1.5f * guiHelper.uiScale);
                 separatorVerticalStyle.stretchHeight = true;
+                separatorVerticalStyle.margin = GetSpacingOffset(6f, 0f);
             }
             catch (Exception ex)
             {
@@ -1509,27 +1511,27 @@ namespace shadcnui.GUIComponents.Core
                 var theme = ThemeManager.Instance.CurrentTheme;
                 tabsListStyle = new UnityHelpers.GUIStyle();
                 tabsListStyle.normal.background = CreateSolidTexture(theme.TabsBg);
-                tabsListStyle.border = GetBorderOffset(6f);
-                tabsListStyle.padding = GetSpacingOffset(4f, 4f);
-                tabsListStyle.margin = GetSpacingOffset(0f, 2f);
-                tabsTriggerStyle = CreateStyleWithFont(GUI.skin.button, GetScaledFontSize(0.875f), FontStyle.Bold);
+                tabsListStyle.border = GetBorderOffset(0f);
+                tabsListStyle.padding = GetSpacingOffset(6f, 6f);
+                tabsListStyle.margin = GetSpacingOffset(0f, 0f);
+                tabsTriggerStyle = CreateStyleWithFont(GUI.skin.button, GetScaledFontSize(0.9f), FontStyle.Bold);
                 tabsTriggerStyle.alignment = TextAnchor.MiddleCenter;
-                tabsTriggerStyle.padding = GetSpacingOffset(12f, 4f);
-                tabsTriggerStyle.border = GetBorderOffset(6f);
+                tabsTriggerStyle.padding = GetSpacingOffset(14f, 6f);
+                tabsTriggerStyle.border = GetBorderOffset(0f);
                 tabsTriggerStyle.normal.background = transparentTexture;
-                tabsTriggerStyle.normal.textColor = theme.TabsTriggerFg;
-                tabsTriggerStyle.hover.background = transparentTexture;
+                tabsTriggerStyle.normal.textColor = Color.Lerp(theme.Muted, Color.black, 0.2f);
+                tabsTriggerStyle.hover.background = CreateSolidTexture(new Color(theme.Accent.r, theme.Accent.g, theme.Accent.b, 0.08f));
                 tabsTriggerStyle.active.background = transparentTexture;
                 tabsTriggerActiveStyle = new UnityHelpers.GUIStyle(tabsTriggerStyle);
                 if (customFont != null)
                     tabsTriggerActiveStyle.font = customFont;
 
-                tabsTriggerActiveStyle.normal.background = CreateBottomBorderTexture(128, GetScaledHeight(36f), Mathf.Max(2, Mathf.RoundToInt(2.5f * guiHelper.uiScale)), theme.AccentColor, theme.TabsTriggerActiveBg);
+                tabsTriggerActiveStyle.normal.background = CreateBottomBorderTexture(128, GetScaledHeight(40f), Mathf.Max(3, Mathf.RoundToInt(3f * guiHelper.uiScale)), theme.Accent, theme.Base);
                 tabsTriggerActiveStyle.normal.textColor = theme.TabsTriggerActiveFg;
                 tabsTriggerActiveStyle.hover.background = tabsTriggerActiveStyle.normal.background;
                 tabsTriggerActiveStyle.active.background = tabsTriggerActiveStyle.normal.background;
                 tabsContentStyle = new UnityHelpers.GUIStyle();
-                tabsContentStyle.padding = GetSpacingOffset(15f, 15f);
+                tabsContentStyle.padding = GetSpacingOffset(18f, 18f);
             }
             catch (Exception ex)
             {
@@ -1547,22 +1549,22 @@ namespace shadcnui.GUIComponents.Core
                 textAreaStyle = CreateStyleWithFont(GUI.skin.textArea, GetScaledFontSize(0.875f));
                 textAreaStyle.padding = GetSpacingOffset(12f, 8f);
                 textAreaStyle.border = GetBorderOffset(6f);
-                textAreaStyle.normal.background = inputBackgroundTexture;
-                textAreaStyle.normal.textColor = theme.InputFg;
-                textAreaStyle.focused.background = inputFocusedTexture;
-                textAreaStyle.focused.textColor = theme.InputFocusedFg;
-                textAreaStyle.hover.background = inputBackgroundTexture;
+                textAreaStyle.normal.background = CreateRoundedRectTexture(128, 80, 8, theme.Secondary);
+                textAreaStyle.normal.textColor = theme.Text;
+                textAreaStyle.focused.background = CreateRoundedRectTexture(128, 80, 8, Color.Lerp(theme.Secondary, theme.Accent, 0.1f));
+                textAreaStyle.focused.textColor = theme.Text;
+                textAreaStyle.hover.background = CreateRoundedRectTexture(128, 80, 8, Color.Lerp(theme.Secondary, Color.white, 0.08f));
                 textAreaStyle.wordWrap = true;
                 textAreaStyle.stretchHeight = true;
                 textAreaFocusedStyle = new UnityHelpers.GUIStyle(textAreaStyle);
-                textAreaFocusedStyle.normal.background = inputFocusedTexture;
+                textAreaFocusedStyle.normal.background = CreateRoundedRectTexture(128, 80, 8, Color.Lerp(theme.Secondary, theme.Accent, 0.1f));
                 textAreaFocusedStyle.border = new UnityHelpers.RectOffset(0, 0, 0, 0);
                 textAreaOutlineStyle = new UnityHelpers.GUIStyle(textAreaStyle);
                 textAreaOutlineStyle.normal.background = CreateOutlineTexture();
-                textAreaOutlineStyle.focused.background = CreateSolidTexture(Color.Lerp(theme.AccentColor, Color.black, 0.15f));
+                textAreaOutlineStyle.focused.background = CreateSolidTexture(Color.Lerp(theme.Accent, Color.black, 0.15f));
                 textAreaGhostStyle = new UnityHelpers.GUIStyle(textAreaStyle);
                 textAreaGhostStyle.normal.background = transparentTexture;
-                textAreaGhostStyle.focused.background = CreateSolidTexture(Color.Lerp(theme.PrimaryColor, Color.black, 0.15f));
+                textAreaGhostStyle.focused.background = CreateSolidTexture(Color.Lerp(theme.Secondary, Color.black, 0.08f));
             }
             catch (Exception ex)
             {
@@ -1580,47 +1582,49 @@ namespace shadcnui.GUIComponents.Core
                 checkboxDefaultStyle = new UnityHelpers.GUIStyle(GUI.skin.toggle);
                 if (customFont != null)
                     checkboxDefaultStyle.font = customFont;
-                checkboxDefaultStyle.fontSize = GetScaledFontSize(0.875f);
-                checkboxDefaultStyle.normal.background = checkboxTexture;
-                checkboxDefaultStyle.normal.textColor = Color.white;
-                checkboxDefaultStyle.hover.background = CreateSolidTexture(Color.Lerp(theme.CheckboxBg, Color.white, 0.12f));
-                checkboxDefaultStyle.hover.textColor = Color.white;
-                checkboxDefaultStyle.active.background = CreateSolidTexture(Color.Lerp(theme.CheckboxBg, Color.black, 0.15f));
-                checkboxDefaultStyle.active.textColor = Color.white;
-                checkboxDefaultStyle.onNormal.background = CreateSolidTexture(theme.ToggleOnBg);
+                checkboxDefaultStyle.fontSize = GetScaledFontSize(0.9f);
+                int cbRadius = GetScaledBorderRadius(6f);
+                checkboxDefaultStyle.normal.background = CreateRoundedRectTexture(20, 20, cbRadius, theme.Secondary);
+                checkboxDefaultStyle.normal.textColor = theme.Text;
+                checkboxDefaultStyle.hover.background = CreateRoundedRectTexture(20, 20, cbRadius, Color.Lerp(theme.Secondary, Color.white, 0.15f));
+                checkboxDefaultStyle.hover.textColor = theme.Text;
+                checkboxDefaultStyle.active.background = CreateRoundedRectTexture(20, 20, cbRadius, Color.Lerp(theme.Secondary, Color.black, 0.1f));
+                checkboxDefaultStyle.active.textColor = theme.Text;
+                checkboxDefaultStyle.onNormal.background = CreateRoundedRectTexture(20, 20, cbRadius, theme.Accent);
                 checkboxDefaultStyle.onNormal.textColor = Color.white;
-                checkboxDefaultStyle.onHover.background = CreateSolidTexture(Color.Lerp(theme.ToggleOnBg, Color.white, 0.12f));
+                checkboxDefaultStyle.onHover.background = CreateRoundedRectTexture(20, 20, cbRadius, Color.Lerp(theme.Accent, Color.white, 0.12f));
                 checkboxDefaultStyle.onHover.textColor = Color.white;
-                checkboxDefaultStyle.onActive.background = CreateSolidTexture(Color.Lerp(theme.ToggleOnBg, Color.black, 0.15f));
+                checkboxDefaultStyle.onActive.background = CreateRoundedRectTexture(20, 20, cbRadius, Color.Lerp(theme.Accent, Color.black, 0.1f));
                 checkboxDefaultStyle.onActive.textColor = Color.white;
                 checkboxDefaultStyle.border = GetBorderOffset(6f);
+                checkboxDefaultStyle.padding = GetSpacingOffset(8f, 0f);
                 checkboxOutlineStyle = new UnityHelpers.GUIStyle(checkboxDefaultStyle);
                 if (customFont != null)
                     checkboxOutlineStyle.font = customFont;
                 checkboxOutlineStyle.normal.background = CreateOutlineTexture();
-                checkboxOutlineStyle.hover.background = CreateSolidTexture(Color.Lerp(theme.AccentColor, Color.white, 0.12f));
+                checkboxOutlineStyle.hover.background = CreateSolidTexture(Color.Lerp(theme.Accent, Color.white, 0.12f));
                 checkboxOutlineStyle.hover.textColor = Color.white;
-                checkboxOutlineStyle.active.background = CreateSolidTexture(Color.Lerp(theme.AccentColor, Color.black, 0.15f));
+                checkboxOutlineStyle.active.background = CreateSolidTexture(Color.Lerp(theme.Accent, Color.black, 0.15f));
                 checkboxOutlineStyle.active.textColor = Color.white;
-                checkboxOutlineStyle.onNormal.background = CreateOutlineButtonTexture(theme.AccentColor, theme.AccentColor);
-                checkboxOutlineStyle.onHover.background = CreateSolidTexture(Color.Lerp(theme.AccentColor, Color.white, 0.12f));
+                checkboxOutlineStyle.onNormal.background = CreateOutlineButtonTexture(theme.Accent, theme.Accent);
+                checkboxOutlineStyle.onHover.background = CreateSolidTexture(Color.Lerp(theme.Accent, Color.white, 0.12f));
                 checkboxOutlineStyle.onHover.textColor = Color.white;
-                checkboxOutlineStyle.onActive.background = CreateSolidTexture(Color.Lerp(theme.AccentColor, Color.black, 0.15f));
+                checkboxOutlineStyle.onActive.background = CreateSolidTexture(Color.Lerp(theme.Accent, Color.black, 0.15f));
                 checkboxOutlineStyle.onActive.textColor = Color.white;
                 checkboxGhostStyle = new UnityHelpers.GUIStyle(checkboxDefaultStyle);
                 if (customFont != null)
                     checkboxGhostStyle.font = customFont;
                 checkboxGhostStyle.normal.background = transparentTexture;
-                checkboxGhostStyle.normal.textColor = theme.TextColor;
-                checkboxGhostStyle.hover.background = CreateSolidTexture(Color.Lerp(theme.PrimaryColor, Color.black, 0.12f));
-                checkboxGhostStyle.hover.textColor = theme.TextColor;
-                checkboxGhostStyle.active.background = CreateSolidTexture(Color.Lerp(theme.PrimaryColor, Color.black, 0.2f));
-                checkboxGhostStyle.active.textColor = theme.TextColor;
-                checkboxGhostStyle.onNormal.background = CreateSolidTexture(theme.AccentColor);
+                checkboxGhostStyle.normal.textColor = theme.Text;
+                checkboxGhostStyle.hover.background = CreateSolidTexture(Color.Lerp(theme.Base, Color.black, 0.12f));
+                checkboxGhostStyle.hover.textColor = theme.Text;
+                checkboxGhostStyle.active.background = CreateSolidTexture(Color.Lerp(theme.Base, Color.black, 0.2f));
+                checkboxGhostStyle.active.textColor = theme.Text;
+                checkboxGhostStyle.onNormal.background = CreateSolidTexture(theme.Accent);
                 checkboxGhostStyle.onNormal.textColor = Color.white;
-                checkboxGhostStyle.onHover.background = CreateSolidTexture(Color.Lerp(theme.AccentColor, Color.white, 0.12f));
+                checkboxGhostStyle.onHover.background = CreateSolidTexture(Color.Lerp(theme.Accent, Color.white, 0.12f));
                 checkboxGhostStyle.onHover.textColor = Color.white;
-                checkboxGhostStyle.onActive.background = CreateSolidTexture(Color.Lerp(theme.AccentColor, Color.black, 0.15f));
+                checkboxGhostStyle.onActive.background = CreateSolidTexture(Color.Lerp(theme.Accent, Color.black, 0.15f));
                 checkboxGhostStyle.onActive.textColor = Color.white;
             }
             catch (Exception ex)
@@ -1641,48 +1645,48 @@ namespace shadcnui.GUIComponents.Core
                     switchDefaultStyle.font = customFont;
                 switchDefaultStyle.fontSize = GetScaledFontSize(0.875f);
                 switchDefaultStyle.normal.background = switchOffTexture;
-                switchDefaultStyle.normal.textColor = Color.white;
-                switchDefaultStyle.hover.background = CreateSolidTexture(Color.Lerp(theme.SwitchOffBg, Color.white, 0.12f));
-                switchDefaultStyle.hover.textColor = Color.white;
-                switchDefaultStyle.active.background = CreateSolidTexture(Color.Lerp(theme.SwitchOffBg, Color.black, 0.15f));
-                switchDefaultStyle.active.textColor = Color.white;
+                switchDefaultStyle.normal.textColor = theme.Text;
+                switchDefaultStyle.hover.background = CreateSolidTexture(Color.Lerp(theme.Secondary, Color.white, 0.12f));
+                switchDefaultStyle.hover.textColor = theme.Text;
+                switchDefaultStyle.active.background = CreateSolidTexture(Color.Lerp(theme.Secondary, Color.black, 0.15f));
+                switchDefaultStyle.active.textColor = theme.Text;
                 switchDefaultStyle.onNormal.background = switchOnTexture;
-                switchDefaultStyle.onNormal.textColor = Color.white;
-                switchDefaultStyle.onHover.background = CreateSolidTexture(Color.Lerp(theme.SwitchOnBg, Color.white, 0.12f));
-                switchDefaultStyle.onHover.textColor = Color.white;
-                switchDefaultStyle.onActive.background = CreateSolidTexture(Color.Lerp(theme.SwitchOnBg, Color.black, 0.15f));
-                switchDefaultStyle.onActive.textColor = Color.white;
+                switchDefaultStyle.onNormal.textColor = theme.Text;
+                switchDefaultStyle.onHover.background = CreateSolidTexture(Color.Lerp(theme.Accent, Color.white, 0.12f));
+                switchDefaultStyle.onHover.textColor = theme.Text;
+                switchDefaultStyle.onActive.background = CreateSolidTexture(Color.Lerp(theme.Accent, Color.black, 0.15f));
+                switchDefaultStyle.onActive.textColor = theme.Text;
                 switchDefaultStyle.border = GetBorderOffset(6f);
                 switchOutlineStyle = new UnityHelpers.GUIStyle(switchDefaultStyle);
                 if (customFont != null)
                     switchOutlineStyle.font = customFont;
                 switchOutlineStyle.normal.background = CreateOutlineTexture();
-                switchOutlineStyle.normal.textColor = Color.white;
-                switchOutlineStyle.hover.background = CreateSolidTexture(Color.Lerp(theme.AccentColor, Color.white, 0.12f));
-                switchOutlineStyle.hover.textColor = Color.white;
-                switchOutlineStyle.active.background = CreateSolidTexture(Color.Lerp(theme.AccentColor, Color.black, 0.15f));
-                switchOutlineStyle.active.textColor = Color.white;
-                switchOutlineStyle.onNormal.background = CreateOutlineButtonTexture(theme.AccentColor, theme.AccentColor);
-                switchOutlineStyle.onNormal.textColor = Color.white;
-                switchOutlineStyle.onHover.background = CreateSolidTexture(Color.Lerp(theme.AccentColor, Color.white, 0.12f));
-                switchOutlineStyle.onHover.textColor = Color.white;
-                switchOutlineStyle.onActive.background = CreateSolidTexture(Color.Lerp(theme.AccentColor, Color.black, 0.15f));
-                switchOutlineStyle.onActive.textColor = Color.white;
+                switchOutlineStyle.normal.textColor = theme.Text;
+                switchOutlineStyle.hover.background = CreateSolidTexture(Color.Lerp(theme.Accent, Color.white, 0.12f));
+                switchOutlineStyle.hover.textColor = theme.Text;
+                switchOutlineStyle.active.background = CreateSolidTexture(Color.Lerp(theme.Accent, Color.black, 0.15f));
+                switchOutlineStyle.active.textColor = theme.Text;
+                switchOutlineStyle.onNormal.background = CreateOutlineButtonTexture(theme.Accent, theme.Accent);
+                switchOutlineStyle.onNormal.textColor = theme.Text;
+                switchOutlineStyle.onHover.background = CreateSolidTexture(Color.Lerp(theme.Accent, Color.white, 0.12f));
+                switchOutlineStyle.onHover.textColor = theme.Text;
+                switchOutlineStyle.onActive.background = CreateSolidTexture(Color.Lerp(theme.Accent, Color.black, 0.15f));
+                switchOutlineStyle.onActive.textColor = theme.Text;
                 switchGhostStyle = new UnityHelpers.GUIStyle(switchDefaultStyle);
                 if (customFont != null)
                     switchGhostStyle.font = customFont;
                 switchGhostStyle.normal.background = transparentTexture;
-                switchGhostStyle.normal.textColor = theme.TextColor;
-                switchGhostStyle.hover.background = CreateSolidTexture(Color.Lerp(theme.PrimaryColor, Color.black, 0.12f));
-                switchGhostStyle.hover.textColor = theme.TextColor;
-                switchGhostStyle.active.background = CreateSolidTexture(Color.Lerp(theme.PrimaryColor, Color.black, 0.2f));
-                switchGhostStyle.active.textColor = theme.TextColor;
-                switchGhostStyle.onNormal.background = CreateSolidTexture(theme.AccentColor);
-                switchGhostStyle.onNormal.textColor = Color.white;
-                switchGhostStyle.onHover.background = CreateSolidTexture(Color.Lerp(theme.AccentColor, Color.white, 0.12f));
-                switchGhostStyle.onHover.textColor = Color.white;
-                switchGhostStyle.onActive.background = CreateSolidTexture(Color.Lerp(theme.AccentColor, Color.black, 0.15f));
-                switchGhostStyle.onActive.textColor = Color.white;
+                switchGhostStyle.normal.textColor = theme.Text;
+                switchGhostStyle.hover.background = CreateSolidTexture(Color.Lerp(theme.Base, Color.black, 0.12f));
+                switchGhostStyle.hover.textColor = theme.Text;
+                switchGhostStyle.active.background = CreateSolidTexture(Color.Lerp(theme.Base, Color.black, 0.2f));
+                switchGhostStyle.active.textColor = theme.Text;
+                switchGhostStyle.onNormal.background = CreateSolidTexture(theme.Accent);
+                switchGhostStyle.onNormal.textColor = theme.Text;
+                switchGhostStyle.onHover.background = CreateSolidTexture(Color.Lerp(theme.Accent, Color.white, 0.12f));
+                switchGhostStyle.onHover.textColor = theme.Text;
+                switchGhostStyle.onActive.background = CreateSolidTexture(Color.Lerp(theme.Accent, Color.black, 0.15f));
+                switchGhostStyle.onActive.textColor = theme.Text;
             }
             catch (Exception ex)
             {
@@ -1697,20 +1701,20 @@ namespace shadcnui.GUIComponents.Core
             try
             {
                 var theme = ThemeManager.Instance.CurrentTheme;
-                badgeDefaultStyle = CreateStyleWithFont(GUI.skin.box, GetScaledFontSize(0.75f));
-                badgeDefaultStyle.normal.background = CreateSolidTexture(theme.BadgeBg);
-                badgeDefaultStyle.normal.textColor = theme.TextColor;
+                badgeDefaultStyle = CreateStyleWithFont(GUI.skin.box, GetScaledFontSize(0.8f), FontStyle.Bold);
+                badgeDefaultStyle.normal.background = CreateRoundedRectTexture(128, 24, 12, theme.Elevated);
+                badgeDefaultStyle.normal.textColor = theme.Text;
                 badgeDefaultStyle.border = GetBorderOffset(12f);
-                badgeDefaultStyle.padding = GetSpacingOffset(8f, 3f);
+                badgeDefaultStyle.padding = GetSpacingOffset(10f, 4f);
                 badgeDefaultStyle.alignment = TextAnchor.MiddleCenter;
                 badgeSecondaryStyle = new UnityHelpers.GUIStyle(badgeDefaultStyle);
                 if (customFont != null)
                     badgeSecondaryStyle.font = customFont;
-                badgeSecondaryStyle.normal.background = CreateSolidTexture(theme.BadgeSecondaryBg);
+                badgeSecondaryStyle.normal.background = CreateRoundedRectTexture(128, 24, 12, theme.Secondary);
                 badgeDestructiveStyle = new UnityHelpers.GUIStyle(badgeDefaultStyle);
                 if (customFont != null)
                     badgeDestructiveStyle.font = customFont;
-                badgeDestructiveStyle.normal.background = CreateSolidTexture(theme.BadgeDestructiveBg);
+                badgeDestructiveStyle.normal.background = CreateRoundedRectTexture(128, 24, 12, theme.Destructive);
                 badgeOutlineStyle = new UnityHelpers.GUIStyle(badgeDefaultStyle);
                 if (customFont != null)
                     badgeOutlineStyle.font = customFont;
@@ -1731,7 +1735,7 @@ namespace shadcnui.GUIComponents.Core
                 var theme = ThemeManager.Instance.CurrentTheme;
                 int defaultAvatarSize = GetScaledHeight(40f);
                 avatarStyle = new UnityHelpers.GUIStyle(GUI.skin.box);
-                avatarStyle.normal.background = CreateSolidTexture(theme.AvatarBg);
+                avatarStyle.normal.background = CreateSolidTexture(theme.Secondary);
                 avatarStyle.alignment = TextAnchor.MiddleCenter;
                 avatarStyle.fixedWidth = defaultAvatarSize;
                 avatarStyle.fixedHeight = defaultAvatarSize;
@@ -1751,44 +1755,44 @@ namespace shadcnui.GUIComponents.Core
             {
                 var theme = ThemeManager.Instance.CurrentTheme;
                 tableStyle = new UnityHelpers.GUIStyle();
-                tableStyle.normal.background = CreateSolidTexture(theme.BackgroundColor);
+                tableStyle.normal.background = CreateSolidTexture(theme.Secondary);
                 tableStyle.border = GetBorderOffset(1f);
                 tableStyle.padding = GetSpacingOffset(0f, 0f);
                 tableStyle.margin = GetSpacingOffset(0f, 0f);
-                tableHeaderStyle = CreateStyleWithFont(GUI.skin.button, GetScaledFontSize(0.875f), FontStyle.Bold);
-                tableHeaderStyle.normal.background = CreateSolidTexture(theme.SecondaryColor);
-                tableHeaderStyle.hover.background = CreateSolidTexture(new Color(theme.SecondaryColor.r, theme.SecondaryColor.g, theme.SecondaryColor.b, 0.85f));
-                tableHeaderStyle.active.background = CreateSolidTexture(new Color(theme.SecondaryColor.r, theme.SecondaryColor.g, theme.SecondaryColor.b, 0.95f));
-                tableHeaderStyle.normal.textColor = theme.TextColor;
-                tableHeaderStyle.hover.textColor = theme.TextColor;
-                tableHeaderStyle.active.textColor = theme.TextColor;
-                tableHeaderStyle.padding = GetSpacingOffset(12f, 12f);
+                tableHeaderStyle = CreateStyleWithFont(GUI.skin.button, GetScaledFontSize(0.9f), FontStyle.Bold);
+                tableHeaderStyle.normal.background = CreateSolidTexture(Color.Lerp(theme.Secondary, theme.Accent, 0.15f));
+                tableHeaderStyle.hover.background = CreateSolidTexture(Color.Lerp(theme.Secondary, theme.Accent, 0.2f));
+                tableHeaderStyle.active.background = CreateSolidTexture(Color.Lerp(theme.Secondary, theme.Accent, 0.25f));
+                tableHeaderStyle.normal.textColor = theme.Text;
+                tableHeaderStyle.hover.textColor = theme.Text;
+                tableHeaderStyle.active.textColor = theme.Text;
+                tableHeaderStyle.padding = GetSpacingOffset(14f, 14f);
                 tableHeaderStyle.alignment = TextAnchor.MiddleLeft;
                 tableHeaderStyle.border = GetBorderOffset(0f);
-                tableCellStyle = CreateStyleWithFont(GUI.skin.label, GetScaledFontSize(1.0f));
-                tableCellStyle.normal.background = CreateSolidTexture(theme.BackgroundColor);
-                tableCellStyle.normal.textColor = theme.TextColor;
-                tableCellStyle.padding = GetSpacingOffset(12f, 12f);
+                tableCellStyle = CreateStyleWithFont(GUI.skin.label, GetScaledFontSize(0.95f));
+                tableCellStyle.normal.background = CreateSolidTexture(theme.Secondary);
+                tableCellStyle.normal.textColor = theme.Text;
+                tableCellStyle.padding = GetSpacingOffset(14f, 14f);
                 tableCellStyle.alignment = TextAnchor.MiddleLeft;
                 tableCellStyle.wordWrap = false;
                 tableCellStyle.clipping = TextClipping.Clip;
                 tableStripedStyle = new UnityHelpers.GUIStyle(tableCellStyle);
                 if (customFont != null)
                     tableStripedStyle.font = customFont;
-                tableStripedStyle.normal.background = CreateSolidTexture(new Color(theme.SecondaryColor.r, theme.SecondaryColor.g, theme.SecondaryColor.b, 0.35f));
+                tableStripedStyle.normal.background = CreateSolidTexture(Color.Lerp(theme.Secondary, theme.Accent, 0.08f));
                 tableBorderedStyle = new UnityHelpers.GUIStyle(tableCellStyle);
                 if (customFont != null)
                     tableBorderedStyle.font = customFont;
-                tableBorderedStyle.normal.background = CreateBorderTexture(theme.ButtonOutlineBorder, 1);
+                tableBorderedStyle.normal.background = CreateBorderTexture(theme.Border, 1);
                 tableHoverStyle = new UnityHelpers.GUIStyle(tableCellStyle);
                 if (customFont != null)
                     tableHoverStyle.font = customFont;
-                tableHoverStyle.normal.background = CreateSolidTexture(theme.BackgroundColor);
-                tableHoverStyle.normal.textColor = theme.TextColor;
-                tableHoverStyle.hover.background = CreateSolidTexture(new Color(theme.AccentColor.r, theme.AccentColor.g, theme.AccentColor.b, 0.12f));
-                tableHoverStyle.hover.textColor = theme.TextColor;
-                tableHoverStyle.active.background = CreateSolidTexture(new Color(theme.AccentColor.r, theme.AccentColor.g, theme.AccentColor.b, 0.25f));
-                tableHoverStyle.active.textColor = theme.TextColor;
+                tableHoverStyle.normal.background = CreateSolidTexture(theme.Secondary);
+                tableHoverStyle.normal.textColor = theme.Text;
+                tableHoverStyle.hover.background = CreateSolidTexture(Color.Lerp(theme.Secondary, theme.Accent, 0.12f));
+                tableHoverStyle.hover.textColor = theme.Text;
+                tableHoverStyle.active.background = CreateSolidTexture(Color.Lerp(theme.Secondary, theme.Accent, 0.12f));
+                tableHoverStyle.active.textColor = theme.Text;
             }
             catch (Exception ex)
             {
@@ -1804,42 +1808,42 @@ namespace shadcnui.GUIComponents.Core
             {
                 var theme = ThemeManager.Instance.CurrentTheme;
                 calendarStyle = new UnityHelpers.GUIStyle(GUI.skin.box);
-                calendarStyle.normal.background = CreateSolidTexture(theme.CardBg);
+                calendarStyle.normal.background = CreateSolidTexture(theme.Secondary);
                 calendarStyle.border = GetBorderOffset(4f);
                 calendarStyle.padding = GetSpacingOffset(12f, 12f);
                 calendarHeaderStyle = new UnityHelpers.GUIStyle();
                 calendarHeaderStyle.padding = GetSpacingOffset(0f, 4f);
                 calendarTitleStyle = CreateStyleWithFont(GUI.skin.label, GetScaledFontSize(1.125f), FontStyle.Bold);
-                calendarTitleStyle.normal.textColor = theme.TextColor;
+                calendarTitleStyle.normal.textColor = theme.Text;
                 calendarTitleStyle.alignment = TextAnchor.MiddleCenter;
                 calendarWeekdayStyle = CreateStyleWithFont(GUI.skin.label, GetScaledFontSize(0.875f));
-                calendarWeekdayStyle.normal.textColor = Color.Lerp(theme.TextColor, Color.black, 0.35f);
+                calendarWeekdayStyle.normal.textColor = Color.Lerp(theme.Text, Color.black, 0.35f);
                 calendarWeekdayStyle.alignment = TextAnchor.MiddleCenter;
                 calendarDayStyle = CreateStyleWithFont(GUI.skin.button, GetScaledFontSize(1.0f));
-                calendarDayStyle.normal.textColor = theme.TextColor;
-                calendarDayStyle.normal.background = CreateSolidTexture(theme.CardBg);
-                calendarDayStyle.hover.background = CreateSolidTexture(Color.Lerp(theme.CardBg, Color.white, 0.12f));
+                calendarDayStyle.normal.textColor = theme.Text;
+                calendarDayStyle.normal.background = CreateSolidTexture(theme.Secondary);
+                calendarDayStyle.hover.background = CreateSolidTexture(Color.Lerp(theme.Secondary, theme.Accent, 0.12f));
                 calendarDaySelectedStyle = new UnityHelpers.GUIStyle(calendarDayStyle);
                 if (customFont != null)
                     calendarDaySelectedStyle.font = customFont;
-                calendarDaySelectedStyle.normal.background = CreateSolidTexture(theme.AccentColor);
-                calendarDaySelectedStyle.normal.textColor = Color.white;
+                calendarDaySelectedStyle.normal.background = CreateSolidTexture(theme.Accent);
+                calendarDaySelectedStyle.normal.textColor = theme.Text;
                 calendarDayOutsideMonthStyle = new UnityHelpers.GUIStyle(calendarDayStyle);
                 if (customFont != null)
                     calendarDayOutsideMonthStyle.font = customFont;
-                calendarDayOutsideMonthStyle.normal.textColor = Color.Lerp(theme.TextColor, Color.black, 0.5f);
+                calendarDayOutsideMonthStyle.normal.textColor = Color.Lerp(theme.Text, Color.black, 0.5f);
                 calendarDayTodayStyle = new UnityHelpers.GUIStyle(calendarDayStyle);
                 if (customFont != null)
                     calendarDayTodayStyle.font = customFont;
-                calendarDayTodayStyle.normal.background = CreateOutlineButtonTexture(theme.CardBg, theme.AccentColor);
+                calendarDayTodayStyle.normal.background = CreateOutlineButtonTexture(theme.Secondary, theme.Accent);
                 calendarDayDisabledStyle = new UnityHelpers.GUIStyle(calendarDayStyle);
                 if (customFont != null)
                     calendarDayDisabledStyle.font = customFont;
-                calendarDayDisabledStyle.normal.textColor = theme.MutedColor;
+                calendarDayDisabledStyle.normal.textColor = theme.Muted;
                 calendarDayInRangeStyle = new UnityHelpers.GUIStyle(calendarDayStyle);
                 if (customFont != null)
                     calendarDayInRangeStyle.font = customFont;
-                calendarDayInRangeStyle.normal.background = CreateSolidTexture(new Color(theme.AccentColor.r, theme.AccentColor.g, theme.AccentColor.b, 0.55f));
+                calendarDayInRangeStyle.normal.background = CreateSolidTexture(new Color(theme.Accent.r, theme.Accent.g, theme.Accent.b, 0.55f));
             }
             catch (Exception ex)
             {
@@ -1855,25 +1859,26 @@ namespace shadcnui.GUIComponents.Core
             {
                 var theme = ThemeManager.Instance.CurrentTheme;
                 dropdownMenuContentStyle = new UnityHelpers.GUIStyle(GUI.skin.box);
-                dropdownMenuContentStyle.normal.background = CreateSolidTexture(theme.CardBg);
-                dropdownMenuContentStyle.border = GetBorderOffset(6f);
-                dropdownMenuContentStyle.padding = GetSpacingOffset(4f, 4f);
-                dropdownMenuItemStyle = CreateStyleWithFont(GUI.skin.button, GetScaledFontSize(0.875f));
+                int dropdownRadius = GetScaledBorderRadius(8f);
+                dropdownMenuContentStyle.normal.background = CreateRoundedRectWithShadowTexture(256, 256, dropdownRadius, theme.Elevated, 0.18f, 10);
+                dropdownMenuContentStyle.border = GetBorderOffset(8f);
+                dropdownMenuContentStyle.padding = GetSpacingOffset(6f, 6f);
+                dropdownMenuItemStyle = CreateStyleWithFont(GUI.skin.button, GetScaledFontSize(0.9f));
                 dropdownMenuItemStyle.alignment = TextAnchor.MiddleLeft;
                 dropdownMenuItemStyle.normal.background = transparentTexture;
-                dropdownMenuItemStyle.normal.textColor = theme.TextColor;
-                dropdownMenuItemStyle.hover.background = CreateSolidTexture(theme.AccentColor);
-                dropdownMenuItemStyle.hover.textColor = Color.white;
-                dropdownMenuItemStyle.active.background = CreateSolidTexture(Color.Lerp(theme.AccentColor, Color.black, 0.15f));
-                dropdownMenuItemStyle.active.textColor = Color.white;
-                dropdownMenuItemStyle.padding = GetSpacingOffset(12f, 4f);
+                dropdownMenuItemStyle.normal.textColor = theme.Text;
+                dropdownMenuItemStyle.hover.background = CreateRoundedRectTexture(128, 32, 6, Color.Lerp(theme.Accent, Color.white, 0.15f));
+                dropdownMenuItemStyle.hover.textColor = theme.Accent;
+                dropdownMenuItemStyle.active.background = CreateRoundedRectTexture(128, 32, 6, Color.Lerp(theme.Accent, Color.black, 0.1f));
+                dropdownMenuItemStyle.active.textColor = theme.Accent;
+                dropdownMenuItemStyle.padding = GetSpacingOffset(14f, 6f);
                 dropdownMenuSeparatorStyle = new UnityHelpers.GUIStyle();
-                dropdownMenuSeparatorStyle.normal.background = CreateSolidTexture(theme.SeparatorColor);
+                dropdownMenuSeparatorStyle.normal.background = CreateSolidTexture(theme.Border);
                 dropdownMenuSeparatorStyle.fixedHeight = 1;
-                dropdownMenuSeparatorStyle.margin = GetSpacingOffset(4f, 4f);
-                dropdownMenuHeaderStyle = CreateStyleWithFont(GUI.skin.label, GetScaledFontSize(0.75f), FontStyle.Bold);
-                dropdownMenuHeaderStyle.normal.textColor = theme.MutedColor;
-                dropdownMenuHeaderStyle.padding = GetSpacingOffset(12f, 4f);
+                dropdownMenuSeparatorStyle.margin = GetSpacingOffset(6f, 6f);
+                dropdownMenuHeaderStyle = CreateStyleWithFont(GUI.skin.label, GetScaledFontSize(0.8f), FontStyle.Bold);
+                dropdownMenuHeaderStyle.normal.textColor = theme.Muted;
+                dropdownMenuHeaderStyle.padding = GetSpacingOffset(14f, 6f);
             }
             catch (Exception ex)
             {
@@ -1889,7 +1894,7 @@ namespace shadcnui.GUIComponents.Core
             {
                 var theme = ThemeManager.Instance.CurrentTheme;
                 popoverContentStyle = new UnityHelpers.GUIStyle(GUI.skin.box);
-                popoverContentStyle.normal.background = CreateSolidTexture(theme.CardBg);
+                popoverContentStyle.normal.background = CreateSolidTexture(theme.Secondary);
                 popoverContentStyle.border = GetBorderOffset(6f);
                 popoverContentStyle.padding = GetSpacingOffset(12f, 12f);
             }
@@ -1907,12 +1912,12 @@ namespace shadcnui.GUIComponents.Core
             {
                 var theme = ThemeManager.Instance.CurrentTheme;
                 scrollAreaStyle = new UnityHelpers.GUIStyle();
-                scrollAreaStyle.normal.background = CreateSolidTexture(theme.BackgroundColor);
+                scrollAreaStyle.normal.background = CreateSolidTexture(theme.Base);
                 scrollAreaThumbStyle = new UnityHelpers.GUIStyle();
-                scrollAreaThumbStyle.normal.background = CreateSolidTexture(Color.Lerp(theme.BackgroundColor, Color.white, 0.25f));
+                scrollAreaThumbStyle.normal.background = CreateSolidTexture(Color.Lerp(theme.Base, Color.white, 0.25f));
                 scrollAreaThumbStyle.border = GetBorderOffset(4f);
                 scrollAreaTrackStyle = new UnityHelpers.GUIStyle();
-                scrollAreaTrackStyle.normal.background = CreateSolidTexture(Color.Lerp(theme.BackgroundColor, Color.black, 0.12f));
+                scrollAreaTrackStyle.normal.background = CreateSolidTexture(Color.Lerp(theme.Base, Color.black, 0.12f));
                 scrollAreaTrackStyle.border = GetBorderOffset(4f);
             }
             catch (Exception ex)
@@ -1932,23 +1937,23 @@ namespace shadcnui.GUIComponents.Core
                 int borderRadius = Mathf.RoundToInt(guiHelper.cornerRadius * guiHelper.uiScale);
                 selectTriggerStyle = CreateStyleWithFont(GUI.skin.button, Mathf.RoundToInt(scaledFontSize));
                 selectTriggerStyle.alignment = TextAnchor.MiddleLeft;
-                selectTriggerStyle.normal.background = CreateSolidTexture(theme.InputBg);
-                selectTriggerStyle.normal.textColor = theme.TextColor;
-                selectTriggerStyle.hover.background = CreateSolidTexture(Color.Lerp(theme.InputBg, theme.AccentColor, 0.12f));
-                selectTriggerStyle.active.background = CreateSolidTexture(Color.Lerp(theme.InputBg, theme.AccentColor, 0.25f));
+                selectTriggerStyle.normal.background = CreateSolidTexture(theme.Base);
+                selectTriggerStyle.normal.textColor = theme.Text;
+                selectTriggerStyle.hover.background = CreateSolidTexture(Color.Lerp(theme.Base, theme.Accent, 0.12f));
+                selectTriggerStyle.active.background = CreateSolidTexture(Color.Lerp(theme.Base, theme.Accent, 0.25f));
                 selectTriggerStyle.padding = new UnityHelpers.RectOffset(10, 10, 5, 5);
                 selectTriggerStyle.border = new UnityHelpers.RectOffset(borderRadius, borderRadius, borderRadius, borderRadius);
                 selectContentStyle = new UnityHelpers.GUIStyle(GUI.skin.box);
-                selectContentStyle.normal.background = CreateSolidTexture(theme.CardBg);
+                selectContentStyle.normal.background = CreateSolidTexture(theme.Elevated);
                 selectContentStyle.border = new UnityHelpers.RectOffset(borderRadius, borderRadius, borderRadius, borderRadius);
                 selectContentStyle.padding = new UnityHelpers.RectOffset(5, 5, 5, 5);
                 selectItemStyle = CreateStyleWithFont(GUI.skin.button, Mathf.RoundToInt(scaledFontSize));
                 selectItemStyle.alignment = TextAnchor.MiddleLeft;
                 selectItemStyle.normal.background = transparentTexture;
-                selectItemStyle.normal.textColor = theme.TextColor;
-                selectItemStyle.hover.background = CreateSolidTexture(theme.AccentColor);
+                selectItemStyle.normal.textColor = theme.Text;
+                selectItemStyle.hover.background = CreateSolidTexture(theme.Accent);
                 selectItemStyle.hover.textColor = Color.white;
-                selectItemStyle.active.background = CreateSolidTexture(Color.Lerp(theme.AccentColor, Color.black, 0.15f));
+                selectItemStyle.active.background = CreateSolidTexture(Color.Lerp(theme.Accent, Color.black, 0.15f));
                 selectItemStyle.active.textColor = Color.white;
                 selectItemStyle.padding = new UnityHelpers.RectOffset(10, 10, 5, 5);
             }
@@ -1966,42 +1971,42 @@ namespace shadcnui.GUIComponents.Core
             {
                 var theme = ThemeManager.Instance.CurrentTheme;
                 datePickerStyle = new UnityHelpers.GUIStyle(GUI.skin.box);
-                datePickerStyle.normal.background = CreateSolidTexture(theme.CardBg);
+                datePickerStyle.normal.background = CreateSolidTexture(theme.Secondary);
                 datePickerStyle.border = new UnityHelpers.RectOffset(4, 4, 4, 4);
                 datePickerStyle.padding = new UnityHelpers.RectOffset(10, 10, 10, 10);
                 datePickerHeaderStyle = new UnityHelpers.GUIStyle();
                 datePickerHeaderStyle.padding = new UnityHelpers.RectOffset(0, 0, 5, 5);
                 datePickerTitleStyle = CreateStyleWithFont(GUI.skin.label, guiHelper.fontSize + 2, FontStyle.Bold);
-                datePickerTitleStyle.normal.textColor = theme.TextColor;
+                datePickerTitleStyle.normal.textColor = theme.Text;
                 datePickerTitleStyle.alignment = TextAnchor.MiddleCenter;
                 datePickerWeekdayStyle = CreateStyleWithFont(GUI.skin.label, guiHelper.fontSize - 1);
-                datePickerWeekdayStyle.normal.textColor = Color.Lerp(theme.TextColor, Color.black, 0.35f);
+                datePickerWeekdayStyle.normal.textColor = Color.Lerp(theme.Text, Color.black, 0.35f);
                 datePickerWeekdayStyle.alignment = TextAnchor.MiddleCenter;
                 datePickerDayStyle = CreateStyleWithFont(GUI.skin.button, guiHelper.fontSize);
-                datePickerDayStyle.normal.textColor = theme.TextColor;
-                datePickerDayStyle.normal.background = CreateSolidTexture(theme.CardBg);
-                datePickerDayStyle.hover.background = CreateSolidTexture(Color.Lerp(theme.CardBg, Color.white, 0.12f));
+                datePickerDayStyle.normal.textColor = theme.Text;
+                datePickerDayStyle.normal.background = CreateSolidTexture(theme.Secondary);
+                datePickerDayStyle.hover.background = CreateSolidTexture(Color.Lerp(theme.Secondary, theme.Accent, 0.12f));
                 datePickerDaySelectedStyle = new UnityHelpers.GUIStyle(datePickerDayStyle);
                 if (customFont != null)
                     datePickerDaySelectedStyle.font = customFont;
-                datePickerDaySelectedStyle.normal.background = CreateSolidTexture(theme.AccentColor);
-                datePickerDaySelectedStyle.normal.textColor = Color.white;
+                datePickerDaySelectedStyle.normal.background = CreateSolidTexture(theme.Accent);
+                datePickerDaySelectedStyle.normal.textColor = theme.Text;
                 datePickerDayOutsideMonthStyle = new UnityHelpers.GUIStyle(datePickerDayStyle);
                 if (customFont != null)
                     datePickerDayOutsideMonthStyle.font = customFont;
-                datePickerDayOutsideMonthStyle.normal.textColor = Color.Lerp(theme.TextColor, Color.black, 0.5f);
+                datePickerDayOutsideMonthStyle.normal.textColor = Color.Lerp(theme.Text, Color.black, 0.5f);
                 datePickerDayTodayStyle = new UnityHelpers.GUIStyle(datePickerDayStyle);
                 if (customFont != null)
                     datePickerDayTodayStyle.font = customFont;
-                datePickerDayTodayStyle.normal.background = CreateOutlineButtonTexture(theme.CardBg, theme.AccentColor);
+                datePickerDayTodayStyle.normal.background = CreateOutlineButtonTexture(theme.Secondary, theme.Accent);
                 datePickerDayDisabledStyle = new UnityHelpers.GUIStyle(datePickerDayStyle);
                 if (customFont != null)
                     datePickerDayDisabledStyle.font = customFont;
-                datePickerDayDisabledStyle.normal.textColor = theme.MutedColor;
+                datePickerDayDisabledStyle.normal.textColor = theme.Muted;
                 datePickerDayInRangeStyle = new UnityHelpers.GUIStyle(datePickerDayStyle);
                 if (customFont != null)
                     datePickerDayInRangeStyle.font = customFont;
-                datePickerDayInRangeStyle.normal.background = CreateSolidTexture(new Color(theme.AccentColor.r, theme.AccentColor.g, theme.AccentColor.b, 0.55f));
+                datePickerDayInRangeStyle.normal.background = CreateSolidTexture(new Color(theme.Accent.r, theme.Accent.g, theme.Accent.b, 0.55f));
             }
             catch (Exception ex)
             {
@@ -2019,14 +2024,14 @@ namespace shadcnui.GUIComponents.Core
                 dialogOverlayStyle = new UnityHelpers.GUIStyle();
                 dialogOverlayStyle.normal.background = CreateSolidTexture(new Color(0, 0, 0, 0.85f));
                 dialogContentStyle = new UnityHelpers.GUIStyle(GUI.skin.box);
-                dialogContentStyle.normal.background = CreateRoundedRectWithShadowTexture(512, 512, 12, theme.CardBg, 0.18f, 12);
+                dialogContentStyle.normal.background = CreateRoundedRectWithShadowTexture(512, 512, 12, theme.Elevated, 0.18f, 12);
                 dialogContentStyle.border = new UnityHelpers.RectOffset(12, 12, 12, 12);
                 dialogContentStyle.padding = new UnityHelpers.RectOffset(24, 24, 24, 24);
                 dialogTitleStyle = CreateStyleWithFont(GUI.skin.label, GetScaledFontSize(1.25f), FontStyle.Bold);
-                dialogTitleStyle.normal.textColor = theme.TextColor;
+                dialogTitleStyle.normal.textColor = theme.Text;
                 dialogTitleStyle.wordWrap = true;
                 dialogDescriptionStyle = CreateStyleWithFont(GUI.skin.label, GetScaledFontSize(1.0f));
-                dialogDescriptionStyle.normal.textColor = theme.MutedColor;
+                dialogDescriptionStyle.normal.textColor = theme.Muted;
                 dialogDescriptionStyle.wordWrap = true;
             }
             catch (Exception ex)
@@ -2052,7 +2057,7 @@ namespace shadcnui.GUIComponents.Core
                 chartContentStyle.padding = GetSpacingOffset(0f, 0f);
                 chartContentStyle.margin = GetSpacingOffset(0f, 0f);
                 chartAxisStyle = CreateStyleWithFont(GUI.skin.label, GetScaledFontSize(0.75f));
-                chartAxisStyle.normal.textColor = theme.MutedColor;
+                chartAxisStyle.normal.textColor = theme.Muted;
                 chartAxisStyle.alignment = TextAnchor.MiddleCenter;
                 chartGridStyle = new UnityHelpers.GUIStyle();
                 chartGridStyle.normal.background = chartGridTexture;
@@ -2081,14 +2086,14 @@ namespace shadcnui.GUIComponents.Core
                 menuBarItemStyle.margin = GetSpacingOffset(0f, 0f);
                 menuBarItemStyle.border = new UnityHelpers.RectOffset(0, 0, 0, 0);
                 menuBarItemStyle.normal.background = transparentTexture;
-                menuBarItemStyle.normal.textColor = theme.TextColor;
-                menuBarItemStyle.hover.background = CreateSolidTexture(theme.ButtonGhostHoverBg);
-                menuBarItemStyle.hover.textColor = theme.TextColor;
-                menuBarItemStyle.active.background = CreateSolidTexture(Color.Lerp(theme.ButtonGhostHoverBg, Color.black, 0.12f));
-                menuBarItemStyle.active.textColor = theme.TextColor;
+                menuBarItemStyle.normal.textColor = theme.Text;
+                menuBarItemStyle.hover.background = CreateSolidTexture(theme.Secondary);
+                menuBarItemStyle.hover.textColor = theme.Text;
+                menuBarItemStyle.active.background = CreateSolidTexture(Color.Lerp(theme.Secondary, Color.black, 0.12f));
+                menuBarItemStyle.active.textColor = theme.Text;
                 menuBarItemStyle.stretchWidth = false;
                 menuDropdownStyle = new UnityHelpers.GUIStyle(GUI.skin.box);
-                menuDropdownStyle.normal.background = CreateSolidTexture(theme.CardBg);
+                menuDropdownStyle.normal.background = CreateSolidTexture(theme.Elevated);
                 menuDropdownStyle.border = GetBorderOffset(4f);
                 menuDropdownStyle.padding = GetSpacingOffset(4f, 4f);
                 menuDropdownStyle.margin = GetSpacingOffset(0f, 0f);

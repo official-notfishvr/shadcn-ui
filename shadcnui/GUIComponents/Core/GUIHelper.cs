@@ -21,12 +21,10 @@ namespace shadcnui.GUIComponents.Core
         #region Internal Settings
         internal bool animationsEnabled = true;
         internal float animationSpeed = 14f;
-        internal bool glowEffectsEnabled = true;
         internal bool particleEffectsEnabled = false;
         internal float backgroundAlpha = 0.85f;
         internal int fontSize = 14;
         internal int cornerRadius = 16;
-        internal bool hoverEffectsEnabled = true;
         internal bool fadeTransitionsEnabled = true;
         internal float glowIntensity = 12.0f;
         internal bool smoothAnimationsEnabled = true;
@@ -36,14 +34,9 @@ namespace shadcnui.GUIComponents.Core
         #region Animation State
         private float menuAlpha = 0f;
         private float menuScale = 0.8f;
-        private float titleGlow = 0f;
-        private int hoveredButton = -1;
-        private float[] buttonGlowEffects = new float[20];
         private float backgroundPulse = 0f;
         private Vector2 mousePos;
         private float particleTime = 0f;
-        private float[] inputFieldGlow = new float[10];
-        private int focusedField = -1;
         #endregion
 
         #region Component Instances
@@ -134,14 +127,11 @@ namespace shadcnui.GUIComponents.Core
                 {
                     menuAlpha = 1f;
                     menuScale = uiScale;
-                    titleGlow = 1f;
                     backgroundPulse = backgroundAlpha;
-                    hoveredButton = -1;
-                    focusedField = -1;
                     particleTime = 0f;
                     return;
                 }
-                animationManager?.UpdateAnimations(isOpen, ref menuAlpha, ref menuScale, ref titleGlow, ref backgroundPulse, ref hoveredButton, buttonGlowEffects, inputFieldGlow, ref focusedField, ref particleTime, ref mousePos);
+                animationManager?.UpdateAnimations(isOpen, ref menuAlpha, ref menuScale, ref backgroundPulse, ref particleTime, ref mousePos);
             }
             catch (Exception ex)
             {
@@ -168,22 +158,15 @@ namespace shadcnui.GUIComponents.Core
                 float currentBackgroundPulse = backgroundPulse;
                 Vector2 currentMousePos = mousePos;
 
-                float screenWidth = Screen.width * 2f;
-                float screenHeight = Screen.height * 2f;
-                float offsetX = (screenWidth - Screen.width) / 2f;
-                float offsetY = (screenHeight - Screen.height) / 2f;
-
-                Rect scaledBackgroundRect = new Rect(-offsetX, -offsetY, screenWidth, screenHeight);
-
                 float targetPulse = animationsEnabled ? currentBackgroundPulse : 1f;
                 float smoothPulse = Mathf.Lerp(targetPulse, currentBackgroundPulse, Time.deltaTime * animationSpeed);
                 float bgAlpha = Mathf.Clamp(currentMenuAlpha * backgroundAlpha * smoothPulse, 0.05f, 1f);
 
-                Color baseCol = ThemeManager.Instance.CurrentTheme.PrimaryColor;
+                Color baseCol = ThemeManager.Instance.CurrentTheme.BackgroundColor;
                 Color backgroundColor = new Color(baseCol.r, baseCol.g, baseCol.b, bgAlpha);
 
                 GUI.color = backgroundColor;
-                GUI.DrawTexture(scaledBackgroundRect, Texture2D.whiteTexture);
+                GUI.DrawTexture(new Rect(0, 0, Screen.width, Screen.height), Texture2D.whiteTexture);
                 GUI.color = Color.white;
 
                 return animationManager?.BeginAnimatedGUI(currentMenuAlpha, currentBackgroundPulse, currentMousePos) ?? true;
