@@ -83,7 +83,7 @@ namespace shadcnui.GUIComponents.Layout
                 if (item.IsSeparator || item.IsHeader)
                     continue;
 
-                var itemStyle = styleManager.GetMenuBarItemStyle();
+                var itemStyle = styleManager.GetButtonStyle(ButtonVariant.Ghost, ButtonSize.Default);
 
                 var wasEnabled = GUI.enabled;
                 if (item.Disabled)
@@ -130,7 +130,7 @@ namespace shadcnui.GUIComponents.Layout
 
             if (_menuStack.Count > 1)
             {
-                if (UnityHelpers.Button("<- Back", styleManager.GetMenuBarItemStyle()))
+                if (UnityHelpers.Button("<- Back", styleManager.GetButtonStyle(ButtonVariant.Ghost, ButtonSize.Default)))
                 {
                     _menuStack.Pop();
                     if (_menuStack.Count == 1)
@@ -158,7 +158,7 @@ namespace shadcnui.GUIComponents.Layout
 
             if (item.IsHeader)
             {
-                UnityHelpers.Label(item.Text, styleManager.GetMenuBarItemStyle());
+                UnityHelpers.Label(item.Text, styleManager.GetButtonStyle(ButtonVariant.Ghost, ButtonSize.Default));
                 return;
             }
 
@@ -174,29 +174,30 @@ namespace shadcnui.GUIComponents.Layout
 
             if (item.SubItems.Count > 0)
             {
-                if (GUILayout.Button(item.Text, styleManager.GetMenuBarItemStyle(), GUILayout.ExpandWidth(true)))
+                if (GUILayout.Button(item.Text, styleManager.GetButtonStyle(ButtonVariant.Ghost, ButtonSize.Default), GUILayout.ExpandWidth(true)))
                 {
                     _menuStack.Push(new MenuData(item.SubItems, _activeMenuIndex));
                 }
             }
             else
             {
-                layoutComponents.BeginHorizontalGroup();
-                UnityHelpers.Label(item.Text, styleManager.GetMenuBarItemStyle());
+                var buttonStyle = styleManager.GetButtonStyle(ButtonVariant.Ghost, ButtonSize.Default);
+                var textStyle = styleManager.GetMenuBarItemStyle();
 
-                if (!string.IsNullOrEmpty(item.Shortcut))
-                {
-                    GUILayout.FlexibleSpace();
-                    UnityHelpers.Label(item.Shortcut, styleManager.GetMenuBarItemStyle());
-                }
+                Rect rect = GUILayoutUtility.GetRect(GUIContent.none, buttonStyle, GUILayout.ExpandWidth(true));
 
-                layoutComponents.EndHorizontalGroup();
-
-                var itemRect = GUILayoutUtility.GetLastRect();
-                if (GUI.Button(itemRect, "", GUIStyle.none))
+                if (GUI.Button(rect, "", buttonStyle))
                 {
                     item.OnClick?.Invoke();
                     CloseDropdown();
+                }
+
+                GUI.Label(rect, item.Text, textStyle);
+
+                if (!string.IsNullOrEmpty(item.Shortcut))
+                {
+                    var shortcutStyle = new UnityHelpers.GUIStyle(textStyle) { alignment = TextAnchor.MiddleRight };
+                    GUI.Label(rect, item.Shortcut, shortcutStyle);
                 }
             }
 

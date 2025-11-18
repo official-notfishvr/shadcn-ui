@@ -86,7 +86,7 @@ namespace shadcnui.GUIComponents.Display
                 layoutOptions.Add(GUILayout.Height(config.Size.y));
             }
 
-            layoutComponents.BeginVerticalGroup(styleManager.GetCardStyle(), layoutOptions.ToArray());
+            layoutComponents.BeginVerticalGroup(styleManager.GetChartStyle(ChartVariant.Default, ChartSize.Default), layoutOptions.ToArray());
 
             DrawChartContent(config);
 

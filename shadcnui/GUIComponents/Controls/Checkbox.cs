@@ -17,37 +17,42 @@ namespace shadcnui.GUIComponents.Controls
 
         public bool DrawCheckbox(string text, bool value, CheckboxVariant variant = CheckboxVariant.Default, CheckboxSize size = CheckboxSize.Default, Action<bool> onToggle = null, bool disabled = false, params GUILayoutOption[] options)
         {
-            if (styleManager == null)
-            {
-                return UnityHelpers.Toggle(value, text ?? "Checkbox", GUI.skin.toggle, new GUILayoutOption[0]);
-            }
-            GUIStyle checkboxStyle = styleManager.GetCheckboxStyle(variant, size);
+            var styleManager = guiHelper.GetStyleManager();
+            GUIStyle checkboxStyle = styleManager?.GetCheckboxStyle(variant, size) ?? GUI.skin.toggle;
+
             bool wasEnabled = GUI.enabled;
             if (disabled)
                 GUI.enabled = false;
+
             bool newValue = UnityHelpers.Toggle(value, text ?? "Checkbox", checkboxStyle, options);
+
             GUI.enabled = wasEnabled;
-            if (newValue != value && !disabled && onToggle != null)
-                onToggle.Invoke(newValue);
-            return newValue;
+
+            if (newValue != value && !disabled)
+                onToggle?.Invoke(newValue);
+
+            return disabled ? value : newValue;
         }
 
         public bool DrawCheckbox(Rect rect, string text, bool value, CheckboxVariant variant = CheckboxVariant.Default, CheckboxSize size = CheckboxSize.Default, Action<bool> onToggle = null, bool disabled = false)
         {
-            if (styleManager == null)
-            {
-                return GUI.Toggle(rect, value, text ?? "Checkbox");
-            }
-            GUIStyle checkboxStyle = styleManager.GetCheckboxStyle(variant, size);
+            var styleManager = guiHelper.GetStyleManager();
+            GUIStyle checkboxStyle = styleManager?.GetCheckboxStyle(variant, size) ?? GUI.skin.toggle;
+
             Rect scaledRect = new Rect(rect.x * guiHelper.uiScale, rect.y * guiHelper.uiScale, rect.width * guiHelper.uiScale, rect.height * guiHelper.uiScale);
+
             bool wasEnabled = GUI.enabled;
             if (disabled)
                 GUI.enabled = false;
+
             bool newValue = UnityHelpers.Toggle(scaledRect, value, text ?? "Checkbox", checkboxStyle);
+
             GUI.enabled = wasEnabled;
-            if (newValue != value && !disabled && onToggle != null)
-                onToggle.Invoke(newValue);
-            return newValue;
+
+            if (newValue != value && !disabled)
+                onToggle?.Invoke(newValue);
+
+            return disabled ? value : newValue;
         }
     }
 }

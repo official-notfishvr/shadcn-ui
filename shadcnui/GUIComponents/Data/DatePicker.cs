@@ -39,7 +39,7 @@ namespace shadcnui.GUIComponents.Data
 
             layoutComponents.BeginVerticalGroup();
 
-            if (UnityHelpers.Button($"{buttonText}", styleManager.GetSelectTriggerStyle(), options))
+            if (UnityHelpers.Button($"{buttonText}", styleManager.GetButtonStyle(ButtonVariant.Outline, ButtonSize.Default), options))
             {
                 _openStates[id] = !isOpen;
                 if (selectedDate.HasValue)
@@ -92,7 +92,7 @@ namespace shadcnui.GUIComponents.Data
 
             layoutComponents.BeginVerticalGroup();
 
-            if (UnityHelpers.Button($"{buttonText}", styleManager.GetSelectTriggerStyle(), options))
+            if (UnityHelpers.Button($"{buttonText}", styleManager.GetButtonStyle(ButtonVariant.Outline, ButtonSize.Default), options))
             {
                 _openStates[id] = !_openStates[id];
             }
@@ -123,7 +123,7 @@ namespace shadcnui.GUIComponents.Data
 
             layoutComponents.BeginVerticalGroup();
 
-            if (UnityHelpers.Button($"{buttonText}", styleManager.GetSelectTriggerStyle(), options))
+            if (UnityHelpers.Button($"{buttonText}", styleManager.GetButtonStyle(ButtonVariant.Outline, ButtonSize.Default), options))
             {
                 _openStates[id] = !isOpen;
                 if (selectedDate.HasValue)
@@ -160,7 +160,7 @@ namespace shadcnui.GUIComponents.Data
 
             layoutComponents.BeginVerticalGroup();
 
-            if (UnityHelpers.Button($"{buttonText}", styleManager.GetSelectTriggerStyle(), options))
+            if (UnityHelpers.Button($"{buttonText}", styleManager.GetButtonStyle(ButtonVariant.Outline, ButtonSize.Default), options))
             {
                 _openStates[id] = !_openStates[id];
             }
@@ -178,7 +178,7 @@ namespace shadcnui.GUIComponents.Data
         private DateTime? DrawCalendarPopover(string id, DateTime? selectedDate, DateTime displayDate, DateTime? minDate, DateTime? maxDate)
         {
             var styleManager = guiHelper.GetStyleManager();
-            layoutComponents.BeginVerticalGroup(styleManager.GetPopoverContentStyle(), GUILayout.Width(280));
+            layoutComponents.BeginVerticalGroup(styleManager.GetDatePickerStyle(CalendarVariant.Default, CalendarSize.Default), GUILayout.Width(280));
 
             DrawCalendarHeader(id, displayDate);
             DrawWeekdayHeaders();
@@ -201,12 +201,12 @@ namespace shadcnui.GUIComponents.Data
             var styleManager = guiHelper.GetStyleManager();
             layoutComponents.BeginHorizontalGroup();
 
-            if (UnityHelpers.Button("«", styleManager.GetButtonStyle(ButtonVariant.Ghost, ButtonSize.Default), GUILayout.Width(32), GUILayout.Height(32)))
+            if (UnityHelpers.Button("<<", styleManager.GetButtonStyle(ButtonVariant.Outline, ButtonSize.Icon)))
             {
                 _displayDates[id] = displayDate.AddYears(-1);
             }
 
-            if (UnityHelpers.Button("‹", styleManager.GetButtonStyle(ButtonVariant.Ghost, ButtonSize.Default), GUILayout.Width(32), GUILayout.Height(32)))
+            if (UnityHelpers.Button("<", styleManager.GetButtonStyle(ButtonVariant.Outline, ButtonSize.Icon)))
             {
                 _displayDates[id] = displayDate.AddMonths(-1);
             }
@@ -217,12 +217,12 @@ namespace shadcnui.GUIComponents.Data
             UnityHelpers.Label(currentMonthYear, styleManager.GetDatePickerTitleStyle());
             GUILayout.FlexibleSpace();
 
-            if (UnityHelpers.Button("›", styleManager.GetButtonStyle(ButtonVariant.Ghost, ButtonSize.Default), GUILayout.Width(32), GUILayout.Height(32)))
+            if (UnityHelpers.Button(">", styleManager.GetButtonStyle(ButtonVariant.Outline, ButtonSize.Icon)))
             {
                 _displayDates[id] = displayDate.AddMonths(1);
             }
-
-            if (UnityHelpers.Button("»", styleManager.GetButtonStyle(ButtonVariant.Ghost, ButtonSize.Default), GUILayout.Width(32), GUILayout.Height(32)))
+            
+            if (UnityHelpers.Button(">>", styleManager.GetButtonStyle(ButtonVariant.Outline, ButtonSize.Icon)))
             {
                 _displayDates[id] = displayDate.AddYears(1);
             }

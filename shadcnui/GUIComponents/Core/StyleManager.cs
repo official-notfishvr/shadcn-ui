@@ -169,18 +169,6 @@ namespace shadcnui.GUIComponents.Core
         Large,
     }
 
-    public enum ScrollAreaVariant
-    {
-        Default,
-    }
-
-    public enum ScrollAreaSize
-    {
-        Default,
-        Small,
-        Large,
-    }
-
     public enum SelectVariant
     {
         Default,
@@ -368,7 +356,6 @@ namespace shadcnui.GUIComponents.Core
         private GUIStyle calendarDaySelectedStyle;
         private GUIStyle calendarDayOutsideMonthStyle;
         private GUIStyle calendarDayTodayStyle;
-        private GUIStyle calendarDayDisabledStyle;
         private GUIStyle calendarDayInRangeStyle;
         #endregion
 
@@ -381,8 +368,6 @@ namespace shadcnui.GUIComponents.Core
         private GUIStyle datePickerDaySelectedStyle;
         private GUIStyle datePickerDayOutsideMonthStyle;
         private GUIStyle datePickerDayTodayStyle;
-        private GUIStyle datePickerDayDisabledStyle;
-        private GUIStyle datePickerDayInRangeStyle;
         #endregion
 
         #region GUIStyle - Dialog
@@ -403,12 +388,6 @@ namespace shadcnui.GUIComponents.Core
         private GUIStyle popoverContentStyle;
         #endregion
 
-        #region GUIStyle - ScrollArea
-        private GUIStyle scrollAreaStyle;
-        private GUIStyle scrollAreaThumbStyle;
-        private GUIStyle scrollAreaTrackStyle;
-        #endregion
-
         #region GUIStyle - Select
         private GUIStyle selectTriggerStyle;
         private GUIStyle selectContentStyle;
@@ -419,7 +398,6 @@ namespace shadcnui.GUIComponents.Core
         private GUIStyle chartContainerStyle;
         private GUIStyle chartContentStyle;
         private GUIStyle chartAxisStyle;
-        private GUIStyle chartGridStyle;
         #endregion
 
         #region GUIStyle - MenuBar
@@ -441,7 +419,6 @@ namespace shadcnui.GUIComponents.Core
         private Dictionary<(TableVariant, TableSize), GUIStyle> tableStyleCache = new();
         private Dictionary<(CalendarVariant, CalendarSize), GUIStyle> calendarStyleCache = new();
         private Dictionary<(DropdownMenuVariant, DropdownMenuSize), GUIStyle> dropdownMenuStyleCache = new();
-        private Dictionary<(ScrollAreaVariant, ScrollAreaSize), GUIStyle> scrollAreaStyleCache = new();
         private Dictionary<(SelectVariant, SelectSize), GUIStyle> selectStyleCache = new();
         private Dictionary<(ChartVariant, ChartSize), GUIStyle> chartStyleCache = new();
         #endregion
@@ -559,7 +536,6 @@ namespace shadcnui.GUIComponents.Core
                 SetupCalendarStyles();
                 SetupDropdownMenuStyles();
                 SetupPopoverStyles();
-                SetupScrollAreaStyles();
                 SetupSelectStyles();
                 SetupDatePickerStyles();
                 SetupDialogStyles();
@@ -642,7 +618,6 @@ namespace shadcnui.GUIComponents.Core
             "calendarDaySelected",
             "calendarDayOutsideMonth",
             "calendarDayToday",
-            "calendarDayDisabled",
             "calendarDayInRange",
             "dialogOverlay",
             "dialogContent",
@@ -659,7 +634,6 @@ namespace shadcnui.GUIComponents.Core
             "chartContainer",
             "chartContent",
             "chartAxis",
-            "chartGrid",
             "menuBar",
             "menuBarItem",
             "menuDropdown",
@@ -679,11 +653,6 @@ namespace shadcnui.GUIComponents.Core
             "datePickerDaySelected",
             "datePickerDayOutsideMonth",
             "datePickerDayToday",
-            "datePickerDayDisabled",
-            "datePickerDayInRange",
-            "scrollAreaStyle",
-            "scrollAreaThumb",
-            "scrollAreaTrack",
         };
 
         private GUIStyle GetStyleByName(string name) =>
@@ -750,7 +719,6 @@ namespace shadcnui.GUIComponents.Core
                 "calendarDaySelected" => calendarDaySelectedStyle,
                 "calendarDayOutsideMonth" => calendarDayOutsideMonthStyle,
                 "calendarDayToday" => calendarDayTodayStyle,
-                "calendarDayDisabled" => calendarDayDisabledStyle,
                 "calendarDayInRange" => calendarDayInRangeStyle,
                 "dialogOverlay" => dialogOverlayStyle,
                 "dialogContent" => dialogContentStyle,
@@ -767,7 +735,6 @@ namespace shadcnui.GUIComponents.Core
                 "chartContainer" => chartContainerStyle,
                 "chartContent" => chartContentStyle,
                 "chartAxis" => chartAxisStyle,
-                "chartGrid" => chartGridStyle,
                 "menuBar" => menuBarStyle,
                 "menuBarItem" => menuBarItemStyle,
                 "menuDropdown" => menuDropdownStyle,
@@ -787,11 +754,6 @@ namespace shadcnui.GUIComponents.Core
                 "datePickerDaySelected" => datePickerDaySelectedStyle,
                 "datePickerDayOutsideMonth" => datePickerDayOutsideMonthStyle,
                 "datePickerDayToday" => datePickerDayTodayStyle,
-                "datePickerDayDisabled" => datePickerDayDisabledStyle,
-                "datePickerDayInRange" => datePickerDayInRangeStyle,
-                "scrollAreaStyle" => scrollAreaStyle,
-                "scrollAreaThumb" => scrollAreaThumbStyle,
-                "scrollAreaTrack" => scrollAreaTrackStyle,
                 _ => null,
             };
 
@@ -836,7 +798,6 @@ namespace shadcnui.GUIComponents.Core
                 tableStyleCache.Clear();
                 calendarStyleCache.Clear();
                 dropdownMenuStyleCache.Clear();
-                scrollAreaStyleCache.Clear();
                 selectStyleCache.Clear();
                 chartStyleCache.Clear();
 
@@ -858,7 +819,6 @@ namespace shadcnui.GUIComponents.Core
                 SetupCalendarStyles();
                 SetupDropdownMenuStyles();
                 SetupPopoverStyles();
-                SetupScrollAreaStyles();
                 SetupSelectStyles();
                 SetupDatePickerStyles();
                 SetupDialogStyles();
@@ -955,13 +915,14 @@ namespace shadcnui.GUIComponents.Core
         {
             var texture = new Texture2D(size, size);
             Vector2 center = new Vector2(size / 2f, size / 2f);
+            float maxDist = size / 2f;
             for (int x = 0; x < size; x++)
             for (int y = 0; y < size; y++)
             {
                 float distance = Vector2.Distance(new Vector2(x, y), center);
-                float alpha = Mathf.Clamp01(1f - (distance / (size / 2f)));
-                alpha = Mathf.Pow(alpha, 2f);
-                texture.SetPixel(x, y, new Color(glowColor.r, glowColor.g, glowColor.b, alpha * 0.45f));
+                float t = Mathf.Clamp01(distance / maxDist);
+                float alpha = 1f - (t * t * (3f - 2f * t));
+                texture.SetPixel(x, y, new Color(glowColor.r, glowColor.g, glowColor.b, alpha * 0.6f));
             }
             texture.Apply();
             return texture;
@@ -1016,7 +977,9 @@ namespace shadcnui.GUIComponents.Core
             return texture;
         }
 
-        public Texture2D CreateRoundedRectTexture(int width, int height, int radius, Color color)
+        public Texture2D CreateRoundedRectTexture(int width, int height, int radius, Color color) => CreateGradientRoundedRectTexture(width, height, radius, color, color);
+
+        public Texture2D CreateGradientRoundedRectTexture(int width, int height, int radius, Color topColor, Color bottomColor)
         {
             Texture2D texture = new Texture2D(width, height);
             for (int x = 0; x < width; x++)
@@ -1033,14 +996,17 @@ namespace shadcnui.GUIComponents.Core
                             continue;
                         }
                     }
-                    texture.SetPixel(x, y, color);
+                    float t = (float)y / (Mathf.Max(1, height - 1));
+                    texture.SetPixel(x, y, Color.Lerp(bottomColor, topColor, t));
                 }
             }
             texture.Apply();
             return texture;
         }
 
-        public Texture2D CreateRoundedRectWithShadowTexture(int width, int height, int radius, Color fillColor, float shadowIntensity = 0.18f, int shadowBlur = 9)
+        public Texture2D CreateRoundedRectWithShadowTexture(int width, int height, int radius, Color fillColor, float shadowIntensity = 0.08f, int shadowBlur = 6) => CreateGradientRoundedRectWithShadowTexture(width, height, radius, fillColor, fillColor, shadowIntensity, shadowBlur);
+
+        public Texture2D CreateGradientRoundedRectWithShadowTexture(int width, int height, int radius, Color topColor, Color bottomColor, float shadowIntensity = 0.08f, int shadowBlur = 6)
         {
             Texture2D texture = new Texture2D(width, height);
             for (int x = 0; x < width; x++)
@@ -1057,7 +1023,8 @@ namespace shadcnui.GUIComponents.Core
                             continue;
                         }
                     }
-                    texture.SetPixel(x, y, fillColor);
+                    float t = (float)y / (Mathf.Max(1, height - 1));
+                    texture.SetPixel(x, y, Color.Lerp(bottomColor, topColor, t));
                 }
             }
 
@@ -1108,11 +1075,12 @@ namespace shadcnui.GUIComponents.Core
         {
             if (outlineButtonTextureCache.TryGetValue((backgroundColor, borderColor), out var cachedTexture))
                 return cachedTexture;
-            Texture2D texture = new Texture2D(4, 4);
-            for (int x = 0; x < 4; x++)
-            for (int y = 0; y < 4; y++)
+            int size = 32;
+            Texture2D texture = new Texture2D(size, size);
+            for (int x = 0; x < size; x++)
+            for (int y = 0; y < size; y++)
             {
-                bool isBorder = x == 0 || y == 0 || x == 3 || y == 3;
+                bool isBorder = x == 0 || y == 0 || x == size - 1 || y == size - 1;
                 texture.SetPixel(x, y, isBorder ? borderColor : backgroundColor);
             }
             texture.Apply();
@@ -1153,40 +1121,40 @@ namespace shadcnui.GUIComponents.Core
                 }
                 gradientTexture.Apply();
 
-                cardBackgroundTexture = CreateRoundedRectWithShadowTexture(128, 128, 12, theme.Elevated, 0.16f, 11);
-                inputBackgroundTexture = CreateRoundedRectTexture(128, 128, 8, theme.Base);
-                inputFocusedTexture = CreateRoundedRectTexture(128, 128, 8, theme.Base);
-                outlineTexture = CreateRoundedRectTexture(128, 128, 8, theme.Border);
+                cardBackgroundTexture = CreateGradientRoundedRectWithShadowTexture(128, 128, 12, Color.Lerp(theme.Secondary, theme.Base, 0.05f), theme.Secondary, 0.1f, 8);
+                inputBackgroundTexture = CreateGradientRoundedRectTexture(128, 128, 6, theme.Base, Color.Lerp(theme.Base, theme.Secondary, 0.05f));
+                inputFocusedTexture = CreateGradientRoundedRectTexture(128, 128, 6, theme.Base, Color.Lerp(theme.Base, theme.Secondary, 0.05f));
+                outlineTexture = CreateRoundedRectTexture(128, 128, 6, theme.Border);
                 transparentTexture = CreateSolidTexture(Color.clear);
                 glowTexture = CreateGlowTexture(theme.Accent, 32);
                 particleTexture = CreateSolidTexture(Color.Lerp(theme.Accent, theme.Text, 0.5f));
-                progressBarBackgroundTexture = CreateRoundedRectTexture(128, 128, 6, theme.Secondary);
-                progressBarFillTexture = CreateRoundedRectTexture(128, 128, 6, theme.Base);
-                separatorTexture = CreateSolidTexture(theme.Border);
+                progressBarBackgroundTexture = CreateGradientRoundedRectTexture(128, 128, 6, theme.Secondary, Color.Lerp(theme.Secondary, Color.black, 0.1f));
+                progressBarFillTexture = CreateGradientRoundedRectTexture(128, 128, 6, Color.Lerp(theme.Accent, Color.white, 0.1f), theme.Accent);
+                separatorTexture = CreateGradientRoundedRectTexture(128, 2, 0, theme.Border, Color.Lerp(theme.Border, Color.black, 0.1f));
                 tabsBackgroundTexture = CreateRoundedRectTexture(128, 128, 6, theme.Secondary);
-                tabsActiveTexture = CreateRoundedRectTexture(128, 128, 6, theme.Base);
-                checkboxTexture = CreateRoundedRectTexture(16, 16, 4, theme.Secondary);
-                checkboxCheckedTexture = CreateRoundedRectTexture(16, 16, 4, theme.Accent);
-                switchTexture = CreateRoundedRectTexture(32, 16, 8, theme.Secondary);
-                switchOnTexture = CreateRoundedRectTexture(32, 16, 8, theme.Accent);
-                switchOffTexture = CreateRoundedRectTexture(32, 16, 8, theme.Secondary);
-                badgeTexture = CreateRoundedRectTexture(64, 24, 12, theme.Elevated);
+                tabsActiveTexture = CreateGradientRoundedRectTexture(128, 128, 6, theme.Base, Color.Lerp(theme.Base, theme.Secondary, 0.05f));
+                checkboxTexture = CreateGradientRoundedRectTexture(16, 16, 4, theme.Secondary, Color.Lerp(theme.Secondary, Color.black, 0.1f));
+                checkboxCheckedTexture = CreateGradientRoundedRectTexture(16, 16, 4, Color.Lerp(theme.Accent, Color.white, 0.1f), theme.Accent);
+                switchTexture = CreateGradientRoundedRectTexture(32, 16, 8, theme.Secondary, Color.Lerp(theme.Secondary, Color.black, 0.1f));
+                switchOnTexture = CreateGradientRoundedRectTexture(32, 16, 8, Color.Lerp(theme.Accent, Color.white, 0.1f), theme.Accent);
+                switchOffTexture = CreateGradientRoundedRectTexture(32, 16, 8, theme.Secondary, Color.Lerp(theme.Secondary, Color.black, 0.1f));
+                badgeTexture = CreateGradientRoundedRectTexture(64, 24, 12, Color.Lerp(theme.Elevated, Color.white, 0.05f), theme.Elevated);
                 avatarTexture = CreateRoundedRectTexture(40, 40, 20, theme.Secondary);
-                tableTexture = CreateSolidTexture(theme.Base);
+                tableTexture = CreateGradientRoundedRectTexture(128, 128, 0, theme.Base, Color.Lerp(theme.Base, theme.Secondary, 0.02f));
                 tableHeaderTexture = CreateSolidTexture(theme.Secondary);
                 tableCellTexture = CreateSolidTexture(theme.Base);
-                calendarBackgroundTexture = CreateRoundedRectTexture(256, 256, 8, theme.Elevated);
-                calendarHeaderTexture = CreateSolidTexture(theme.Elevated);
-                calendarDayTexture = CreateRoundedRectTexture(32, 32, 4, theme.Elevated);
-                calendarDaySelectedTexture = CreateRoundedRectTexture(32, 32, 4, theme.Base);
-                dropdownMenuContentTexture = CreateRoundedRectWithShadowTexture(128, 128, 8, theme.Elevated, 0.14f, 10);
-                popoverContentTexture = CreateRoundedRectWithShadowTexture(128, 128, 8, theme.Elevated, 0.14f, 10);
+                calendarBackgroundTexture = CreateGradientRoundedRectTexture(256, 256, 6, Color.Lerp(theme.Secondary, theme.Base, 0.05f), theme.Secondary);
+                calendarHeaderTexture = CreateSolidTexture(theme.Secondary);
+                calendarDayTexture = CreateRoundedRectTexture(32, 32, 4, theme.Secondary);
+                calendarDaySelectedTexture = CreateGradientRoundedRectTexture(32, 32, 4, Color.Lerp(theme.Accent, Color.white, 0.1f), theme.Accent);
+                dropdownMenuContentTexture = CreateGradientRoundedRectWithShadowTexture(128, 128, 6, Color.Lerp(theme.Secondary, theme.Base, 0.05f), theme.Secondary, 0.1f, 6);
+                popoverContentTexture = CreateGradientRoundedRectWithShadowTexture(128, 128, 6, Color.Lerp(theme.Base, theme.Secondary, 0.05f), theme.Base, 0.1f, 6);
                 scrollAreaThumbTexture = CreateRoundedRectTexture(8, 8, 4, theme.Border);
                 scrollAreaTrackTexture = CreateRoundedRectTexture(8, 8, 4, theme.Secondary);
-                selectTriggerTexture = CreateRoundedRectTexture(128, 40, 8, theme.Base);
-                selectContentTexture = CreateRoundedRectWithShadowTexture(128, 128, 8, theme.Elevated, 0.14f, 10);
-                chartContainerTexture = CreateRoundedRectWithShadowTexture(256, 256, 8, theme.Elevated, 0.12f, 8);
-                chartGridTexture = CreateSolidTexture(theme.Border);
+                selectTriggerTexture = CreateGradientRoundedRectTexture(128, 40, 6, theme.Base, Color.Lerp(theme.Base, theme.Secondary, 0.05f));
+                selectContentTexture = CreateGradientRoundedRectWithShadowTexture(128, 128, 6, Color.Lerp(theme.Secondary, theme.Base, 0.05f), theme.Secondary, 0.1f, 6);
+                chartContainerTexture = CreateGradientRoundedRectWithShadowTexture(256, 256, 8, Color.Lerp(theme.Secondary, theme.Base, 0.05f), theme.Secondary, 0.08f, 6);
+                chartGridTexture = CreateGradientRoundedRectTexture(128, 2, 0, theme.Border, Color.Lerp(theme.Border, Color.clear, 0.5f));
                 chartAxisTexture = CreateSolidTexture(theme.Muted);
 
                 GUILogger.LogInfo("Custom textures created successfully", "StyleManager.CreateCustomTextures");
@@ -1241,7 +1209,7 @@ namespace shadcnui.GUIComponents.Core
                 var theme = ThemeManager.Instance.CurrentTheme;
                 cardStyle = new UnityHelpers.GUIStyle(GUI.skin.box);
                 int cardRadius = GetScaledBorderRadius(12f);
-                cardStyle.normal.background = CreateRoundedRectWithShadowTexture(256, 256, cardRadius, theme.Elevated, 0.2f, 12);
+                cardStyle.normal.background = CreateRoundedRectWithShadowTexture(256, 256, cardRadius, theme.Secondary, 0.2f, 12);
                 cardStyle.border = new UnityHelpers.RectOffset(12, 12, 12, 12);
                 cardStyle.padding = GetSpacingOffset(28f, 28f);
                 cardStyle.margin = GetSpacingOffset(8f, 8f);
@@ -1272,11 +1240,11 @@ namespace shadcnui.GUIComponents.Core
             try
             {
                 var theme = ThemeManager.Instance.CurrentTheme;
-                buttonDefaultStyle = CreateButtonStyle(theme.ButtonPrimaryBg, theme.ButtonPrimaryFg, Color.Lerp(theme.ButtonPrimaryBg, Color.black, 0.2f), theme.ButtonPrimaryFg);
-                buttonDestructiveStyle = CreateButtonStyle(theme.ButtonDestructiveBg, theme.ButtonDestructiveFg, Color.Lerp(theme.ButtonDestructiveBg, Color.black, 0.25f), theme.ButtonDestructiveFg);
-                buttonOutlineStyle = CreateButtonStyle(theme.Border, theme.ButtonOutlineFg, Color.Lerp(theme.Border, Color.black, 0.08f), theme.ButtonOutlineFg);
-                buttonSecondaryStyle = CreateButtonStyle(theme.ButtonSecondaryBg, theme.ButtonSecondaryFg, Color.Lerp(theme.ButtonSecondaryBg, Color.black, 0.1f), theme.ButtonSecondaryFg);
-                buttonGhostStyle = CreateButtonStyle(Color.clear, theme.ButtonGhostFg, Color.Lerp(theme.Secondary, Color.black, 0.12f), theme.ButtonGhostFg);
+                buttonDefaultStyle = CreateButtonStyle(theme.Secondary, theme.ButtonPrimaryFg, GetHoverColor(theme.Secondary, true), theme.ButtonPrimaryFg);
+                buttonDestructiveStyle = CreateButtonStyle(theme.ButtonDestructiveBg, theme.ButtonDestructiveFg, Color.Lerp(theme.ButtonDestructiveBg, Color.black, 0.15f), theme.ButtonDestructiveFg);
+                buttonOutlineStyle = CreateButtonStyle(theme.Border, theme.ButtonOutlineFg, Color.Lerp(theme.Border, Color.black, 0.05f), theme.ButtonOutlineFg);
+                buttonSecondaryStyle = CreateButtonStyle(theme.Secondary, theme.ButtonSecondaryFg, GetHoverColor(theme.Secondary, true), theme.ButtonSecondaryFg);
+                buttonGhostStyle = CreateButtonStyle(transparentTexture, theme.ButtonGhostFg, theme.Secondary, theme.ButtonGhostFg);
                 buttonLinkStyle = CreateLinkButtonStyle(theme);
             }
             catch (Exception ex)
@@ -1289,18 +1257,39 @@ namespace shadcnui.GUIComponents.Core
         {
             GUIStyle style = CreateStyleWithFont(GUI.skin.button, GetScaledFontSize(0.875f), FontStyle.Bold);
             style.alignment = TextAnchor.MiddleCenter;
-            style.padding = GetSpacingOffset(18f, 10f);
-            style.border = GetBorderOffset(8f);
-            style.fixedHeight = GetScaledHeight(42f);
-            int btnTexH = GetScaledHeight(42f);
-            int btnRadius = GetScaledBorderRadius(8f);
-            style.normal.background = CreateRoundedRectWithShadowTexture(128, btnTexH, btnRadius, normalBg, 0.15f, 9);
-            style.hover.background = CreateRoundedRectWithShadowTexture(128, btnTexH, btnRadius, GetHoverColor(normalBg, false), 0.2f, 11);
+            style.padding = GetSpacingOffset(16f, 8f);
+            style.border = GetBorderOffset(6f);
+            style.fixedHeight = GetScaledHeight(36f);
+            int btnTexH = GetScaledHeight(36f);
+            int btnRadius = GetScaledBorderRadius(6f);
+
+            style.normal.background = CreateGradientRoundedRectTexture(128, btnTexH, btnRadius, normalBg, Color.Lerp(normalBg, Color.black, 0.05f));
+            style.hover.background = CreateGradientRoundedRectTexture(128, btnTexH, btnRadius, GetHoverColor(normalBg, false), Color.Lerp(GetHoverColor(normalBg, false), Color.black, 0.05f));
             style.normal.textColor = normalFg;
             style.hover.textColor = normalFg;
-            style.active.background = CreateRoundedRectWithShadowTexture(128, btnTexH, btnRadius, activeBg, 0.18f, 8);
+            style.active.background = CreateGradientRoundedRectTexture(128, btnTexH, btnRadius, activeBg, Color.Lerp(activeBg, Color.black, 0.1f));
             style.active.textColor = activeFg;
-            style.focused.background = CreateRoundedRectWithShadowTexture(128, btnTexH, btnRadius, Color.Lerp(normalBg, ThemeManager.Instance.CurrentTheme.Accent, 0.2f), 0.16f, 10);
+            style.focused.background = CreateGradientRoundedRectTexture(128, btnTexH, btnRadius, Color.Lerp(normalBg, ThemeManager.Instance.CurrentTheme.Accent, 0.1f), Color.Lerp(normalBg, ThemeManager.Instance.CurrentTheme.Accent, 0.15f));
+            style.focused.textColor = normalFg;
+            return style;
+        }
+
+        private GUIStyle CreateButtonStyle(Texture2D normalBg, Color normalFg, Color hoverBg, Color activeFg)
+        {
+            GUIStyle style = CreateStyleWithFont(GUI.skin.button, GetScaledFontSize(0.875f), FontStyle.Bold);
+            style.alignment = TextAnchor.MiddleCenter;
+            style.padding = GetSpacingOffset(16f, 8f);
+            style.border = GetBorderOffset(6f);
+            style.fixedHeight = GetScaledHeight(36f);
+            int btnTexH = GetScaledHeight(36f);
+            int btnRadius = GetScaledBorderRadius(6f);
+            style.normal.background = normalBg;
+            style.hover.background = CreateRoundedRectTexture(128, btnTexH, btnRadius, hoverBg);
+            style.normal.textColor = normalFg;
+            style.hover.textColor = normalFg;
+            style.active.background = CreateRoundedRectTexture(128, btnTexH, btnRadius, hoverBg);
+            style.active.textColor = activeFg;
+            style.focused.background = normalBg;
             style.focused.textColor = normalFg;
             return style;
         }
@@ -1345,17 +1334,19 @@ namespace shadcnui.GUIComponents.Core
             GUIStyle style = CreateStyleWithFont(GUI.skin.button, guiHelper.fontSize);
             style.alignment = TextAnchor.MiddleCenter;
             style.normal.textColor = normalFg;
-            style.normal.background = CreateSolidTexture(normalBg);
-            style.hover.background = CreateSolidTexture(ThemeManager.Instance.CurrentTheme.Secondary);
+            int radius = GetScaledBorderRadius(4f);
+            style.normal.background = CreateGradientRoundedRectTexture(32, 32, radius, normalBg, Color.Lerp(normalBg, Color.black, 0.05f));
+            style.hover.background = CreateGradientRoundedRectTexture(32, 32, radius, ThemeManager.Instance.CurrentTheme.Secondary, Color.Lerp(ThemeManager.Instance.CurrentTheme.Secondary, Color.white, 0.05f));
             style.hover.textColor = ThemeManager.Instance.CurrentTheme.Text;
-            style.active.background = CreateSolidTexture(Color.Lerp(normalBg, Color.black, 0.15f));
+            style.active.background = CreateGradientRoundedRectTexture(32, 32, radius, Color.Lerp(normalBg, Color.black, 0.15f), Color.Lerp(normalBg, Color.black, 0.2f));
             style.active.textColor = Color.Lerp(normalFg, Color.white, 0.5f);
-            style.onNormal.background = CreateSolidTexture(onBg);
+            style.onNormal.background = CreateGradientRoundedRectTexture(32, 32, radius, onBg, Color.Lerp(onBg, Color.black, 0.05f));
             style.onNormal.textColor = onFg;
-            style.onHover.background = CreateSolidTexture(Color.Lerp(onBg, Color.white, 0.12f));
+            style.onHover.background = CreateGradientRoundedRectTexture(32, 32, radius, Color.Lerp(onBg, Color.white, 0.12f), Color.Lerp(onBg, Color.white, 0.05f));
             style.onHover.textColor = onFg;
-            style.onActive.background = CreateSolidTexture(Color.Lerp(onBg, Color.black, 0.15f));
+            style.onActive.background = CreateGradientRoundedRectTexture(32, 32, radius, Color.Lerp(onBg, Color.black, 0.15f), Color.Lerp(onBg, Color.black, 0.2f));
             style.onActive.textColor = onFg;
+            style.border = GetBorderOffset(4f);
             return style;
         }
         #endregion
@@ -1367,11 +1358,13 @@ namespace shadcnui.GUIComponents.Core
             {
                 var theme = ThemeManager.Instance.CurrentTheme;
                 inputDefaultStyle = CreateInputStyle(inputBackgroundTexture, theme.Text, theme.Text);
+                inputDefaultStyle.normal.background = CreateRoundedRectTexture(128, 40, 8, theme.Secondary);
+                inputDefaultStyle.focused.background = CreateRoundedRectTexture(128, 40, 8, theme.Secondary);
                 inputOutlineStyle = new UnityHelpers.GUIStyle(inputDefaultStyle);
                 if (customFont != null)
                     inputOutlineStyle.font = customFont;
-                inputOutlineStyle.normal.background = CreateRoundedRectTexture(128, 40, 8, theme.Base);
-                inputOutlineStyle.focused.background = CreateRoundedRectTexture(128, 40, 8, theme.Base);
+                inputOutlineStyle.normal.background = CreateRoundedRectTexture(128, 40, 6, theme.Base);
+                inputOutlineStyle.focused.background = CreateRoundedRectTexture(128, 40, 6, theme.Base);
                 inputGhostStyle = new UnityHelpers.GUIStyle(inputDefaultStyle);
                 if (customFont != null)
                     inputGhostStyle.font = customFont;
@@ -1408,18 +1401,18 @@ namespace shadcnui.GUIComponents.Core
             GUIStyle style = CreateStyleWithFont(GUI.skin.textField, GetScaledFontSize(0.875f));
             style.padding = GetSpacingOffset(12f, 8f);
             style.margin = GetSpacingOffset(0f, 4f);
-            style.border = GetBorderOffset(8f);
-            style.fixedHeight = GetScaledHeight(40f);
+            style.border = GetBorderOffset(6f);
+            style.fixedHeight = GetScaledHeight(36f);
             style.normal.background = background;
             style.normal.textColor = textColor;
             style.hover.background = background;
             style.hover.textColor = textColor;
             style.focused.background = inputFocusedTexture;
             style.focused.textColor = focusedColor;
-            int inpRadius = GetScaledBorderRadius(8f);
+            int inpRadius = GetScaledBorderRadius(6f);
             var theme = ThemeManager.Instance.CurrentTheme;
-            Color focusTint = Color.Lerp(theme.Accent, theme.Overlay, 0.3f);
-            style.onFocused.background = CreateRoundedRectTexture(128, GetScaledHeight(40f), inpRadius, focusTint);
+            Color focusTint = Color.Lerp(theme.Accent, theme.Overlay, 0.1f);
+            style.onFocused.background = CreateGradientRoundedRectTexture(128, GetScaledHeight(36f), inpRadius, focusTint, Color.Lerp(focusTint, Color.black, 0.05f));
             return style;
         }
         #endregion
@@ -1510,7 +1503,7 @@ namespace shadcnui.GUIComponents.Core
             {
                 var theme = ThemeManager.Instance.CurrentTheme;
                 tabsListStyle = new UnityHelpers.GUIStyle();
-                tabsListStyle.normal.background = CreateSolidTexture(theme.TabsBg);
+                tabsListStyle.normal.background = CreateGradientRoundedRectTexture(128, 128, 6, theme.TabsBg, Color.Lerp(theme.TabsBg, Color.black, 0.05f));
                 tabsListStyle.border = GetBorderOffset(0f);
                 tabsListStyle.padding = GetSpacingOffset(6f, 6f);
                 tabsListStyle.margin = GetSpacingOffset(0f, 0f);
@@ -1710,11 +1703,11 @@ namespace shadcnui.GUIComponents.Core
                 badgeSecondaryStyle = new UnityHelpers.GUIStyle(badgeDefaultStyle);
                 if (customFont != null)
                     badgeSecondaryStyle.font = customFont;
-                badgeSecondaryStyle.normal.background = CreateRoundedRectTexture(128, 24, 12, theme.Secondary);
+                badgeSecondaryStyle.normal.background = CreateGradientRoundedRectTexture(128, 24, 12, theme.Secondary, Color.Lerp(theme.Secondary, Color.black, 0.05f));
                 badgeDestructiveStyle = new UnityHelpers.GUIStyle(badgeDefaultStyle);
                 if (customFont != null)
                     badgeDestructiveStyle.font = customFont;
-                badgeDestructiveStyle.normal.background = CreateRoundedRectTexture(128, 24, 12, theme.Destructive);
+                badgeDestructiveStyle.normal.background = CreateGradientRoundedRectTexture(128, 24, 12, theme.Destructive, Color.Lerp(theme.Destructive, Color.black, 0.1f));
                 badgeOutlineStyle = new UnityHelpers.GUIStyle(badgeDefaultStyle);
                 if (customFont != null)
                     badgeOutlineStyle.font = customFont;
@@ -1760,7 +1753,7 @@ namespace shadcnui.GUIComponents.Core
                 tableStyle.padding = GetSpacingOffset(0f, 0f);
                 tableStyle.margin = GetSpacingOffset(0f, 0f);
                 tableHeaderStyle = CreateStyleWithFont(GUI.skin.button, GetScaledFontSize(0.9f), FontStyle.Bold);
-                tableHeaderStyle.normal.background = CreateSolidTexture(Color.Lerp(theme.Secondary, theme.Accent, 0.15f));
+                tableHeaderStyle.normal.background = CreateGradientRoundedRectTexture(128, 40, 0, Color.Lerp(theme.Secondary, theme.Accent, 0.15f), Color.Lerp(theme.Secondary, theme.Accent, 0.1f));
                 tableHeaderStyle.hover.background = CreateSolidTexture(Color.Lerp(theme.Secondary, theme.Accent, 0.2f));
                 tableHeaderStyle.active.background = CreateSolidTexture(Color.Lerp(theme.Secondary, theme.Accent, 0.25f));
                 tableHeaderStyle.normal.textColor = theme.Text;
@@ -1822,7 +1815,7 @@ namespace shadcnui.GUIComponents.Core
                 calendarDayStyle = CreateStyleWithFont(GUI.skin.button, GetScaledFontSize(1.0f));
                 calendarDayStyle.normal.textColor = theme.Text;
                 calendarDayStyle.normal.background = CreateSolidTexture(theme.Secondary);
-                calendarDayStyle.hover.background = CreateSolidTexture(Color.Lerp(theme.Secondary, theme.Accent, 0.12f));
+                calendarDayStyle.hover.background = CreateGradientRoundedRectTexture(32, 32, 4, Color.Lerp(theme.Secondary, theme.Accent, 0.12f), Color.Lerp(theme.Secondary, theme.Accent, 0.08f));
                 calendarDaySelectedStyle = new UnityHelpers.GUIStyle(calendarDayStyle);
                 if (customFont != null)
                     calendarDaySelectedStyle.font = customFont;
@@ -1836,10 +1829,6 @@ namespace shadcnui.GUIComponents.Core
                 if (customFont != null)
                     calendarDayTodayStyle.font = customFont;
                 calendarDayTodayStyle.normal.background = CreateOutlineButtonTexture(theme.Secondary, theme.Accent);
-                calendarDayDisabledStyle = new UnityHelpers.GUIStyle(calendarDayStyle);
-                if (customFont != null)
-                    calendarDayDisabledStyle.font = customFont;
-                calendarDayDisabledStyle.normal.textColor = theme.Muted;
                 calendarDayInRangeStyle = new UnityHelpers.GUIStyle(calendarDayStyle);
                 if (customFont != null)
                     calendarDayInRangeStyle.font = customFont;
@@ -1860,16 +1849,16 @@ namespace shadcnui.GUIComponents.Core
                 var theme = ThemeManager.Instance.CurrentTheme;
                 dropdownMenuContentStyle = new UnityHelpers.GUIStyle(GUI.skin.box);
                 int dropdownRadius = GetScaledBorderRadius(8f);
-                dropdownMenuContentStyle.normal.background = CreateRoundedRectWithShadowTexture(256, 256, dropdownRadius, theme.Elevated, 0.18f, 10);
+                dropdownMenuContentStyle.normal.background = CreateRoundedRectWithShadowTexture(256, 256, dropdownRadius, theme.Secondary, 0.18f, 10);
                 dropdownMenuContentStyle.border = GetBorderOffset(8f);
                 dropdownMenuContentStyle.padding = GetSpacingOffset(6f, 6f);
                 dropdownMenuItemStyle = CreateStyleWithFont(GUI.skin.button, GetScaledFontSize(0.9f));
                 dropdownMenuItemStyle.alignment = TextAnchor.MiddleLeft;
                 dropdownMenuItemStyle.normal.background = transparentTexture;
                 dropdownMenuItemStyle.normal.textColor = theme.Text;
-                dropdownMenuItemStyle.hover.background = CreateRoundedRectTexture(128, 32, 6, Color.Lerp(theme.Accent, Color.white, 0.15f));
+                dropdownMenuItemStyle.hover.background = CreateGradientRoundedRectTexture(128, 32, 6, Color.Lerp(theme.Accent, Color.white, 0.15f), Color.Lerp(theme.Accent, Color.white, 0.1f));
                 dropdownMenuItemStyle.hover.textColor = theme.Accent;
-                dropdownMenuItemStyle.active.background = CreateRoundedRectTexture(128, 32, 6, Color.Lerp(theme.Accent, Color.black, 0.1f));
+                dropdownMenuItemStyle.active.background = CreateGradientRoundedRectTexture(128, 32, 6, Color.Lerp(theme.Accent, Color.black, 0.1f), Color.Lerp(theme.Accent, Color.black, 0.15f));
                 dropdownMenuItemStyle.active.textColor = theme.Accent;
                 dropdownMenuItemStyle.padding = GetSpacingOffset(14f, 6f);
                 dropdownMenuSeparatorStyle = new UnityHelpers.GUIStyle();
@@ -1905,28 +1894,6 @@ namespace shadcnui.GUIComponents.Core
         }
         #endregion
 
-        #region Style Setup - ScrollArea
-        private void SetupScrollAreaStyles()
-        {
-            try
-            {
-                var theme = ThemeManager.Instance.CurrentTheme;
-                scrollAreaStyle = new UnityHelpers.GUIStyle();
-                scrollAreaStyle.normal.background = CreateSolidTexture(theme.Base);
-                scrollAreaThumbStyle = new UnityHelpers.GUIStyle();
-                scrollAreaThumbStyle.normal.background = CreateSolidTexture(Color.Lerp(theme.Base, Color.white, 0.25f));
-                scrollAreaThumbStyle.border = GetBorderOffset(4f);
-                scrollAreaTrackStyle = new UnityHelpers.GUIStyle();
-                scrollAreaTrackStyle.normal.background = CreateSolidTexture(Color.Lerp(theme.Base, Color.black, 0.12f));
-                scrollAreaTrackStyle.border = GetBorderOffset(4f);
-            }
-            catch (Exception ex)
-            {
-                GUILogger.LogException(ex, "SetupScrollAreaStyles", "StyleManager");
-            }
-        }
-        #endregion
-
         #region Style Setup - Select
         private void SetupSelectStyles()
         {
@@ -1937,24 +1904,24 @@ namespace shadcnui.GUIComponents.Core
                 int borderRadius = Mathf.RoundToInt(guiHelper.cornerRadius * guiHelper.uiScale);
                 selectTriggerStyle = CreateStyleWithFont(GUI.skin.button, Mathf.RoundToInt(scaledFontSize));
                 selectTriggerStyle.alignment = TextAnchor.MiddleLeft;
-                selectTriggerStyle.normal.background = CreateSolidTexture(theme.Base);
+                selectTriggerStyle.normal.background = selectTriggerTexture;
                 selectTriggerStyle.normal.textColor = theme.Text;
-                selectTriggerStyle.hover.background = CreateSolidTexture(Color.Lerp(theme.Base, theme.Accent, 0.12f));
-                selectTriggerStyle.active.background = CreateSolidTexture(Color.Lerp(theme.Base, theme.Accent, 0.25f));
+                selectTriggerStyle.hover.background = CreateGradientRoundedRectTexture(128, 40, 6, Color.Lerp(theme.Base, theme.Accent, 0.12f), Color.Lerp(theme.Base, theme.Accent, 0.08f));
+                selectTriggerStyle.active.background = CreateGradientRoundedRectTexture(128, 40, 6, Color.Lerp(theme.Base, theme.Accent, 0.25f), Color.Lerp(theme.Base, theme.Accent, 0.2f));
                 selectTriggerStyle.padding = new UnityHelpers.RectOffset(10, 10, 5, 5);
                 selectTriggerStyle.border = new UnityHelpers.RectOffset(borderRadius, borderRadius, borderRadius, borderRadius);
                 selectContentStyle = new UnityHelpers.GUIStyle(GUI.skin.box);
-                selectContentStyle.normal.background = CreateSolidTexture(theme.Elevated);
+                selectContentStyle.normal.background = CreateSolidTexture(theme.Secondary);
                 selectContentStyle.border = new UnityHelpers.RectOffset(borderRadius, borderRadius, borderRadius, borderRadius);
                 selectContentStyle.padding = new UnityHelpers.RectOffset(5, 5, 5, 5);
                 selectItemStyle = CreateStyleWithFont(GUI.skin.button, Mathf.RoundToInt(scaledFontSize));
                 selectItemStyle.alignment = TextAnchor.MiddleLeft;
                 selectItemStyle.normal.background = transparentTexture;
                 selectItemStyle.normal.textColor = theme.Text;
-                selectItemStyle.hover.background = CreateSolidTexture(theme.Accent);
-                selectItemStyle.hover.textColor = Color.white;
-                selectItemStyle.active.background = CreateSolidTexture(Color.Lerp(theme.Accent, Color.black, 0.15f));
-                selectItemStyle.active.textColor = Color.white;
+                selectItemStyle.hover.background = CreateSolidTexture(GetHoverColor(theme.Base));
+                selectItemStyle.hover.textColor = theme.Text;
+                selectItemStyle.active.background = CreateSolidTexture(GetHoverColor(theme.Base, true));
+                selectItemStyle.active.textColor = theme.Text;
                 selectItemStyle.padding = new UnityHelpers.RectOffset(10, 10, 5, 5);
             }
             catch (Exception ex)
@@ -1999,14 +1966,6 @@ namespace shadcnui.GUIComponents.Core
                 if (customFont != null)
                     datePickerDayTodayStyle.font = customFont;
                 datePickerDayTodayStyle.normal.background = CreateOutlineButtonTexture(theme.Secondary, theme.Accent);
-                datePickerDayDisabledStyle = new UnityHelpers.GUIStyle(datePickerDayStyle);
-                if (customFont != null)
-                    datePickerDayDisabledStyle.font = customFont;
-                datePickerDayDisabledStyle.normal.textColor = theme.Muted;
-                datePickerDayInRangeStyle = new UnityHelpers.GUIStyle(datePickerDayStyle);
-                if (customFont != null)
-                    datePickerDayInRangeStyle.font = customFont;
-                datePickerDayInRangeStyle.normal.background = CreateSolidTexture(new Color(theme.Accent.r, theme.Accent.g, theme.Accent.b, 0.55f));
             }
             catch (Exception ex)
             {
@@ -2024,7 +1983,7 @@ namespace shadcnui.GUIComponents.Core
                 dialogOverlayStyle = new UnityHelpers.GUIStyle();
                 dialogOverlayStyle.normal.background = CreateSolidTexture(new Color(0, 0, 0, 0.85f));
                 dialogContentStyle = new UnityHelpers.GUIStyle(GUI.skin.box);
-                dialogContentStyle.normal.background = CreateRoundedRectWithShadowTexture(512, 512, 12, theme.Elevated, 0.18f, 12);
+                dialogContentStyle.normal.background = CreateRoundedRectWithShadowTexture(512, 512, 12, theme.Secondary, 0.18f, 12);
                 dialogContentStyle.border = new UnityHelpers.RectOffset(12, 12, 12, 12);
                 dialogContentStyle.padding = new UnityHelpers.RectOffset(24, 24, 24, 24);
                 dialogTitleStyle = CreateStyleWithFont(GUI.skin.label, GetScaledFontSize(1.25f), FontStyle.Bold);
@@ -2059,8 +2018,6 @@ namespace shadcnui.GUIComponents.Core
                 chartAxisStyle = CreateStyleWithFont(GUI.skin.label, GetScaledFontSize(0.75f));
                 chartAxisStyle.normal.textColor = theme.Muted;
                 chartAxisStyle.alignment = TextAnchor.MiddleCenter;
-                chartGridStyle = new UnityHelpers.GUIStyle();
-                chartGridStyle.normal.background = chartGridTexture;
             }
             catch (Exception ex)
             {
@@ -2087,13 +2044,13 @@ namespace shadcnui.GUIComponents.Core
                 menuBarItemStyle.border = new UnityHelpers.RectOffset(0, 0, 0, 0);
                 menuBarItemStyle.normal.background = transparentTexture;
                 menuBarItemStyle.normal.textColor = theme.Text;
-                menuBarItemStyle.hover.background = CreateSolidTexture(theme.Secondary);
+                menuBarItemStyle.hover.background = CreateSolidTexture(GetHoverColor(theme.Base));
                 menuBarItemStyle.hover.textColor = theme.Text;
-                menuBarItemStyle.active.background = CreateSolidTexture(Color.Lerp(theme.Secondary, Color.black, 0.12f));
+                menuBarItemStyle.active.background = CreateSolidTexture(GetHoverColor(theme.Base, true));
                 menuBarItemStyle.active.textColor = theme.Text;
                 menuBarItemStyle.stretchWidth = false;
                 menuDropdownStyle = new UnityHelpers.GUIStyle(GUI.skin.box);
-                menuDropdownStyle.normal.background = CreateSolidTexture(theme.Elevated);
+                menuDropdownStyle.normal.background = CreateGradientRoundedRectWithShadowTexture(200, 200, 4, theme.Secondary, theme.Secondary, 0.1f, 6);
                 menuDropdownStyle.border = GetBorderOffset(4f);
                 menuDropdownStyle.padding = GetSpacingOffset(4f, 4f);
                 menuDropdownStyle.margin = GetSpacingOffset(0f, 0f);
@@ -2109,8 +2066,6 @@ namespace shadcnui.GUIComponents.Core
 
         #region Style Getters - Public Only
         public GUIStyle GetAnimatedBoxStyle() => animatedBoxStyle ?? GUI.skin.box;
-
-        public GUIStyle GetGlowLabelStyle() => glowLabelStyle ?? GUI.skin.label;
 
         public GUIStyle GetSectionHeaderStyle() => sectionHeaderStyle ?? GUI.skin.label;
 
@@ -2171,6 +2126,13 @@ namespace shadcnui.GUIComponents.Core
                     style.fixedHeight = iconSize;
                     style.border = GetBorderOffset(6f);
                     break;
+
+                case ButtonSize.Default:
+                    style.fontSize = GetScaledFontSize(0.875f);
+                    style.padding = GetSpacingOffset(16f, 8f);
+                    style.fixedHeight = GetScaledHeight(36f);
+                    style.border = GetBorderOffset(6f);
+                    break;
             }
         }
 
@@ -2178,21 +2140,35 @@ namespace shadcnui.GUIComponents.Core
         {
             if (toggleStyleCache.TryGetValue((variant, size), out var cachedStyle))
                 return cachedStyle;
-            GUIStyle baseStyle = variant == ToggleVariant.Outline ? toggleOutlineStyle : toggleDefaultStyle;
+            GUIStyle baseStyle = variant switch
+            {
+                ToggleVariant.Outline => toggleOutlineStyle,
+                ToggleVariant.Default => toggleDefaultStyle,
+                _ => toggleDefaultStyle,
+            };
             GUIStyle sizedStyle = new UnityHelpers.GUIStyle(baseStyle ?? GUI.skin.button);
+            ApplyToggleSizing(sizedStyle, size);
+            toggleStyleCache[(variant, size)] = sizedStyle;
+            return sizedStyle;
+        }
+
+        private void ApplyToggleSizing(GUIStyle style, ToggleSize size)
+        {
             switch (size)
             {
                 case ToggleSize.Small:
-                    sizedStyle.fontSize = guiHelper.fontSize - 2;
-                    sizedStyle.padding = new UnityHelpers.RectOffset(6, 6, 4, 4);
+                    style.fontSize = GetScaledFontSize(0.75f);
+                    style.padding = GetSpacingOffset(6f, 2f);
                     break;
                 case ToggleSize.Large:
-                    sizedStyle.fontSize = guiHelper.fontSize + 2;
-                    sizedStyle.padding = new UnityHelpers.RectOffset(10, 10, 8, 8);
+                    style.fontSize = GetScaledFontSize(1.25f);
+                    style.padding = GetSpacingOffset(10f, 6f);
+                    break;
+                case ToggleSize.Default:
+                    style.fontSize = GetScaledFontSize(1.0f);
+                    style.padding = GetSpacingOffset(8f, 4f);
                     break;
             }
-            toggleStyleCache[(variant, size)] = sizedStyle;
-            return sizedStyle;
         }
 
         public GUIStyle GetInputStyle(InputVariant variant, bool focused = false, bool disabled = false)
@@ -2206,6 +2182,7 @@ namespace shadcnui.GUIComponents.Core
                 {
                     InputVariant.Outline => inputOutlineStyle ?? GUI.skin.textField,
                     InputVariant.Ghost => inputGhostStyle ?? GUI.skin.textField,
+                    InputVariant.Default => inputDefaultStyle ?? GUI.skin.textField,
                     _ => inputDefaultStyle ?? GUI.skin.textField,
                 };
             inputStyleCache[(variant, focused, disabled)] = style;
@@ -2221,6 +2198,7 @@ namespace shadcnui.GUIComponents.Core
                 LabelVariant.Secondary => labelSecondaryStyle ?? GUI.skin.label,
                 LabelVariant.Muted => labelMutedStyle ?? GUI.skin.label,
                 LabelVariant.Destructive => labelDestructiveStyle ?? GUI.skin.label,
+                LabelVariant.Default => labelDefaultStyle ?? GUI.skin.label,
                 _ => labelDefaultStyle ?? GUI.skin.label,
             };
             labelStyleCache[variant] = style;
@@ -2237,6 +2215,7 @@ namespace shadcnui.GUIComponents.Core
             {
                 TextAreaVariant.Outline => textAreaOutlineStyle ?? textAreaStyle ?? GUI.skin.textArea,
                 TextAreaVariant.Ghost => textAreaGhostStyle ?? textAreaStyle ?? GUI.skin.textArea,
+                TextAreaVariant.Default => textAreaStyle ?? GUI.skin.textArea,
                 _ => textAreaStyle ?? GUI.skin.textArea,
             };
             GUIStyle style = focused ? (textAreaFocusedStyle ?? baseStyle) : baseStyle;
@@ -2250,7 +2229,13 @@ namespace shadcnui.GUIComponents.Core
 
         public GUIStyle GetProgressBarFillStyle() => progressBarFillStyle ?? GUI.skin.box;
 
-        public GUIStyle GetSeparatorStyle(SeparatorOrientation orientation) => orientation == SeparatorOrientation.Horizontal ? (separatorHorizontalStyle ?? GUI.skin.box) : (separatorVerticalStyle ?? GUI.skin.box);
+        public GUIStyle GetSeparatorStyle(SeparatorOrientation orientation) =>
+            orientation switch
+            {
+                SeparatorOrientation.Horizontal => separatorHorizontalStyle ?? GUI.skin.box,
+                SeparatorOrientation.Vertical => separatorVerticalStyle ?? GUI.skin.box,
+                _ => separatorHorizontalStyle ?? GUI.skin.box,
+            };
 
         public GUIStyle GetTabsListStyle() => tabsListStyle ?? GUI.skin.box;
 
@@ -2266,20 +2251,32 @@ namespace shadcnui.GUIComponents.Core
             {
                 CheckboxVariant.Outline => checkboxOutlineStyle,
                 CheckboxVariant.Ghost => checkboxGhostStyle,
+                CheckboxVariant.Default => checkboxDefaultStyle,
                 _ => checkboxDefaultStyle,
             };
-            GUIStyle sizedStyle = new UnityHelpers.GUIStyle(baseStyle);
+            GUIStyle sizedStyle = new UnityHelpers.GUIStyle(baseStyle ?? GUI.skin.toggle);
+            ApplyCheckboxSizing(sizedStyle, size);
+            checkboxStyleCache[(variant, size)] = sizedStyle;
+            return sizedStyle;
+        }
+
+        private void ApplyCheckboxSizing(GUIStyle style, CheckboxSize size)
+        {
             switch (size)
             {
                 case CheckboxSize.Small:
-                    sizedStyle.fontSize = Mathf.RoundToInt((guiHelper.fontSize - 2) * guiHelper.uiScale);
+                    style.fontSize = GetScaledFontSize(0.75f);
+                    style.padding = GetSpacingOffset(6f, 0f);
                     break;
                 case CheckboxSize.Large:
-                    sizedStyle.fontSize = Mathf.RoundToInt((guiHelper.fontSize + 2) * guiHelper.uiScale);
+                    style.fontSize = GetScaledFontSize(1.25f);
+                    style.padding = GetSpacingOffset(10f, 0f);
+                    break;
+                case CheckboxSize.Default:
+                    style.fontSize = GetScaledFontSize(0.9f);
+                    style.padding = GetSpacingOffset(8f, 0f);
                     break;
             }
-            checkboxStyleCache[(variant, size)] = sizedStyle;
-            return sizedStyle;
         }
 
         public GUIStyle GetSwitchStyle(SwitchVariant variant, SwitchSize size)
@@ -2290,20 +2287,32 @@ namespace shadcnui.GUIComponents.Core
             {
                 SwitchVariant.Outline => switchOutlineStyle,
                 SwitchVariant.Ghost => switchGhostStyle,
+                SwitchVariant.Default => switchDefaultStyle,
                 _ => switchDefaultStyle,
             };
-            GUIStyle sizedStyle = new UnityHelpers.GUIStyle(baseStyle);
+            GUIStyle sizedStyle = new UnityHelpers.GUIStyle(baseStyle ?? GUI.skin.toggle);
+            ApplySwitchSizing(sizedStyle, size);
+            switchStyleCache[(variant, size)] = sizedStyle;
+            return sizedStyle;
+        }
+
+        private void ApplySwitchSizing(GUIStyle style, SwitchSize size)
+        {
             switch (size)
             {
                 case SwitchSize.Small:
-                    sizedStyle.fontSize = Mathf.RoundToInt((guiHelper.fontSize - 2) * guiHelper.uiScale);
+                    style.fontSize = GetScaledFontSize(0.75f);
+                    style.padding = GetSpacingOffset(6f, 2f);
                     break;
                 case SwitchSize.Large:
-                    sizedStyle.fontSize = Mathf.RoundToInt((guiHelper.fontSize + 2) * guiHelper.uiScale);
+                    style.fontSize = GetScaledFontSize(1.25f);
+                    style.padding = GetSpacingOffset(10f, 6f);
+                    break;
+                case SwitchSize.Default:
+                    style.fontSize = GetScaledFontSize(0.875f);
+                    style.padding = GetSpacingOffset(8f, 4f);
                     break;
             }
-            switchStyleCache[(variant, size)] = sizedStyle;
-            return sizedStyle;
         }
 
         public GUIStyle GetBadgeStyle(BadgeVariant variant, BadgeSize size)
@@ -2315,32 +2324,45 @@ namespace shadcnui.GUIComponents.Core
                 BadgeVariant.Secondary => badgeSecondaryStyle,
                 BadgeVariant.Destructive => badgeDestructiveStyle,
                 BadgeVariant.Outline => badgeOutlineStyle,
+                BadgeVariant.Default => badgeDefaultStyle,
                 _ => badgeDefaultStyle,
             };
-            GUIStyle sizedStyle = new UnityHelpers.GUIStyle(baseStyle);
+            GUIStyle sizedStyle = new UnityHelpers.GUIStyle(baseStyle ?? GUI.skin.box);
+            ApplyBadgeSizing(sizedStyle, size);
+            badgeStyleCache[(variant, size)] = sizedStyle;
+            return sizedStyle;
+        }
+
+        private void ApplyBadgeSizing(GUIStyle style, BadgeSize size)
+        {
             switch (size)
             {
                 case BadgeSize.Small:
-                    sizedStyle.fontSize = Mathf.RoundToInt((guiHelper.fontSize - 2) * guiHelper.uiScale);
+                    style.fontSize = GetScaledFontSize(0.65f);
+                    style.padding = GetSpacingOffset(8f, 2f);
                     break;
                 case BadgeSize.Large:
-                    sizedStyle.fontSize = Mathf.RoundToInt((guiHelper.fontSize + 2) * guiHelper.uiScale);
+                    style.fontSize = GetScaledFontSize(1.0f);
+                    style.padding = GetSpacingOffset(12f, 6f);
+                    break;
+                case BadgeSize.Default:
+                    style.fontSize = GetScaledFontSize(0.8f);
+                    style.padding = GetSpacingOffset(10f, 4f);
                     break;
             }
-            badgeStyleCache[(variant, size)] = sizedStyle;
-            return sizedStyle;
         }
 
         public GUIStyle GetAvatarStyle(AvatarSize size, AvatarShape shape)
         {
             if (avatarStyleCache.TryGetValue((size, shape), out var cachedStyle))
                 return cachedStyle;
-            GUIStyle sizedStyle = new UnityHelpers.GUIStyle(avatarStyle);
+            GUIStyle sizedStyle = new UnityHelpers.GUIStyle(avatarStyle ?? GUI.skin.box);
             int avatarSizeValue = size switch
             {
-                AvatarSize.Small => Mathf.RoundToInt(32 * guiHelper.uiScale),
-                AvatarSize.Large => Mathf.RoundToInt(48 * guiHelper.uiScale),
-                _ => Mathf.RoundToInt(40 * guiHelper.uiScale),
+                AvatarSize.Small => GetScaledHeight(32f),
+                AvatarSize.Large => GetScaledHeight(48f),
+                AvatarSize.Default => GetScaledHeight(40f),
+                _ => GetScaledHeight(40f),
             };
             sizedStyle.fixedWidth = avatarSizeValue;
             sizedStyle.fixedHeight = avatarSizeValue;
@@ -2354,7 +2376,8 @@ namespace shadcnui.GUIComponents.Core
             int borderRadius = shape switch
             {
                 AvatarShape.Circle => Mathf.RoundToInt(50 * guiHelper.uiScale),
-                AvatarShape.Rounded => Mathf.RoundToInt(8 * guiHelper.uiScale),
+                AvatarShape.Rounded => GetScaledBorderRadius(8f),
+                AvatarShape.Square => 0,
                 _ => 0,
             };
             return new UnityHelpers.RectOffset(borderRadius, borderRadius, borderRadius, borderRadius);
@@ -2365,6 +2388,7 @@ namespace shadcnui.GUIComponents.Core
             {
                 AvatarSize.Small => 6f,
                 AvatarSize.Large => 12f,
+                AvatarSize.Default => 8f,
                 _ => 8f,
             };
 
@@ -2377,15 +2401,73 @@ namespace shadcnui.GUIComponents.Core
                 TableVariant.Striped => tableStripedStyle,
                 TableVariant.Bordered => tableBorderedStyle,
                 TableVariant.Hover => tableHoverStyle,
+                TableVariant.Default => tableStyle,
                 _ => tableStyle,
             };
-            tableStyleCache[(variant, size)] = baseStyle ?? GUI.skin.box;
-            return baseStyle ?? GUI.skin.box;
+            GUIStyle sizedStyle = new UnityHelpers.GUIStyle(baseStyle ?? GUI.skin.box);
+            ApplyTableSizing(sizedStyle, size);
+            tableStyleCache[(variant, size)] = sizedStyle;
+            return sizedStyle;
+        }
+
+        private void ApplyTableSizing(GUIStyle style, TableSize size)
+        {
+            switch (size)
+            {
+                case TableSize.Small:
+                    style.fontSize = GetScaledFontSize(0.9f);
+                    style.padding = GetSpacingOffset(8f, 8f);
+                    break;
+                case TableSize.Large:
+                    style.fontSize = GetScaledFontSize(1.1f);
+                    style.padding = GetSpacingOffset(20f, 20f);
+                    break;
+                case TableSize.Default:
+                    style.fontSize = GetScaledFontSize(0.95f);
+                    style.padding = GetSpacingOffset(14f, 14f);
+                    break;
+            }
         }
 
         public GUIStyle GetTableHeaderStyle(TableVariant variant, TableSize size) => tableHeaderStyle ?? GUI.skin.label;
 
         public GUIStyle GetTableCellStyle(TableVariant variant, TableSize size) => tableCellStyle ?? GUI.skin.label;
+
+        public GUIStyle GetCalendarStyle(CalendarVariant variant, CalendarSize size)
+        {
+            if (calendarStyleCache.TryGetValue((variant, size), out var cachedStyle))
+                return cachedStyle;
+            GUIStyle baseStyle = variant switch
+            {
+                CalendarVariant.Default => calendarStyle,
+                _ => calendarStyle,
+            };
+            GUIStyle sizedStyle = new UnityHelpers.GUIStyle(baseStyle ?? GUI.skin.box);
+            ApplyCalendarSizing(sizedStyle, size, variant);
+            calendarStyleCache[(variant, size)] = sizedStyle;
+            return sizedStyle;
+        }
+
+        private void ApplyCalendarSizing(GUIStyle style, CalendarSize size, CalendarVariant variant)
+        {
+            switch (variant)
+            {
+                case CalendarVariant.Default:
+                    break;
+            }
+            switch (size)
+            {
+                case CalendarSize.Small:
+                    style.padding = GetSpacingOffset(8f, 8f);
+                    break;
+                case CalendarSize.Large:
+                    style.padding = GetSpacingOffset(16f, 16f);
+                    break;
+                case CalendarSize.Default:
+                    style.padding = GetSpacingOffset(12f, 12f);
+                    break;
+            }
+        }
 
         public GUIStyle GetCalendarWeekdayStyle() => calendarWeekdayStyle ?? GUI.skin.label;
 
@@ -2397,9 +2479,43 @@ namespace shadcnui.GUIComponents.Core
 
         public GUIStyle GetCalendarDayTodayStyle() => calendarDayTodayStyle ?? GUI.skin.button;
 
-        public GUIStyle GetCalendarDayDisabledStyle() => calendarDayDisabledStyle ?? GUI.skin.button;
-
         public GUIStyle GetCalendarDayInRangeStyle() => calendarDayInRangeStyle ?? GUI.skin.button;
+
+        public GUIStyle GetDatePickerStyle(CalendarVariant variant, CalendarSize size)
+        {
+            if (calendarStyleCache.TryGetValue((variant, size), out var cachedStyle))
+                return cachedStyle;
+            GUIStyle baseStyle = variant switch
+            {
+                CalendarVariant.Default => datePickerStyle,
+                _ => datePickerStyle,
+            };
+            GUIStyle sizedStyle = new UnityHelpers.GUIStyle(baseStyle ?? GUI.skin.box);
+            ApplyDatePickerSizing(sizedStyle, size, variant);
+            calendarStyleCache[(variant, size)] = sizedStyle;
+            return sizedStyle;
+        }
+
+        private void ApplyDatePickerSizing(GUIStyle style, CalendarSize size, CalendarVariant variant)
+        {
+            switch (variant)
+            {
+                case CalendarVariant.Default:
+                    break;
+            }
+            switch (size)
+            {
+                case CalendarSize.Small:
+                    style.padding = GetSpacingOffset(8f, 8f);
+                    break;
+                case CalendarSize.Large:
+                    style.padding = GetSpacingOffset(16f, 16f);
+                    break;
+                case CalendarSize.Default:
+                    style.padding = GetSpacingOffset(10f, 10f);
+                    break;
+            }
+        }
 
         public GUIStyle GetDatePickerTitleStyle() => datePickerTitleStyle ?? GUI.skin.label;
 
@@ -2419,13 +2535,42 @@ namespace shadcnui.GUIComponents.Core
 
         public GUIStyle GetDialogDescriptionStyle() => dialogDescriptionStyle ?? GUI.skin.label;
 
-        public GUIStyle GetDropdownMenuContentStyle() => dropdownMenuContentStyle ?? GUI.skin.box;
-
         public GUIStyle GetDropdownMenuItemStyle() => dropdownMenuItemStyle ?? GUI.skin.button;
 
         public GUIStyle GetDropdownMenuSeparatorStyle() => dropdownMenuSeparatorStyle ?? GUIStyle.none;
 
         public GUIStyle GetDropdownMenuHeaderStyle() => dropdownMenuHeaderStyle ?? GUI.skin.label;
+
+        public GUIStyle GetDropdownMenuStyle(DropdownMenuVariant variant, DropdownMenuSize size)
+        {
+            if (dropdownMenuStyleCache.TryGetValue((variant, size), out var cachedStyle))
+                return cachedStyle;
+            GUIStyle sizedStyle = new UnityHelpers.GUIStyle(dropdownMenuContentStyle ?? GUI.skin.box);
+            ApplyDropdownMenuSizing(sizedStyle, size, variant);
+            dropdownMenuStyleCache[(variant, size)] = sizedStyle;
+            return sizedStyle;
+        }
+
+        private void ApplyDropdownMenuSizing(GUIStyle style, DropdownMenuSize size, DropdownMenuVariant variant)
+        {
+            switch (size)
+            {
+                case DropdownMenuSize.Small:
+                    style.padding = GetSpacingOffset(4f, 4f);
+                    break;
+                case DropdownMenuSize.Large:
+                    style.padding = GetSpacingOffset(8f, 8f);
+                    break;
+                case DropdownMenuSize.Default:
+                    style.padding = GetSpacingOffset(6f, 6f);
+                    break;
+            }
+            switch (variant)
+            {
+                case DropdownMenuVariant.Default:
+                    break;
+            }
+        }
 
         public GUIStyle GetPopoverContentStyle() => popoverContentStyle ?? GUI.skin.box;
 
@@ -2437,18 +2582,65 @@ namespace shadcnui.GUIComponents.Core
         {
             if (selectStyleCache.TryGetValue((variant, size), out var cachedStyle))
                 return cachedStyle;
-            GUIStyle sizedStyle = new UnityHelpers.GUIStyle(selectContentStyle);
+            GUIStyle sizedStyle = new UnityHelpers.GUIStyle(selectContentStyle ?? GUI.skin.box);
+            ApplySelectSizing(sizedStyle, size, variant);
+            selectStyleCache[(variant, size)] = sizedStyle;
+            return sizedStyle;
+        }
+
+        private void ApplySelectSizing(GUIStyle style, SelectSize size, SelectVariant variant)
+        {
             switch (size)
             {
                 case SelectSize.Small:
-                    sizedStyle.fontSize = Mathf.RoundToInt((guiHelper.fontSize - 2) * guiHelper.uiScale);
+                    style.fontSize = GetScaledFontSize(0.8f);
+                    style.padding = GetSpacingOffset(8f, 6f);
                     break;
                 case SelectSize.Large:
-                    sizedStyle.fontSize = Mathf.RoundToInt((guiHelper.fontSize + 2) * guiHelper.uiScale);
+                    style.fontSize = GetScaledFontSize(1.1f);
+                    style.padding = GetSpacingOffset(12f, 10f);
+                    break;
+                case SelectSize.Default:
+                    style.fontSize = GetScaledFontSize(0.95f);
+                    style.padding = GetSpacingOffset(10f, 8f);
                     break;
             }
-            selectStyleCache[(variant, size)] = sizedStyle;
+            switch (variant)
+            {
+                case SelectVariant.Default:
+                    break;
+            }
+        }
+
+        public GUIStyle GetChartStyle(ChartVariant variant, ChartSize size)
+        {
+            if (chartStyleCache.TryGetValue((variant, size), out var cachedStyle))
+                return cachedStyle;
+            GUIStyle sizedStyle = new UnityHelpers.GUIStyle(chartContainerStyle ?? GUI.skin.box);
+            ApplyChartSizing(sizedStyle, size, variant);
+            chartStyleCache[(variant, size)] = sizedStyle;
             return sizedStyle;
+        }
+
+        private void ApplyChartSizing(GUIStyle style, ChartSize size, ChartVariant variant)
+        {
+            switch (size)
+            {
+                case ChartSize.Small:
+                    style.padding = GetSpacingOffset(12f, 12f);
+                    break;
+                case ChartSize.Large:
+                    style.padding = GetSpacingOffset(20f, 20f);
+                    break;
+                case ChartSize.Default:
+                    style.padding = GetSpacingOffset(16f, 16f);
+                    break;
+            }
+            switch (variant)
+            {
+                case ChartVariant.Default:
+                    break;
+            }
         }
 
         public GUIStyle GetChartAxisStyle() => chartAxisStyle ?? GUI.skin.label;

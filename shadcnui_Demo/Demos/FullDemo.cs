@@ -91,7 +91,17 @@ namespace shadcnui_Demo.Menu
 #if MONO
             img.LoadImage(imageData);
 #endif
+            /*
+            // Custom Font Loading
 
+            byte[] fontData = LoadEmbeddedBytes("shadcnui_Demo.Fonts.ProggyClean.ttf"); // {file name}.Fonts.{font name}.ttf // you need Directory.Build.targets to do it or fully find the name yourself
+
+            if (fontData != null)
+            {
+                guiHelper.GetStyleManager().SetCustomFont(fontData, "ProggyClean.ttf");
+            }
+
+            */
             demoTabs = new Tabs.TabConfig[]
             {
                 new Tabs.TabConfig("Avatar", DrawAvatarDemos),
