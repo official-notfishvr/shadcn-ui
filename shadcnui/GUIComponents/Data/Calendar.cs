@@ -37,9 +37,13 @@ namespace shadcnui.GUIComponents.Data
         {
             var styleManager = guiHelper.GetStyleManager();
 
+            layoutComponents.BeginVerticalGroup(styleManager.GetCalendarStyle(CalendarVariant.Default, CalendarSize.Default));
+
             DrawHeader(styleManager);
             DrawWeekdays(styleManager);
             DrawDays(styleManager);
+
+            layoutComponents.EndVerticalGroup();
         }
 
         private void DrawHeader(StyleManager styleManager)
@@ -113,7 +117,7 @@ namespace shadcnui.GUIComponents.Data
                         GUIStyle dayStyle = styleManager.GetCalendarDayStyle();
                         if (isDisabled)
                         {
-                            dayStyle = styleManager.GetCalendarDayDisabledStyle();
+                            dayStyle = styleManager.GetCalendarDayStyle();
                         }
                         else if (SelectedDate.HasValue && SelectedDate.Value.Date == currentDay.Date)
                         {

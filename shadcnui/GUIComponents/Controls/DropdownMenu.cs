@@ -94,7 +94,7 @@ namespace shadcnui.GUIComponents.Controls
                 layoutOptions.AddRange(options);
             }
 
-            GUIStyle contentStyle = styleManager.GetDropdownMenuContentStyle();
+            GUIStyle contentStyle = styleManager.GetDropdownMenuStyle(DropdownMenuVariant.Default, DropdownMenuSize.Default);
             GUIStyle itemStyle = styleManager.GetDropdownMenuItemStyle();
             GUIStyle separatorStyle = styleManager.GetDropdownMenuSeparatorStyle();
 

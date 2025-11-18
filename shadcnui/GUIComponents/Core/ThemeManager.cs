@@ -23,6 +23,12 @@ namespace shadcnui.GUIComponents.Core
             Themes = new Dictionary<string, Theme>();
             AddTheme(Theme.Dark);
             AddTheme(Theme.Light);
+            AddTheme(Theme.Slate);
+            AddTheme(Theme.Gray);
+            AddTheme(Theme.Zinc);
+            AddTheme(Theme.Stone);
+            AddTheme(Theme.Olive);
+            AddTheme(Theme.Cyan);
             CurrentTheme = Themes["Dark"];
         }
 

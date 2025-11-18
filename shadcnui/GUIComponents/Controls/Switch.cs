@@ -17,38 +17,26 @@ namespace shadcnui.GUIComponents.Controls
         public bool DrawSwitch(string text, bool value, SwitchVariant variant = SwitchVariant.Default, SwitchSize size = SwitchSize.Default, Action<bool> onToggle = null, bool disabled = false, params GUILayoutOption[] options)
         {
             var styleManager = guiHelper.GetStyleManager();
-            if (styleManager == null)
-            {
-                return UnityHelpers.Toggle(value, text ?? "Switch", GUI.skin.toggle, new GUILayoutOption[0]);
-            }
-
-            GUIStyle switchStyle = styleManager.GetSwitchStyle(variant, size);
+            GUIStyle switchStyle = styleManager?.GetSwitchStyle(variant, size) ?? GUI.skin.toggle;
 
             bool wasEnabled = GUI.enabled;
             if (disabled)
                 GUI.enabled = false;
 
-            bool newValue;
-
-            newValue = UnityHelpers.Toggle(value, text ?? "Switch", switchStyle, options);
+            bool newValue = UnityHelpers.Toggle(value, text ?? "Switch", switchStyle, options);
 
             GUI.enabled = wasEnabled;
 
-            if (newValue != value && !disabled && onToggle != null)
-                onToggle.Invoke(newValue);
+            if (newValue != value && !disabled)
+                onToggle?.Invoke(newValue);
 
-            return newValue && !disabled;
+            return disabled ? value : newValue;
         }
 
         public bool DrawSwitch(Rect rect, string text, bool value, SwitchVariant variant = SwitchVariant.Default, SwitchSize size = SwitchSize.Default, Action<bool> onToggle = null, bool disabled = false)
         {
             var styleManager = guiHelper.GetStyleManager();
-            if (styleManager == null)
-            {
-                return GUI.Toggle(rect, value, text ?? "Switch");
-            }
-
-            GUIStyle switchStyle = styleManager.GetSwitchStyle(variant, size);
+            GUIStyle switchStyle = styleManager?.GetSwitchStyle(variant, size) ?? GUI.skin.toggle;
 
             Rect scaledRect = new Rect(rect.x * guiHelper.uiScale, rect.y * guiHelper.uiScale, rect.width * guiHelper.uiScale, rect.height * guiHelper.uiScale);
 
@@ -60,10 +48,10 @@ namespace shadcnui.GUIComponents.Controls
 
             GUI.enabled = wasEnabled;
 
-            if (newValue != value && !disabled && onToggle != null)
-                onToggle.Invoke(newValue);
+            if (newValue != value && !disabled)
+                onToggle?.Invoke(newValue);
 
-            return newValue && !disabled;
+            return disabled ? value : newValue;
         }
     }
 }

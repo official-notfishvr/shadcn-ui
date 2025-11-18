@@ -43,11 +43,13 @@ namespace shadcnui.GUIComponents.Controls
             var styleManager = guiHelper.GetStyleManager();
             GUIStyle toggleStyle = styleManager?.GetToggleStyle(variant, size) ?? GUI.skin.toggle;
 
+            Rect scaledRect = new Rect(rect.x * guiHelper.uiScale, rect.y * guiHelper.uiScale, rect.width * guiHelper.uiScale, rect.height * guiHelper.uiScale);
+
             bool wasEnabled = GUI.enabled;
             if (disabled)
                 GUI.enabled = false;
 
-            bool newValue = UnityHelpers.Toggle(rect, value, text, toggleStyle);
+            bool newValue = UnityHelpers.Toggle(scaledRect, value, text ?? "", toggleStyle);
 
             GUI.enabled = wasEnabled;
 
@@ -56,7 +58,7 @@ namespace shadcnui.GUIComponents.Controls
                 onToggle?.Invoke(newValue);
             }
 
-            return newValue;
+            return disabled ? value : newValue;
         }
     }
 }
