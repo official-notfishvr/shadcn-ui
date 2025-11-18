@@ -196,7 +196,7 @@ namespace shadcnui.GUIComponents.Layout
 
                 if (!string.IsNullOrEmpty(item.Shortcut))
                 {
-                    var shortcutStyle = new GUIStyle(textStyle) { alignment = TextAnchor.MiddleRight };
+                    var shortcutStyle = new UnityHelpers.GUIStyle(textStyle) { alignment = TextAnchor.MiddleRight };
                     GUI.Label(rect, item.Shortcut, shortcutStyle);
                 }
             }
