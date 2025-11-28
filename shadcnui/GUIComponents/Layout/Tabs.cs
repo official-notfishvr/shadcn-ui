@@ -113,13 +113,20 @@ namespace shadcnui.GUIComponents.Layout
                             var isActive = i == selectedIndex;
                             var triggerStyle = styleManager.GetTabsTriggerStyle(isActive);
 
-                            var tabOptions = new List<GUILayoutOption>();
-                            tabOptions.Add(GUILayout.Height(Mathf.RoundToInt(36 * guiHelper.uiScale)));
-
-                            if (config.Options != null && config.Options.Length > 0)
+                            GUILayoutOption[] finalOptions;
+                            if (config.Options == null || config.Options.Length == 0)
+                            {
+                                finalOptions = new GUILayoutOption[] { GUILayout.Height(Mathf.RoundToInt(36 * guiHelper.uiScale)) };
+                            }
+                            else
+                            {
+                                var tabOptions = new List<GUILayoutOption>(config.Options.Length + 1);
+                                tabOptions.Add(GUILayout.Height(Mathf.RoundToInt(36 * guiHelper.uiScale)));
                                 tabOptions.AddRange(config.Options);
+                                finalOptions = tabOptions.ToArray();
+                            }
 
-                            var clicked = UnityHelpers.Button(config.TabNames[i] ?? $"Tab {i + 1}", triggerStyle, tabOptions.ToArray());
+                            var clicked = UnityHelpers.Button(config.TabNames[i] ?? $"Tab {i + 1}", triggerStyle, finalOptions);
                             if (clicked && i != selectedIndex)
                             {
                                 newSelectedIndex = i;
@@ -163,17 +170,28 @@ namespace shadcnui.GUIComponents.Layout
                             var isActive = i == selectedIndex;
                             var triggerStyle = styleManager.GetTabsTriggerStyle(isActive);
 
-                            var tabOptions = new List<GUILayoutOption>();
-
-                            tabOptions.Add(GUILayout.Width(config.TabWidth * guiHelper.uiScale));
-                            tabOptions.Add(GUILayout.Height(Mathf.RoundToInt(36 * guiHelper.uiScale)));
-                            tabOptions.Add(GUILayout.ExpandWidth(false));
-                            tabOptions.Add(GUILayout.ExpandHeight(false));
-
-                            if (config.Options != null && config.Options.Length > 0)
+                            GUILayoutOption[] finalOptions;
+                            if (config.Options == null || config.Options.Length == 0)
+                            {
+                                finalOptions = new GUILayoutOption[] {
+                                    GUILayout.Width(config.TabWidth * guiHelper.uiScale),
+                                    GUILayout.Height(Mathf.RoundToInt(36 * guiHelper.uiScale)),
+                                    GUILayout.ExpandWidth(false),
+                                    GUILayout.ExpandHeight(false)
+                                };
+                            }
+                            else
+                            {
+                                var tabOptions = new List<GUILayoutOption>(config.Options.Length + 4);
+                                tabOptions.Add(GUILayout.Width(config.TabWidth * guiHelper.uiScale));
+                                tabOptions.Add(GUILayout.Height(Mathf.RoundToInt(36 * guiHelper.uiScale)));
+                                tabOptions.Add(GUILayout.ExpandWidth(false));
+                                tabOptions.Add(GUILayout.ExpandHeight(false));
                                 tabOptions.AddRange(config.Options);
+                                finalOptions = tabOptions.ToArray();
+                            }
 
-                            var clicked = UnityHelpers.Button(config.TabNames[i] ?? $"Tab {i + 1}", triggerStyle, tabOptions.ToArray());
+                            var clicked = UnityHelpers.Button(config.TabNames[i] ?? $"Tab {i + 1}", triggerStyle, finalOptions);
 
                             if (clicked && i != selectedIndex)
                             {

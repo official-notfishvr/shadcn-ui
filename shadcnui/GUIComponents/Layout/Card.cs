@@ -92,7 +92,7 @@ namespace shadcnui.GUIComponents.Layout
                 CardContent(() =>
                 {
                     var styleManager = guiHelper.GetStyleManager();
-                    UnityHelpers.Label(content, styleManager.GetLabelStyle(LabelVariant.Default));
+                    UnityHelpers.Label(content, styleManager.GetLabelStyle(ControlVariant.Default));
                 });
             }
 
@@ -138,7 +138,7 @@ namespace shadcnui.GUIComponents.Layout
                 {
                     var styleManager = guiHelper.GetStyleManager();
 
-                    UnityHelpers.Label(content, styleManager.GetLabelStyle(LabelVariant.Default));
+                    UnityHelpers.Label(content, styleManager.GetLabelStyle(ControlVariant.Default));
                 });
             }
 
@@ -174,7 +174,7 @@ namespace shadcnui.GUIComponents.Layout
                 {
                     var styleManager = guiHelper.GetStyleManager();
 
-                    UnityHelpers.Label(content, styleManager.GetLabelStyle(LabelVariant.Default));
+                    UnityHelpers.Label(content, styleManager.GetLabelStyle(ControlVariant.Default));
                 });
             }
 
@@ -211,7 +211,7 @@ namespace shadcnui.GUIComponents.Layout
                 {
                     var styleManager = guiHelper.GetStyleManager();
 
-                    UnityHelpers.Label(content, styleManager.GetLabelStyle(LabelVariant.Default));
+                    UnityHelpers.Label(content, styleManager.GetLabelStyle(ControlVariant.Default));
                 });
             }
 
@@ -230,7 +230,7 @@ namespace shadcnui.GUIComponents.Layout
             {
                 var styleManager = guiHelper.GetStyleManager();
 
-                UnityHelpers.Label(content, styleManager.GetLabelStyle(LabelVariant.Default));
+                UnityHelpers.Label(content, styleManager.GetLabelStyle(ControlVariant.Default));
             });
             EndCard();
         }

@@ -42,7 +42,7 @@ namespace shadcnui.GUIComponents.Display
             layoutComponents.BeginHorizontalGroup();
             GUILayout.FlexibleSpace();
 
-            if (UnityHelpers.Button("Ã—", styleManager.GetButtonStyle(ButtonVariant.Ghost, ButtonSize.Default), GUILayout.Width(24), GUILayout.Height(24)))
+            if (UnityHelpers.Button("Ã—", styleManager.GetButtonStyle(ControlVariant.Ghost, ControlSize.Default), GUILayout.Width(24), GUILayout.Height(24)))
             {
                 Close();
             }
@@ -67,15 +67,15 @@ namespace shadcnui.GUIComponents.Display
             layoutComponents.BeginVerticalGroup();
             if (!string.IsNullOrEmpty(title))
             {
-                UnityHelpers.Label(title, styleManager.GetDialogTitleStyle());
+                UnityHelpers.Label(title, styleManager.GetLabelStyle(ControlVariant.Default, ControlSize.Large));
             }
             if (!string.IsNullOrEmpty(description))
             {
-                UnityHelpers.Label(description, styleManager.GetDialogDescriptionStyle());
+                UnityHelpers.Label(description, styleManager.GetLabelStyle(ControlVariant.Muted, ControlSize.Default));
             }
             layoutComponents.EndVerticalGroup();
             GUILayout.FlexibleSpace();
-            if (UnityHelpers.Button("Ã—", styleManager.GetButtonStyle(ButtonVariant.Ghost, ButtonSize.Default), GUILayout.Width(24), GUILayout.Height(24)))
+            if (UnityHelpers.Button("Ã—", styleManager.GetButtonStyle(ControlVariant.Ghost, ControlSize.Default), GUILayout.Width(24), GUILayout.Height(24)))
             {
                 Close();
             }
@@ -97,7 +97,7 @@ namespace shadcnui.GUIComponents.Display
             GUILayout.EndVertical();
         }
 
-        public bool DrawDialogTrigger(string label, ButtonVariant variant = ButtonVariant.Default, ButtonSize size = ButtonSize.Default)
+        public bool DrawDialogTrigger(string label, ControlVariant variant = ControlVariant.Default, ControlSize size = ControlSize.Default)
         {
             return guiHelper.Button(label, variant, size, null);
         }
@@ -108,11 +108,11 @@ namespace shadcnui.GUIComponents.Display
             layoutComponents.BeginVerticalGroup();
             if (!string.IsNullOrEmpty(title))
             {
-                UnityHelpers.Label(title, styleManager.GetDialogTitleStyle());
+                UnityHelpers.Label(title, styleManager.GetLabelStyle(ControlVariant.Default, ControlSize.Large));
             }
             if (!string.IsNullOrEmpty(description))
             {
-                UnityHelpers.Label(description, styleManager.GetDialogDescriptionStyle());
+                UnityHelpers.Label(description, styleManager.GetLabelStyle(ControlVariant.Muted, ControlSize.Default));
             }
             layoutComponents.EndVerticalGroup();
         }

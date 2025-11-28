@@ -1,10 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using shadcnui.GUIComponents.Controls;
+﻿using System.Linq;
 using shadcnui.GUIComponents.Core;
-using shadcnui.GUIComponents.Data;
-using shadcnui.GUIComponents.Display;
 using shadcnui.GUIComponents.Layout;
 using UnityEngine;
 
@@ -60,6 +55,7 @@ namespace shadcnui_Demo.Menu
 
         void OnGUI()
         {
+            // Todo: make the GUI auto do this
             GUI.skin.horizontalScrollbar = GUIStyle.none;
             GUI.skin.verticalScrollbar = GUIStyle.none;
 
@@ -108,7 +104,7 @@ namespace shadcnui_Demo.Menu
         void DrawDashboard()
         {
             guiHelper.BeginVerticalGroup(GUILayout.ExpandWidth(true), GUILayout.ExpandHeight(true));
-            guiHelper.Label("Dashboard Overview", LabelVariant.Default);
+            guiHelper.Label("Dashboard Overview", ControlVariant.Default);
             guiHelper.MutedLabel("Real-time analytics and system metrics");
             guiHelper.HorizontalSeparator();
 
@@ -125,7 +121,7 @@ namespace shadcnui_Demo.Menu
             guiHelper.EndHorizontalGroup();
             guiHelper.HorizontalSeparator();
 
-            guiHelper.Label("System Status", LabelVariant.Default);
+            guiHelper.Label("System Status", ControlVariant.Default);
             guiHelper.BeginHorizontalGroup();
             guiHelper.StatusBadge("Server", true);
             GUILayout.Space(12);
@@ -136,15 +132,15 @@ namespace shadcnui_Demo.Menu
 
             guiHelper.HorizontalSeparator();
 
-            guiHelper.Label("Quick Actions", LabelVariant.Default);
+            guiHelper.Label("Quick Actions", ControlVariant.Default);
             guiHelper.BeginHorizontalGroup();
-            if (guiHelper.Button("Generate Report", ButtonVariant.Default, ButtonSize.Small))
+            if (guiHelper.Button("Generate Report", ControlVariant.Default, ControlSize.Small))
                 Debug.Log("Report generated");
             GUILayout.Space(8);
-            if (guiHelper.Button("Export Data", ButtonVariant.Outline, ButtonSize.Small))
+            if (guiHelper.Button("Export Data", ControlVariant.Outline, ControlSize.Small))
                 Debug.Log("Data exported");
             GUILayout.Space(8);
-            if (guiHelper.Button("Settings", ButtonVariant.Ghost, ButtonSize.Small))
+            if (guiHelper.Button("Settings", ControlVariant.Ghost, ControlSize.Small))
                 Debug.Log("Settings opened");
             guiHelper.EndHorizontalGroup();
 
@@ -156,59 +152,59 @@ namespace shadcnui_Demo.Menu
             guiHelper.BeginCard(180, 120);
             guiHelper.CardContent(() =>
             {
-                guiHelper.Label(title, LabelVariant.Muted);
-                guiHelper.Label(value, LabelVariant.Default);
+                guiHelper.Label(title, ControlVariant.Muted);
+                guiHelper.Label(value, ControlVariant.Default);
                 guiHelper.BeginHorizontalGroup();
-                guiHelper.Badge(change, GetBadgeVariantFromColor(color), BadgeSize.Small);
+                guiHelper.Badge(change, GetBadgeVariantFromColor(color), ControlSize.Small);
                 guiHelper.EndHorizontalGroup();
             });
             guiHelper.EndCard();
         }
 
-        BadgeVariant GetBadgeVariantFromColor(string color)
+        ControlVariant GetBadgeVariantFromColor(string color)
         {
             return color switch
             {
-                "green" => BadgeVariant.Default,
-                "blue" => BadgeVariant.Secondary,
-                "cyan" => BadgeVariant.Outline,
-                _ => BadgeVariant.Secondary,
+                "green" => ControlVariant.Default,
+                "blue" => ControlVariant.Secondary,
+                "cyan" => ControlVariant.Outline,
+                _ => ControlVariant.Secondary,
             };
         }
 
         void DrawComponentShowcase()
         {
             guiHelper.BeginVerticalGroup(GUILayout.ExpandWidth(true), GUILayout.ExpandHeight(true));
-            guiHelper.Label("Component Library", LabelVariant.Default);
+            guiHelper.Label("Component Library", ControlVariant.Default);
             guiHelper.MutedLabel("Explore all available UI components");
             guiHelper.HorizontalSeparator();
 
-            guiHelper.Label("Button Variants & Sizes", LabelVariant.Default);
+            guiHelper.Label("Button Variants & Sizes", ControlVariant.Default);
             guiHelper.BeginHorizontalGroup();
-            guiHelper.Button("Default", ButtonVariant.Default);
-            guiHelper.Button("Secondary", ButtonVariant.Secondary);
-            guiHelper.Button("Destructive", ButtonVariant.Destructive);
-            guiHelper.Button("Outline", ButtonVariant.Outline);
+            guiHelper.Button("Default", ControlVariant.Default);
+            guiHelper.Button("Secondary", ControlVariant.Secondary);
+            guiHelper.Button("Destructive", ControlVariant.Destructive);
+            guiHelper.Button("Outline", ControlVariant.Outline);
             guiHelper.EndHorizontalGroup();
 
             guiHelper.BeginHorizontalGroup();
-            guiHelper.Button("Large", ButtonVariant.Default, ButtonSize.Large);
-            guiHelper.Button("Small", ButtonVariant.Default, ButtonSize.Small);
-            guiHelper.Button("Icon", ButtonVariant.Ghost, ButtonSize.Icon);
+            guiHelper.Button("Large", ControlVariant.Default, ControlSize.Large);
+            guiHelper.Button("Small", ControlVariant.Default, ControlSize.Small);
+            guiHelper.Button("Icon", ControlVariant.Ghost, ControlSize.Icon);
             guiHelper.EndHorizontalGroup();
             guiHelper.HorizontalSeparator();
 
-            guiHelper.Label("Badges & Status Indicators", LabelVariant.Default);
+            guiHelper.Label("Badges & Status Indicators", ControlVariant.Default);
             guiHelper.BeginHorizontalGroup();
             guiHelper.Badge("Default");
-            guiHelper.Badge("Secondary", BadgeVariant.Secondary);
-            guiHelper.Badge("Destructive", BadgeVariant.Destructive);
-            guiHelper.Badge("Outline", BadgeVariant.Outline);
+            guiHelper.Badge("Secondary", ControlVariant.Secondary);
+            guiHelper.Badge("Destructive", ControlVariant.Destructive);
+            guiHelper.Badge("Outline", ControlVariant.Outline);
             guiHelper.CountBadge(99, maxCount: 99);
             guiHelper.EndHorizontalGroup();
             guiHelper.HorizontalSeparator();
 
-            guiHelper.Label("Progress Indicators", LabelVariant.Default);
+            guiHelper.Label("Progress Indicators", ControlVariant.Default);
             guiHelper.LabeledProgress("Upload", 0.65f, 400, showPercentage: true);
             guiHelper.LabeledProgress("Download", 0.35f, 400, showPercentage: true);
             guiHelper.BeginHorizontalGroup();
@@ -218,7 +214,7 @@ namespace shadcnui_Demo.Menu
             guiHelper.EndHorizontalGroup();
             guiHelper.HorizontalSeparator();
 
-            guiHelper.Label("Separators", LabelVariant.Default);
+            guiHelper.Label("Separators", ControlVariant.Default);
             guiHelper.HorizontalSeparator();
             guiHelper.LabeledSeparator("OR");
             guiHelper.Separator(SeparatorOrientation.Horizontal, true);
@@ -229,15 +225,15 @@ namespace shadcnui_Demo.Menu
         void DrawFormsDemo()
         {
             guiHelper.BeginVerticalGroup(GUILayout.ExpandWidth(true), GUILayout.ExpandHeight(true));
-            guiHelper.Label("Form Elements", LabelVariant.Default);
+            guiHelper.Label("Form Elements", ControlVariant.Default);
             guiHelper.MutedLabel("Interactive form components and controls");
             guiHelper.HorizontalSeparator();
 
-            guiHelper.Label("Text Input", LabelVariant.Default);
+            guiHelper.Label("Text Input", ControlVariant.Default);
             searchQuery = guiHelper.TextArea(searchQuery, placeholder: "Search users...", minHeight: 60);
             guiHelper.HorizontalSeparator();
 
-            guiHelper.Label("Toggle Controls", LabelVariant.Default);
+            guiHelper.Label("Toggle Controls", ControlVariant.Default);
             guiHelper.BeginHorizontalGroup();
             opt1 = guiHelper.Toggle("Option 1", opt1);
             opt2 = guiHelper.Toggle("Option 2", opt2);
@@ -245,23 +241,23 @@ namespace shadcnui_Demo.Menu
             guiHelper.EndHorizontalGroup();
             guiHelper.HorizontalSeparator();
 
-            guiHelper.Label("Checkboxes", LabelVariant.Default);
+            guiHelper.Label("Checkboxes", ControlVariant.Default);
             guiHelper.BeginHorizontalGroup();
             chk1 = guiHelper.Checkbox("Receive emails", chk1);
             chk2 = guiHelper.Checkbox("Enable notifications", chk2);
             guiHelper.EndHorizontalGroup();
             guiHelper.HorizontalSeparator();
 
-            guiHelper.Label("Switches", LabelVariant.Default);
+            guiHelper.Label("Switches", ControlVariant.Default);
             sw1 = guiHelper.Switch("Two-Factor Auth", sw1);
             sw2 = guiHelper.Switch("Public Profile", sw2);
             guiHelper.HorizontalSeparator();
 
-            guiHelper.Label("Actions", LabelVariant.Default);
+            guiHelper.Label("Actions", ControlVariant.Default);
             guiHelper.BeginHorizontalGroup();
-            guiHelper.Button("Save Changes", ButtonVariant.Default);
+            guiHelper.Button("Save Changes", ControlVariant.Default);
             GUILayout.Space(8);
-            guiHelper.Button("Cancel", ButtonVariant.Outline);
+            guiHelper.Button("Cancel", ControlVariant.Outline);
             guiHelper.EndHorizontalGroup();
 
             guiHelper.EndVerticalGroup();
@@ -270,11 +266,11 @@ namespace shadcnui_Demo.Menu
         void DrawTablesDemo()
         {
             guiHelper.BeginVerticalGroup(GUILayout.ExpandWidth(true), GUILayout.ExpandHeight(true));
-            guiHelper.Label("Data Tables & Lists", LabelVariant.Default);
+            guiHelper.Label("Data Tables & Lists", ControlVariant.Default);
             guiHelper.MutedLabel("Display structured data and collections");
             guiHelper.HorizontalSeparator();
 
-            guiHelper.Label("Product Inventory", LabelVariant.Default);
+            guiHelper.Label("Product Inventory", ControlVariant.Default);
             string[] headers = { "SKU", "Product", "Category", "Stock", "Price", "Status" };
             string[,] data = new string[,]
             {
@@ -284,10 +280,10 @@ namespace shadcnui_Demo.Menu
                 { "SK004", "Monitor 4K", "Electronics", "8", "$599", "Low Stock" },
                 { "SK005", "Keyboard RGB", "Electronics", "42", "$129", "In Stock" },
             };
-            guiHelper.Table(headers, data, TableVariant.Striped);
+            guiHelper.Table(headers, data, ControlVariant.Secondary);
             guiHelper.HorizontalSeparator();
 
-            guiHelper.Label("Task List", LabelVariant.Default);
+            guiHelper.Label("Task List", ControlVariant.Default);
             guiHelper.BeginVerticalGroup();
             DrawTaskItem("Complete project documentation", true);
             DrawTaskItem("Review pull requests", true);
@@ -313,27 +309,27 @@ namespace shadcnui_Demo.Menu
         void DrawSettingsDemo()
         {
             guiHelper.BeginVerticalGroup(GUILayout.ExpandWidth(true), GUILayout.ExpandHeight(true));
-            guiHelper.Label("Settings & Preferences", LabelVariant.Default);
+            guiHelper.Label("Settings & Preferences", ControlVariant.Default);
             guiHelper.MutedLabel("Application configuration and user preferences");
             guiHelper.HorizontalSeparator();
 
-            guiHelper.Label("Display", LabelVariant.Default);
+            guiHelper.Label("Display", ControlVariant.Default);
             compactView = guiHelper.Switch("Compact View", compactView);
             guiHelper.HorizontalSeparator();
 
-            guiHelper.Label("Notifications", LabelVariant.Default);
+            guiHelper.Label("Notifications", ControlVariant.Default);
             emailNotif = guiHelper.Checkbox("Email Notifications", emailNotif);
             pushNotif = guiHelper.Checkbox("Push Notifications", pushNotif);
             smsNotif = guiHelper.Checkbox("SMS Alerts", smsNotif);
             guiHelper.HorizontalSeparator();
 
-            guiHelper.Label("Privacy & Security", LabelVariant.Default);
+            guiHelper.Label("Privacy & Security", ControlVariant.Default);
             publicProfile = guiHelper.Switch("Public Profile", publicProfile);
             twoFactor = guiHelper.Switch("Two-Factor Authentication", twoFactor);
             dataCollection = guiHelper.Switch("Allow Data Collection", dataCollection);
             guiHelper.HorizontalSeparator();
 
-            guiHelper.Label("Advanced", LabelVariant.Default);
+            guiHelper.Label("Advanced", ControlVariant.Default);
             showAdvanced = guiHelper.Toggle("Show Advanced Options", showAdvanced);
             if (showAdvanced)
             {
@@ -344,9 +340,9 @@ namespace shadcnui_Demo.Menu
             guiHelper.HorizontalSeparator();
 
             guiHelper.BeginHorizontalGroup();
-            guiHelper.Button("Save Settings", ButtonVariant.Default);
+            guiHelper.Button("Save Settings", ControlVariant.Default);
             GUILayout.Space(8);
-            guiHelper.Button("Reset to Defaults", ButtonVariant.Outline);
+            guiHelper.Button("Reset to Defaults", ControlVariant.Outline);
             guiHelper.EndHorizontalGroup();
 
             guiHelper.EndVerticalGroup();
@@ -355,11 +351,11 @@ namespace shadcnui_Demo.Menu
         void DrawGalleryDemo()
         {
             guiHelper.BeginVerticalGroup(GUILayout.ExpandWidth(true), GUILayout.ExpandHeight(true));
-            guiHelper.Label("Component Gallery", LabelVariant.Default);
+            guiHelper.Label("Component Gallery", ControlVariant.Default);
             guiHelper.MutedLabel("Visual showcase of styled components");
             guiHelper.HorizontalSeparator();
 
-            guiHelper.Label("Feature Cards", LabelVariant.Default);
+            guiHelper.Label("Feature Cards", ControlVariant.Default);
             guiHelper.BeginHorizontalGroup();
 
             DrawFeatureCard("Fast", "Lightning quick performance");
@@ -371,14 +367,14 @@ namespace shadcnui_Demo.Menu
             guiHelper.EndHorizontalGroup();
             guiHelper.HorizontalSeparator();
 
-            guiHelper.Label("All Badge Variants", LabelVariant.Default);
+            guiHelper.Label("All Badge Variants", ControlVariant.Default);
             guiHelper.BeginVerticalGroup();
 
             guiHelper.BeginHorizontalGroup();
-            guiHelper.Badge("Default", BadgeVariant.Default);
-            guiHelper.Badge("Secondary", BadgeVariant.Secondary);
-            guiHelper.Badge("Destructive", BadgeVariant.Destructive);
-            guiHelper.Badge("Outline", BadgeVariant.Outline);
+            guiHelper.Badge("Default", ControlVariant.Default);
+            guiHelper.Badge("Secondary", ControlVariant.Secondary);
+            guiHelper.Badge("Destructive", ControlVariant.Destructive);
+            guiHelper.Badge("Outline", ControlVariant.Outline);
             guiHelper.EndHorizontalGroup();
 
             guiHelper.BeginHorizontalGroup();
@@ -392,7 +388,7 @@ namespace shadcnui_Demo.Menu
             guiHelper.EndVerticalGroup();
             guiHelper.HorizontalSeparator();
 
-            guiHelper.Label("Text Variants", LabelVariant.Default);
+            guiHelper.Label("Text Variants", ControlVariant.Default);
             guiHelper.Label("Default text styling");
             guiHelper.SecondaryLabel("Secondary text styling");
             guiHelper.MutedLabel("Muted text styling");
@@ -406,10 +402,10 @@ namespace shadcnui_Demo.Menu
             guiHelper.BeginCard(180, 120);
             guiHelper.CardContent(() =>
             {
-                guiHelper.Label(title, LabelVariant.Default);
+                guiHelper.Label(title, ControlVariant.Default);
                 guiHelper.MutedLabel(description);
                 GUILayout.Space(12);
-                guiHelper.Button("Learn More", ButtonVariant.Ghost, ButtonSize.Small);
+                guiHelper.Button("Learn More", ControlVariant.Ghost, ControlSize.Small);
             });
             guiHelper.EndCard();
         }

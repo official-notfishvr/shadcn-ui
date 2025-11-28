@@ -1,5 +1,5 @@
-﻿using System;
-using shadcnui.GUIComponents.Controls;
+﻿#define Showcase
+
 using shadcnui.GUIComponents.Core;
 using UnityEngine;
 
@@ -8,7 +8,7 @@ namespace shadcnui_Demo.Menu
     public class DemoSelector : MonoBehaviour
     {
         private GUIHelper guiHelper;
-        private Rect selectorRect = new Rect(Screen.width / 2 - 200, Screen.height / 2 - 150, 400, 300);
+        private Rect selectorRect = new Rect(Screen.width / 2 - 200, Screen.height / 2 - 150, 400, 380);
         private bool showSelector = true;
         private GameObject currentDemo;
 
@@ -33,30 +33,47 @@ namespace shadcnui_Demo.Menu
                 guiHelper.BeginVerticalGroup();
                 GUILayout.Space(10);
 
-                guiHelper.Label("Choose a Demo to Load", LabelVariant.Default);
+                guiHelper.Label("Choose a Demo to Load", ControlVariant.Default);
                 guiHelper.MutedLabel("Select which component showcase you want to view");
                 guiHelper.HorizontalSeparator();
 
                 GUILayout.Space(20);
 
-                if (guiHelper.Button("Component Showcase", ButtonVariant.Default, ButtonSize.Default))
+                if (guiHelper.Button("Component Showcase", ControlVariant.Default, ControlSize.Default))
                 {
                     LoadDemo<ComponentShowcase>();
                 }
 
                 GUILayout.Space(10);
 
-                if (guiHelper.Button("Full Demo", ButtonVariant.Secondary, ButtonSize.Default))
+                if (guiHelper.Button("Full Demo", ControlVariant.Secondary, ControlSize.Default))
                 {
                     LoadDemo<FullDemo>();
                 }
 
+                GUILayout.Space(10);
+
+                if (guiHelper.Button("Documentation", ControlVariant.Outline, ControlSize.Default))
+                {
+                    LoadDemo<DocsDemo>();
+                }
+#if Showcase
+#if MONO
+
+                GUILayout.Space(10);
+
+                if (guiHelper.Button("Screenshot Utility", ControlVariant.Ghost, ControlSize.Default))
+                {
+                    LoadDemo<ScreenshotUtility>();
+                }
+#endif
+#endif
                 GUILayout.Space(20);
                 guiHelper.HorizontalSeparator();
 
                 guiHelper.BeginHorizontalGroup();
                 GUILayout.FlexibleSpace();
-                if (guiHelper.Button("Close", ButtonVariant.Ghost, ButtonSize.Small))
+                if (guiHelper.Button("Close", ControlVariant.Ghost, ControlSize.Small))
                 {
                     showSelector = false;
                 }
@@ -73,14 +90,20 @@ namespace shadcnui_Demo.Menu
         {
             if (currentDemo != null)
             {
+#if Showcase
+#elif! Showcase
+
                 Destroy(currentDemo);
+#endif
             }
 
             currentDemo = new GameObject(typeof(T).Name);
             currentDemo.AddComponent<T>();
             DontDestroyOnLoad(currentDemo);
-
+#if Showcase
+#elif !Showcase
             showSelector = false;
+#endif
             Debug.Log($"Loaded {typeof(T).Name} demo");
         }
 

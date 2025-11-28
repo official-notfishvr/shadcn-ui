@@ -38,13 +38,13 @@ namespace shadcnui.GUIComponents.Display
             Rect progressRect = GUILayoutUtility.GetRect(GUIContent.none, styleManager.GetProgressBarStyle(), layoutOptions.ToArray());
 #endif
 
-            GUI.Box(progressRect, GUIContent.none, styleManager.GetProgressBarBackgroundStyle());
+            GUI.Box(progressRect, GUIContent.none, styleManager.GetProgressBarStyle(ControlVariant.Default, ControlSize.Default));
 
             if (value > 0)
             {
                 Rect fillRect = new Rect(progressRect.x, progressRect.y, progressRect.width * value, progressRect.height);
 
-                GUI.Box(fillRect, GUIContent.none, styleManager.GetProgressBarFillStyle());
+                GUI.Box(fillRect, GUIContent.none, styleManager.GetProgressBarStyle(ControlVariant.Secondary, ControlSize.Default));
             }
         }
 
@@ -56,13 +56,13 @@ namespace shadcnui.GUIComponents.Display
 
             Rect scaledRect = new Rect(rect.x * guiHelper.uiScale, rect.y * guiHelper.uiScale, rect.width * guiHelper.uiScale, rect.height * guiHelper.uiScale);
 
-            GUI.Box(scaledRect, GUIContent.none, styleManager.GetProgressBarBackgroundStyle());
+            GUI.Box(scaledRect, GUIContent.none, styleManager.GetProgressBarStyle(ControlVariant.Default, ControlSize.Default));
 
             if (value > 0)
             {
                 Rect fillRect = new Rect(scaledRect.x, scaledRect.y, scaledRect.width * value, scaledRect.height);
 
-                GUI.Box(fillRect, GUIContent.none, styleManager.GetProgressBarFillStyle());
+                GUI.Box(fillRect, GUIContent.none, styleManager.GetProgressBarStyle(ControlVariant.Secondary, ControlSize.Default));
             }
         }
 
@@ -74,14 +74,14 @@ namespace shadcnui.GUIComponents.Display
             {
                 layoutComponents.BeginHorizontalGroup();
 
-                UnityHelpers.Label(label, styleManager.GetLabelStyle(LabelVariant.Default));
+                UnityHelpers.Label(label, styleManager.GetLabelStyle(ControlVariant.Default));
 
                 if (showPercentage)
                 {
                     GUILayout.FlexibleSpace();
                     string percentText = (value * 100f).ToString("F0") + "%";
 
-                    UnityHelpers.Label(percentText, styleManager.GetLabelStyle(LabelVariant.Muted));
+                    UnityHelpers.Label(percentText, styleManager.GetLabelStyle(ControlVariant.Muted));
                 }
 
                 layoutComponents.EndHorizontalGroup();
@@ -112,7 +112,7 @@ namespace shadcnui.GUIComponents.Display
 
             var styleManager = guiHelper.GetStyleManager();
 
-            GUI.Box(circleRect, GUIContent.none, styleManager.GetProgressBarBackgroundStyle());
+            GUI.Box(circleRect, GUIContent.none, styleManager.GetProgressBarStyle(ControlVariant.Default, ControlSize.Default));
 
             if (value > 0)
             {
@@ -125,7 +125,7 @@ namespace shadcnui.GUIComponents.Display
 
                     if (i < segments)
                     {
-                        GUI.Box(segmentRect, GUIContent.none, styleManager.GetProgressBarFillStyle());
+                        GUI.Box(segmentRect, GUIContent.none, styleManager.GetProgressBarStyle(ControlVariant.Secondary, ControlSize.Default));
                     }
                 }
             }

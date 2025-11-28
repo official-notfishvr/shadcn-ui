@@ -15,7 +15,7 @@ namespace shadcnui.GUIComponents.Layout
         public Table(GUIHelper helper)
             : base(helper) { }
 
-        public void DrawTable(string[] headers, string[,] data, TableVariant variant = TableVariant.Default, TableSize size = TableSize.Default, params GUILayoutOption[] options)
+        public void DrawTable(string[] headers, string[,] data, ControlVariant variant = ControlVariant.Default, ControlSize size = ControlSize.Default, params GUILayoutOption[] options)
         {
             if (headers == null || data == null)
                 return;
@@ -59,7 +59,7 @@ namespace shadcnui.GUIComponents.Layout
             layoutComponents.EndVerticalGroup();
         }
 
-        public void DrawTable(Rect rect, string[] headers, string[,] data, TableVariant variant = TableVariant.Default, TableSize size = TableSize.Default)
+        public void DrawTable(Rect rect, string[] headers, string[,] data, ControlVariant variant = ControlVariant.Default, ControlSize size = ControlSize.Default)
         {
             if (headers == null || data == null)
                 return;
@@ -82,7 +82,7 @@ namespace shadcnui.GUIComponents.Layout
             GUILayout.EndArea();
         }
 
-        public void SortableTable(string[] headers, string[,] data, ref int[] sortColumns, ref bool[] sortAscending, TableVariant variant = TableVariant.Default, TableSize size = TableSize.Default, Action<int, bool> onSort = null, params GUILayoutOption[] options)
+        public void SortableTable(string[] headers, string[,] data, ref int[] sortColumns, ref bool[] sortAscending, ControlVariant variant = ControlVariant.Default, ControlSize size = ControlSize.Default, Action<int, bool> onSort = null, params GUILayoutOption[] options)
         {
             if (headers == null || data == null)
                 return;
@@ -150,7 +150,7 @@ namespace shadcnui.GUIComponents.Layout
             layoutComponents.EndVerticalGroup();
         }
 
-        public void SelectableTable(string[] headers, string[,] data, ref bool[] selectedRows, TableVariant variant = TableVariant.Default, TableSize size = TableSize.Default, Action<int, bool> onSelectionChange = null, params GUILayoutOption[] options)
+        public void SelectableTable(string[] headers, string[,] data, ref bool[] selectedRows, ControlVariant variant = ControlVariant.Default, ControlSize size = ControlSize.Default, Action<int, bool> onSelectionChange = null, params GUILayoutOption[] options)
         {
             if (headers == null || data == null)
                 return;
@@ -208,7 +208,7 @@ namespace shadcnui.GUIComponents.Layout
             layoutComponents.EndVerticalGroup();
         }
 
-        public void CustomTable(string[] headers, object[,] data, Action<object, int, int> cellRenderer, TableVariant variant = TableVariant.Default, TableSize size = TableSize.Default, params GUILayoutOption[] options)
+        public void CustomTable(string[] headers, object[,] data, Action<object, int, int> cellRenderer, ControlVariant variant = ControlVariant.Default, ControlSize size = ControlSize.Default, params GUILayoutOption[] options)
         {
             if (headers == null || data == null || cellRenderer == null)
                 return;
@@ -251,7 +251,7 @@ namespace shadcnui.GUIComponents.Layout
             layoutComponents.EndVerticalGroup();
         }
 
-        public void PaginatedTable(string[] headers, string[,] data, ref int currentPage, int pageSize, TableVariant variant = TableVariant.Default, TableSize size = TableSize.Default, Action<int> onPageChange = null, params GUILayoutOption[] options)
+        public void PaginatedTable(string[] headers, string[,] data, ref int currentPage, int pageSize, ControlVariant variant = ControlVariant.Default, ControlSize size = ControlSize.Default, Action<int> onPageChange = null, params GUILayoutOption[] options)
         {
             if (headers == null || data == null)
                 return;
@@ -292,7 +292,7 @@ namespace shadcnui.GUIComponents.Layout
 
             string pageInfo = $"Page {currentPage + 1} of {totalPages}";
             var styleManager = guiHelper.GetStyleManager();
-            GUIStyle infoStyle = styleManager?.GetLabelStyle(LabelVariant.Muted) ?? GUI.skin.label;
+            GUIStyle infoStyle = styleManager?.GetLabelStyle(ControlVariant.Muted) ?? GUI.skin.label;
 
             UnityHelpers.Label(pageInfo, infoStyle);
 
@@ -310,7 +310,7 @@ namespace shadcnui.GUIComponents.Layout
             layoutComponents.EndHorizontalGroup();
         }
 
-        public void SearchableTable(string[] headers, string[,] data, ref string searchQuery, ref string[,] filteredData, TableVariant variant = TableVariant.Default, TableSize size = TableSize.Default, Action<string> onSearch = null, params GUILayoutOption[] options)
+        public void SearchableTable(string[] headers, string[,] data, ref string searchQuery, ref string[,] filteredData, ControlVariant variant = ControlVariant.Default, ControlSize size = ControlSize.Default, Action<string> onSearch = null, params GUILayoutOption[] options)
         {
             if (headers == null || data == null)
                 return;
@@ -318,8 +318,8 @@ namespace shadcnui.GUIComponents.Layout
             layoutComponents.BeginHorizontalGroup();
 
             var styleManager = guiHelper.GetStyleManager();
-            var labelStyle = styleManager?.GetLabelStyle(LabelVariant.Default) ?? GUI.skin.label;
-            var inputStyle = styleManager?.GetInputStyle(InputVariant.Default) ?? GUI.skin.textField;
+            var labelStyle = styleManager?.GetLabelStyle(ControlVariant.Default) ?? GUI.skin.label;
+            var inputStyle = styleManager?.GetInputStyle(ControlVariant.Default) ?? GUI.skin.textField;
 
             UnityHelpers.Label("Search:", labelStyle, GUILayout.Width(60 * guiHelper.uiScale));
 
@@ -344,7 +344,7 @@ namespace shadcnui.GUIComponents.Layout
             DrawTable(headers, displayData, variant, size, options);
         }
 
-        public void ResizableTable(string[] headers, string[,] data, ref float[] columnWidths, TableVariant variant = TableVariant.Default, TableSize size = TableSize.Default, params GUILayoutOption[] options)
+        public void ResizableTable(string[] headers, string[,] data, ref float[] columnWidths, ControlVariant variant = ControlVariant.Default, ControlSize size = ControlSize.Default, params GUILayoutOption[] options)
         {
             if (headers == null || data == null)
                 return;

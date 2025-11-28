@@ -14,7 +14,7 @@ namespace shadcnui.GUIComponents.Controls
         public Switch(GUIHelper helper)
             : base(helper) { }
 
-        public bool DrawSwitch(string text, bool value, SwitchVariant variant = SwitchVariant.Default, SwitchSize size = SwitchSize.Default, Action<bool> onToggle = null, bool disabled = false, params GUILayoutOption[] options)
+        public bool DrawSwitch(string text, bool value, ControlVariant variant = ControlVariant.Default, ControlSize size = ControlSize.Default, Action<bool> onToggle = null, bool disabled = false, params GUILayoutOption[] options)
         {
             var styleManager = guiHelper.GetStyleManager();
             GUIStyle switchStyle = styleManager?.GetSwitchStyle(variant, size) ?? GUI.skin.toggle;
@@ -33,7 +33,7 @@ namespace shadcnui.GUIComponents.Controls
             return disabled ? value : newValue;
         }
 
-        public bool DrawSwitch(Rect rect, string text, bool value, SwitchVariant variant = SwitchVariant.Default, SwitchSize size = SwitchSize.Default, Action<bool> onToggle = null, bool disabled = false)
+        public bool DrawSwitch(Rect rect, string text, bool value, ControlVariant variant = ControlVariant.Default, ControlSize size = ControlSize.Default, Action<bool> onToggle = null, bool disabled = false)
         {
             var styleManager = guiHelper.GetStyleManager();
             GUIStyle switchStyle = styleManager?.GetSwitchStyle(variant, size) ?? GUI.skin.toggle;

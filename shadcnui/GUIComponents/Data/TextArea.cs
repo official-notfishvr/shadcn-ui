@@ -13,13 +13,13 @@ namespace shadcnui.GUIComponents.Data
         public TextArea(GUIHelper helper)
             : base(helper) { }
 
-        public string DrawTextArea(string text, TextAreaVariant variant = TextAreaVariant.Default, string placeholder = "", bool disabled = false, float minHeight = 60f, int maxLength = -1, params GUILayoutOption[] options)
+        public string DrawTextArea(string text, ControlVariant variant = ControlVariant.Default, string placeholder = "", bool disabled = false, float minHeight = 60f, int maxLength = -1, params GUILayoutOption[] options)
         {
             var styleManager = guiHelper.GetStyleManager();
 
             bool focused = GUI.GetNameOfFocusedControl() == "textarea_" + text?.GetHashCode();
 
-            GUIStyle textAreaStyle = styleManager.GetTextAreaStyle(variant, focused);
+            GUIStyle textAreaStyle = styleManager.GetTextAreaStyle(variant, ControlSize.Default, focused);
 
             float scaledMinHeight = minHeight * guiHelper.uiScale;
 
@@ -50,13 +50,13 @@ namespace shadcnui.GUIComponents.Data
             return disabled ? text : result;
         }
 
-        public string DrawTextArea(Rect rect, string text, TextAreaVariant variant = TextAreaVariant.Default, string placeholder = "", bool disabled = false, int maxLength = -1)
+        public string DrawTextArea(Rect rect, string text, ControlVariant variant = ControlVariant.Default, string placeholder = "", bool disabled = false, int maxLength = -1)
         {
             var styleManager = guiHelper.GetStyleManager();
 
             bool focused = GUI.GetNameOfFocusedControl() == "textarea_rect_" + text?.GetHashCode();
 
-            GUIStyle textAreaStyle = styleManager.GetTextAreaStyle(variant, focused);
+            GUIStyle textAreaStyle = styleManager.GetTextAreaStyle(variant, ControlSize.Default, focused);
 
             Rect scaledRect = new Rect(rect.x * guiHelper.uiScale, rect.y * guiHelper.uiScale, rect.width * guiHelper.uiScale, rect.height * guiHelper.uiScale);
 
@@ -80,21 +80,21 @@ namespace shadcnui.GUIComponents.Data
 
         public string OutlineTextArea(string text, string placeholder = "", bool disabled = false, float minHeight = 60f, int maxLength = -1, params GUILayoutOption[] options)
         {
-            return DrawTextArea(text, TextAreaVariant.Outline, placeholder, disabled, minHeight, maxLength, options);
+            return DrawTextArea(text, ControlVariant.Outline, placeholder, disabled, minHeight, maxLength, options);
         }
 
         public string GhostTextArea(string text, string placeholder = "", bool disabled = false, float minHeight = 60f, int maxLength = -1, params GUILayoutOption[] options)
         {
-            return DrawTextArea(text, TextAreaVariant.Ghost, placeholder, disabled, minHeight, maxLength, options);
+            return DrawTextArea(text, ControlVariant.Ghost, placeholder, disabled, minHeight, maxLength, options);
         }
 
-        public string LabeledTextArea(string label, string text, TextAreaVariant variant = TextAreaVariant.Default, string placeholder = "", bool disabled = false, float minHeight = 60f, int maxLength = -1, bool showCharCount = true, params GUILayoutOption[] options)
+        public string LabeledTextArea(string label, string text, ControlVariant variant = ControlVariant.Default, string placeholder = "", bool disabled = false, float minHeight = 60f, int maxLength = -1, bool showCharCount = true, params GUILayoutOption[] options)
         {
             var styleManager = guiHelper.GetStyleManager();
 
             if (!string.IsNullOrEmpty(label))
             {
-                UnityHelpers.Label(label, styleManager.GetLabelStyle(LabelVariant.Default));
+                UnityHelpers.Label(label, styleManager.GetLabelStyle(ControlVariant.Default));
                 layoutComponents.AddSpace(4);
             }
 
@@ -110,7 +110,7 @@ namespace shadcnui.GUIComponents.Data
 
                 Color countColor = (maxLength > 0 && (result?.Length ?? 0) > maxLength * 0.9f) ? new Color(0.9f, 0.3f, 0.3f) : new Color(0.64f, 0.64f, 0.71f);
 
-                var countStyle = new UnityHelpers.GUIStyle(styleManager.GetLabelStyle(LabelVariant.Muted)) { normal = { textColor = countColor } };
+                var countStyle = new UnityHelpers.GUIStyle(styleManager.GetLabelStyle(ControlVariant.Muted)) { normal = { textColor = countColor } };
 
                 UnityHelpers.Label(countText, countStyle);
 
@@ -120,7 +120,7 @@ namespace shadcnui.GUIComponents.Data
             return result;
         }
 
-        public string ResizableTextArea(string text, ref float height, TextAreaVariant variant = TextAreaVariant.Default, string placeholder = "", bool disabled = false, float minHeight = 60f, float maxHeight = 300f, int maxLength = -1, params GUILayoutOption[] options)
+        public string ResizableTextArea(string text, ref float height, ControlVariant variant = ControlVariant.Default, string placeholder = "", bool disabled = false, float minHeight = 60f, float maxHeight = 300f, int maxLength = -1, params GUILayoutOption[] options)
         {
             height = Mathf.Clamp(height, minHeight, maxHeight);
 
@@ -138,7 +138,7 @@ namespace shadcnui.GUIComponents.Data
 
             var styleManager = guiHelper.GetStyleManager();
 
-            if (UnityHelpers.Button("⋮⋮⋮", styleManager.GetLabelStyle(LabelVariant.Muted), new GUILayoutOption[] { GUILayout.Width(20 * guiHelper.uiScale), GUILayout.Height(10 * guiHelper.uiScale) }))
+            if (UnityHelpers.Button("⋮⋮⋮", styleManager.GetLabelStyle(ControlVariant.Muted), new GUILayoutOption[] { GUILayout.Width(20 * guiHelper.uiScale), GUILayout.Height(10 * guiHelper.uiScale) }))
             {
                 height = height >= maxHeight ? minHeight : height + 20f;
             }

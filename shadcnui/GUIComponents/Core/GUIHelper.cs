@@ -243,7 +243,7 @@ namespace shadcnui.GUIComponents.Core
         #endregion
 
         #region Button Components
-        public bool DrawButtonVariant(string text, ButtonVariant variant, ButtonSize size) =>
+        public bool DrawButtonVariant(string text, ControlVariant variant, ControlSize size) =>
             TryExecute(
                 () =>
                 {
@@ -255,44 +255,44 @@ namespace shadcnui.GUIComponents.Core
             );
 
         public bool DrawButton(float windowWidth, string text, Action onClick, float opacity = 1f) =>
-            TryExecute(() => GetComponent<Button>()?.DrawButton(text, ButtonVariant.Default, ButtonSize.Default, onClick, false, opacity, new GUILayoutOption[] { GUILayout.Width(windowWidth) }) ?? false, "DrawButton");
+            TryExecute(() => GetComponent<Button>()?.DrawButton(text, ControlVariant.Default, ControlSize.Default, onClick, false, opacity, new GUILayoutOption[] { GUILayout.Width(windowWidth) }) ?? false, "DrawButton");
 
         public bool DrawFixedButton(string text, float width, float height, Action onClick = null, float opacity = 1f) =>
-            TryExecute(() => GetComponent<Button>()?.DrawButton(text, ButtonVariant.Default, ButtonSize.Default, onClick, false, opacity, new GUILayoutOption[] { GUILayout.Width(width), GUILayout.Height(height) }) ?? false, "DrawFixedButton");
+            TryExecute(() => GetComponent<Button>()?.DrawButton(text, ControlVariant.Default, ControlSize.Default, onClick, false, opacity, new GUILayoutOption[] { GUILayout.Width(width), GUILayout.Height(height) }) ?? false, "DrawFixedButton");
 
-        public bool Button(string text, ButtonVariant variant = ButtonVariant.Default, ButtonSize size = ButtonSize.Default, Action onClick = null, bool disabled = false, float opacity = 1f, params GUILayoutOption[] options) =>
+        public bool Button(string text, ControlVariant variant = ControlVariant.Default, ControlSize size = ControlSize.Default, Action onClick = null, bool disabled = false, float opacity = 1f, params GUILayoutOption[] options) =>
             TryExecute(() => GetComponent<Button>()?.DrawButton(text, variant, size, onClick, disabled, opacity, options ?? Array.Empty<GUILayoutOption>()) ?? false, "Button");
 
-        public bool DestructiveButton(string text, Action onClick, ButtonSize size = ButtonSize.Default, float opacity = 1f, params GUILayoutOption[] options) => Button(text, ButtonVariant.Destructive, size, onClick, false, opacity, options);
+        public bool DestructiveButton(string text, Action onClick, ControlSize size = ControlSize.Default, float opacity = 1f, params GUILayoutOption[] options) => Button(text, ControlVariant.Destructive, size, onClick, false, opacity, options);
 
-        public bool OutlineButton(string text, Action onClick, ButtonSize size = ButtonSize.Default, float opacity = 1f, params GUILayoutOption[] options) => Button(text, ButtonVariant.Outline, size, onClick, false, opacity, options);
+        public bool OutlineButton(string text, Action onClick, ControlSize size = ControlSize.Default, float opacity = 1f, params GUILayoutOption[] options) => Button(text, ControlVariant.Outline, size, onClick, false, opacity, options);
 
-        public bool SecondaryButton(string text, Action onClick, ButtonSize size = ButtonSize.Default, float opacity = 1f, params GUILayoutOption[] options) => Button(text, ButtonVariant.Secondary, size, onClick, false, opacity, options);
+        public bool SecondaryButton(string text, Action onClick, ControlSize size = ControlSize.Default, float opacity = 1f, params GUILayoutOption[] options) => Button(text, ControlVariant.Secondary, size, onClick, false, opacity, options);
 
-        public bool GhostButton(string text, Action onClick, ButtonSize size = ButtonSize.Default, float opacity = 1f, params GUILayoutOption[] options) => Button(text, ButtonVariant.Ghost, size, onClick, false, opacity, options);
+        public bool GhostButton(string text, Action onClick, ControlSize size = ControlSize.Default, float opacity = 1f, params GUILayoutOption[] options) => Button(text, ControlVariant.Ghost, size, onClick, false, opacity, options);
 
-        public bool LinkButton(string text, Action onClick, ButtonSize size = ButtonSize.Default, float opacity = 1f, params GUILayoutOption[] options) => Button(text, ButtonVariant.Link, size, onClick, false, opacity, options);
+        public bool LinkButton(string text, Action onClick, ControlSize size = ControlSize.Default, float opacity = 1f, params GUILayoutOption[] options) => Button(text, ControlVariant.Link, size, onClick, false, opacity, options);
 
-        public bool SmallButton(string text, Action onClick, ButtonVariant variant = ButtonVariant.Default, float opacity = 1f, params GUILayoutOption[] options) => Button(text, variant, ButtonSize.Small, onClick, false, opacity, options);
+        public bool SmallButton(string text, Action onClick, ControlVariant variant = ControlVariant.Default, float opacity = 1f, params GUILayoutOption[] options) => Button(text, variant, ControlSize.Small, onClick, false, opacity, options);
 
-        public bool LargeButton(string text, Action onClick, ButtonVariant variant = ButtonVariant.Default, float opacity = 1f, params GUILayoutOption[] options) => Button(text, variant, ButtonSize.Large, onClick, false, opacity, options);
+        public bool LargeButton(string text, Action onClick, ControlVariant variant = ControlVariant.Default, float opacity = 1f, params GUILayoutOption[] options) => Button(text, variant, ControlSize.Large, onClick, false, opacity, options);
 
-        public bool IconButton(string text, Action onClick, ButtonVariant variant = ButtonVariant.Default, float opacity = 1f, params GUILayoutOption[] options) => Button(text, variant, ButtonSize.Icon, onClick, false, opacity, options);
+        public bool IconButton(string text, Action onClick, ControlVariant variant = ControlVariant.Default, float opacity = 1f, params GUILayoutOption[] options) => Button(text, variant, ControlSize.Icon, onClick, false, opacity, options);
 
         public void ButtonGroup(Action drawButtons, bool horizontal = true, float spacing = 5f) => TryExecute(() => GetComponent<Button>()?.ButtonGroup(drawButtons, horizontal, spacing), "ButtonGroup");
 
-        private GUILayoutOption[] GetButtonSizeOptions(ButtonSize size) =>
+        private GUILayoutOption[] GetButtonSizeOptions(ControlSize size) =>
             size switch
             {
-                ButtonSize.Small => new GUILayoutOption[] { GUILayout.Height(24 * uiScale) },
-                ButtonSize.Large => new GUILayoutOption[] { GUILayout.Height(40 * uiScale) },
-                ButtonSize.Icon => new GUILayoutOption[] { GUILayout.Width(36 * uiScale), GUILayout.Height(36 * uiScale) },
+                ControlSize.Small => new GUILayoutOption[] { GUILayout.Height(24 * uiScale) },
+                ControlSize.Large => new GUILayoutOption[] { GUILayout.Height(40 * uiScale) },
+                ControlSize.Icon => new GUILayoutOption[] { GUILayout.Width(36 * uiScale), GUILayout.Height(36 * uiScale) },
                 _ => new GUILayoutOption[] { GUILayout.Height(30 * uiScale) },
             };
         #endregion
 
         #region Toggle Components
-        public bool Toggle(string text, bool value, ToggleVariant variant = ToggleVariant.Default, ToggleSize size = ToggleSize.Default, Action<bool> onToggle = null, bool disabled = false, params GUILayoutOption[] options) =>
+        public bool Toggle(string text, bool value, ControlVariant variant = ControlVariant.Default, ControlSize size = ControlSize.Default, Action<bool> onToggle = null, bool disabled = false, params GUILayoutOption[] options) =>
             TryExecute(
                 () =>
                 {
@@ -304,14 +304,14 @@ namespace shadcnui.GUIComponents.Core
                 "Toggle"
             );
 
-        public bool Toggle(Rect rect, string text, bool value, ToggleVariant variant = ToggleVariant.Default, ToggleSize size = ToggleSize.Default, Action<bool> onToggle = null, bool disabled = false) =>
+        public bool Toggle(Rect rect, string text, bool value, ControlVariant variant = ControlVariant.Default, ControlSize size = ControlSize.Default, Action<bool> onToggle = null, bool disabled = false) =>
             TryExecute(() => GetComponent<Toggle>()?.DrawToggle(rect, text, value, variant, size, onToggle, disabled) ?? value, "Toggle");
 
-        public bool OutlineToggle(string text, bool value, Action<bool> onToggle = null, ToggleSize size = ToggleSize.Default, params GUILayoutOption[] options) => Toggle(text, value, ToggleVariant.Outline, size, onToggle, false, options);
+        public bool OutlineToggle(string text, bool value, Action<bool> onToggle = null, ControlSize size = ControlSize.Default, params GUILayoutOption[] options) => Toggle(text, value, ControlVariant.Outline, size, onToggle, false, options);
 
-        public bool SmallToggle(string text, bool value, Action<bool> onToggle = null, ToggleVariant variant = ToggleVariant.Default, params GUILayoutOption[] options) => Toggle(text, value, variant, ToggleSize.Small, onToggle, false, options);
+        public bool SmallToggle(string text, bool value, Action<bool> onToggle = null, ControlVariant variant = ControlVariant.Default, params GUILayoutOption[] options) => Toggle(text, value, variant, ControlSize.Small, onToggle, false, options);
 
-        public bool LargeToggle(string text, bool value, Action<bool> onToggle = null, ToggleVariant variant = ToggleVariant.Default, params GUILayoutOption[] options) => Toggle(text, value, variant, ToggleSize.Large, onToggle, false, options);
+        public bool LargeToggle(string text, bool value, Action<bool> onToggle = null, ControlVariant variant = ControlVariant.Default, params GUILayoutOption[] options) => Toggle(text, value, variant, ControlSize.Large, onToggle, false, options);
         #endregion
 
         #region Card Components
@@ -359,9 +359,9 @@ namespace shadcnui.GUIComponents.Core
         #endregion
 
         #region Label Components
-        public void Label(string text, LabelVariant variant = LabelVariant.Default, bool disabled = false, params GUILayoutOption[] options) => TryExecute(() => GetComponent<Label>()?.DrawLabel(text, variant, disabled, options), "Label");
+        public void Label(string text, ControlVariant variant = ControlVariant.Default, bool disabled = false, params GUILayoutOption[] options) => TryExecute(() => GetComponent<Label>()?.DrawLabel(text, variant, disabled, options), "Label");
 
-        public void Label(Rect rect, string text, LabelVariant variant = LabelVariant.Default, bool disabled = false) => TryExecute(() => GetComponent<Label>()?.DrawLabel(rect, text, variant, disabled), "Label");
+        public void Label(Rect rect, string text, ControlVariant variant = ControlVariant.Default, bool disabled = false) => TryExecute(() => GetComponent<Label>()?.DrawLabel(rect, text, variant, disabled), "Label");
 
         public void SecondaryLabel(string text, params GUILayoutOption[] options) => TryExecute(() => GetComponent<Label>()?.SecondaryLabel(text, options), "SecondaryLabel");
 
@@ -381,27 +381,27 @@ namespace shadcnui.GUIComponents.Core
         #endregion
 
         #region Avatar Components
-        public void Avatar(Texture2D image, string fallbackText, AvatarSize size = AvatarSize.Default, AvatarShape shape = AvatarShape.Circle, params GUILayoutOption[] options) =>
+        public void Avatar(Texture2D image, string fallbackText, ControlSize size = ControlSize.Default, AvatarShape shape = AvatarShape.Circle, params GUILayoutOption[] options) =>
             TryExecute(() => GetComponent<shadcnui.GUIComponents.Display.Avatar>()?.DrawAvatar(image, fallbackText, size, shape, options), "Avatar");
 
-        public void Avatar(Rect rect, Texture2D image, string fallbackText, AvatarSize size = AvatarSize.Default, AvatarShape shape = AvatarShape.Circle) => TryExecute(() => GetComponent<shadcnui.GUIComponents.Display.Avatar>()?.DrawAvatar(rect, image, fallbackText, size, shape), "Avatar");
+        public void Avatar(Rect rect, Texture2D image, string fallbackText, ControlSize size = ControlSize.Default, AvatarShape shape = AvatarShape.Circle) => TryExecute(() => GetComponent<shadcnui.GUIComponents.Display.Avatar>()?.DrawAvatar(rect, image, fallbackText, size, shape), "Avatar");
 
-        public void AvatarWithStatus(Texture2D image, string fallbackText, bool isOnline, AvatarSize size = AvatarSize.Default, AvatarShape shape = AvatarShape.Circle, params GUILayoutOption[] options) =>
+        public void AvatarWithStatus(Texture2D image, string fallbackText, bool isOnline, ControlSize size = ControlSize.Default, AvatarShape shape = AvatarShape.Circle, params GUILayoutOption[] options) =>
             TryExecute(() => GetComponent<shadcnui.GUIComponents.Display.Avatar>()?.AvatarWithStatus(image, fallbackText, isOnline, size, shape, options), "AvatarWithStatus");
 
-        public void AvatarWithName(Texture2D image, string fallbackText, string name, AvatarSize size = AvatarSize.Default, AvatarShape shape = AvatarShape.Circle, bool showNameBelow = false, params GUILayoutOption[] options) =>
+        public void AvatarWithName(Texture2D image, string fallbackText, string name, ControlSize size = ControlSize.Default, AvatarShape shape = AvatarShape.Circle, bool showNameBelow = false, params GUILayoutOption[] options) =>
             TryExecute(() => GetComponent<shadcnui.GUIComponents.Display.Avatar>()?.AvatarWithName(image, fallbackText, name, size, shape, showNameBelow, options), "AvatarWithName");
 
-        public void AvatarWithBorder(Texture2D image, string fallbackText, Color borderColor, AvatarSize size = AvatarSize.Default, AvatarShape shape = AvatarShape.Circle, params GUILayoutOption[] options) =>
+        public void AvatarWithBorder(Texture2D image, string fallbackText, Color borderColor, ControlSize size = ControlSize.Default, AvatarShape shape = AvatarShape.Circle, params GUILayoutOption[] options) =>
             TryExecute(() => GetComponent<shadcnui.GUIComponents.Display.Avatar>()?.AvatarWithBorder(image, fallbackText, borderColor, size, shape, options), "AvatarWithBorder");
         #endregion
 
         #region Table Components
-        public void Table(string[] headers, string[,] data, TableVariant variant = TableVariant.Default, TableSize size = TableSize.Default, params GUILayoutOption[] options) => TryExecute(() => GetComponent<Table>()?.DrawTable(headers, data, variant, size, options), "Table");
+        public void Table(string[] headers, string[,] data, ControlVariant variant = ControlVariant.Default, ControlSize size = ControlSize.Default, params GUILayoutOption[] options) => TryExecute(() => GetComponent<Table>()?.DrawTable(headers, data, variant, size, options), "Table");
 
-        public void Table(Rect rect, string[] headers, string[,] data, TableVariant variant = TableVariant.Default, TableSize size = TableSize.Default) => TryExecute(() => GetComponent<Table>()?.DrawTable(rect, headers, data, variant, size), "Table");
+        public void Table(Rect rect, string[] headers, string[,] data, ControlVariant variant = ControlVariant.Default, ControlSize size = ControlSize.Default) => TryExecute(() => GetComponent<Table>()?.DrawTable(rect, headers, data, variant, size), "Table");
 
-        public void SortableTable(string[] headers, string[,] data, ref int[] sortColumns, ref bool[] sortAscending, TableVariant variant = TableVariant.Default, TableSize size = TableSize.Default, Action<int, bool> onSort = null, params GUILayoutOption[] options)
+        public void SortableTable(string[] headers, string[,] data, ref int[] sortColumns, ref bool[] sortAscending, ControlVariant variant = ControlVariant.Default, ControlSize size = ControlSize.Default, Action<int, bool> onSort = null, params GUILayoutOption[] options)
         {
             try
             {
@@ -413,7 +413,7 @@ namespace shadcnui.GUIComponents.Core
             }
         }
 
-        public void SelectableTable(string[] headers, string[,] data, ref bool[] selectedRows, TableVariant variant = TableVariant.Default, TableSize size = TableSize.Default, Action<int, bool> onSelectionChange = null, params GUILayoutOption[] options)
+        public void SelectableTable(string[] headers, string[,] data, ref bool[] selectedRows, ControlVariant variant = ControlVariant.Default, ControlSize size = ControlSize.Default, Action<int, bool> onSelectionChange = null, params GUILayoutOption[] options)
         {
             try
             {
@@ -425,10 +425,10 @@ namespace shadcnui.GUIComponents.Core
             }
         }
 
-        public void CustomTable(string[] headers, object[,] data, Action<object, int, int> cellRenderer, TableVariant variant = TableVariant.Default, TableSize size = TableSize.Default, params GUILayoutOption[] options) =>
+        public void CustomTable(string[] headers, object[,] data, Action<object, int, int> cellRenderer, ControlVariant variant = ControlVariant.Default, ControlSize size = ControlSize.Default, params GUILayoutOption[] options) =>
             TryExecute(() => GetComponent<Table>()?.CustomTable(headers, data, cellRenderer, variant, size, options), "CustomTable");
 
-        public void PaginatedTable(string[] headers, string[,] data, ref int currentPage, int pageSize, TableVariant variant = TableVariant.Default, TableSize size = TableSize.Default, Action<int> onPageChange = null, params GUILayoutOption[] options)
+        public void PaginatedTable(string[] headers, string[,] data, ref int currentPage, int pageSize, ControlVariant variant = ControlVariant.Default, ControlSize size = ControlSize.Default, Action<int> onPageChange = null, params GUILayoutOption[] options)
         {
             try
             {
@@ -440,7 +440,7 @@ namespace shadcnui.GUIComponents.Core
             }
         }
 
-        public void SearchableTable(string[] headers, string[,] data, ref string searchQuery, ref string[,] filteredData, TableVariant variant = TableVariant.Default, TableSize size = TableSize.Default, Action<string> onSearch = null, params GUILayoutOption[] options)
+        public void SearchableTable(string[] headers, string[,] data, ref string searchQuery, ref string[,] filteredData, ControlVariant variant = ControlVariant.Default, ControlSize size = ControlSize.Default, Action<string> onSearch = null, params GUILayoutOption[] options)
         {
             try
             {
@@ -452,7 +452,7 @@ namespace shadcnui.GUIComponents.Core
             }
         }
 
-        public void ResizableTable(string[] headers, string[,] data, ref float[] columnWidths, TableVariant variant = TableVariant.Default, TableSize size = TableSize.Default, params GUILayoutOption[] options)
+        public void ResizableTable(string[] headers, string[,] data, ref float[] columnWidths, ControlVariant variant = ControlVariant.Default, ControlSize size = ControlSize.Default, params GUILayoutOption[] options)
         {
             try
             {
@@ -505,7 +505,7 @@ namespace shadcnui.GUIComponents.Core
 
         public bool IsDialogOpen() => GetComponent<Dialog>()?.IsOpen ?? false;
 
-        public bool DrawDialogTrigger(string label, ButtonVariant variant = ButtonVariant.Default, ButtonSize size = ButtonSize.Default)
+        public bool DrawDialogTrigger(string label, ControlVariant variant = ControlVariant.Default, ControlSize size = ControlSize.Default)
         {
             try
             {
@@ -676,10 +676,10 @@ namespace shadcnui.GUIComponents.Core
         #endregion
 
         #region TextArea Components
-        public string TextArea(string text, TextAreaVariant variant = TextAreaVariant.Default, string placeholder = "", bool disabled = false, float minHeight = 60f, int maxLength = -1, params GUILayoutOption[] options) =>
+        public string TextArea(string text, ControlVariant variant = ControlVariant.Default, string placeholder = "", bool disabled = false, float minHeight = 60f, int maxLength = -1, params GUILayoutOption[] options) =>
             TryExecute(() => GetComponent<TextArea>()?.DrawTextArea(text, variant, placeholder, disabled, minHeight, maxLength, options) ?? text, "TextArea");
 
-        public string TextArea(Rect rect, string text, TextAreaVariant variant = TextAreaVariant.Default, string placeholder = "", bool disabled = false, int maxLength = -1) =>
+        public string TextArea(Rect rect, string text, ControlVariant variant = ControlVariant.Default, string placeholder = "", bool disabled = false, int maxLength = -1) =>
             TryExecute(() => GetComponent<TextArea>()?.DrawTextArea(rect, text, variant, placeholder, disabled, maxLength) ?? text, "TextArea");
 
         public string OutlineTextArea(string text, string placeholder = "", bool disabled = false, float minHeight = 60f, int maxLength = -1, params GUILayoutOption[] options) =>
@@ -688,10 +688,10 @@ namespace shadcnui.GUIComponents.Core
         public string GhostTextArea(string text, string placeholder = "", bool disabled = false, float minHeight = 60f, int maxLength = -1, params GUILayoutOption[] options) =>
             TryExecute(() => GetComponent<TextArea>()?.GhostTextArea(text, placeholder, disabled, minHeight, maxLength, options) ?? text, "GhostTextArea");
 
-        public string LabeledTextArea(string label, string text, TextAreaVariant variant = TextAreaVariant.Default, string placeholder = "", bool disabled = false, float minHeight = 60f, int maxLength = -1, bool showCharCount = true, params GUILayoutOption[] options) =>
+        public string LabeledTextArea(string label, string text, ControlVariant variant = ControlVariant.Default, string placeholder = "", bool disabled = false, float minHeight = 60f, int maxLength = -1, bool showCharCount = true, params GUILayoutOption[] options) =>
             TryExecute(() => GetComponent<TextArea>()?.LabeledTextArea(label, text, variant, placeholder, disabled, minHeight, maxLength, showCharCount, options) ?? text, "LabeledTextArea");
 
-        public string ResizableTextArea(string text, ref float height, TextAreaVariant variant = TextAreaVariant.Default, string placeholder = "", bool disabled = false, float minHeight = 60f, float maxHeight = 300f, int maxLength = -1, params GUILayoutOption[] options)
+        public string ResizableTextArea(string text, ref float height, ControlVariant variant = ControlVariant.Default, string placeholder = "", bool disabled = false, float minHeight = 60f, float maxHeight = 300f, int maxLength = -1, params GUILayoutOption[] options)
         {
             try
             {
@@ -707,40 +707,41 @@ namespace shadcnui.GUIComponents.Core
         #endregion
 
         #region Checkbox Components
-        public bool Checkbox(string text, bool value, CheckboxVariant variant = CheckboxVariant.Default, CheckboxSize size = CheckboxSize.Default, Action<bool> onToggle = null, bool disabled = false, params GUILayoutOption[] options) =>
+        public bool Checkbox(string text, bool value, ControlVariant variant = ControlVariant.Default, ControlSize size = ControlSize.Default, Action<bool> onToggle = null, bool disabled = false, params GUILayoutOption[] options) =>
             TryExecute(() => GetComponent<Checkbox>()?.DrawCheckbox(text, value, variant, size, onToggle, disabled, options) ?? value, "Checkbox");
 
-        public bool Checkbox(Rect rect, string text, bool value, CheckboxVariant variant = CheckboxVariant.Default, CheckboxSize size = CheckboxSize.Default, Action<bool> onToggle = null, bool disabled = false) =>
+        public bool Checkbox(Rect rect, string text, bool value, ControlVariant variant = ControlVariant.Default, ControlSize size = ControlSize.Default, Action<bool> onToggle = null, bool disabled = false) =>
             TryExecute(() => GetComponent<Checkbox>()?.DrawCheckbox(rect, text, value, variant, size, onToggle, disabled) ?? value, "Checkbox");
 
         #endregion
 
         #region Switch Components
 
-        public bool Switch(string text, bool value, SwitchVariant variant = SwitchVariant.Default, SwitchSize size = SwitchSize.Default, Action<bool> onToggle = null, bool disabled = false, params GUILayoutOption[] options) =>
+        public bool Switch(string text, bool value, ControlVariant variant = ControlVariant.Default, ControlSize size = ControlSize.Default, Action<bool> onToggle = null, bool disabled = false, params GUILayoutOption[] options) =>
             TryExecute(() => GetComponent<Switch>()?.DrawSwitch(text, value, variant, size, onToggle, disabled, options) ?? value, "Switch");
 
-        public bool Switch(Rect rect, string text, bool value, SwitchVariant variant = SwitchVariant.Default, SwitchSize size = SwitchSize.Default, Action<bool> onToggle = null, bool disabled = false) =>
+        public bool Switch(Rect rect, string text, bool value, ControlVariant variant = ControlVariant.Default, ControlSize size = ControlSize.Default, Action<bool> onToggle = null, bool disabled = false) =>
             TryExecute(() => GetComponent<Switch>()?.DrawSwitch(rect, text, value, variant, size, onToggle, disabled) ?? false, "RoundedBadge");
 
         #endregion
 
         #region Badge Components
-        public void Badge(string text, BadgeVariant variant = BadgeVariant.Default, BadgeSize size = BadgeSize.Default, params GUILayoutOption[] options) => TryExecute(() => GetComponent<Badge>()?.DrawBadge(text, variant, size, options), "Badge");
+        public void Badge(string text, ControlVariant variant = ControlVariant.Default, ControlSize size = ControlSize.Default, params GUILayoutOption[] options) => TryExecute(() => GetComponent<Badge>()?.DrawBadge(text, variant, size, options), "Badge");
 
-        public void Badge(Rect rect, string text, BadgeVariant variant = BadgeVariant.Default, BadgeSize size = BadgeSize.Default) => TryExecute(() => GetComponent<Badge>()?.DrawBadge(rect, text, variant, size), "Badge");
+        public void Badge(Rect rect, string text, ControlVariant variant = ControlVariant.Default, ControlSize size = ControlSize.Default) => TryExecute(() => GetComponent<Badge>()?.DrawBadge(rect, text, variant, size), "Badge");
 
-        public void BadgeWithIcon(string text, Texture2D icon, BadgeVariant variant = BadgeVariant.Default, BadgeSize size = BadgeSize.Default, params GUILayoutOption[] options) => TryExecute(() => GetComponent<Badge>()?.BadgeWithIcon(text, icon, variant, size, options), "BadgeWithIcon");
+        public void BadgeWithIcon(string text, Texture2D icon, ControlVariant variant = ControlVariant.Default, ControlSize size = ControlSize.Default, params GUILayoutOption[] options) => TryExecute(() => GetComponent<Badge>()?.BadgeWithIcon(text, icon, variant, size, options), "BadgeWithIcon");
 
-        public void CountBadge(int count, BadgeVariant variant = BadgeVariant.Default, BadgeSize size = BadgeSize.Default, int maxCount = 99, params GUILayoutOption[] options) => TryExecute(() => GetComponent<Badge>()?.CountBadge(count, variant, size, maxCount, options), "CountBadge");
+        public void CountBadge(int count, ControlVariant variant = ControlVariant.Default, ControlSize size = ControlSize.Default, int maxCount = 99, params GUILayoutOption[] options) => TryExecute(() => GetComponent<Badge>()?.CountBadge(count, variant, size, maxCount, options), "CountBadge");
 
-        public void StatusBadge(string text, bool isActive, BadgeVariant variant = BadgeVariant.Default, BadgeSize size = BadgeSize.Default, params GUILayoutOption[] options) => TryExecute(() => GetComponent<Badge>()?.StatusBadge(text, isActive, variant, size, options), "StatusBadge");
+        public void StatusBadge(string text, bool isActive, ControlVariant variant = ControlVariant.Default, ControlSize size = ControlSize.Default, params GUILayoutOption[] options) => TryExecute(() => GetComponent<Badge>()?.StatusBadge(text, isActive, variant, size, options), "StatusBadge");
 
-        public void ProgressBadge(string text, float progress, BadgeVariant variant = BadgeVariant.Default, BadgeSize size = BadgeSize.Default, params GUILayoutOption[] options) => TryExecute(() => GetComponent<Badge>()?.ProgressBadge(text, progress, variant, size, options), "ProgressBadge");
+        public void ProgressBadge(string text, float progress, ControlVariant variant = ControlVariant.Default, ControlSize size = ControlSize.Default, params GUILayoutOption[] options) =>
+            TryExecute(() => GetComponent<Badge>()?.ProgressBadge(text, progress, variant, size, options), "ProgressBadge");
 
-        public void AnimatedBadge(string text, BadgeVariant variant = BadgeVariant.Default, BadgeSize size = BadgeSize.Default, params GUILayoutOption[] options) => TryExecute(() => GetComponent<Badge>()?.AnimatedBadge(text, variant, size, options), "AnimatedBadge");
+        public void AnimatedBadge(string text, ControlVariant variant = ControlVariant.Default, ControlSize size = ControlSize.Default, params GUILayoutOption[] options) => TryExecute(() => GetComponent<Badge>()?.AnimatedBadge(text, variant, size, options), "AnimatedBadge");
 
-        public void RoundedBadge(string text, BadgeVariant variant = BadgeVariant.Default, BadgeSize size = BadgeSize.Default, float cornerRadius = 12f, params GUILayoutOption[] options) =>
+        public void RoundedBadge(string text, ControlVariant variant = ControlVariant.Default, ControlSize size = ControlSize.Default, float cornerRadius = 12f, params GUILayoutOption[] options) =>
             TryExecute(() => GetComponent<Badge>()?.RoundedBadge(text, variant, size, cornerRadius, options), "RoundedBadge");
         #endregion
 

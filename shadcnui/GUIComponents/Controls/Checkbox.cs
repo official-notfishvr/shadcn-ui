@@ -15,7 +15,7 @@ namespace shadcnui.GUIComponents.Controls
         public Checkbox(GUIHelper helper)
             : base(helper) { }
 
-        public bool DrawCheckbox(string text, bool value, CheckboxVariant variant = CheckboxVariant.Default, CheckboxSize size = CheckboxSize.Default, Action<bool> onToggle = null, bool disabled = false, params GUILayoutOption[] options)
+        public bool DrawCheckbox(string text, bool value, ControlVariant variant = ControlVariant.Default, ControlSize size = ControlSize.Default, Action<bool> onToggle = null, bool disabled = false, params GUILayoutOption[] options)
         {
             var styleManager = guiHelper.GetStyleManager();
             GUIStyle checkboxStyle = styleManager?.GetCheckboxStyle(variant, size) ?? GUI.skin.toggle;
@@ -34,7 +34,7 @@ namespace shadcnui.GUIComponents.Controls
             return disabled ? value : newValue;
         }
 
-        public bool DrawCheckbox(Rect rect, string text, bool value, CheckboxVariant variant = CheckboxVariant.Default, CheckboxSize size = CheckboxSize.Default, Action<bool> onToggle = null, bool disabled = false)
+        public bool DrawCheckbox(Rect rect, string text, bool value, ControlVariant variant = ControlVariant.Default, ControlSize size = ControlSize.Default, Action<bool> onToggle = null, bool disabled = false)
         {
             var styleManager = guiHelper.GetStyleManager();
             GUIStyle checkboxStyle = styleManager?.GetCheckboxStyle(variant, size) ?? GUI.skin.toggle;

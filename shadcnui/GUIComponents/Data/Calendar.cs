@@ -23,6 +23,7 @@ namespace shadcnui.GUIComponents.Data
 
         private bool showMonthDropdown;
         private bool showYearDropdown;
+        private static readonly string[] DayOfWeekShort = { "Su", "Mo", "Tu", "We", "Th", "Fr", "Sa" };
 
         public Calendar(GUIHelper helper)
             : base(helper)
@@ -37,7 +38,7 @@ namespace shadcnui.GUIComponents.Data
         {
             var styleManager = guiHelper.GetStyleManager();
 
-            layoutComponents.BeginVerticalGroup(styleManager.GetCalendarStyle(CalendarVariant.Default, CalendarSize.Default));
+            layoutComponents.BeginVerticalGroup(styleManager.GetCalendarStyle(ControlVariant.Default, ControlSize.Default));
 
             DrawHeader(styleManager);
             DrawWeekdays(styleManager);
@@ -50,7 +51,7 @@ namespace shadcnui.GUIComponents.Data
         {
             layoutComponents.BeginHorizontalGroup();
 
-            GUIStyle buttonGhostStyle = styleManager.GetButtonStyle(ButtonVariant.Ghost, ButtonSize.Default);
+            GUIStyle buttonGhostStyle = styleManager.GetButtonStyle(ControlVariant.Ghost, ControlSize.Default);
 
             if (UnityHelpers.Button("<", buttonGhostStyle))
             {
@@ -89,7 +90,7 @@ namespace shadcnui.GUIComponents.Data
             GUIStyle weekdayStyle = styleManager.GetCalendarWeekdayStyle();
             for (int i = 0; i < 7; i++)
             {
-                UnityHelpers.Label(((DayOfWeek)i).ToString().Substring(0, 2), weekdayStyle);
+                UnityHelpers.Label(DayOfWeekShort[i], weekdayStyle);
             }
             layoutComponents.EndHorizontalGroup();
         }

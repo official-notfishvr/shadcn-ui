@@ -1,10 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Reflection;
-using System.Text;
-using shadcnui;
-using shadcnui.GUIComponents.Core;
 using UnityEngine;
 using Object = UnityEngine.Object;
 #if IL2CPP_MELONLOADER_PRE57
@@ -14,113 +10,30 @@ using UnhollowerBaseLib;
 namespace shadcnui.GUIComponents.Core
 {
     #region Enums
-    public enum ButtonVariant
+    public enum ControlVariant
     {
         Default,
+        Secondary,
         Destructive,
         Outline,
-        Secondary,
         Ghost,
         Link,
+        Muted,
     }
 
-    public enum ButtonSize
+    public enum ControlSize
     {
         Default,
         Small,
         Large,
         Icon,
-    }
-
-    public enum ToggleVariant
-    {
-        Default,
-        Outline,
-    }
-
-    public enum ToggleSize
-    {
-        Default,
-        Small,
-        Large,
-    }
-
-    public enum InputVariant
-    {
-        Default,
-        Outline,
-        Ghost,
-    }
-
-    public enum LabelVariant
-    {
-        Default,
-        Secondary,
-        Muted,
-        Destructive,
+        Mini,
     }
 
     public enum SeparatorOrientation
     {
         Horizontal,
         Vertical,
-    }
-
-    public enum TextAreaVariant
-    {
-        Default,
-        Outline,
-        Ghost,
-    }
-
-    public enum CheckboxVariant
-    {
-        Default,
-        Outline,
-        Ghost,
-    }
-
-    public enum CheckboxSize
-    {
-        Default,
-        Small,
-        Large,
-    }
-
-    public enum SwitchVariant
-    {
-        Default,
-        Outline,
-        Ghost,
-    }
-
-    public enum SwitchSize
-    {
-        Default,
-        Small,
-        Large,
-    }
-
-    public enum BadgeVariant
-    {
-        Default,
-        Secondary,
-        Destructive,
-        Outline,
-    }
-
-    public enum BadgeSize
-    {
-        Default,
-        Small,
-        Large,
-    }
-
-    public enum AvatarSize
-    {
-        Small,
-        Default,
-        Large,
     }
 
     public enum AvatarShape
@@ -130,67 +43,98 @@ namespace shadcnui.GUIComponents.Core
         Rounded,
     }
 
-    public enum TableVariant
+    public enum StyleComponentType
     {
-        Default,
-        Striped,
-        Bordered,
-        Hover,
+        Button,
+        Toggle,
+        Input,
+        Label,
+        PasswordField,
+        TextArea,
+        ProgressBar,
+        Separator,
+        TabsList,
+        TabsTrigger,
+        TabsContent,
+        Checkbox,
+        Switch,
+        Badge,
+        Avatar,
+        Table,
+        TableHeader,
+        TableCell,
+        Calendar,
+        CalendarHeader,
+        CalendarWeekday,
+        CalendarDay,
+        CalendarDaySelected,
+        CalendarDayOutsideMonth,
+        CalendarDayToday,
+        CalendarDayInRange,
+        DatePicker,
+        DatePickerWeekday,
+        DatePickerDay,
+        DatePickerDaySelected,
+        DatePickerDayOutsideMonth,
+        DatePickerDayToday,
+        Dialog,
+        Chart,
+        ChartAxis,
+        MenuBar,
+        MenuBarItem,
+        MenuDropdown,
+        SelectTrigger,
+        SelectContent,
+        SelectItem,
+        DropdownMenu,
+        DropdownMenuItem,
+        Popover,
+        AnimatedBox,
+        SectionHeader,
+        Card,
+        CardHeader,
+        CardTitle,
+        CardDescription,
+        CardContent,
+        CardFooter
     }
 
-    public enum TableSize
+    public struct StyleKey : IEquatable<StyleKey>
     {
-        Small,
-        Default,
-        Large,
-    }
+        public StyleComponentType Type;
+        public ControlVariant Variant;
+        public ControlSize Size;
+        public int State;
 
-    public enum CalendarVariant
-    {
-        Default,
-    }
+        public StyleKey(StyleComponentType type, ControlVariant variant, ControlSize size, int state = 0)
+        {
+            Type = type;
+            Variant = variant;
+            Size = size;
+            State = state;
+        }
 
-    public enum CalendarSize
-    {
-        Default,
-        Small,
-        Large,
-    }
+        public bool Equals(StyleKey other)
+        {
+            return Type == other.Type && Variant == other.Variant && Size == other.Size && State == other.State;
+        }
 
-    public enum DropdownMenuVariant
-    {
-        Default,
-    }
+        public override bool Equals(object obj)
+        {
+            return obj is StyleKey other && Equals(other);
+        }
 
-    public enum DropdownMenuSize
-    {
-        Default,
-        Small,
-        Large,
-    }
-
-    public enum SelectVariant
-    {
-        Default,
-    }
-
-    public enum SelectSize
-    {
-        Default,
-        Small,
-        Large,
-    }
-
-    public enum ChartVariant
-    {
-        Default,
-    }
-
-    public enum ChartSize
-    {
-        Default,
-        Small,
-        Large,
+        public override int GetHashCode()
+        {
+            unchecked
+            {
+                int hashCode = (int)Type;
+                hashCode = (hashCode * 397) ^ (int)Variant;
+                hashCode = (hashCode * 397) ^ (int)Size;
+                hashCode = (hashCode * 397) ^ State;
+                return hashCode;
+            }
+        }
     }
     #endregion
 
@@ -241,186 +185,69 @@ namespace shadcnui.GUIComponents.Core
         private Texture2D chartAxisTexture;
         #endregion
 
-        #region GUIStyle - Animated
-        private GUIStyle animatedBoxStyle;
-        private GUIStyle animatedButtonStyle;
-        private GUIStyle animatedInputStyle;
-        private GUIStyle glowLabelStyle;
-        private GUIStyle titleStyle;
-        private GUIStyle colorPresetStyle;
+        #region Base GUIStyles
+        private GUIStyle baseButtonStyle;
+        private GUIStyle baseToggleStyle;
+        private GUIStyle baseInputStyle;
+        private GUIStyle baseLabelStyle;
+        private GUIStyle baseCheckboxStyle;
+        private GUIStyle baseSwitchStyle;
+        private GUIStyle baseBadgeStyle;
+        private GUIStyle baseTableStyle;
+        private GUIStyle baseCalendarStyle;
+        private GUIStyle baseDatePickerStyle;
+        internal GUIStyle animatedBoxStyle;
         private GUIStyle sectionHeaderStyle;
-        #endregion
-
-        #region GUIStyle - Card
         private GUIStyle cardStyle;
         private GUIStyle cardHeaderStyle;
         private GUIStyle cardTitleStyle;
         private GUIStyle cardDescriptionStyle;
         private GUIStyle cardContentStyle;
         private GUIStyle cardFooterStyle;
-        #endregion
-
-        #region GUIStyle - Button
-        private GUIStyle buttonDefaultStyle;
-        private GUIStyle buttonDestructiveStyle;
-        private GUIStyle buttonOutlineStyle;
-        private GUIStyle buttonSecondaryStyle;
-        private GUIStyle buttonGhostStyle;
-        private GUIStyle buttonLinkStyle;
-        #endregion
-
-        #region GUIStyle - Toggle
-        private GUIStyle toggleDefaultStyle;
-        private GUIStyle toggleOutlineStyle;
-        #endregion
-
-        #region GUIStyle - Input
-        private GUIStyle inputDefaultStyle;
-        private GUIStyle inputOutlineStyle;
-        private GUIStyle inputGhostStyle;
-        private GUIStyle inputFocusedStyle;
-        private GUIStyle inputDisabledStyle;
         private GUIStyle passwordFieldStyle;
-        #endregion
-
-        #region GUIStyle - Label
-        private GUIStyle labelDefaultStyle;
-        private GUIStyle labelSecondaryStyle;
-        private GUIStyle labelMutedStyle;
-        private GUIStyle labelDestructiveStyle;
-        #endregion
-
-        #region GUIStyle - TextArea
         private GUIStyle textAreaStyle;
-        private GUIStyle textAreaFocusedStyle;
-        private GUIStyle textAreaOutlineStyle;
-        private GUIStyle textAreaGhostStyle;
-        #endregion
-
-        #region GUIStyle - Progress
         private GUIStyle progressBarStyle;
-        private GUIStyle progressBarBackgroundStyle;
-        private GUIStyle progressBarFillStyle;
-        #endregion
-
-        #region GUIStyle - Separator
         private GUIStyle separatorHorizontalStyle;
         private GUIStyle separatorVerticalStyle;
-        #endregion
-
-        #region GUIStyle - Tabs
         private GUIStyle tabsListStyle;
         private GUIStyle tabsTriggerStyle;
         private GUIStyle tabsTriggerActiveStyle;
         private GUIStyle tabsContentStyle;
-        #endregion
-
-        #region GUIStyle - Checkbox
-        private GUIStyle checkboxDefaultStyle;
-        private GUIStyle checkboxOutlineStyle;
-        private GUIStyle checkboxGhostStyle;
-        #endregion
-
-        #region GUIStyle - Switch
-        private GUIStyle switchDefaultStyle;
-        private GUIStyle switchOutlineStyle;
-        private GUIStyle switchGhostStyle;
-        #endregion
-
-        #region GUIStyle - Badge
-        private GUIStyle badgeDefaultStyle;
-        private GUIStyle badgeSecondaryStyle;
-        private GUIStyle badgeDestructiveStyle;
-        private GUIStyle badgeOutlineStyle;
-        #endregion
-
-        #region GUIStyle - Avatar
         private GUIStyle avatarStyle;
-        #endregion
-
-        #region GUIStyle - Table
-        private GUIStyle tableStyle;
         private GUIStyle tableHeaderStyle;
         private GUIStyle tableCellStyle;
         private GUIStyle tableStripedStyle;
         private GUIStyle tableBorderedStyle;
         private GUIStyle tableHoverStyle;
-        #endregion
-
-        #region GUIStyle - Calendar
-        private GUIStyle calendarStyle;
         private GUIStyle calendarHeaderStyle;
-        private GUIStyle calendarTitleStyle;
         private GUIStyle calendarWeekdayStyle;
         private GUIStyle calendarDayStyle;
         private GUIStyle calendarDaySelectedStyle;
         private GUIStyle calendarDayOutsideMonthStyle;
         private GUIStyle calendarDayTodayStyle;
         private GUIStyle calendarDayInRangeStyle;
-        #endregion
-
-        #region GUIStyle - DatePicker
-        private GUIStyle datePickerStyle;
         private GUIStyle datePickerHeaderStyle;
-        private GUIStyle datePickerTitleStyle;
         private GUIStyle datePickerWeekdayStyle;
         private GUIStyle datePickerDayStyle;
         private GUIStyle datePickerDaySelectedStyle;
         private GUIStyle datePickerDayOutsideMonthStyle;
         private GUIStyle datePickerDayTodayStyle;
-        #endregion
-
-        #region GUIStyle - Dialog
-        private GUIStyle dialogOverlayStyle;
         private GUIStyle dialogContentStyle;
-        private GUIStyle dialogTitleStyle;
-        private GUIStyle dialogDescriptionStyle;
-        #endregion
-
-        #region GUIStyle - DropdownMenu
         private GUIStyle dropdownMenuContentStyle;
         private GUIStyle dropdownMenuItemStyle;
-        private GUIStyle dropdownMenuSeparatorStyle;
-        private GUIStyle dropdownMenuHeaderStyle;
-        #endregion
-
-        #region GUIStyle - Popover
         private GUIStyle popoverContentStyle;
-        #endregion
-
-        #region GUIStyle - Select
         private GUIStyle selectTriggerStyle;
         private GUIStyle selectContentStyle;
         private GUIStyle selectItemStyle;
-        #endregion
-
-        #region GUIStyle - Chart
         private GUIStyle chartContainerStyle;
-        private GUIStyle chartContentStyle;
         private GUIStyle chartAxisStyle;
-        #endregion
-
-        #region GUIStyle - MenuBar
         private GUIStyle menuBarStyle;
         private GUIStyle menuBarItemStyle;
         private GUIStyle menuDropdownStyle;
         #endregion
 
         #region Style Caches
-        private Dictionary<(ButtonVariant, ButtonSize), GUIStyle> buttonStyleCache = new();
-        private Dictionary<(ToggleVariant, ToggleSize), GUIStyle> toggleStyleCache = new();
-        private Dictionary<(InputVariant, bool, bool), GUIStyle> inputStyleCache = new();
-        private Dictionary<LabelVariant, GUIStyle> labelStyleCache = new();
-        private Dictionary<(TextAreaVariant, bool), GUIStyle> textAreaStyleCache = new();
-        private Dictionary<(CheckboxVariant, CheckboxSize), GUIStyle> checkboxStyleCache = new();
-        private Dictionary<(SwitchVariant, SwitchSize), GUIStyle> switchStyleCache = new();
-        private Dictionary<(BadgeVariant, BadgeSize), GUIStyle> badgeStyleCache = new();
-        private Dictionary<(AvatarSize, AvatarShape), GUIStyle> avatarStyleCache = new();
-        private Dictionary<(TableVariant, TableSize), GUIStyle> tableStyleCache = new();
-        private Dictionary<(CalendarVariant, CalendarSize), GUIStyle> calendarStyleCache = new();
-        private Dictionary<(DropdownMenuVariant, DropdownMenuSize), GUIStyle> dropdownMenuStyleCache = new();
-        private Dictionary<(SelectVariant, SelectSize), GUIStyle> selectStyleCache = new();
-        private Dictionary<(ChartVariant, ChartSize), GUIStyle> chartStyleCache = new();
+        private Dictionary<StyleKey, GUIStyle> styleCache = new();
         #endregion
 
         #region Texture Caches
@@ -502,6 +329,12 @@ namespace shadcnui.GUIComponents.Core
                 }
 
                 GUILogger.LogInfo("Starting StyleManager initialization", "StyleManager.InitializeGUI");
+
+                solidColorTextureCache.Clear();
+                outlineButtonTextureCache.Clear();
+                outlineTextureCache.Clear();
+                styleCache.Clear();
+
                 CreateCustomTextures();
                 SetupAllStyles();
                 isInitialized = true;
@@ -520,24 +353,23 @@ namespace shadcnui.GUIComponents.Core
             {
                 SetupAnimatedStyles();
                 SetupCardStyles();
-                SetupButtonVariantStyles();
-                SetupToggleVariantStyles();
-                SetupInputVariantStyles();
-                SetupLabelVariantStyles();
+                SetupButtonStyle();
+                SetupToggleStyle();
+                SetupInputStyle();
+                SetupLabelStyle();
                 SetupProgressBarStyles();
                 SetupSeparatorStyles();
                 SetupTabsStyles();
-                SetupTextAreaVariantStyles();
-                SetupCheckboxStyles();
-                SetupSwitchStyles();
-                SetupBadgeStyles();
+                SetupCheckboxStyle();
+                SetupSwitchStyle();
+                SetupBadgeStyle();
                 SetupAvatarStyles();
                 SetupTableStyles();
-                SetupCalendarStyles();
+                SetupCalendarStyle();
                 SetupDropdownMenuStyles();
                 SetupPopoverStyles();
                 SetupSelectStyles();
-                SetupDatePickerStyles();
+                SetupDatePickerStyle();
                 SetupDialogStyles();
                 SetupChartStyles();
                 SetupMenuBarStyles();
@@ -547,353 +379,6 @@ namespace shadcnui.GUIComponents.Core
                 GUILogger.LogException(ex, "SetupAllStyles", "StyleManager");
             }
         }
-        #endregion
-
-        #region Fix GUI Styles
-        private bool _stylesCorruption = false;
-        private float _lastScanTime = 0f;
-        private float _scanInterval = 5f;
-        private Dictionary<string, int> _styleHealthChecks = new Dictionary<string, int>();
-
-        private readonly string[] _stylesToMonitor = new[]
-        {
-            "tabsTriggerActive",
-            "buttonDefault",
-            "buttonDestructive",
-            "buttonOutline",
-            "buttonSecondary",
-            "buttonGhost",
-            "buttonLink",
-            "toggleDefault",
-            "toggleOutline",
-            "inputDefault",
-            "inputOutline",
-            "inputGhost",
-            "inputFocused",
-            "inputDisabled",
-            "labelDefault",
-            "labelSecondary",
-            "labelMuted",
-            "labelDestructive",
-            "cardStyle",
-            "cardHeader",
-            "cardTitle",
-            "cardDescription",
-            "cardContent",
-            "cardFooter",
-            "progressBar",
-            "progressBarBg",
-            "progressBarFill",
-            "checkboxDefault",
-            "checkboxOutline",
-            "checkboxGhost",
-            "switchDefault",
-            "switchOutline",
-            "switchGhost",
-            "badgeDefault",
-            "badgeSecondary",
-            "badgeDestructive",
-            "badgeOutline",
-            "separator",
-            "separatorVertical",
-            "textArea",
-            "textAreaFocused",
-            "textAreaOutline",
-            "textAreaGhost",
-            "passwordField",
-            "tabsList",
-            "tabsTrigger",
-            "tabsContent",
-            "table",
-            "tableHeader",
-            "tableCell",
-            "tableStriped",
-            "tableBordered",
-            "tableHover",
-            "calendar",
-            "calendarHeader",
-            "calendarTitle",
-            "calendarWeekday",
-            "calendarDay",
-            "calendarDaySelected",
-            "calendarDayOutsideMonth",
-            "calendarDayToday",
-            "calendarDayInRange",
-            "dialogOverlay",
-            "dialogContent",
-            "dialogTitle",
-            "dialogDescription",
-            "dropdownMenuContent",
-            "dropdownMenuItem",
-            "dropdownMenuSeparator",
-            "dropdownMenuHeader",
-            "popover",
-            "selectTrigger",
-            "selectContent",
-            "selectItem",
-            "chartContainer",
-            "chartContent",
-            "chartAxis",
-            "menuBar",
-            "menuBarItem",
-            "menuDropdown",
-            "animatedBox",
-            "animatedButton",
-            "animatedInput",
-            "glowLabel",
-            "title",
-            "colorPreset",
-            "sectionHeader",
-            "avatar",
-            "datePickerStyle",
-            "datePickerHeader",
-            "datePickerTitle",
-            "datePickerWeekday",
-            "datePickerDay",
-            "datePickerDaySelected",
-            "datePickerDayOutsideMonth",
-            "datePickerDayToday",
-        };
-
-        private GUIStyle GetStyleByName(string name) =>
-            name switch
-            {
-                "tabsTriggerActive" => tabsTriggerActiveStyle,
-                "buttonDefault" => buttonDefaultStyle,
-                "buttonDestructive" => buttonDestructiveStyle,
-                "buttonOutline" => buttonOutlineStyle,
-                "buttonSecondary" => buttonSecondaryStyle,
-                "buttonGhost" => buttonGhostStyle,
-                "buttonLink" => buttonLinkStyle,
-                "toggleDefault" => toggleDefaultStyle,
-                "toggleOutline" => toggleOutlineStyle,
-                "inputDefault" => inputDefaultStyle,
-                "inputOutline" => inputOutlineStyle,
-                "inputGhost" => inputGhostStyle,
-                "inputFocused" => inputFocusedStyle,
-                "inputDisabled" => inputDisabledStyle,
-                "labelDefault" => labelDefaultStyle,
-                "labelSecondary" => labelSecondaryStyle,
-                "labelMuted" => labelMutedStyle,
-                "labelDestructive" => labelDestructiveStyle,
-                "cardStyle" => cardStyle,
-                "cardHeader" => cardHeaderStyle,
-                "cardTitle" => cardTitleStyle,
-                "cardDescription" => cardDescriptionStyle,
-                "cardContent" => cardContentStyle,
-                "cardFooter" => cardFooterStyle,
-                "progressBar" => progressBarStyle,
-                "progressBarBg" => progressBarBackgroundStyle,
-                "progressBarFill" => progressBarFillStyle,
-                "checkboxDefault" => checkboxDefaultStyle,
-                "checkboxOutline" => checkboxOutlineStyle,
-                "checkboxGhost" => checkboxGhostStyle,
-                "switchDefault" => switchDefaultStyle,
-                "switchOutline" => switchOutlineStyle,
-                "switchGhost" => switchGhostStyle,
-                "badgeDefault" => badgeDefaultStyle,
-                "badgeSecondary" => badgeSecondaryStyle,
-                "badgeDestructive" => badgeDestructiveStyle,
-                "badgeOutline" => badgeOutlineStyle,
-                "separator" => separatorHorizontalStyle,
-                "separatorVertical" => separatorVerticalStyle,
-                "textArea" => textAreaStyle,
-                "textAreaFocused" => textAreaFocusedStyle,
-                "textAreaOutline" => textAreaOutlineStyle,
-                "textAreaGhost" => textAreaGhostStyle,
-                "passwordField" => passwordFieldStyle,
-                "tabsList" => tabsListStyle,
-                "tabsTrigger" => tabsTriggerStyle,
-                "tabsContent" => tabsContentStyle,
-                "table" => tableStyle,
-                "tableHeader" => tableHeaderStyle,
-                "tableCell" => tableCellStyle,
-                "tableStriped" => tableStripedStyle,
-                "tableBordered" => tableBorderedStyle,
-                "tableHover" => tableHoverStyle,
-                "calendar" => calendarStyle,
-                "calendarHeader" => calendarHeaderStyle,
-                "calendarTitle" => calendarTitleStyle,
-                "calendarWeekday" => calendarWeekdayStyle,
-                "calendarDay" => calendarDayStyle,
-                "calendarDaySelected" => calendarDaySelectedStyle,
-                "calendarDayOutsideMonth" => calendarDayOutsideMonthStyle,
-                "calendarDayToday" => calendarDayTodayStyle,
-                "calendarDayInRange" => calendarDayInRangeStyle,
-                "dialogOverlay" => dialogOverlayStyle,
-                "dialogContent" => dialogContentStyle,
-                "dialogTitle" => dialogTitleStyle,
-                "dialogDescription" => dialogDescriptionStyle,
-                "dropdownMenuContent" => dropdownMenuContentStyle,
-                "dropdownMenuItem" => dropdownMenuItemStyle,
-                "dropdownMenuSeparator" => dropdownMenuSeparatorStyle,
-                "dropdownMenuHeader" => dropdownMenuHeaderStyle,
-                "popover" => popoverContentStyle,
-                "selectTrigger" => selectTriggerStyle,
-                "selectContent" => selectContentStyle,
-                "selectItem" => selectItemStyle,
-                "chartContainer" => chartContainerStyle,
-                "chartContent" => chartContentStyle,
-                "chartAxis" => chartAxisStyle,
-                "menuBar" => menuBarStyle,
-                "menuBarItem" => menuBarItemStyle,
-                "menuDropdown" => menuDropdownStyle,
-                "animatedBox" => animatedBoxStyle,
-                "animatedButton" => animatedButtonStyle,
-                "animatedInput" => animatedInputStyle,
-                "glowLabel" => glowLabelStyle,
-                "title" => titleStyle,
-                "colorPreset" => colorPresetStyle,
-                "sectionHeader" => sectionHeaderStyle,
-                "avatar" => avatarStyle,
-                "datePickerStyle" => datePickerStyle,
-                "datePickerHeader" => datePickerHeaderStyle,
-                "datePickerTitle" => datePickerTitleStyle,
-                "datePickerWeekday" => datePickerWeekdayStyle,
-                "datePickerDay" => datePickerDayStyle,
-                "datePickerDaySelected" => datePickerDaySelectedStyle,
-                "datePickerDayOutsideMonth" => datePickerDayOutsideMonthStyle,
-                "datePickerDayToday" => datePickerDayTodayStyle,
-                _ => null,
-            };
-
-        private int GetStyleHealth(GUIStyle style)
-        {
-            if (style == null)
-                return 0;
-            unchecked
-            {
-                int hash = 17;
-                hash = hash * 31 + (style.normal.background?.GetInstanceID() ?? 0);
-                hash = hash * 31 + (style.hover.background?.GetInstanceID() ?? 0);
-                hash = hash * 31 + (style.active.background?.GetInstanceID() ?? 0);
-                hash = hash * 31 + style.fontSize;
-                hash = hash * 31 + style.padding.left + style.padding.right + style.padding.top + style.padding.bottom;
-                hash = hash * 31 + (style.normal.textColor.GetHashCode());
-                return hash;
-            }
-        }
-
-        public void MarkStylesCorruption()
-        {
-            _stylesCorruption = true;
-        }
-
-        public void RefreshStylesIfCorruption()
-        {
-            if (!_stylesCorruption)
-                return;
-
-            try
-            {
-                buttonStyleCache.Clear();
-                toggleStyleCache.Clear();
-                inputStyleCache.Clear();
-                labelStyleCache.Clear();
-                textAreaStyleCache.Clear();
-                checkboxStyleCache.Clear();
-                switchStyleCache.Clear();
-                badgeStyleCache.Clear();
-                avatarStyleCache.Clear();
-                tableStyleCache.Clear();
-                calendarStyleCache.Clear();
-                dropdownMenuStyleCache.Clear();
-                selectStyleCache.Clear();
-                chartStyleCache.Clear();
-
-                SetupAnimatedStyles();
-                SetupCardStyles();
-                SetupButtonVariantStyles();
-                SetupToggleVariantStyles();
-                SetupInputVariantStyles();
-                SetupLabelVariantStyles();
-                SetupProgressBarStyles();
-                SetupSeparatorStyles();
-                SetupTabsStyles();
-                SetupTextAreaVariantStyles();
-                SetupCheckboxStyles();
-                SetupSwitchStyles();
-                SetupBadgeStyles();
-                SetupAvatarStyles();
-                SetupTableStyles();
-                SetupCalendarStyles();
-                SetupDropdownMenuStyles();
-                SetupPopoverStyles();
-                SetupSelectStyles();
-                SetupDatePickerStyles();
-                SetupDialogStyles();
-                SetupChartStyles();
-                SetupMenuBarStyles();
-
-                _styleHealthChecks.Clear();
-                foreach (var styleName in _stylesToMonitor)
-                {
-                    _styleHealthChecks[styleName] = GetStyleHealth(GetStyleByName(styleName));
-                }
-
-                _stylesCorruption = false;
-            }
-            catch (Exception ex)
-            {
-                GUILogger.LogException(ex, "RefreshStylesIfCorruption", "StyleManager");
-            }
-        }
-
-        public bool ScanForCorruption()
-        {
-            if (Time.realtimeSinceStartup - _lastScanTime < _scanInterval)
-                return false;
-
-            _lastScanTime = Time.realtimeSinceStartup;
-
-            foreach (var styleName in _stylesToMonitor)
-            {
-                int currentHealth = GetStyleHealth(GetStyleByName(styleName));
-
-                if (_styleHealthChecks.ContainsKey(styleName) && _styleHealthChecks[styleName] != currentHealth)
-                {
-                    _styleHealthChecks[styleName] = currentHealth;
-                    return true;
-                }
-
-                _styleHealthChecks[styleName] = currentHealth;
-            }
-
-            return false;
-        }
-        #endregion
-
-        #region Design Helpers
-        public int GetScaledBorderRadius(float radius) => Mathf.RoundToInt(radius * guiHelper.uiScale);
-
-        public int GetScaledSpacing(float spacing) => Mathf.RoundToInt(spacing * guiHelper.uiScale);
-
-        public int GetScaledHeight(float height) => Mathf.RoundToInt(height * guiHelper.uiScale);
-
-        public int GetScaledFontSize(float scale = 1.0f) => Mathf.RoundToInt(guiHelper.fontSize * scale * guiHelper.uiScale);
-
-        public RectOffset GetSpacingOffset(float horizontal = 8f, float vertical = 8f)
-        {
-            int h = GetScaledSpacing(horizontal);
-            int v = GetScaledSpacing(vertical);
-            return new UnityHelpers.RectOffset(h, h, v, v);
-        }
-
-        public RectOffset GetBorderOffset(float radius = 6f)
-        {
-            int r = GetScaledBorderRadius(radius);
-            return new UnityHelpers.RectOffset(r, r, r, r);
-        }
-
-        public Color GetHoverColor(Color baseColor, bool isDark = true) => isDark ? Color.Lerp(baseColor, Color.white, 0.15f) : Color.Lerp(baseColor, Color.black, 0.08f);
-
-        public Color GetFocusColor(Color baseColor) => Color.Lerp(baseColor, ThemeManager.Instance.CurrentTheme.Accent, 0.25f);
-
-        public Color GetOverlayColor() => ThemeManager.Instance.CurrentTheme.Overlay;
-
-        public Color GetShadowColor() => ThemeManager.Instance.CurrentTheme.Shadow;
-
-        public Color GetBorderColor() => ThemeManager.Instance.CurrentTheme.Border;
         #endregion
 
         #region Texture Creation
@@ -928,39 +413,14 @@ namespace shadcnui.GUIComponents.Core
             return texture;
         }
 
-        private Texture2D CreateShadowTexture(int width, int height, float intensity = 0.22f, float blur = 3.5f)
-        {
-            var texture = new Texture2D(width, height);
-            Color themeShadow = ThemeManager.Instance.CurrentTheme.Shadow;
-            for (int x = 0; x < width; x++)
-            for (int y = 0; y < height; y++)
-            {
-                float edgeDistanceX = Mathf.Min(x, width - x - 1);
-                float edgeDistanceY = Mathf.Min(y, height - y - 1);
-                float edgeDistance = Mathf.Min(edgeDistanceX, edgeDistanceY);
-                float alpha = Mathf.Clamp01(edgeDistance / blur);
-                alpha = (1f - alpha) * intensity;
-                texture.SetPixel(x, y, new Color(themeShadow.r, themeShadow.g, themeShadow.b, alpha));
-            }
-            texture.Apply();
-            return texture;
-        }
-
         private Texture2D CreateBottomBorderTexture(int width, int height, int borderThickness, Color borderColor, Color fillColor)
         {
             Texture2D texture = new Texture2D(width, height);
             for (int x = 0; x < width; x++)
             for (int y = 0; y < height; y++)
             {
-                bool isBorder = y < borderThickness ? false : (y >= height - borderThickness);
-                if (isBorder)
-                {
-                    texture.SetPixel(x, y, borderColor);
-                }
-                else
-                {
-                    texture.SetPixel(x, y, fillColor);
-                }
+                bool isBorder = y >= height - borderThickness;
+                texture.SetPixel(x, y, isBorder ? borderColor : fillColor);
             }
             texture.Apply();
             return texture;
@@ -1071,6 +531,49 @@ namespace shadcnui.GUIComponents.Core
             return new Vector2(width - radius, height - radius);
         }
 
+        public Texture2D CreateRoundedOutlineTexture(int width, int height, int radius, Color borderColor, float thickness = 1f)
+        {
+            Texture2D texture = new Texture2D(width, height);
+            for (int x = 0; x < width; x++)
+            {
+                for (int y = 0; y < height; y++)
+                {
+                    bool isCornerArea = (x < radius && y < radius) || (x > width - radius && y < radius) || (x < radius && y > height - radius) || (x > width - radius && y > height - radius);
+
+                    if (isCornerArea)
+                    {
+                        Vector2 cornerCenter = GetCornerCenter(x, y, width, height, radius);
+                        float dist = Vector2.Distance(new Vector2(x, y), cornerCenter);
+                        if (dist > radius)
+                        {
+                            texture.SetPixel(x, y, Color.clear);
+                        }
+                        else if (dist > radius - thickness)
+                        {
+                            texture.SetPixel(x, y, borderColor);
+                        }
+                        else
+                        {
+                            texture.SetPixel(x, y, Color.clear);
+                        }
+                    }
+                    else
+                    {
+                        if (x < thickness || x >= width - thickness || y < thickness || y >= height - thickness)
+                        {
+                            texture.SetPixel(x, y, borderColor);
+                        }
+                        else
+                        {
+                            texture.SetPixel(x, y, Color.clear);
+                        }
+                    }
+                }
+            }
+            texture.Apply();
+            return texture;
+        }
+
         public Texture2D CreateOutlineButtonTexture(Color backgroundColor, Color borderColor)
         {
             if (outlineButtonTextureCache.TryGetValue((backgroundColor, borderColor), out var cachedTexture))
@@ -1085,24 +588,6 @@ namespace shadcnui.GUIComponents.Core
             }
             texture.Apply();
             outlineButtonTextureCache[(backgroundColor, borderColor)] = texture;
-            return texture;
-        }
-
-        private Texture2D CreateOutlineTexture()
-        {
-            var theme = ThemeManager.Instance.CurrentTheme;
-            var keyColor = theme.Border;
-            if (outlineTextureCache.TryGetValue(keyColor, out var cachedTexture))
-                return cachedTexture;
-            Texture2D texture = new Texture2D(4, 4);
-            for (int x = 0; x < 4; x++)
-            for (int y = 0; y < 4; y++)
-            {
-                bool isBorder = x == 0 || y == 0 || x == 3 || y == 3;
-                texture.SetPixel(x, y, isBorder ? keyColor : Color.clear);
-            }
-            texture.Apply();
-            outlineTextureCache[keyColor] = texture;
             return texture;
         }
 
@@ -1128,32 +613,32 @@ namespace shadcnui.GUIComponents.Core
                 transparentTexture = CreateSolidTexture(Color.clear);
                 glowTexture = CreateGlowTexture(theme.Accent, 32);
                 particleTexture = CreateSolidTexture(Color.Lerp(theme.Accent, theme.Text, 0.5f));
-                progressBarBackgroundTexture = CreateGradientRoundedRectTexture(128, 128, 6, theme.Secondary, Color.Lerp(theme.Secondary, Color.black, 0.1f));
+                progressBarBackgroundTexture = CreateGradientRoundedRectTexture(128, 128, 6, theme.Base, Color.Lerp(theme.Base, Color.black, 0.1f));
                 progressBarFillTexture = CreateGradientRoundedRectTexture(128, 128, 6, Color.Lerp(theme.Accent, Color.white, 0.1f), theme.Accent);
                 separatorTexture = CreateGradientRoundedRectTexture(128, 2, 0, theme.Border, Color.Lerp(theme.Border, Color.black, 0.1f));
                 tabsBackgroundTexture = CreateRoundedRectTexture(128, 128, 6, theme.Secondary);
                 tabsActiveTexture = CreateGradientRoundedRectTexture(128, 128, 6, theme.Base, Color.Lerp(theme.Base, theme.Secondary, 0.05f));
-                checkboxTexture = CreateGradientRoundedRectTexture(16, 16, 4, theme.Secondary, Color.Lerp(theme.Secondary, Color.black, 0.1f));
+                checkboxTexture = CreateGradientRoundedRectTexture(16, 16, 4, Color.Lerp(theme.Secondary, theme.Text, 0.1f), Color.Lerp(theme.Secondary, theme.Text, 0.05f));
                 checkboxCheckedTexture = CreateGradientRoundedRectTexture(16, 16, 4, Color.Lerp(theme.Accent, Color.white, 0.1f), theme.Accent);
-                switchTexture = CreateGradientRoundedRectTexture(32, 16, 8, theme.Secondary, Color.Lerp(theme.Secondary, Color.black, 0.1f));
+                switchTexture = CreateGradientRoundedRectTexture(32, 16, 8, Color.Lerp(theme.Secondary, theme.Text, 0.1f), Color.Lerp(theme.Secondary, theme.Text, 0.05f));
                 switchOnTexture = CreateGradientRoundedRectTexture(32, 16, 8, Color.Lerp(theme.Accent, Color.white, 0.1f), theme.Accent);
-                switchOffTexture = CreateGradientRoundedRectTexture(32, 16, 8, theme.Secondary, Color.Lerp(theme.Secondary, Color.black, 0.1f));
+                switchOffTexture = CreateGradientRoundedRectTexture(32, 16, 8, Color.Lerp(theme.Secondary, theme.Text, 0.1f), Color.Lerp(theme.Secondary, theme.Text, 0.05f));
                 badgeTexture = CreateGradientRoundedRectTexture(64, 24, 12, Color.Lerp(theme.Elevated, Color.white, 0.05f), theme.Elevated);
-                avatarTexture = CreateRoundedRectTexture(40, 40, 20, theme.Secondary);
+                avatarTexture = CreateRoundedRectTexture(40, 40, 20, theme.Muted);
                 tableTexture = CreateGradientRoundedRectTexture(128, 128, 0, theme.Base, Color.Lerp(theme.Base, theme.Secondary, 0.02f));
                 tableHeaderTexture = CreateSolidTexture(theme.Secondary);
                 tableCellTexture = CreateSolidTexture(theme.Base);
-                calendarBackgroundTexture = CreateGradientRoundedRectTexture(256, 256, 6, Color.Lerp(theme.Secondary, theme.Base, 0.05f), theme.Secondary);
-                calendarHeaderTexture = CreateSolidTexture(theme.Secondary);
-                calendarDayTexture = CreateRoundedRectTexture(32, 32, 4, theme.Secondary);
+                calendarBackgroundTexture = CreateGradientRoundedRectTexture(256, 256, 6, Color.Lerp(theme.Elevated, theme.Base, 0.05f), theme.Elevated);
+                calendarHeaderTexture = CreateSolidTexture(theme.Elevated);
+                calendarDayTexture = CreateRoundedRectTexture(32, 32, 4, theme.Elevated);
                 calendarDaySelectedTexture = CreateGradientRoundedRectTexture(32, 32, 4, Color.Lerp(theme.Accent, Color.white, 0.1f), theme.Accent);
-                dropdownMenuContentTexture = CreateGradientRoundedRectWithShadowTexture(128, 128, 6, Color.Lerp(theme.Secondary, theme.Base, 0.05f), theme.Secondary, 0.1f, 6);
-                popoverContentTexture = CreateGradientRoundedRectWithShadowTexture(128, 128, 6, Color.Lerp(theme.Base, theme.Secondary, 0.05f), theme.Base, 0.1f, 6);
+                dropdownMenuContentTexture = CreateGradientRoundedRectWithShadowTexture(128, 128, 6, Color.Lerp(theme.Elevated, theme.Base, 0.05f), theme.Elevated, 0.1f, 6);
+                popoverContentTexture = CreateGradientRoundedRectWithShadowTexture(128, 128, 6, Color.Lerp(theme.Base, theme.Elevated, 0.05f), theme.Base, 0.1f, 6);
                 scrollAreaThumbTexture = CreateRoundedRectTexture(8, 8, 4, theme.Border);
                 scrollAreaTrackTexture = CreateRoundedRectTexture(8, 8, 4, theme.Secondary);
                 selectTriggerTexture = CreateGradientRoundedRectTexture(128, 40, 6, theme.Base, Color.Lerp(theme.Base, theme.Secondary, 0.05f));
-                selectContentTexture = CreateGradientRoundedRectWithShadowTexture(128, 128, 6, Color.Lerp(theme.Secondary, theme.Base, 0.05f), theme.Secondary, 0.1f, 6);
-                chartContainerTexture = CreateGradientRoundedRectWithShadowTexture(256, 256, 8, Color.Lerp(theme.Secondary, theme.Base, 0.05f), theme.Secondary, 0.08f, 6);
+                selectContentTexture = CreateGradientRoundedRectWithShadowTexture(128, 128, 6, Color.Lerp(theme.Elevated, theme.Base, 0.05f), theme.Elevated, 0.1f, 6);
+                chartContainerTexture = CreateGradientRoundedRectWithShadowTexture(256, 256, 8, Color.Lerp(theme.Elevated, theme.Base, 0.05f), theme.Elevated, 0.08f, 6);
                 chartGridTexture = CreateGradientRoundedRectTexture(128, 2, 0, theme.Border, Color.Lerp(theme.Border, Color.clear, 0.5f));
                 chartAxisTexture = CreateSolidTexture(theme.Muted);
 
@@ -1166,6 +651,39 @@ namespace shadcnui.GUIComponents.Core
         }
         #endregion
 
+        #region Design Helpers
+        public int GetScaledBorderRadius(float radius) => Mathf.RoundToInt(radius * guiHelper.uiScale);
+
+        public int GetScaledSpacing(float spacing) => Mathf.RoundToInt(spacing * guiHelper.uiScale);
+
+        public int GetScaledHeight(float height) => Mathf.RoundToInt(height * guiHelper.uiScale);
+
+        public int GetScaledFontSize(float scale = 1.0f) => Mathf.RoundToInt(guiHelper.fontSize * scale * guiHelper.uiScale);
+
+        public RectOffset GetSpacingOffset(float horizontal = 8f, float vertical = 8f)
+        {
+            int h = GetScaledSpacing(horizontal);
+            int v = GetScaledSpacing(vertical);
+            return new UnityHelpers.RectOffset(h, h, v, v);
+        }
+
+        public RectOffset GetBorderOffset(float radius = 6f)
+        {
+            int r = GetScaledBorderRadius(radius);
+            return new UnityHelpers.RectOffset(r, r, r, r);
+        }
+
+        public Color GetHoverColor(Color baseColor, bool isDark = true) => isDark ? Color.Lerp(baseColor, Color.white, 0.15f) : Color.Lerp(baseColor, Color.black, 0.08f);
+
+        public Color GetFocusColor(Color baseColor) => Color.Lerp(baseColor, ThemeManager.Instance.CurrentTheme.Accent, 0.25f);
+
+        public Color GetOverlayColor() => ThemeManager.Instance.CurrentTheme.Overlay;
+
+        public Color GetShadowColor() => ThemeManager.Instance.CurrentTheme.Shadow;
+
+        public Color GetBorderColor() => ThemeManager.Instance.CurrentTheme.Border;
+        #endregion
+
         #region Style Setup - Animated
         private void SetupAnimatedStyles()
         {
@@ -1176,21 +694,6 @@ namespace shadcnui.GUIComponents.Core
                 animatedBoxStyle.normal.background = gradientTexture;
                 animatedBoxStyle.border = new UnityHelpers.RectOffset(guiHelper.cornerRadius, guiHelper.cornerRadius, guiHelper.cornerRadius, 5);
                 animatedBoxStyle.padding = new UnityHelpers.RectOffset(15, 15, 15, 15);
-                animatedButtonStyle = CreateStyleWithFont(GUI.skin.button, guiHelper.fontSize, FontStyle.Bold);
-                animatedButtonStyle.alignment = TextAnchor.MiddleCenter;
-                animatedButtonStyle.normal.textColor = Color.Lerp(Color.white, theme.Accent, 0.4f);
-                animatedButtonStyle.hover.textColor = theme.Accent;
-                colorPresetStyle = CreateStyleWithFont(GUI.skin.button, Mathf.RoundToInt(guiHelper.fontSize * 0.9f), FontStyle.Bold);
-                colorPresetStyle.alignment = TextAnchor.MiddleCenter;
-                animatedInputStyle = CreateStyleWithFont(GUI.skin.textField, guiHelper.fontSize + 1);
-                animatedInputStyle.padding = new UnityHelpers.RectOffset(8, 8, 4, 4);
-                animatedInputStyle.normal.textColor = theme.Text;
-                animatedInputStyle.focused.textColor = theme.Accent;
-                glowLabelStyle = CreateStyleWithFont(GUI.skin.label, guiHelper.fontSize);
-                glowLabelStyle.normal.textColor = Color.Lerp(theme.Text, theme.Accent, 0.25f);
-                titleStyle = CreateStyleWithFont(GUI.skin.label, guiHelper.fontSize + 4, FontStyle.Bold);
-                titleStyle.alignment = TextAnchor.MiddleCenter;
-                titleStyle.normal.textColor = theme.Accent;
                 sectionHeaderStyle = CreateStyleWithFont(GUI.skin.label, guiHelper.fontSize + 2, FontStyle.Bold);
                 sectionHeaderStyle.normal.textColor = Color.Lerp(theme.Accent, theme.Text, 0.4f);
             }
@@ -1234,213 +737,113 @@ namespace shadcnui.GUIComponents.Core
         }
         #endregion
 
-        #region Style Setup - Button
-        private void SetupButtonVariantStyles()
+        #region Style Setup - Button Base
+        private void SetupButtonStyle()
         {
             try
             {
                 var theme = ThemeManager.Instance.CurrentTheme;
-                buttonDefaultStyle = CreateButtonStyle(theme.Secondary, theme.ButtonPrimaryFg, GetHoverColor(theme.Secondary, true), theme.ButtonPrimaryFg);
-                buttonDestructiveStyle = CreateButtonStyle(theme.ButtonDestructiveBg, theme.ButtonDestructiveFg, Color.Lerp(theme.ButtonDestructiveBg, Color.black, 0.15f), theme.ButtonDestructiveFg);
-                buttonOutlineStyle = CreateButtonStyle(theme.Border, theme.ButtonOutlineFg, Color.Lerp(theme.Border, Color.black, 0.05f), theme.ButtonOutlineFg);
-                buttonSecondaryStyle = CreateButtonStyle(theme.Secondary, theme.ButtonSecondaryFg, GetHoverColor(theme.Secondary, true), theme.ButtonSecondaryFg);
-                buttonGhostStyle = CreateButtonStyle(transparentTexture, theme.ButtonGhostFg, theme.Secondary, theme.ButtonGhostFg);
-                buttonLinkStyle = CreateLinkButtonStyle(theme);
+                baseButtonStyle = CreateStyleWithFont(GUI.skin.button, GetScaledFontSize(0.875f), FontStyle.Bold);
+                baseButtonStyle.alignment = TextAnchor.MiddleCenter;
+                baseButtonStyle.padding = GetSpacingOffset(16f, 8f);
+                baseButtonStyle.border = GetBorderOffset(6f);
+                baseButtonStyle.fixedHeight = GetScaledHeight(36f);
+                int btnTexH = GetScaledHeight(36f);
+                int btnRadius = GetScaledBorderRadius(6f);
+                baseButtonStyle.normal.background = CreateGradientRoundedRectTexture(128, btnTexH, btnRadius, theme.ButtonPrimaryBg, Color.Lerp(theme.ButtonPrimaryBg, Color.black, 0.05f));
+                baseButtonStyle.normal.textColor = theme.ButtonPrimaryFg;
+                baseButtonStyle.hover.background = CreateGradientRoundedRectTexture(128, btnTexH, btnRadius, GetHoverColor(theme.ButtonPrimaryBg, true), Color.Lerp(GetHoverColor(theme.ButtonPrimaryBg, true), Color.black, 0.05f));
+                baseButtonStyle.hover.textColor = theme.ButtonPrimaryFg;
+                baseButtonStyle.active.background = CreateGradientRoundedRectTexture(128, btnTexH, btnRadius, Color.Lerp(theme.ButtonPrimaryBg, Color.black, 0.15f), Color.Lerp(theme.ButtonPrimaryBg, Color.black, 0.1f));
+                baseButtonStyle.active.textColor = theme.ButtonPrimaryFg;
+                baseButtonStyle.focused.background = CreateGradientRoundedRectTexture(128, btnTexH, btnRadius, Color.Lerp(theme.ButtonPrimaryBg, theme.Accent, 0.1f), Color.Lerp(theme.ButtonPrimaryBg, theme.Accent, 0.15f));
+                baseButtonStyle.focused.textColor = theme.ButtonPrimaryFg;
             }
             catch (Exception ex)
             {
-                GUILogger.LogException(ex, "SetupButtonVariantStyles", "StyleManager");
+                GUILogger.LogException(ex, "SetupButtonStyle", "StyleManager");
             }
-        }
-
-        private GUIStyle CreateButtonStyle(Color normalBg, Color normalFg, Color activeBg, Color activeFg)
-        {
-            GUIStyle style = CreateStyleWithFont(GUI.skin.button, GetScaledFontSize(0.875f), FontStyle.Bold);
-            style.alignment = TextAnchor.MiddleCenter;
-            style.padding = GetSpacingOffset(16f, 8f);
-            style.border = GetBorderOffset(6f);
-            style.fixedHeight = GetScaledHeight(36f);
-            int btnTexH = GetScaledHeight(36f);
-            int btnRadius = GetScaledBorderRadius(6f);
-
-            style.normal.background = CreateGradientRoundedRectTexture(128, btnTexH, btnRadius, normalBg, Color.Lerp(normalBg, Color.black, 0.05f));
-            style.hover.background = CreateGradientRoundedRectTexture(128, btnTexH, btnRadius, GetHoverColor(normalBg, false), Color.Lerp(GetHoverColor(normalBg, false), Color.black, 0.05f));
-            style.normal.textColor = normalFg;
-            style.hover.textColor = normalFg;
-            style.active.background = CreateGradientRoundedRectTexture(128, btnTexH, btnRadius, activeBg, Color.Lerp(activeBg, Color.black, 0.1f));
-            style.active.textColor = activeFg;
-            style.focused.background = CreateGradientRoundedRectTexture(128, btnTexH, btnRadius, Color.Lerp(normalBg, ThemeManager.Instance.CurrentTheme.Accent, 0.1f), Color.Lerp(normalBg, ThemeManager.Instance.CurrentTheme.Accent, 0.15f));
-            style.focused.textColor = normalFg;
-            return style;
-        }
-
-        private GUIStyle CreateButtonStyle(Texture2D normalBg, Color normalFg, Color hoverBg, Color activeFg)
-        {
-            GUIStyle style = CreateStyleWithFont(GUI.skin.button, GetScaledFontSize(0.875f), FontStyle.Bold);
-            style.alignment = TextAnchor.MiddleCenter;
-            style.padding = GetSpacingOffset(16f, 8f);
-            style.border = GetBorderOffset(6f);
-            style.fixedHeight = GetScaledHeight(36f);
-            int btnTexH = GetScaledHeight(36f);
-            int btnRadius = GetScaledBorderRadius(6f);
-            style.normal.background = normalBg;
-            style.hover.background = CreateRoundedRectTexture(128, btnTexH, btnRadius, hoverBg);
-            style.normal.textColor = normalFg;
-            style.hover.textColor = normalFg;
-            style.active.background = CreateRoundedRectTexture(128, btnTexH, btnRadius, hoverBg);
-            style.active.textColor = activeFg;
-            style.focused.background = normalBg;
-            style.focused.textColor = normalFg;
-            return style;
-        }
-
-        private GUIStyle CreateLinkButtonStyle(Theme theme)
-        {
-            GUIStyle style = CreateStyleWithFont(GUI.skin.button, GetScaledFontSize(0.875f));
-            style.alignment = TextAnchor.MiddleCenter;
-            style.padding = GetSpacingOffset(0f, 2f);
-            style.border = new UnityHelpers.RectOffset(0, 0, 0, 0);
-            style.normal.background = transparentTexture;
-            style.hover.background = transparentTexture;
-            style.normal.textColor = theme.ButtonLinkColor;
-            style.hover.textColor = Color.Lerp(theme.ButtonLinkColor, Color.white, 0.2f);
-            style.active.background = transparentTexture;
-            style.active.textColor = Color.Lerp(theme.ButtonLinkColor, Color.black, 0.25f);
-            return style;
         }
         #endregion
 
-        #region Style Setup - Toggle
-        private void SetupToggleVariantStyles()
+        #region Style Setup - Toggle Base
+        private void SetupToggleStyle()
         {
             try
             {
                 var theme = ThemeManager.Instance.CurrentTheme;
-                toggleDefaultStyle = CreateToggleStyle(theme.Secondary, theme.Text, theme.Accent, theme.Text);
-                toggleOutlineStyle = new UnityHelpers.GUIStyle(toggleDefaultStyle);
-                if (customFont != null)
-                    toggleOutlineStyle.font = customFont;
-                toggleOutlineStyle.normal.background = CreateOutlineButtonTexture(Color.Lerp(theme.Base, Color.black, 0.15f), theme.Accent);
-                toggleOutlineStyle.border = new UnityHelpers.RectOffset(2, 2, 2, 2);
+                baseToggleStyle = CreateStyleWithFont(GUI.skin.button, guiHelper.fontSize);
+                baseToggleStyle.alignment = TextAnchor.MiddleCenter;
+                baseToggleStyle.normal.textColor = theme.Text;
+                int radius = GetScaledBorderRadius(4f);
+                baseToggleStyle.normal.background = CreateGradientRoundedRectTexture(32, 32, radius, theme.ButtonPrimaryBg, Color.Lerp(theme.ButtonPrimaryBg, Color.black, 0.05f));
+                baseToggleStyle.hover.background = CreateGradientRoundedRectTexture(32, 32, radius, theme.ButtonPrimaryBg, Color.Lerp(theme.ButtonPrimaryBg, Color.white, 0.05f));
+                baseToggleStyle.hover.textColor = theme.Text;
+                baseToggleStyle.active.background = CreateGradientRoundedRectTexture(32, 32, radius, Color.Lerp(theme.ButtonPrimaryBg, Color.black, 0.15f), Color.Lerp(theme.ButtonPrimaryBg, Color.black, 0.2f));
+                baseToggleStyle.active.textColor = Color.Lerp(theme.Text, Color.white, 0.5f);
+                baseToggleStyle.onNormal.background = CreateGradientRoundedRectTexture(32, 32, radius, theme.Accent, Color.Lerp(theme.Accent, Color.black, 0.05f));
+                baseToggleStyle.onNormal.textColor = theme.Text;
+                baseToggleStyle.onHover.background = CreateGradientRoundedRectTexture(32, 32, radius, Color.Lerp(theme.Accent, Color.white, 0.12f), Color.Lerp(theme.Accent, Color.white, 0.05f));
+                baseToggleStyle.onHover.textColor = theme.Text;
+                baseToggleStyle.onActive.background = CreateGradientRoundedRectTexture(32, 32, radius, Color.Lerp(theme.Accent, Color.black, 0.15f), Color.Lerp(theme.Accent, Color.black, 0.2f));
+                baseToggleStyle.onActive.textColor = theme.Text;
+                baseToggleStyle.border = GetBorderOffset(4f);
             }
             catch (Exception ex)
             {
-                GUILogger.LogException(ex, "SetupToggleVariantStyles", "StyleManager");
+                GUILogger.LogException(ex, "SetupToggleStyle", "StyleManager");
             }
-        }
-
-        private GUIStyle CreateToggleStyle(Color normalBg, Color normalFg, Color onBg, Color onFg)
-        {
-            GUIStyle style = CreateStyleWithFont(GUI.skin.button, guiHelper.fontSize);
-            style.alignment = TextAnchor.MiddleCenter;
-            style.normal.textColor = normalFg;
-            int radius = GetScaledBorderRadius(4f);
-            style.normal.background = CreateGradientRoundedRectTexture(32, 32, radius, normalBg, Color.Lerp(normalBg, Color.black, 0.05f));
-            style.hover.background = CreateGradientRoundedRectTexture(32, 32, radius, ThemeManager.Instance.CurrentTheme.Secondary, Color.Lerp(ThemeManager.Instance.CurrentTheme.Secondary, Color.white, 0.05f));
-            style.hover.textColor = ThemeManager.Instance.CurrentTheme.Text;
-            style.active.background = CreateGradientRoundedRectTexture(32, 32, radius, Color.Lerp(normalBg, Color.black, 0.15f), Color.Lerp(normalBg, Color.black, 0.2f));
-            style.active.textColor = Color.Lerp(normalFg, Color.white, 0.5f);
-            style.onNormal.background = CreateGradientRoundedRectTexture(32, 32, radius, onBg, Color.Lerp(onBg, Color.black, 0.05f));
-            style.onNormal.textColor = onFg;
-            style.onHover.background = CreateGradientRoundedRectTexture(32, 32, radius, Color.Lerp(onBg, Color.white, 0.12f), Color.Lerp(onBg, Color.white, 0.05f));
-            style.onHover.textColor = onFg;
-            style.onActive.background = CreateGradientRoundedRectTexture(32, 32, radius, Color.Lerp(onBg, Color.black, 0.15f), Color.Lerp(onBg, Color.black, 0.2f));
-            style.onActive.textColor = onFg;
-            style.border = GetBorderOffset(4f);
-            return style;
         }
         #endregion
 
-        #region Style Setup - Input
-        private void SetupInputVariantStyles()
+        #region Style Setup - Input Base
+        private void SetupInputStyle()
         {
             try
             {
                 var theme = ThemeManager.Instance.CurrentTheme;
-                inputDefaultStyle = CreateInputStyle(inputBackgroundTexture, theme.Text, theme.Text);
-                inputDefaultStyle.normal.background = CreateRoundedRectTexture(128, 40, 8, theme.Secondary);
-                inputDefaultStyle.focused.background = CreateRoundedRectTexture(128, 40, 8, theme.Secondary);
-                inputOutlineStyle = new UnityHelpers.GUIStyle(inputDefaultStyle);
-                if (customFont != null)
-                    inputOutlineStyle.font = customFont;
-                inputOutlineStyle.normal.background = CreateRoundedRectTexture(128, 40, 6, theme.Base);
-                inputOutlineStyle.focused.background = CreateRoundedRectTexture(128, 40, 6, theme.Base);
-                inputGhostStyle = new UnityHelpers.GUIStyle(inputDefaultStyle);
-                if (customFont != null)
-                    inputGhostStyle.font = customFont;
-                inputGhostStyle.normal.background = transparentTexture;
-                inputGhostStyle.focused.background = transparentTexture;
-                inputFocusedStyle = new UnityHelpers.GUIStyle(inputDefaultStyle);
-                if (customFont != null)
-                    inputFocusedStyle.font = customFont;
-                inputFocusedStyle.normal.background = inputFocusedTexture;
-                inputFocusedStyle.border = new UnityHelpers.RectOffset(2, 2, 2, 2);
-                inputDisabledStyle = new UnityHelpers.GUIStyle(inputDefaultStyle);
-                if (customFont != null)
-                    inputDisabledStyle.font = customFont;
-                inputDisabledStyle.normal.textColor = theme.Muted;
-                inputDisabledStyle.normal.background = CreateRoundedRectTexture(128, 40, 8, theme.Secondary);
-                passwordFieldStyle = CreateStyleWithFont(inputDefaultStyle, guiHelper.fontSize + 2);
-                textAreaStyle = CreateStyleWithFont(inputDefaultStyle, guiHelper.fontSize);
+                baseInputStyle = CreateStyleWithFont(GUI.skin.textField, GetScaledFontSize(0.875f));
+                baseInputStyle.padding = GetSpacingOffset(12f, 8f);
+                baseInputStyle.margin = GetSpacingOffset(0f, 4f);
+                baseInputStyle.border = GetBorderOffset(6f);
+                baseInputStyle.fixedHeight = GetScaledHeight(36f);
+                baseInputStyle.normal.background = CreateRoundedRectTexture(128, 40, 8, Color.Lerp(theme.Secondary, theme.Text, 0.05f));
+                baseInputStyle.normal.textColor = theme.Text;
+                baseInputStyle.hover.background = CreateRoundedRectTexture(128, 40, 8, Color.Lerp(theme.Secondary, theme.Text, 0.1f));
+                baseInputStyle.hover.textColor = theme.Text;
+                baseInputStyle.focused.background = CreateRoundedRectTexture(128, 40, 8, Color.Lerp(theme.Secondary, theme.Text, 0.05f));
+                baseInputStyle.focused.textColor = theme.Accent;
+                int inpRadius = GetScaledBorderRadius(6f);
+                Color focusTint = Color.Lerp(theme.Accent, theme.Overlay, 0.1f);
+                baseInputStyle.onFocused.background = CreateGradientRoundedRectTexture(128, GetScaledHeight(36f), inpRadius, focusTint, Color.Lerp(focusTint, Color.black, 0.05f));
+                passwordFieldStyle = CreateStyleWithFont(baseInputStyle, guiHelper.fontSize + 2);
+                textAreaStyle = CreateStyleWithFont(baseInputStyle, guiHelper.fontSize);
                 textAreaStyle.wordWrap = true;
                 textAreaStyle.stretchHeight = true;
                 textAreaStyle.padding = new UnityHelpers.RectOffset(12, 12, 8, 8);
-                textAreaFocusedStyle = new UnityHelpers.GUIStyle(inputDefaultStyle);
-                if (customFont != null)
-                    textAreaFocusedStyle.font = customFont;
-                textAreaFocusedStyle.normal.background = inputFocusedTexture;
             }
             catch (Exception ex)
             {
-                GUILogger.LogException(ex, "SetupInputVariantStyles", "StyleManager");
+                GUILogger.LogException(ex, "SetupInputStyle", "StyleManager");
             }
-        }
-
-        private GUIStyle CreateInputStyle(Texture2D background, Color textColor, Color focusedColor)
-        {
-            GUIStyle style = CreateStyleWithFont(GUI.skin.textField, GetScaledFontSize(0.875f));
-            style.padding = GetSpacingOffset(12f, 8f);
-            style.margin = GetSpacingOffset(0f, 4f);
-            style.border = GetBorderOffset(6f);
-            style.fixedHeight = GetScaledHeight(36f);
-            style.normal.background = background;
-            style.normal.textColor = textColor;
-            style.hover.background = background;
-            style.hover.textColor = textColor;
-            style.focused.background = inputFocusedTexture;
-            style.focused.textColor = focusedColor;
-            int inpRadius = GetScaledBorderRadius(6f);
-            var theme = ThemeManager.Instance.CurrentTheme;
-            Color focusTint = Color.Lerp(theme.Accent, theme.Overlay, 0.1f);
-            style.onFocused.background = CreateGradientRoundedRectTexture(128, GetScaledHeight(36f), inpRadius, focusTint, Color.Lerp(focusTint, Color.black, 0.05f));
-            return style;
         }
         #endregion
 
-        #region Style Setup - Label
-        private void SetupLabelVariantStyles()
+        #region Style Setup - Label Base
+        private void SetupLabelStyle()
         {
             try
             {
                 var theme = ThemeManager.Instance.CurrentTheme;
-                labelDefaultStyle = CreateStyleWithFont(GUI.skin.label, GetScaledFontSize(1.0f), FontStyle.Normal);
-                labelDefaultStyle.normal.textColor = theme.Text;
-                labelDefaultStyle.padding = GetSpacingOffset(0f, 3f);
-                labelDefaultStyle.wordWrap = true;
-                labelDefaultStyle.alignment = TextAnchor.UpperLeft;
-                labelSecondaryStyle = CreateStyleWithFont(GUI.skin.label, GetScaledFontSize(0.9f));
-                labelSecondaryStyle.normal.textColor = Color.Lerp(theme.Text, theme.Muted, 0.4f);
-                labelSecondaryStyle.wordWrap = true;
-                labelMutedStyle = CreateStyleWithFont(GUI.skin.label, GetScaledFontSize(0.85f));
-                labelMutedStyle.normal.textColor = theme.Muted;
-                labelMutedStyle.wordWrap = true;
-                labelDestructiveStyle = CreateStyleWithFont(GUI.skin.label, GetScaledFontSize(1.0f), FontStyle.Bold);
-                labelDestructiveStyle.normal.textColor = theme.Destructive;
-                labelDestructiveStyle.wordWrap = true;
+                baseLabelStyle = CreateStyleWithFont(GUI.skin.label, GetScaledFontSize(1.0f), FontStyle.Normal);
+                baseLabelStyle.normal.textColor = theme.Text;
+                baseLabelStyle.padding = GetSpacingOffset(0f, 3f);
+                baseLabelStyle.wordWrap = true;
+                baseLabelStyle.alignment = TextAnchor.UpperLeft;
             }
             catch (Exception ex)
             {
-                GUILogger.LogException(ex, "SetupLabelVariantStyles", "StyleManager");
+                GUILogger.LogException(ex, "SetupLabelStyle", "StyleManager");
             }
         }
         #endregion
@@ -1453,17 +856,11 @@ namespace shadcnui.GUIComponents.Core
                 var theme = ThemeManager.Instance.CurrentTheme;
                 progressBarStyle = new UnityHelpers.GUIStyle(GUI.skin.box);
                 int progRadius = GetScaledBorderRadius(8f);
-                progressBarStyle.normal.background = CreateRoundedRectTexture(256, 12, progRadius, theme.Secondary);
+                progressBarStyle.normal.background = CreateRoundedRectTexture(256, 12, progRadius, theme.Base);
                 progressBarStyle.border = GetBorderOffset(8f);
                 progressBarStyle.padding = GetSpacingOffset(0f, 0f);
                 progressBarStyle.margin = GetSpacingOffset(0f, 4f);
                 progressBarStyle.fixedHeight = GetScaledHeight(12f);
-                progressBarBackgroundStyle = new UnityHelpers.GUIStyle();
-                progressBarBackgroundStyle.normal.background = CreateRoundedRectTexture(256, 12, progRadius, theme.Secondary);
-                progressBarBackgroundStyle.fixedHeight = GetScaledHeight(12f);
-                progressBarFillStyle = new UnityHelpers.GUIStyle();
-                progressBarFillStyle.normal.background = CreateRoundedRectTexture(256, 12, progRadius, theme.Accent);
-                progressBarFillStyle.fixedHeight = GetScaledHeight(12f);
             }
             catch (Exception ex)
             {
@@ -1518,7 +915,6 @@ namespace shadcnui.GUIComponents.Core
                 tabsTriggerActiveStyle = new UnityHelpers.GUIStyle(tabsTriggerStyle);
                 if (customFont != null)
                     tabsTriggerActiveStyle.font = customFont;
-
                 tabsTriggerActiveStyle.normal.background = CreateBottomBorderTexture(128, GetScaledHeight(40f), Mathf.Max(3, Mathf.RoundToInt(3f * guiHelper.uiScale)), theme.Accent, theme.Base);
                 tabsTriggerActiveStyle.normal.textColor = theme.TabsTriggerActiveFg;
                 tabsTriggerActiveStyle.hover.background = tabsTriggerActiveStyle.normal.background;
@@ -1533,189 +929,86 @@ namespace shadcnui.GUIComponents.Core
         }
         #endregion
 
-        #region Style Setup - TextArea
-        private void SetupTextAreaVariantStyles()
+        #region Style Setup - Checkbox Base
+        private void SetupCheckboxStyle()
         {
             try
             {
                 var theme = ThemeManager.Instance.CurrentTheme;
-                textAreaStyle = CreateStyleWithFont(GUI.skin.textArea, GetScaledFontSize(0.875f));
-                textAreaStyle.padding = GetSpacingOffset(12f, 8f);
-                textAreaStyle.border = GetBorderOffset(6f);
-                textAreaStyle.normal.background = CreateRoundedRectTexture(128, 80, 8, theme.Secondary);
-                textAreaStyle.normal.textColor = theme.Text;
-                textAreaStyle.focused.background = CreateRoundedRectTexture(128, 80, 8, Color.Lerp(theme.Secondary, theme.Accent, 0.1f));
-                textAreaStyle.focused.textColor = theme.Text;
-                textAreaStyle.hover.background = CreateRoundedRectTexture(128, 80, 8, Color.Lerp(theme.Secondary, Color.white, 0.08f));
-                textAreaStyle.wordWrap = true;
-                textAreaStyle.stretchHeight = true;
-                textAreaFocusedStyle = new UnityHelpers.GUIStyle(textAreaStyle);
-                textAreaFocusedStyle.normal.background = CreateRoundedRectTexture(128, 80, 8, Color.Lerp(theme.Secondary, theme.Accent, 0.1f));
-                textAreaFocusedStyle.border = new UnityHelpers.RectOffset(0, 0, 0, 0);
-                textAreaOutlineStyle = new UnityHelpers.GUIStyle(textAreaStyle);
-                textAreaOutlineStyle.normal.background = CreateOutlineTexture();
-                textAreaOutlineStyle.focused.background = CreateSolidTexture(Color.Lerp(theme.Accent, Color.black, 0.15f));
-                textAreaGhostStyle = new UnityHelpers.GUIStyle(textAreaStyle);
-                textAreaGhostStyle.normal.background = transparentTexture;
-                textAreaGhostStyle.focused.background = CreateSolidTexture(Color.Lerp(theme.Secondary, Color.black, 0.08f));
-            }
-            catch (Exception ex)
-            {
-                GUILogger.LogException(ex, "SetupTextAreaVariantStyles", "StyleManager");
-            }
-        }
-        #endregion
-
-        #region Style Setup - Checkbox
-        private void SetupCheckboxStyles()
-        {
-            try
-            {
-                var theme = ThemeManager.Instance.CurrentTheme;
-                checkboxDefaultStyle = new UnityHelpers.GUIStyle(GUI.skin.toggle);
+                baseCheckboxStyle = new UnityHelpers.GUIStyle(GUI.skin.toggle);
                 if (customFont != null)
-                    checkboxDefaultStyle.font = customFont;
-                checkboxDefaultStyle.fontSize = GetScaledFontSize(0.9f);
+                    baseCheckboxStyle.font = customFont;
+                baseCheckboxStyle.fontSize = GetScaledFontSize(0.9f);
                 int cbRadius = GetScaledBorderRadius(6f);
-                checkboxDefaultStyle.normal.background = CreateRoundedRectTexture(20, 20, cbRadius, theme.Secondary);
-                checkboxDefaultStyle.normal.textColor = theme.Text;
-                checkboxDefaultStyle.hover.background = CreateRoundedRectTexture(20, 20, cbRadius, Color.Lerp(theme.Secondary, Color.white, 0.15f));
-                checkboxDefaultStyle.hover.textColor = theme.Text;
-                checkboxDefaultStyle.active.background = CreateRoundedRectTexture(20, 20, cbRadius, Color.Lerp(theme.Secondary, Color.black, 0.1f));
-                checkboxDefaultStyle.active.textColor = theme.Text;
-                checkboxDefaultStyle.onNormal.background = CreateRoundedRectTexture(20, 20, cbRadius, theme.Accent);
-                checkboxDefaultStyle.onNormal.textColor = Color.white;
-                checkboxDefaultStyle.onHover.background = CreateRoundedRectTexture(20, 20, cbRadius, Color.Lerp(theme.Accent, Color.white, 0.12f));
-                checkboxDefaultStyle.onHover.textColor = Color.white;
-                checkboxDefaultStyle.onActive.background = CreateRoundedRectTexture(20, 20, cbRadius, Color.Lerp(theme.Accent, Color.black, 0.1f));
-                checkboxDefaultStyle.onActive.textColor = Color.white;
-                checkboxDefaultStyle.border = GetBorderOffset(6f);
-                checkboxDefaultStyle.padding = GetSpacingOffset(8f, 0f);
-                checkboxOutlineStyle = new UnityHelpers.GUIStyle(checkboxDefaultStyle);
-                if (customFont != null)
-                    checkboxOutlineStyle.font = customFont;
-                checkboxOutlineStyle.normal.background = CreateOutlineTexture();
-                checkboxOutlineStyle.hover.background = CreateSolidTexture(Color.Lerp(theme.Accent, Color.white, 0.12f));
-                checkboxOutlineStyle.hover.textColor = Color.white;
-                checkboxOutlineStyle.active.background = CreateSolidTexture(Color.Lerp(theme.Accent, Color.black, 0.15f));
-                checkboxOutlineStyle.active.textColor = Color.white;
-                checkboxOutlineStyle.onNormal.background = CreateOutlineButtonTexture(theme.Accent, theme.Accent);
-                checkboxOutlineStyle.onHover.background = CreateSolidTexture(Color.Lerp(theme.Accent, Color.white, 0.12f));
-                checkboxOutlineStyle.onHover.textColor = Color.white;
-                checkboxOutlineStyle.onActive.background = CreateSolidTexture(Color.Lerp(theme.Accent, Color.black, 0.15f));
-                checkboxOutlineStyle.onActive.textColor = Color.white;
-                checkboxGhostStyle = new UnityHelpers.GUIStyle(checkboxDefaultStyle);
-                if (customFont != null)
-                    checkboxGhostStyle.font = customFont;
-                checkboxGhostStyle.normal.background = transparentTexture;
-                checkboxGhostStyle.normal.textColor = theme.Text;
-                checkboxGhostStyle.hover.background = CreateSolidTexture(Color.Lerp(theme.Base, Color.black, 0.12f));
-                checkboxGhostStyle.hover.textColor = theme.Text;
-                checkboxGhostStyle.active.background = CreateSolidTexture(Color.Lerp(theme.Base, Color.black, 0.2f));
-                checkboxGhostStyle.active.textColor = theme.Text;
-                checkboxGhostStyle.onNormal.background = CreateSolidTexture(theme.Accent);
-                checkboxGhostStyle.onNormal.textColor = Color.white;
-                checkboxGhostStyle.onHover.background = CreateSolidTexture(Color.Lerp(theme.Accent, Color.white, 0.12f));
-                checkboxGhostStyle.onHover.textColor = Color.white;
-                checkboxGhostStyle.onActive.background = CreateSolidTexture(Color.Lerp(theme.Accent, Color.black, 0.15f));
-                checkboxGhostStyle.onActive.textColor = Color.white;
+                baseCheckboxStyle.normal.background = CreateRoundedRectTexture(20, 20, cbRadius, Color.Lerp(theme.Secondary, theme.Text, 0.1f));
+                baseCheckboxStyle.normal.textColor = theme.Text;
+                baseCheckboxStyle.hover.background = CreateRoundedRectTexture(20, 20, cbRadius, Color.Lerp(theme.Secondary, theme.Text, 0.2f));
+                baseCheckboxStyle.hover.textColor = theme.Text;
+                baseCheckboxStyle.active.background = CreateRoundedRectTexture(20, 20, cbRadius, Color.Lerp(theme.Secondary, theme.Text, 0.05f));
+                baseCheckboxStyle.active.textColor = theme.Text;
+                baseCheckboxStyle.onNormal.background = CreateRoundedRectTexture(20, 20, cbRadius, theme.Accent);
+                baseCheckboxStyle.onNormal.textColor = Color.white;
+                baseCheckboxStyle.onHover.background = CreateRoundedRectTexture(20, 20, cbRadius, Color.Lerp(theme.Accent, Color.white, 0.12f));
+                baseCheckboxStyle.onHover.textColor = Color.white;
+                baseCheckboxStyle.onActive.background = CreateRoundedRectTexture(20, 20, cbRadius, Color.Lerp(theme.Accent, Color.black, 0.1f));
+                baseCheckboxStyle.onActive.textColor = Color.white;
+                baseCheckboxStyle.border = GetBorderOffset(6f);
+                baseCheckboxStyle.padding = GetSpacingOffset(8f, 0f);
             }
             catch (Exception ex)
             {
-                GUILogger.LogException(ex, "SetupCheckboxStyles", "StyleManager");
+                GUILogger.LogException(ex, "SetupCheckboxStyle", "StyleManager");
             }
         }
         #endregion
 
-        #region Style Setup - Switch
-        private void SetupSwitchStyles()
+        #region Style Setup - Switch Base
+        private void SetupSwitchStyle()
         {
             try
             {
                 var theme = ThemeManager.Instance.CurrentTheme;
-                switchDefaultStyle = new UnityHelpers.GUIStyle(GUI.skin.toggle);
+                baseSwitchStyle = new UnityHelpers.GUIStyle(GUI.skin.toggle);
                 if (customFont != null)
-                    switchDefaultStyle.font = customFont;
-                switchDefaultStyle.fontSize = GetScaledFontSize(0.875f);
-                switchDefaultStyle.normal.background = switchOffTexture;
-                switchDefaultStyle.normal.textColor = theme.Text;
-                switchDefaultStyle.hover.background = CreateSolidTexture(Color.Lerp(theme.Secondary, Color.white, 0.12f));
-                switchDefaultStyle.hover.textColor = theme.Text;
-                switchDefaultStyle.active.background = CreateSolidTexture(Color.Lerp(theme.Secondary, Color.black, 0.15f));
-                switchDefaultStyle.active.textColor = theme.Text;
-                switchDefaultStyle.onNormal.background = switchOnTexture;
-                switchDefaultStyle.onNormal.textColor = theme.Text;
-                switchDefaultStyle.onHover.background = CreateSolidTexture(Color.Lerp(theme.Accent, Color.white, 0.12f));
-                switchDefaultStyle.onHover.textColor = theme.Text;
-                switchDefaultStyle.onActive.background = CreateSolidTexture(Color.Lerp(theme.Accent, Color.black, 0.15f));
-                switchDefaultStyle.onActive.textColor = theme.Text;
-                switchDefaultStyle.border = GetBorderOffset(6f);
-                switchOutlineStyle = new UnityHelpers.GUIStyle(switchDefaultStyle);
-                if (customFont != null)
-                    switchOutlineStyle.font = customFont;
-                switchOutlineStyle.normal.background = CreateOutlineTexture();
-                switchOutlineStyle.normal.textColor = theme.Text;
-                switchOutlineStyle.hover.background = CreateSolidTexture(Color.Lerp(theme.Accent, Color.white, 0.12f));
-                switchOutlineStyle.hover.textColor = theme.Text;
-                switchOutlineStyle.active.background = CreateSolidTexture(Color.Lerp(theme.Accent, Color.black, 0.15f));
-                switchOutlineStyle.active.textColor = theme.Text;
-                switchOutlineStyle.onNormal.background = CreateOutlineButtonTexture(theme.Accent, theme.Accent);
-                switchOutlineStyle.onNormal.textColor = theme.Text;
-                switchOutlineStyle.onHover.background = CreateSolidTexture(Color.Lerp(theme.Accent, Color.white, 0.12f));
-                switchOutlineStyle.onHover.textColor = theme.Text;
-                switchOutlineStyle.onActive.background = CreateSolidTexture(Color.Lerp(theme.Accent, Color.black, 0.15f));
-                switchOutlineStyle.onActive.textColor = theme.Text;
-                switchGhostStyle = new UnityHelpers.GUIStyle(switchDefaultStyle);
-                if (customFont != null)
-                    switchGhostStyle.font = customFont;
-                switchGhostStyle.normal.background = transparentTexture;
-                switchGhostStyle.normal.textColor = theme.Text;
-                switchGhostStyle.hover.background = CreateSolidTexture(Color.Lerp(theme.Base, Color.black, 0.12f));
-                switchGhostStyle.hover.textColor = theme.Text;
-                switchGhostStyle.active.background = CreateSolidTexture(Color.Lerp(theme.Base, Color.black, 0.2f));
-                switchGhostStyle.active.textColor = theme.Text;
-                switchGhostStyle.onNormal.background = CreateSolidTexture(theme.Accent);
-                switchGhostStyle.onNormal.textColor = theme.Text;
-                switchGhostStyle.onHover.background = CreateSolidTexture(Color.Lerp(theme.Accent, Color.white, 0.12f));
-                switchGhostStyle.onHover.textColor = theme.Text;
-                switchGhostStyle.onActive.background = CreateSolidTexture(Color.Lerp(theme.Accent, Color.black, 0.15f));
-                switchGhostStyle.onActive.textColor = theme.Text;
+                    baseSwitchStyle.font = customFont;
+                baseSwitchStyle.fontSize = GetScaledFontSize(0.875f);
+                baseSwitchStyle.normal.background = switchOffTexture;
+                baseSwitchStyle.normal.textColor = theme.Text;
+                baseSwitchStyle.hover.background = CreateSolidTexture(Color.Lerp(theme.Secondary, theme.Text, 0.2f));
+                baseSwitchStyle.hover.textColor = theme.Text;
+                baseSwitchStyle.active.background = CreateSolidTexture(Color.Lerp(theme.Secondary, theme.Text, 0.05f));
+                baseSwitchStyle.active.textColor = theme.Text;
+                baseSwitchStyle.onNormal.background = switchOnTexture;
+                baseSwitchStyle.onNormal.textColor = theme.Text;
+                baseSwitchStyle.onHover.background = CreateSolidTexture(Color.Lerp(theme.Accent, Color.white, 0.12f));
+                baseSwitchStyle.onHover.textColor = theme.Text;
+                baseSwitchStyle.onActive.background = CreateSolidTexture(Color.Lerp(theme.Accent, Color.black, 0.15f));
+                baseSwitchStyle.onActive.textColor = theme.Text;
+                baseSwitchStyle.border = GetBorderOffset(6f);
             }
             catch (Exception ex)
             {
-                GUILogger.LogException(ex, "SetupSwitchStyles", "StyleManager");
+                GUILogger.LogException(ex, "SetupSwitchStyle", "StyleManager");
             }
         }
         #endregion
 
-        #region Style Setup - Badge
-        private void SetupBadgeStyles()
+        #region Style Setup - Badge Base
+        private void SetupBadgeStyle()
         {
             try
             {
                 var theme = ThemeManager.Instance.CurrentTheme;
-                badgeDefaultStyle = CreateStyleWithFont(GUI.skin.box, GetScaledFontSize(0.8f), FontStyle.Bold);
-                badgeDefaultStyle.normal.background = CreateRoundedRectTexture(128, 24, 12, theme.Elevated);
-                badgeDefaultStyle.normal.textColor = theme.Text;
-                badgeDefaultStyle.border = GetBorderOffset(12f);
-                badgeDefaultStyle.padding = GetSpacingOffset(10f, 4f);
-                badgeDefaultStyle.alignment = TextAnchor.MiddleCenter;
-                badgeSecondaryStyle = new UnityHelpers.GUIStyle(badgeDefaultStyle);
-                if (customFont != null)
-                    badgeSecondaryStyle.font = customFont;
-                badgeSecondaryStyle.normal.background = CreateGradientRoundedRectTexture(128, 24, 12, theme.Secondary, Color.Lerp(theme.Secondary, Color.black, 0.05f));
-                badgeDestructiveStyle = new UnityHelpers.GUIStyle(badgeDefaultStyle);
-                if (customFont != null)
-                    badgeDestructiveStyle.font = customFont;
-                badgeDestructiveStyle.normal.background = CreateGradientRoundedRectTexture(128, 24, 12, theme.Destructive, Color.Lerp(theme.Destructive, Color.black, 0.1f));
-                badgeOutlineStyle = new UnityHelpers.GUIStyle(badgeDefaultStyle);
-                if (customFont != null)
-                    badgeOutlineStyle.font = customFont;
-                badgeOutlineStyle.normal.background = CreateOutlineTexture();
+                baseBadgeStyle = CreateStyleWithFont(GUI.skin.box, GetScaledFontSize(0.8f), FontStyle.Bold);
+                baseBadgeStyle.normal.background = CreateRoundedRectTexture(128, 24, 12, theme.Elevated);
+                baseBadgeStyle.normal.textColor = theme.Text;
+                baseBadgeStyle.border = GetBorderOffset(12f);
+                baseBadgeStyle.padding = GetSpacingOffset(10f, 4f);
+                baseBadgeStyle.alignment = TextAnchor.MiddleCenter;
             }
             catch (Exception ex)
             {
-                GUILogger.LogException(ex, "SetupBadgeStyles", "StyleManager");
+                GUILogger.LogException(ex, "SetupBadgeStyle", "StyleManager");
             }
         }
         #endregion
@@ -1728,11 +1021,11 @@ namespace shadcnui.GUIComponents.Core
                 var theme = ThemeManager.Instance.CurrentTheme;
                 int defaultAvatarSize = GetScaledHeight(40f);
                 avatarStyle = new UnityHelpers.GUIStyle(GUI.skin.box);
-                avatarStyle.normal.background = CreateSolidTexture(theme.Secondary);
+                avatarStyle.normal.background = CreateSolidTexture(theme.Muted);
                 avatarStyle.alignment = TextAnchor.MiddleCenter;
                 avatarStyle.fixedWidth = defaultAvatarSize;
                 avatarStyle.fixedHeight = defaultAvatarSize;
-                avatarStyle.border = GetAvatarBorder(AvatarShape.Circle, AvatarSize.Default);
+                avatarStyle.border = GetAvatarBorder(AvatarShape.Circle, ControlSize.Default);
             }
             catch (Exception ex)
             {
@@ -1741,17 +1034,17 @@ namespace shadcnui.GUIComponents.Core
         }
         #endregion
 
-        #region Style Setup - Table
+        #region Style Setup - Table Base
         private void SetupTableStyles()
         {
             try
             {
                 var theme = ThemeManager.Instance.CurrentTheme;
-                tableStyle = new UnityHelpers.GUIStyle();
-                tableStyle.normal.background = CreateSolidTexture(theme.Secondary);
-                tableStyle.border = GetBorderOffset(1f);
-                tableStyle.padding = GetSpacingOffset(0f, 0f);
-                tableStyle.margin = GetSpacingOffset(0f, 0f);
+                baseTableStyle = new UnityHelpers.GUIStyle();
+                baseTableStyle.normal.background = CreateSolidTexture(Color.Lerp(theme.Secondary, theme.Text, 0.05f));
+                baseTableStyle.border = GetBorderOffset(1f);
+                baseTableStyle.padding = GetSpacingOffset(0f, 0f);
+                baseTableStyle.margin = GetSpacingOffset(0f, 0f);
                 tableHeaderStyle = CreateStyleWithFont(GUI.skin.button, GetScaledFontSize(0.9f), FontStyle.Bold);
                 tableHeaderStyle.normal.background = CreateGradientRoundedRectTexture(128, 40, 0, Color.Lerp(theme.Secondary, theme.Accent, 0.15f), Color.Lerp(theme.Secondary, theme.Accent, 0.1f));
                 tableHeaderStyle.hover.background = CreateSolidTexture(Color.Lerp(theme.Secondary, theme.Accent, 0.2f));
@@ -1780,7 +1073,7 @@ namespace shadcnui.GUIComponents.Core
                 tableHoverStyle = new UnityHelpers.GUIStyle(tableCellStyle);
                 if (customFont != null)
                     tableHoverStyle.font = customFont;
-                tableHoverStyle.normal.background = CreateSolidTexture(theme.Secondary);
+                tableHoverStyle.normal.background = CreateSolidTexture(Color.Lerp(theme.Secondary, theme.Text, 0.05f));
                 tableHoverStyle.normal.textColor = theme.Text;
                 tableHoverStyle.hover.background = CreateSolidTexture(Color.Lerp(theme.Secondary, theme.Accent, 0.12f));
                 tableHoverStyle.hover.textColor = theme.Text;
@@ -1794,27 +1087,25 @@ namespace shadcnui.GUIComponents.Core
         }
         #endregion
 
-        #region Style Setup - Calendar
-        private void SetupCalendarStyles()
+        #region Style Setup - Calendar Base
+        private void SetupCalendarStyle()
         {
             try
             {
                 var theme = ThemeManager.Instance.CurrentTheme;
-                calendarStyle = new UnityHelpers.GUIStyle(GUI.skin.box);
-                calendarStyle.normal.background = CreateSolidTexture(theme.Secondary);
-                calendarStyle.border = GetBorderOffset(4f);
-                calendarStyle.padding = GetSpacingOffset(12f, 12f);
+                baseCalendarStyle = new UnityHelpers.GUIStyle(GUI.skin.box);
+                baseCalendarStyle.normal.background = CreateSolidTexture(theme.Elevated);
+                baseCalendarStyle.border = GetBorderOffset(4f);
+                baseCalendarStyle.padding = GetSpacingOffset(12f, 12f);
                 calendarHeaderStyle = new UnityHelpers.GUIStyle();
                 calendarHeaderStyle.padding = GetSpacingOffset(0f, 4f);
-                calendarTitleStyle = CreateStyleWithFont(GUI.skin.label, GetScaledFontSize(1.125f), FontStyle.Bold);
-                calendarTitleStyle.normal.textColor = theme.Text;
-                calendarTitleStyle.alignment = TextAnchor.MiddleCenter;
+
                 calendarWeekdayStyle = CreateStyleWithFont(GUI.skin.label, GetScaledFontSize(0.875f));
                 calendarWeekdayStyle.normal.textColor = Color.Lerp(theme.Text, Color.black, 0.35f);
                 calendarWeekdayStyle.alignment = TextAnchor.MiddleCenter;
                 calendarDayStyle = CreateStyleWithFont(GUI.skin.button, GetScaledFontSize(1.0f));
                 calendarDayStyle.normal.textColor = theme.Text;
-                calendarDayStyle.normal.background = CreateSolidTexture(theme.Secondary);
+                calendarDayStyle.normal.background = CreateSolidTexture(theme.Elevated);
                 calendarDayStyle.hover.background = CreateGradientRoundedRectTexture(32, 32, 4, Color.Lerp(theme.Secondary, theme.Accent, 0.12f), Color.Lerp(theme.Secondary, theme.Accent, 0.08f));
                 calendarDaySelectedStyle = new UnityHelpers.GUIStyle(calendarDayStyle);
                 if (customFont != null)
@@ -1836,7 +1127,7 @@ namespace shadcnui.GUIComponents.Core
             }
             catch (Exception ex)
             {
-                GUILogger.LogException(ex, "SetupCalendarStyles", "StyleManager");
+                GUILogger.LogException(ex, "SetupCalendarStyle", "StyleManager");
             }
         }
         #endregion
@@ -1849,7 +1140,7 @@ namespace shadcnui.GUIComponents.Core
                 var theme = ThemeManager.Instance.CurrentTheme;
                 dropdownMenuContentStyle = new UnityHelpers.GUIStyle(GUI.skin.box);
                 int dropdownRadius = GetScaledBorderRadius(8f);
-                dropdownMenuContentStyle.normal.background = CreateRoundedRectWithShadowTexture(256, 256, dropdownRadius, theme.Secondary, 0.18f, 10);
+                dropdownMenuContentStyle.normal.background = CreateRoundedRectWithShadowTexture(256, 256, dropdownRadius, theme.Elevated, 0.18f, 10);
                 dropdownMenuContentStyle.border = GetBorderOffset(8f);
                 dropdownMenuContentStyle.padding = GetSpacingOffset(6f, 6f);
                 dropdownMenuItemStyle = CreateStyleWithFont(GUI.skin.button, GetScaledFontSize(0.9f));
@@ -1861,13 +1152,6 @@ namespace shadcnui.GUIComponents.Core
                 dropdownMenuItemStyle.active.background = CreateGradientRoundedRectTexture(128, 32, 6, Color.Lerp(theme.Accent, Color.black, 0.1f), Color.Lerp(theme.Accent, Color.black, 0.15f));
                 dropdownMenuItemStyle.active.textColor = theme.Accent;
                 dropdownMenuItemStyle.padding = GetSpacingOffset(14f, 6f);
-                dropdownMenuSeparatorStyle = new UnityHelpers.GUIStyle();
-                dropdownMenuSeparatorStyle.normal.background = CreateSolidTexture(theme.Border);
-                dropdownMenuSeparatorStyle.fixedHeight = 1;
-                dropdownMenuSeparatorStyle.margin = GetSpacingOffset(6f, 6f);
-                dropdownMenuHeaderStyle = CreateStyleWithFont(GUI.skin.label, GetScaledFontSize(0.8f), FontStyle.Bold);
-                dropdownMenuHeaderStyle.normal.textColor = theme.Muted;
-                dropdownMenuHeaderStyle.padding = GetSpacingOffset(14f, 6f);
             }
             catch (Exception ex)
             {
@@ -1883,7 +1167,7 @@ namespace shadcnui.GUIComponents.Core
             {
                 var theme = ThemeManager.Instance.CurrentTheme;
                 popoverContentStyle = new UnityHelpers.GUIStyle(GUI.skin.box);
-                popoverContentStyle.normal.background = CreateSolidTexture(theme.Secondary);
+                popoverContentStyle.normal.background = CreateSolidTexture(theme.Elevated);
                 popoverContentStyle.border = GetBorderOffset(6f);
                 popoverContentStyle.padding = GetSpacingOffset(12f, 12f);
             }
@@ -1911,7 +1195,7 @@ namespace shadcnui.GUIComponents.Core
                 selectTriggerStyle.padding = new UnityHelpers.RectOffset(10, 10, 5, 5);
                 selectTriggerStyle.border = new UnityHelpers.RectOffset(borderRadius, borderRadius, borderRadius, borderRadius);
                 selectContentStyle = new UnityHelpers.GUIStyle(GUI.skin.box);
-                selectContentStyle.normal.background = CreateSolidTexture(theme.Secondary);
+                selectContentStyle.normal.background = CreateSolidTexture(theme.Elevated);
                 selectContentStyle.border = new UnityHelpers.RectOffset(borderRadius, borderRadius, borderRadius, borderRadius);
                 selectContentStyle.padding = new UnityHelpers.RectOffset(5, 5, 5, 5);
                 selectItemStyle = CreateStyleWithFont(GUI.skin.button, Mathf.RoundToInt(scaledFontSize));
@@ -1931,27 +1215,25 @@ namespace shadcnui.GUIComponents.Core
         }
         #endregion
 
-        #region Style Setup - DatePicker
-        private void SetupDatePickerStyles()
+        #region Style Setup - DatePicker Base
+        private void SetupDatePickerStyle()
         {
             try
             {
                 var theme = ThemeManager.Instance.CurrentTheme;
-                datePickerStyle = new UnityHelpers.GUIStyle(GUI.skin.box);
-                datePickerStyle.normal.background = CreateSolidTexture(theme.Secondary);
-                datePickerStyle.border = new UnityHelpers.RectOffset(4, 4, 4, 4);
-                datePickerStyle.padding = new UnityHelpers.RectOffset(10, 10, 10, 10);
+                baseDatePickerStyle = new UnityHelpers.GUIStyle(GUI.skin.box);
+                baseDatePickerStyle.normal.background = CreateSolidTexture(Color.Lerp(theme.Secondary, theme.Text, 0.05f));
+                baseDatePickerStyle.border = new UnityHelpers.RectOffset(4, 4, 4, 4);
+                baseDatePickerStyle.padding = new UnityHelpers.RectOffset(10, 10, 10, 10);
                 datePickerHeaderStyle = new UnityHelpers.GUIStyle();
                 datePickerHeaderStyle.padding = new UnityHelpers.RectOffset(0, 0, 5, 5);
-                datePickerTitleStyle = CreateStyleWithFont(GUI.skin.label, guiHelper.fontSize + 2, FontStyle.Bold);
-                datePickerTitleStyle.normal.textColor = theme.Text;
-                datePickerTitleStyle.alignment = TextAnchor.MiddleCenter;
+
                 datePickerWeekdayStyle = CreateStyleWithFont(GUI.skin.label, guiHelper.fontSize - 1);
                 datePickerWeekdayStyle.normal.textColor = Color.Lerp(theme.Text, Color.black, 0.35f);
                 datePickerWeekdayStyle.alignment = TextAnchor.MiddleCenter;
                 datePickerDayStyle = CreateStyleWithFont(GUI.skin.button, guiHelper.fontSize);
                 datePickerDayStyle.normal.textColor = theme.Text;
-                datePickerDayStyle.normal.background = CreateSolidTexture(theme.Secondary);
+                datePickerDayStyle.normal.background = CreateSolidTexture(Color.Lerp(theme.Secondary, theme.Text, 0.05f));
                 datePickerDayStyle.hover.background = CreateSolidTexture(Color.Lerp(theme.Secondary, theme.Accent, 0.12f));
                 datePickerDaySelectedStyle = new UnityHelpers.GUIStyle(datePickerDayStyle);
                 if (customFont != null)
@@ -1969,7 +1251,7 @@ namespace shadcnui.GUIComponents.Core
             }
             catch (Exception ex)
             {
-                GUILogger.LogException(ex, "SetupDatePickerStyles", "StyleManager");
+                GUILogger.LogException(ex, "SetupDatePickerStyle", "StyleManager");
             }
         }
         #endregion
@@ -1980,18 +1262,10 @@ namespace shadcnui.GUIComponents.Core
             try
             {
                 var theme = ThemeManager.Instance.CurrentTheme;
-                dialogOverlayStyle = new UnityHelpers.GUIStyle();
-                dialogOverlayStyle.normal.background = CreateSolidTexture(new Color(0, 0, 0, 0.85f));
                 dialogContentStyle = new UnityHelpers.GUIStyle(GUI.skin.box);
-                dialogContentStyle.normal.background = CreateRoundedRectWithShadowTexture(512, 512, 12, theme.Secondary, 0.18f, 12);
+                dialogContentStyle.normal.background = CreateRoundedRectWithShadowTexture(512, 512, 12, theme.Elevated, 0.18f, 12);
                 dialogContentStyle.border = new UnityHelpers.RectOffset(12, 12, 12, 12);
                 dialogContentStyle.padding = new UnityHelpers.RectOffset(24, 24, 24, 24);
-                dialogTitleStyle = CreateStyleWithFont(GUI.skin.label, GetScaledFontSize(1.25f), FontStyle.Bold);
-                dialogTitleStyle.normal.textColor = theme.Text;
-                dialogTitleStyle.wordWrap = true;
-                dialogDescriptionStyle = CreateStyleWithFont(GUI.skin.label, GetScaledFontSize(1.0f));
-                dialogDescriptionStyle.normal.textColor = theme.Muted;
-                dialogDescriptionStyle.wordWrap = true;
             }
             catch (Exception ex)
             {
@@ -2011,10 +1285,7 @@ namespace shadcnui.GUIComponents.Core
                 chartContainerStyle.border = GetBorderOffset(12f);
                 chartContainerStyle.padding = GetSpacingOffset(16f, 16f);
                 chartContainerStyle.margin = GetSpacingOffset(0f, 0f);
-                chartContentStyle = new UnityHelpers.GUIStyle();
-                chartContentStyle.normal.background = transparentTexture;
-                chartContentStyle.padding = GetSpacingOffset(0f, 0f);
-                chartContentStyle.margin = GetSpacingOffset(0f, 0f);
+
                 chartAxisStyle = CreateStyleWithFont(GUI.skin.label, GetScaledFontSize(0.75f));
                 chartAxisStyle.normal.textColor = theme.Muted;
                 chartAxisStyle.alignment = TextAnchor.MiddleCenter;
@@ -2050,7 +1321,8 @@ namespace shadcnui.GUIComponents.Core
                 menuBarItemStyle.active.textColor = theme.Text;
                 menuBarItemStyle.stretchWidth = false;
                 menuDropdownStyle = new UnityHelpers.GUIStyle(GUI.skin.box);
-                menuDropdownStyle.normal.background = CreateGradientRoundedRectWithShadowTexture(200, 200, 4, theme.Secondary, theme.Secondary, 0.1f, 6);
+                Color menuBg = Color.Lerp(theme.Secondary, theme.Text, 0.05f);
+                menuDropdownStyle.normal.background = CreateGradientRoundedRectWithShadowTexture(200, 200, 4, menuBg, menuBg, 0.1f, 6);
                 menuDropdownStyle.border = GetBorderOffset(4f);
                 menuDropdownStyle.padding = GetSpacingOffset(4f, 4f);
                 menuDropdownStyle.margin = GetSpacingOffset(0f, 0f);
@@ -2064,314 +1336,944 @@ namespace shadcnui.GUIComponents.Core
         }
         #endregion
 
-        #region Style Getters - Public Only
-        public GUIStyle GetAnimatedBoxStyle() => animatedBoxStyle ?? GUI.skin.box;
+        #region Variant Application
 
-        public GUIStyle GetSectionHeaderStyle() => sectionHeaderStyle ?? GUI.skin.label;
-
-        public GUIStyle GetCardStyle() => cardStyle ?? GUI.skin.box;
-
-        public GUIStyle GetCardHeaderStyle() => cardHeaderStyle ?? GUIStyle.none;
-
-        public GUIStyle GetCardTitleStyle() => cardTitleStyle ?? GUI.skin.label;
-
-        public GUIStyle GetCardDescriptionStyle() => cardDescriptionStyle ?? GUI.skin.label;
-
-        public GUIStyle GetCardContentStyle() => cardContentStyle ?? GUIStyle.none;
-
-        public GUIStyle GetCardFooterStyle() => cardFooterStyle ?? GUIStyle.none;
-
-        public GUIStyle GetButtonStyle(ButtonVariant variant, ButtonSize size)
+        private void ApplyContainerVariant(GUIStyle style, ControlVariant variant, Theme theme)
         {
-            if (buttonStyleCache.TryGetValue((variant, size), out var cachedStyle))
-                return cachedStyle;
-            var baseStyle = variant switch
+            switch (variant)
             {
-                ButtonVariant.Destructive => buttonDestructiveStyle,
-                ButtonVariant.Outline => buttonOutlineStyle,
-                ButtonVariant.Secondary => buttonSecondaryStyle,
-                ButtonVariant.Ghost => buttonGhostStyle,
-                ButtonVariant.Link => buttonLinkStyle,
-                _ => buttonDefaultStyle,
-            };
-            GUIStyle sizedStyle = new UnityHelpers.GUIStyle(baseStyle ?? GUI.skin.button);
-            ApplyButtonSizing(sizedStyle, size);
-            buttonStyleCache[(variant, size)] = sizedStyle;
-            return sizedStyle;
-        }
-
-        private void ApplyButtonSizing(GUIStyle style, ButtonSize size)
-        {
-            switch (size)
-            {
-                case ButtonSize.Small:
-                    style.fontSize = GetScaledFontSize(0.75f);
-                    style.padding = GetSpacingOffset(12f, 2f);
-                    style.fixedHeight = GetScaledHeight(32f);
-                    style.border = GetBorderOffset(6f);
+                case ControlVariant.Secondary:
+                    style.normal.background = CreateSolidTexture(Color.Lerp(theme.Secondary, theme.Text, 0.05f));
                     break;
-
-                case ButtonSize.Large:
-                    style.fontSize = GetScaledFontSize(1.0f);
-                    style.padding = GetSpacingOffset(24f, 12f);
-                    style.fixedHeight = GetScaledHeight(44f);
-                    style.border = GetBorderOffset(6f);
+                case ControlVariant.Destructive:
+                    style.normal.background = CreateSolidTexture(theme.Destructive);
+                    style.normal.textColor = theme.ButtonDestructiveFg;
                     break;
-
-                case ButtonSize.Icon:
-                    style.fontSize = GetScaledFontSize(1.0f);
-                    style.padding = GetSpacingOffset(0f, 0f);
-                    int iconSize = GetScaledHeight(36f);
-                    style.fixedWidth = iconSize;
-                    style.fixedHeight = iconSize;
-                    style.border = GetBorderOffset(6f);
+                case ControlVariant.Outline:
+                    style.normal.background = transparentTexture;
+                    style.border = new UnityHelpers.RectOffset(1, 1, 1, 1);
                     break;
-
-                case ButtonSize.Default:
-                    style.fontSize = GetScaledFontSize(0.875f);
-                    style.padding = GetSpacingOffset(16f, 8f);
-                    style.fixedHeight = GetScaledHeight(36f);
-                    style.border = GetBorderOffset(6f);
+                case ControlVariant.Ghost:
+                    style.normal.background = transparentTexture;
+                    break;
+                case ControlVariant.Muted:
+                    style.normal.background = CreateSolidTexture(theme.Muted);
                     break;
             }
         }
 
-        public GUIStyle GetToggleStyle(ToggleVariant variant, ToggleSize size)
+        private void ApplyVariantToStyle(GUIStyle style, ControlVariant variant, Theme theme)
         {
-            if (toggleStyleCache.TryGetValue((variant, size), out var cachedStyle))
-                return cachedStyle;
-            GUIStyle baseStyle = variant switch
+            switch (variant)
             {
-                ToggleVariant.Outline => toggleOutlineStyle,
-                ToggleVariant.Default => toggleDefaultStyle,
-                _ => toggleDefaultStyle,
-            };
-            GUIStyle sizedStyle = new UnityHelpers.GUIStyle(baseStyle ?? GUI.skin.button);
-            ApplyToggleSizing(sizedStyle, size);
-            toggleStyleCache[(variant, size)] = sizedStyle;
-            return sizedStyle;
-        }
-
-        private void ApplyToggleSizing(GUIStyle style, ToggleSize size)
-        {
-            switch (size)
-            {
-                case ToggleSize.Small:
-                    style.fontSize = GetScaledFontSize(0.75f);
-                    style.padding = GetSpacingOffset(6f, 2f);
+                case ControlVariant.Secondary:
+                    style.normal.textColor = theme.ButtonSecondaryFg;
+                    Color secBg = Color.Lerp(theme.Secondary, theme.Text, 0.1f);
+                    style.normal.background = CreateGradientRoundedRectTexture(128, 40, 6, secBg, Color.Lerp(secBg, Color.black, 0.05f));
+                    style.hover.background = CreateGradientRoundedRectTexture(128, 40, 6, Color.Lerp(secBg, Color.white, 0.05f), Color.Lerp(secBg, Color.black, 0.05f));
+                    style.onNormal.textColor = theme.ButtonSecondaryFg;
+                    style.onNormal.background = CreateGradientRoundedRectTexture(128, 40, 6, theme.Accent, Color.Lerp(theme.Accent, Color.black, 0.05f));
+                    style.onHover.background = CreateGradientRoundedRectTexture(128, 40, 6, Color.Lerp(theme.Accent, Color.white, 0.1f), Color.Lerp(theme.Accent, Color.white, 0.05f));
                     break;
-                case ToggleSize.Large:
-                    style.fontSize = GetScaledFontSize(1.25f);
-                    style.padding = GetSpacingOffset(10f, 6f);
+                case ControlVariant.Destructive:
+                    style.normal.textColor = theme.ButtonDestructiveFg;
+                    style.normal.background = CreateGradientRoundedRectTexture(128, 40, 6, theme.ButtonDestructiveBg, Color.Lerp(theme.ButtonDestructiveBg, Color.black, 0.1f));
+                    style.hover.background = CreateGradientRoundedRectTexture(128, 40, 6, Color.Lerp(theme.ButtonDestructiveBg, Color.white, 0.08f), Color.Lerp(theme.ButtonDestructiveBg, Color.black, 0.05f));
+                    style.onNormal.textColor = theme.ButtonDestructiveFg;
+                    style.onNormal.background = CreateGradientRoundedRectTexture(128, 40, 6, theme.Destructive, Color.Lerp(theme.Destructive, Color.black, 0.2f));
                     break;
-                case ToggleSize.Default:
-                    style.fontSize = GetScaledFontSize(1.0f);
-                    style.padding = GetSpacingOffset(8f, 4f);
+                case ControlVariant.Outline:
+                    style.normal.textColor = theme.ButtonOutlineFg;
+                    style.normal.background = CreateRoundedOutlineTexture(128, 40, 6, theme.Border);
+                    style.hover.background = CreateRoundedOutlineTexture(128, 40, 6, theme.Accent);
+                    style.border = new UnityHelpers.RectOffset(6, 6, 6, 6);
+                    style.onNormal.textColor = theme.Accent;
+                    style.onNormal.background = CreateRoundedOutlineTexture(128, 40, 6, theme.Accent);
+                    style.onHover.background = CreateRoundedOutlineTexture(128, 40, 6, theme.Accent);
+                    break;
+                case ControlVariant.Ghost:
+                    style.normal.textColor = theme.ButtonGhostFg;
+                    style.normal.background = transparentTexture;
+                    Color ghostHover = new Color(theme.Secondary.r, theme.Secondary.g, theme.Secondary.b, 0.5f);
+                    style.hover.background = CreateSolidTexture(ghostHover);
+                    style.active.background = CreateSolidTexture(Color.Lerp(ghostHover, Color.black, 0.2f));
+                    style.onNormal.textColor = theme.Accent;
+                    style.onNormal.background = CreateSolidTexture(new Color(theme.Accent.r, theme.Accent.g, theme.Accent.b, 0.5f));
+                    style.onHover.background = CreateSolidTexture(new Color(theme.Accent.r, theme.Accent.g, theme.Accent.b, 0.65f));
+                    break;
+                case ControlVariant.Link:
+                    style.normal.textColor = theme.ButtonLinkColor;
+                    style.normal.background = transparentTexture;
+                    style.hover.background = transparentTexture;
+                    style.hover.textColor = Color.Lerp(theme.ButtonLinkColor, Color.white, 0.2f);
+                    style.active.background = transparentTexture;
+                    style.active.textColor = Color.Lerp(theme.ButtonLinkColor, Color.black, 0.25f);
+                    style.padding = GetSpacingOffset(0f, 2f);
+                    style.border = new UnityHelpers.RectOffset(0, 0, 0, 0);
+                    style.onNormal.textColor = theme.Accent;
+                    style.onNormal.background = transparentTexture;
+                    break;
+                case ControlVariant.Muted:
+                    style.normal.textColor = theme.Muted;
+                    style.normal.background = CreateGradientRoundedRectTexture(128, 40, 6, Color.Lerp(theme.Secondary, Color.black, 0.08f), Color.Lerp(theme.Secondary, Color.black, 0.12f));
+                    style.hover.background = CreateGradientRoundedRectTexture(128, 40, 6, Color.Lerp(theme.Secondary, Color.black, 0.1f), Color.Lerp(theme.Secondary, Color.black, 0.15f));
+                    style.onNormal.textColor = theme.Muted;
+                    style.onNormal.background = CreateGradientRoundedRectTexture(128, 40, 6, Color.Lerp(theme.Secondary, theme.Accent, 0.1f), Color.Lerp(theme.Secondary, theme.Accent, 0.15f));
                     break;
             }
         }
 
-        public GUIStyle GetInputStyle(InputVariant variant, bool focused = false, bool disabled = false)
+        private void ApplyVariantToInputStyle(GUIStyle style, ControlVariant variant)
         {
-            if (inputStyleCache.TryGetValue((variant, focused, disabled), out var cachedStyle))
-                return cachedStyle;
-            GUIStyle style =
-                disabled ? (inputDisabledStyle ?? GUI.skin.textField)
-                : focused ? (inputFocusedStyle ?? GUI.skin.textField)
-                : variant switch
-                {
-                    InputVariant.Outline => inputOutlineStyle ?? GUI.skin.textField,
-                    InputVariant.Ghost => inputGhostStyle ?? GUI.skin.textField,
-                    InputVariant.Default => inputDefaultStyle ?? GUI.skin.textField,
-                    _ => inputDefaultStyle ?? GUI.skin.textField,
-                };
-            inputStyleCache[(variant, focused, disabled)] = style;
-            return style;
-        }
-
-        public GUIStyle GetLabelStyle(LabelVariant variant)
-        {
-            if (labelStyleCache.TryGetValue(variant, out var cachedStyle))
-                return cachedStyle;
-            GUIStyle style = variant switch
+            var theme = ThemeManager.Instance.CurrentTheme;
+            switch (variant)
             {
-                LabelVariant.Secondary => labelSecondaryStyle ?? GUI.skin.label,
-                LabelVariant.Muted => labelMutedStyle ?? GUI.skin.label,
-                LabelVariant.Destructive => labelDestructiveStyle ?? GUI.skin.label,
-                LabelVariant.Default => labelDefaultStyle ?? GUI.skin.label,
-                _ => labelDefaultStyle ?? GUI.skin.label,
-            };
-            labelStyleCache[variant] = style;
-            return style;
+                case ControlVariant.Outline:
+                    style.normal.background = CreateRoundedRectTexture(128, 40, 6, theme.Base);
+                    style.focused.background = CreateRoundedRectTexture(128, 40, 6, theme.Base);
+                    break;
+                case ControlVariant.Ghost:
+                    style.normal.background = transparentTexture;
+                    style.focused.background = transparentTexture;
+                    break;
+                default:
+                    style.normal.background = CreateRoundedRectTexture(128, 40, 8, Color.Lerp(theme.Secondary, theme.Text, 0.05f));
+                    style.focused.background = CreateRoundedRectTexture(128, 40, 8, Color.Lerp(theme.Secondary, theme.Text, 0.05f));
+                    break;
+            }
         }
 
-        public GUIStyle GetPasswordFieldStyle() => passwordFieldStyle ?? GUI.skin.textField;
+        #endregion
 
-        public GUIStyle GetTextAreaStyle(TextAreaVariant variant = TextAreaVariant.Default, bool focused = false)
+        #region Style Sizing
+
+        private void ApplySizing(GUIStyle style, ControlSize size, string styleType, bool isHeader = false, SeparatorOrientation orientation = SeparatorOrientation.Horizontal)
         {
-            if (textAreaStyleCache.TryGetValue((variant, focused), out var cachedStyle))
-                return cachedStyle;
-            GUIStyle baseStyle = variant switch
+            switch (styleType)
             {
-                TextAreaVariant.Outline => textAreaOutlineStyle ?? textAreaStyle ?? GUI.skin.textArea,
-                TextAreaVariant.Ghost => textAreaGhostStyle ?? textAreaStyle ?? GUI.skin.textArea,
-                TextAreaVariant.Default => textAreaStyle ?? GUI.skin.textArea,
-                _ => textAreaStyle ?? GUI.skin.textArea,
-            };
-            GUIStyle style = focused ? (textAreaFocusedStyle ?? baseStyle) : baseStyle;
-            textAreaStyleCache[(variant, focused)] = style;
+                case "Button":
+                    switch (size)
+                    {
+                        case ControlSize.Small:
+                            style.fontSize = GetScaledFontSize(0.75f);
+                            style.padding = GetSpacingOffset(12f, 2f);
+                            style.fixedHeight = GetScaledHeight(32f);
+                            style.border = GetBorderOffset(6f);
+                            break;
+                        case ControlSize.Large:
+                            style.fontSize = GetScaledFontSize(1.0f);
+                            style.padding = GetSpacingOffset(24f, 12f);
+                            style.fixedHeight = GetScaledHeight(44f);
+                            style.border = GetBorderOffset(6f);
+                            break;
+                        case ControlSize.Icon:
+                            style.fontSize = GetScaledFontSize(1.0f);
+                            style.padding = GetSpacingOffset(0f, 0f);
+                            int iconSize = GetScaledHeight(36f);
+                            style.fixedWidth = iconSize;
+                            style.fixedHeight = iconSize;
+                            style.border = GetBorderOffset(6f);
+                            break;
+                        case ControlSize.Mini:
+                            style.fontSize = GetScaledFontSize(0.7f);
+                            style.padding = GetSpacingOffset(8f, 2f);
+                            style.fixedHeight = GetScaledHeight(24f);
+                            style.border = GetBorderOffset(4f);
+                            break;
+                        case ControlSize.Default:
+                            style.fontSize = GetScaledFontSize(0.875f);
+                            style.padding = GetSpacingOffset(16f, 8f);
+                            style.fixedHeight = GetScaledHeight(36f);
+                            style.border = GetBorderOffset(6f);
+                            break;
+                    }
+                    break;
+
+                case "Toggle":
+                case "Checkbox":
+                case "Switch":
+                    switch (size)
+                    {
+                        case ControlSize.Small:
+                            style.fontSize = GetScaledFontSize(0.75f);
+                            style.padding = GetSpacingOffset(6f, styleType == "Checkbox" || styleType == "Switch" ? 0f : 2f);
+                            break;
+                        case ControlSize.Large:
+                            style.fontSize = GetScaledFontSize(styleType == "Toggle" ? 1.25f : 1.25f);
+                            style.padding = GetSpacingOffset(10f, styleType == "Checkbox" || styleType == "Switch" ? 0f : 6f);
+                            break;
+                        case ControlSize.Mini:
+                            style.fontSize = GetScaledFontSize(styleType == "Toggle" ? 0.65f : 0.65f);
+                            style.padding = GetSpacingOffset(4f, styleType == "Checkbox" || styleType == "Switch" ? 0f : 1f);
+                            break;
+                        case ControlSize.Default:
+                            style.fontSize = GetScaledFontSize(styleType == "Checkbox" ? 0.9f : 1.0f);
+                            style.padding = GetSpacingOffset(8f, styleType == "Checkbox" || styleType == "Switch" ? 0f : 4f);
+                            break;
+                    }
+                    break;
+
+                case "Input":
+                case "PasswordField":
+                    switch (size)
+                    {
+                        case ControlSize.Small:
+                            style.fontSize = GetScaledFontSize(0.75f);
+                            style.padding = GetSpacingOffset(8f, 4f);
+                            style.fixedHeight = GetScaledHeight(28f);
+                            break;
+                        case ControlSize.Large:
+                            style.fontSize = GetScaledFontSize(1.0f);
+                            style.padding = GetSpacingOffset(16f, 10f);
+                            style.fixedHeight = GetScaledHeight(44f);
+                            break;
+                        case ControlSize.Mini:
+                            style.fontSize = GetScaledFontSize(0.7f);
+                            style.padding = GetSpacingOffset(6f, 2f);
+                            style.fixedHeight = GetScaledHeight(24f);
+                            break;
+                        case ControlSize.Default:
+                            style.fontSize = GetScaledFontSize(0.875f);
+                            style.padding = GetSpacingOffset(12f, 8f);
+                            style.fixedHeight = GetScaledHeight(36f);
+                            break;
+                    }
+                    break;
+
+                case "Label":
+                case "ChartAxis":
+                case "SectionHeader":
+                case "CardTitle":
+                case "CardDescription":
+                    switch (size)
+                    {
+                        case ControlSize.Small:
+                            style.fontSize = GetScaledFontSize(0.75f);
+                            break;
+                        case ControlSize.Large:
+                            style.fontSize = GetScaledFontSize(1.25f);
+                            break;
+                        case ControlSize.Mini:
+                            style.fontSize = GetScaledFontSize(0.65f);
+                            break;
+                        case ControlSize.Default:
+                            style.fontSize = GetScaledFontSize(0.875f);
+                            break;
+                    }
+                    break;
+
+                case "TextArea":
+                    switch (size)
+                    {
+                        case ControlSize.Small:
+                            style.fontSize = GetScaledFontSize(0.75f);
+                            style.padding = GetSpacingOffset(6f, 4f);
+                            break;
+                        case ControlSize.Large:
+                            style.fontSize = GetScaledFontSize(1.0f);
+                            style.padding = GetSpacingOffset(12f, 8f);
+                            break;
+                        case ControlSize.Mini:
+                            style.fontSize = GetScaledFontSize(0.7f);
+                            style.padding = GetSpacingOffset(4f, 2f);
+                            break;
+                        case ControlSize.Default:
+                            style.fontSize = GetScaledFontSize(0.875f);
+                            style.padding = GetSpacingOffset(8f, 6f);
+                            break;
+                    }
+                    break;
+
+                case "ProgressBar":
+                    switch (size)
+                    {
+                        case ControlSize.Small:
+                            style.fixedHeight = GetScaledHeight(4f);
+                            break;
+                        case ControlSize.Large:
+                            style.fixedHeight = GetScaledHeight(12f);
+                            break;
+                        case ControlSize.Mini:
+                            style.fixedHeight = GetScaledHeight(2f);
+                            break;
+                        case ControlSize.Default:
+                            style.fixedHeight = GetScaledHeight(8f);
+                            break;
+                    }
+                    break;
+
+                case "Separator":
+                    float thickness = size switch
+                    {
+                        ControlSize.Small => 1f,
+                        ControlSize.Large => 4f,
+                        ControlSize.Mini => 1f,
+                        ControlSize.Default => 2f,
+                        _ => 1f,
+                    };
+                    if (orientation == SeparatorOrientation.Horizontal)
+                        style.fixedHeight = GetScaledHeight(thickness);
+                    else
+                        style.fixedWidth = GetScaledHeight(thickness);
+                    break;
+
+                case "TabsList":
+                    switch (size)
+                    {
+                        case ControlSize.Small:
+                            style.padding = GetSpacingOffset(2f, 2f);
+                            break;
+                        case ControlSize.Large:
+                            style.padding = GetSpacingOffset(6f, 6f);
+                            break;
+                        case ControlSize.Mini:
+                            style.padding = GetSpacingOffset(1f, 1f);
+                            break;
+                        case ControlSize.Default:
+                            style.padding = GetSpacingOffset(4f, 4f);
+                            break;
+                    }
+                    break;
+
+                case "TabsTrigger":
+                    switch (size)
+                    {
+                        case ControlSize.Small:
+                            style.fontSize = GetScaledFontSize(0.75f);
+                            style.padding = GetSpacingOffset(8f, 4f);
+                            break;
+                        case ControlSize.Large:
+                            style.fontSize = GetScaledFontSize(1.0f);
+                            style.padding = GetSpacingOffset(16f, 8f);
+                            break;
+                        case ControlSize.Mini:
+                            style.fontSize = GetScaledFontSize(0.7f);
+                            style.padding = GetSpacingOffset(6f, 2f);
+                            break;
+                        case ControlSize.Default:
+                            style.fontSize = GetScaledFontSize(0.875f);
+                            style.padding = GetSpacingOffset(12f, 6f);
+                            break;
+                    }
+                    break;
+
+                case "TabsContent":
+                    switch (size)
+                    {
+                        case ControlSize.Small:
+                            style.padding = GetSpacingOffset(8f, 8f);
+                            break;
+                        case ControlSize.Large:
+                            style.padding = GetSpacingOffset(24f, 24f);
+                            break;
+                        case ControlSize.Mini:
+                            style.padding = GetSpacingOffset(4f, 4f);
+                            break;
+                        case ControlSize.Default:
+                            style.padding = GetSpacingOffset(16f, 16f);
+                            break;
+                    }
+                    break;
+
+                case "Badge":
+                    switch (size)
+                    {
+                        case ControlSize.Small:
+                            style.fontSize = GetScaledFontSize(0.65f);
+                            style.padding = GetSpacingOffset(8f, 2f);
+                            break;
+                        case ControlSize.Large:
+                            style.fontSize = GetScaledFontSize(1.0f);
+                            style.padding = GetSpacingOffset(12f, 6f);
+                            break;
+                        case ControlSize.Mini:
+                            style.fontSize = GetScaledFontSize(0.6f);
+                            style.padding = GetSpacingOffset(6f, 1f);
+                            break;
+                        case ControlSize.Default:
+                            style.fontSize = GetScaledFontSize(0.8f);
+                            style.padding = GetSpacingOffset(10f, 4f);
+                            break;
+                    }
+                    break;
+
+                case "CalendarChild":
+                    switch (size)
+                    {
+                        case ControlSize.Small:
+                            style.fontSize = GetScaledFontSize(0.8f);
+                            style.fixedWidth = GetScaledHeight(28f);
+                            style.fixedHeight = GetScaledHeight(28f);
+                            break;
+                        case ControlSize.Large:
+                            style.fontSize = GetScaledFontSize(1.0f);
+                            style.fixedWidth = GetScaledHeight(40f);
+                            style.fixedHeight = GetScaledHeight(40f);
+                            break;
+                        case ControlSize.Mini:
+                            style.fontSize = GetScaledFontSize(0.7f);
+                            style.fixedWidth = GetScaledHeight(20f);
+                            style.fixedHeight = GetScaledHeight(20f);
+                            break;
+                        case ControlSize.Default:
+                            style.fontSize = GetScaledFontSize(0.9f);
+                            style.fixedWidth = GetScaledHeight(32f);
+                            style.fixedHeight = GetScaledHeight(32f);
+                            break;
+                    }
+                    break;
+
+                case "Table":
+                    switch (size)
+                    {
+                        case ControlSize.Small:
+                            style.fontSize = GetScaledFontSize(0.9f);
+                            style.padding = GetSpacingOffset(8f, 8f);
+                            break;
+                        case ControlSize.Large:
+                            style.fontSize = GetScaledFontSize(1.1f);
+                            style.padding = GetSpacingOffset(20f, 20f);
+                            break;
+                        case ControlSize.Mini:
+                            style.fontSize = GetScaledFontSize(0.75f);
+                            style.padding = GetSpacingOffset(6f, 4f);
+                            break;
+                        case ControlSize.Default:
+                            style.fontSize = GetScaledFontSize(0.95f);
+                            style.padding = GetSpacingOffset(14f, 14f);
+                            break;
+                    }
+                    break;
+
+                case "TableChild":
+                    switch (size)
+                    {
+                        case ControlSize.Small:
+                            style.fontSize = GetScaledFontSize(isHeader ? 0.85f : 0.8f);
+                            style.padding = GetSpacingOffset(8f, 6f);
+                            break;
+                        case ControlSize.Large:
+                            style.fontSize = GetScaledFontSize(isHeader ? 1.1f : 1.0f);
+                            style.padding = GetSpacingOffset(16f, 12f);
+                            break;
+                        case ControlSize.Mini:
+                            style.fontSize = GetScaledFontSize(isHeader ? 0.75f : 0.7f);
+                            style.padding = GetSpacingOffset(4f, 2f);
+                            break;
+                        case ControlSize.Default:
+                            style.fontSize = GetScaledFontSize(isHeader ? 0.95f : 0.9f);
+                            style.padding = GetSpacingOffset(12f, 8f);
+                            break;
+                    }
+                    break;
+
+                case "Dialog":
+                    switch (size)
+                    {
+                        case ControlSize.Small:
+                            style.padding = GetSpacingOffset(16f, 16f);
+                            break;
+                        case ControlSize.Large:
+                            style.padding = GetSpacingOffset(32f, 32f);
+                            break;
+                        case ControlSize.Mini:
+                            style.padding = GetSpacingOffset(8f, 8f);
+                            break;
+                        case ControlSize.Default:
+                            style.padding = GetSpacingOffset(24f, 24f);
+                            break;
+                    }
+                    break;
+
+                case "Calendar":
+                case "DatePicker":
+                case "Popover":
+                case "DropdownMenu":
+                case "AnimatedBox":
+                case "Chart":
+                    switch (size)
+                    {
+                        case ControlSize.Small:
+                            style.padding = GetSpacingOffset(8f, 8f);
+                            break;
+                        case ControlSize.Large:
+                            style.padding = GetSpacingOffset(24f, 24f);
+                            break;
+                        case ControlSize.Mini:
+                            style.padding = GetSpacingOffset(4f, 4f);
+                            break;
+                        case ControlSize.Default:
+                            style.padding = GetSpacingOffset(16f, 16f);
+                            break;
+                    }
+                    break;
+
+                case "Card":
+                    switch (size)
+                    {
+                        case ControlSize.Small:
+                            style.padding = GetSpacingOffset(12f, 12f);
+                            break;
+                        case ControlSize.Large:
+                            style.padding = GetSpacingOffset(32f, 32f);
+                            break;
+                        case ControlSize.Mini:
+                            style.padding = GetSpacingOffset(8f, 8f);
+                            break;
+                        case ControlSize.Default:
+                            style.padding = GetSpacingOffset(24f, 24f);
+                            break;
+                    }
+                    break;
+
+                case "CardChild":
+                    switch (size)
+                    {
+                        case ControlSize.Small:
+                            style.padding = GetSpacingOffset(4f, 4f);
+                            break;
+                        case ControlSize.Large:
+                            style.padding = GetSpacingOffset(8f, 8f);
+                            break;
+                        case ControlSize.Mini:
+                            style.padding = GetSpacingOffset(2f, 2f);
+                            break;
+                        case ControlSize.Default:
+                            style.padding = GetSpacingOffset(6f, 6f);
+                            break;
+                    }
+                    break;
+
+                case "DropdownItem":
+                    switch (size)
+                    {
+                        case ControlSize.Small:
+                            style.fontSize = GetScaledFontSize(0.75f);
+                            style.padding = GetSpacingOffset(6f, 4f);
+                            break;
+                        case ControlSize.Large:
+                            style.fontSize = GetScaledFontSize(1.0f);
+                            style.padding = GetSpacingOffset(12f, 8f);
+                            break;
+                        case ControlSize.Mini:
+                            style.fontSize = GetScaledFontSize(0.7f);
+                            style.padding = GetSpacingOffset(4f, 2f);
+                            break;
+                        case ControlSize.Default:
+                            style.fontSize = GetScaledFontSize(0.875f);
+                            style.padding = GetSpacingOffset(8f, 6f);
+                            break;
+                    }
+                    break;
+
+                case "MenuBar":
+                    switch (size)
+                    {
+                        case ControlSize.Small:
+                            style.padding = GetSpacingOffset(2f, 2f);
+                            break;
+                        case ControlSize.Large:
+                            style.padding = GetSpacingOffset(6f, 6f);
+                            break;
+                        case ControlSize.Mini:
+                            style.padding = GetSpacingOffset(1f, 1f);
+                            break;
+                        case ControlSize.Default:
+                            style.padding = GetSpacingOffset(4f, 4f);
+                            break;
+                    }
+                    break;
+
+                case "MenuBarItem":
+                    switch (size)
+                    {
+                        case ControlSize.Small:
+                            style.fontSize = GetScaledFontSize(0.75f);
+                            style.padding = GetSpacingOffset(6f, 4f);
+                            break;
+                        case ControlSize.Large:
+                            style.fontSize = GetScaledFontSize(1.0f);
+                            style.padding = GetSpacingOffset(12f, 8f);
+                            break;
+                        case ControlSize.Mini:
+                            style.fontSize = GetScaledFontSize(0.7f);
+                            style.padding = GetSpacingOffset(4f, 2f);
+                            break;
+                        case ControlSize.Default:
+                            style.fontSize = GetScaledFontSize(0.875f);
+                            style.padding = GetSpacingOffset(8f, 6f);
+                            break;
+                    }
+                    break;
+
+                case "SelectTrigger":
+                case "SelectItem":
+                    switch (size)
+                    {
+                        case ControlSize.Small:
+                            style.fontSize = GetScaledFontSize(0.75f);
+                            style.padding = GetSpacingOffset(8f, 4f);
+                            style.fixedHeight = GetScaledHeight(28f);
+                            break;
+                        case ControlSize.Large:
+                            style.fontSize = GetScaledFontSize(1.0f);
+                            style.padding = GetSpacingOffset(16f, 8f);
+                            style.fixedHeight = GetScaledHeight(44f);
+                            break;
+                        case ControlSize.Mini:
+                            style.fontSize = GetScaledFontSize(0.7f);
+                            style.padding = GetSpacingOffset(6f, 2f);
+                            style.fixedHeight = GetScaledHeight(24f);
+                            break;
+                        case ControlSize.Default:
+                            style.fontSize = GetScaledFontSize(0.875f);
+                            style.padding = GetSpacingOffset(12f, 6f);
+                            style.fixedHeight = GetScaledHeight(36f);
+                            break;
+                    }
+                    break;
+
+                case "SelectContent":
+                    switch (size)
+                    {
+                        case ControlSize.Small:
+                            style.fontSize = GetScaledFontSize(0.8f);
+                            style.padding = GetSpacingOffset(8f, 6f);
+                            break;
+                        case ControlSize.Large:
+                            style.fontSize = GetScaledFontSize(1.1f);
+                            style.padding = GetSpacingOffset(12f, 10f);
+                            break;
+                        case ControlSize.Mini:
+                            style.fontSize = GetScaledFontSize(0.75f);
+                            style.padding = GetSpacingOffset(6f, 4f);
+                            break;
+                        case ControlSize.Default:
+                            style.fontSize = GetScaledFontSize(0.95f);
+                            style.padding = GetSpacingOffset(10f, 8f);
+                            break;
+                    }
+                    break;
+            }
+        }
+
+        #endregion
+
+        #region Style Getters
+
+        public GUIStyle GetButtonStyle(ControlVariant variant, ControlSize size)
+        {
+            var key = new StyleKey(StyleComponentType.Button, variant, size);
+            if (styleCache.TryGetValue(key, out var cachedStyle))
+                return cachedStyle;
+
+            GUIStyle style = new UnityHelpers.GUIStyle(baseButtonStyle ?? GUI.skin.button);
+            ApplyVariantToStyle(style, variant, ThemeManager.Instance.CurrentTheme);
+            ApplySizing(style, size, "Button");
+
+            styleCache[key] = style;
             return style;
         }
 
-        public GUIStyle GetProgressBarStyle() => progressBarStyle ?? GUI.skin.box;
+        public GUIStyle GetToggleStyle(ControlVariant variant, ControlSize size)
+        {
+            var key = new StyleKey(StyleComponentType.Toggle, variant, size);
+            if (styleCache.TryGetValue(key, out var cachedStyle))
+                return cachedStyle;
 
-        public GUIStyle GetProgressBarBackgroundStyle() => progressBarBackgroundStyle ?? GUI.skin.box;
+            GUIStyle style = new UnityHelpers.GUIStyle(baseToggleStyle ?? GUI.skin.button);
+            ApplyVariantToStyle(style, variant, ThemeManager.Instance.CurrentTheme);
+            ApplySizing(style, size, "Toggle");
 
-        public GUIStyle GetProgressBarFillStyle() => progressBarFillStyle ?? GUI.skin.box;
+            styleCache[key] = style;
+            return style;
+        }
 
-        public GUIStyle GetSeparatorStyle(SeparatorOrientation orientation) =>
-            orientation switch
+        public GUIStyle GetInputStyle(ControlVariant variant, ControlSize size = ControlSize.Default, bool focused = false, bool disabled = false)
+        {
+            int state = (focused ? 1 : 0) | (disabled ? 2 : 0);
+            var key = new StyleKey(StyleComponentType.Input, variant, size, state);
+            if (styleCache.TryGetValue(key, out var cachedStyle))
+                return cachedStyle;
+
+            GUIStyle style = new UnityHelpers.GUIStyle(baseInputStyle ?? GUI.skin.textField);
+
+            if (disabled)
+                style.normal.textColor = ThemeManager.Instance.CurrentTheme.Muted;
+
+            if (focused)
+                style.focused.background = inputFocusedTexture;
+
+            ApplyVariantToInputStyle(style, variant);
+            ApplySizing(style, size, "Input");
+
+            styleCache[key] = style;
+            return style;
+        }
+
+        public GUIStyle GetLabelStyle(ControlVariant variant, ControlSize size = ControlSize.Default)
+        {
+            var key = new StyleKey(StyleComponentType.Label, variant, size);
+            if (styleCache.TryGetValue(key, out var cachedStyle))
+                return cachedStyle;
+
+            GUIStyle style = new UnityHelpers.GUIStyle(baseLabelStyle ?? GUI.skin.label);
+            ApplySizing(style, size, "Label");
+
+            styleCache[key] = style;
+            return style;
+        }
+
+        public GUIStyle GetPasswordFieldStyle(ControlVariant variant = ControlVariant.Default, ControlSize size = ControlSize.Default, bool focused = false, bool disabled = false)
+        {
+            int state = (focused ? 1 : 0) | (disabled ? 2 : 0);
+            var key = new StyleKey(StyleComponentType.PasswordField, variant, size, state);
+            if (styleCache.TryGetValue(key, out var cachedStyle))
+                return cachedStyle;
+
+            GUIStyle style = new UnityHelpers.GUIStyle(passwordFieldStyle ?? GUI.skin.textField);
+
+            if (disabled)
+                style.normal.textColor = ThemeManager.Instance.CurrentTheme.Muted;
+
+            if (focused)
+                style.focused.background = inputFocusedTexture;
+
+            ApplyVariantToInputStyle(style, variant);
+            ApplySizing(style, size, "PasswordField");
+
+            styleCache[key] = style;
+            return style;
+        }
+
+        public GUIStyle GetTextAreaStyle(ControlVariant variant = ControlVariant.Default, ControlSize size = ControlSize.Default, bool focused = false)
+        {
+            int state = focused ? 1 : 0;
+            var key = new StyleKey(StyleComponentType.TextArea, variant, size, state);
+            if (styleCache.TryGetValue(key, out var cachedStyle))
+                return cachedStyle;
+
+            var theme = ThemeManager.Instance.CurrentTheme;
+            GUIStyle baseStyle = textAreaStyle ?? GUI.skin.textArea;
+            GUIStyle style = new UnityHelpers.GUIStyle(baseStyle);
+
+            switch (variant)
+            {
+                case ControlVariant.Outline:
+                    style.normal.background = CreateRoundedOutlineTexture(128, 40, 6, theme.Border);
+                    style.focused.background = CreateRoundedOutlineTexture(128, 40, 6, theme.Accent);
+                    style.border = new UnityHelpers.RectOffset(6, 6, 6, 6);
+                    break;
+                case ControlVariant.Ghost:
+                    style.normal.background = transparentTexture;
+                    style.focused.background = CreateSolidTexture(Color.Lerp(theme.Secondary, Color.black, 0.08f));
+                    break;
+            }
+
+            ApplySizing(style, size, "TextArea");
+
+            styleCache[key] = style;
+            return style;
+        }
+
+        public GUIStyle GetProgressBarStyle(ControlVariant variant = ControlVariant.Default, ControlSize size = ControlSize.Default)
+        {
+            var key = new StyleKey(StyleComponentType.ProgressBar, variant, size);
+            if (styleCache.TryGetValue(key, out var cachedStyle))
+                return cachedStyle;
+
+            GUIStyle style = new UnityHelpers.GUIStyle(progressBarStyle ?? GUI.skin.box);
+            ApplyContainerVariant(style, variant, ThemeManager.Instance.CurrentTheme);
+            ApplySizing(style, size, "ProgressBar");
+
+            styleCache[key] = style;
+            return style;
+        }
+
+        public GUIStyle GetSeparatorStyle(SeparatorOrientation orientation, ControlVariant variant = ControlVariant.Default, ControlSize size = ControlSize.Default)
+        {
+            int state = (int)orientation;
+            var key = new StyleKey(StyleComponentType.Separator, variant, size, state);
+            if (styleCache.TryGetValue(key, out var cachedStyle))
+                return cachedStyle;
+
+            GUIStyle baseStyle = orientation switch
             {
                 SeparatorOrientation.Horizontal => separatorHorizontalStyle ?? GUI.skin.box,
                 SeparatorOrientation.Vertical => separatorVerticalStyle ?? GUI.skin.box,
                 _ => separatorHorizontalStyle ?? GUI.skin.box,
             };
+            GUIStyle style = new UnityHelpers.GUIStyle(baseStyle);
+            ApplyContainerVariant(style, variant, ThemeManager.Instance.CurrentTheme);
+            ApplySizing(style, size, "Separator", false, orientation);
 
-        public GUIStyle GetTabsListStyle() => tabsListStyle ?? GUI.skin.box;
-
-        public GUIStyle GetTabsTriggerStyle(bool active = false) => active ? (tabsTriggerActiveStyle ?? tabsTriggerStyle ?? GUI.skin.button) : (tabsTriggerStyle ?? GUI.skin.button);
-
-        public GUIStyle GetTabsContentStyle() => tabsContentStyle ?? GUIStyle.none;
-
-        public GUIStyle GetCheckboxStyle(CheckboxVariant variant, CheckboxSize size)
-        {
-            if (checkboxStyleCache.TryGetValue((variant, size), out var cachedStyle))
-                return cachedStyle;
-            GUIStyle baseStyle = variant switch
-            {
-                CheckboxVariant.Outline => checkboxOutlineStyle,
-                CheckboxVariant.Ghost => checkboxGhostStyle,
-                CheckboxVariant.Default => checkboxDefaultStyle,
-                _ => checkboxDefaultStyle,
-            };
-            GUIStyle sizedStyle = new UnityHelpers.GUIStyle(baseStyle ?? GUI.skin.toggle);
-            ApplyCheckboxSizing(sizedStyle, size);
-            checkboxStyleCache[(variant, size)] = sizedStyle;
-            return sizedStyle;
+            styleCache[key] = style;
+            return style;
         }
 
-        private void ApplyCheckboxSizing(GUIStyle style, CheckboxSize size)
+        public GUIStyle GetTabsListStyle(ControlVariant variant = ControlVariant.Default, ControlSize size = ControlSize.Default)
         {
-            switch (size)
+            var key = new StyleKey(StyleComponentType.TabsList, variant, size);
+            if (styleCache.TryGetValue(key, out var cachedStyle))
+                return cachedStyle;
+
+            GUIStyle style = new UnityHelpers.GUIStyle(tabsListStyle ?? GUI.skin.box);
+            ApplyContainerVariant(style, variant, ThemeManager.Instance.CurrentTheme);
+            ApplySizing(style, size, "TabsList");
+
+            styleCache[key] = style;
+            return style;
+        }
+
+        public GUIStyle GetTabsTriggerStyle(bool active = false, ControlVariant variant = ControlVariant.Default, ControlSize size = ControlSize.Default)
+        {
+            int state = active ? 1 : 0;
+            var key = new StyleKey(StyleComponentType.TabsTrigger, variant, size, state);
+            if (styleCache.TryGetValue(key, out var cachedStyle))
+                return cachedStyle;
+
+            GUIStyle baseStyle = active ? (tabsTriggerActiveStyle ?? tabsTriggerStyle ?? GUI.skin.button) : (tabsTriggerStyle ?? GUI.skin.button);
+            GUIStyle style = new UnityHelpers.GUIStyle(baseStyle);
+
+            if (variant != ControlVariant.Default)
             {
-                case CheckboxSize.Small:
-                    style.fontSize = GetScaledFontSize(0.75f);
-                    style.padding = GetSpacingOffset(6f, 0f);
+                ApplyVariantToStyle(style, variant, ThemeManager.Instance.CurrentTheme);
+                if (active)
+                {
+                    style.normal = style.onNormal;
+                    style.hover = style.onHover;
+                    style.active = style.onActive;
+                }
+            }
+
+            ApplySizing(style, size, "TabsTrigger");
+            styleCache[key] = style;
+            return style;
+        }
+
+        public GUIStyle GetTabsContentStyle(ControlVariant variant = ControlVariant.Default, ControlSize size = ControlSize.Default)
+        {
+            var key = new StyleKey(StyleComponentType.TabsContent, variant, size);
+            if (styleCache.TryGetValue(key, out var cachedStyle))
+                return cachedStyle;
+
+            GUIStyle style = new UnityHelpers.GUIStyle(tabsContentStyle ?? GUIStyle.none);
+            ApplyContainerVariant(style, variant, ThemeManager.Instance.CurrentTheme);
+            ApplySizing(style, size, "TabsContent");
+
+            styleCache[key] = style;
+            return style;
+        }
+
+        public GUIStyle GetCheckboxStyle(ControlVariant variant, ControlSize size)
+        {
+            var key = new StyleKey(StyleComponentType.Checkbox, variant, size);
+            if (styleCache.TryGetValue(key, out var cachedStyle))
+                return cachedStyle;
+
+            GUIStyle style = new UnityHelpers.GUIStyle(baseCheckboxStyle ?? GUI.skin.toggle);
+
+            switch (variant)
+            {
+                case ControlVariant.Outline:
+                    style.normal.background = CreateRoundedOutlineTexture(20, 20, 6, ThemeManager.Instance.CurrentTheme.Border);
+                    style.onNormal.background = CreateOutlineButtonTexture(ThemeManager.Instance.CurrentTheme.Accent, ThemeManager.Instance.CurrentTheme.Accent);
+                    style.border = new UnityHelpers.RectOffset(6, 6, 6, 6);
                     break;
-                case CheckboxSize.Large:
-                    style.fontSize = GetScaledFontSize(1.25f);
-                    style.padding = GetSpacingOffset(10f, 0f);
-                    break;
-                case CheckboxSize.Default:
-                    style.fontSize = GetScaledFontSize(0.9f);
-                    style.padding = GetSpacingOffset(8f, 0f);
+                case ControlVariant.Ghost:
+                    style.normal.background = transparentTexture;
+                    style.onNormal.background = CreateSolidTexture(ThemeManager.Instance.CurrentTheme.Accent);
                     break;
             }
+
+            ApplySizing(style, size, "Checkbox");
+
+            styleCache[key] = style;
+            return style;
         }
 
-        public GUIStyle GetSwitchStyle(SwitchVariant variant, SwitchSize size)
+        public GUIStyle GetSwitchStyle(ControlVariant variant, ControlSize size)
         {
-            if (switchStyleCache.TryGetValue((variant, size), out var cachedStyle))
+            var key = new StyleKey(StyleComponentType.Switch, variant, size);
+            if (styleCache.TryGetValue(key, out var cachedStyle))
                 return cachedStyle;
-            GUIStyle baseStyle = variant switch
-            {
-                SwitchVariant.Outline => switchOutlineStyle,
-                SwitchVariant.Ghost => switchGhostStyle,
-                SwitchVariant.Default => switchDefaultStyle,
-                _ => switchDefaultStyle,
-            };
-            GUIStyle sizedStyle = new UnityHelpers.GUIStyle(baseStyle ?? GUI.skin.toggle);
-            ApplySwitchSizing(sizedStyle, size);
-            switchStyleCache[(variant, size)] = sizedStyle;
-            return sizedStyle;
-        }
 
-        private void ApplySwitchSizing(GUIStyle style, SwitchSize size)
-        {
-            switch (size)
+            GUIStyle style = new UnityHelpers.GUIStyle(baseSwitchStyle ?? GUI.skin.toggle);
+
+            switch (variant)
             {
-                case SwitchSize.Small:
-                    style.fontSize = GetScaledFontSize(0.75f);
-                    style.padding = GetSpacingOffset(6f, 2f);
+                case ControlVariant.Outline:
+                    style.normal.background = CreateRoundedOutlineTexture(40, 24, 12, ThemeManager.Instance.CurrentTheme.Border);
+                    style.onNormal.background = CreateOutlineButtonTexture(ThemeManager.Instance.CurrentTheme.Accent, ThemeManager.Instance.CurrentTheme.Accent);
+                    style.border = new UnityHelpers.RectOffset(12, 12, 12, 12);
                     break;
-                case SwitchSize.Large:
-                    style.fontSize = GetScaledFontSize(1.25f);
-                    style.padding = GetSpacingOffset(10f, 6f);
-                    break;
-                case SwitchSize.Default:
-                    style.fontSize = GetScaledFontSize(0.875f);
-                    style.padding = GetSpacingOffset(8f, 4f);
+                case ControlVariant.Ghost:
+                    style.normal.background = transparentTexture;
+                    style.onNormal.background = CreateSolidTexture(ThemeManager.Instance.CurrentTheme.Accent);
                     break;
             }
+
+            ApplySizing(style, size, "Switch");
+
+            styleCache[key] = style;
+            return style;
         }
 
-        public GUIStyle GetBadgeStyle(BadgeVariant variant, BadgeSize size)
+        public GUIStyle GetBadgeStyle(ControlVariant variant, ControlSize size)
         {
-            if (badgeStyleCache.TryGetValue((variant, size), out var cachedStyle))
+            var key = new StyleKey(StyleComponentType.Badge, variant, size);
+            if (styleCache.TryGetValue(key, out var cachedStyle))
                 return cachedStyle;
-            GUIStyle baseStyle = variant switch
-            {
-                BadgeVariant.Secondary => badgeSecondaryStyle,
-                BadgeVariant.Destructive => badgeDestructiveStyle,
-                BadgeVariant.Outline => badgeOutlineStyle,
-                BadgeVariant.Default => badgeDefaultStyle,
-                _ => badgeDefaultStyle,
-            };
-            GUIStyle sizedStyle = new UnityHelpers.GUIStyle(baseStyle ?? GUI.skin.box);
-            ApplyBadgeSizing(sizedStyle, size);
-            badgeStyleCache[(variant, size)] = sizedStyle;
-            return sizedStyle;
-        }
 
-        private void ApplyBadgeSizing(GUIStyle style, BadgeSize size)
-        {
-            switch (size)
+            var theme = ThemeManager.Instance.CurrentTheme;
+            GUIStyle style = new UnityHelpers.GUIStyle(baseBadgeStyle ?? GUI.skin.box);
+
+            switch (variant)
             {
-                case BadgeSize.Small:
-                    style.fontSize = GetScaledFontSize(0.65f);
-                    style.padding = GetSpacingOffset(8f, 2f);
+                case ControlVariant.Secondary:
+                    style.normal.background = CreateGradientRoundedRectTexture(128, 24, 12, theme.Secondary, Color.Lerp(theme.Secondary, Color.black, 0.05f));
                     break;
-                case BadgeSize.Large:
-                    style.fontSize = GetScaledFontSize(1.0f);
-                    style.padding = GetSpacingOffset(12f, 6f);
+                case ControlVariant.Destructive:
+                    style.normal.background = CreateGradientRoundedRectTexture(128, 24, 12, theme.Destructive, Color.Lerp(theme.Destructive, Color.black, 0.1f));
                     break;
-                case BadgeSize.Default:
-                    style.fontSize = GetScaledFontSize(0.8f);
-                    style.padding = GetSpacingOffset(10f, 4f);
+                case ControlVariant.Outline:
+                    style.normal.background = CreateRoundedOutlineTexture(128, 24, 12, theme.Border);
+                    style.border = new UnityHelpers.RectOffset(12, 12, 12, 12);
                     break;
             }
+
+            ApplySizing(style, size, "Badge");
+
+            styleCache[key] = style;
+            return style;
         }
 
-        public GUIStyle GetAvatarStyle(AvatarSize size, AvatarShape shape)
+        public GUIStyle GetAvatarStyle(ControlSize size, AvatarShape shape, ControlVariant variant = ControlVariant.Default)
         {
-            if (avatarStyleCache.TryGetValue((size, shape), out var cachedStyle))
+            int state = (int)shape;
+            var key = new StyleKey(StyleComponentType.Avatar, variant, size, state);
+            if (styleCache.TryGetValue(key, out var cachedStyle))
                 return cachedStyle;
-            GUIStyle sizedStyle = new UnityHelpers.GUIStyle(avatarStyle ?? GUI.skin.box);
+
+            GUIStyle style = new UnityHelpers.GUIStyle(avatarStyle ?? GUI.skin.box);
             int avatarSizeValue = size switch
             {
-                AvatarSize.Small => GetScaledHeight(32f),
-                AvatarSize.Large => GetScaledHeight(48f),
-                AvatarSize.Default => GetScaledHeight(40f),
+                ControlSize.Small => GetScaledHeight(32f),
+                ControlSize.Large => GetScaledHeight(48f),
+                ControlSize.Mini => GetScaledHeight(24f),
+                ControlSize.Default => GetScaledHeight(40f),
                 _ => GetScaledHeight(40f),
             };
-            sizedStyle.fixedWidth = avatarSizeValue;
-            sizedStyle.fixedHeight = avatarSizeValue;
-            sizedStyle.border = GetAvatarBorder(shape, size);
-            avatarStyleCache[(size, shape)] = sizedStyle;
-            return sizedStyle;
+            style.fixedWidth = avatarSizeValue;
+            style.fixedHeight = avatarSizeValue;
+            style.border = GetAvatarBorder(shape, size);
+            ApplyContainerVariant(style, variant, ThemeManager.Instance.CurrentTheme);
+
+            styleCache[key] = style;
+            return style;
         }
 
-        public RectOffset GetAvatarBorder(AvatarShape shape, AvatarSize size)
+        public RectOffset GetAvatarBorder(AvatarShape shape, ControlSize size)
         {
             int borderRadius = shape switch
             {
@@ -2383,273 +2285,564 @@ namespace shadcnui.GUIComponents.Core
             return new UnityHelpers.RectOffset(borderRadius, borderRadius, borderRadius, borderRadius);
         }
 
-        public float GetStatusIndicatorSize(AvatarSize size) =>
+        public float GetStatusIndicatorSize(ControlSize size) =>
             size switch
             {
-                AvatarSize.Small => 6f,
-                AvatarSize.Large => 12f,
-                AvatarSize.Default => 8f,
+                ControlSize.Small => 6f,
+                ControlSize.Large => 12f,
+                ControlSize.Mini => 4f,
+                ControlSize.Default => 8f,
                 _ => 8f,
             };
 
-        public GUIStyle GetTableStyle(TableVariant variant, TableSize size)
+        public GUIStyle GetTableStyle(ControlVariant variant, ControlSize size)
         {
-            if (tableStyleCache.TryGetValue((variant, size), out var cachedStyle))
+            var key = new StyleKey(StyleComponentType.Table, variant, size);
+            if (styleCache.TryGetValue(key, out var cachedStyle))
                 return cachedStyle;
+
+            var theme = ThemeManager.Instance.CurrentTheme;
             GUIStyle baseStyle = variant switch
             {
-                TableVariant.Striped => tableStripedStyle,
-                TableVariant.Bordered => tableBorderedStyle,
-                TableVariant.Hover => tableHoverStyle,
-                TableVariant.Default => tableStyle,
-                _ => tableStyle,
+                ControlVariant.Secondary => tableStripedStyle,
+                ControlVariant.Outline => tableBorderedStyle,
+                ControlVariant.Ghost => tableHoverStyle,
+                _ => baseTableStyle,
             };
-            GUIStyle sizedStyle = new UnityHelpers.GUIStyle(baseStyle ?? GUI.skin.box);
-            ApplyTableSizing(sizedStyle, size);
-            tableStyleCache[(variant, size)] = sizedStyle;
-            return sizedStyle;
+            GUIStyle style = new UnityHelpers.GUIStyle(baseStyle ?? GUI.skin.box);
+            ApplyContainerVariant(style, variant, theme);
+            ApplySizing(style, size, "Table");
+
+            styleCache[key] = style;
+            return style;
         }
 
-        private void ApplyTableSizing(GUIStyle style, TableSize size)
+        public GUIStyle GetTableHeaderStyle(ControlVariant variant = ControlVariant.Default, ControlSize size = ControlSize.Default)
         {
-            switch (size)
-            {
-                case TableSize.Small:
-                    style.fontSize = GetScaledFontSize(0.9f);
-                    style.padding = GetSpacingOffset(8f, 8f);
-                    break;
-                case TableSize.Large:
-                    style.fontSize = GetScaledFontSize(1.1f);
-                    style.padding = GetSpacingOffset(20f, 20f);
-                    break;
-                case TableSize.Default:
-                    style.fontSize = GetScaledFontSize(0.95f);
-                    style.padding = GetSpacingOffset(14f, 14f);
-                    break;
-            }
-        }
-
-        public GUIStyle GetTableHeaderStyle(TableVariant variant, TableSize size) => tableHeaderStyle ?? GUI.skin.label;
-
-        public GUIStyle GetTableCellStyle(TableVariant variant, TableSize size) => tableCellStyle ?? GUI.skin.label;
-
-        public GUIStyle GetCalendarStyle(CalendarVariant variant, CalendarSize size)
-        {
-            if (calendarStyleCache.TryGetValue((variant, size), out var cachedStyle))
+            var key = new StyleKey(StyleComponentType.TableHeader, variant, size);
+            if (styleCache.TryGetValue(key, out var cachedStyle))
                 return cachedStyle;
-            GUIStyle baseStyle = variant switch
-            {
-                CalendarVariant.Default => calendarStyle,
-                _ => calendarStyle,
-            };
-            GUIStyle sizedStyle = new UnityHelpers.GUIStyle(baseStyle ?? GUI.skin.box);
-            ApplyCalendarSizing(sizedStyle, size, variant);
-            calendarStyleCache[(variant, size)] = sizedStyle;
-            return sizedStyle;
+
+            GUIStyle style = new UnityHelpers.GUIStyle(tableHeaderStyle ?? GUI.skin.label);
+            ApplySizing(style, size, "TableChild", true);
+
+            styleCache[key] = style;
+            return style;
         }
 
-        private void ApplyCalendarSizing(GUIStyle style, CalendarSize size, CalendarVariant variant)
+        public GUIStyle GetTableCellStyle(ControlVariant variant = ControlVariant.Default, ControlSize size = ControlSize.Default, TextAnchor alignment = TextAnchor.MiddleLeft)
         {
-            switch (variant)
-            {
-                case CalendarVariant.Default:
-                    break;
-            }
-            switch (size)
-            {
-                case CalendarSize.Small:
-                    style.padding = GetSpacingOffset(8f, 8f);
-                    break;
-                case CalendarSize.Large:
-                    style.padding = GetSpacingOffset(16f, 16f);
-                    break;
-                case CalendarSize.Default:
-                    style.padding = GetSpacingOffset(12f, 12f);
-                    break;
-            }
-        }
-
-        public GUIStyle GetCalendarWeekdayStyle() => calendarWeekdayStyle ?? GUI.skin.label;
-
-        public GUIStyle GetCalendarDayStyle() => calendarDayStyle ?? GUI.skin.button;
-
-        public GUIStyle GetCalendarDaySelectedStyle() => calendarDaySelectedStyle ?? GUI.skin.button;
-
-        public GUIStyle GetCalendarDayOutsideMonthStyle() => calendarDayOutsideMonthStyle ?? GUI.skin.button;
-
-        public GUIStyle GetCalendarDayTodayStyle() => calendarDayTodayStyle ?? GUI.skin.button;
-
-        public GUIStyle GetCalendarDayInRangeStyle() => calendarDayInRangeStyle ?? GUI.skin.button;
-
-        public GUIStyle GetDatePickerStyle(CalendarVariant variant, CalendarSize size)
-        {
-            if (calendarStyleCache.TryGetValue((variant, size), out var cachedStyle))
+            var key = new StyleKey(StyleComponentType.TableCell, variant, size, (int)alignment);
+            if (styleCache.TryGetValue(key, out var cachedStyle))
                 return cachedStyle;
-            GUIStyle baseStyle = variant switch
-            {
-                CalendarVariant.Default => datePickerStyle,
-                _ => datePickerStyle,
-            };
-            GUIStyle sizedStyle = new UnityHelpers.GUIStyle(baseStyle ?? GUI.skin.box);
-            ApplyDatePickerSizing(sizedStyle, size, variant);
-            calendarStyleCache[(variant, size)] = sizedStyle;
-            return sizedStyle;
+
+            GUIStyle style = new UnityHelpers.GUIStyle(tableCellStyle ?? GUI.skin.label);
+            ApplySizing(style, size, "TableChild", false);
+            style.alignment = alignment;
+
+            styleCache[key] = style;
+            return style;
         }
 
-        private void ApplyDatePickerSizing(GUIStyle style, CalendarSize size, CalendarVariant variant)
+        public GUIStyle GetCalendarStyle(ControlVariant variant, ControlSize size)
         {
-            switch (variant)
-            {
-                case CalendarVariant.Default:
-                    break;
-            }
-            switch (size)
-            {
-                case CalendarSize.Small:
-                    style.padding = GetSpacingOffset(8f, 8f);
-                    break;
-                case CalendarSize.Large:
-                    style.padding = GetSpacingOffset(16f, 16f);
-                    break;
-                case CalendarSize.Default:
-                    style.padding = GetSpacingOffset(10f, 10f);
-                    break;
-            }
-        }
-
-        public GUIStyle GetDatePickerTitleStyle() => datePickerTitleStyle ?? GUI.skin.label;
-
-        public GUIStyle GetDatePickerWeekdayStyle() => datePickerWeekdayStyle ?? GUI.skin.label;
-
-        public GUIStyle GetDatePickerDayStyle() => datePickerDayStyle ?? GUI.skin.button;
-
-        public GUIStyle GetDatePickerDaySelectedStyle() => datePickerDaySelectedStyle ?? GUI.skin.button;
-
-        public GUIStyle GetDatePickerDayOutsideMonthStyle() => datePickerDayOutsideMonthStyle ?? GUI.skin.button;
-
-        public GUIStyle GetDatePickerDayTodayStyle() => datePickerDayTodayStyle ?? GUI.skin.button;
-
-        public GUIStyle GetDialogContentStyle() => dialogContentStyle ?? GUI.skin.box;
-
-        public GUIStyle GetDialogTitleStyle() => dialogTitleStyle ?? GUI.skin.label;
-
-        public GUIStyle GetDialogDescriptionStyle() => dialogDescriptionStyle ?? GUI.skin.label;
-
-        public GUIStyle GetDropdownMenuItemStyle() => dropdownMenuItemStyle ?? GUI.skin.button;
-
-        public GUIStyle GetDropdownMenuSeparatorStyle() => dropdownMenuSeparatorStyle ?? GUIStyle.none;
-
-        public GUIStyle GetDropdownMenuHeaderStyle() => dropdownMenuHeaderStyle ?? GUI.skin.label;
-
-        public GUIStyle GetDropdownMenuStyle(DropdownMenuVariant variant, DropdownMenuSize size)
-        {
-            if (dropdownMenuStyleCache.TryGetValue((variant, size), out var cachedStyle))
+            var key = new StyleKey(StyleComponentType.Calendar, variant, size);
+            if (styleCache.TryGetValue(key, out var cachedStyle))
                 return cachedStyle;
-            GUIStyle sizedStyle = new UnityHelpers.GUIStyle(dropdownMenuContentStyle ?? GUI.skin.box);
-            ApplyDropdownMenuSizing(sizedStyle, size, variant);
-            dropdownMenuStyleCache[(variant, size)] = sizedStyle;
-            return sizedStyle;
+
+            GUIStyle style = new UnityHelpers.GUIStyle(baseCalendarStyle ?? GUI.skin.box);
+            ApplyContainerVariant(style, variant, ThemeManager.Instance.CurrentTheme);
+            ApplySizing(style, size, "Calendar");
+
+            styleCache[key] = style;
+            return style;
         }
 
-        private void ApplyDropdownMenuSizing(GUIStyle style, DropdownMenuSize size, DropdownMenuVariant variant)
+        public GUIStyle GetCalendarHeaderStyle(ControlVariant variant = ControlVariant.Default, ControlSize size = ControlSize.Default)
         {
-            switch (size)
-            {
-                case DropdownMenuSize.Small:
-                    style.padding = GetSpacingOffset(4f, 4f);
-                    break;
-                case DropdownMenuSize.Large:
-                    style.padding = GetSpacingOffset(8f, 8f);
-                    break;
-                case DropdownMenuSize.Default:
-                    style.padding = GetSpacingOffset(6f, 6f);
-                    break;
-            }
-            switch (variant)
-            {
-                case DropdownMenuVariant.Default:
-                    break;
-            }
-        }
-
-        public GUIStyle GetPopoverContentStyle() => popoverContentStyle ?? GUI.skin.box;
-
-        public GUIStyle GetSelectTriggerStyle() => selectTriggerStyle ?? GUI.skin.button;
-
-        public GUIStyle GetSelectItemStyle() => selectItemStyle ?? GUI.skin.button;
-
-        public GUIStyle GetSelectStyle(SelectVariant variant, SelectSize size)
-        {
-            if (selectStyleCache.TryGetValue((variant, size), out var cachedStyle))
+            var key = new StyleKey(StyleComponentType.CalendarHeader, variant, size);
+            if (styleCache.TryGetValue(key, out var cachedStyle))
                 return cachedStyle;
-            GUIStyle sizedStyle = new UnityHelpers.GUIStyle(selectContentStyle ?? GUI.skin.box);
-            ApplySelectSizing(sizedStyle, size, variant);
-            selectStyleCache[(variant, size)] = sizedStyle;
-            return sizedStyle;
+
+            GUIStyle style = new UnityHelpers.GUIStyle(calendarHeaderStyle ?? GUI.skin.label);
+            ApplySizing(style, size, "CalendarHeader");
+
+            styleCache[key] = style;
+            return style;
         }
 
-        private void ApplySelectSizing(GUIStyle style, SelectSize size, SelectVariant variant)
+        public GUIStyle GetCalendarWeekdayStyle(ControlVariant variant = ControlVariant.Default, ControlSize size = ControlSize.Default)
         {
-            switch (size)
-            {
-                case SelectSize.Small:
-                    style.fontSize = GetScaledFontSize(0.8f);
-                    style.padding = GetSpacingOffset(8f, 6f);
-                    break;
-                case SelectSize.Large:
-                    style.fontSize = GetScaledFontSize(1.1f);
-                    style.padding = GetSpacingOffset(12f, 10f);
-                    break;
-                case SelectSize.Default:
-                    style.fontSize = GetScaledFontSize(0.95f);
-                    style.padding = GetSpacingOffset(10f, 8f);
-                    break;
-            }
-            switch (variant)
-            {
-                case SelectVariant.Default:
-                    break;
-            }
-        }
-
-        public GUIStyle GetChartStyle(ChartVariant variant, ChartSize size)
-        {
-            if (chartStyleCache.TryGetValue((variant, size), out var cachedStyle))
+            var key = new StyleKey(StyleComponentType.CalendarWeekday, variant, size);
+            if (styleCache.TryGetValue(key, out var cachedStyle))
                 return cachedStyle;
-            GUIStyle sizedStyle = new UnityHelpers.GUIStyle(chartContainerStyle ?? GUI.skin.box);
-            ApplyChartSizing(sizedStyle, size, variant);
-            chartStyleCache[(variant, size)] = sizedStyle;
-            return sizedStyle;
+
+            GUIStyle style = new UnityHelpers.GUIStyle(calendarWeekdayStyle ?? GUI.skin.label);
+            ApplySizing(style, size, "CalendarChild");
+
+            styleCache[key] = style;
+            return style;
         }
 
-        private void ApplyChartSizing(GUIStyle style, ChartSize size, ChartVariant variant)
+        public GUIStyle GetCalendarDayStyle(ControlVariant variant = ControlVariant.Default, ControlSize size = ControlSize.Default)
         {
-            switch (size)
-            {
-                case ChartSize.Small:
-                    style.padding = GetSpacingOffset(12f, 12f);
-                    break;
-                case ChartSize.Large:
-                    style.padding = GetSpacingOffset(20f, 20f);
-                    break;
-                case ChartSize.Default:
-                    style.padding = GetSpacingOffset(16f, 16f);
-                    break;
-            }
-            switch (variant)
-            {
-                case ChartVariant.Default:
-                    break;
-            }
+            var key = new StyleKey(StyleComponentType.CalendarDay, variant, size);
+            if (styleCache.TryGetValue(key, out var cachedStyle))
+                return cachedStyle;
+
+            GUIStyle style = new UnityHelpers.GUIStyle(calendarDayStyle ?? GUI.skin.button);
+            if (variant != ControlVariant.Default)
+                ApplyVariantToStyle(style, variant, ThemeManager.Instance.CurrentTheme);
+            ApplySizing(style, size, "CalendarChild");
+
+            styleCache[key] = style;
+            return style;
         }
 
-        public GUIStyle GetChartAxisStyle() => chartAxisStyle ?? GUI.skin.label;
+        public GUIStyle GetCalendarDaySelectedStyle(ControlVariant variant = ControlVariant.Default, ControlSize size = ControlSize.Default)
+        {
+            var key = new StyleKey(StyleComponentType.CalendarDaySelected, variant, size);
+            if (styleCache.TryGetValue(key, out var cachedStyle))
+                return cachedStyle;
 
-        public GUIStyle GetMenuBarStyle() => menuBarStyle ?? GUIStyle.none;
+            GUIStyle style = new UnityHelpers.GUIStyle(calendarDaySelectedStyle ?? GUI.skin.button);
+            if (variant != ControlVariant.Default)
+            {
+                ApplyVariantToStyle(style, variant, ThemeManager.Instance.CurrentTheme);
+                style.normal = style.onNormal;
+                style.hover = style.onHover;
+                style.active = style.onActive;
+            }
+            ApplySizing(style, size, "CalendarChild");
 
-        public GUIStyle GetMenuBarItemStyle() => menuBarItemStyle ?? GUI.skin.button;
+            styleCache[key] = style;
+            return style;
+        }
 
-        public GUIStyle GetMenuDropdownStyle() => menuDropdownStyle ?? GUI.skin.box;
+        public GUIStyle GetCalendarDayOutsideMonthStyle(ControlVariant variant = ControlVariant.Default, ControlSize size = ControlSize.Default)
+        {
+            var key = new StyleKey(StyleComponentType.CalendarDayOutsideMonth, variant, size);
+            if (styleCache.TryGetValue(key, out var cachedStyle))
+                return cachedStyle;
+
+            GUIStyle style = new UnityHelpers.GUIStyle(calendarDayOutsideMonthStyle ?? GUI.skin.button);
+            if (variant != ControlVariant.Default)
+                ApplyVariantToStyle(style, variant, ThemeManager.Instance.CurrentTheme);
+            ApplySizing(style, size, "CalendarChild");
+
+            styleCache[key] = style;
+            return style;
+        }
+
+        public GUIStyle GetCalendarDayTodayStyle(ControlVariant variant = ControlVariant.Default, ControlSize size = ControlSize.Default)
+        {
+            var key = new StyleKey(StyleComponentType.CalendarDayToday, variant, size);
+            if (styleCache.TryGetValue(key, out var cachedStyle))
+                return cachedStyle;
+
+            GUIStyle style = new UnityHelpers.GUIStyle(calendarDayTodayStyle ?? GUI.skin.button);
+            if (variant != ControlVariant.Default)
+                ApplyVariantToStyle(style, variant, ThemeManager.Instance.CurrentTheme);
+            ApplySizing(style, size, "CalendarChild");
+
+            styleCache[key] = style;
+            return style;
+        }
+
+        public GUIStyle GetCalendarDayInRangeStyle(ControlVariant variant = ControlVariant.Default, ControlSize size = ControlSize.Default)
+        {
+            var key = new StyleKey(StyleComponentType.CalendarDayInRange, variant, size);
+            if (styleCache.TryGetValue(key, out var cachedStyle))
+                return cachedStyle;
+
+            GUIStyle style = new UnityHelpers.GUIStyle(calendarDayInRangeStyle ?? GUI.skin.button);
+            if (variant != ControlVariant.Default)
+            {
+                ApplyVariantToStyle(style, variant, ThemeManager.Instance.CurrentTheme);
+                style.normal.background = CreateSolidTexture(new Color(ThemeManager.Instance.CurrentTheme.Accent.r, ThemeManager.Instance.CurrentTheme.Accent.g, ThemeManager.Instance.CurrentTheme.Accent.b, 0.55f));
+            }
+            ApplySizing(style, size, "CalendarChild");
+
+            styleCache[key] = style;
+            return style;
+        }
+
+        public GUIStyle GetDatePickerStyle(ControlVariant variant, ControlSize size)
+        {
+            var key = new StyleKey(StyleComponentType.DatePicker, variant, size);
+            if (styleCache.TryGetValue(key, out var cachedStyle))
+                return cachedStyle;
+
+            GUIStyle style = new UnityHelpers.GUIStyle(baseDatePickerStyle ?? GUI.skin.box);
+            ApplyContainerVariant(style, variant, ThemeManager.Instance.CurrentTheme);
+            ApplySizing(style, size, "DatePicker");
+
+            styleCache[key] = style;
+            return style;
+        }
+
+        public GUIStyle GetDatePickerWeekdayStyle(ControlVariant variant = ControlVariant.Default, ControlSize size = ControlSize.Default)
+        {
+            var key = new StyleKey(StyleComponentType.DatePickerWeekday, variant, size);
+            if (styleCache.TryGetValue(key, out var cachedStyle))
+                return cachedStyle;
+
+            GUIStyle style = new UnityHelpers.GUIStyle(datePickerWeekdayStyle ?? GUI.skin.label);
+            ApplySizing(style, size, "CalendarChild");
+
+            styleCache[key] = style;
+            return style;
+        }
+
+        public GUIStyle GetDatePickerDayStyle(ControlVariant variant = ControlVariant.Default, ControlSize size = ControlSize.Default)
+        {
+            var key = new StyleKey(StyleComponentType.DatePickerDay, variant, size);
+            if (styleCache.TryGetValue(key, out var cachedStyle))
+                return cachedStyle;
+
+            GUIStyle style = new UnityHelpers.GUIStyle(datePickerDayStyle ?? GUI.skin.button);
+            if (variant != ControlVariant.Default)
+                ApplyVariantToStyle(style, variant, ThemeManager.Instance.CurrentTheme);
+            ApplySizing(style, size, "CalendarChild");
+
+            styleCache[key] = style;
+            return style;
+        }
+
+        public GUIStyle GetDatePickerDaySelectedStyle(ControlVariant variant = ControlVariant.Default, ControlSize size = ControlSize.Default)
+        {
+            var key = new StyleKey(StyleComponentType.DatePickerDaySelected, variant, size);
+            if (styleCache.TryGetValue(key, out var cachedStyle))
+                return cachedStyle;
+
+            GUIStyle style = new UnityHelpers.GUIStyle(datePickerDaySelectedStyle ?? GUI.skin.button);
+            if (variant != ControlVariant.Default)
+            {
+                ApplyVariantToStyle(style, variant, ThemeManager.Instance.CurrentTheme);
+                style.normal = style.onNormal;
+                style.hover = style.onHover;
+                style.active = style.onActive;
+            }
+            ApplySizing(style, size, "CalendarChild");
+
+            styleCache[key] = style;
+            return style;
+        }
+
+        public GUIStyle GetDatePickerDayOutsideMonthStyle(ControlVariant variant = ControlVariant.Default, ControlSize size = ControlSize.Default)
+        {
+            var key = new StyleKey(StyleComponentType.DatePickerDayOutsideMonth, variant, size);
+            if (styleCache.TryGetValue(key, out var cachedStyle))
+                return cachedStyle;
+
+            GUIStyle style = new UnityHelpers.GUIStyle(datePickerDayOutsideMonthStyle ?? GUI.skin.button);
+            if (variant != ControlVariant.Default)
+                ApplyVariantToStyle(style, variant, ThemeManager.Instance.CurrentTheme);
+            ApplySizing(style, size, "CalendarChild");
+
+            styleCache[key] = style;
+            return style;
+        }
+
+        public GUIStyle GetDatePickerDayTodayStyle(ControlVariant variant = ControlVariant.Default, ControlSize size = ControlSize.Default)
+        {
+            var key = new StyleKey(StyleComponentType.DatePickerDayToday, variant, size);
+            if (styleCache.TryGetValue(key, out var cachedStyle))
+                return cachedStyle;
+
+            GUIStyle style = new UnityHelpers.GUIStyle(datePickerDayTodayStyle ?? GUI.skin.button);
+            if (variant != ControlVariant.Default)
+                ApplyVariantToStyle(style, variant, ThemeManager.Instance.CurrentTheme);
+            ApplySizing(style, size, "CalendarChild");
+
+            styleCache[key] = style;
+            return style;
+        }
+
+        public GUIStyle GetDialogContentStyle(ControlVariant variant = ControlVariant.Default, ControlSize size = ControlSize.Default)
+        {
+            var key = new StyleKey(StyleComponentType.Dialog, variant, size);
+            if (styleCache.TryGetValue(key, out var cachedStyle))
+                return cachedStyle;
+
+            GUIStyle style = new UnityHelpers.GUIStyle(dialogContentStyle ?? GUI.skin.box);
+            ApplyContainerVariant(style, variant, ThemeManager.Instance.CurrentTheme);
+            ApplySizing(style, size, "Dialog");
+
+            styleCache[key] = style;
+            return style;
+        }
+
+        public GUIStyle GetDropdownMenuItemStyle(ControlVariant variant = ControlVariant.Default, ControlSize size = ControlSize.Default)
+        {
+            var key = new StyleKey(StyleComponentType.DropdownMenuItem, variant, size);
+            if (styleCache.TryGetValue(key, out var cachedStyle))
+                return cachedStyle;
+
+            GUIStyle style = new UnityHelpers.GUIStyle(dropdownMenuItemStyle ?? GUI.skin.button);
+            if (variant != ControlVariant.Default)
+                ApplyVariantToStyle(style, variant, ThemeManager.Instance.CurrentTheme);
+            ApplySizing(style, size, "DropdownItem");
+
+            styleCache[key] = style;
+            return style;
+        }
+
+        public GUIStyle GetDropdownMenuStyle(ControlVariant variant, ControlSize size)
+        {
+            var key = new StyleKey(StyleComponentType.DropdownMenu, variant, size);
+            if (styleCache.TryGetValue(key, out var cachedStyle))
+                return cachedStyle;
+
+            GUIStyle style = new UnityHelpers.GUIStyle(dropdownMenuContentStyle ?? GUI.skin.box);
+            ApplyContainerVariant(style, variant, ThemeManager.Instance.CurrentTheme);
+            ApplySizing(style, size, "DropdownMenu");
+
+            styleCache[key] = style;
+            return style;
+        }
+
+        public GUIStyle GetPopoverContentStyle(ControlVariant variant = ControlVariant.Default, ControlSize size = ControlSize.Default)
+        {
+            var key = new StyleKey(StyleComponentType.Popover, variant, size);
+            if (styleCache.TryGetValue(key, out var cachedStyle))
+                return cachedStyle;
+
+            GUIStyle style = new UnityHelpers.GUIStyle(popoverContentStyle ?? GUI.skin.box);
+            ApplyContainerVariant(style, variant, ThemeManager.Instance.CurrentTheme);
+            ApplySizing(style, size, "Popover");
+
+            styleCache[key] = style;
+            return style;
+        }
+
+        public GUIStyle GetSelectTriggerStyle(ControlVariant variant = ControlVariant.Default, ControlSize size = ControlSize.Default)
+        {
+            var key = new StyleKey(StyleComponentType.SelectTrigger, variant, size);
+            if (styleCache.TryGetValue(key, out var cachedStyle))
+                return cachedStyle;
+
+            GUIStyle style = new UnityHelpers.GUIStyle(selectTriggerStyle ?? GUI.skin.button);
+            if (variant != ControlVariant.Default)
+                ApplyVariantToStyle(style, variant, ThemeManager.Instance.CurrentTheme);
+            ApplySizing(style, size, "SelectTrigger");
+
+            styleCache[key] = style;
+            return style;
+        }
+
+        public GUIStyle GetSelectItemStyle(ControlVariant variant = ControlVariant.Default, ControlSize size = ControlSize.Default)
+        {
+            var key = new StyleKey(StyleComponentType.SelectItem, variant, size);
+            if (styleCache.TryGetValue(key, out var cachedStyle))
+                return cachedStyle;
+
+            GUIStyle style = new UnityHelpers.GUIStyle(selectItemStyle ?? GUI.skin.button);
+            if (variant != ControlVariant.Default)
+                ApplyVariantToStyle(style, variant, ThemeManager.Instance.CurrentTheme);
+            ApplySizing(style, size, "SelectItem");
+
+            styleCache[key] = style;
+            return style;
+        }
+
+        public GUIStyle GetSelectStyle(ControlVariant variant, ControlSize size)
+        {
+            var key = new StyleKey(StyleComponentType.SelectContent, variant, size);
+            if (styleCache.TryGetValue(key, out var cachedStyle))
+                return cachedStyle;
+
+            GUIStyle style = new UnityHelpers.GUIStyle(selectContentStyle ?? GUI.skin.box);
+            ApplyContainerVariant(style, variant, ThemeManager.Instance.CurrentTheme);
+            ApplySizing(style, size, "SelectContent");
+
+            styleCache[key] = style;
+            return style;
+        }
+
+        public GUIStyle GetChartStyle(ControlVariant variant, ControlSize size)
+        {
+            var key = new StyleKey(StyleComponentType.Chart, variant, size);
+            if (styleCache.TryGetValue(key, out var cachedStyle))
+                return cachedStyle;
+
+            GUIStyle style = new UnityHelpers.GUIStyle(chartContainerStyle ?? GUI.skin.box);
+            ApplyContainerVariant(style, variant, ThemeManager.Instance.CurrentTheme);
+            ApplySizing(style, size, "Chart");
+
+            styleCache[key] = style;
+            return style;
+        }
+
+        public GUIStyle GetChartAxisStyle(ControlVariant variant = ControlVariant.Default, ControlSize size = ControlSize.Default)
+        {
+            var key = new StyleKey(StyleComponentType.ChartAxis, variant, size);
+            if (styleCache.TryGetValue(key, out var cachedStyle))
+                return cachedStyle;
+
+            GUIStyle style = new UnityHelpers.GUIStyle(chartAxisStyle ?? GUI.skin.label);
+            ApplySizing(style, size, "ChartAxis");
+
+            styleCache[key] = style;
+            return style;
+        }
+
+        public GUIStyle GetMenuBarStyle(ControlVariant variant = ControlVariant.Default, ControlSize size = ControlSize.Default)
+        {
+            var key = new StyleKey(StyleComponentType.MenuBar, variant, size);
+            if (styleCache.TryGetValue(key, out var cachedStyle))
+                return cachedStyle;
+
+            GUIStyle style = new UnityHelpers.GUIStyle(menuBarStyle ?? GUIStyle.none);
+            ApplyContainerVariant(style, variant, ThemeManager.Instance.CurrentTheme);
+            ApplySizing(style, size, "MenuBar");
+
+            styleCache[key] = style;
+            return style;
+        }
+
+        public GUIStyle GetMenuBarItemStyle(ControlVariant variant = ControlVariant.Default, ControlSize size = ControlSize.Default, bool isShortcut = false)
+        {
+            var key = new StyleKey(StyleComponentType.MenuBarItem, variant, size, isShortcut ? 1 : 0);
+            if (styleCache.TryGetValue(key, out var cachedStyle))
+                return cachedStyle;
+
+            GUIStyle style = new UnityHelpers.GUIStyle(menuBarItemStyle ?? GUI.skin.button);
+            if (variant != ControlVariant.Default)
+                ApplyVariantToStyle(style, variant, ThemeManager.Instance.CurrentTheme);
+            ApplySizing(style, size, "MenuBarItem");
+
+            if (isShortcut)
+            {
+                style.alignment = TextAnchor.MiddleRight;
+            }
+
+            styleCache[key] = style;
+            return style;
+        }
+
+        public GUIStyle GetMenuDropdownStyle(ControlVariant variant = ControlVariant.Default, ControlSize size = ControlSize.Default)
+        {
+            var key = new StyleKey(StyleComponentType.MenuDropdown, variant, size);
+            if (styleCache.TryGetValue(key, out var cachedStyle))
+                return cachedStyle;
+
+            GUIStyle style = new UnityHelpers.GUIStyle(menuDropdownStyle ?? GUI.skin.box);
+            ApplyContainerVariant(style, variant, ThemeManager.Instance.CurrentTheme);
+            ApplySizing(style, size, "DropdownMenu");
+
+            styleCache[key] = style;
+            return style;
+        }
+
+        public GUIStyle GetAnimatedBoxStyle(ControlVariant variant = ControlVariant.Default, ControlSize size = ControlSize.Default)
+        {
+            var key = new StyleKey(StyleComponentType.AnimatedBox, variant, size);
+            if (styleCache.TryGetValue(key, out var cachedStyle))
+                return cachedStyle;
+
+            GUIStyle style = new UnityHelpers.GUIStyle(animatedBoxStyle ?? GUI.skin.box);
+            ApplyContainerVariant(style, variant, ThemeManager.Instance.CurrentTheme);
+            ApplySizing(style, size, "AnimatedBox");
+
+            styleCache[key] = style;
+            return style;
+        }
+
+        public GUIStyle GetSectionHeaderStyle(ControlVariant variant = ControlVariant.Default, ControlSize size = ControlSize.Default)
+        {
+            var key = new StyleKey(StyleComponentType.SectionHeader, variant, size);
+            if (styleCache.TryGetValue(key, out var cachedStyle))
+                return cachedStyle;
+
+            GUIStyle style = new UnityHelpers.GUIStyle(sectionHeaderStyle ?? GUI.skin.label);
+            ApplySizing(style, size, "SectionHeader");
+
+            styleCache[key] = style;
+            return style;
+        }
+
+        public GUIStyle GetCardStyle(ControlVariant variant = ControlVariant.Default, ControlSize size = ControlSize.Default)
+        {
+            var key = new StyleKey(StyleComponentType.Card, variant, size);
+            if (styleCache.TryGetValue(key, out var cachedStyle))
+                return cachedStyle;
+
+            GUIStyle style = new UnityHelpers.GUIStyle(cardStyle ?? GUI.skin.box);
+            ApplyContainerVariant(style, variant, ThemeManager.Instance.CurrentTheme);
+            ApplySizing(style, size, "Card");
+
+            styleCache[key] = style;
+            return style;
+        }
+
+        public GUIStyle GetCardHeaderStyle(ControlVariant variant = ControlVariant.Default, ControlSize size = ControlSize.Default)
+        {
+            var key = new StyleKey(StyleComponentType.CardHeader, variant, size);
+            if (styleCache.TryGetValue(key, out var cachedStyle))
+                return cachedStyle;
+
+            GUIStyle style = new UnityHelpers.GUIStyle(cardHeaderStyle ?? GUIStyle.none);
+            ApplyContainerVariant(style, variant, ThemeManager.Instance.CurrentTheme);
+            ApplySizing(style, size, "CardChild");
+
+            styleCache[key] = style;
+            return style;
+        }
+
+        public GUIStyle GetCardTitleStyle(ControlVariant variant = ControlVariant.Default, ControlSize size = ControlSize.Default)
+        {
+            var key = new StyleKey(StyleComponentType.CardTitle, variant, size);
+            if (styleCache.TryGetValue(key, out var cachedStyle))
+                return cachedStyle;
+
+            GUIStyle style = new UnityHelpers.GUIStyle(cardTitleStyle ?? GUI.skin.label);
+            ApplySizing(style, size, "CardTitle");
+
+            styleCache[key] = style;
+            return style;
+        }
+
+        public GUIStyle GetCardDescriptionStyle(ControlVariant variant = ControlVariant.Default, ControlSize size = ControlSize.Default)
+        {
+            var key = new StyleKey(StyleComponentType.CardDescription, variant, size);
+            if (styleCache.TryGetValue(key, out var cachedStyle))
+                return cachedStyle;
+
+            GUIStyle style = new UnityHelpers.GUIStyle(cardDescriptionStyle ?? GUI.skin.label);
+            ApplySizing(style, size, "CardDescription");
+
+            styleCache[key] = style;
+            return style;
+        }
+
+        public GUIStyle GetCardContentStyle(ControlVariant variant = ControlVariant.Default, ControlSize size = ControlSize.Default)
+        {
+            var key = new StyleKey(StyleComponentType.CardContent, variant, size);
+            if (styleCache.TryGetValue(key, out var cachedStyle))
+                return cachedStyle;
+
+            GUIStyle style = new UnityHelpers.GUIStyle(cardContentStyle ?? GUIStyle.none);
+            ApplyContainerVariant(style, variant, ThemeManager.Instance.CurrentTheme);
+            ApplySizing(style, size, "CardChild");
+
+            styleCache[key] = style;
+            return style;
+        }
+
+        public GUIStyle GetCardFooterStyle(ControlVariant variant = ControlVariant.Default, ControlSize size = ControlSize.Default)
+        {
+            var key = new StyleKey(StyleComponentType.CardFooter, variant, size);
+            if (styleCache.TryGetValue(key, out var cachedStyle))
+                return cachedStyle;
+
+            GUIStyle style = new UnityHelpers.GUIStyle(cardFooterStyle ?? GUIStyle.none);
+            ApplyContainerVariant(style, variant, ThemeManager.Instance.CurrentTheme);
+            ApplySizing(style, size, "CardChild");
+
+            styleCache[key] = style;
+            return style;
+        }
 
         public Texture2D GetParticleTexture() => particleTexture;
 
@@ -2723,6 +2916,138 @@ namespace shadcnui.GUIComponents.Core
                 if (texture)
                     Object.Destroy(texture);
             cache.Clear();
+        }
+        #endregion
+
+        #region Fix GUI Styles
+        private bool _stylesCorruption = false;
+        private float _lastScanTime = 0f;
+        private float _lastRefreshTime = 0f;
+        private float _scanInterval = 5f;
+        private Dictionary<string, int> _styleHealthChecks = new Dictionary<string, int>();
+        private List<System.Reflection.FieldInfo> _monitoredStyleFields = new List<System.Reflection.FieldInfo>();
+
+        private int GetStyleHealth(GUIStyle style)
+        {
+            if (style == null)
+                return 0;
+            unchecked
+            {
+                int hash = 17;
+                hash = hash * 31 + (style.normal.background?.GetInstanceID() ?? 0);
+                hash = hash * 31 + (style.hover.background?.GetInstanceID() ?? 0);
+                hash = hash * 31 + (style.active.background?.GetInstanceID() ?? 0);
+                hash = hash * 31 + style.fontSize;
+                hash = hash * 31 + style.padding.left + style.padding.right + style.padding.top + style.padding.bottom;
+                hash = hash * 31 + (style.normal.textColor.GetHashCode());
+                return hash;
+            }
+        }
+
+        public void MarkStylesCorruption()
+        {
+            _stylesCorruption = true;
+        }
+
+        public void RefreshStylesIfCorruption()
+        {
+            if (!_stylesCorruption)
+                return;
+
+            if (Time.realtimeSinceStartup - _lastRefreshTime < 1.0f)
+            {
+                _stylesCorruption = false;
+                return;
+            }
+
+            _lastRefreshTime = Time.realtimeSinceStartup;
+
+            try
+            {
+                GUILogger.LogWarning("Corruption detected or flagged. Refreshing styles...", "StyleManager.RefreshStylesIfCorruption");
+                isInitialized = false;
+                InitializeGUI();
+
+                if (_monitoredStyleFields.Count == 0)
+                {
+                    var fields = this.GetType().GetFields(System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.Public);
+                    foreach (var field in fields)
+                    {
+                        if (field.FieldType == typeof(GUIStyle))
+                        {
+                            _monitoredStyleFields.Add(field);
+                        }
+                    }
+                }
+
+                _styleHealthChecks.Clear();
+                foreach (var field in _monitoredStyleFields)
+                {
+                    var style = field.GetValue(this) as GUIStyle;
+                    if (style != null)
+                    {
+                        _styleHealthChecks[field.Name] = GetStyleHealth(style);
+                    }
+                }
+
+                _stylesCorruption = false;
+            }
+            catch (Exception ex)
+            {
+                GUILogger.LogException(ex, "RefreshStylesIfCorruption", "StyleManager");
+            }
+        }
+
+        public bool ScanForCorruption()
+        {
+            if (Time.realtimeSinceStartup - _lastScanTime < _scanInterval)
+                return false;
+
+            _lastScanTime = Time.realtimeSinceStartup;
+
+            if (_monitoredStyleFields.Count == 0)
+            {
+                var fields = this.GetType().GetFields(System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.Public);
+                foreach (var field in fields)
+                {
+                    if (field.FieldType == typeof(GUIStyle))
+                    {
+                        _monitoredStyleFields.Add(field);
+                    }
+                }
+
+                foreach (var field in _monitoredStyleFields)
+                {
+                    var style = field.GetValue(this) as GUIStyle;
+                    if (style != null)
+                    {
+                        _styleHealthChecks[field.Name] = GetStyleHealth(style);
+                    }
+                }
+                return false;
+            }
+
+            foreach (var field in _monitoredStyleFields)
+            {
+                var style = field.GetValue(this) as GUIStyle;
+                if (style == null)
+                    continue;
+
+                int currentHealth = GetStyleHealth(style);
+                string styleName = field.Name;
+
+                if (_styleHealthChecks.ContainsKey(styleName) && _styleHealthChecks[styleName] != currentHealth)
+                {
+                    GUILogger.LogWarning($"Style corruption detected in '{styleName}'", "StyleManager.ScanForCorruption");
+                    _stylesCorruption = true;
+                    RefreshStylesIfCorruption();
+                    return true;
+                }
+
+                _styleHealthChecks[styleName] = currentHealth;
+            }
+
+            return false;
         }
         #endregion
     }

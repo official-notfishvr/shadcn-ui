@@ -14,6 +14,8 @@ namespace shadcnui.GUIComponents.Data
         private Dictionary<string, DateTime> _displayDates = new Dictionary<string, DateTime>();
         private Dictionary<string, DateTime> _focusedDates = new Dictionary<string, DateTime>();
         private bool _weekStartsMonday = true;
+        private static readonly string[] WeekdaysMonday = { "Mo", "Tu", "We", "Th", "Fr", "Sa", "Su" };
+        private static readonly string[] WeekdaysSunday = { "Su", "Mo", "Tu", "We", "Th", "Fr", "Sa" };
 
         public void SetWeekStartsMonday(bool value)
         {
@@ -39,7 +41,7 @@ namespace shadcnui.GUIComponents.Data
 
             layoutComponents.BeginVerticalGroup();
 
-            if (UnityHelpers.Button($"{buttonText}", styleManager.GetButtonStyle(ButtonVariant.Outline, ButtonSize.Default), options))
+            if (UnityHelpers.Button($"{buttonText}", styleManager.GetButtonStyle(ControlVariant.Outline, ControlSize.Default), options))
             {
                 _openStates[id] = !isOpen;
                 if (selectedDate.HasValue)
@@ -69,7 +71,7 @@ namespace shadcnui.GUIComponents.Data
             layoutComponents.BeginVerticalGroup();
             if (!string.IsNullOrEmpty(label))
             {
-                UnityHelpers.Label(label, styleManager.GetLabelStyle(LabelVariant.Default));
+                UnityHelpers.Label(label, styleManager.GetLabelStyle(ControlVariant.Default));
                 GUILayout.Space(4);
             }
 
@@ -92,7 +94,7 @@ namespace shadcnui.GUIComponents.Data
 
             layoutComponents.BeginVerticalGroup();
 
-            if (UnityHelpers.Button($"{buttonText}", styleManager.GetButtonStyle(ButtonVariant.Outline, ButtonSize.Default), options))
+            if (UnityHelpers.Button($"{buttonText}", styleManager.GetButtonStyle(ControlVariant.Outline, ControlSize.Default), options))
             {
                 _openStates[id] = !_openStates[id];
             }
@@ -123,7 +125,7 @@ namespace shadcnui.GUIComponents.Data
 
             layoutComponents.BeginVerticalGroup();
 
-            if (UnityHelpers.Button($"{buttonText}", styleManager.GetButtonStyle(ButtonVariant.Outline, ButtonSize.Default), options))
+            if (UnityHelpers.Button($"{buttonText}", styleManager.GetButtonStyle(ControlVariant.Outline, ControlSize.Default), options))
             {
                 _openStates[id] = !isOpen;
                 if (selectedDate.HasValue)
@@ -160,7 +162,7 @@ namespace shadcnui.GUIComponents.Data
 
             layoutComponents.BeginVerticalGroup();
 
-            if (UnityHelpers.Button($"{buttonText}", styleManager.GetButtonStyle(ButtonVariant.Outline, ButtonSize.Default), options))
+            if (UnityHelpers.Button($"{buttonText}", styleManager.GetButtonStyle(ControlVariant.Outline, ControlSize.Default), options))
             {
                 _openStates[id] = !_openStates[id];
             }
@@ -178,7 +180,7 @@ namespace shadcnui.GUIComponents.Data
         private DateTime? DrawCalendarPopover(string id, DateTime? selectedDate, DateTime displayDate, DateTime? minDate, DateTime? maxDate)
         {
             var styleManager = guiHelper.GetStyleManager();
-            layoutComponents.BeginVerticalGroup(styleManager.GetDatePickerStyle(CalendarVariant.Default, CalendarSize.Default), GUILayout.Width(280));
+            layoutComponents.BeginVerticalGroup(styleManager.GetDatePickerStyle(ControlVariant.Default, ControlSize.Default), GUILayout.Width(280));
 
             DrawCalendarHeader(id, displayDate);
             DrawWeekdayHeaders();
@@ -201,12 +203,12 @@ namespace shadcnui.GUIComponents.Data
             var styleManager = guiHelper.GetStyleManager();
             layoutComponents.BeginHorizontalGroup();
 
-            if (UnityHelpers.Button("<<", styleManager.GetButtonStyle(ButtonVariant.Outline, ButtonSize.Icon)))
+            if (UnityHelpers.Button("<<", styleManager.GetButtonStyle(ControlVariant.Outline, ControlSize.Icon)))
             {
                 _displayDates[id] = displayDate.AddYears(-1);
             }
 
-            if (UnityHelpers.Button("<", styleManager.GetButtonStyle(ButtonVariant.Outline, ButtonSize.Icon)))
+            if (UnityHelpers.Button("<", styleManager.GetButtonStyle(ControlVariant.Outline, ControlSize.Icon)))
             {
                 _displayDates[id] = displayDate.AddMonths(-1);
             }
@@ -214,15 +216,15 @@ namespace shadcnui.GUIComponents.Data
             GUILayout.FlexibleSpace();
             string currentMonthYear = displayDate.ToString("MMMM yyyy");
 
-            UnityHelpers.Label(currentMonthYear, styleManager.GetDatePickerTitleStyle());
+            UnityHelpers.Label(currentMonthYear, styleManager.GetLabelStyle(ControlVariant.Default, ControlSize.Large));
             GUILayout.FlexibleSpace();
 
-            if (UnityHelpers.Button(">", styleManager.GetButtonStyle(ButtonVariant.Outline, ButtonSize.Icon)))
+            if (UnityHelpers.Button(">", styleManager.GetButtonStyle(ControlVariant.Outline, ControlSize.Icon)))
             {
                 _displayDates[id] = displayDate.AddMonths(1);
             }
-            
-            if (UnityHelpers.Button(">>", styleManager.GetButtonStyle(ButtonVariant.Outline, ButtonSize.Icon)))
+
+            if (UnityHelpers.Button(">>", styleManager.GetButtonStyle(ControlVariant.Outline, ControlSize.Icon)))
             {
                 _displayDates[id] = displayDate.AddYears(1);
             }
@@ -234,7 +236,7 @@ namespace shadcnui.GUIComponents.Data
         private void DrawWeekdayHeaders()
         {
             var styleManager = guiHelper.GetStyleManager();
-            string[] weekdays = _weekStartsMonday ? new[] { "Mo", "Tu", "We", "Th", "Fr", "Sa", "Su" } : new[] { "Su", "Mo", "Tu", "We", "Th", "Fr", "Sa" };
+            string[] weekdays = _weekStartsMonday ? WeekdaysMonday : WeekdaysSunday;
 
             layoutComponents.BeginHorizontalGroup();
             foreach (string day in weekdays)
@@ -361,14 +363,14 @@ namespace shadcnui.GUIComponents.Data
             var styleManager = guiHelper.GetStyleManager();
             layoutComponents.BeginHorizontalGroup();
 
-            if (UnityHelpers.Button("Today", styleManager.GetButtonStyle(ButtonVariant.Outline, ButtonSize.Default), GUILayout.Height(32)))
+            if (UnityHelpers.Button("Today", styleManager.GetButtonStyle(ControlVariant.Outline, ControlSize.Default), GUILayout.Height(32)))
             {
                 _displayDates[id] = DateTime.Today;
             }
 
             GUILayout.FlexibleSpace();
 
-            if (UnityHelpers.Button("Clear", styleManager.GetButtonStyle(ButtonVariant.Ghost, ButtonSize.Default), GUILayout.Height(32)))
+            if (UnityHelpers.Button("Clear", styleManager.GetButtonStyle(ControlVariant.Ghost, ControlSize.Default), GUILayout.Height(32)))
             {
                 _openStates[id] = false;
             }

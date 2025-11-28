@@ -105,7 +105,7 @@ namespace shadcnui.GUIComponents.Data
             state.ShowColumnToggle = showColumnToggle;
 
             var theme = styleManager?.GetTheme();
-            var tableStyle = styleManager?.GetTableStyle(TableVariant.Default, TableSize.Default) ?? GUI.skin.box;
+            var tableStyle = styleManager?.GetTableStyle(ControlVariant.Default, ControlSize.Default) ?? GUI.skin.box;
 
             layoutComponents.BeginVerticalGroup(tableStyle, options);
 
@@ -155,11 +155,11 @@ namespace shadcnui.GUIComponents.Data
         private void DrawSearchInput(string id, DataTableState state)
         {
             var styleManager = guiHelper.GetStyleManager();
-            var labelStyle = styleManager?.GetLabelStyle(LabelVariant.Default) ?? GUI.skin.label;
+            var labelStyle = styleManager?.GetLabelStyle(ControlVariant.Default) ?? GUI.skin.label;
 
             UnityHelpers.Label("Search:", labelStyle, GUILayout.Width(60 * guiHelper.uiScale));
 
-            var inputStyle = styleManager?.GetInputStyle(InputVariant.Default) ?? GUI.skin.textField;
+            var inputStyle = styleManager?.GetInputStyle(ControlVariant.Default) ?? GUI.skin.textField;
 
 #if IL2CPP_MELONLOADER_PRE57
             string newFilterText = GUILayout.TextField(state.FilterText ?? "", inputStyle, new Il2CppReferenceArray<GUILayoutOption>(new GUILayoutOption[] { GUILayout.Width(200 * guiHelper.uiScale) }));
@@ -176,20 +176,20 @@ namespace shadcnui.GUIComponents.Data
 
         private void DrawColumnToggle(string id, DataTableState state, List<DataTableColumn> columns)
         {
-            guiHelper.Button("Columns ▼", ButtonVariant.Outline, ButtonSize.Small);
+            guiHelper.Button("Columns ▼", ControlVariant.Outline, ControlSize.Small);
         }
 
         private void DrawTableHeader(string id, List<DataTableColumn> columns, DataTableState state, bool showSelection, List<DataTableRow> allData)
         {
             var styleManager = guiHelper.GetStyleManager();
-            var headerStyle = styleManager?.GetTableHeaderStyle(TableVariant.Default, TableSize.Default) ?? GUI.skin.label;
+            var headerStyle = styleManager?.GetTableHeaderStyle(ControlVariant.Default, ControlSize.Default) ?? GUI.skin.label;
 
             layoutComponents.BeginHorizontalGroup();
 
             if (showSelection)
             {
                 bool allSelected = allData.Count > 0 && allData.All(row => state.SelectedRows.Contains(row.Id));
-                bool newSelectAll = guiHelper.Toggle("", allSelected, ToggleVariant.Default, ToggleSize.Default, null, false, GUILayout.Width(20 * guiHelper.uiScale));
+                bool newSelectAll = guiHelper.Toggle("", allSelected, ControlVariant.Default, ControlSize.Default, null, false, GUILayout.Width(20 * guiHelper.uiScale));
 
                 if (newSelectAll != allSelected)
                 {
@@ -223,7 +223,7 @@ namespace shadcnui.GUIComponents.Data
                         sortIcon = state.SortAscending ? " ↑" : " ↓";
                     }
 
-                    if (guiHelper.Button(headerText + sortIcon, ButtonVariant.Ghost, ButtonSize.Default, null, false, 1f, GUILayout.Width(column.Width * guiHelper.uiScale)))
+                    if (guiHelper.Button(headerText + sortIcon, ControlVariant.Ghost, ControlSize.Default, null, false, 1f, GUILayout.Width(column.Width * guiHelper.uiScale)))
                     {
                         if (state.SortColumn == column.Id)
                         {
@@ -254,7 +254,6 @@ namespace shadcnui.GUIComponents.Data
             }
 
             var styleManager = guiHelper.GetStyleManager();
-            var cellStyle = styleManager?.GetTableCellStyle(TableVariant.Default, TableSize.Default) ?? GUI.skin.label;
 
             for (int i = 0; i < data.Count; i++)
             {
@@ -265,7 +264,7 @@ namespace shadcnui.GUIComponents.Data
 
                 if (showSelection)
                 {
-                    bool newSelected = guiHelper.Toggle("", isSelected, ToggleVariant.Default, ToggleSize.Default, null, false, GUILayout.Width(20 * guiHelper.uiScale));
+                    bool newSelected = guiHelper.Toggle("", isSelected, ControlVariant.Default, ControlSize.Default, null, false, GUILayout.Width(20 * guiHelper.uiScale));
 
                     if (newSelected != isSelected)
                     {
@@ -295,8 +294,7 @@ namespace shadcnui.GUIComponents.Data
                         cellText = row.GetValue<string>(column.AccessorKey, "");
                     }
 
-                    var customCellStyle = new UnityHelpers.GUIStyle(cellStyle);
-                    customCellStyle.alignment = column.Alignment;
+                    GUIStyle customCellStyle = styleManager.GetTableCellStyle(ControlVariant.Default, ControlSize.Default, column.Alignment);
 
                     string displayText = cellText ?? "";
                     if (string.IsNullOrEmpty(displayText))
@@ -314,7 +312,7 @@ namespace shadcnui.GUIComponents.Data
         private void DrawEmptyState()
         {
             var styleManager = guiHelper.GetStyleManager();
-            var labelStyle = styleManager?.GetLabelStyle(LabelVariant.Muted) ?? GUI.skin.label;
+            var labelStyle = styleManager?.GetLabelStyle(ControlVariant.Muted) ?? GUI.skin.label;
 
             layoutComponents.BeginHorizontalGroup();
             GUILayout.FlexibleSpace();
@@ -332,7 +330,7 @@ namespace shadcnui.GUIComponents.Data
             layoutComponents.AddSpace(8);
             layoutComponents.BeginHorizontalGroup();
 
-            if (guiHelper.Button("← Previous", ButtonVariant.Default, ButtonSize.Default, null, false, 1f, GUILayout.Width(80 * guiHelper.uiScale)))
+            if (guiHelper.Button("← Previous", ControlVariant.Default, ControlSize.Default, null, false, 1f, GUILayout.Width(80 * guiHelper.uiScale)))
             {
                 if (state.CurrentPage > 0)
                     state.CurrentPage--;
@@ -341,13 +339,13 @@ namespace shadcnui.GUIComponents.Data
             GUILayout.FlexibleSpace();
 
             var styleManager = guiHelper.GetStyleManager();
-            var labelStyle = styleManager?.GetLabelStyle(LabelVariant.Muted) ?? GUI.skin.label;
+            var labelStyle = styleManager?.GetLabelStyle(ControlVariant.Muted) ?? GUI.skin.label;
             string pageInfo = $"Page {state.CurrentPage + 1} of {totalPages}";
             UnityHelpers.Label(pageInfo, labelStyle);
 
             GUILayout.FlexibleSpace();
 
-            if (guiHelper.Button("Next →", ButtonVariant.Default, ButtonSize.Default, null, false, 1f, GUILayout.Width(80 * guiHelper.uiScale)))
+            if (guiHelper.Button("Next →", ControlVariant.Default, ControlSize.Default, null, false, 1f, GUILayout.Width(80 * guiHelper.uiScale)))
             {
                 if (state.CurrentPage < totalPages - 1)
                     state.CurrentPage++;
