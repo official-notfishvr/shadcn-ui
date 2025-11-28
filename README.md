@@ -2,48 +2,6 @@
 
 A C# UI component library inspired by shadcn/ui. Provides reusable, customizable components for .NET applications using Unity's IMGUI system.
 
-## Screenshots
-
-<div align="center">
-
-<img src="Screenshots/FullDemo_01_Button.png" alt="Button" width="45%">
-<img src="Screenshots/FullDemo_02_Badge.png" alt="Badge" width="45%">
-
-<img src="Screenshots/FullDemo_03_Input.png" alt="Input" width="45%">
-<img src="Screenshots/FullDemo_04_Toggle.png" alt="Toggle" width="45%">
-
-<img src="Screenshots/FullDemo_05_Checkbox.png" alt="Checkbox" width="45%">
-<img src="Screenshots/FullDemo_06_Switch.png" alt="Switch" width="45%">
-
-<img src="Screenshots/FullDemo_07_TextArea.png" alt="TextArea" width="45%">
-<img src="Screenshots/FullDemo_08_Avatar.png" alt="Avatar" width="45%">
-
-<img src="Screenshots/FullDemo_09_Card.png" alt="Card" width="45%">
-<img src="Screenshots/FullDemo_10_Progress.png" alt="Progress" width="45%">
-
-<img src="Screenshots/FullDemo_11_Separator.png" alt="Separator" width="45%">
-<img src="Screenshots/FullDemo_12_Label.png" alt="Label" width="45%">
-
-<img src="Screenshots/FullDemo_13_Dialog.png" alt="Dialog" width="45%">
-<img src="Screenshots/FullDemo_14_Select.png" alt="Select" width="45%">
-
-<img src="Screenshots/FullDemo_15_Dropdown.png" alt="Dropdown" width="45%">
-<img src="Screenshots/FullDemo_16_Popover.png" alt="Popover" width="45%">
-
-<img src="Screenshots/FullDemo_17_Calendar.png" alt="Calendar" width="45%">
-<img src="Screenshots/FullDemo_18_DatePicker.png" alt="DatePicker" width="45%">
-
-<img src="Screenshots/FullDemo_19_Tabs.png" alt="Tabs" width="45%">
-<img src="Screenshots/FullDemo_20_MenuBar.png" alt="MenuBar" width="45%">
-
-<img src="Screenshots/FullDemo_21_Chart.png" alt="Chart" width="45%">
-<img src="Screenshots/FullDemo_22_Table.png" alt="Table" width="45%">
-
-<img src="Screenshots/FullDemo_23_Interactive_Tables.png" alt="Interactive Tables" width="45%">
-<img src="Screenshots/FullDemo_24_Layout.png" alt="Layout" width="45%">
-
-</div>
-
 ## Installation
 
 Clone the repo and open the solution in Visual Studio:
@@ -143,7 +101,21 @@ float height = 100f;
 text = guiHelper.ResizableTextArea(text, ref height, "Resize me");
 ```
 
-Check the `shadcnui_Demo` project for all available components and examples.
+## Gallery
+
+Check out what's possible with shadcnui:
+
+<div align="center">
+
+<img src="Screenshots/FullDemo_01_Button.png" alt="Button" width="45%">
+<img src="Screenshots/FullDemo_04_Toggle.png" alt="Toggle" width="45%">
+
+<img src="Screenshots/FullDemo_09_Card.png" alt="Card" width="45%">
+<img src="Screenshots/FullDemo_12_Label.png" alt="Label" width="45%">
+
+<img src="Screenshots/FullDemo_05_Checkbox.png" alt="Checkbox" width="45%">
+
+</div>
 
 ## Embedding the Library
 
