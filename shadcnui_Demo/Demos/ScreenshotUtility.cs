@@ -1,4 +1,5 @@
 #define Showcase
+#if MONO
 
 #if Showcase
 using System.Collections;
@@ -543,4 +544,5 @@ namespace shadcnui_Demo.Menu
         }
     }
 }
+#endif
 #endif

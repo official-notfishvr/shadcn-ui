@@ -58,6 +58,7 @@ namespace shadcnui_Demo.Menu
                     LoadDemo<DocsDemo>();
                 }
 #if Showcase
+#if MONO
 
                 GUILayout.Space(10);
 
@@ -65,6 +66,7 @@ namespace shadcnui_Demo.Menu
                 {
                     LoadDemo<ScreenshotUtility>();
                 }
+#endif
 #endif
                 GUILayout.Space(20);
                 guiHelper.HorizontalSeparator();
