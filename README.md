@@ -183,7 +183,12 @@ static void Main()
 ## Known Issues
 
 - Some styles may have edge cases that need fixing
-- Custom fonts don't work with IL2CPP
+- Custom fonts don't fully work with IL2CPP
+
+## Star History
+
+[![Star History Chart](https://api.star-history.com/svg?repos=official-notfishvr/shadcn-ui&type=Timeline)](https://star-history.com/#official-notfishvr/shadcn-ui&Timeline)
+
 
 ## Contributing
 
