@@ -1,6 +1,6 @@
 # shadcnui
 
-A C# UI component library inspired by shadcn/ui. for .NET applications using Unity's IMGUI system.
+A C# UI component library inspired by shadcn/ui. Provides reusable, customizable components for .NET applications using Unity's IMGUI system.
 
 ## Installation
 
@@ -187,8 +187,13 @@ static void Main()
 
 ## Star History
 
-[![Star History Chart](https://api.star-history.com/svg?repos=official-notfishvr/shadcn-ui&type=Timeline)](https://star-history.com/#official-notfishvr/shadcn-ui&Timeline)
-
+<a href="https://star-history.com/#official-notfishvr/shadcn-ui&Timeline">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/svg?repos=official-notfishvr/shadcn-ui&type=Timeline&theme=dark" />
+    <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/svg?repos=official-notfishvr/shadcn-ui&type=Timeline" />
+    <img alt="Star History Chart" src="https://api.star-history.com/svg?repos=official-notfishvr/shadcn-ui&type=Timeline" />
+  </picture>
+</a>
 
 ## Contributing
 
