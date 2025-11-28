@@ -86,7 +86,7 @@ namespace shadcnui.GUIComponents.Display
                 layoutOptions.Add(GUILayout.Height(config.Size.y));
             }
 
-            layoutComponents.BeginVerticalGroup(styleManager.GetChartStyle(ChartVariant.Default, ChartSize.Default), layoutOptions.ToArray());
+            layoutComponents.BeginVerticalGroup(styleManager.GetChartStyle(ControlVariant.Default, ControlSize.Default), layoutOptions.ToArray());
 
             DrawChartContent(config);
 
@@ -384,19 +384,21 @@ namespace shadcnui.GUIComponents.Display
             return maxValue <= 0f ? 1f : maxValue;
         }
 
-        private void DrawLine(Vector2 start, Vector2 end, Color color)
+        private void DrawLine(Vector2 start, Vector2 end, Color color, float width = 1f)
         {
-            var distance = Vector2.Distance(start, end);
+            if (Event.current.type != EventType.Repaint) return;
 
             var originalColor = GUI.color;
             GUI.color = color;
 
-            var segments = Mathf.Max(1, Mathf.RoundToInt(distance / 2f));
-            for (var i = 0; i < segments; i++)
-            {
-                var pos = Vector2.Lerp(start, end, i / (float)segments);
-                GUI.DrawTexture(new Rect(pos.x - 0.5f, pos.y - 0.5f, 1f, 1f), Texture2D.whiteTexture);
-            }
+            Vector2 d = end - start;
+            float angle = Mathf.Atan2(d.y, d.x) * Mathf.Rad2Deg;
+            float length = d.magnitude;
+
+            Matrix4x4 matrix = GUI.matrix;
+            GUIUtility.RotateAroundPivot(angle, start);
+            GUI.DrawTexture(new Rect(start.x, start.y - width * 0.5f, length, width), Texture2D.whiteTexture);
+            GUI.matrix = matrix;
 
             GUI.color = originalColor;
         }
@@ -411,19 +413,7 @@ namespace shadcnui.GUIComponents.Display
 
         private void DrawThickLine(Vector2 start, Vector2 end, Color color, float thickness)
         {
-            var distance = Vector2.Distance(start, end);
-
-            var originalColor = GUI.color;
-            GUI.color = color;
-
-            var segments = Mathf.Max(1, Mathf.RoundToInt(distance / 1f));
-            for (var i = 0; i < segments; i++)
-            {
-                var pos = Vector2.Lerp(start, end, i / (float)segments);
-                GUI.DrawTexture(new Rect(pos.x - thickness / 2, pos.y - thickness / 2, thickness, thickness), Texture2D.whiteTexture);
-            }
-
-            GUI.color = originalColor;
+            DrawLine(start, end, color, thickness);
         }
 
         private void DrawRoundedRect(Rect rect, Color color, float cornerRadius)

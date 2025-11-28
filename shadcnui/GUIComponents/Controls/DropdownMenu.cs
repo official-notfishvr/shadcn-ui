@@ -94,9 +94,9 @@ namespace shadcnui.GUIComponents.Controls
                 layoutOptions.AddRange(options);
             }
 
-            GUIStyle contentStyle = styleManager.GetDropdownMenuStyle(DropdownMenuVariant.Default, DropdownMenuSize.Default);
+            GUIStyle contentStyle = styleManager.GetDropdownMenuStyle(ControlVariant.Default, ControlSize.Default);
             GUIStyle itemStyle = styleManager.GetDropdownMenuItemStyle();
-            GUIStyle separatorStyle = styleManager.GetDropdownMenuSeparatorStyle();
+            GUIStyle separatorStyle = styleManager.GetSeparatorStyle(SeparatorOrientation.Horizontal, ControlVariant.Default, ControlSize.Default);
 
             layoutComponents.BeginVerticalGroup(contentStyle, layoutOptions.ToArray());
             _scrollPosition = layoutComponents.DrawScrollView(
@@ -129,8 +129,8 @@ namespace shadcnui.GUIComponents.Controls
         private void DrawMenuItem(DropdownMenuItem item)
         {
             var styleManager = guiHelper.GetStyleManager();
-            GUIStyle headerStyle = styleManager.GetDropdownMenuHeaderStyle();
-            GUIStyle separatorStyle = styleManager.GetDropdownMenuSeparatorStyle();
+            GUIStyle headerStyle = styleManager.GetLabelStyle(ControlVariant.Muted, ControlSize.Small);
+            GUIStyle separatorStyle = styleManager.GetSeparatorStyle(SeparatorOrientation.Horizontal, ControlVariant.Default, ControlSize.Default);
             GUIStyle itemStyle = styleManager.GetDropdownMenuItemStyle();
 
             switch (item.Type)

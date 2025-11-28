@@ -16,7 +16,7 @@ namespace shadcnui.GUIComponents.Controls
         public Toggle(GUIHelper helper)
             : base(helper) { }
 
-        public bool DrawToggle(string text, bool value, ToggleVariant variant = ToggleVariant.Default, ToggleSize size = ToggleSize.Default, Action<bool> onToggle = null, bool disabled = false, params GUILayoutOption[] options)
+        public bool DrawToggle(string text, bool value, ControlVariant variant = ControlVariant.Default, ControlSize size = ControlSize.Default, Action<bool> onToggle = null, bool disabled = false, params GUILayoutOption[] options)
         {
             var styleManager = guiHelper.GetStyleManager();
             GUIStyle toggleStyle = styleManager?.GetToggleStyle(variant, size) ?? GUI.skin.toggle;
@@ -38,7 +38,7 @@ namespace shadcnui.GUIComponents.Controls
             return newValue;
         }
 
-        public bool DrawToggle(Rect rect, string text, bool value, ToggleVariant variant = ToggleVariant.Default, ToggleSize size = ToggleSize.Default, Action<bool> onToggle = null, bool disabled = false)
+        public bool DrawToggle(Rect rect, string text, bool value, ControlVariant variant = ControlVariant.Default, ControlSize size = ControlSize.Default, Action<bool> onToggle = null, bool disabled = false)
         {
             var styleManager = guiHelper.GetStyleManager();
             GUIStyle toggleStyle = styleManager?.GetToggleStyle(variant, size) ?? GUI.skin.toggle;

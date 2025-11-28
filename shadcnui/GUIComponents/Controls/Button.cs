@@ -41,7 +41,7 @@ namespace shadcnui.GUIComponents.Controls
             return clicked && !config.Disabled;
         }
 
-        public bool DrawButton(string text, ButtonVariant variant = ButtonVariant.Default, ButtonSize size = ButtonSize.Default, Action onClick = null, bool disabled = false, float opacity = 1f, params GUILayoutOption[] options)
+        public bool DrawButton(string text, ControlVariant variant = ControlVariant.Default, ControlSize size = ControlSize.Default, Action onClick = null, bool disabled = false, float opacity = 1f, params GUILayoutOption[] options)
         {
             var config = new ButtonConfig(text)
             {
@@ -78,8 +78,8 @@ namespace shadcnui.GUIComponents.Controls
     public class ButtonConfig
     {
         public string Text { get; set; }
-        public ButtonVariant Variant { get; set; }
-        public ButtonSize Size { get; set; }
+        public ControlVariant Variant { get; set; }
+        public ControlSize Size { get; set; }
         public Action OnClick { get; set; }
         public bool Disabled { get; set; }
         public float Opacity { get; set; }
@@ -88,8 +88,8 @@ namespace shadcnui.GUIComponents.Controls
         public ButtonConfig(string text)
         {
             Text = text;
-            Variant = ButtonVariant.Default;
-            Size = ButtonSize.Default;
+            Variant = ControlVariant.Default;
+            Size = ControlSize.Default;
             OnClick = null;
             Disabled = false;
             Opacity = 1f;

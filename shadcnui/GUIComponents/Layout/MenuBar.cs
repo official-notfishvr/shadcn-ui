@@ -83,7 +83,7 @@ namespace shadcnui.GUIComponents.Layout
                 if (item.IsSeparator || item.IsHeader)
                     continue;
 
-                var itemStyle = styleManager.GetButtonStyle(ButtonVariant.Ghost, ButtonSize.Default);
+                var itemStyle = styleManager.GetButtonStyle(ControlVariant.Ghost, ControlSize.Default);
 
                 var wasEnabled = GUI.enabled;
                 if (item.Disabled)
@@ -130,7 +130,7 @@ namespace shadcnui.GUIComponents.Layout
 
             if (_menuStack.Count > 1)
             {
-                if (UnityHelpers.Button("<- Back", styleManager.GetButtonStyle(ButtonVariant.Ghost, ButtonSize.Default)))
+                if (UnityHelpers.Button("<- Back", styleManager.GetButtonStyle(ControlVariant.Ghost, ControlSize.Default)))
                 {
                     _menuStack.Pop();
                     if (_menuStack.Count == 1)
@@ -158,7 +158,7 @@ namespace shadcnui.GUIComponents.Layout
 
             if (item.IsHeader)
             {
-                UnityHelpers.Label(item.Text, styleManager.GetButtonStyle(ButtonVariant.Ghost, ButtonSize.Default));
+                UnityHelpers.Label(item.Text, styleManager.GetButtonStyle(ControlVariant.Ghost, ControlSize.Default));
                 return;
             }
 
@@ -174,14 +174,14 @@ namespace shadcnui.GUIComponents.Layout
 
             if (item.SubItems.Count > 0)
             {
-                if (GUILayout.Button(item.Text, styleManager.GetButtonStyle(ButtonVariant.Ghost, ButtonSize.Default), GUILayout.ExpandWidth(true)))
+                if (GUILayout.Button(item.Text, styleManager.GetButtonStyle(ControlVariant.Ghost, ControlSize.Default), GUILayout.ExpandWidth(true)))
                 {
                     _menuStack.Push(new MenuData(item.SubItems, _activeMenuIndex));
                 }
             }
             else
             {
-                var buttonStyle = styleManager.GetButtonStyle(ButtonVariant.Ghost, ButtonSize.Default);
+                var buttonStyle = styleManager.GetButtonStyle(ControlVariant.Ghost, ControlSize.Default);
                 var textStyle = styleManager.GetMenuBarItemStyle();
 
                 Rect rect = GUILayoutUtility.GetRect(GUIContent.none, buttonStyle, GUILayout.ExpandWidth(true));
@@ -196,7 +196,7 @@ namespace shadcnui.GUIComponents.Layout
 
                 if (!string.IsNullOrEmpty(item.Shortcut))
                 {
-                    var shortcutStyle = new UnityHelpers.GUIStyle(textStyle) { alignment = TextAnchor.MiddleRight };
+                    var shortcutStyle = styleManager.GetMenuBarItemStyle(ControlVariant.Default, ControlSize.Default, true);
                     GUI.Label(rect, item.Shortcut, shortcutStyle);
                 }
             }

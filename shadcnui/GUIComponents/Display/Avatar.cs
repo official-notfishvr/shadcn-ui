@@ -14,7 +14,7 @@ namespace shadcnui.GUIComponents.Display
         public Avatar(GUIHelper helper)
             : base(helper) { }
 
-        public void DrawAvatar(Texture2D image, string fallbackText, AvatarSize size = AvatarSize.Default, AvatarShape shape = AvatarShape.Circle, params GUILayoutOption[] options)
+        public void DrawAvatar(Texture2D image, string fallbackText, ControlSize size = ControlSize.Default, AvatarShape shape = AvatarShape.Circle, params GUILayoutOption[] options)
         {
             var styleManager = guiHelper.GetStyleManager();
             GUIStyle avatarStyle = styleManager.GetAvatarStyle(size, shape);
@@ -32,7 +32,7 @@ namespace shadcnui.GUIComponents.Display
             }
         }
 
-        public void DrawAvatar(Rect rect, Texture2D image, string fallbackText, AvatarSize size = AvatarSize.Default, AvatarShape shape = AvatarShape.Circle)
+        public void DrawAvatar(Rect rect, Texture2D image, string fallbackText, ControlSize size = ControlSize.Default, AvatarShape shape = AvatarShape.Circle)
         {
             var styleManager = guiHelper.GetStyleManager();
             GUIStyle avatarStyle = styleManager.GetAvatarStyle(size, shape);
@@ -49,7 +49,7 @@ namespace shadcnui.GUIComponents.Display
             }
         }
 
-        public void AvatarWithStatus(Texture2D image, string fallbackText, bool isOnline, AvatarSize size = AvatarSize.Default, AvatarShape shape = AvatarShape.Circle, params GUILayoutOption[] options)
+        public void AvatarWithStatus(Texture2D image, string fallbackText, bool isOnline, ControlSize size = ControlSize.Default, AvatarShape shape = AvatarShape.Circle, params GUILayoutOption[] options)
         {
             var styleManager = guiHelper.GetStyleManager();
             layoutComponents.BeginVerticalGroup();
@@ -66,7 +66,7 @@ namespace shadcnui.GUIComponents.Display
             layoutComponents.EndVerticalGroup();
         }
 
-        private void DrawStatusIndicator(bool isOnline, AvatarSize size)
+        private void DrawStatusIndicator(bool isOnline, ControlSize size)
         {
             var styleManager = guiHelper.GetStyleManager();
             if (styleManager == null)
@@ -97,7 +97,7 @@ namespace shadcnui.GUIComponents.Display
             GUI.Box(rect, GUIContent.none, statusStyle);
         }
 
-        public void AvatarWithName(Texture2D image, string fallbackText, string name, AvatarSize size = AvatarSize.Default, AvatarShape shape = AvatarShape.Circle, bool showNameBelow = false, params GUILayoutOption[] options)
+        public void AvatarWithName(Texture2D image, string fallbackText, string name, ControlSize size = ControlSize.Default, AvatarShape shape = AvatarShape.Circle, bool showNameBelow = false, params GUILayoutOption[] options)
         {
             if (showNameBelow)
             {
@@ -108,7 +108,7 @@ namespace shadcnui.GUIComponents.Display
                 {
                     layoutComponents.AddSpace(4);
                     var styleManager = guiHelper.GetStyleManager();
-                    GUIStyle nameStyle = styleManager?.GetLabelStyle(LabelVariant.Default) ?? GUI.skin.label;
+                    GUIStyle nameStyle = styleManager?.GetLabelStyle(ControlVariant.Default) ?? GUI.skin.label;
 
                     UnityHelpers.Label(name, nameStyle);
                 }
@@ -124,7 +124,7 @@ namespace shadcnui.GUIComponents.Display
                 {
                     layoutComponents.AddSpace(8);
                     var styleManager = guiHelper.GetStyleManager();
-                    GUIStyle nameStyle = styleManager?.GetLabelStyle(LabelVariant.Default) ?? GUI.skin.label;
+                    GUIStyle nameStyle = styleManager?.GetLabelStyle(ControlVariant.Default) ?? GUI.skin.label;
                     nameStyle.alignment = TextAnchor.MiddleLeft;
 
                     UnityHelpers.Label(name, nameStyle);
@@ -134,7 +134,7 @@ namespace shadcnui.GUIComponents.Display
             }
         }
 
-        public void AvatarWithBorder(Texture2D image, string fallbackText, Color borderColor, AvatarSize size = AvatarSize.Default, AvatarShape shape = AvatarShape.Circle, params GUILayoutOption[] options)
+        public void AvatarWithBorder(Texture2D image, string fallbackText, Color borderColor, ControlSize size = ControlSize.Default, AvatarShape shape = AvatarShape.Circle, params GUILayoutOption[] options)
         {
             var styleManager = guiHelper.GetStyleManager();
 

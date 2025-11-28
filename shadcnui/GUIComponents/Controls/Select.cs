@@ -33,7 +33,7 @@ namespace shadcnui.GUIComponents.Controls
             if (!isOpen)
                 return selectedIndex;
 
-            GUIStyle selectStyle = styleManager?.GetSelectStyle(SelectVariant.Default, SelectSize.Default) ?? GUI.skin.box;
+            GUIStyle selectStyle = styleManager?.GetSelectStyle(ControlVariant.Default, ControlSize.Default) ?? GUI.skin.box;
             GUIStyle itemStyle = styleManager?.GetSelectItemStyle() ?? GUI.skin.button;
 
             layoutComponents.BeginVerticalGroup(selectStyle, GUILayout.MaxWidth(300), GUILayout.MaxHeight(200));

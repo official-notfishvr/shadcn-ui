@@ -91,7 +91,7 @@ namespace shadcnui.GUIComponents.Layout
             {
                 GUILayout.Space(8 * guiHelper.uiScale);
 
-                UnityHelpers.Label(text, styleManager.GetLabelStyle(LabelVariant.Muted));
+                UnityHelpers.Label(text, styleManager.GetLabelStyle(ControlVariant.Muted));
                 GUILayout.Space(8 * guiHelper.uiScale);
             }
 

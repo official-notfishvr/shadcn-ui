@@ -13,7 +13,7 @@ namespace shadcnui.GUIComponents.Display
         public Label(GUIHelper helper)
             : base(helper) { }
 
-        public void DrawLabel(string text, LabelVariant variant = LabelVariant.Default, bool disabled = false, params GUILayoutOption[] options)
+        public void DrawLabel(string text, ControlVariant variant = ControlVariant.Default, bool disabled = false, params GUILayoutOption[] options)
         {
             var styleManager = guiHelper.GetStyleManager();
             GUIStyle labelStyle = styleManager.GetLabelStyle(variant);
@@ -32,7 +32,7 @@ namespace shadcnui.GUIComponents.Display
             UnityHelpers.Label(text ?? "", scaledStyle, autoScaledOptions);
         }
 
-        public void DrawLabel(Rect rect, string text, LabelVariant variant = LabelVariant.Default, bool disabled = false)
+        public void DrawLabel(Rect rect, string text, ControlVariant variant = ControlVariant.Default, bool disabled = false)
         {
             var styleManager = guiHelper.GetStyleManager();
             GUIStyle labelStyle = styleManager.GetLabelStyle(variant);
@@ -53,17 +53,17 @@ namespace shadcnui.GUIComponents.Display
 
         public void SecondaryLabel(string text, params GUILayoutOption[] options)
         {
-            DrawLabel(text, LabelVariant.Secondary, false, options);
+            DrawLabel(text, ControlVariant.Secondary, false, options);
         }
 
         public void MutedLabel(string text, params GUILayoutOption[] options)
         {
-            DrawLabel(text, LabelVariant.Muted, false, options);
+            DrawLabel(text, ControlVariant.Muted, false, options);
         }
 
         public void DestructiveLabel(string text, params GUILayoutOption[] options)
         {
-            DrawLabel(text, LabelVariant.Destructive, false, options);
+            DrawLabel(text, ControlVariant.Destructive, false, options);
         }
 
         private GUILayoutOption[] GetAutoScaledOptions(GUILayoutOption[] userOptions)
