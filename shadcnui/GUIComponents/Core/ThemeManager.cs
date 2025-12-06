@@ -29,6 +29,7 @@ namespace shadcnui.GUIComponents.Core
             AddTheme(Theme.Stone);
             AddTheme(Theme.Olive);
             AddTheme(Theme.Cyan);
+            AddTheme(Theme.BlueDark);
             CurrentTheme = Themes["Dark"];
         }
 

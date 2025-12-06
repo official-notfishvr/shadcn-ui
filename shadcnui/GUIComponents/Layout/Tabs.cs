@@ -173,12 +173,7 @@ namespace shadcnui.GUIComponents.Layout
                             GUILayoutOption[] finalOptions;
                             if (config.Options == null || config.Options.Length == 0)
                             {
-                                finalOptions = new GUILayoutOption[] {
-                                    GUILayout.Width(config.TabWidth * guiHelper.uiScale),
-                                    GUILayout.Height(Mathf.RoundToInt(36 * guiHelper.uiScale)),
-                                    GUILayout.ExpandWidth(false),
-                                    GUILayout.ExpandHeight(false)
-                                };
+                                finalOptions = new GUILayoutOption[] { GUILayout.Width(config.TabWidth * guiHelper.uiScale), GUILayout.Height(Mathf.RoundToInt(36 * guiHelper.uiScale)), GUILayout.ExpandWidth(false), GUILayout.ExpandHeight(false) };
                             }
                             else
                             {

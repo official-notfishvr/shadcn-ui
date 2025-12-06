@@ -132,7 +132,7 @@ namespace shadcnui_Demo.Menu
 
             guiHelper.HorizontalSeparator();
 
-            guiHelper.Label("Quick Actions", ControlVariant.Default);
+            guiHelper.Label(" Actions", ControlVariant.Default);
             guiHelper.BeginHorizontalGroup();
             if (guiHelper.Button("Generate Report", ControlVariant.Default, ControlSize.Small))
                 Debug.Log("Report generated");
@@ -358,7 +358,7 @@ namespace shadcnui_Demo.Menu
             guiHelper.Label("Feature Cards", ControlVariant.Default);
             guiHelper.BeginHorizontalGroup();
 
-            DrawFeatureCard("Fast", "Lightning quick performance");
+            DrawFeatureCard("Fast", "Lightning  performance");
             GUILayout.Space(12);
             DrawFeatureCard("Reliable", "Enterprise-grade stability");
             GUILayout.Space(12);

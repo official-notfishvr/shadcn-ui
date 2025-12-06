@@ -515,6 +515,10 @@
         <Compile Include="GUIComponents\Core\GUIHelper.cs" />
         <Compile Include="GUIComponents\Core\GUILogger.cs" />
         <Compile Include="GUIComponents\Core\StyleManager.cs" />
+        <Compile Include="GUIComponents\Core\StyleManager.Getters.cs" />
+        <Compile Include="GUIComponents\Core\StyleManager.Registration.cs" />
+        <Compile Include="GUIComponents\Core\StyleManager.Setup.cs" />
+        <Compile Include="GUIComponents\Core\StyleRegistry.cs" />
         <Compile Include="GUIComponents\Core\Theme.cs" />
         <Compile Include="GUIComponents\Core\ThemeManager.cs" />
         <Compile Include="GUIComponents\Data\Calendar.cs" />

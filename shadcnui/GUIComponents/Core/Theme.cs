@@ -37,9 +37,9 @@ namespace shadcnui.GUIComponents.Core
             new Theme
             {
                 Name = "Dark",
-                Base = new Color(0.012f, 0.027f, 0.071f),
+                Base = new Color(0.04f, 0.05f, 0.09f),
                 Secondary = new Color(0.118f, 0.161f, 0.231f),
-                Elevated = new Color(0.059f, 0.071f, 0.165f),
+                Elevated = new Color(0.08f, 0.09f, 0.18f),
                 Text = new Color(0.980f, 0.988f, 0.996f),
                 Muted = new Color(0.639f, 0.651f, 0.667f),
                 Border = new Color(0.118f, 0.161f, 0.231f),
@@ -63,7 +63,7 @@ namespace shadcnui.GUIComponents.Core
                 TabsTriggerFg = new Color(0.639f, 0.651f, 0.667f),
                 TabsTriggerActiveBg = new Color(0.012f, 0.027f, 0.071f),
                 TabsTriggerActiveFg = new Color(0.980f, 0.988f, 0.996f),
-                BackgroundColor = new Color(0.012f, 0.027f, 0.071f),
+                BackgroundColor = new Color(0.04f, 0.05f, 0.09f),
             };
 
         public static Theme Light =>
@@ -295,6 +295,39 @@ namespace shadcnui.GUIComponents.Core
                 TabsTriggerActiveBg = new Color(0.02f, 0.051f, 0.063f),
                 TabsTriggerActiveFg = new Color(0.98f, 0.98f, 0.98f),
                 BackgroundColor = new Color(0.01f, 0.027f, 0.035f),
+            };
+
+        public static Theme BlueDark =>
+            new Theme
+            {
+                Name = "BlueDark",
+                Base = new Color(0.06f, 0.09f, 0.16f),
+                Secondary = new Color(0.14f, 0.18f, 0.28f),
+                Elevated = new Color(0.09f, 0.12f, 0.20f),
+                Text = new Color(0.96f, 0.98f, 1.0f),
+                Muted = new Color(0.55f, 0.60f, 0.70f),
+                Border = new Color(0.20f, 0.25f, 0.35f),
+                Accent = new Color(0.25f, 0.55f, 0.95f),
+                Destructive = new Color(0.95f, 0.3f, 0.3f),
+                Success = new Color(0.2f, 0.75f, 0.45f),
+                Warning = new Color(0.95f, 0.75f, 0.25f),
+                Info = new Color(0.25f, 0.55f, 0.95f),
+                Overlay = new Color(0.02f, 0.04f, 0.1f, 0.6f),
+                Shadow = new Color(0f, 0f, 0f, 0.4f),
+                ButtonPrimaryBg = new Color(0.25f, 0.55f, 0.95f),
+                ButtonPrimaryFg = new Color(1.0f, 1.0f, 1.0f),
+                ButtonDestructiveBg = new Color(0.95f, 0.3f, 0.3f),
+                ButtonDestructiveFg = new Color(1.0f, 1.0f, 1.0f),
+                ButtonOutlineFg = new Color(0.96f, 0.98f, 1.0f),
+                ButtonSecondaryBg = new Color(0.14f, 0.18f, 0.28f),
+                ButtonSecondaryFg = new Color(0.96f, 0.98f, 1.0f),
+                ButtonGhostFg = new Color(0.96f, 0.98f, 1.0f),
+                ButtonLinkColor = new Color(0.25f, 0.55f, 0.95f),
+                TabsBg = new Color(0.09f, 0.12f, 0.20f, 0.8f),
+                TabsTriggerFg = new Color(0.55f, 0.60f, 0.70f),
+                TabsTriggerActiveBg = new Color(0.14f, 0.18f, 0.28f),
+                TabsTriggerActiveFg = new Color(0.96f, 0.98f, 1.0f),
+                BackgroundColor = new Color(0.06f, 0.09f, 0.16f),
             };
     }
 }
