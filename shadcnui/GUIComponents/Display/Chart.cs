@@ -386,7 +386,8 @@ namespace shadcnui.GUIComponents.Display
 
         private void DrawLine(Vector2 start, Vector2 end, Color color, float width = 1f)
         {
-            if (Event.current.type != EventType.Repaint) return;
+            if (Event.current.type != EventType.Repaint)
+                return;
 
             var originalColor = GUI.color;
             GUI.color = color;

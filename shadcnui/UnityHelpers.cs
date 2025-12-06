@@ -29,6 +29,11 @@ namespace shadcnui
                 get { return _guiStyle.margin; }
                 set { _guiStyle.margin = value; }
             }
+            public bool richText
+            {
+                get { return _guiStyle.richText; }
+                set { _guiStyle.richText = value; }
+            }
 
             public UnityEngine.RectOffset padding
             {
