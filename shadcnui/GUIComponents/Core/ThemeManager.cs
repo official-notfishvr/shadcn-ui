@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 
 namespace shadcnui.GUIComponents.Core
@@ -17,6 +18,8 @@ namespace shadcnui.GUIComponents.Core
 
         public Dictionary<string, Theme> Themes { get; private set; }
         public Theme CurrentTheme { get; private set; }
+
+        public event Action OnThemeChanged;
 
         private ThemeManager()
         {
@@ -46,6 +49,7 @@ namespace shadcnui.GUIComponents.Core
             if (Themes.TryGetValue(themeName, out var theme))
             {
                 CurrentTheme = theme;
+                OnThemeChanged?.Invoke();
             }
         }
     }

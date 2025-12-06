@@ -253,6 +253,7 @@ namespace shadcnui.GUIComponents.Core
         private Dictionary<Color, Texture2D> solidColorTextureCache = new();
         private Dictionary<(Color, Color), Texture2D> outlineButtonTextureCache = new();
         private Dictionary<Color, Texture2D> outlineTextureCache = new();
+        private List<Texture2D> trackedTextures = new();
         #endregion
 
         #region Constructor
@@ -262,6 +263,9 @@ namespace shadcnui.GUIComponents.Core
             {
                 guiHelper = helper ?? throw new ArgumentNullException(nameof(helper));
                 Registry = new StyleRegistry();
+                
+                ThemeManager.Instance.OnThemeChanged += OnThemeChanged;
+                
                 GUILogger.LogInfo("StyleManager initialized successfully", "StyleManager.Constructor");
             }
             catch (Exception ex)
@@ -274,6 +278,50 @@ namespace shadcnui.GUIComponents.Core
 
         #region Core Methods
         public Theme GetTheme() => ThemeManager.Instance.CurrentTheme;
+
+        private void OnThemeChanged()
+        {
+            try
+            {
+                GUILogger.LogInfo("Theme changed, clearing style cache and recreating textures", "StyleManager.OnThemeChanged");
+                styleCache.Clear();
+                DestroyTrackedTextures();
+                solidColorTextureCache.Clear();
+                outlineButtonTextureCache.Clear();
+                outlineTextureCache.Clear();
+                
+                if (isInitialized)
+                {
+                    CreateCustomTextures();
+                    SetupAllStyles();
+                }
+            }
+            catch (Exception ex)
+            {
+                GUILogger.LogException(ex, "OnThemeChanged", "StyleManager");
+            }
+        }
+
+        private void DestroyTrackedTextures()
+        {
+            try
+            {
+                int count = trackedTextures.Count;
+                foreach (var texture in trackedTextures)
+                {
+                    if (texture != null)
+                    {
+                        Object.DestroyImmediate(texture);
+                    }
+                }
+                trackedTextures.Clear();
+                GUILogger.LogInfo($"Destroyed {count} tracked textures", "StyleManager.DestroyTrackedTextures");
+            }
+            catch (Exception ex)
+            {
+                GUILogger.LogException(ex, "DestroyTrackedTextures", "StyleManager");
+            }
+        }
 
         public void SetCustomFont(byte[] fontData, string fontName = "CustomFont.ttf")
         {
@@ -395,6 +443,7 @@ namespace shadcnui.GUIComponents.Core
                 texture.SetPixel(x, y, isBorder ? borderColor : Color.clear);
             }
             texture.Apply();
+            trackedTextures.Add(texture);
             return texture;
         }
 
@@ -412,6 +461,7 @@ namespace shadcnui.GUIComponents.Core
                 texture.SetPixel(x, y, new Color(glowColor.r, glowColor.g, glowColor.b, alpha * 0.6f));
             }
             texture.Apply();
+            trackedTextures.Add(texture);
             return texture;
         }
 
@@ -425,6 +475,7 @@ namespace shadcnui.GUIComponents.Core
                 texture.SetPixel(x, y, isBorder ? borderColor : fillColor);
             }
             texture.Apply();
+            trackedTextures.Add(texture);
             return texture;
         }
 
@@ -436,6 +487,7 @@ namespace shadcnui.GUIComponents.Core
             texture.SetPixel(0, 0, color);
             texture.Apply();
             solidColorTextureCache[color] = texture;
+            trackedTextures.Add(texture);
             return texture;
         }
 
@@ -463,6 +515,7 @@ namespace shadcnui.GUIComponents.Core
                 }
             }
             texture.Apply();
+            trackedTextures.Add(texture);
             return texture;
         }
 
@@ -519,6 +572,7 @@ namespace shadcnui.GUIComponents.Core
                 }
             }
             texture.Apply();
+            trackedTextures.Add(texture);
             return texture;
         }
 
@@ -573,6 +627,7 @@ namespace shadcnui.GUIComponents.Core
                 }
             }
             texture.Apply();
+            trackedTextures.Add(texture);
             return texture;
         }
 
@@ -610,6 +665,7 @@ namespace shadcnui.GUIComponents.Core
                 }
             }
             texture.Apply();
+            trackedTextures.Add(texture);
             return texture;
         }
 
@@ -627,6 +683,7 @@ namespace shadcnui.GUIComponents.Core
             }
             texture.Apply();
             outlineButtonTextureCache[(backgroundColor, borderColor)] = texture;
+            trackedTextures.Add(texture);
             return texture;
         }
 
@@ -773,6 +830,7 @@ namespace shadcnui.GUIComponents.Core
             ClearTextureCache(solidColorTextureCache);
             ClearTextureCache(outlineButtonTextureCache);
             ClearTextureCache(outlineTextureCache);
+            DestroyTrackedTextures();
         }
 
         private void DestroyTexture(Texture2D texture)
