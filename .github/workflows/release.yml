@@ -82,7 +82,7 @@ jobs:
           name: Release ${{ steps.get_version.outputs.version }}
           body_path: release_notes.md
           draft: false
-          prerelease: ${{ startsWith(steps.get_version.outputs.version, 'beta-') || startsWith(steps.get_version.outputs.version, 'alpha-') || startsWith(steps.get_version.outputs.version, 'rc-') }}
+          prerelease: false
           generate_release_notes: true
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
