@@ -1,0 +1,193 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*.*.*'
+      - 'beta-v*.*.*'
+      - 'alpha-v*.*.*'
+      - 'rc-v*.*.*'
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version tag (e.g., v1.0.0 or beta-v0.0.1)'
+        required: true
+        type: string
+
+env:
+  DOTNET_SKIP_FIRST_TIME_EXPERIENCE: true
+  DOTNET_CLI_TELEMETRY_OPTOUT: true
+
+jobs:
+  create-release:
+    name: Create Release
+    runs-on: ubuntu-latest
+    outputs:
+      upload_url: ${{ steps.create_release.outputs.upload_url }}
+      version: ${{ steps.get_version.outputs.version }}
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Get version from tag
+        id: get_version
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            VERSION="${{ github.event.inputs.version }}"
+          else
+            VERSION=${GITHUB_REF#refs/tags/}
+          fi
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+          echo "Version: $VERSION"
+
+      - name: Generate Release Notes
+        id: release_notes
+        run: |
+          PREVIOUS_TAG=$(git describe --tags --abbrev=0 HEAD^ 2>/dev/null || echo "")
+          
+          if [ -z "$PREVIOUS_TAG" ]; then
+            echo "First release - no previous tag found"
+            NOTES="## What's New\n\nInitial release of shadcnui ${{ steps.get_version.outputs.version }}"
+          else
+            echo "Generating changelog from $PREVIOUS_TAG to ${{ steps.get_version.outputs.version }}"
+            
+            NOTES="## What's Changed\n\n"
+            NOTES+="### Commits\n\n"
+            NOTES+=$(git log $PREVIOUS_TAG..HEAD --pretty=format:"- %s (%h)" --no-merges)
+            NOTES+="\n\n### Contributors\n\n"
+            NOTES+=$(git log $PREVIOUS_TAG..HEAD --format='%aN' --no-merges | sort -u | sed 's/^/- @/')
+          fi
+          
+          NOTES+="\n\n## Downloads\n\n"
+          NOTES+="Choose the appropriate build for your modding framework:\n\n"
+          NOTES+="- **IL2CPP + MelonLoader**: \`shadcnui-IL2CPP_Melonloader.dll\` + \`shadcnui_Demo-IL2CPP_Melonloader.dll\`\n"
+          NOTES+="- **IL2CPP + BepInEx**: \`shadcnui-IL2CPP_BepInEx.dll\` + \`shadcnui_Demo-IL2CPP_BepInEx.dll\`\n"
+          NOTES+="- **Mono + MelonLoader**: \`shadcnui-Mono_Melonloader.dll\` + \`shadcnui_Demo-Mono_Melonloader.dll\`\n"
+          NOTES+="- **Mono + BepInEx**: \`shadcnui-Mono_BepInEx.dll\` + \`shadcnui_Demo-Mono_BepInEx.dll\`\n"
+          
+          echo -e "$NOTES" > release_notes.md
+          cat release_notes.md
+
+      - name: Create Release
+        id: create_release
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: ${{ steps.get_version.outputs.version }}
+          name: Release ${{ steps.get_version.outputs.version }}
+          body_path: release_notes.md
+          draft: false
+          prerelease: ${{ startsWith(steps.get_version.outputs.version, 'beta-') || startsWith(steps.get_version.outputs.version, 'alpha-') || startsWith(steps.get_version.outputs.version, 'rc-') }}
+          generate_release_notes: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  build-and-upload:
+    name: Build ${{ matrix.configuration }}
+    needs: create-release
+    runs-on: windows-latest
+    strategy:
+      matrix:
+        configuration: [IL2CPP_Melonloader, IL2CPP_BepInEx, Mono_Melonloader, Mono_BepInEx]
+      fail-fast: false
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Add MSBuild to PATH
+        uses: microsoft/setup-msbuild@v2
+
+      - name: Setup NuGet
+        uses: NuGet/setup-nuget@v2
+
+      - name: Restore NuGet packages
+        run: nuget restore shadcnui.sln
+
+      - name: Build ${{ matrix.configuration }}
+        run: msbuild shadcnui.sln /p:Configuration=${{ matrix.configuration }} /p:Platform="Any CPU" /m /p:DebugType=None
+
+      - name: Verify build outputs
+        run: |
+          Write-Host "Checking build outputs for ${{ matrix.configuration }}..."
+          
+          $mainDll = "shadcnui/bin/${{ matrix.configuration }}/shadcnui.dll"
+          $demoDll = "shadcnui_Demo/bin/${{ matrix.configuration }}/netstandard2.1/shadcnui_Demo.dll"
+          
+          if (Test-Path $mainDll) {
+            Write-Host "Found shadcnui.dll ($(((Get-Item $mainDll).Length / 1KB).ToString('F2')) KB)"
+          } else {
+            Write-Error "shadcnui.dll not found at $mainDll"
+            exit 1
+          }
+          
+          if (Test-Path $demoDll) {
+            Write-Host "Found shadcnui_Demo.dll ($(((Get-Item $demoDll).Length / 1KB).ToString('F2')) KB)"
+          } else {
+            Write-Error "shadcnui_Demo.dll not found at $demoDll"
+            exit 1
+          }
+
+      - name: Prepare release artifacts
+        run: |
+          $config = "${{ matrix.configuration }}"
+          New-Item -ItemType Directory -Force -Path "release-artifacts"
+          
+          # Copy and rename DLLs
+          Copy-Item "shadcnui/bin/$config/shadcnui.dll" "release-artifacts/shadcnui-$config.dll"
+          Copy-Item "shadcnui_Demo/bin/$config/netstandard2.1/shadcnui_Demo.dll" "release-artifacts/shadcnui_Demo-$config.dll"
+
+      - name: Upload shadcnui.dll to Release
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: ${{ needs.create-release.outputs.version }}
+          files: release-artifacts/shadcnui-${{ matrix.configuration }}.dll
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Upload shadcnui_Demo.dll to Release
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: ${{ needs.create-release.outputs.version }}
+          files: release-artifacts/shadcnui_Demo-${{ matrix.configuration }}.dll
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Upload build artifacts (for debugging)
+        uses: actions/upload-artifact@v4
+        with:
+          name: release-build-${{ matrix.configuration }}
+          path: release-artifacts/
+          retention-days: 7
+
+  finalize-release:
+    name: Finalize Release
+    needs: [create-release, build-and-upload]
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Add release summary
+        run: |
+          echo "## Release ${{ needs.create-release.outputs.version }} Published!" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "All build configurations have been successfully compiled and uploaded." >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### Available Downloads:" >> $GITHUB_STEP_SUMMARY
+          echo "- shadcnui-IL2CPP_Melonloader.dll" >> $GITHUB_STEP_SUMMARY
+          echo "- shadcnui-IL2CPP_BepInEx.dll" >> $GITHUB_STEP_SUMMARY
+          echo "- shadcnui-Mono_Melonloader.dll" >> $GITHUB_STEP_SUMMARY
+          echo "- shadcnui-Mono_BepInEx.dll" >> $GITHUB_STEP_SUMMARY
+          echo "- shadcnui_Demo builds for each configuration" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "[View Release](https://github.com/${{ github.repository }}/releases/tag/${{ needs.create-release.outputs.version }})" >> $GITHUB_STEP_SUMMARY
+
+      - name: Notify success
+        run: |
+          echo "Release ${{ needs.create-release.outputs.version }} completed successfully!"
