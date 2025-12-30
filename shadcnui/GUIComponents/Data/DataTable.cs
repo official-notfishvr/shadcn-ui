@@ -1,7 +1,8 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
-using shadcnui.GUIComponents.Core;
+using shadcnui.GUIComponents.Core.Base;
+using shadcnui.GUIComponents.Core.Styling;
+using shadcnui.GUIComponents.Core.Utils;
 using UnityEngine;
 #if IL2CPP_MELONLOADER_PRE57
 using UnhollowerBaseLib;
@@ -9,86 +10,22 @@ using UnhollowerBaseLib;
 
 namespace shadcnui.GUIComponents.Data
 {
-    public class DataTableColumn
-    {
-        public string Id { get; set; }
-        public string Header { get; set; }
-        public string AccessorKey { get; set; }
-        public bool Sortable { get; set; } = true;
-        public bool Filterable { get; set; } = true;
-        public float Width { get; set; } = 120f;
-        public float MinWidth { get; set; } = 80f;
-        public bool CanHide { get; set; } = true;
-        public bool IsVisible { get; set; } = true;
-        public Func<object, string> CellRenderer { get; set; }
-        public TextAnchor Alignment { get; set; } = TextAnchor.MiddleLeft;
-
-        public DataTableColumn(string id, string header, string accessorKey = null)
-        {
-            Id = id;
-            Header = header;
-            AccessorKey = accessorKey ?? id;
-        }
-    }
-
-    public class DataTableRow
-    {
-        public string Id { get; set; }
-        public Dictionary<string, object> Data { get; set; } = new Dictionary<string, object>();
-        public bool Selected { get; set; } = false;
-
-        public DataTableRow(string id = null)
-        {
-            Id = id ?? Guid.NewGuid().ToString();
-        }
-
-        public T GetValue<T>(string key, T defaultValue = default(T))
-        {
-            if (Data.TryGetValue(key, out object value))
-            {
-                try
-                {
-                    return (T)Convert.ChangeType(value, typeof(T));
-                }
-                catch
-                {
-                    return defaultValue;
-                }
-            }
-            return defaultValue;
-        }
-
-        public void SetValue(string key, object value)
-        {
-            Data[key] = value;
-        }
-
-        public DataTableRow SetData(string key, object value)
-        {
-            Data[key] = value;
-            return this;
-        }
-    }
-
-    public class DataTableState
-    {
-        public string SortColumn { get; set; }
-        public bool SortAscending { get; set; } = true;
-        public string FilterText { get; set; } = "";
-        public int CurrentPage { get; set; } = 0;
-        public int PageSize { get; set; } = 10;
-        public List<string> SelectedRows { get; set; } = new List<string>();
-        public bool SelectAll { get; set; } = false;
-        public Dictionary<string, bool> ColumnVisibility { get; set; } = new Dictionary<string, bool>();
-        public bool ShowColumnToggle { get; set; } = false;
-    }
-
     public class DataTable : BaseComponent
     {
+        #region State
+
         private Dictionary<string, DataTableState> _tableStates = new Dictionary<string, DataTableState>();
+
+        #endregion
+
+        #region Lifecycle
 
         public DataTable(GUIHelper helper)
             : base(helper) { }
+
+        #endregion
+
+        #region Public API
 
         public void DrawDataTable(string id, List<DataTableColumn> columns, List<DataTableRow> data, bool showPagination = true, bool showSearch = true, bool showSelection = true, bool showColumnToggle = false, params GUILayoutOption[] options)
         {
@@ -128,6 +65,10 @@ namespace shadcnui.GUIComponents.Data
             GUILayout.EndVertical();
         }
 
+        #endregion
+
+        #region Internal Drawing
+
         private void DrawToolbar(string id, DataTableState state, List<DataTableColumn> columns, bool showSearch, bool showColumnToggle)
         {
             if (!showSearch && !showColumnToggle)
@@ -149,7 +90,7 @@ namespace shadcnui.GUIComponents.Data
 
             layoutComponents.EndHorizontalGroup();
 
-            layoutComponents.AddSpace(8);
+            layoutComponents.AddSpace(DesignTokens.Spacing.SM);
         }
 
         private void DrawSearchInput(string id, DataTableState state)
@@ -255,12 +196,14 @@ namespace shadcnui.GUIComponents.Data
 
             var styleManager = guiHelper.GetStyleManager();
 
+            var rowStyle = styleManager.GetTableRowStyle(ControlVariant.Default, ControlSize.Default);
+
             for (int i = 0; i < data.Count; i++)
             {
                 var row = data[i];
                 bool isSelected = state.SelectedRows.Contains(row.Id);
 
-                layoutComponents.BeginHorizontalGroup();
+                layoutComponents.BeginHorizontalGroup(rowStyle);
 
                 if (showSelection)
                 {
@@ -320,14 +263,14 @@ namespace shadcnui.GUIComponents.Data
             GUILayout.FlexibleSpace();
             layoutComponents.EndHorizontalGroup();
 
-            layoutComponents.AddSpace(8);
+            layoutComponents.AddSpace(DesignTokens.Spacing.SM);
         }
 
         private void DrawPagination(string id, DataTableState state, int totalItems)
         {
             int totalPages = Mathf.CeilToInt((float)totalItems / state.PageSize);
 
-            layoutComponents.AddSpace(8);
+            layoutComponents.AddSpace(DesignTokens.Spacing.SM);
             layoutComponents.BeginHorizontalGroup();
 
             if (guiHelper.Button("← Previous", ControlVariant.Default, ControlSize.Default, null, false, 1f, GUILayout.Width(80 * guiHelper.uiScale)))
@@ -353,6 +296,10 @@ namespace shadcnui.GUIComponents.Data
 
             layoutComponents.EndHorizontalGroup();
         }
+
+        #endregion
+
+        #region Data Processing
 
         private List<DataTableRow> FilterData(List<DataTableRow> data, string filterText, List<DataTableColumn> columns)
         {
@@ -389,6 +336,10 @@ namespace shadcnui.GUIComponents.Data
             return data.Skip(currentPage * pageSize).Take(pageSize).ToList();
         }
 
+        #endregion
+
+        #region Public Helpers
+
         public DataTableState GetTableState(string id)
         {
             return _tableStates.ContainsKey(id) ? _tableStates[id] : null;
@@ -416,5 +367,7 @@ namespace shadcnui.GUIComponents.Data
         {
             return _tableStates.ContainsKey(id) ? _tableStates[id].SelectedRows : new List<string>();
         }
+
+        #endregion
     }
 }

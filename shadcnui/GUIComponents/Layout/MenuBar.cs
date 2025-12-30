@@ -1,6 +1,8 @@
 using System;
 using System.Collections.Generic;
-using shadcnui.GUIComponents.Core;
+using shadcnui.GUIComponents.Core.Base;
+using shadcnui.GUIComponents.Core.Styling;
+using shadcnui.GUIComponents.Core.Utils;
 using UnityEngine;
 
 namespace shadcnui.GUIComponents.Layout
@@ -11,6 +13,8 @@ namespace shadcnui.GUIComponents.Layout
         private bool _isDropdownOpen = false;
         private readonly Stack<MenuData> _menuStack = new Stack<MenuData>();
         private Rect _menuBarRect;
+        private string _menuId;
+        private const float AnimationDuration = DesignTokens.Animation.DurationFast;
 
         public MenuBar(GUIHelper helper)
             : base(helper) { }
@@ -83,7 +87,8 @@ namespace shadcnui.GUIComponents.Layout
                 if (item.IsSeparator || item.IsHeader)
                     continue;
 
-                var itemStyle = styleManager.GetButtonStyle(ControlVariant.Ghost, ControlSize.Default);
+                var itemStyle = styleManager.GetMenuBarItemStyle(ControlVariant.Default, ControlSize.Default, active: _isDropdownOpen && _activeMenuIndex == i);
+                itemStyle.alignment = TextAnchor.MiddleCenter;
 
                 var wasEnabled = GUI.enabled;
                 if (item.Disabled)
@@ -98,9 +103,15 @@ namespace shadcnui.GUIComponents.Layout
                     if (item.SubItems.Count > 0)
                     {
                         _activeMenuIndex = i;
+                        _menuId = $"menu_{i}";
                         _menuStack.Clear();
                         _menuStack.Push(new MenuData(item.SubItems, i));
                         _isDropdownOpen = true;
+
+                        var animManager = guiHelper.GetAnimationManager();
+                        animManager.FadeIn($"menubar_alpha_{_menuId}", AnimationDuration, EasingFunctions.EaseOutCubic);
+                        animManager.ScaleIn($"menubar_scale_{_menuId}", AnimationDuration, 0.92f, EasingFunctions.EaseOutCubic);
+                        animManager.SlideIn($"menubar_slide_{_menuId}", Vector2.zero, new Vector2(0, -DesignTokens.Spacing.MD), AnimationDuration, EasingFunctions.EaseOutCubic);
                     }
                     else
                     {
@@ -124,13 +135,30 @@ namespace shadcnui.GUIComponents.Layout
         private void DrawDropdownMenu()
         {
             var styleManager = guiHelper.GetStyleManager();
+            var animManager = guiHelper.GetAnimationManager();
             var currentMenu = _menuStack.Peek();
+
+            float alpha = animManager.GetFloat($"menubar_alpha_{_menuId}", 1f);
+            float scale = animManager.GetFloat($"menubar_scale_{_menuId}", 1f);
+            Vector2 slideOffset = animManager.GetVector2($"menubar_slide_{_menuId}", Vector2.zero);
+
+            Color prevColor = GUI.color;
+            Matrix4x4 prevMatrix = GUI.matrix;
+
+            if (alpha < 1f)
+                GUI.color = new Color(prevColor.r, prevColor.g, prevColor.b, prevColor.a * alpha);
+
+            if (scale < 1f || slideOffset != Vector2.zero)
+            {
+                GUIUtility.ScaleAroundPivot(new Vector3(scale, scale, 1f), Vector2.zero);
+                GUI.matrix = Matrix4x4.Translate(new Vector3(slideOffset.x, slideOffset.y, 0f)) * GUI.matrix;
+            }
 
             layoutComponents.BeginVerticalGroup(styleManager.GetMenuDropdownStyle(), GUILayout.Width(220 * guiHelper.uiScale));
 
             if (_menuStack.Count > 1)
             {
-                if (UnityHelpers.Button("<- Back", styleManager.GetButtonStyle(ControlVariant.Ghost, ControlSize.Default)))
+                if (UnityHelpers.Button("<- Back", styleManager.GetMenuBarItemStyle(ControlVariant.Default, ControlSize.Default)))
                 {
                     _menuStack.Pop();
                     if (_menuStack.Count == 1)
@@ -138,6 +166,8 @@ namespace shadcnui.GUIComponents.Layout
                         _activeMenuIndex = _menuStack.Peek().ParentIndex;
                     }
                     layoutComponents.EndVerticalGroup();
+                    GUI.matrix = prevMatrix;
+                    GUI.color = prevColor;
                     return;
                 }
 
@@ -150,6 +180,8 @@ namespace shadcnui.GUIComponents.Layout
             }
 
             layoutComponents.EndVerticalGroup();
+            GUI.matrix = prevMatrix;
+            GUI.color = prevColor;
         }
 
         private void DrawMenuItem(MenuItem item)
@@ -174,14 +206,14 @@ namespace shadcnui.GUIComponents.Layout
 
             if (item.SubItems.Count > 0)
             {
-                if (GUILayout.Button(item.Text, styleManager.GetButtonStyle(ControlVariant.Ghost, ControlSize.Default), GUILayout.ExpandWidth(true)))
+                if (GUILayout.Button(item.Text, styleManager.GetMenuBarItemStyle(ControlVariant.Default, ControlSize.Default), GUILayout.ExpandWidth(true)))
                 {
                     _menuStack.Push(new MenuData(item.SubItems, _activeMenuIndex));
                 }
             }
             else
             {
-                var buttonStyle = styleManager.GetButtonStyle(ControlVariant.Ghost, ControlSize.Default);
+                var buttonStyle = styleManager.GetMenuBarItemStyle(ControlVariant.Default, ControlSize.Default);
                 var textStyle = styleManager.GetMenuBarItemStyle();
 
                 Rect rect = GUILayoutUtility.GetRect(GUIContent.none, buttonStyle, GUILayout.ExpandWidth(true));
@@ -219,9 +251,16 @@ namespace shadcnui.GUIComponents.Layout
 
         public void CloseDropdown()
         {
+            if (_menuId != null)
+            {
+                var animManager = guiHelper.GetAnimationManager();
+                animManager.FadeOut($"menubar_alpha_{_menuId}", AnimationDuration * 0.8f, EasingFunctions.EaseInCubic);
+                animManager.ScaleOut($"menubar_scale_{_menuId}", AnimationDuration * 0.8f, 0.92f, EasingFunctions.EaseInCubic);
+            }
             _activeMenuIndex = -1;
             _isDropdownOpen = false;
             _menuStack.Clear();
+            _menuId = null;
         }
 
         private struct MenuData

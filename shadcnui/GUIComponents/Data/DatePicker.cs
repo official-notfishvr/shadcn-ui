@@ -1,6 +1,8 @@
 using System;
 using System.Collections.Generic;
-using shadcnui.GUIComponents.Core;
+using shadcnui.GUIComponents.Core.Base;
+using shadcnui.GUIComponents.Core.Styling;
+using shadcnui.GUIComponents.Core.Utils;
 using UnityEngine;
 #if IL2CPP_MELONLOADER_PRE57
 using UnhollowerBaseLib;
@@ -10,190 +12,248 @@ namespace shadcnui.GUIComponents.Data
 {
     public class DatePicker : BaseComponent
     {
-        private Dictionary<string, bool> _openStates = new Dictionary<string, bool>();
-        private Dictionary<string, DateTime> _displayDates = new Dictionary<string, DateTime>();
-        private Dictionary<string, DateTime> _focusedDates = new Dictionary<string, DateTime>();
+        #region State
+
+        private Dictionary<string, bool> _openStates;
+        private Dictionary<string, DateTime> _displayDates;
+        private Dictionary<string, DateTime> _focusedDates;
         private bool _weekStartsMonday = true;
         private static readonly string[] WeekdaysMonday = { "Mo", "Tu", "We", "Th", "Fr", "Sa", "Su" };
         private static readonly string[] WeekdaysSunday = { "Su", "Mo", "Tu", "We", "Th", "Fr", "Sa" };
+        private const float AnimationDuration = DesignTokens.Animation.DurationNormal;
 
-        public void SetWeekStartsMonday(bool value)
-        {
-            _weekStartsMonday = value;
-        }
+        #endregion
+
+        #region Lifecycle
 
         public DatePicker(GUIHelper helper)
             : base(helper) { }
 
-        public DateTime? DrawDatePicker(string placeholder, DateTime? selectedDate, string id = "datepicker", params GUILayoutOption[] options)
+        public override void Initialize()
         {
-            if (!_openStates.ContainsKey(id))
+            _openStates = new Dictionary<string, bool>();
+            _displayDates = new Dictionary<string, DateTime>();
+            _focusedDates = new Dictionary<string, DateTime>();
+        }
+
+        public override void Dispose()
+        {
+            _openStates?.Clear();
+            _displayDates?.Clear();
+            _focusedDates?.Clear();
+            base.Dispose();
+        }
+
+        #endregion
+
+        #region Config-based API
+
+        public DateTime? DrawDatePicker(DatePickerConfig config)
+        {
+            if (!_openStates.ContainsKey(config.Id))
             {
-                _openStates[id] = false;
-                _displayDates[id] = selectedDate ?? DateTime.Today;
-                _focusedDates[id] = selectedDate ?? DateTime.Today;
+                _openStates[config.Id] = false;
+                _displayDates[config.Id] = config.SelectedDate ?? DateTime.Today;
+                _focusedDates[config.Id] = config.SelectedDate ?? DateTime.Today;
             }
 
             var styleManager = guiHelper.GetStyleManager();
-            bool isOpen = _openStates[id];
-            DateTime displayDate = _displayDates[id];
-            string buttonText = selectedDate?.ToString("MMM dd, yyyy") ?? placeholder;
+            bool isOpen = _openStates[config.Id];
+            DateTime displayDate = _displayDates[config.Id];
+            string buttonText = config.SelectedDate?.ToString("MMM dd, yyyy") ?? config.Placeholder;
 
             layoutComponents.BeginVerticalGroup();
 
-            if (UnityHelpers.Button($"{buttonText}", styleManager.GetButtonStyle(ControlVariant.Outline, ControlSize.Default), options))
+            if (UnityHelpers.Button($"{buttonText}", styleManager.GetButtonStyle(ControlVariant.Outline, ControlSize.Default), config.Options))
             {
-                _openStates[id] = !isOpen;
-                if (selectedDate.HasValue)
+                _openStates[config.Id] = !isOpen;
+                if (config.SelectedDate.HasValue)
                 {
-                    _displayDates[id] = selectedDate.Value;
+                    _displayDates[config.Id] = config.SelectedDate.Value;
+                }
+
+                var animManager = guiHelper.GetAnimationManager();
+                if (!isOpen)
+                {
+                    animManager.FadeIn($"datepicker_popover_{config.Id}", AnimationDuration, EasingFunctions.EaseOutCubic);
+                    animManager.ScaleIn($"datepicker_scale_{config.Id}", AnimationDuration, 0.92f, EasingFunctions.EaseOutCubic);
+                    animManager.SlideIn($"datepicker_slide_{config.Id}", Vector2.zero, new Vector2(0, -DesignTokens.Spacing.LG), AnimationDuration, EasingFunctions.EaseOutCubic);
+                }
+                else
+                {
+                    animManager.FadeOut($"datepicker_popover_{config.Id}", AnimationDuration * 0.7f, EasingFunctions.EaseInCubic);
+                    animManager.ScaleOut($"datepicker_scale_{config.Id}", AnimationDuration * 0.7f, 0.92f, EasingFunctions.EaseInCubic);
                 }
             }
 
-            if (_openStates[id])
+            if (_openStates[config.Id])
             {
-                DateTime? newSelectedDate = DrawCalendarPopover(id, selectedDate, displayDate, null, null);
-                if (newSelectedDate != selectedDate)
+                DateTime? newSelectedDate = DrawCalendarPopover(config.Id, config.SelectedDate, displayDate, config.MinDate, config.MaxDate);
+                if (newSelectedDate != config.SelectedDate)
                 {
-                    _openStates[id] = false;
+                    _openStates[config.Id] = false;
+                    var animManager = guiHelper.GetAnimationManager();
+                    animManager.FadeOut($"datepicker_popover_{config.Id}", AnimationDuration * 0.7f, EasingFunctions.EaseInCubic);
                     return newSelectedDate;
                 }
             }
 
             layoutComponents.EndVerticalGroup();
 
-            return selectedDate;
+            return config.SelectedDate;
         }
 
-        public DateTime? DrawDatePickerWithLabel(string label, string placeholder, DateTime? selectedDate, string id = "datepicker", params GUILayoutOption[] options)
+        public DateTime? DrawDatePickerWithLabel(DatePickerConfig config)
         {
             var styleManager = guiHelper.GetStyleManager();
             layoutComponents.BeginVerticalGroup();
-            if (!string.IsNullOrEmpty(label))
+            if (!string.IsNullOrEmpty(config.Label))
             {
-                UnityHelpers.Label(label, styleManager.GetLabelStyle(ControlVariant.Default));
-                GUILayout.Space(4);
+                UnityHelpers.Label(config.Label, styleManager.GetLabelStyle(ControlVariant.Default));
+                GUILayout.Space(DesignTokens.Spacing.XS);
             }
 
-            DateTime? result = DrawDatePicker(placeholder, selectedDate, id, options);
+            DateTime? result = DrawDatePicker(config);
 
             layoutComponents.EndVerticalGroup();
             return result;
         }
 
+        public DateTime? DrawDateRangePicker(DatePickerConfig config)
+        {
+            if (!_openStates.ContainsKey(config.Id))
+            {
+                _openStates[config.Id] = false;
+                _displayDates[config.Id] = config.StartDate ?? DateTime.Today;
+            }
+
+            var styleManager = guiHelper.GetStyleManager();
+            string buttonText = config.StartDate.HasValue && config.EndDate.HasValue ? $"{config.StartDate.Value.ToString("MMM dd")} - {config.EndDate.Value.ToString("MMM dd, yyyy")}" : config.Placeholder;
+
+            layoutComponents.BeginVerticalGroup();
+
+            if (UnityHelpers.Button($"{buttonText}", styleManager.GetButtonStyle(ControlVariant.Outline, ControlSize.Default), config.Options))
+            {
+                _openStates[config.Id] = !_openStates[config.Id];
+
+                var animManager = guiHelper.GetAnimationManager();
+                if (_openStates[config.Id])
+                {
+                    animManager.FadeIn($"daterange_popover_{config.Id}", AnimationDuration, EasingFunctions.EaseOutCubic);
+                    animManager.ScaleIn($"daterange_scale_{config.Id}", AnimationDuration, 0.92f, EasingFunctions.EaseOutCubic);
+                    animManager.SlideIn($"daterange_slide_{config.Id}", Vector2.zero, new Vector2(0, -DesignTokens.Spacing.LG), AnimationDuration, EasingFunctions.EaseOutCubic);
+                }
+                else
+                {
+                    animManager.FadeOut($"daterange_popover_{config.Id}", AnimationDuration * 0.7f, EasingFunctions.EaseInCubic);
+                    animManager.ScaleOut($"daterange_scale_{config.Id}", AnimationDuration * 0.7f, 0.92f, EasingFunctions.EaseInCubic);
+                }
+            }
+
+            if (_openStates[config.Id])
+            {
+                DrawCalendarPopover(config.Id, config.StartDate, _displayDates[config.Id], config.MinDate, config.MaxDate);
+            }
+
+            layoutComponents.EndVerticalGroup();
+
+            return config.StartDate;
+        }
+
+        #endregion
+
+        #region API
+
+        public DateTime? DrawDatePicker(string placeholder, DateTime? selectedDate, string id = "datepicker", params GUILayoutOption[] options)
+        {
+            return DrawDatePicker(
+                new DatePickerConfig
+                {
+                    Placeholder = placeholder,
+                    SelectedDate = selectedDate,
+                    Id = id,
+                    Options = options,
+                }
+            );
+        }
+
+        public DateTime? DrawDatePickerWithLabel(string label, string placeholder, DateTime? selectedDate, string id = "datepicker", params GUILayoutOption[] options)
+        {
+            return DrawDatePickerWithLabel(
+                new DatePickerConfig
+                {
+                    Label = label,
+                    Placeholder = placeholder,
+                    SelectedDate = selectedDate,
+                    Id = id,
+                    Options = options,
+                }
+            );
+        }
+
         public DateTime? DrawDateRangePicker(string placeholder, DateTime? startDate, DateTime? endDate, string id = "daterange", params GUILayoutOption[] options)
         {
-            if (!_openStates.ContainsKey(id))
-            {
-                _openStates[id] = false;
-                _displayDates[id] = startDate ?? DateTime.Today;
-            }
-
-            var styleManager = guiHelper.GetStyleManager();
-            string buttonText = startDate.HasValue && endDate.HasValue ? $"{startDate.Value.ToString("MMM dd")} - {endDate.Value.ToString("MMM dd, yyyy")}" : placeholder;
-
-            layoutComponents.BeginVerticalGroup();
-
-            if (UnityHelpers.Button($"{buttonText}", styleManager.GetButtonStyle(ControlVariant.Outline, ControlSize.Default), options))
-            {
-                _openStates[id] = !_openStates[id];
-            }
-
-            if (_openStates[id])
-            {
-                DrawCalendarPopover(id, startDate, _displayDates[id], null, null);
-            }
-
-            layoutComponents.EndVerticalGroup();
-
-            return startDate;
-        }
-
-        public DateTime? DrawDatePicker(string placeholder, DateTime? selectedDate, DateTime? minDate, DateTime? maxDate, string id = "datepicker", params GUILayoutOption[] options)
-        {
-            if (!_openStates.ContainsKey(id))
-            {
-                _openStates[id] = false;
-                _displayDates[id] = selectedDate ?? DateTime.Today;
-                _focusedDates[id] = selectedDate ?? DateTime.Today;
-            }
-
-            var styleManager = guiHelper.GetStyleManager();
-            bool isOpen = _openStates[id];
-            DateTime displayDate = _displayDates[id];
-            string buttonText = selectedDate?.ToString("MMM dd, yyyy") ?? placeholder;
-
-            layoutComponents.BeginVerticalGroup();
-
-            if (UnityHelpers.Button($"{buttonText}", styleManager.GetButtonStyle(ControlVariant.Outline, ControlSize.Default), options))
-            {
-                _openStates[id] = !isOpen;
-                if (selectedDate.HasValue)
+            return DrawDateRangePicker(
+                new DatePickerConfig
                 {
-                    _displayDates[id] = selectedDate.Value;
+                    Placeholder = placeholder,
+                    StartDate = startDate,
+                    EndDate = endDate,
+                    Id = id,
+                    Options = options,
                 }
-            }
-
-            if (_openStates[id])
-            {
-                DateTime? newSelectedDate = DrawCalendarPopover(id, selectedDate, displayDate, minDate, maxDate);
-                if (newSelectedDate != selectedDate)
-                {
-                    _openStates[id] = false;
-                    return newSelectedDate;
-                }
-            }
-
-            layoutComponents.EndVerticalGroup();
-
-            return selectedDate;
+            );
         }
 
-        public DateTime? DrawDateRangePicker(string placeholder, DateTime? startDate, DateTime? endDate, DateTime? minDate, DateTime? maxDate, string id = "daterange", params GUILayoutOption[] options)
-        {
-            if (!_openStates.ContainsKey(id))
-            {
-                _openStates[id] = false;
-                _displayDates[id] = startDate ?? DateTime.Today;
-            }
+        #endregion
 
-            var styleManager = guiHelper.GetStyleManager();
-            string buttonText = startDate.HasValue && endDate.HasValue ? $"{startDate.Value.ToString("MMM dd")} - {endDate.Value.ToString("MMM dd, yyyy")}" : placeholder;
-
-            layoutComponents.BeginVerticalGroup();
-
-            if (UnityHelpers.Button($"{buttonText}", styleManager.GetButtonStyle(ControlVariant.Outline, ControlSize.Default), options))
-            {
-                _openStates[id] = !_openStates[id];
-            }
-
-            if (_openStates[id])
-            {
-                DrawCalendarPopover(id, startDate, _displayDates[id], minDate, maxDate);
-            }
-
-            layoutComponents.EndVerticalGroup();
-
-            return startDate;
-        }
+        #region Internal Drawing
 
         private DateTime? DrawCalendarPopover(string id, DateTime? selectedDate, DateTime displayDate, DateTime? minDate, DateTime? maxDate)
         {
             var styleManager = guiHelper.GetStyleManager();
+            var animManager = guiHelper.GetAnimationManager();
+
+            float alpha = animManager.GetFloat($"datepicker_popover_{id}", 1f);
+            if (alpha == 0f)
+                alpha = animManager.GetFloat($"daterange_popover_{id}", 1f);
+
+            float scale = animManager.GetFloat($"datepicker_scale_{id}", 1f);
+            if (scale == 1f)
+                scale = animManager.GetFloat($"daterange_scale_{id}", 1f);
+
+            Vector2 slideOffset = animManager.GetVector2($"datepicker_slide_{id}", Vector2.zero);
+            if (slideOffset == Vector2.zero)
+                slideOffset = animManager.GetVector2($"daterange_slide_{id}", Vector2.zero);
+
+            Color prevColor = GUI.color;
+            Matrix4x4 prevMatrix = GUI.matrix;
+
+            if (alpha < 1f)
+                GUI.color = new Color(prevColor.r, prevColor.g, prevColor.b, prevColor.a * alpha);
+
+            if (scale < 1f || slideOffset != Vector2.zero)
+            {
+                GUIUtility.ScaleAroundPivot(new Vector3(scale, scale, 1f), Vector2.zero);
+                GUI.matrix = Matrix4x4.Translate(new Vector3(slideOffset.x, slideOffset.y, 0f)) * GUI.matrix;
+            }
+
             layoutComponents.BeginVerticalGroup(styleManager.GetDatePickerStyle(ControlVariant.Default, ControlSize.Default), GUILayout.Width(280));
 
             DrawCalendarHeader(id, displayDate);
             DrawWeekdayHeaders();
             DateTime? newSelectedDate = DrawCalendarGrid(id, selectedDate, displayDate, minDate, maxDate);
-            HandleCalendarKeyboard(id, ref newSelectedDate);
 
             if (newSelectedDate.HasValue)
             {
-                GUILayout.Space(8);
+                GUILayout.Space(DesignTokens.Spacing.SM);
                 DrawCalendarFooter(id);
             }
 
             layoutComponents.EndVerticalGroup();
+
+            GUI.matrix = prevMatrix;
+            GUI.color = prevColor;
 
             return newSelectedDate;
         }
@@ -203,34 +263,28 @@ namespace shadcnui.GUIComponents.Data
             var styleManager = guiHelper.GetStyleManager();
             layoutComponents.BeginHorizontalGroup();
 
-            if (UnityHelpers.Button("<<", styleManager.GetButtonStyle(ControlVariant.Outline, ControlSize.Icon)))
-            {
-                _displayDates[id] = displayDate.AddYears(-1);
-            }
+            GUIStyle buttonGhostStyle = styleManager.GetButtonStyle(ControlVariant.Ghost, ControlSize.Default);
 
-            if (UnityHelpers.Button("<", styleManager.GetButtonStyle(ControlVariant.Outline, ControlSize.Icon)))
+            if (UnityHelpers.Button("<", buttonGhostStyle))
             {
                 _displayDates[id] = displayDate.AddMonths(-1);
+                var animManager = guiHelper.GetAnimationManager();
+                animManager.StartFloat($"datepicker_month_shift_{id}", 0f, 1f, AnimationDuration * 0.8f, EasingFunctions.EaseOutCubic);
             }
 
-            GUILayout.FlexibleSpace();
-            string currentMonthYear = displayDate.ToString("MMMM yyyy");
+            if (UnityHelpers.Button(displayDate.ToString("MMMM"), buttonGhostStyle)) { }
 
-            UnityHelpers.Label(currentMonthYear, styleManager.GetLabelStyle(ControlVariant.Default, ControlSize.Large));
-            GUILayout.FlexibleSpace();
+            if (UnityHelpers.Button(displayDate.ToString("yyyy"), buttonGhostStyle)) { }
 
-            if (UnityHelpers.Button(">", styleManager.GetButtonStyle(ControlVariant.Outline, ControlSize.Icon)))
+            if (UnityHelpers.Button(">", buttonGhostStyle))
             {
                 _displayDates[id] = displayDate.AddMonths(1);
-            }
-
-            if (UnityHelpers.Button(">>", styleManager.GetButtonStyle(ControlVariant.Outline, ControlSize.Icon)))
-            {
-                _displayDates[id] = displayDate.AddYears(1);
+                var animManager = guiHelper.GetAnimationManager();
+                animManager.StartFloat($"datepicker_month_shift_{id}", 0f, 1f, AnimationDuration * 0.8f, EasingFunctions.EaseOutCubic);
             }
 
             layoutComponents.EndHorizontalGroup();
-            GUILayout.Space(8);
+            GUILayout.Space(DesignTokens.Spacing.SM);
         }
 
         private void DrawWeekdayHeaders()
@@ -244,7 +298,7 @@ namespace shadcnui.GUIComponents.Data
                 UnityHelpers.Label(day, styleManager.GetDatePickerWeekdayStyle(), GUILayout.Width(36), GUILayout.Height(24));
             }
             layoutComponents.EndHorizontalGroup();
-            GUILayout.Space(4);
+            GUILayout.Space(DesignTokens.Spacing.XS);
         }
 
         private DateTime? DrawCalendarGrid(string id, DateTime? selectedDate, DateTime displayDate, DateTime? minDate, DateTime? maxDate)
@@ -278,10 +332,12 @@ namespace shadcnui.GUIComponents.Data
                     if (!withinRange)
                         GUI.enabled = false;
 
-                    if (UnityHelpers.Button(currentDate.Day.ToString(), dayStyle, GUILayout.Width(36), GUILayout.Height(32)))
+                    if (UnityHelpers.Button(currentDate.Day.ToString(), dayStyle))
                     {
                         newSelectedDate = currentDate;
                         _focusedDates[id] = currentDate;
+                        var animManager = guiHelper.GetAnimationManager();
+                        animManager.StartFloat($"datepicker_day_select_{id}_{currentDate.Day}", 0f, 1f, AnimationDuration * 0.6f, EasingFunctions.EaseOutCubic);
                     }
 
                     GUI.enabled = wasEnabled;
@@ -290,56 +346,10 @@ namespace shadcnui.GUIComponents.Data
                 layoutComponents.EndHorizontalGroup();
 
                 if (week < 5)
-                    GUILayout.Space(2);
+                    GUILayout.Space(DesignTokens.Spacing.XXS);
             }
 
             return newSelectedDate;
-        }
-
-        private void HandleCalendarKeyboard(string id, ref DateTime? selected)
-        {
-            if (Event.current.type != EventType.KeyDown)
-                return;
-
-            if (!_focusedDates.ContainsKey(id))
-                _focusedDates[id] = _displayDates.ContainsKey(id) ? _displayDates[id] : DateTime.Today;
-
-            DateTime focus = _focusedDates[id];
-            bool used = false;
-            switch (Event.current.keyCode)
-            {
-                case KeyCode.LeftArrow:
-                    focus = focus.AddDays(-1);
-                    used = true;
-                    break;
-                case KeyCode.RightArrow:
-                    focus = focus.AddDays(1);
-                    used = true;
-                    break;
-                case KeyCode.UpArrow:
-                    focus = focus.AddDays(-7);
-                    used = true;
-                    break;
-                case KeyCode.DownArrow:
-                    focus = focus.AddDays(7);
-                    used = true;
-                    break;
-                case KeyCode.Return:
-                    selected = focus;
-                    used = true;
-                    break;
-                case KeyCode.Escape:
-                    _openStates[id] = false;
-                    used = true;
-                    break;
-            }
-
-            if (used)
-            {
-                _focusedDates[id] = focus;
-                _displayDates[id] = new DateTime(focus.Year, focus.Month, 1);
-                Event.current.Use();
-            }
         }
 
         private GUIStyle GetDayStyle(bool isCurrentMonth, bool isSelected, bool isToday)
@@ -366,6 +376,8 @@ namespace shadcnui.GUIComponents.Data
             if (UnityHelpers.Button("Today", styleManager.GetButtonStyle(ControlVariant.Outline, ControlSize.Default), GUILayout.Height(32)))
             {
                 _displayDates[id] = DateTime.Today;
+                var animManager = guiHelper.GetAnimationManager();
+                animManager.StartFloat($"datepicker_today_btn_{id}", 0f, 1f, AnimationDuration * 0.5f, EasingFunctions.EaseOutCubic);
             }
 
             GUILayout.FlexibleSpace();
@@ -373,16 +385,26 @@ namespace shadcnui.GUIComponents.Data
             if (UnityHelpers.Button("Clear", styleManager.GetButtonStyle(ControlVariant.Ghost, ControlSize.Default), GUILayout.Height(32)))
             {
                 _openStates[id] = false;
+                var animManager = guiHelper.GetAnimationManager();
+                animManager.FadeOut($"datepicker_popover_{id}", AnimationDuration * 0.7f, EasingFunctions.EaseInCubic);
+                animManager.FadeOut($"daterange_popover_{id}", AnimationDuration * 0.7f, EasingFunctions.EaseInCubic);
             }
 
             layoutComponents.EndHorizontalGroup();
         }
+
+        #endregion
+
+        #region Public Helpers
 
         public void CloseDatePicker(string id)
         {
             if (_openStates.ContainsKey(id))
             {
                 _openStates[id] = false;
+                var animManager = guiHelper.GetAnimationManager();
+                animManager.FadeOut($"datepicker_popover_{id}", AnimationDuration * 0.7f, EasingFunctions.EaseInCubic);
+                animManager.FadeOut($"daterange_popover_{id}", AnimationDuration * 0.7f, EasingFunctions.EaseInCubic);
             }
         }
 
@@ -390,5 +412,7 @@ namespace shadcnui.GUIComponents.Data
         {
             return _openStates.ContainsKey(id) && _openStates[id];
         }
+
+        #endregion
     }
 }

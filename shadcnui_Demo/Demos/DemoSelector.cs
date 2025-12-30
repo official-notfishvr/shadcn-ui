@@ -1,6 +1,6 @@
 ﻿#define Showcase
-
-using shadcnui.GUIComponents.Core;
+using shadcnui.GUIComponents.Core.Base;
+using shadcnui.GUIComponents.Core.Styling;
 using UnityEngine;
 
 namespace shadcnui_Demo.Menu
@@ -27,8 +27,8 @@ namespace shadcnui_Demo.Menu
 
         void DrawSelectorWindow(int windowID)
         {
-            guiHelper.UpdateAnimations(showSelector);
-            if (guiHelper.BeginAnimatedGUI())
+            guiHelper.UpdateGUI(showSelector);
+            if (guiHelper.BeginGUI())
             {
                 guiHelper.BeginVerticalGroup();
                 GUILayout.Space(10);
@@ -80,7 +80,7 @@ namespace shadcnui_Demo.Menu
                 guiHelper.EndHorizontalGroup();
 
                 GUILayout.EndVertical();
-                guiHelper.EndAnimatedGUI();
+                guiHelper.EndGUI();
             }
             GUI.DragWindow();
         }

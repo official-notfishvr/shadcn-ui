@@ -1,7 +1,9 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using shadcnui.GUIComponents.Core;
+using shadcnui.GUIComponents.Core.Base;
+using shadcnui.GUIComponents.Core.Styling;
+using shadcnui.GUIComponents.Core.Utils;
 using UnityEngine;
 #if IL2CPP_MELONLOADER_PRE57
 using UnhollowerBaseLib;
@@ -11,6 +13,8 @@ namespace shadcnui.GUIComponents.Data
 {
     public class Calendar : BaseComponent
     {
+        #region State
+
         private DateTime displayedMonth;
 
         public DateTime? SelectedDate { get; set; }
@@ -24,21 +28,39 @@ namespace shadcnui.GUIComponents.Data
         private bool showMonthDropdown;
         private bool showYearDropdown;
         private static readonly string[] DayOfWeekShort = { "Su", "Mo", "Tu", "We", "Th", "Fr", "Sa" };
+        private const float AnimationDuration = DesignTokens.Animation.DurationNormal;
+
+        #endregion
+
+        #region Lifecycle
 
         public Calendar(GUIHelper helper)
-            : base(helper)
+            : base(helper) { }
+
+        public override void Initialize()
         {
             this.displayedMonth = DateTime.Today;
-
             this.Ranges = new List<(DateTime Start, DateTime End)>();
             this.DisabledDates = new List<DateTime>();
         }
 
-        public void DrawCalendar()
+        public override void Dispose()
+        {
+            Ranges?.Clear();
+            DisabledDates?.Clear();
+            base.Dispose();
+        }
+
+        #endregion
+
+        #region Config-based API
+
+        public void DrawCalendar(CalendarConfig config = null)
         {
             var styleManager = guiHelper.GetStyleManager();
+            config = config ?? new CalendarConfig();
 
-            layoutComponents.BeginVerticalGroup(styleManager.GetCalendarStyle(ControlVariant.Default, ControlSize.Default));
+            layoutComponents.BeginVerticalGroup(styleManager.GetCalendarStyle(config.Variant, config.Size));
 
             DrawHeader(styleManager);
             DrawWeekdays(styleManager);
@@ -46,6 +68,10 @@ namespace shadcnui.GUIComponents.Data
 
             layoutComponents.EndVerticalGroup();
         }
+
+        #endregion
+
+        #region Internal Drawing
 
         private void DrawHeader(StyleManager styleManager)
         {
@@ -56,6 +82,8 @@ namespace shadcnui.GUIComponents.Data
             if (UnityHelpers.Button("<", buttonGhostStyle))
             {
                 displayedMonth = displayedMonth.AddMonths(-1);
+                var animManager = guiHelper.GetAnimationManager();
+                animManager.StartFloat($"calendar_month_shift", 0f, 1f, AnimationDuration, EasingFunctions.EaseOutCubic);
             }
 
             if (showMonthDropdown) { }
@@ -64,6 +92,8 @@ namespace shadcnui.GUIComponents.Data
                 if (UnityHelpers.Button(displayedMonth.ToString("MMMM"), buttonGhostStyle))
                 {
                     showMonthDropdown = true;
+                    var animManager = guiHelper.GetAnimationManager();
+                    animManager.FadeIn($"calendar_month_dropdown", AnimationDuration, EasingFunctions.EaseOutCubic);
                 }
             }
 
@@ -73,12 +103,16 @@ namespace shadcnui.GUIComponents.Data
                 if (UnityHelpers.Button(displayedMonth.ToString("yyyy"), buttonGhostStyle))
                 {
                     showYearDropdown = true;
+                    var animManager = guiHelper.GetAnimationManager();
+                    animManager.FadeIn($"calendar_year_dropdown", AnimationDuration, EasingFunctions.EaseOutCubic);
                 }
             }
 
             if (UnityHelpers.Button(">", buttonGhostStyle))
             {
                 displayedMonth = displayedMonth.AddMonths(1);
+                var animManager = guiHelper.GetAnimationManager();
+                animManager.StartFloat($"calendar_month_shift", 0f, 1f, AnimationDuration, EasingFunctions.EaseOutCubic);
             }
 
             layoutComponents.EndHorizontalGroup();
@@ -138,6 +172,8 @@ namespace shadcnui.GUIComponents.Data
                             if (!isDisabled)
                             {
                                 HandleDateSelection(currentDay);
+                                var animManager = guiHelper.GetAnimationManager();
+                                animManager.StartFloat($"calendar_day_select_{dayCounter}", 0f, 1f, AnimationDuration * 0.5f, EasingFunctions.EaseOutCubic);
                             }
                         }
                         dayCounter++;
@@ -148,6 +184,10 @@ namespace shadcnui.GUIComponents.Data
                     break;
             }
         }
+
+        #endregion
+
+        #region Selection Handling
 
         private void HandleDateSelection(DateTime date)
         {
@@ -170,5 +210,7 @@ namespace shadcnui.GUIComponents.Data
                 OnDateSelected(date);
             }
         }
+
+        #endregion
     }
 }

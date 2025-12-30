@@ -1,68 +1,47 @@
-using System;
 using System.Collections.Generic;
-using shadcnui.GUIComponents.Core;
+using shadcnui.GUIComponents.Core.Base;
+using shadcnui.GUIComponents.Core.Styling;
+using shadcnui.GUIComponents.Core.Utils;
 using UnityEngine;
 
 namespace shadcnui.GUIComponents.Controls
 {
-    public enum DropdownMenuItemType
-    {
-        Item,
-        Separator,
-        Header,
-    }
-
-    public class DropdownMenuItem
-    {
-        public DropdownMenuItemType Type { get; set; }
-        public GUIContent Content { get; set; }
-        public Action OnClick { get; set; }
-        public bool IsSelected { get; set; }
-        public List<DropdownMenuItem> SubItems { get; set; }
-
-        public DropdownMenuItem(DropdownMenuItemType type, string text = null, Action onClick = null, bool isSelected = false, Texture2D icon = null)
-        {
-            Type = type;
-            Content = new UnityHelpers.GUIContent(text, icon);
-            OnClick = onClick;
-            IsSelected = isSelected;
-            SubItems = new List<DropdownMenuItem>();
-        }
-    }
-
-    public class DropdownMenuConfig
-    {
-        public List<DropdownMenuItem> Items { get; set; }
-        public GUILayoutOption[] Options { get; set; }
-
-        public DropdownMenuConfig(List<DropdownMenuItem> items)
-        {
-            Items = items;
-        }
-    }
-
     public class DropdownMenu : BaseComponent
     {
         private bool _isOpen;
         private Vector2 _scrollPosition;
         private readonly Stack<List<DropdownMenuItem>> _menuStack = new Stack<List<DropdownMenuItem>>();
+        private string _menuId;
+        private const float AnimationDuration = DesignTokens.Animation.DurationFast;
 
         public DropdownMenu(GUIHelper helper)
             : base(helper) { }
 
         public bool IsOpen => _isOpen;
 
-        public void Open(List<DropdownMenuItem> rootItems)
+        public void Open(List<DropdownMenuItem> rootItems, string id = "dropdown")
         {
             _menuStack.Clear();
             _menuStack.Push(rootItems);
             _isOpen = true;
+            _menuId = id;
+            var animManager = guiHelper.GetAnimationManager();
+            animManager.FadeIn($"dropdown_alpha_{id}", AnimationDuration, EasingFunctions.EaseOutCubic);
+            animManager.ScaleIn($"dropdown_scale_{id}", AnimationDuration, 0.95f, EasingFunctions.EaseOutCubic);
+            animManager.SlideIn($"dropdown_slide_{id}", Vector2.zero, new Vector2(0, -DesignTokens.Spacing.LG), AnimationDuration, EasingFunctions.EaseOutCubic);
         }
 
         public void Close()
         {
+            if (_menuId != null)
+            {
+                var animManager = guiHelper.GetAnimationManager();
+                animManager.FadeOut($"dropdown_alpha_{_menuId}", AnimationDuration * 0.8f, EasingFunctions.EaseInCubic);
+                animManager.ScaleOut($"dropdown_scale_{_menuId}", AnimationDuration * 0.8f, 0.95f, EasingFunctions.EaseInCubic);
+            }
             _menuStack.Clear();
             _isOpen = false;
+            _menuId = null;
         }
 
         public void Draw(DropdownMenuConfig config)
@@ -72,12 +51,8 @@ namespace shadcnui.GUIComponents.Controls
                 Close();
                 return;
             }
-
             if (!_isOpen)
-            {
                 Open(config.Items);
-            }
-
             DrawDropdownMenu(config.Options);
         }
 
@@ -85,18 +60,30 @@ namespace shadcnui.GUIComponents.Controls
         {
             if (!_isOpen || _menuStack.Count == 0)
                 return;
-
             var styleManager = guiHelper.GetStyleManager();
+            var animManager = guiHelper.GetAnimationManager();
+            string id = _menuId ?? "dropdown";
+            float alpha = animManager.GetFloat($"dropdown_alpha_{id}", 1f);
+            float scale = animManager.GetFloat($"dropdown_scale_{id}", 1f);
+            Vector2 slideOffset = animManager.GetVector2($"dropdown_slide_{id}", Vector2.zero);
 
             var layoutOptions = new List<GUILayoutOption> { GUILayout.ExpandWidth(true), GUILayout.MinHeight(0), GUILayout.MaxHeight(200) };
             if (options != null)
-            {
                 layoutOptions.AddRange(options);
-            }
-
             GUIStyle contentStyle = styleManager.GetDropdownMenuStyle(ControlVariant.Default, ControlSize.Default);
             GUIStyle itemStyle = styleManager.GetDropdownMenuItemStyle();
             GUIStyle separatorStyle = styleManager.GetSeparatorStyle(SeparatorOrientation.Horizontal, ControlVariant.Default, ControlSize.Default);
+            Color prevColor = GUI.color;
+            Matrix4x4 prevMatrix = GUI.matrix;
+
+            if (alpha < 1f)
+                GUI.color = new Color(prevColor.r, prevColor.g, prevColor.b, prevColor.a * alpha);
+
+            if (scale < 1f || slideOffset != Vector2.zero)
+            {
+                GUIUtility.ScaleAroundPivot(new Vector3(scale, scale, 1f), Vector2.zero);
+                GUI.matrix = Matrix4x4.Translate(new Vector3(slideOffset.x, slideOffset.y, 0f)) * GUI.matrix;
+            }
 
             layoutComponents.BeginVerticalGroup(contentStyle, layoutOptions.ToArray());
             _scrollPosition = layoutComponents.DrawScrollView(
@@ -110,20 +97,19 @@ namespace shadcnui.GUIComponents.Controls
                             _menuStack.Pop();
                             return;
                         }
-
                         UnityHelpers.Box("", separatorStyle);
                     }
-
                     var currentItems = _menuStack.Peek();
                     foreach (var item in currentItems)
-                    {
                         DrawMenuItem(item);
-                    }
                 },
                 GUILayout.ExpandWidth(true),
                 GUILayout.ExpandHeight(true)
             );
             layoutComponents.EndVerticalGroup();
+
+            GUI.matrix = prevMatrix;
+            GUI.color = prevColor;
         }
 
         private void DrawMenuItem(DropdownMenuItem item)
@@ -132,7 +118,6 @@ namespace shadcnui.GUIComponents.Controls
             GUIStyle headerStyle = styleManager.GetLabelStyle(ControlVariant.Muted, ControlSize.Small);
             GUIStyle separatorStyle = styleManager.GetSeparatorStyle(SeparatorOrientation.Horizontal, ControlVariant.Default, ControlSize.Default);
             GUIStyle itemStyle = styleManager.GetDropdownMenuItemStyle();
-
             switch (item.Type)
             {
                 case DropdownMenuItemType.Header:
@@ -148,30 +133,29 @@ namespace shadcnui.GUIComponents.Controls
                 case DropdownMenuItemType.Item:
                     if (item.SubItems != null && item.SubItems.Count > 0)
                     {
-                        if (
 #if IL2CPP_MELONLOADER_PRE57
-                            GUILayout.Button(item.Content, itemStyle, shadcnui.GUIComponents.Layout.Layout.EmptyOptions)
-#else
-                            GUILayout.Button(item.Content, itemStyle)
-#endif
-                        )
-                        {
+                        if (GUILayout.Button(item.Content, itemStyle, shadcnui.GUIComponents.Layout.Layout.EmptyOptions))
                             _menuStack.Push(item.SubItems);
-                        }
+#else
+                        if (GUILayout.Button(item.Content, itemStyle))
+                            _menuStack.Push(item.SubItems);
+#endif
                     }
                     else
                     {
-                        if (
 #if IL2CPP_MELONLOADER_PRE57
-                            GUILayout.Button(item.Content, itemStyle, shadcnui.GUIComponents.Layout.Layout.EmptyOptions)
-#else
-                            GUILayout.Button(item.Content, itemStyle)
-#endif
-                        )
+                        if (GUILayout.Button(item.Content, itemStyle, shadcnui.GUIComponents.Layout.Layout.EmptyOptions))
                         {
                             item.OnClick?.Invoke();
                             Close();
                         }
+#else
+                        if (GUILayout.Button(item.Content, itemStyle))
+                        {
+                            item.OnClick?.Invoke();
+                            Close();
+                        }
+#endif
                     }
                     break;
             }

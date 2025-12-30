@@ -1,79 +1,29 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using shadcnui.GUIComponents.Core;
+using shadcnui.GUIComponents.Core.Base;
+using shadcnui.GUIComponents.Core.Styling;
+using shadcnui.GUIComponents.Core.Utils;
 using UnityEngine;
 
 namespace shadcnui.GUIComponents.Display
 {
-    public enum ChartType
-    {
-        Line,
-        Bar,
-        Area,
-        Pie,
-        Scatter,
-    }
-
-    [Serializable]
-    public class ChartDataPoint
-    {
-        public string Name { get; set; }
-        public float Value { get; set; }
-        public Color Color { get; set; }
-        public Dictionary<string, object> Payload { get; set; }
-
-        public ChartDataPoint(string name, float value, Color color = default)
-        {
-            Name = name;
-            Value = value;
-            Color = color == default ? Color.blue : color;
-            Payload = new Dictionary<string, object>();
-        }
-    }
-
-    [Serializable]
-    public class ChartSeries
-    {
-        public string Key { get; set; }
-        public string Label { get; set; }
-        public Color Color { get; set; }
-        public List<ChartDataPoint> Data { get; set; }
-        public bool Visible { get; set; }
-
-        public ChartSeries(string key, string label, Color color = default)
-        {
-            Key = key;
-            Label = label;
-            Color = color == default ? Color.blue : color;
-            Data = new List<ChartDataPoint>();
-            Visible = true;
-        }
-    }
-
-    [Serializable]
-    public class ChartConfig
-    {
-        public List<ChartSeries> Series { get; set; }
-        public ChartType ChartType { get; set; }
-        public Vector2 Size { get; set; }
-        public GUILayoutOption[] Options { get; set; }
-
-        public ChartConfig(List<ChartSeries> series, ChartType chartType)
-        {
-            Series = series;
-            ChartType = chartType;
-            Size = new Vector2(400, 300);
-            Options = Array.Empty<GUILayoutOption>();
-        }
-    }
-
     public class Chart : BaseComponent
     {
+        #region State
+
         private Rect _chartRect;
+
+        #endregion
+
+        #region Lifecycle
 
         public Chart(GUIHelper helper)
             : base(helper) { }
+
+        #endregion
+
+        #region Config-based API
 
         public void DrawChart(ChartConfig config)
         {
@@ -92,6 +42,10 @@ namespace shadcnui.GUIComponents.Display
 
             layoutComponents.EndVerticalGroup();
         }
+
+        #endregion
+
+        #region Internal Drawing
 
         private void DrawChartContent(ChartConfig config)
         {
@@ -127,6 +81,10 @@ namespace shadcnui.GUIComponents.Display
                     break;
             }
         }
+
+        #endregion
+
+        #region Chart Type Renderers
 
         private void DrawLineChart(List<ChartSeries> series)
         {
@@ -234,6 +192,10 @@ namespace shadcnui.GUIComponents.Display
             }
         }
 
+        #endregion
+
+        #region Grid and Axes
+
         private void DrawGrid()
         {
             var theme = guiHelper.GetStyleManager().GetTheme();
@@ -281,6 +243,10 @@ namespace shadcnui.GUIComponents.Display
                 Debug.LogError($"DrawAxes error: {ex.Message}");
             }
         }
+
+        #endregion
+
+        #region Series Drawing
 
         private void DrawLineSeries(ChartSeries seriesData, List<ChartSeries> series)
         {
@@ -377,6 +343,10 @@ namespace shadcnui.GUIComponents.Display
             DrawLine(center, prevPoint, color);
         }
 
+        #endregion
+
+        #region Drawing Primitives
+
         private float GetMaxValue(IEnumerable<ChartSeries> series)
         {
             var values = series.Where(s => s?.Data != null).SelectMany(s => s.Data).Select(d => d.Value);
@@ -424,5 +394,7 @@ namespace shadcnui.GUIComponents.Display
             GUI.DrawTexture(rect, Texture2D.whiteTexture);
             GUI.color = originalColor;
         }
+
+        #endregion
     }
 }

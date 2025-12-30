@@ -1,7 +1,8 @@
 using System;
 using System.Collections.Generic;
-using shadcnui;
-using shadcnui.GUIComponents.Core;
+using shadcnui.GUIComponents.Core.Base;
+using shadcnui.GUIComponents.Core.Styling;
+using shadcnui.GUIComponents.Core.Utils;
 using UnityEngine;
 #if IL2CPP_MELONLOADER_PRE57
 using UnhollowerBaseLib;
@@ -14,13 +15,89 @@ namespace shadcnui.GUIComponents.Display
         public Avatar(GUIHelper helper)
             : base(helper) { }
 
-        public void DrawAvatar(Texture2D image, string fallbackText, ControlSize size = ControlSize.Default, AvatarShape shape = AvatarShape.Circle, params GUILayoutOption[] options)
+        #region Config-based API
+        public void DrawAvatar(AvatarConfig config)
+        {
+            var styleManager = guiHelper.GetStyleManager();
+
+            if (config.BorderColor != Color.clear)
+            {
+                GUIStyle borderedStyle = new UnityHelpers.GUIStyle(GUI.skin.box);
+                borderedStyle.normal.background = styleManager.CreateSolidTexture(config.BorderColor);
+                borderedStyle.alignment = TextAnchor.MiddleCenter;
+                borderedStyle.padding = new UnityHelpers.RectOffset((int)DesignTokens.Spacing.XXS, (int)DesignTokens.Spacing.XXS, (int)DesignTokens.Spacing.XXS, (int)DesignTokens.Spacing.XXS);
+                layoutComponents.BeginVerticalGroup(borderedStyle, config.Options);
+            }
+
+            if (!string.IsNullOrEmpty(config.Name))
+            {
+                if (config.ShowNameBelow)
+                    layoutComponents.BeginVerticalGroup();
+                else
+                    layoutComponents.BeginHorizontalGroup();
+            }
+            else if (config.IsOnline)
+            {
+                layoutComponents.BeginVerticalGroup();
+            }
+
+            if (config.Rect.HasValue)
+            {
+                DrawAvatarRect(config.Rect.Value, config.Image, config.FallbackText, config.Size, config.Shape);
+            }
+            else
+            {
+                DrawAvatarInternal(config.Image, config.FallbackText, config.Size, config.Shape, config.Options);
+            }
+
+            if (config.IsOnline && styleManager != null && !config.Rect.HasValue)
+            {
+                var avatarRect = GUILayoutUtility.GetLastRect();
+                float indicatorSize = styleManager.GetStatusIndicatorSize(config.Size) * guiHelper.uiScale;
+                float x = avatarRect.x + avatarRect.width - indicatorSize * 0.9f;
+                float y = avatarRect.y + avatarRect.height - indicatorSize * 0.9f;
+                Rect dotRect = new Rect(x, y, indicatorSize, indicatorSize);
+                DrawStatusDot(dotRect, true);
+            }
+
+            if (!string.IsNullOrEmpty(config.Name))
+            {
+                if (config.ShowNameBelow)
+                {
+                    layoutComponents.AddSpace(DesignTokens.Spacing.XS);
+                    GUIStyle nameStyle = styleManager?.GetLabelStyle(ControlVariant.Default) ?? GUI.skin.label;
+                    UnityHelpers.Label(config.Name, nameStyle);
+                    layoutComponents.EndVerticalGroup();
+                }
+                else
+                {
+                    layoutComponents.AddSpace(DesignTokens.Spacing.SM);
+                    GUIStyle nameStyle = styleManager?.GetLabelStyle(ControlVariant.Default) ?? GUI.skin.label;
+                    nameStyle.alignment = TextAnchor.MiddleLeft;
+                    UnityHelpers.Label(config.Name, nameStyle);
+                    layoutComponents.EndHorizontalGroup();
+                }
+            }
+            else if (config.IsOnline)
+            {
+                layoutComponents.EndVerticalGroup();
+            }
+
+            if (config.BorderColor != Color.clear)
+            {
+                layoutComponents.EndVerticalGroup();
+            }
+        }
+        #endregion
+
+        #region Internal Drawing
+        private void DrawAvatarInternal(Texture2D image, string fallbackText, ControlSize size, AvatarShape shape, GUILayoutOption[] options)
         {
             var styleManager = guiHelper.GetStyleManager();
             GUIStyle avatarStyle = styleManager.GetAvatarStyle(size, shape);
             GUIStyle fallbackStyle = styleManager.GetAvatarStyle(size, shape);
 
-            GUILayoutOption[] layoutOptions = new List<GUILayoutOption>(options).ToArray();
+            GUILayoutOption[] layoutOptions = options != null ? new List<GUILayoutOption>(options).ToArray() : Array.Empty<GUILayoutOption>();
 
             if (image != null)
             {
@@ -32,7 +109,7 @@ namespace shadcnui.GUIComponents.Display
             }
         }
 
-        public void DrawAvatar(Rect rect, Texture2D image, string fallbackText, ControlSize size = ControlSize.Default, AvatarShape shape = AvatarShape.Circle)
+        private void DrawAvatarRect(Rect rect, Texture2D image, string fallbackText, ControlSize size, AvatarShape shape)
         {
             var styleManager = guiHelper.GetStyleManager();
             GUIStyle avatarStyle = styleManager.GetAvatarStyle(size, shape);
@@ -49,105 +126,97 @@ namespace shadcnui.GUIComponents.Display
             }
         }
 
-        public void AvatarWithStatus(Texture2D image, string fallbackText, bool isOnline, ControlSize size = ControlSize.Default, AvatarShape shape = AvatarShape.Circle, params GUILayoutOption[] options)
-        {
-            var styleManager = guiHelper.GetStyleManager();
-            layoutComponents.BeginVerticalGroup();
-            DrawAvatar(image, fallbackText, size, shape, options);
-            var avatarRect = GUILayoutUtility.GetLastRect();
-            if (isOnline && styleManager != null)
-            {
-                float indicatorSize = styleManager.GetStatusIndicatorSize(size) * guiHelper.uiScale;
-                float x = avatarRect.x + avatarRect.width - indicatorSize * 0.9f;
-                float y = avatarRect.y + avatarRect.height - indicatorSize * 0.9f;
-                Rect dotRect = new Rect(x, y, indicatorSize, indicatorSize);
-                DrawStatusDot(dotRect, true);
-            }
-            layoutComponents.EndVerticalGroup();
-        }
-
-        private void DrawStatusIndicator(bool isOnline, ControlSize size)
-        {
-            var styleManager = guiHelper.GetStyleManager();
-            if (styleManager == null)
-                return;
-
-            Color statusColor = isOnline ? Color.green : Color.gray;
-            float indicatorSize = styleManager.GetStatusIndicatorSize(size);
-
-            GUIStyle statusStyle = new UnityHelpers.GUIStyle(GUI.skin.box);
-            statusStyle.normal.background = styleManager.CreateSolidTexture(statusColor);
-            statusStyle.fixedWidth = indicatorSize * guiHelper.uiScale;
-            statusStyle.fixedHeight = indicatorSize * guiHelper.uiScale;
-            statusStyle.border = new UnityHelpers.RectOffset(0, 0, 0, 0);
-            statusStyle.padding = new UnityHelpers.RectOffset(0, 0, 0, 0);
-            statusStyle.margin = new UnityHelpers.RectOffset(0, 0, 0, 0);
-
-            UnityHelpers.Label(GUIContent.none, statusStyle);
-        }
-
         private void DrawStatusDot(Rect rect, bool isOnline)
         {
             var styleManager = guiHelper.GetStyleManager();
             if (styleManager == null)
                 return;
+
             Color statusColor = isOnline ? Color.green : Color.gray;
+
             GUIStyle statusStyle = new UnityHelpers.GUIStyle(GUI.skin.box);
             statusStyle.normal.background = styleManager.CreateSolidTexture(statusColor);
             GUI.Box(rect, GUIContent.none, statusStyle);
         }
+        #endregion
+
+        #region API
+        public void DrawAvatar(Texture2D image, string fallbackText, ControlSize size = ControlSize.Default, AvatarShape shape = AvatarShape.Circle, params GUILayoutOption[] options)
+        {
+            DrawAvatar(
+                new AvatarConfig
+                {
+                    Image = image,
+                    FallbackText = fallbackText,
+                    Size = size,
+                    Shape = shape,
+                    Options = options,
+                }
+            );
+        }
+
+        public void DrawAvatar(Rect rect, Texture2D image, string fallbackText, ControlSize size = ControlSize.Default, AvatarShape shape = AvatarShape.Circle)
+        {
+            DrawAvatar(
+                new AvatarConfig
+                {
+                    Rect = rect,
+                    Image = image,
+                    FallbackText = fallbackText,
+                    Size = size,
+                    Shape = shape,
+                }
+            );
+        }
+
+        public void AvatarWithStatus(Texture2D image, string fallbackText, bool isOnline, ControlSize size = ControlSize.Default, AvatarShape shape = AvatarShape.Circle, params GUILayoutOption[] options)
+        {
+            DrawAvatar(
+                new AvatarConfig
+                {
+                    Image = image,
+                    FallbackText = fallbackText,
+                    Size = size,
+                    Shape = shape,
+                    IsOnline = isOnline,
+                    Options = options,
+                }
+            );
+        }
 
         public void AvatarWithName(Texture2D image, string fallbackText, string name, ControlSize size = ControlSize.Default, AvatarShape shape = AvatarShape.Circle, bool showNameBelow = false, params GUILayoutOption[] options)
         {
-            if (showNameBelow)
-            {
-                layoutComponents.BeginVerticalGroup();
-                DrawAvatar(image, fallbackText, size, shape, options);
-
-                if (!string.IsNullOrEmpty(name))
+            DrawAvatar(
+                new AvatarConfig
                 {
-                    layoutComponents.AddSpace(4);
-                    var styleManager = guiHelper.GetStyleManager();
-                    GUIStyle nameStyle = styleManager?.GetLabelStyle(ControlVariant.Default) ?? GUI.skin.label;
-
-                    UnityHelpers.Label(name, nameStyle);
+                    Image = image,
+                    FallbackText = fallbackText,
+                    Name = name,
+                    Size = size,
+                    Shape = shape,
+                    ShowNameBelow = showNameBelow,
+                    Options = options,
                 }
-
-                layoutComponents.EndVerticalGroup();
-            }
-            else
-            {
-                layoutComponents.BeginHorizontalGroup();
-                DrawAvatar(image, fallbackText, size, shape, options);
-
-                if (!string.IsNullOrEmpty(name))
-                {
-                    layoutComponents.AddSpace(8);
-                    var styleManager = guiHelper.GetStyleManager();
-                    GUIStyle nameStyle = styleManager?.GetLabelStyle(ControlVariant.Default) ?? GUI.skin.label;
-                    nameStyle.alignment = TextAnchor.MiddleLeft;
-
-                    UnityHelpers.Label(name, nameStyle);
-                }
-
-                layoutComponents.EndHorizontalGroup();
-            }
+            );
         }
 
         public void AvatarWithBorder(Texture2D image, string fallbackText, Color borderColor, ControlSize size = ControlSize.Default, AvatarShape shape = AvatarShape.Circle, params GUILayoutOption[] options)
         {
-            var styleManager = guiHelper.GetStyleManager();
-
-            GUIStyle borderedStyle = new UnityHelpers.GUIStyle(GUI.skin.box);
-            borderedStyle.normal.background = styleManager.CreateSolidTexture(borderColor);
-            borderedStyle.alignment = TextAnchor.MiddleCenter;
-            borderedStyle.padding = new UnityHelpers.RectOffset(2, 2, 2, 2);
-
-            layoutComponents.BeginVerticalGroup(borderedStyle, options);
-            DrawAvatar(image, fallbackText, size, shape, options);
-            layoutComponents.EndVerticalGroup();
+            DrawAvatar(
+                new AvatarConfig
+                {
+                    Image = image,
+                    FallbackText = fallbackText,
+                    BorderColor = borderColor,
+                    Size = size,
+                    Shape = shape,
+                    Options = options,
+                }
+            );
         }
+        #endregion
 
+        #region Data Types
         public struct AvatarData
         {
             public Texture2D Image;
@@ -163,5 +232,6 @@ namespace shadcnui.GUIComponents.Display
                 Name = name;
             }
         }
+        #endregion
     }
 }

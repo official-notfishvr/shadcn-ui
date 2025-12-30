@@ -1,5 +1,6 @@
 ﻿using System.Linq;
-using shadcnui.GUIComponents.Core;
+using shadcnui.GUIComponents.Core.Base;
+using shadcnui.GUIComponents.Core.Styling;
 using shadcnui.GUIComponents.Layout;
 using UnityEngine;
 
@@ -72,8 +73,8 @@ namespace shadcnui_Demo.Menu
 
         void DrawDemoWindow(int windowID)
         {
-            guiHelper.UpdateAnimations(showDemoWindow);
-            if (guiHelper.BeginAnimatedGUI())
+            guiHelper.UpdateGUI(showDemoWindow);
+            if (guiHelper.BeginGUI())
             {
                 currentDemoTab = guiHelper.DrawTabs(
                     demoTabs.Select(tab => tab.Name).ToArray(),
@@ -86,7 +87,7 @@ namespace shadcnui_Demo.Menu
                     position: Tabs.TabPosition.Top
                 );
 
-                guiHelper.EndAnimatedGUI();
+                guiHelper.EndGUI();
             }
             GUI.DragWindow();
         }
