@@ -492,19 +492,20 @@ namespace shadcnui.GUIComponents.Layout
 
         public void SearchableTable(string[] headers, string[,] data, ref string searchQuery, ref string[,] filteredData, ControlVariant variant = ControlVariant.Default, ControlSize size = ControlSize.Default, Action<string> onSearch = null, params GUILayoutOption[] options)
         {
-            SearchableTable(
-                new TableConfig
-                {
-                    Headers = headers,
-                    Data = data,
-                    SearchQuery = searchQuery,
-                    FilteredData = filteredData,
-                    Variant = variant,
-                    Size = size,
-                    OnSearch = onSearch,
-                    Options = options,
-                }
-            );
+            var config = new TableConfig
+            {
+                Headers = headers,
+                Data = data,
+                SearchQuery = searchQuery,
+                FilteredData = filteredData,
+                Variant = variant,
+                Size = size,
+                OnSearch = onSearch,
+                Options = options,
+            };
+            SearchableTable(config);
+            searchQuery = config.SearchQuery;
+            filteredData = config.FilteredData;
         }
 
         #endregion
