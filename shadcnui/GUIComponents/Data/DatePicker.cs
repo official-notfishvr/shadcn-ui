@@ -14,9 +14,9 @@ namespace shadcnui.GUIComponents.Data
     {
         #region State
 
-        private Dictionary<string, bool> _openStates;
-        private Dictionary<string, DateTime> _displayDates;
-        private Dictionary<string, DateTime> _focusedDates;
+        private Dictionary<string, bool> _openStates = new Dictionary<string, bool>();
+        private Dictionary<string, DateTime> _displayDates = new Dictionary<string, DateTime>();
+        private Dictionary<string, DateTime> _focusedDates = new Dictionary<string, DateTime>();
         private bool _weekStartsMonday = true;
         private static readonly string[] WeekdaysMonday = { "Mo", "Tu", "We", "Th", "Fr", "Sa", "Su" };
         private static readonly string[] WeekdaysSunday = { "Su", "Mo", "Tu", "We", "Th", "Fr", "Sa" };
@@ -29,12 +29,7 @@ namespace shadcnui.GUIComponents.Data
         public DatePicker(GUIHelper helper)
             : base(helper) { }
 
-        public override void Initialize()
-        {
-            _openStates = new Dictionary<string, bool>();
-            _displayDates = new Dictionary<string, DateTime>();
-            _focusedDates = new Dictionary<string, DateTime>();
-        }
+        public override void Initialize() { }
 
         public override void Dispose()
         {

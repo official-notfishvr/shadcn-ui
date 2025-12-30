@@ -107,7 +107,7 @@ namespace shadcnui.GUIComponents.Layout
 
         public void DrawTable(Rect rect, string[] headers, string[,] data, ControlVariant variant = ControlVariant.Default, ControlSize size = ControlSize.Default)
         {
-            DrawTable(
+            DrawRectTable(
                 new TableConfig
                 {
                     Rect = rect,
@@ -273,18 +273,21 @@ namespace shadcnui.GUIComponents.Layout
 
         public void SelectableTable(string[] headers, string[,] data, ref bool[] selectedRows, ControlVariant variant = ControlVariant.Default, ControlSize size = ControlSize.Default, Action<int, bool> onSelectionChange = null, params GUILayoutOption[] options)
         {
-            SelectableTable(
-                new TableConfig
-                {
-                    Headers = headers,
-                    Data = data,
-                    SelectedRows = selectedRows,
-                    Variant = variant,
-                    Size = size,
-                    OnSelectionChange = onSelectionChange,
-                    Options = options,
-                }
-            );
+            int rowCount = data.GetLength(0);
+            if (selectedRows == null || selectedRows.Length != rowCount)
+                selectedRows = new bool[rowCount];
+
+            var config = new TableConfig
+            {
+                Headers = headers,
+                Data = data,
+                SelectedRows = selectedRows,
+                Variant = variant,
+                Size = size,
+                OnSelectionChange = onSelectionChange,
+                Options = options,
+            };
+            SelectableTable(config);
         }
 
         #endregion
@@ -361,15 +364,13 @@ namespace shadcnui.GUIComponents.Layout
                 return;
 
             int totalRows = config.Data.GetLength(0);
-            int totalPages = Mathf.CeilToInt((float)totalRows / config.PageSize);
+            int pageSize = config.PageSize > 0 ? config.PageSize : 10;
+            int totalPages = Mathf.Max(1, Mathf.CeilToInt((float)totalRows / pageSize));
 
-            if (config.CurrentPage < 0)
-                config.CurrentPage = 0;
-            if (config.CurrentPage >= totalPages)
-                config.CurrentPage = totalPages - 1;
+            int currentPage = Mathf.Clamp(config.CurrentPage, 0, totalPages - 1);
 
-            int startRow = config.CurrentPage * config.PageSize;
-            int endRow = Mathf.Min(startRow + config.PageSize, totalRows);
+            int startRow = currentPage * pageSize;
+            int endRow = Mathf.Min(startRow + pageSize, totalRows);
 
             int pageRowCount = endRow - startRow;
             string[,] pageData = new string[pageRowCount, config.Data.GetLength(1)];
@@ -394,16 +395,16 @@ namespace shadcnui.GUIComponents.Layout
 
             if (guiHelper.Button("← Previous", ControlVariant.Outline, ControlSize.Default, null, false, 1f, GUILayout.Width(100 * guiHelper.uiScale)))
             {
-                if (config.CurrentPage > 0)
+                if (currentPage > 0)
                 {
-                    config.CurrentPage--;
-                    config.OnPageChange?.Invoke(config.CurrentPage);
+                    currentPage--;
+                    config.OnPageChange?.Invoke(currentPage);
                 }
             }
 
             GUILayout.FlexibleSpace();
 
-            string pageInfo = $"Page {config.CurrentPage + 1} of {totalPages}";
+            string pageInfo = $"Page {currentPage + 1} of {totalPages}";
             var styleManager = guiHelper.GetStyleManager();
             GUIStyle infoStyle = styleManager?.GetLabelStyle(ControlVariant.Muted) ?? GUI.skin.label;
 
@@ -413,31 +414,33 @@ namespace shadcnui.GUIComponents.Layout
 
             if (guiHelper.Button("Next →", ControlVariant.Outline, ControlSize.Default, null, false, 1f, GUILayout.Width(100 * guiHelper.uiScale)))
             {
-                if (config.CurrentPage < totalPages - 1)
+                if (currentPage < totalPages - 1)
                 {
-                    config.CurrentPage++;
-                    config.OnPageChange?.Invoke(config.CurrentPage);
+                    currentPage++;
+                    config.OnPageChange?.Invoke(currentPage);
                 }
             }
 
             layoutComponents.EndHorizontalGroup();
+
+            config.CurrentPage = currentPage;
         }
 
         public void PaginatedTable(string[] headers, string[,] data, ref int currentPage, int pageSize, ControlVariant variant = ControlVariant.Default, ControlSize size = ControlSize.Default, Action<int> onPageChange = null, params GUILayoutOption[] options)
         {
-            PaginatedTable(
-                new TableConfig
-                {
-                    Headers = headers,
-                    Data = data,
-                    CurrentPage = currentPage,
-                    PageSize = pageSize,
-                    Variant = variant,
-                    Size = size,
-                    OnPageChange = onPageChange,
-                    Options = options,
-                }
-            );
+            var config = new TableConfig
+            {
+                Headers = headers,
+                Data = data,
+                CurrentPage = currentPage,
+                PageSize = pageSize,
+                Variant = variant,
+                Size = size,
+                OnPageChange = onPageChange,
+                Options = options,
+            };
+            PaginatedTable(config);
+            currentPage = config.CurrentPage;
         }
 
         #endregion
@@ -567,17 +570,23 @@ namespace shadcnui.GUIComponents.Layout
 
         public void ResizableTable(string[] headers, string[,] data, ref float[] columnWidths, ControlVariant variant = ControlVariant.Default, ControlSize size = ControlSize.Default, params GUILayoutOption[] options)
         {
-            ResizableTable(
-                new TableConfig
-                {
-                    Headers = headers,
-                    Data = data,
-                    ColumnWidths = columnWidths,
-                    Variant = variant,
-                    Size = size,
-                    Options = options,
-                }
-            );
+            if (columnWidths == null || columnWidths.Length != headers.Length)
+            {
+                columnWidths = new float[headers.Length];
+                for (int i = 0; i < columnWidths.Length; i++)
+                    columnWidths[i] = 100f;
+            }
+
+            var config = new TableConfig
+            {
+                Headers = headers,
+                Data = data,
+                ColumnWidths = columnWidths,
+                Variant = variant,
+                Size = size,
+                Options = options,
+            };
+            ResizableTable(config);
         }
 
         #endregion

@@ -13,6 +13,7 @@ namespace shadcnui.GUIComponents.Controls
         private readonly Stack<List<DropdownMenuItem>> _menuStack = new Stack<List<DropdownMenuItem>>();
         private string _menuId;
         private const float AnimationDuration = DesignTokens.Animation.DurationFast;
+        private Rect _cachedDropdownRect;
 
         public DropdownMenu(GUIHelper helper)
             : base(helper) { }
@@ -79,10 +80,11 @@ namespace shadcnui.GUIComponents.Controls
             if (alpha < 1f)
                 GUI.color = new Color(prevColor.r, prevColor.g, prevColor.b, prevColor.a * alpha);
 
-            if (scale < 1f || slideOffset != Vector2.zero)
+            bool needsTransform = scale < 1f || slideOffset != Vector2.zero;
+            if (needsTransform)
             {
-                GUIUtility.ScaleAroundPivot(new Vector3(scale, scale, 1f), Vector2.zero);
-                GUI.matrix = Matrix4x4.Translate(new Vector3(slideOffset.x, slideOffset.y, 0f)) * GUI.matrix;
+                Vector2 pivot = _cachedDropdownRect.center;
+                GUI.matrix = Matrix4x4.Translate(new Vector3(pivot.x, pivot.y, 0f)) * Matrix4x4.Scale(new Vector3(scale, scale, 1f)) * Matrix4x4.Translate(new Vector3(-pivot.x + slideOffset.x, -pivot.y + slideOffset.y, 0f)) * prevMatrix;
             }
 
             layoutComponents.BeginVerticalGroup(contentStyle, layoutOptions.ToArray());
@@ -107,6 +109,9 @@ namespace shadcnui.GUIComponents.Controls
                 GUILayout.ExpandHeight(true)
             );
             layoutComponents.EndVerticalGroup();
+
+            if (Event.current.type == EventType.Repaint)
+                _cachedDropdownRect = GUILayoutUtility.GetLastRect();
 
             GUI.matrix = prevMatrix;
             GUI.color = prevColor;

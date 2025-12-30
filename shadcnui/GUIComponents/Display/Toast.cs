@@ -292,7 +292,15 @@ namespace shadcnui.GUIComponents.Display
             {
                 if (!GlobalEnablePauseOnHover)
                     return;
-                Vector2 mousePos = Event.current != null ? Event.current.mousePosition : Input.mousePosition;
+                Vector2 mousePos;
+                if (Event.current != null)
+                {
+                    mousePos = Event.current.mousePosition;
+                }
+                else
+                {
+                    mousePos = new Vector2(Input.mousePosition.x, Screen.height - Input.mousePosition.y);
+                }
                 string newHoveredId = GetToastAtPosition(mousePos);
                 if (newHoveredId != _hoveredToastId)
                 {

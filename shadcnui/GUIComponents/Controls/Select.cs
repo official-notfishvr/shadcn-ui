@@ -14,6 +14,7 @@ namespace shadcnui.GUIComponents.Controls
         private Vector2 scrollPosition;
         private string _selectId;
         private const float AnimationDuration = DesignTokens.Animation.DurationFast;
+        private Rect _cachedSelectRect;
 
         public Select(GUIHelper helper)
             : base(helper) { }
@@ -62,10 +63,11 @@ namespace shadcnui.GUIComponents.Controls
             if (alpha < 1f)
                 GUI.color = new Color(prevColor.r, prevColor.g, prevColor.b, prevColor.a * alpha);
 
-            if (scale < 1f || slideOffset != Vector2.zero)
+            bool needsTransform = scale < 1f || slideOffset != Vector2.zero;
+            if (needsTransform)
             {
-                GUIUtility.ScaleAroundPivot(new Vector3(scale, scale, 1f), Vector2.zero);
-                GUI.matrix = Matrix4x4.Translate(new Vector3(slideOffset.x, slideOffset.y, 0f)) * GUI.matrix;
+                Vector2 pivot = _cachedSelectRect.center;
+                GUI.matrix = Matrix4x4.Translate(new Vector3(pivot.x, pivot.y, 0f)) * Matrix4x4.Scale(new Vector3(scale, scale, 1f)) * Matrix4x4.Translate(new Vector3(-pivot.x + slideOffset.x, -pivot.y + slideOffset.y, 0f)) * prevMatrix;
             }
 
             layoutComponents.BeginVerticalGroup(selectStyle, GUILayout.MaxWidth(300), GUILayout.MaxHeight(200));
@@ -88,6 +90,9 @@ namespace shadcnui.GUIComponents.Controls
                 GUILayout.MaxHeight(200)
             );
             GUILayout.EndVertical();
+
+            if (Event.current.type == EventType.Repaint)
+                _cachedSelectRect = GUILayoutUtility.GetLastRect();
 
             GUI.matrix = prevMatrix;
             GUI.color = prevColor;

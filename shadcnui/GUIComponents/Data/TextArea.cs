@@ -27,11 +27,11 @@ namespace shadcnui.GUIComponents.Data
             string result;
             if (config.Rect.HasValue)
             {
-                result = DrawTextAreaRect(config.Rect.Value, config.Text, config.Variant, config.Placeholder, config.Disabled, config.MaxLength);
+                result = DrawTextAreaRect(config.Rect.Value, config.Text, config.Variant, config.Placeholder, config.Disabled, config.MaxLength, config.Id);
             }
             else
             {
-                result = DrawTextAreaLayout(config.Text, config.Variant, config.Placeholder, config.Disabled, config.MinHeight, config.MaxLength, config.Options);
+                result = DrawTextAreaLayout(config.Text, config.Variant, config.Placeholder, config.Disabled, config.MinHeight, config.MaxLength, config.Options, config.Id);
             }
 
             if (config.ShowCharCount)
@@ -51,10 +51,11 @@ namespace shadcnui.GUIComponents.Data
         #endregion
 
         #region Internal Drawing
-        private string DrawTextAreaLayout(string text, ControlVariant variant, string placeholder, bool disabled, float minHeight, int maxLength, GUILayoutOption[] options)
+        private string DrawTextAreaLayout(string text, ControlVariant variant, string placeholder, bool disabled, float minHeight, int maxLength, GUILayoutOption[] options, string id)
         {
             var styleManager = guiHelper.GetStyleManager();
-            bool focused = GUI.GetNameOfFocusedControl() == "textarea_" + text?.GetHashCode();
+            string controlName = "textarea_" + id;
+            bool focused = GUI.GetNameOfFocusedControl() == controlName;
             GUIStyle textAreaStyle = styleManager.GetTextAreaStyle(variant, ControlSize.Default, focused);
             float scaledMinHeight = minHeight * guiHelper.uiScale;
 
@@ -69,7 +70,7 @@ namespace shadcnui.GUIComponents.Data
             if (disabled)
                 GUI.enabled = false;
 
-            GUI.SetNextControlName("textarea_" + text?.GetHashCode());
+            GUI.SetNextControlName(controlName);
             string result = UnityHelpers.TextArea(text ?? (string.IsNullOrEmpty(placeholder) ? "" : placeholder), textAreaStyle, layoutOptions.ToArray());
 
             GUI.enabled = wasEnabled;
@@ -80,10 +81,11 @@ namespace shadcnui.GUIComponents.Data
             return disabled ? text : result;
         }
 
-        private string DrawTextAreaRect(Rect rect, string text, ControlVariant variant, string placeholder, bool disabled, int maxLength)
+        private string DrawTextAreaRect(Rect rect, string text, ControlVariant variant, string placeholder, bool disabled, int maxLength, string id)
         {
             var styleManager = guiHelper.GetStyleManager();
-            bool focused = GUI.GetNameOfFocusedControl() == "textarea_rect_" + text?.GetHashCode();
+            string controlName = "textarea_rect_" + id;
+            bool focused = GUI.GetNameOfFocusedControl() == controlName;
             GUIStyle textAreaStyle = styleManager.GetTextAreaStyle(variant, ControlSize.Default, focused);
             Rect scaledRect = new Rect(rect.x * guiHelper.uiScale, rect.y * guiHelper.uiScale, rect.width * guiHelper.uiScale, rect.height * guiHelper.uiScale);
 
@@ -91,7 +93,7 @@ namespace shadcnui.GUIComponents.Data
             if (disabled)
                 GUI.enabled = false;
 
-            GUI.SetNextControlName("textarea_rect_" + text?.GetHashCode());
+            GUI.SetNextControlName(controlName);
             string result = GUI.TextArea(scaledRect, text ?? (string.IsNullOrEmpty(placeholder) ? "" : placeholder), textAreaStyle);
 
             GUI.enabled = wasEnabled;

@@ -57,6 +57,7 @@ namespace shadcnui.GUIComponents.Data
 
         public void DrawCalendar(CalendarConfig config = null)
         {
+            EnsureInitialized();
             var styleManager = guiHelper.GetStyleManager();
             config = config ?? new CalendarConfig();
 

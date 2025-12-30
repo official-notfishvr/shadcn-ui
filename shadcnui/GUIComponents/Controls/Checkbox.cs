@@ -36,7 +36,7 @@ namespace shadcnui.GUIComponents.Controls
             {
                 GUILayout.BeginHorizontal();
                 RenderIcon(config.Icon);
-                layoutComponents.AddSpace(config.Icon.Spacing * guiHelper.uiScale);
+                layoutComponents.AddSpace(config.Icon.Spacing);
                 newValue = UnityHelpers.Toggle(config.Value, config.Text ?? "Checkbox", checkboxStyle);
                 GUILayout.EndHorizontal();
             }

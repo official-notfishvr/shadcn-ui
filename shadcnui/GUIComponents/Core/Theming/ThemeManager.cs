@@ -53,14 +53,16 @@ namespace shadcnui.GUIComponents.Core.Theming
 
         public void SetTheme(string themeName)
         {
+            Action handler = null;
             lock (_themeLock)
             {
                 if (Themes.TryGetValue(themeName, out var theme))
                 {
                     CurrentTheme = theme;
-                    OnThemeChanged?.Invoke();
+                    handler = OnThemeChanged;
                 }
             }
+            handler?.Invoke();
         }
     }
 }

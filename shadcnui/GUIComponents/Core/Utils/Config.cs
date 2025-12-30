@@ -457,6 +457,7 @@ namespace shadcnui.GUIComponents.Core.Utils
 
     public class TextAreaConfig
     {
+        public string Id { get; set; }
         public string Text { get; set; }
         public string Placeholder { get; set; }
         public string Label { get; set; }
@@ -469,8 +470,11 @@ namespace shadcnui.GUIComponents.Core.Utils
         public Rect? Rect { get; set; }
         public GUILayoutOption[] Options { get; set; }
 
+        private static int _idCounter = 0;
+
         public TextAreaConfig()
         {
+            Id = "textarea_" + System.Threading.Interlocked.Increment(ref _idCounter);
             Variant = ControlVariant.Default;
             MinHeight = 60f;
             MaxHeight = 300f;

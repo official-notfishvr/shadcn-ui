@@ -170,10 +170,10 @@ namespace shadcnui.GUIComponents.Core.Utils
                 return;
             try
             {
-                RotateLogFilesIfNeeded();
                 string batch = string.Join(Environment.NewLine, _logBuffer);
-                _logBuffer.Clear();
+                RotateLogFilesIfNeeded();
                 File.AppendAllText(_logFilePath, batch + Environment.NewLine);
+                _logBuffer.Clear();
             }
             catch (Exception ex)
             {

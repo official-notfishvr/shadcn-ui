@@ -65,14 +65,16 @@ namespace shadcnui.GUIComponents.Display
                 if (config.ShowNameBelow)
                 {
                     layoutComponents.AddSpace(DesignTokens.Spacing.XS);
-                    GUIStyle nameStyle = styleManager?.GetLabelStyle(ControlVariant.Default) ?? GUI.skin.label;
+                    GUIStyle baseStyle = styleManager?.GetLabelStyle(ControlVariant.Default) ?? GUI.skin.label;
+                    GUIStyle nameStyle = new UnityHelpers.GUIStyle(baseStyle);
                     UnityHelpers.Label(config.Name, nameStyle);
                     layoutComponents.EndVerticalGroup();
                 }
                 else
                 {
                     layoutComponents.AddSpace(DesignTokens.Spacing.SM);
-                    GUIStyle nameStyle = styleManager?.GetLabelStyle(ControlVariant.Default) ?? GUI.skin.label;
+                    GUIStyle baseStyle = styleManager?.GetLabelStyle(ControlVariant.Default) ?? GUI.skin.label;
+                    GUIStyle nameStyle = new UnityHelpers.GUIStyle(baseStyle);
                     nameStyle.alignment = TextAnchor.MiddleLeft;
                     UnityHelpers.Label(config.Name, nameStyle);
                     layoutComponents.EndHorizontalGroup();

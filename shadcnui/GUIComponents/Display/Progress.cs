@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using shadcnui.GUIComponents.Core.Base;
 using shadcnui.GUIComponents.Core.Styling;
+using shadcnui.GUIComponents.Core.Theming;
 using shadcnui.GUIComponents.Core.Utils;
 using UnityEngine;
 #if IL2CPP_MELONLOADER_PRE57
@@ -22,6 +23,12 @@ namespace shadcnui.GUIComponents.Display
             float targetValue = Mathf.Clamp01(config.Value);
             float displayValue = targetValue;
 
+            if (config.Size > 0)
+            {
+                DrawCircularProgressInternal(displayValue, config.Size, config.Options);
+                return;
+            }
+
             if (!string.IsNullOrEmpty(config.Label))
             {
                 layoutComponents.BeginHorizontalGroup();
@@ -39,6 +46,75 @@ namespace shadcnui.GUIComponents.Display
                 DrawProgressRect(config.Rect.Value, displayValue);
             else
                 DrawProgressLayout(displayValue, config.Width, config.Height, config.Options);
+        }
+
+        private void DrawCircularProgressInternal(float value, float size, GUILayoutOption[] options)
+        {
+            var styleManager = guiHelper.GetStyleManager();
+            float scaledSize = size * guiHelper.uiScale;
+            var layoutOptions = new List<GUILayoutOption> { GUILayout.Width(scaledSize), GUILayout.Height(scaledSize) };
+            if (options != null && options.Length > 0)
+                layoutOptions.AddRange(options);
+
+#if IL2CPP_MELONLOADER_PRE57
+            Rect circleRect = GUILayoutUtility.GetRect(scaledSize, scaledSize, (Il2CppReferenceArray<GUILayoutOption>)layoutOptions.ToArray());
+#else
+            Rect circleRect = GUILayoutUtility.GetRect(scaledSize, scaledSize, layoutOptions.ToArray());
+#endif
+
+            float thickness = Mathf.Max(2f, scaledSize * 0.1f);
+            float radius = (scaledSize - thickness) * 0.5f;
+            Vector2 center = new Vector2(circleRect.x + scaledSize * 0.5f, circleRect.y + scaledSize * 0.5f);
+
+            Color bgColor = ThemeManager.Instance.CurrentTheme.Secondary;
+            Color fgColor = ThemeManager.Instance.CurrentTheme.Accent;
+
+            int segments = 36;
+            float angleStep = 360f / segments;
+
+            for (int i = 0; i < segments; i++)
+            {
+                float startAngle = i * angleStep - 90f;
+                float endAngle = startAngle + angleStep;
+                float progress = (float)i / segments;
+                Color segmentColor = progress < value ? fgColor : bgColor;
+                DrawArcSegment(center, radius, startAngle, endAngle, thickness, segmentColor);
+            }
+
+            string percentText = (value * 100f).ToString("F0") + "%";
+            GUIStyle centeredStyle = new UnityHelpers.GUIStyle(styleManager.GetLabelStyle(ControlVariant.Default));
+            centeredStyle.alignment = TextAnchor.MiddleCenter;
+            centeredStyle.fontSize = Mathf.RoundToInt(scaledSize * 0.2f);
+            GUI.Label(circleRect, percentText, centeredStyle);
+        }
+
+        private void DrawArcSegment(Vector2 center, float radius, float startAngle, float endAngle, float thickness, Color color)
+        {
+            float startRad = startAngle * Mathf.Deg2Rad;
+            float endRad = endAngle * Mathf.Deg2Rad;
+
+            Vector2 start = center + new Vector2(Mathf.Cos(startRad), Mathf.Sin(startRad)) * radius;
+            Vector2 end = center + new Vector2(Mathf.Cos(endRad), Mathf.Sin(endRad)) * radius;
+
+            DrawLine(start, end, thickness, color);
+        }
+
+        private void DrawLine(Vector2 start, Vector2 end, float thickness, Color color)
+        {
+            var styleManager = guiHelper.GetStyleManager();
+            Texture2D tex = styleManager.CreateSolidTexture(color);
+
+            Vector2 delta = end - start;
+            float length = delta.magnitude;
+            if (length < 0.001f)
+                return;
+
+            float angle = Mathf.Atan2(delta.y, delta.x) * Mathf.Rad2Deg;
+
+            Matrix4x4 prevMatrix = GUI.matrix;
+            GUIUtility.RotateAroundPivot(angle, start);
+            GUI.DrawTexture(new Rect(start.x, start.y - thickness * 0.5f, length, thickness), tex);
+            GUI.matrix = prevMatrix;
         }
 
         private void DrawProgressInternal(ProgressConfig config, string animId)

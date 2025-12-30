@@ -6,6 +6,7 @@ namespace shadcnui.GUIComponents.Core.Base
     public interface IComponent : IDisposable
     {
         void Initialize();
+        void EnsureInitialized();
     }
 
     public abstract class BaseComponent : IComponent
@@ -14,19 +15,26 @@ namespace shadcnui.GUIComponents.Core.Base
         protected StyleManager styleManager;
         protected Layout.Layout layoutComponents;
         protected bool isDisposed = false;
+        private bool _initialized = false;
 
         public BaseComponent(GUIHelper helper)
         {
             guiHelper = helper;
             styleManager = helper.GetStyleManager();
             layoutComponents = new Layout.Layout(helper);
-            Initialize();
         }
 
-        // not fully used yet
+        public void EnsureInitialized()
+        {
+            if (!_initialized)
+            {
+                _initialized = true;
+                Initialize();
+            }
+        }
+
         public virtual void Initialize() { }
 
-        // not fully used yet
         public virtual void Dispose()
         {
             if (!isDisposed)
