@@ -35,6 +35,7 @@ namespace shadcnui.GUIComponents.Display
         public float Padding { get; set; }
         public float MaxWidth { get; set; }
         public float MinWidth { get; set; }
+        public float MinHeight { get; set; }
         public bool IsDismissing { get; set; }
         public bool IsPaused { get; set; }
         public bool EnablePauseOnHover { get; set; }
@@ -66,6 +67,7 @@ namespace shadcnui.GUIComponents.Display
             Padding = config.Padding;
             MaxWidth = config.MaxWidth;
             MinWidth = config.MinWidth;
+            MinHeight = config.MinHeight;
             IsDismissing = false;
             IsPaused = false;
             EnablePauseOnHover = config.EnablePauseOnHover;
@@ -238,6 +240,11 @@ namespace shadcnui.GUIComponents.Display
                 _activeToasts.Clear();
                 _toastCreationTimes.Clear();
                 _toastQueue.Clear();
+                foreach (var texture in _cachedTextures.Values)
+                {
+                    if (texture != null)
+                        UnityEngine.Object.Destroy(texture);
+                }
                 _cachedTextures.Clear();
             }
             catch (Exception ex)
@@ -367,26 +374,31 @@ namespace shadcnui.GUIComponents.Display
             float scaledWidth = firstToast.Width * guiHelper.uiScale;
             float scaledMargin = firstToast.Margin * guiHelper.uiScale;
             float scaledSpacing = firstToast.Spacing * guiHelper.uiScale;
-            float toastHeight = 90f * guiHelper.uiScale;
             for (int i = 0; i < _activeToasts.Count; i++)
             {
+                float toastHeight = _activeToasts[i].MinHeight * guiHelper.uiScale;
                 _activeToasts[i].Width = scaledWidth;
                 _activeToasts[i].Height = toastHeight;
             }
+            float baseToastHeight = firstToast.MinHeight * guiHelper.uiScale;
             float baseX = 0,
                 baseY = 0;
-            GetBasePosition(out baseX, out baseY, scaledWidth, scaledMargin, toastHeight, firstToast.Position, firstToast.StackDirection);
+            GetBasePosition(out baseX, out baseY, scaledWidth, scaledMargin, baseToastHeight, firstToast.Position, firstToast.StackDirection);
+            float cumulativeOffset = 0f;
             for (int i = 0; i < _activeToasts.Count; i++)
             {
+                float toastHeight = _activeToasts[i].Height;
                 switch (firstToast.StackDirection)
                 {
                     case ToastStackDirection.Up:
                         _activeToasts[i].X = baseX;
-                        _activeToasts[i].Y = baseY - (i * (toastHeight + scaledSpacing));
+                        _activeToasts[i].Y = baseY - cumulativeOffset;
+                        cumulativeOffset += toastHeight + scaledSpacing;
                         break;
                     case ToastStackDirection.Down:
                         _activeToasts[i].X = baseX;
-                        _activeToasts[i].Y = baseY + (i * (toastHeight + scaledSpacing));
+                        _activeToasts[i].Y = baseY + cumulativeOffset;
+                        cumulativeOffset += toastHeight + scaledSpacing;
                         break;
                     case ToastStackDirection.Left:
                         _activeToasts[i].X = baseX - (i * (scaledWidth + scaledSpacing));

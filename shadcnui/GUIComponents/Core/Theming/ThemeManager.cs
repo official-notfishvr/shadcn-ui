@@ -27,7 +27,23 @@ namespace shadcnui.GUIComponents.Core.Theming
             AddTheme(Theme.Olive);
             AddTheme(Theme.Cyan);
             AddTheme(Theme.BlueDark);
-            CurrentTheme = Themes["Dark"];
+
+            if (Themes.TryGetValue("Dark", out var darkTheme))
+            {
+                CurrentTheme = darkTheme;
+            }
+            else if (Themes.Count > 0)
+            {
+                foreach (var theme in Themes.Values)
+                {
+                    CurrentTheme = theme;
+                    break;
+                }
+            }
+            else
+            {
+                throw new InvalidOperationException("ThemeManager initialization failed: no valid themes available.");
+            }
         }
 
         public void AddTheme(Theme theme)
@@ -43,10 +59,12 @@ namespace shadcnui.GUIComponents.Core.Theming
 
         public bool RemoveTheme(string themeName)
         {
-            if (string.IsNullOrEmpty(themeName) || themeName == CurrentTheme?.Name)
+            if (string.IsNullOrEmpty(themeName))
                 return false;
             lock (_themeLock)
             {
+                if (themeName == CurrentTheme?.Name)
+                    return false;
                 return Themes.Remove(themeName);
             }
         }
