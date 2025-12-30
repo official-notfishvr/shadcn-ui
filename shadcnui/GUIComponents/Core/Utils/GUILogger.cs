@@ -5,22 +5,27 @@ using UnityEngine;
 using MelonLoader;
 #endif
 
-namespace shadcnui.GUIComponents.Core
+namespace shadcnui.GUIComponents.Core.Utils
 {
     public static class GUILogger
     {
         public enum LogLevel
         {
+            Trace,
             Debug,
             Info,
             Warning,
             Error,
         }
 
-        private static LogLevel _minLogLevel = LogLevel.Warning;
+        private static LogLevel _minLogLevel = LogLevel.Trace;
         private static string _logFilePath;
         private static bool _fileLoggingEnabled = false;
         private static readonly object _fileLock = new object();
+        private static int _maxLogFileSizeBytes = 5 * 1024 * 1024;
+        private static int _maxLogFileCount = 5;
+        private static System.Collections.Generic.Queue<string> _logBuffer = new System.Collections.Generic.Queue<string>();
+        private static int _bufferFlushThreshold = 10;
 
         public static void SetLogLevel(LogLevel level)
         {
@@ -48,6 +53,11 @@ namespace shadcnui.GUIComponents.Core
         public static void DisableFileLogging()
         {
             _fileLoggingEnabled = false;
+        }
+
+        public static void LogTrace(string message, string component = "GUIHelper")
+        {
+            Log(LogLevel.Trace, message, component);
         }
 
         public static void LogDebug(string message, string component = "GUIHelper")
@@ -89,9 +99,10 @@ namespace shadcnui.GUIComponents.Core
             string levelStr = level.ToString().ToUpper();
             string formattedMessage = $"[{timestamp}] [{levelStr}] [{component}] {message}";
 
-#if IL2CPP_MELONLOADER
+#if IL2CPP_MELONLOADER || IL2CPP_MELONLOADER_PRE157
             switch (level)
             {
+                case LogLevel.Trace:
                 case LogLevel.Debug:
                 case LogLevel.Info:
                     MelonLogger.Msg(formattedMessage);
@@ -106,6 +117,7 @@ namespace shadcnui.GUIComponents.Core
 #else
             switch (level)
             {
+                case LogLevel.Trace:
                 case LogLevel.Debug:
                 case LogLevel.Info:
                     Debug.Log(formattedMessage);
@@ -131,13 +143,66 @@ namespace shadcnui.GUIComponents.Core
             {
                 try
                 {
-                    File.AppendAllText(_logFilePath, message + Environment.NewLine);
+                    _logBuffer.Enqueue(message);
+                    if (_logBuffer.Count >= _bufferFlushThreshold)
+                    {
+                        FlushLogBufferInternal();
+                    }
                 }
                 catch (Exception ex)
                 {
                     Debug.LogError($"Failed to write to log file: {ex.Message}");
                 }
             }
+        }
+
+        public static void FlushLogBuffer()
+        {
+            lock (_fileLock)
+            {
+                FlushLogBufferInternal();
+            }
+        }
+
+        private static void FlushLogBufferInternal()
+        {
+            if (_logBuffer.Count == 0)
+                return;
+            try
+            {
+                string batch = string.Join(Environment.NewLine, _logBuffer);
+                RotateLogFilesIfNeeded();
+                File.AppendAllText(_logFilePath, batch + Environment.NewLine);
+                _logBuffer.Clear();
+            }
+            catch (Exception ex)
+            {
+                Debug.LogError($"Failed to flush log buffer: {ex.Message}");
+            }
+        }
+
+        private static void RotateLogFilesIfNeeded()
+        {
+            if (!_fileLoggingEnabled || string.IsNullOrEmpty(_logFilePath))
+                return;
+
+            FileInfo logFile = new FileInfo(_logFilePath);
+            if (!logFile.Exists || logFile.Length < _maxLogFileSizeBytes)
+                return;
+
+            for (int i = _maxLogFileCount - 1; i >= 1; i--)
+            {
+                string oldPath = _logFilePath + "." + i;
+                string newPath = _logFilePath + "." + (i + 1);
+                if (File.Exists(oldPath))
+                {
+                    if (i == _maxLogFileCount - 1)
+                        File.Delete(oldPath);
+                    else
+                        File.Move(oldPath, newPath);
+                }
+            }
+            File.Move(_logFilePath, _logFilePath + ".1");
         }
     }
 }

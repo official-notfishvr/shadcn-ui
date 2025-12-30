@@ -508,19 +508,23 @@
         <Compile Include="GUIComponents\Controls\DropdownMenu.cs" />
         <Compile Include="GUIComponents\Controls\Input.cs" />
         <Compile Include="GUIComponents\Controls\Select.cs" />
+        <Compile Include="GUIComponents\Controls\Slider.cs" />
         <Compile Include="GUIComponents\Controls\Switch.cs" />
         <Compile Include="GUIComponents\Controls\Toggle.cs" />
-        <Compile Include="GUIComponents\Core\AnimationManager.cs" />
-        <Compile Include="GUIComponents\Core\BaseComponent.cs" />
-        <Compile Include="GUIComponents\Core\GUIHelper.cs" />
-        <Compile Include="GUIComponents\Core\GUILogger.cs" />
-        <Compile Include="GUIComponents\Core\StyleManager.cs" />
-        <Compile Include="GUIComponents\Core\StyleManager.Getters.cs" />
-        <Compile Include="GUIComponents\Core\StyleManager.Registration.cs" />
-        <Compile Include="GUIComponents\Core\StyleManager.Setup.cs" />
-        <Compile Include="GUIComponents\Core\StyleRegistry.cs" />
-        <Compile Include="GUIComponents\Core\Theme.cs" />
-        <Compile Include="GUIComponents\Core\ThemeManager.cs" />
+        <Compile Include="GUIComponents\Core\Base\BaseComponent.cs" />
+        <Compile Include="GUIComponents\Core\Base\GUIHelper.cs" />
+        <Compile Include="GUIComponents\Core\Utils\AnimationManager.cs" />
+        <Compile Include="GUIComponents\Core\Utils\Config.cs" />
+        <Compile Include="GUIComponents\Core\Utils\GUILogger.cs" />
+        <Compile Include="GUIComponents\Core\Utils\UnityHelpers.cs" />
+        <Compile Include="GUIComponents\Core\Styling\DesignTokens.cs" />
+        <Compile Include="GUIComponents\Core\Styling\StyleManager.cs" />
+        <Compile Include="GUIComponents\Core\Styling\StyleManager.Getters.cs" />
+        <Compile Include="GUIComponents\Core\Styling\StyleManager.Registration.cs" />
+        <Compile Include="GUIComponents\Core\Styling\StyleManager.Setup.cs" />
+        <Compile Include="GUIComponents\Core\Styling\StyleRegistry.cs" />
+        <Compile Include="GUIComponents\Core\Theming\Theme.cs" />
+        <Compile Include="GUIComponents\Core\Theming\ThemeManager.cs" />
         <Compile Include="GUIComponents\Data\Calendar.cs" />
         <Compile Include="GUIComponents\Data\DataTable.cs" />
         <Compile Include="GUIComponents\Data\TextArea.cs" />
@@ -532,6 +536,7 @@
         <Compile Include="GUIComponents\Display\Label.cs" />
         <Compile Include="GUIComponents\Display\Popover.cs" />
         <Compile Include="GUIComponents\Display\Progress.cs" />
+        <Compile Include="GUIComponents\Display\Toast.cs" />
         <Compile Include="GUIComponents\Layout\Card.cs" />
         <Compile Include="GUIComponents\Layout\Layout.cs" />
         <Compile Include="GUIComponents\Layout\MenuBar.cs" />
@@ -539,7 +544,6 @@
         <Compile Include="GUIComponents\Layout\Table.cs" />
         <Compile Include="GUIComponents\Layout\Tabs.cs" />
         <Compile Include="Properties\AssemblyInfo.cs" />
-        <Compile Include="UnityHelpers.cs" />
     </ItemGroup>
     <ItemGroup />
     <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

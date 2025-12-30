@@ -1,7 +1,5 @@
 using System;
-using System.IO;
 using System.Reflection;
-using shadcnui;
 using shadcnui_Demo.Menu;
 using UnityEngine;
 #if IL2CPP_BEPINEX

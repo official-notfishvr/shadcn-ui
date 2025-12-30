@@ -1,8 +1,8 @@
 using System;
 using System.Collections.Generic;
-using System.Threading.Tasks;
-using shadcnui;
-using shadcnui.GUIComponents.Core;
+using shadcnui.GUIComponents.Core.Base;
+using shadcnui.GUIComponents.Core.Styling;
+using shadcnui.GUIComponents.Core.Utils;
 using UnityEngine;
 #if IL2CPP_MELONLOADER_PRE57
 using UnhollowerBaseLib;
@@ -15,41 +15,45 @@ namespace shadcnui.GUIComponents.Layout
         public Table(GUIHelper helper)
             : base(helper) { }
 
-        public void DrawTable(string[] headers, string[,] data, ControlVariant variant = ControlVariant.Default, ControlSize size = ControlSize.Default, params GUILayoutOption[] options)
+        #region Config-based API
+
+        public void DrawTable(TableConfig config)
         {
-            if (headers == null || data == null)
+            if (config.Headers == null || config.Data == null)
                 return;
 
             var styleManager = guiHelper.GetStyleManager();
             if (styleManager == null)
             {
-                DrawSimpleTable(headers, data);
+                DrawSimpleTable(config.Headers, config.Data);
                 return;
             }
 
-            GUIStyle tableStyle = styleManager.GetTableStyle(variant, size);
-            GUIStyle headerStyle = styleManager.GetTableHeaderStyle(variant, size);
-            GUIStyle cellStyle = styleManager.GetTableCellStyle(variant, size);
+            GUIStyle tableStyle = styleManager.GetTableStyle(config.Variant, config.Size);
+            GUIStyle headerStyle = styleManager.GetTableHeaderStyle(config.Variant, config.Size);
+            GUIStyle cellStyle = styleManager.GetTableCellStyle(config.Variant, config.Size);
 
-            layoutComponents.BeginVerticalGroup(tableStyle, options);
+            layoutComponents.BeginVerticalGroup(tableStyle, config.Options);
 
             layoutComponents.BeginHorizontalGroup();
-            for (int i = 0; i < headers.Length; i++)
+            for (int i = 0; i < config.Headers.Length; i++)
             {
-                UnityHelpers.Label(headers[i], headerStyle);
+                UnityHelpers.Label(config.Headers[i], headerStyle);
             }
             layoutComponents.EndHorizontalGroup();
 
-            int rowCount = data.GetLength(0);
-            int colCount = data.GetLength(1);
+            int rowCount = config.Data.GetLength(0);
+            int colCount = config.Data.GetLength(1);
+
+            GUIStyle rowStyle = styleManager.GetTableRowStyle(config.Variant, config.Size);
 
             for (int row = 0; row < rowCount; row++)
             {
-                layoutComponents.BeginHorizontalGroup();
+                layoutComponents.BeginHorizontalGroup(rowStyle);
 
                 for (int col = 0; col < colCount; col++)
                 {
-                    string cellValue = data[row, col] ?? "";
+                    string cellValue = config.Data[row, col] ?? "";
                     UnityHelpers.Label(cellValue, cellStyle);
                 }
 
@@ -59,88 +63,205 @@ namespace shadcnui.GUIComponents.Layout
             layoutComponents.EndVerticalGroup();
         }
 
-        public void DrawTable(Rect rect, string[] headers, string[,] data, ControlVariant variant = ControlVariant.Default, ControlSize size = ControlSize.Default)
+        public void DrawRectTable(TableConfig config)
         {
-            if (headers == null || data == null)
+            if (config.Headers == null || config.Data == null || !config.Rect.HasValue)
                 return;
 
             var styleManager = guiHelper.GetStyleManager();
             if (styleManager == null)
             {
-                GUI.Box(rect, "Table", GUI.skin.box);
+                GUI.Box(config.Rect.Value, "Table", GUI.skin.box);
                 return;
             }
 
-            GUIStyle tableStyle = styleManager.GetTableStyle(variant, size);
+            GUIStyle tableStyle = styleManager.GetTableStyle(config.Variant, config.Size);
 
-            Rect scaledRect = new Rect(rect.x * guiHelper.uiScale, rect.y * guiHelper.uiScale, rect.width * guiHelper.uiScale, rect.height * guiHelper.uiScale);
+            Rect r = config.Rect.Value;
+            Rect scaledRect = new Rect(r.x * guiHelper.uiScale, r.y * guiHelper.uiScale, r.width * guiHelper.uiScale, r.height * guiHelper.uiScale);
 
             GUI.Box(scaledRect, "", tableStyle);
 
             GUILayout.BeginArea(scaledRect);
-            DrawTable(headers, data, variant, size);
+            DrawTable(config);
             GUILayout.EndArea();
         }
 
-        public void SortableTable(string[] headers, string[,] data, ref int[] sortColumns, ref bool[] sortAscending, ControlVariant variant = ControlVariant.Default, ControlSize size = ControlSize.Default, Action<int, bool> onSort = null, params GUILayoutOption[] options)
+        #endregion
+
+        #region API
+
+        public void DrawTable(string[] headers, string[,] data, ControlVariant variant = ControlVariant.Default, ControlSize size = ControlSize.Default, params GUILayoutOption[] options)
         {
-            if (headers == null || data == null)
+            DrawTable(
+                new TableConfig
+                {
+                    Headers = headers,
+                    Data = data,
+                    Variant = variant,
+                    Size = size,
+                    Options = options,
+                }
+            );
+        }
+
+        public void DrawTable(Rect rect, string[] headers, string[,] data, ControlVariant variant = ControlVariant.Default, ControlSize size = ControlSize.Default)
+        {
+            DrawRectTable(
+                new TableConfig
+                {
+                    Rect = rect,
+                    Headers = headers,
+                    Data = data,
+                    Variant = variant,
+                    Size = size,
+                }
+            );
+        }
+
+        #endregion
+
+        #region Sortable Table
+
+        public void SortableTable(TableConfig config)
+        {
+            if (config.Headers == null || config.Data == null)
                 return;
 
             var styleManager = guiHelper.GetStyleManager();
             if (styleManager == null)
             {
-                DrawSimpleTable(headers, data);
+                DrawSimpleTable(config.Headers, config.Data);
                 return;
             }
 
-            GUIStyle tableStyle = styleManager.GetTableStyle(variant, size);
-            GUIStyle headerStyle = styleManager.GetTableHeaderStyle(variant, size);
-            GUIStyle cellStyle = styleManager.GetTableCellStyle(variant, size);
+            GUIStyle tableStyle = styleManager.GetTableStyle(config.Variant, config.Size);
+            GUIStyle headerStyle = styleManager.GetTableHeaderStyle(config.Variant, config.Size);
+            GUIStyle cellStyle = styleManager.GetTableCellStyle(config.Variant, config.Size);
 
-            layoutComponents.BeginVerticalGroup(tableStyle, options);
+            layoutComponents.BeginVerticalGroup(tableStyle, config.Options);
 
             layoutComponents.BeginHorizontalGroup();
-            for (int i = 0; i < headers.Length; i++)
+            for (int i = 0; i < config.Headers.Length; i++)
             {
                 int columnIndex = i;
-                string headerText = headers[i];
+                string headerText = config.Headers[i];
 
-                if (sortColumns != null && sortAscending != null && i < sortColumns.Length)
+                if (config.SortColumns != null && config.SortAscending != null && i < config.SortColumns.Length)
                 {
-                    if (sortColumns[i] == i)
+                    if (config.SortColumns[i] == i)
                     {
-                        headerText += sortAscending[i] ? " ↑" : " ↓";
+                        headerText += config.SortAscending[i] ? " ↑" : " ↓";
                     }
                 }
 
-                if (UnityHelpers.Button(headerText, headerStyle, options))
+                if (UnityHelpers.Button(headerText, headerStyle, config.Options))
                 {
-                    if (onSort != null)
+                    if (config.OnSort != null)
                     {
                         bool newAscending = true;
-                        if (sortColumns != null && sortAscending != null && i < sortColumns.Length)
+                        if (config.SortColumns != null && config.SortAscending != null && i < config.SortColumns.Length)
                         {
-                            if (sortColumns[i] == i)
-                                newAscending = !sortAscending[i];
+                            if (config.SortColumns[i] == i)
+                                newAscending = !config.SortAscending[i];
                         }
-                        onSort.Invoke(columnIndex, newAscending);
+                        config.OnSort.Invoke(columnIndex, newAscending);
                     }
                 }
             }
             layoutComponents.EndHorizontalGroup();
 
-            int rowCount = data.GetLength(0);
-            int colCount = data.GetLength(1);
+            int rowCount = config.Data.GetLength(0);
+            int colCount = config.Data.GetLength(1);
+            GUIStyle rowStyle = styleManager.GetTableRowStyle(config.Variant, config.Size);
 
             for (int row = 0; row < rowCount; row++)
             {
-                layoutComponents.BeginHorizontalGroup();
+                layoutComponents.BeginHorizontalGroup(rowStyle);
 
                 for (int col = 0; col < colCount; col++)
                 {
-                    string cellValue = data[row, col] ?? "";
+                    string cellValue = config.Data[row, col] ?? "";
+                    UnityHelpers.Label(cellValue, cellStyle);
+                }
 
+                layoutComponents.EndHorizontalGroup();
+            }
+
+            layoutComponents.EndVerticalGroup();
+        }
+
+        public void SortableTable(string[] headers, string[,] data, ref int[] sortColumns, ref bool[] sortAscending, ControlVariant variant = ControlVariant.Default, ControlSize size = ControlSize.Default, Action<int, bool> onSort = null, params GUILayoutOption[] options)
+        {
+            SortableTable(
+                new TableConfig
+                {
+                    Headers = headers,
+                    Data = data,
+                    SortColumns = sortColumns,
+                    SortAscending = sortAscending,
+                    Variant = variant,
+                    Size = size,
+                    OnSort = onSort,
+                    Options = options,
+                }
+            );
+        }
+
+        #endregion
+
+        #region Selectable Table
+
+        public void SelectableTable(TableConfig config)
+        {
+            if (config.Headers == null || config.Data == null)
+                return;
+
+            var styleManager = guiHelper.GetStyleManager();
+            if (styleManager == null)
+            {
+                DrawSimpleTable(config.Headers, config.Data);
+                return;
+            }
+
+            GUIStyle tableStyle = styleManager.GetTableStyle(config.Variant, config.Size);
+            GUIStyle headerStyle = styleManager.GetTableHeaderStyle(config.Variant, config.Size);
+            GUIStyle cellStyle = styleManager.GetTableCellStyle(config.Variant, config.Size);
+
+            layoutComponents.BeginVerticalGroup(tableStyle, config.Options);
+
+            layoutComponents.BeginHorizontalGroup(headerStyle);
+
+            UnityHelpers.Label("", headerStyle, GUILayout.Width(20 * guiHelper.uiScale));
+
+            for (int i = 0; i < config.Headers.Length; i++)
+            {
+                UnityHelpers.Label(config.Headers[i], headerStyle);
+            }
+            layoutComponents.EndHorizontalGroup();
+
+            int rowCount = config.Data.GetLength(0);
+            int colCount = config.Data.GetLength(1);
+
+            var selectedRows = config.SelectedRows ?? new bool[rowCount];
+
+            GUIStyle rowStyle = styleManager.GetTableRowStyle(config.Variant, config.Size);
+
+            for (int row = 0; row < rowCount; row++)
+            {
+                layoutComponents.BeginHorizontalGroup(rowStyle);
+
+                bool newSelected = UnityHelpers.Toggle(selectedRows[row], "", GUILayout.Width(20 * guiHelper.uiScale));
+
+                if (newSelected != selectedRows[row])
+                {
+                    selectedRows[row] = newSelected;
+                    config.OnSelectionChange?.Invoke(row, newSelected);
+                }
+
+                for (int col = 0; col < colCount; col++)
+                {
+                    string cellValue = config.Data[row, col] ?? "";
                     UnityHelpers.Label(cellValue, cellStyle);
                 }
 
@@ -152,54 +273,64 @@ namespace shadcnui.GUIComponents.Layout
 
         public void SelectableTable(string[] headers, string[,] data, ref bool[] selectedRows, ControlVariant variant = ControlVariant.Default, ControlSize size = ControlSize.Default, Action<int, bool> onSelectionChange = null, params GUILayoutOption[] options)
         {
-            if (headers == null || data == null)
+            int rowCount = data.GetLength(0);
+            if (selectedRows == null || selectedRows.Length != rowCount)
+                selectedRows = new bool[rowCount];
+
+            var config = new TableConfig
+            {
+                Headers = headers,
+                Data = data,
+                SelectedRows = selectedRows,
+                Variant = variant,
+                Size = size,
+                OnSelectionChange = onSelectionChange,
+                Options = options,
+            };
+            SelectableTable(config);
+        }
+
+        #endregion
+
+        #region Custom Table
+
+        public void CustomTable(TableConfig config)
+        {
+            if (config.Headers == null || config.ObjectData == null || config.CellRenderer == null)
                 return;
 
             var styleManager = guiHelper.GetStyleManager();
             if (styleManager == null)
             {
-                DrawSimpleTable(headers, data);
+                DrawSimpleTable(config.Headers, config.ObjectData);
                 return;
             }
 
-            GUIStyle tableStyle = styleManager.GetTableStyle(variant, size);
-            GUIStyle headerStyle = styleManager.GetTableHeaderStyle(variant, size);
-            GUIStyle cellStyle = styleManager.GetTableCellStyle(variant, size);
+            GUIStyle tableStyle = styleManager.GetTableStyle(config.Variant, config.Size);
+            GUIStyle headerStyle = styleManager.GetTableHeaderStyle(config.Variant, config.Size);
 
-            layoutComponents.BeginVerticalGroup(tableStyle, options);
+            layoutComponents.BeginVerticalGroup(tableStyle, config.Options);
 
             layoutComponents.BeginHorizontalGroup();
-
-            UnityHelpers.Label("", GUILayout.Width(20 * guiHelper.uiScale));
-
-            for (int i = 0; i < headers.Length; i++)
+            for (int i = 0; i < config.Headers.Length; i++)
             {
-                UnityHelpers.Label(headers[i], headerStyle);
+                UnityHelpers.Label(config.Headers[i], headerStyle);
             }
             layoutComponents.EndHorizontalGroup();
 
-            int rowCount = data.GetLength(0);
-            int colCount = data.GetLength(1);
+            int rowCount = config.ObjectData.GetLength(0);
+            int colCount = config.ObjectData.GetLength(1);
 
-            if (selectedRows == null || selectedRows.Length != rowCount)
-                selectedRows = new bool[rowCount];
+            GUIStyle rowStyle = styleManager.GetTableRowStyle(config.Variant, config.Size);
 
             for (int row = 0; row < rowCount; row++)
             {
-                layoutComponents.BeginHorizontalGroup();
-
-                bool newSelected = UnityHelpers.Toggle(selectedRows[row], "", GUILayout.Width(20 * guiHelper.uiScale));
-
-                if (newSelected != selectedRows[row])
-                {
-                    selectedRows[row] = newSelected;
-                    onSelectionChange?.Invoke(row, newSelected);
-                }
+                layoutComponents.BeginHorizontalGroup(rowStyle);
 
                 for (int col = 0; col < colCount; col++)
                 {
-                    string cellValue = data[row, col] ?? "";
-                    UnityHelpers.Label(cellValue, cellStyle);
+                    object cellValue = config.ObjectData[row, col];
+                    config.CellRenderer.Invoke(cellValue, row, col);
                 }
 
                 layoutComponents.EndHorizontalGroup();
@@ -210,81 +341,64 @@ namespace shadcnui.GUIComponents.Layout
 
         public void CustomTable(string[] headers, object[,] data, Action<object, int, int> cellRenderer, ControlVariant variant = ControlVariant.Default, ControlSize size = ControlSize.Default, params GUILayoutOption[] options)
         {
-            if (headers == null || data == null || cellRenderer == null)
-                return;
-
-            var styleManager = guiHelper.GetStyleManager();
-            if (styleManager == null)
-            {
-                DrawSimpleTable(headers, data);
-                return;
-            }
-
-            GUIStyle tableStyle = styleManager.GetTableStyle(variant, size);
-            GUIStyle headerStyle = styleManager.GetTableHeaderStyle(variant, size);
-
-            layoutComponents.BeginVerticalGroup(tableStyle, options);
-
-            layoutComponents.BeginHorizontalGroup();
-            for (int i = 0; i < headers.Length; i++)
-            {
-                UnityHelpers.Label(headers[i], headerStyle);
-            }
-            layoutComponents.EndHorizontalGroup();
-
-            int rowCount = data.GetLength(0);
-            int colCount = data.GetLength(1);
-
-            for (int row = 0; row < rowCount; row++)
-            {
-                layoutComponents.BeginHorizontalGroup();
-
-                for (int col = 0; col < colCount; col++)
+            CustomTable(
+                new TableConfig
                 {
-                    object cellValue = data[row, col];
-                    cellRenderer.Invoke(cellValue, row, col);
+                    Headers = headers,
+                    ObjectData = data,
+                    CellRenderer = cellRenderer,
+                    Variant = variant,
+                    Size = size,
+                    Options = options,
                 }
-
-                layoutComponents.EndHorizontalGroup();
-            }
-
-            layoutComponents.EndVerticalGroup();
+            );
         }
 
-        public void PaginatedTable(string[] headers, string[,] data, ref int currentPage, int pageSize, ControlVariant variant = ControlVariant.Default, ControlSize size = ControlSize.Default, Action<int> onPageChange = null, params GUILayoutOption[] options)
+        #endregion
+
+        #region Paginated Table
+
+        public void PaginatedTable(TableConfig config)
         {
-            if (headers == null || data == null)
+            if (config.Headers == null || config.Data == null)
                 return;
 
-            int totalRows = data.GetLength(0);
-            int totalPages = Mathf.CeilToInt((float)totalRows / pageSize);
+            int totalRows = config.Data.GetLength(0);
+            int pageSize = config.PageSize > 0 ? config.PageSize : 10;
+            int totalPages = Mathf.Max(1, Mathf.CeilToInt((float)totalRows / pageSize));
 
-            if (currentPage < 0)
-                currentPage = 0;
-            if (currentPage >= totalPages)
-                currentPage = totalPages - 1;
+            int currentPage = Mathf.Clamp(config.CurrentPage, 0, totalPages - 1);
 
             int startRow = currentPage * pageSize;
             int endRow = Mathf.Min(startRow + pageSize, totalRows);
 
             int pageRowCount = endRow - startRow;
-            string[,] pageData = new string[pageRowCount, data.GetLength(1)];
+            string[,] pageData = new string[pageRowCount, config.Data.GetLength(1)];
 
             for (int row = 0; row < pageRowCount; row++)
-            for (int col = 0; col < data.GetLength(1); col++)
-                pageData[row, col] = data[startRow + row, col];
+            for (int col = 0; col < config.Data.GetLength(1); col++)
+                pageData[row, col] = config.Data[startRow + row, col];
 
-            DrawTable(headers, pageData, variant, size, options);
+            DrawTable(
+                new TableConfig
+                {
+                    Headers = config.Headers,
+                    Data = pageData,
+                    Variant = config.Variant,
+                    Size = config.Size,
+                    Options = config.Options,
+                }
+            );
 
-            layoutComponents.AddSpace(8);
+            layoutComponents.AddSpace(DesignTokens.Spacing.SM);
             layoutComponents.BeginHorizontalGroup();
 
-            if (UnityHelpers.Button("← Previous", GUILayout.Width(80 * guiHelper.uiScale)))
+            if (guiHelper.Button("← Previous", ControlVariant.Outline, ControlSize.Default, null, false, 1f, GUILayout.Width(100 * guiHelper.uiScale)))
             {
                 if (currentPage > 0)
                 {
                     currentPage--;
-                    onPageChange?.Invoke(currentPage);
+                    config.OnPageChange?.Invoke(currentPage);
                 }
             }
 
@@ -298,21 +412,44 @@ namespace shadcnui.GUIComponents.Layout
 
             GUILayout.FlexibleSpace();
 
-            if (UnityHelpers.Button("Next →", GUILayout.Width(80 * guiHelper.uiScale)))
+            if (guiHelper.Button("Next →", ControlVariant.Outline, ControlSize.Default, null, false, 1f, GUILayout.Width(100 * guiHelper.uiScale)))
             {
                 if (currentPage < totalPages - 1)
                 {
                     currentPage++;
-                    onPageChange?.Invoke(currentPage);
+                    config.OnPageChange?.Invoke(currentPage);
                 }
             }
 
             layoutComponents.EndHorizontalGroup();
+
+            config.CurrentPage = currentPage;
         }
 
-        public void SearchableTable(string[] headers, string[,] data, ref string searchQuery, ref string[,] filteredData, ControlVariant variant = ControlVariant.Default, ControlSize size = ControlSize.Default, Action<string> onSearch = null, params GUILayoutOption[] options)
+        public void PaginatedTable(string[] headers, string[,] data, ref int currentPage, int pageSize, ControlVariant variant = ControlVariant.Default, ControlSize size = ControlSize.Default, Action<int> onPageChange = null, params GUILayoutOption[] options)
         {
-            if (headers == null || data == null)
+            var config = new TableConfig
+            {
+                Headers = headers,
+                Data = data,
+                CurrentPage = currentPage,
+                PageSize = pageSize,
+                Variant = variant,
+                Size = size,
+                OnPageChange = onPageChange,
+                Options = options,
+            };
+            PaginatedTable(config);
+            currentPage = config.CurrentPage;
+        }
+
+        #endregion
+
+        #region Searchable Table
+
+        public void SearchableTable(TableConfig config)
+        {
+            if (config.Headers == null || config.Data == null)
                 return;
 
             layoutComponents.BeginHorizontalGroup();
@@ -324,75 +461,105 @@ namespace shadcnui.GUIComponents.Layout
             UnityHelpers.Label("Search:", labelStyle, GUILayout.Width(60 * guiHelper.uiScale));
 
 #if IL2CPP_MELONLOADER_PRE57
-            string newSearchQuery = GUILayout.TextField(searchQuery ?? "", inputStyle, new Il2CppReferenceArray<GUILayoutOption>(new GUILayoutOption[] { GUILayout.Width(200 * guiHelper.uiScale) }));
+            string newSearchQuery = GUILayout.TextField(config.SearchQuery ?? "", inputStyle, new Il2CppReferenceArray<GUILayoutOption>(new GUILayoutOption[] { GUILayout.Width(200 * guiHelper.uiScale) }));
 #else
-            string newSearchQuery = GUILayout.TextField(searchQuery ?? "", inputStyle, GUILayout.Width(200 * guiHelper.uiScale));
+            string newSearchQuery = GUILayout.TextField(config.SearchQuery ?? "", inputStyle, GUILayout.Width(200 * guiHelper.uiScale));
 #endif
 
-            if (newSearchQuery != searchQuery)
+            if (newSearchQuery != config.SearchQuery)
             {
-                searchQuery = newSearchQuery;
-                onSearch?.Invoke(searchQuery);
-
-                filteredData = FilterTableData(data, searchQuery);
+                config.SearchQuery = newSearchQuery;
+                config.OnSearch?.Invoke(config.SearchQuery);
+                config.FilteredData = FilterTableData(config.Data, config.SearchQuery);
             }
 
             layoutComponents.EndHorizontalGroup();
-            layoutComponents.AddSpace(8);
+            layoutComponents.AddSpace(DesignTokens.Spacing.SM);
 
-            string[,] displayData = filteredData ?? data;
-            DrawTable(headers, displayData, variant, size, options);
+            string[,] displayData = config.FilteredData ?? config.Data;
+
+            DrawTable(
+                new TableConfig
+                {
+                    Headers = config.Headers,
+                    Data = displayData,
+                    Variant = config.Variant,
+                    Size = config.Size,
+                    Options = config.Options,
+                }
+            );
         }
 
-        public void ResizableTable(string[] headers, string[,] data, ref float[] columnWidths, ControlVariant variant = ControlVariant.Default, ControlSize size = ControlSize.Default, params GUILayoutOption[] options)
+        public void SearchableTable(string[] headers, string[,] data, ref string searchQuery, ref string[,] filteredData, ControlVariant variant = ControlVariant.Default, ControlSize size = ControlSize.Default, Action<string> onSearch = null, params GUILayoutOption[] options)
         {
-            if (headers == null || data == null)
+            var config = new TableConfig
+            {
+                Headers = headers,
+                Data = data,
+                SearchQuery = searchQuery,
+                FilteredData = filteredData,
+                Variant = variant,
+                Size = size,
+                OnSearch = onSearch,
+                Options = options,
+            };
+            SearchableTable(config);
+            searchQuery = config.SearchQuery;
+            filteredData = config.FilteredData;
+        }
+
+        #endregion
+
+        #region Resizable Table
+
+        public void ResizableTable(TableConfig config)
+        {
+            if (config.Headers == null || config.Data == null)
                 return;
 
-            if (columnWidths == null || columnWidths.Length != headers.Length)
+            if (config.ColumnWidths == null || config.ColumnWidths.Length != config.Headers.Length)
             {
-                columnWidths = new float[headers.Length];
-                for (int i = 0; i < columnWidths.Length; i++)
+                config.ColumnWidths = new float[config.Headers.Length];
+                for (int i = 0; i < config.ColumnWidths.Length; i++)
                 {
-                    columnWidths[i] = 100f;
+                    config.ColumnWidths[i] = 100f;
                 }
             }
 
             var styleManager = guiHelper.GetStyleManager();
             if (styleManager == null)
             {
-                DrawSimpleTable(headers, data);
+                DrawSimpleTable(config.Headers, config.Data);
                 return;
             }
 
-            GUIStyle tableStyle = styleManager.GetTableStyle(variant, size);
-            GUIStyle headerStyle = styleManager.GetTableHeaderStyle(variant, size);
-            GUIStyle cellStyle = styleManager.GetTableCellStyle(variant, size);
+            GUIStyle tableStyle = styleManager.GetTableStyle(config.Variant, config.Size);
+            GUIStyle headerStyle = styleManager.GetTableHeaderStyle(config.Variant, config.Size);
+            GUIStyle cellStyle = styleManager.GetTableCellStyle(config.Variant, config.Size);
 
-            layoutComponents.BeginVerticalGroup(tableStyle, options);
+            layoutComponents.BeginVerticalGroup(tableStyle, config.Options);
 
             layoutComponents.BeginHorizontalGroup();
-            for (int i = 0; i < headers.Length; i++)
+            for (int i = 0; i < config.Headers.Length; i++)
             {
-                int columnIndex = i;
-                float width = columnWidths[i] * guiHelper.uiScale;
-
-                UnityHelpers.Label(headers[i], headerStyle, GUILayout.Width(width));
+                float width = config.ColumnWidths[i] * guiHelper.uiScale;
+                UnityHelpers.Label(config.Headers[i], headerStyle, GUILayout.Width(width));
             }
             layoutComponents.EndHorizontalGroup();
 
-            int rowCount = data.GetLength(0);
-            int colCount = data.GetLength(1);
+            int rowCount = config.Data.GetLength(0);
+            int colCount = config.Data.GetLength(1);
+
+            GUIStyle rowStyle = styleManager.GetTableRowStyle(config.Variant, config.Size);
 
             for (int row = 0; row < rowCount; row++)
             {
-                layoutComponents.BeginHorizontalGroup();
+                layoutComponents.BeginHorizontalGroup(rowStyle);
 
                 for (int col = 0; col < colCount; col++)
                 {
-                    string cellValue = data[row, col] ?? "";
-                    float width = columnWidths[col] * guiHelper.uiScale;
-
+                    string cellValue = config.Data[row, col] ?? "";
+                    float width = config.ColumnWidths[col] * guiHelper.uiScale;
                     UnityHelpers.Label(cellValue, cellStyle, GUILayout.Width(width));
                 }
 
@@ -401,6 +568,31 @@ namespace shadcnui.GUIComponents.Layout
 
             layoutComponents.EndVerticalGroup();
         }
+
+        public void ResizableTable(string[] headers, string[,] data, ref float[] columnWidths, ControlVariant variant = ControlVariant.Default, ControlSize size = ControlSize.Default, params GUILayoutOption[] options)
+        {
+            if (columnWidths == null || columnWidths.Length != headers.Length)
+            {
+                columnWidths = new float[headers.Length];
+                for (int i = 0; i < columnWidths.Length; i++)
+                    columnWidths[i] = 100f;
+            }
+
+            var config = new TableConfig
+            {
+                Headers = headers,
+                Data = data,
+                ColumnWidths = columnWidths,
+                Variant = variant,
+                Size = size,
+                Options = options,
+            };
+            ResizableTable(config);
+        }
+
+        #endregion
+
+        #region Internal Helpers
 
         private void DrawSimpleTable(string[] headers, string[,] data)
         {
@@ -499,5 +691,7 @@ namespace shadcnui.GUIComponents.Layout
 
             return filteredData;
         }
+
+        #endregion
     }
 }

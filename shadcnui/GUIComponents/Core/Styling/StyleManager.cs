@@ -1,13 +1,16 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using shadcnui.GUIComponents.Core.Base;
+using shadcnui.GUIComponents.Core.Theming;
+using shadcnui.GUIComponents.Core.Utils;
 using UnityEngine;
 using Object = UnityEngine.Object;
 #if IL2CPP_MELONLOADER_PRE57
 using UnhollowerBaseLib;
 #endif
 
-namespace shadcnui.GUIComponents.Core
+namespace shadcnui.GUIComponents.Core.Styling
 {
     #region Enums
     public enum ControlVariant
@@ -61,10 +64,10 @@ namespace shadcnui.GUIComponents.Core
         Badge,
         Avatar,
         Table,
+        TableRow,
         TableHeader,
         TableCell,
         Calendar,
-        CalendarHeader,
         CalendarWeekday,
         CalendarDay,
         CalendarDaySelected,
@@ -83,7 +86,6 @@ namespace shadcnui.GUIComponents.Core
         MenuBar,
         MenuBarItem,
         MenuDropdown,
-        SelectTrigger,
         SelectContent,
         SelectItem,
         DropdownMenu,
@@ -97,6 +99,12 @@ namespace shadcnui.GUIComponents.Core
         CardDescription,
         CardContent,
         CardFooter,
+        Toast,
+        ToastTitle,
+        ToastDescription,
+        SliderTrack,
+        SliderThumb,
+        SliderFill,
     }
 
     public struct StyleKey : IEquatable<StyleKey>
@@ -182,71 +190,41 @@ namespace shadcnui.GUIComponents.Core
         private Texture2D chartContainerTexture;
         private Texture2D chartGridTexture;
         private Texture2D chartAxisTexture;
+        private Texture2D sliderTrackTexture;
         #endregion
 
         #region Base GUIStyles
         private GUIStyle baseButtonStyle;
         private GUIStyle baseToggleStyle;
-        private GUIStyle baseInputStyle;
-        private GUIStyle baseLabelStyle;
         private GUIStyle baseCheckboxStyle;
         private GUIStyle baseSwitchStyle;
+        private GUIStyle baseInputStyle;
+        private GUIStyle baseLabelStyle;
         private GUIStyle baseBadgeStyle;
         private GUIStyle baseTableStyle;
         private GUIStyle baseCalendarStyle;
-        private GUIStyle baseDatePickerStyle;
-        internal GUIStyle animatedBoxStyle;
-        private GUIStyle sectionHeaderStyle;
+        private GUIStyle calendarDayStyle;
+        private GUIStyle tableCellStyle;
         private GUIStyle cardStyle;
-        private GUIStyle cardHeaderStyle;
-        private GUIStyle cardTitleStyle;
-        private GUIStyle cardDescriptionStyle;
-        private GUIStyle cardContentStyle;
-        private GUIStyle cardFooterStyle;
-        private GUIStyle passwordFieldStyle;
-        private GUIStyle textAreaStyle;
-        private GUIStyle progressBarStyle;
-        private GUIStyle separatorHorizontalStyle;
-        private GUIStyle separatorVerticalStyle;
         private GUIStyle tabsListStyle;
         private GUIStyle tabsTriggerStyle;
-        private GUIStyle tabsTriggerActiveStyle;
-        private GUIStyle tabsContentStyle;
-        private GUIStyle avatarStyle;
-        private GUIStyle tableHeaderStyle;
-        private GUIStyle tableCellStyle;
-        private GUIStyle tableStripedStyle;
-        private GUIStyle tableBorderedStyle;
-        private GUIStyle tableHoverStyle;
-        private GUIStyle calendarHeaderStyle;
-        private GUIStyle calendarWeekdayStyle;
-        private GUIStyle calendarDayStyle;
-        private GUIStyle calendarDaySelectedStyle;
-        private GUIStyle calendarDayOutsideMonthStyle;
-        private GUIStyle calendarDayTodayStyle;
-        private GUIStyle calendarDayInRangeStyle;
-        private GUIStyle datePickerHeaderStyle;
-        private GUIStyle datePickerWeekdayStyle;
-        private GUIStyle datePickerDayStyle;
-        private GUIStyle datePickerDaySelectedStyle;
-        private GUIStyle datePickerDayOutsideMonthStyle;
-        private GUIStyle datePickerDayTodayStyle;
-        private GUIStyle dialogContentStyle;
-        private GUIStyle dropdownMenuContentStyle;
-        private GUIStyle dropdownMenuItemStyle;
-        private GUIStyle popoverContentStyle;
-        private GUIStyle selectTriggerStyle;
-        private GUIStyle selectContentStyle;
-        private GUIStyle selectItemStyle;
         private GUIStyle chartContainerStyle;
-        private GUIStyle chartAxisStyle;
+        private GUIStyle dialogContentStyle;
+        private GUIStyle dropdownContentStyle;
+        private GUIStyle dropdownItemStyle;
         private GUIStyle menuBarStyle;
-        private GUIStyle menuBarItemStyle;
-        private GUIStyle menuDropdownStyle;
+        private GUIStyle progressBarStyle;
+        private GUIStyle separatorStyle;
+        private GUIStyle avatarStyle;
+        internal GUIStyle animatedBoxStyle;
+        private GUIStyle baseSliderStyle;
         #endregion
 
         #region Style Caches
         private Dictionary<StyleKey, GUIStyle> styleCache = new();
+        private const int MaxCacheSize = 500;
+        private LinkedList<StyleKey> cacheOrder = new LinkedList<StyleKey>();
+        private Dictionary<StyleKey, LinkedListNode<StyleKey>> cacheNodes = new Dictionary<StyleKey, LinkedListNode<StyleKey>>();
         #endregion
 
         #region Texture Caches
@@ -256,6 +234,36 @@ namespace shadcnui.GUIComponents.Core
         private List<Texture2D> trackedTextures = new();
         #endregion
 
+        #region LRU Cache Methods
+        private void EvictOldestCacheEntry()
+        {
+            if (cacheOrder.Count >= MaxCacheSize && cacheOrder.Last != null)
+            {
+                var oldest = cacheOrder.Last.Value;
+                styleCache.Remove(oldest);
+                cacheNodes.Remove(oldest);
+                cacheOrder.RemoveLast();
+            }
+        }
+
+        private void TouchCacheEntry(StyleKey key)
+        {
+            if (cacheNodes.TryGetValue(key, out var node))
+            {
+                cacheOrder.Remove(node);
+                cacheOrder.AddFirst(node);
+            }
+        }
+
+        private void AddToCacheWithLRU(StyleKey key, GUIStyle style)
+        {
+            EvictOldestCacheEntry();
+            styleCache[key] = style;
+            var node = cacheOrder.AddFirst(key);
+            cacheNodes[key] = node;
+        }
+        #endregion
+
         #region Constructor
         public StyleManager(GUIHelper helper)
         {
@@ -263,9 +271,9 @@ namespace shadcnui.GUIComponents.Core
             {
                 guiHelper = helper ?? throw new ArgumentNullException(nameof(helper));
                 Registry = new StyleRegistry();
-                
+
                 ThemeManager.Instance.OnThemeChanged += OnThemeChanged;
-                
+
                 GUILogger.LogInfo("StyleManager initialized successfully", "StyleManager.Constructor");
             }
             catch (Exception ex)
@@ -289,7 +297,7 @@ namespace shadcnui.GUIComponents.Core
                 solidColorTextureCache.Clear();
                 outlineButtonTextureCache.Clear();
                 outlineTextureCache.Clear();
-                
+
                 if (isInitialized)
                 {
                     CreateCustomTextures();
@@ -401,28 +409,25 @@ namespace shadcnui.GUIComponents.Core
         {
             try
             {
-                SetupAnimatedStyles();
                 SetupCardStyles();
                 SetupButtonStyle();
                 SetupToggleStyle();
+                SetupCheckboxStyles();
+                SetupSwitchStyles();
                 SetupInputStyle();
                 SetupLabelStyle();
                 SetupProgressBarStyles();
                 SetupSeparatorStyles();
                 SetupTabsStyles();
-                SetupCheckboxStyle();
-                SetupSwitchStyle();
                 SetupBadgeStyle();
                 SetupAvatarStyles();
                 SetupTableStyles();
                 SetupCalendarStyle();
                 SetupDropdownMenuStyles();
-                SetupPopoverStyles();
-                SetupSelectStyles();
-                SetupDatePickerStyle();
                 SetupDialogStyles();
                 SetupChartStyles();
                 SetupMenuBarStyles();
+                SetupSliderStyles();
             }
             catch (Exception ex)
             {
@@ -519,9 +524,114 @@ namespace shadcnui.GUIComponents.Core
             return texture;
         }
 
-        public Texture2D CreateRoundedRectWithShadowTexture(int width, int height, int radius, Color fillColor, float shadowIntensity = 0.08f, int shadowBlur = 6) => CreateGradientRoundedRectWithShadowTexture(width, height, radius, fillColor, fillColor, shadowIntensity, shadowBlur);
+        public Texture2D CreateFocusRingTexture(int width, int height, int radius, Color ringColor, float thickness = 2f)
+        {
+            Texture2D texture = new Texture2D(width, height);
+            Color transparent = new Color(ringColor.r, ringColor.g, ringColor.b, 0f);
 
-        public Texture2D CreateGradientRoundedRectWithShadowTexture(int width, int height, int radius, Color topColor, Color bottomColor, float shadowIntensity = 0.08f, int shadowBlur = 6)
+            for (int x = 0; x < width; x++)
+            {
+                for (int y = 0; y < height; y++)
+                {
+                    float dist = GetSoftDistanceToRoundedRect(x, y, width, height, radius);
+
+                    if (dist < 0)
+                    {
+                        texture.SetPixel(x, y, Color.clear);
+                    }
+                    else if (dist < thickness)
+                    {
+                        float alpha = 1f - (dist / thickness);
+                        texture.SetPixel(x, y, new Color(ringColor.r, ringColor.g, ringColor.b, ringColor.a * alpha));
+                    }
+                    else
+                    {
+                        texture.SetPixel(x, y, Color.clear);
+                    }
+                }
+            }
+            texture.Apply();
+            trackedTextures.Add(texture);
+            return texture;
+        }
+
+        private float GetSoftDistanceToRoundedRect(int x, int y, int width, int height, int radius)
+        {
+            if (x >= radius && x <= width - radius)
+                return Mathf.Max(0 - y, y - (height - 1), -y, y - height);
+            if (y >= radius && y <= height - radius)
+                return Mathf.Max(0 - x, x - (width - 1), -x, x - width);
+
+            Vector2 innerPos = new Vector2(x < radius ? radius : width - radius, y < radius ? radius : height - radius);
+            return Vector2.Distance(new Vector2(x, y), innerPos) - radius;
+        }
+
+        public Texture2D CreateGradientRoundedRectWithShadowTexture(int width, int height, int radius, Color topColor, Color bottomColor, float shadowIntensity = 0.12f, int shadowBlur = 10)
+        {
+            Texture2D texture = new Texture2D(width, height);
+
+            for (int x = 0; x < width; x++)
+            for (int y = 0; y < height; y++)
+                texture.SetPixel(x, y, Color.clear);
+
+            int margin = shadowBlur / 2;
+            int innerW = width - shadowBlur;
+            int innerH = height - shadowBlur;
+
+            for (int x = 0; x < width; x++)
+            {
+                for (int y = 0; y < height; y++)
+                {
+                    int ix = x - margin;
+                    int iy = y - margin;
+
+                    if (ix < 0 || iy < 0 || ix >= innerW || iy >= innerH)
+                        continue;
+
+                    bool isCornerArea = (ix < radius && iy < radius) || (ix > innerW - radius && iy < radius) || (ix < radius && iy > innerH - radius) || (ix > innerW - radius && iy > innerH - radius);
+                    if (isCornerArea)
+                    {
+                        Vector2 cornerCenter = GetCornerCenter(ix, iy, innerW, innerH, radius);
+                        if (Vector2.Distance(new Vector2(ix, iy), cornerCenter) > radius)
+                        {
+                            continue;
+                        }
+                    }
+                    float t = (float)iy / (Mathf.Max(1, innerH - 1));
+                    texture.SetPixel(x, y, Color.Lerp(bottomColor, topColor, t));
+                }
+            }
+
+            for (int x = 0; x < width; x++)
+            {
+                for (int y = 0; y < height; y++)
+                {
+                    Color px = texture.GetPixel(x, y);
+                    if (px.a > 0.1f)
+                        continue;
+
+                    float minDist = float.MaxValue;
+                    int dx = Mathf.Min(x - margin, (width - margin) - x);
+                    int dy = Mathf.Min(y - margin, (height - margin) - y);
+                    int d = Mathf.Min(dx, dy);
+
+                    if (d < 0)
+                    {
+                        float dist = Mathf.Abs(d);
+                        if (dist < shadowBlur)
+                        {
+                            float alpha = (1f - (dist / shadowBlur)) * shadowIntensity;
+                            texture.SetPixel(x, y, new Color(0, 0, 0, alpha));
+                        }
+                    }
+                }
+            }
+            texture.Apply();
+            trackedTextures.Add(texture);
+            return texture;
+        }
+
+        public Texture2D CreateInnerShadowTexture(int width, int height, int radius, Color baseColor, float shadowIntensity = 0.1f, int shadowSize = 4)
         {
             Texture2D texture = new Texture2D(width, height);
             for (int x = 0; x < width; x++)
@@ -538,37 +648,15 @@ namespace shadcnui.GUIComponents.Core
                             continue;
                         }
                     }
-                    float t = (float)y / (Mathf.Max(1, height - 1));
-                    texture.SetPixel(x, y, Color.Lerp(bottomColor, topColor, t));
-                }
-            }
 
-            for (int x = 0; x < width; x++)
-            {
-                for (int y = 0; y < height; y++)
-                {
-                    int dx = Mathf.Min(x, width - 1 - x);
-                    int dy = Mathf.Min(y, height - 1 - y);
-                    int d = Mathf.Min(dx, dy);
-                    if (d < shadowBlur)
+                    int distToEdge = Mathf.Min(x, width - 1 - x, y, height - 1 - y);
+                    float shadowFactor = 0f;
+                    if (distToEdge < shadowSize)
                     {
-                        Color basePx = texture.GetPixel(x, y);
-                        float t = 1f - (d / (float)shadowBlur);
-                        float a = t * shadowIntensity;
-                        Color shadow = new Color(0f, 0f, 0f, a);
-                        float outA = shadow.a + basePx.a * (1f - shadow.a);
-                        if (outA <= 0f)
-                        {
-                            texture.SetPixel(x, y, basePx);
-                        }
-                        else
-                        {
-                            float outR = (shadow.r * shadow.a + basePx.r * basePx.a * (1f - shadow.a)) / outA;
-                            float outG = (shadow.g * shadow.a + basePx.g * basePx.a * (1f - shadow.a)) / outA;
-                            float outB = (shadow.b * shadow.a + basePx.b * basePx.a * (1f - shadow.a)) / outA;
-                            texture.SetPixel(x, y, new Color(outR, outG, outB, outA));
-                        }
+                        shadowFactor = (1f - (float)distToEdge / shadowSize) * shadowIntensity;
                     }
+
+                    texture.SetPixel(x, y, Color.Lerp(baseColor, Color.black, shadowFactor));
                 }
             }
             texture.Apply();
@@ -669,24 +757,6 @@ namespace shadcnui.GUIComponents.Core
             return texture;
         }
 
-        public Texture2D CreateOutlineButtonTexture(Color backgroundColor, Color borderColor)
-        {
-            if (outlineButtonTextureCache.TryGetValue((backgroundColor, borderColor), out var cachedTexture))
-                return cachedTexture;
-            int size = 32;
-            Texture2D texture = new Texture2D(size, size);
-            for (int x = 0; x < size; x++)
-            for (int y = 0; y < size; y++)
-            {
-                bool isBorder = x == 0 || y == 0 || x == size - 1 || y == size - 1;
-                texture.SetPixel(x, y, isBorder ? borderColor : backgroundColor);
-            }
-            texture.Apply();
-            outlineButtonTextureCache[(backgroundColor, borderColor)] = texture;
-            trackedTextures.Add(texture);
-            return texture;
-        }
-
         private void CreateCustomTextures()
         {
             try
@@ -702,40 +772,79 @@ namespace shadcnui.GUIComponents.Core
                 }
                 gradientTexture.Apply();
 
-                cardBackgroundTexture = CreateBorderedRoundedRectTexture(128, 128, 12, theme.Elevated, theme.Border, 1);
-                inputBackgroundTexture = CreateBorderedRoundedRectTexture(128, 128, 6, theme.Base, theme.Border, 1);
-                inputFocusedTexture = CreateBorderedRoundedRectTexture(128, 128, 6, theme.Base, theme.Accent, 1);
-                outlineTexture = CreateRoundedOutlineTexture(128, 128, 6, theme.Border, 1);
+                cardBackgroundTexture = CreateGradientRoundedRectWithShadowTexture(
+                    DesignTokens.TextureSize.Default,
+                    DesignTokens.TextureSize.Default,
+                    (int)DesignTokens.Radius.LG,
+                    Color.Lerp(theme.Elevated, Color.white, 0.02f),
+                    theme.Elevated,
+                    DesignTokens.Effects.ShadowLight,
+                    DesignTokens.Effects.ShadowBlurSM
+                );
+
+                inputBackgroundTexture = CreateInnerShadowTexture(DesignTokens.TextureSize.Default, (int)DesignTokens.Height.Default, (int)DesignTokens.Radius.MD, theme.Base, DesignTokens.Effects.InnerShadowIntensity, DesignTokens.Effects.InnerShadowSize);
+                inputFocusedTexture = CreateBorderedRoundedRectTexture(DesignTokens.TextureSize.Default, (int)DesignTokens.Height.Default, (int)DesignTokens.Radius.MD, theme.Base, theme.Accent, DesignTokens.Effects.FocusRingThickness);
+
+                outlineTexture = CreateRoundedOutlineTexture(DesignTokens.TextureSize.Default, DesignTokens.TextureSize.Default, (int)DesignTokens.Radius.MD, theme.Border, 1);
                 transparentTexture = CreateSolidTexture(Color.clear);
-                glowTexture = CreateGlowTexture(theme.Accent, 32);
+                glowTexture = CreateGlowTexture(theme.Accent, DesignTokens.TextureSize.Small);
                 particleTexture = CreateSolidTexture(Color.Lerp(theme.Accent, theme.Text, 0.5f));
-                progressBarBackgroundTexture = CreateRoundedRectTexture(128, 128, 6, theme.Secondary);
-                progressBarFillTexture = CreateRoundedRectTexture(128, 128, 6, theme.Accent);
+
+                progressBarBackgroundTexture = CreateRoundedRectTexture(DesignTokens.TextureSize.Default, DesignTokens.ProgressBar.TextureHeight, (int)DesignTokens.Radius.SM, theme.Secondary);
+                progressBarFillTexture = CreateRoundedRectTexture(DesignTokens.TextureSize.Default, DesignTokens.ProgressBar.TextureHeight, (int)DesignTokens.Radius.SM, theme.Accent);
+
                 separatorTexture = CreateSolidTexture(theme.Border);
-                tabsBackgroundTexture = CreateRoundedRectTexture(128, 128, 6, theme.TabsBg);
-                tabsActiveTexture = CreateRoundedRectTexture(128, 128, 6, theme.Elevated);
-                switchTexture = CreateRoundedRectTexture(32, 16, 8, theme.Secondary);
-                switchOnTexture = CreateRoundedRectTexture(32, 16, 8, theme.Accent);
-                switchOffTexture = CreateRoundedRectTexture(32, 16, 8, Color.Lerp(theme.Secondary, theme.Text, 0.15f));
-                badgeTexture = CreateRoundedRectTexture(64, 24, 12, theme.Accent);
-                avatarTexture = CreateRoundedRectTexture(40, 40, 20, theme.Muted);
+
+                tabsBackgroundTexture = CreateRoundedRectTexture(DesignTokens.TextureSize.Default, DesignTokens.TextureSize.Default, (int)DesignTokens.Radius.MD, theme.TabsBg);
+                tabsActiveTexture = CreateRoundedRectTexture(DesignTokens.TextureSize.Default, DesignTokens.TextureSize.Default, (int)DesignTokens.Radius.SM, theme.TabsTriggerActiveBg);
+
+                switchTexture = CreateRoundedRectTexture(DesignTokens.Switch.Width + 2, DesignTokens.Switch.Height + 2, DesignTokens.Switch.Radius, theme.Secondary);
+                switchOnTexture = CreateRoundedRectTexture(DesignTokens.Switch.Width + 2, DesignTokens.Switch.Height + 2, DesignTokens.Switch.Radius, theme.Accent);
+                switchOffTexture = CreateRoundedRectTexture(DesignTokens.Switch.Width + 2, DesignTokens.Switch.Height + 2, DesignTokens.Switch.Radius, Color.Lerp(theme.Secondary, theme.Muted, 0.2f));
+
+                badgeTexture = CreateRoundedRectTexture(DesignTokens.TextureSize.Medium, DesignTokens.Badge.Height, (int)DesignTokens.Radius.XL, theme.Accent);
+
+                avatarTexture = CreateRoundedRectTexture((int)DesignTokens.Height.Default, (int)DesignTokens.Height.Default, (int)DesignTokens.Radius.LG, theme.Muted);
+
                 tableTexture = CreateSolidTexture(theme.Base);
-                tableHeaderTexture = CreateSolidTexture(theme.Secondary);
+                tableHeaderTexture = CreateSolidTexture(Color.Lerp(theme.Secondary, theme.Base, 0.5f));
                 tableCellTexture = CreateSolidTexture(theme.Base);
-                calendarBackgroundTexture = CreateBorderedRoundedRectTexture(256, 256, 8, theme.Elevated, theme.Border, 1);
+
+                calendarBackgroundTexture = CreateBorderedRoundedRectTexture(DesignTokens.TextureSize.Large, DesignTokens.TextureSize.Large, (int)DesignTokens.Radius.LG, theme.Elevated, theme.Border, 1);
                 calendarHeaderTexture = CreateSolidTexture(theme.Elevated);
                 calendarDayTexture = CreateSolidTexture(theme.Elevated);
-                calendarDaySelectedTexture = CreateRoundedRectTexture(32, 32, 4, theme.Accent);
-                dropdownMenuContentTexture = CreateBorderedRoundedRectTexture(128, 128, 6, theme.Elevated, theme.Border, 1);
-                popoverContentTexture = CreateBorderedRoundedRectTexture(128, 128, 6, theme.Elevated, theme.Border, 1);
-                scrollAreaThumbTexture = CreateRoundedRectTexture(8, 8, 4, theme.Border);
+                calendarDaySelectedTexture = CreateRoundedRectTexture(DesignTokens.TextureSize.Small, DesignTokens.TextureSize.Small, (int)DesignTokens.Radius.SM, theme.Accent);
+
+                dropdownMenuContentTexture = CreateGradientRoundedRectWithShadowTexture(
+                    DesignTokens.TextureSize.Default,
+                    DesignTokens.TextureSize.Default,
+                    (int)DesignTokens.Radius.MD,
+                    Color.Lerp(theme.Elevated, Color.white, 0.02f),
+                    theme.Elevated,
+                    DesignTokens.Effects.ShadowMedium,
+                    DesignTokens.Effects.ShadowBlurMD
+                );
+                popoverContentTexture = CreateGradientRoundedRectWithShadowTexture(
+                    DesignTokens.TextureSize.Default,
+                    DesignTokens.TextureSize.Default,
+                    (int)DesignTokens.Radius.LG,
+                    Color.Lerp(theme.Elevated, Color.white, 0.02f),
+                    theme.Elevated,
+                    DesignTokens.Effects.ShadowMedium,
+                    DesignTokens.Effects.ShadowBlurMD
+                );
+
+                scrollAreaThumbTexture = CreateRoundedRectTexture(8, 8, 4, Color.Lerp(theme.Border, theme.Muted, 0.3f));
                 scrollAreaTrackTexture = CreateSolidTexture(Color.clear);
-                selectTriggerTexture = CreateBorderedRoundedRectTexture(128, 40, 6, theme.Base, theme.Border, 1);
-                selectContentTexture = CreateBorderedRoundedRectTexture(128, 128, 6, theme.Elevated, theme.Border, 1);
-                chartContainerTexture = CreateBorderedRoundedRectTexture(256, 256, 8, theme.Elevated, theme.Border, 1);
-                chartGridTexture = CreateSolidTexture(theme.Border);
+
+                selectTriggerTexture = CreateBorderedRoundedRectTexture(DesignTokens.TextureSize.Default, (int)DesignTokens.Height.Default, (int)DesignTokens.Radius.MD, theme.Base, theme.Border, 1);
+                selectContentTexture = CreateGradientRoundedRectWithShadowTexture(DesignTokens.TextureSize.Default, DesignTokens.TextureSize.Default, (int)DesignTokens.Radius.MD, theme.Elevated, theme.Elevated, DesignTokens.Effects.ShadowMedium, DesignTokens.Effects.ShadowBlurMD);
+
+                chartContainerTexture = CreateBorderedRoundedRectTexture(DesignTokens.TextureSize.Large, DesignTokens.TextureSize.Large, (int)DesignTokens.Radius.LG, theme.Elevated, theme.Border, 1);
+                chartGridTexture = CreateSolidTexture(Color.Lerp(theme.Border, Color.clear, 0.5f));
                 chartAxisTexture = CreateSolidTexture(theme.Muted);
 
+                sliderTrackTexture = CreateRoundedRectTexture(DesignTokens.TextureSize.Default, 8, (int)DesignTokens.Radius.SM, theme.Secondary);
                 GUILogger.LogInfo("Custom textures created successfully", "StyleManager.CreateCustomTextures");
             }
             catch (Exception ex)
@@ -761,21 +870,7 @@ namespace shadcnui.GUIComponents.Core
             return new UnityHelpers.RectOffset(h, h, v, v);
         }
 
-        public RectOffset GetBorderOffset(float radius = 6f)
-        {
-            int r = GetScaledBorderRadius(radius);
-            return new UnityHelpers.RectOffset(r, r, r, r);
-        }
-
-        public Color GetHoverColor(Color baseColor, bool isDark = true) => isDark ? Color.Lerp(baseColor, Color.white, 0.15f) : Color.Lerp(baseColor, Color.black, 0.08f);
-
-        public Color GetFocusColor(Color baseColor) => Color.Lerp(baseColor, ThemeManager.Instance.CurrentTheme.Accent, 0.25f);
-
-        public Color GetOverlayColor() => ThemeManager.Instance.CurrentTheme.Overlay;
-
-        public Color GetShadowColor() => ThemeManager.Instance.CurrentTheme.Shadow;
-
-        public Color GetBorderColor() => ThemeManager.Instance.CurrentTheme.Border;
+        public Color GetHoverColor(Color baseColor, bool isDark = true) => isDark ? Color.Lerp(baseColor, Color.white, DesignTokens.Effects.HoverLighten) : Color.Lerp(baseColor, Color.black, DesignTokens.Effects.HoverDarken);
         #endregion
 
         #region Helpers

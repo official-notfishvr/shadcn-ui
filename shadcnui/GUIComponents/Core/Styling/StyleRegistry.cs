@@ -1,8 +1,9 @@
-using System;
 using System.Collections.Generic;
+using shadcnui.GUIComponents.Core.Base;
+using shadcnui.GUIComponents.Core.Theming;
 using UnityEngine;
 
-namespace shadcnui.GUIComponents.Core
+namespace shadcnui.GUIComponents.Core.Styling
 {
     public delegate void StyleModifier(GUIStyle style, Theme theme, GUIHelper helper);
 
@@ -22,16 +23,6 @@ namespace shadcnui.GUIComponents.Core
         public void RegisterSize(StyleComponentType type, ControlSize size, StyleModifier modifier)
         {
             sizeModifiers[(type, size)] = modifier;
-        }
-
-        public void RegisterGlobalVariant(ControlVariant variant, StyleModifier modifier)
-        {
-            globalVariantModifiers[variant] = modifier;
-        }
-
-        public void RegisterGlobalSize(ControlSize size, StyleModifier modifier)
-        {
-            globalSizeModifiers[size] = modifier;
         }
 
         public StyleModifier GetVariantModifier(StyleComponentType type, ControlVariant variant)

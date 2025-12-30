@@ -1,10 +1,8 @@
 using System;
-using System.Collections.Generic;
-using System.Text;
-using shadcnui;
-using shadcnui.GUIComponents.Core;
+using shadcnui.GUIComponents.Core.Base;
+using shadcnui.GUIComponents.Core.Styling;
+using shadcnui.GUIComponents.Core.Utils;
 using UnityEngine;
-using static shadcnui.GUIComponents.Layout.Layout;
 #if IL2CPP_MELONLOADER_PRE57
 using UnhollowerBaseLib;
 #endif
@@ -16,49 +14,88 @@ namespace shadcnui.GUIComponents.Controls
         public Toggle(GUIHelper helper)
             : base(helper) { }
 
-        public bool DrawToggle(string text, bool value, ControlVariant variant = ControlVariant.Default, ControlSize size = ControlSize.Default, Action<bool> onToggle = null, bool disabled = false, params GUILayoutOption[] options)
+        private void RenderIcon(IconConfig iconConfig)
+        {
+            float scaledSize = iconConfig.Size * guiHelper.uiScale;
+            UnityHelpers.Label(iconConfig.Image, GUILayout.Width(scaledSize), GUILayout.Height(scaledSize));
+        }
+
+        #region Config-based API
+        public bool DrawToggle(ToggleConfig config)
         {
             var styleManager = guiHelper.GetStyleManager();
-            GUIStyle toggleStyle = styleManager?.GetToggleStyle(variant, size) ?? GUI.skin.toggle;
+            GUIStyle toggleStyle = styleManager?.GetToggleStyle(config.Variant, config.Size) ?? GUI.skin.toggle;
 
             bool wasEnabled = GUI.enabled;
-            if (disabled)
+            if (config.Disabled)
                 GUI.enabled = false;
 
             bool newValue;
-            newValue = options != null && options.Length > 0 ? UnityHelpers.Toggle(value, text, toggleStyle, options) : UnityHelpers.Toggle(value, text, toggleStyle);
+
+            if (config.Icon?.Image != null)
+            {
+                GUILayout.BeginHorizontal();
+                RenderIcon(config.Icon);
+                layoutComponents.AddSpace(config.Icon.Spacing * guiHelper.uiScale);
+                newValue = UnityHelpers.Toggle(config.Value, config.Text ?? "Toggle", toggleStyle);
+                GUILayout.EndHorizontal();
+            }
+            else
+            {
+                if (config.Rect.HasValue)
+                {
+                    Rect scaledRect = new Rect(config.Rect.Value.x * guiHelper.uiScale, config.Rect.Value.y * guiHelper.uiScale, config.Rect.Value.width * guiHelper.uiScale, config.Rect.Value.height * guiHelper.uiScale);
+                    newValue = UnityHelpers.Toggle(scaledRect, config.Value, config.Text ?? "", toggleStyle);
+                }
+                else
+                {
+                    newValue = config.Options != null && config.Options.Length > 0 ? UnityHelpers.Toggle(config.Value, config.Text, toggleStyle, config.Options) : UnityHelpers.Toggle(config.Value, config.Text, toggleStyle);
+                }
+            }
 
             GUI.enabled = wasEnabled;
 
-            if (newValue != value && !disabled)
+            if (newValue != config.Value && !config.Disabled)
             {
-                onToggle?.Invoke(newValue);
+                config.OnToggle?.Invoke(newValue);
             }
 
-            return newValue;
+            return config.Disabled ? config.Value : newValue;
+        }
+        #endregion
+
+        #region API
+        public bool DrawToggle(string text, bool value, ControlVariant variant = ControlVariant.Default, ControlSize size = ControlSize.Default, Action<bool> onToggle = null, bool disabled = false, params GUILayoutOption[] options)
+        {
+            return DrawToggle(
+                new ToggleConfig
+                {
+                    Text = text,
+                    Value = value,
+                    Variant = variant,
+                    Size = size,
+                    OnToggle = onToggle,
+                    Disabled = disabled,
+                    Options = options,
+                }
+            );
         }
 
         public bool DrawToggle(Rect rect, string text, bool value, ControlVariant variant = ControlVariant.Default, ControlSize size = ControlSize.Default, Action<bool> onToggle = null, bool disabled = false)
         {
-            var styleManager = guiHelper.GetStyleManager();
-            GUIStyle toggleStyle = styleManager?.GetToggleStyle(variant, size) ?? GUI.skin.toggle;
-
-            Rect scaledRect = new Rect(rect.x * guiHelper.uiScale, rect.y * guiHelper.uiScale, rect.width * guiHelper.uiScale, rect.height * guiHelper.uiScale);
-
-            bool wasEnabled = GUI.enabled;
-            if (disabled)
-                GUI.enabled = false;
-
-            bool newValue = UnityHelpers.Toggle(scaledRect, value, text ?? "", toggleStyle);
-
-            GUI.enabled = wasEnabled;
-
-            if (newValue != value && !disabled)
-            {
-                onToggle?.Invoke(newValue);
-            }
-
-            return disabled ? value : newValue;
+            return DrawToggle(
+                new ToggleConfig
+                {
+                    Rect = rect,
+                    Text = text,
+                    Value = value,
+                    Variant = variant,
+                    Size = size,
+                    OnToggle = onToggle,
+                    Disabled = disabled,
+                }
+            );
         }
+        #endregion
     }
 }

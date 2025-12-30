@@ -1,7 +1,8 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using shadcnui.GUIComponents.Core;
+using shadcnui.GUIComponents.Core.Base;
+using shadcnui.GUIComponents.Core.Styling;
 using shadcnui.GUIComponents.Layout;
 using UnityEngine;
 #if IL2CPP_MELONLOADER_PRE57
@@ -74,8 +75,8 @@ void OnGUI() {
 
         void DrawDocsWindow(int windowID)
         {
-            guiHelper.UpdateAnimations(showDocsWindow);
-            if (guiHelper.BeginAnimatedGUI())
+            guiHelper.UpdateGUI(showDocsWindow);
+            if (guiHelper.BeginGUI())
             {
                 guiHelper.BeginHorizontalGroup();
 
@@ -104,7 +105,7 @@ void OnGUI() {
                 );
 
                 guiHelper.EndHorizontalGroup();
-                guiHelper.EndAnimatedGUI();
+                guiHelper.EndGUI();
             }
             GUI.DragWindow();
         }

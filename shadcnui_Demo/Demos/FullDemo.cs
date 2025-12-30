@@ -1,12 +1,11 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
-using shadcnui.GUIComponents.Controls;
-using shadcnui.GUIComponents.Core;
-using shadcnui.GUIComponents.Data;
-using shadcnui.GUIComponents.Display;
+using shadcnui.GUIComponents.Core.Base;
+using shadcnui.GUIComponents.Core.Styling;
+using shadcnui.GUIComponents.Core.Utils;
 using shadcnui.GUIComponents.Layout;
 using UnityEngine;
 #if IL2CPP_MELONLOADER_PRE57
@@ -39,6 +38,15 @@ namespace shadcnui_Demo.Menu
         private string labeledTextAreaValue = "Labeled Text Area";
         private float resizableTextAreaHeight = 100f;
         private string resizableTextAreaValue = "Resizable Text Area";
+
+        // Slider States
+        private float sliderValue = 0.5f;
+        private float sliderWithStepValue = 50f;
+        private float sliderLabeledValue = 0.75f;
+        private float sliderDisabledValue = 0.3f;
+        private float sliderDestructiveValue = 0.6f;
+        private float sliderSmallValue = 0.4f;
+        private float sliderLargeValue = 0.8f;
 
         // Toggle/Switch/Checkbox States
         private Dictionary<string, bool> toggleStates = new Dictionary<string, bool>();
@@ -94,7 +102,7 @@ namespace shadcnui_Demo.Menu
                 new Tabs.TabConfig("Label", DrawLabelDemos),
                 new Tabs.TabConfig("Dialog", DrawDialogDemos),
                 new Tabs.TabConfig("Select", DrawSelectDemos),
-                new Tabs.TabConfig("Dropdown", DrawDropdownMenuDemos),
+                new Tabs.TabConfig("DropdownMenu", DrawDropdownMenuDemos),
                 new Tabs.TabConfig("Popover", DrawPopoverDemos),
                 new Tabs.TabConfig("Calendar", DrawCalendarDemos),
                 new Tabs.TabConfig("DatePicker", DrawDatePickerDemos),
@@ -102,7 +110,9 @@ namespace shadcnui_Demo.Menu
                 new Tabs.TabConfig("MenuBar", DrawMenuBar),
                 new Tabs.TabConfig("Chart", DrawChartDemos),
                 new Tabs.TabConfig("Table", DrawTableDemos),
-                new Tabs.TabConfig("Interactive Tables", DataTableDemos),
+                new Tabs.TabConfig("DataTable", DataTableDemos),
+                new Tabs.TabConfig("Toast", DrawToastDemos),
+                new Tabs.TabConfig("Slider", DrawSliderDemos),
                 new Tabs.TabConfig("Layout", DrawLayoutDemos),
             };
 
@@ -149,12 +159,15 @@ namespace shadcnui_Demo.Menu
             {
                 windowRect = GUI.Window(101, windowRect, (GUI.WindowFunction)DrawDemoWindow, "shadcn/ui Demo - Full Showcase");
             }
+
+            // Draw toasts for Toast
+            guiHelper.DrawToasts();
         }
 
         void DrawDemoWindow(int windowID)
         {
-            guiHelper.UpdateAnimations(showDemoWindow);
-            if (guiHelper.BeginAnimatedGUI())
+            guiHelper.UpdateGUI(showDemoWindow);
+            if (guiHelper.BeginGUI())
             {
                 DrawHeader();
 
@@ -168,7 +181,7 @@ namespace shadcnui_Demo.Menu
                     var position = tabsOnBottom ? Tabs.TabPosition.Bottom : Tabs.TabPosition.Top;
                     currentDemoTab = guiHelper.DrawTabs(demoTabs.Select(tab => tab.Name).ToArray(), currentDemoTab, DrawScrollableContent, maxLines: 2, position: position);
                 }
-                guiHelper.EndAnimatedGUI();
+                guiHelper.EndGUI();
             }
             GUI.DragWindow();
         }
@@ -275,6 +288,40 @@ namespace shadcnui_Demo.Menu
                     guiHelper.EndHorizontalGroup();
                 }
             );
+
+            DrawSection(
+                "Buttons with Icons",
+                () =>
+                {
+                    guiHelper.BeginHorizontalGroup();
+                    guiHelper.Button("Button with a icon", img);
+                    guiHelper.Button("Left Icon", img, ControlVariant.Outline);
+                    guiHelper.Button("Secondary", img, ControlVariant.Secondary);
+                    guiHelper.EndHorizontalGroup();
+
+                    guiHelper.Label("Icon Positioning");
+                    guiHelper.BeginHorizontalGroup();
+                    guiHelper.Button(
+                        "Left",
+                        new IconConfig(img)
+                        {
+                            Position = IconPosition.Left,
+                            Size = 14f,
+                            Spacing = 4f,
+                        }
+                    );
+                    guiHelper.Button(
+                        "Right",
+                        new IconConfig(img)
+                        {
+                            Position = IconPosition.Right,
+                            Size = 14f,
+                            Spacing = 4f,
+                        }
+                    );
+                    guiHelper.EndHorizontalGroup();
+                }
+            );
         }
 
         void DrawBadgeDemos()
@@ -303,9 +350,26 @@ namespace shadcnui_Demo.Menu
                     guiHelper.CountBadge(5);
                     guiHelper.StatusBadge("Online", true);
                     guiHelper.ProgressBadge("Loading", 0.7f);
-                    guiHelper.AnimatedBadge("New");
                     guiHelper.RoundedBadge("Rounded", cornerRadius: 8f);
                     guiHelper.BadgeWithIcon("Icon", img);
+                    guiHelper.EndHorizontalGroup();
+
+                    guiHelper.Label("Badge with Icon");
+                    guiHelper.BeginHorizontalGroup();
+                    guiHelper.Badge("Icon", new IconConfig(img) { Size = 12f, Spacing = 3f });
+                    guiHelper.EndHorizontalGroup();
+                }
+            );
+
+            DrawSection(
+                "Animated Badges",
+                () =>
+                {
+                    guiHelper.Label("Badges with smooth pulse animation using AnimationManager:");
+                    guiHelper.BeginHorizontalGroup();
+                    guiHelper.AnimatedBadge("Pulse 1", "badge_anim_1");
+                    guiHelper.AnimatedBadge("Pulse 2", "badge_anim_2", ControlVariant.Destructive);
+                    guiHelper.AnimatedBadge("Pulse 3", "badge_anim_3", ControlVariant.Secondary);
                     guiHelper.EndHorizontalGroup();
                 }
             );
@@ -318,8 +382,7 @@ namespace shadcnui_Demo.Menu
                 () =>
                 {
                     guiHelper.Label("Default");
-                    string val = "";
-                    guiHelper.DrawPasswordField(200, "Default", ref val);
+                    guiHelper.DrawPasswordField(200, "Default", ref passwordValue);
                 }
             );
 
@@ -335,6 +398,34 @@ namespace shadcnui_Demo.Menu
 
                     guiHelper.Label("Render Label");
                     guiHelper.RenderLabel("Rendered Label Text", 200);
+                }
+            );
+
+            DrawSection(
+                "Inputs with Icons",
+                () =>
+                {
+                    guiHelper.DrawInput("Input with Icon", img, passwordValue);
+
+                    guiHelper.Label("Icon Config");
+                    guiHelper.DrawInput(
+                        "Left Icon",
+                        new IconConfig(img)
+                        {
+                            Position = IconPosition.Left,
+                            Size = 14f,
+                            Spacing = 4f,
+                        }
+                    );
+                    guiHelper.DrawInput(
+                        "Right Icon",
+                        new IconConfig(img)
+                        {
+                            Position = IconPosition.Right,
+                            Size = 14f,
+                            Spacing = 4f,
+                        }
+                    );
                 }
             );
         }
@@ -368,6 +459,46 @@ namespace shadcnui_Demo.Menu
                     });
                 }
             );
+
+            DrawSection(
+                "Toggles with Icons",
+                () =>
+                {
+                    string key = "icon_toggle";
+                    if (!toggleStates.ContainsKey(key))
+                        toggleStates[key] = false;
+                    toggleStates[key] = guiHelper.Toggle("Toggle with Icon", new IconConfig(img, IconPosition.Left), toggleStates[key]);
+
+                    guiHelper.Label("Icon Config");
+                    string leftKey = "toggle_left";
+                    if (!toggleStates.ContainsKey(leftKey))
+                        toggleStates[leftKey] = false;
+                    toggleStates[leftKey] = guiHelper.Toggle(
+                        "Left",
+                        new IconConfig(img)
+                        {
+                            Position = IconPosition.Left,
+                            Size = 14f,
+                            Spacing = 4f,
+                        },
+                        toggleStates[leftKey]
+                    );
+
+                    string rightKey = "toggle_right";
+                    if (!toggleStates.ContainsKey(rightKey))
+                        toggleStates[rightKey] = false;
+                    toggleStates[rightKey] = guiHelper.Toggle(
+                        "Right",
+                        new IconConfig(img)
+                        {
+                            Position = IconPosition.Right,
+                            Size = 14f,
+                            Spacing = 4f,
+                        },
+                        toggleStates[rightKey]
+                    );
+                }
+            );
         }
 
         void DrawCheckboxDemos()
@@ -383,6 +514,40 @@ namespace shadcnui_Demo.Menu
                             toggleStates[key] = false;
                         toggleStates[key] = guiHelper.Checkbox("Check", toggleStates[key], variant);
                     });
+                }
+            );
+
+            DrawSection(
+                "Checkboxes with Icons",
+                () =>
+                {
+                    string leftKey = "check_left";
+                    if (!toggleStates.ContainsKey(leftKey))
+                        toggleStates[leftKey] = false;
+                    toggleStates[leftKey] = guiHelper.Checkbox(
+                        "Left",
+                        new IconConfig(img)
+                        {
+                            Position = IconPosition.Left,
+                            Size = 14f,
+                            Spacing = 4f,
+                        },
+                        toggleStates[leftKey]
+                    );
+
+                    string rightKey = "check_right";
+                    if (!toggleStates.ContainsKey(rightKey))
+                        toggleStates[rightKey] = false;
+                    toggleStates[rightKey] = guiHelper.Checkbox(
+                        "Right",
+                        new IconConfig(img)
+                        {
+                            Position = IconPosition.Right,
+                            Size = 14f,
+                            Spacing = 4f,
+                        },
+                        toggleStates[rightKey]
+                    );
                 }
             );
 
@@ -537,6 +702,9 @@ namespace shadcnui_Demo.Menu
             );
         }
 
+        private float animatedProgressValue = 0f;
+        private float animatedProgressTarget = 0.7f;
+
         void DrawProgressDemos()
         {
             DrawSection(
@@ -554,6 +722,27 @@ namespace shadcnui_Demo.Menu
                     guiHelper.CircularProgress(0.25f, 40);
                     guiHelper.CircularProgress(0.75f, 40);
                     guiHelper.EndHorizontalGroup();
+                }
+            );
+
+            DrawSection(
+                "Animated Progress",
+                () =>
+                {
+                    guiHelper.Label("Click buttons to animate progress smoothly:");
+                    guiHelper.BeginHorizontalGroup();
+                    if (guiHelper.Button("0%"))
+                        animatedProgressTarget = 0f;
+                    if (guiHelper.Button("25%"))
+                        animatedProgressTarget = 0.25f;
+                    if (guiHelper.Button("50%"))
+                        animatedProgressTarget = 0.5f;
+                    if (guiHelper.Button("75%"))
+                        animatedProgressTarget = 0.75f;
+                    if (guiHelper.Button("100%"))
+                        animatedProgressTarget = 1f;
+                    guiHelper.EndHorizontalGroup();
+                    guiHelper.AnimatedProgress("demo_progress", animatedProgressTarget, 300);
                 }
             );
         }
@@ -593,6 +782,32 @@ namespace shadcnui_Demo.Menu
                     DrawAllVariants(variant => guiHelper.Label("Label", variant));
                 }
             );
+
+            DrawSection(
+                "Labels with Icons",
+                () =>
+                {
+                    guiHelper.Label(
+                        "Label with Icon",
+                        new IconConfig(img)
+                        {
+                            Position = IconPosition.Left,
+                            Size = 14f,
+                            Spacing = 4f,
+                        }
+                    );
+                    guiHelper.Label(
+                        "Muted Icon Label",
+                        new IconConfig(img)
+                        {
+                            Position = IconPosition.Left,
+                            Size = 14f,
+                            Spacing = 4f,
+                        },
+                        ControlVariant.Muted
+                    );
+                }
+            );
         }
 
         void DrawDialogDemos()
@@ -625,6 +840,112 @@ namespace shadcnui_Demo.Menu
                             guiHelper.Label("Simple Content");
                             if (guiHelper.Button("Close"))
                                 guiHelper.CloseDialog();
+                        }
+                    );
+                }
+            );
+
+            DrawSection(
+                "Dialog with Animation",
+                () =>
+                {
+                    guiHelper.BeginHorizontalGroup();
+                    if (guiHelper.Button("Animated Dialog"))
+                        guiHelper.OpenDialog("anim_dlg");
+
+                    guiHelper.EndHorizontalGroup();
+
+                    guiHelper.DrawDialog(
+                        new DialogConfig
+                        {
+                            Id = "anim_dlg",
+                            Title = "Animated Dialog",
+                            Description = "This dialog opens with a fade and scale animation.",
+                            Content = () => guiHelper.Label("Watch the smooth animation!"),
+                            Footer = () =>
+                            {
+                                if (guiHelper.Button("Close"))
+                                    guiHelper.CloseDialog();
+                            },
+                            Width = 400,
+                            Height = 200,
+                        }
+                    );
+                }
+            );
+
+            DrawSection(
+                "Dialog with Overlay Click",
+                () =>
+                {
+                    if (guiHelper.Button("Click Overlay to Close"))
+                        guiHelper.OpenDialog("overlay_dlg");
+
+                    guiHelper.DrawDialog(
+                        new DialogConfig
+                        {
+                            Id = "overlay_dlg",
+                            Title = "Click Outside to Close",
+                            Description = "Click the dark overlay area to close this dialog.",
+                            CloseOnOverlayClick = true,
+                            Content = () => guiHelper.Label("Try clicking outside this dialog!"),
+                            Footer = () =>
+                            {
+                                if (guiHelper.Button("Or Click Here"))
+                                    guiHelper.CloseDialog();
+                            },
+                            Width = 400,
+                            Height = 200,
+                        }
+                    );
+                }
+            );
+
+            DrawSection(
+                "Dialog Z-Ordering",
+                () =>
+                {
+                    guiHelper.Label("Open multiple dialogs to see z-ordering in action.");
+                    guiHelper.BeginHorizontalGroup();
+                    if (guiHelper.Button("Dialog Z=100"))
+                        guiHelper.OpenDialog("z100_dlg");
+                    if (guiHelper.Button("Dialog Z=200"))
+                        guiHelper.OpenDialog("z200_dlg");
+                    guiHelper.EndHorizontalGroup();
+
+                    guiHelper.DrawDialog(
+                        new DialogConfig
+                        {
+                            Id = "z100_dlg",
+                            Title = "Z-Index: 100",
+                            Description = "This dialog has ZIndex=100 (lower priority).",
+                            ZIndex = 100,
+                            Content = () => guiHelper.Label("I should appear behind Z=200 dialog."),
+                            Footer = () =>
+                            {
+                                if (guiHelper.Button("Close"))
+                                    guiHelper.CloseDialog();
+                            },
+                            Width = 350,
+                            Height = 180,
+                        }
+                    );
+
+                    guiHelper.DrawDialog(
+                        new DialogConfig
+                        {
+                            Id = "z200_dlg",
+                            Title = "Z-Index: 200",
+                            Description = "This dialog has ZIndex=200 (higher priority).",
+                            ZIndex = 200,
+                            Content = () => guiHelper.Label("I should appear in front of Z=100 dialog."),
+                            Footer = () =>
+                            {
+                                if (guiHelper.Button("Close"))
+                                    guiHelper.CloseDialog();
+                            },
+                            Width = 350,
+                            Height = 180,
                         }
                     );
                 }
@@ -727,13 +1048,132 @@ namespace shadcnui_Demo.Menu
             );
         }
 
+        // Tab state variables
+        private int disabledTabIndex = 0;
+        private int indicatorUnderlineIndex = 0;
+        private int indicatorBgIndex = 0;
+        private int indicatorBorderIndex = 0;
+        private int combinedTabIndex = 0;
+        private int closableTabIndex = 0;
+        private string[] closableTabNames = new string[] { "Tab 1", "Tab 2", "Tab 3", "Tab 4" };
+        private bool[] closableTabs = new bool[] { true, true, true, false };
+        private int iconTabIndex = 0;
+
         void DrawTabsDemos()
         {
             DrawSection(
-                "Tabs",
+                "Disabled Tabs",
+                () =>
+                {
+                    guiHelper.Label("Tabs with disabled state - disabled tabs cannot be selected");
+                    var disabledTabConfigs = new Tabs.TabConfig[]
+                    {
+                        new Tabs.TabConfig("Enabled 1", () => guiHelper.Label("This tab is enabled")),
+                        new Tabs.TabConfig("Disabled", () => guiHelper.Label("This tab is disabled"), true),
+                        new Tabs.TabConfig("Enabled 2", () => guiHelper.Label("This tab is also enabled")),
+                    };
+
+                    disabledTabIndex = guiHelper.TabsWithContent(disabledTabConfigs, disabledTabIndex);
+                }
+            );
+
+            DrawSection(
+                "Tabs with Selection Indicator",
+                () =>
+                {
+                    guiHelper.Label("Tabs with different indicator styles");
+
+                    guiHelper.Label("Underline Indicator (default)");
+                    var underlineConfig = new TabsConfig(new[] { "Tab 1", "Tab 2", "Tab 3" }, indicatorUnderlineIndex)
+                    {
+                        Content = () => guiHelper.Label("Content for selected tab"),
+                        ShowIndicator = true,
+                        IndicatorStyle = Tabs.IndicatorStyle.Underline,
+                    };
+                    indicatorUnderlineIndex = guiHelper.Tabs(underlineConfig);
+
+                    GUILayout.Space(10);
+
+                    guiHelper.Label("Background Indicator");
+                    var bgConfig = new TabsConfig(new[] { "Tab 1", "Tab 2", "Tab 3" }, indicatorBgIndex)
+                    {
+                        Content = () => guiHelper.Label("Content for selected tab"),
+                        ShowIndicator = true,
+                        IndicatorStyle = Tabs.IndicatorStyle.Background,
+                    };
+                    indicatorBgIndex = guiHelper.Tabs(bgConfig);
+
+                    GUILayout.Space(10);
+
+                    guiHelper.Label("Border Indicator");
+                    var borderConfig = new TabsConfig(new[] { "Tab 1", "Tab 2", "Tab 3" }, indicatorBorderIndex)
+                    {
+                        Content = () => guiHelper.Label("Content for selected tab"),
+                        ShowIndicator = true,
+                        IndicatorStyle = Tabs.IndicatorStyle.Border,
+                    };
+                    indicatorBorderIndex = guiHelper.Tabs(borderConfig);
+                }
+            );
+
+            DrawSection(
+                "Combined Features",
+                () =>
+                {
+                    guiHelper.Label("Tabs combining multiple features");
+                    var combinedConfigs = new Tabs.TabConfig[]
+                    {
+                        new Tabs.TabConfig("Overview", () => guiHelper.Label("Overview content")),
+                        new Tabs.TabConfig("Details", () => guiHelper.Label("Details content")),
+                        new Tabs.TabConfig("Disabled", () => guiHelper.Label("This won't show"), true),
+                        new Tabs.TabConfig("Advanced", () => guiHelper.Label("Advanced content")),
+                    };
+
+                    combinedTabIndex = guiHelper.TabsWithContent(combinedConfigs, combinedTabIndex);
+                }
+            );
+
+            DrawSection(
+                "Main Demo Tabs",
                 () =>
                 {
                     guiHelper.Label("See the main demo window tabs for examples of Vertical/Horizontal tabs.");
+                }
+            );
+
+            DrawSection(
+                "Closable Tabs",
+                () =>
+                {
+                    guiHelper.Label("Tabs with close buttons - click X to close a tab");
+
+                    if (closableTabNames.Length > 0)
+                    {
+                        closableTabIndex = guiHelper.DrawClosableTabs(ref closableTabNames, ref closableTabs, closableTabIndex, content: () => guiHelper.Label($"Content for {closableTabNames[Math.Min(closableTabIndex, closableTabNames.Length - 1)]}"));
+                    }
+                    else
+                    {
+                        guiHelper.Label("All tabs closed!");
+                    }
+
+                    GUILayout.Space(5);
+                    if (guiHelper.Button("Reset Tabs", ControlVariant.Outline))
+                    {
+                        closableTabNames = new string[] { "Tab 1", "Tab 2", "Tab 3", "Tab 4" };
+                        closableTabs = new bool[] { true, true, true, false };
+                        closableTabIndex = 0;
+                    }
+                }
+            );
+
+            DrawSection(
+                "Tabs with Icons",
+                () =>
+                {
+                    guiHelper.Label("Tabs with icons displayed alongside labels");
+
+                    var iconConfig = new TabsConfig(new[] { "Home", "Settings", "Profile", "Help" }, iconTabIndex) { Content = () => guiHelper.Label($"Content for tab {iconTabIndex + 1}"), TabIcons = new Texture2D[] { img, img, img, img } };
+                    iconTabIndex = guiHelper.Tabs(iconConfig);
                 }
             );
         }
@@ -922,6 +1362,258 @@ namespace shadcnui_Demo.Menu
                 result[i, 2] = rows[i].GetValue<string>("role");
             }
             return result;
+        }
+
+        void DrawToastDemos()
+        {
+            DrawSection(
+                "Quick Toast Variants",
+                () =>
+                {
+                    guiHelper.Label("Show notifications with one click:");
+                    guiHelper.HorizontalSeparator();
+
+                    if (guiHelper.Button("Success"))
+                        guiHelper.ShowSuccessToast("Success!", "Operation completed successfully");
+
+                    if (guiHelper.Button("Error"))
+                        guiHelper.ShowErrorToast("Error", "Something went wrong");
+
+                    if (guiHelper.Button("Warning"))
+                        guiHelper.ShowWarningToast("Warning", "Please be careful");
+
+                    if (guiHelper.Button("Info"))
+                        guiHelper.ShowInfoToast("Info", "Here is some information");
+                }
+            );
+
+            DrawSection(
+                "Advanced Toast Builder",
+                () =>
+                {
+                    guiHelper.Label("Fully customized toasts using fluent API:");
+                    guiHelper.HorizontalSeparator();
+
+                    if (guiHelper.Button("Toast with Action"))
+                    {
+                        guiHelper
+                            .Toast()
+                            .Title("Confirm Action")
+                            .Description("Do you want to proceed?")
+                            .Variant(ToastVariant.Warning)
+                            .Duration(8000f)
+                            .Position(ToastPosition.Center)
+                            .Action("Confirm", () => guiHelper.ShowSuccessToast("Confirmed!", "Action was executed"))
+                            .AccentBar(true)
+                            .ProgressBar(true)
+                            .Show();
+                    }
+
+                    if (guiHelper.Button("Click-to-Dismiss Toast"))
+                    {
+                        guiHelper.Toast().Title("Click Me!").Description("Click anywhere on this toast to dismiss").Variant(ToastVariant.Info).Duration(10000f).Position(ToastPosition.TopCenter).ClickToDismiss(true).ProgressBar(true).Show();
+                    }
+
+                    if (guiHelper.Button("Long-Duration Toast"))
+                    {
+                        guiHelper.Toast().Title("Long Message").Description("This toast will stay for 15 seconds. Hover to pause the timer!").Variant(ToastVariant.Info).Duration(15000f).Position(ToastPosition.BottomLeft).PauseOnHover(true).HoverDelay(0.5f).AccentBar(true).ProgressBar(true).Show();
+                    }
+                }
+            );
+
+            DrawSection(
+                "Toast Positions",
+                () =>
+                {
+                    guiHelper.Label("Show toasts at different screen positions:");
+                    guiHelper.HorizontalSeparator();
+
+                    if (guiHelper.Button("Top Left"))
+                    {
+                        guiHelper.Toast().Title("Top Left").Variant(ToastVariant.Default).Position(ToastPosition.TopLeft).Duration(3000f).Show();
+                    }
+
+                    if (guiHelper.Button("Top Center"))
+                    {
+                        guiHelper.Toast().Title("Top Center").Variant(ToastVariant.Info).Position(ToastPosition.TopCenter).Duration(3000f).Show();
+                    }
+
+                    if (guiHelper.Button("Top Right"))
+                    {
+                        guiHelper.Toast().Title("Top Right").Variant(ToastVariant.Success).Position(ToastPosition.TopRight).Duration(3000f).Show();
+                    }
+
+                    if (guiHelper.Button("Center"))
+                    {
+                        guiHelper.Toast().Title("Center").Description("Perfectly centered on screen").Variant(ToastVariant.Warning).Position(ToastPosition.Center).Duration(3000f).Show();
+                    }
+
+                    if (guiHelper.Button("Bottom Left"))
+                    {
+                        guiHelper.Toast().Title("Bottom Left").Variant(ToastVariant.Error).Position(ToastPosition.BottomLeft).Duration(3000f).Show();
+                    }
+
+                    if (guiHelper.Button("Bottom Center"))
+                    {
+                        guiHelper.Toast().Title("Bottom Center").Variant(ToastVariant.Default).Position(ToastPosition.BottomCenter).Duration(3000f).Show();
+                    }
+
+                    if (guiHelper.Button("Bottom Right"))
+                    {
+                        guiHelper.Toast().Title("Bottom Right").Variant(ToastVariant.Success).Position(ToastPosition.BottomRight).Duration(3000f).Show();
+                    }
+                }
+            );
+
+            DrawSection(
+                "Stack Directions",
+                () =>
+                {
+                    guiHelper.Label("Show multiple toasts stacking in different directions:");
+                    guiHelper.HorizontalSeparator();
+
+                    if (guiHelper.Button("Stack Up"))
+                    {
+                        for (int i = 0; i < 3; i++)
+                        {
+                            guiHelper.Toast().Title($"Toast {i + 1}").Description($"Stacking upward - Message {i + 1}").Variant((ToastVariant)(i % 4)).Position(ToastPosition.BottomRight).StackDirection(ToastStackDirection.Up).Duration(5000f).Show();
+                        }
+                    }
+
+                    if (guiHelper.Button("Stack Down"))
+                    {
+                        for (int i = 0; i < 3; i++)
+                        {
+                            guiHelper.Toast().Title($"Toast {i + 1}").Description($"Stacking downward - Message {i + 1}").Variant((ToastVariant)(i % 4)).Position(ToastPosition.TopRight).StackDirection(ToastStackDirection.Down).Duration(5000f).Show();
+                        }
+                    }
+
+                    if (guiHelper.Button("Stack Left"))
+                    {
+                        for (int i = 0; i < 3; i++)
+                        {
+                            guiHelper.Toast().Title($"Toast {i + 1}").Description($"Stacking left - Message {i + 1}").Variant((ToastVariant)(i % 4)).Position(ToastPosition.CenterRight).StackDirection(ToastStackDirection.Left).Duration(5000f).Show();
+                        }
+                    }
+
+                    if (guiHelper.Button("Stack Right"))
+                    {
+                        for (int i = 0; i < 3; i++)
+                        {
+                            guiHelper.Toast().Title($"Toast {i + 1}").Description($"Stacking right - Message {i + 1}").Variant((ToastVariant)(i % 4)).Position(ToastPosition.CenterLeft).StackDirection(ToastStackDirection.Right).Duration(5000f).Show();
+                        }
+                    }
+                }
+            );
+
+            DrawSection(
+                "Toast Management",
+                () =>
+                {
+                    guiHelper.Label("Monitor and control active toasts:");
+                    guiHelper.HorizontalSeparator();
+
+                    int activeCount = guiHelper.GetActiveToastCount();
+
+                    guiHelper.Label($"Active: {activeCount}");
+
+                    if (activeCount > 0)
+                    {
+                        if (guiHelper.Button("Dismiss All Toasts"))
+                            guiHelper.DismissAllToasts();
+                    }
+                }
+            );
+        }
+
+        void DrawSliderDemos()
+        {
+            DrawSection(
+                "Basic Slider",
+                () =>
+                {
+                    guiHelper.Label("Simple slider with default settings:");
+                    sliderValue = guiHelper.Slider(sliderValue, 0f, 1f);
+                    guiHelper.MutedLabel($"Value: {sliderValue:F2}");
+                }
+            );
+
+            DrawSection(
+                "Labeled Slider",
+                () =>
+                {
+                    guiHelper.Label("Slider with label and value display:");
+                    sliderLabeledValue = guiHelper.LabeledSlider("Volume", sliderLabeledValue, 0f, 1f, true);
+                }
+            );
+
+            DrawSection(
+                "Slider with Step",
+                () =>
+                {
+                    guiHelper.Label("Slider that snaps to increments of 10:");
+                    sliderWithStepValue = guiHelper.LabeledSlider("Percentage", sliderWithStepValue, 0f, 100f, 10f, true);
+                }
+            );
+
+            DrawSection(
+                "Disabled Slider",
+                () =>
+                {
+                    guiHelper.Label("Slider in disabled state:");
+                    sliderDisabledValue = guiHelper.DisabledSlider(sliderDisabledValue, 0f, 1f);
+                    guiHelper.MutedLabel("This slider cannot be interacted with");
+                }
+            );
+
+            DrawSection(
+                "Slider Variants",
+                () =>
+                {
+                    guiHelper.Label("Destructive variant:");
+                    sliderDestructiveValue = guiHelper.Slider(
+                        new SliderConfig
+                        {
+                            Value = sliderDestructiveValue,
+                            MinValue = 0f,
+                            MaxValue = 1f,
+                            Label = "Danger Level",
+                            Variant = ControlVariant.Destructive,
+                            ShowValue = true,
+                        }
+                    );
+                }
+            );
+
+            DrawSection(
+                "Slider Sizes",
+                () =>
+                {
+                    guiHelper.Label("Small slider:");
+                    sliderSmallValue = guiHelper.Slider(
+                        new SliderConfig
+                        {
+                            Value = sliderSmallValue,
+                            MinValue = 0f,
+                            MaxValue = 1f,
+                            Size = ControlSize.Small,
+                        }
+                    );
+
+                    guiHelper.AddSpace(10);
+
+                    guiHelper.Label("Large slider:");
+                    sliderLargeValue = guiHelper.Slider(
+                        new SliderConfig
+                        {
+                            Value = sliderLargeValue,
+                            MinValue = 0f,
+                            MaxValue = 1f,
+                            Size = ControlSize.Large,
+                        }
+                    );
+                }
+            );
         }
 
         void DrawLayoutDemos()

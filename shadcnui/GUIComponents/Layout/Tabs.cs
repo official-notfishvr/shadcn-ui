@@ -1,13 +1,16 @@
 using System;
 using System.Collections.Generic;
-using shadcnui;
-using shadcnui.GUIComponents.Core;
+using shadcnui.GUIComponents.Core.Base;
+using shadcnui.GUIComponents.Core.Styling;
+using shadcnui.GUIComponents.Core.Theming;
+using shadcnui.GUIComponents.Core.Utils;
 using UnityEngine;
 
 namespace shadcnui.GUIComponents.Layout
 {
     public class Tabs : BaseComponent
     {
+        #region Enums
         public enum TabSide
         {
             Left,
@@ -22,35 +25,15 @@ namespace shadcnui.GUIComponents.Layout
             Right,
         }
 
-        public Tabs(GUIHelper helper)
-            : base(helper) { }
-
-        public class TabsConfig
+        public enum IndicatorStyle
         {
-            public string[] TabNames { get; set; }
-            public int SelectedIndex { get; set; }
-            public Action<int> OnTabChange { get; set; }
-            public Action Content { get; set; }
-            public int MaxLines { get; set; }
-            public TabPosition Position { get; set; }
-            public TabSide Side { get; set; }
-            public float TabWidth { get; set; }
-            public GUILayoutOption[] Options { get; set; }
-
-            public TabsConfig(string[] tabNames, int selectedIndex)
-            {
-                TabNames = tabNames;
-                SelectedIndex = selectedIndex;
-                OnTabChange = null;
-                Content = null;
-                MaxLines = 1;
-                Position = TabPosition.Top;
-                Side = TabSide.Left;
-                TabWidth = 120f;
-                Options = Array.Empty<GUILayoutOption>();
-            }
+            Underline,
+            Background,
+            Border,
         }
+        #endregion
 
+        #region Data Types
         public struct TabConfig
         {
             public string Name;
@@ -64,24 +47,79 @@ namespace shadcnui.GUIComponents.Layout
                 Disabled = disabled;
             }
         }
+        #endregion
 
+        public Tabs(GUIHelper helper)
+            : base(helper) { }
+
+        #region Config-based API
         public int Draw(TabsConfig config)
         {
             return DrawTabsInternal(config);
         }
 
-        public int Draw(string[] tabNames, int selectedIndex, Action content, Action<int> onTabChange = null, int maxLines = 1, TabPosition position = TabPosition.Top, TabSide side = TabSide.Left, float tabWidth = 120f, params GUILayoutOption[] options)
+        public int DrawWithAutoClose(ref string[] tabNames, ref bool[] closableTabs, int selectedIndex, Action content = null, Action<int> onTabChange = null)
         {
             var config = new TabsConfig(tabNames, selectedIndex)
             {
-                OnTabChange = onTabChange,
+                ClosableTabs = closableTabs,
                 Content = content,
-                MaxLines = maxLines,
-                Position = position,
-                Side = side,
-                TabWidth = tabWidth,
-                Options = options,
+                OnTabChange = onTabChange,
             };
+
+            var result = DrawTabsInternalWithAutoClose(ref tabNames, ref closableTabs, ref selectedIndex, config);
+            return result;
+        }
+        #endregion
+
+        private int _pendingCloseIndex = -1;
+        private Action<int> _pendingCloseCallback = null;
+
+        #region Internal Drawing
+
+        private int DrawTabsInternalWithAutoClose(ref string[] tabNames, ref bool[] closableTabs, ref int selectedIndex, TabsConfig config)
+        {
+            if (tabNames == null || tabNames.Length == 0)
+            {
+                config.Content?.Invoke();
+                return selectedIndex;
+            }
+
+            if (_pendingCloseIndex >= 0 && _pendingCloseCallback == null)
+            {
+                var closeIndex = _pendingCloseIndex;
+                _pendingCloseIndex = -1;
+
+                var newNames = new List<string>(tabNames);
+                var newClosable = new List<bool>(closableTabs);
+
+                if (closeIndex >= 0 && closeIndex < newNames.Count)
+                {
+                    newNames.RemoveAt(closeIndex);
+                    if (closeIndex < newClosable.Count)
+                        newClosable.RemoveAt(closeIndex);
+
+                    tabNames = newNames.ToArray();
+                    closableTabs = newClosable.ToArray();
+
+                    config.TabNames = tabNames;
+                    config.ClosableTabs = closableTabs;
+
+                    if (selectedIndex >= tabNames.Length)
+                        selectedIndex = Math.Max(0, tabNames.Length - 1);
+                    else if (selectedIndex > closeIndex)
+                        selectedIndex--;
+
+                    config.SelectedIndex = selectedIndex;
+                }
+
+                if (tabNames.Length == 0)
+                {
+                    config.Content?.Invoke();
+                    return selectedIndex;
+                }
+            }
+
             return DrawTabsInternal(config);
         }
 
@@ -93,6 +131,15 @@ namespace shadcnui.GUIComponents.Layout
                 return config.SelectedIndex;
             }
 
+            if (_pendingCloseIndex >= 0 && _pendingCloseCallback != null)
+            {
+                var closeIndex = _pendingCloseIndex;
+                var closeCallback = _pendingCloseCallback;
+                _pendingCloseIndex = -1;
+                _pendingCloseCallback = null;
+                closeCallback(closeIndex);
+            }
+
             var styleManager = guiHelper.GetStyleManager();
             var selectedIndex = Mathf.Clamp(config.SelectedIndex, 0, config.TabNames.Length - 1);
             var newSelectedIndex = selectedIndex;
@@ -100,9 +147,11 @@ namespace shadcnui.GUIComponents.Layout
             Action drawTabButtons = () =>
             {
                 var tabsPerLine = (int)Mathf.Ceil((float)config.TabNames.Length / config.MaxLines);
+
                 for (var line = 0; line < config.MaxLines; line++)
                 {
                     var horizontalStarted = false;
+
                     try
                     {
                         layoutComponents.BeginHorizontalGroup(styleManager.GetTabsListStyle());
@@ -111,31 +160,118 @@ namespace shadcnui.GUIComponents.Layout
                         for (var i = line * tabsPerLine; i < (line + 1) * tabsPerLine && i < config.TabNames.Length; i++)
                         {
                             var isActive = i == selectedIndex;
+                            var isDisabled = config.DisabledTabs != null && i < config.DisabledTabs.Length && config.DisabledTabs[i];
                             var triggerStyle = styleManager.GetTabsTriggerStyle(isActive);
+
+                            var hasIcon = config.TabIcons != null && i < config.TabIcons.Length && config.TabIcons[i] != null;
+                            var isClosable = config.ClosableTabs != null && i < config.ClosableTabs.Length && config.ClosableTabs[i];
+
+                            var tabLabel = config.TabNames[i] ?? $"Tab {i + 1}";
+                            var displayLabel = isClosable ? tabLabel + "  ×" : tabLabel;
 
                             GUILayoutOption[] finalOptions;
                             if (config.Options == null || config.Options.Length == 0)
                             {
-                                finalOptions = new GUILayoutOption[] { GUILayout.Height(Mathf.RoundToInt(36 * guiHelper.uiScale)) };
+                                finalOptions = new GUILayoutOption[] { GUILayout.Height(Mathf.RoundToInt(DesignTokens.Tab.Height * guiHelper.uiScale)) };
                             }
                             else
                             {
                                 var tabOptions = new List<GUILayoutOption>(config.Options.Length + 1);
-                                tabOptions.Add(GUILayout.Height(Mathf.RoundToInt(36 * guiHelper.uiScale)));
+                                tabOptions.Add(GUILayout.Height(Mathf.RoundToInt(DesignTokens.Tab.Height * guiHelper.uiScale)));
                                 tabOptions.AddRange(config.Options);
                                 finalOptions = tabOptions.ToArray();
                             }
 
-                            var clicked = UnityHelpers.Button(config.TabNames[i] ?? $"Tab {i + 1}", triggerStyle, finalOptions);
+                            GUI.enabled = !isDisabled;
+                            var tabRect = GUILayoutUtility.GetRect(new GUIContent(displayLabel), triggerStyle, finalOptions);
+
+                            var closeClicked = false;
+                            if (isClosable)
+                            {
+                                var closeButtonSize = DesignTokens.CloseButton.HitArea * guiHelper.uiScale;
+                                var closeButtonRect = new Rect(tabRect.x + tabRect.width - closeButtonSize - DesignTokens.Spacing.XS * guiHelper.uiScale, tabRect.y + (tabRect.height - closeButtonSize) / 2, closeButtonSize, closeButtonSize);
+
+                                if (Event.current.type == EventType.MouseDown && Event.current.button == 0 && closeButtonRect.Contains(Event.current.mousePosition))
+                                {
+                                    closeClicked = true;
+                                    _pendingCloseIndex = i;
+                                    _pendingCloseCallback = config.OnTabClose;
+                                    Event.current.Use();
+                                }
+                            }
+
+                            var clicked = !isDisabled && !closeClicked && GUI.Button(tabRect, "", triggerStyle);
+
+                            if (hasIcon)
+                            {
+                                var iconSize = DesignTokens.Icon.Small * guiHelper.uiScale;
+                                var labelContent = new GUIContent(tabLabel);
+                                var labelWidth = triggerStyle.CalcSize(labelContent).x;
+                                var totalContentWidth = iconSize + DesignTokens.Spacing.XS * guiHelper.uiScale + labelWidth;
+                                var contentStartX = tabRect.x + (tabRect.width - totalContentWidth) / 2;
+                                if (isClosable)
+                                    contentStartX -= DesignTokens.Spacing.MD * guiHelper.uiScale;
+
+                                var iconY = tabRect.y + (tabRect.height - iconSize) / 2;
+                                var iconRect = new Rect(contentStartX, iconY, iconSize, iconSize);
+                                GUI.DrawTexture(iconRect, config.TabIcons[i], ScaleMode.ScaleToFit);
+
+                                var labelStyle = new UnityHelpers.GUIStyle(triggerStyle);
+                                labelStyle.alignment = TextAnchor.MiddleLeft;
+                                var labelRect = new Rect(contentStartX + iconSize + DesignTokens.Spacing.XS * guiHelper.uiScale, tabRect.y, labelWidth, tabRect.height);
+                                GUI.Label(labelRect, tabLabel, labelStyle);
+                            }
+                            else
+                            {
+                                var labelStyle = new UnityHelpers.GUIStyle(triggerStyle);
+                                labelStyle.alignment = TextAnchor.MiddleCenter;
+                                var labelRect = isClosable ? new Rect(tabRect.x, tabRect.y, tabRect.width - DesignTokens.CloseButton.HitArea * guiHelper.uiScale, tabRect.height) : tabRect;
+                                GUI.Label(labelRect, tabLabel, labelStyle);
+                            }
+
+                            if (isClosable)
+                            {
+                                var closeButtonSize = DesignTokens.CloseButton.IconSize * guiHelper.uiScale;
+                                var closeX = tabRect.x + tabRect.width - closeButtonSize - DesignTokens.Spacing.SM * guiHelper.uiScale;
+                                var closeY = tabRect.y + (tabRect.height - closeButtonSize) / 2;
+                                var closeRect = new Rect(closeX, closeY, closeButtonSize, closeButtonSize);
+
+                                var closeStyle = new UnityHelpers.GUIStyle(GUI.skin.label);
+                                closeStyle.fontSize = Mathf.RoundToInt(DesignTokens.CloseButton.FontSize * guiHelper.uiScale);
+                                closeStyle.fontStyle = FontStyle.Bold;
+                                closeStyle.alignment = TextAnchor.MiddleCenter;
+                                closeStyle.normal.textColor = closeRect.Contains(Event.current.mousePosition) ? ThemeManager.Instance.CurrentTheme.Destructive : ThemeManager.Instance.CurrentTheme.Muted;
+
+                                GUI.Label(closeRect, "×", closeStyle);
+                            }
+
+                            GUI.enabled = true;
+
                             if (clicked && i != selectedIndex)
                             {
                                 newSelectedIndex = i;
                                 config.OnTabChange?.Invoke(i);
                             }
 
+                            if (config.ShowIndicator && isActive)
+                            {
+                                switch (config.IndicatorStyle)
+                                {
+                                    case IndicatorStyle.Underline:
+                                        DrawUnderlineIndicator(tabRect, config.IndicatorStyle);
+                                        break;
+                                    case IndicatorStyle.Background:
+                                        DrawBackgroundIndicator(tabRect, config.IndicatorStyle);
+                                        break;
+                                    case IndicatorStyle.Border:
+                                        DrawBorderIndicator(tabRect, config.IndicatorStyle);
+                                        break;
+                                }
+                            }
+
                             if (i < (line + 1) * tabsPerLine - 1 && i < config.TabNames.Length - 1)
                             {
-                                layoutComponents.AddSpace(2);
+                                layoutComponents.AddSpace((int)DesignTokens.Spacing.XXS);
                             }
                         }
                     }
@@ -157,6 +293,7 @@ namespace shadcnui.GUIComponents.Layout
             Action drawVerticalTabButtons = () =>
             {
                 var tabsPerColumn = (int)Mathf.Ceil((float)config.TabNames.Length / config.MaxLines);
+
                 for (var col = 0; col < config.MaxLines; col++)
                 {
                     var verticalStarted = false;
@@ -168,25 +305,96 @@ namespace shadcnui.GUIComponents.Layout
                         for (var i = col * tabsPerColumn; i < (col + 1) * tabsPerColumn && i < config.TabNames.Length; i++)
                         {
                             var isActive = i == selectedIndex;
+                            var isDisabled = config.DisabledTabs != null && i < config.DisabledTabs.Length && config.DisabledTabs[i];
                             var triggerStyle = styleManager.GetTabsTriggerStyle(isActive);
+
+                            var hasIcon = config.TabIcons != null && i < config.TabIcons.Length && config.TabIcons[i] != null;
+                            var isClosable = config.ClosableTabs != null && i < config.ClosableTabs.Length && config.ClosableTabs[i];
+
+                            var tabLabel = config.TabNames[i] ?? $"Tab {i + 1}";
+                            var displayLabel = isClosable ? tabLabel + "  ×" : tabLabel;
 
                             GUILayoutOption[] finalOptions;
                             if (config.Options == null || config.Options.Length == 0)
                             {
-                                finalOptions = new GUILayoutOption[] { GUILayout.Width(config.TabWidth * guiHelper.uiScale), GUILayout.Height(Mathf.RoundToInt(36 * guiHelper.uiScale)), GUILayout.ExpandWidth(false), GUILayout.ExpandHeight(false) };
+                                finalOptions = new GUILayoutOption[] { GUILayout.Width(config.TabWidth * guiHelper.uiScale), GUILayout.Height(Mathf.RoundToInt(DesignTokens.Tab.Height * guiHelper.uiScale)), GUILayout.ExpandWidth(false), GUILayout.ExpandHeight(false) };
                             }
                             else
                             {
                                 var tabOptions = new List<GUILayoutOption>(config.Options.Length + 4);
                                 tabOptions.Add(GUILayout.Width(config.TabWidth * guiHelper.uiScale));
-                                tabOptions.Add(GUILayout.Height(Mathf.RoundToInt(36 * guiHelper.uiScale)));
+                                tabOptions.Add(GUILayout.Height(Mathf.RoundToInt(DesignTokens.Tab.Height * guiHelper.uiScale)));
                                 tabOptions.Add(GUILayout.ExpandWidth(false));
                                 tabOptions.Add(GUILayout.ExpandHeight(false));
                                 tabOptions.AddRange(config.Options);
                                 finalOptions = tabOptions.ToArray();
                             }
 
-                            var clicked = UnityHelpers.Button(config.TabNames[i] ?? $"Tab {i + 1}", triggerStyle, finalOptions);
+                            GUI.enabled = !isDisabled;
+
+                            var tabRect = GUILayoutUtility.GetRect(new GUIContent(displayLabel), triggerStyle, finalOptions);
+
+                            var closeClicked = false;
+                            if (isClosable)
+                            {
+                                var closeButtonSize = DesignTokens.CloseButton.HitArea * guiHelper.uiScale;
+                                var closeButtonRect = new Rect(tabRect.x + tabRect.width - closeButtonSize - DesignTokens.Spacing.XS * guiHelper.uiScale, tabRect.y + (tabRect.height - closeButtonSize) / 2, closeButtonSize, closeButtonSize);
+
+                                if (Event.current.type == EventType.MouseDown && Event.current.button == 0 && closeButtonRect.Contains(Event.current.mousePosition))
+                                {
+                                    closeClicked = true;
+                                    _pendingCloseIndex = i;
+                                    _pendingCloseCallback = config.OnTabClose;
+                                    Event.current.Use();
+                                }
+                            }
+
+                            var clicked = !isDisabled && !closeClicked && GUI.Button(tabRect, "", triggerStyle);
+
+                            if (hasIcon)
+                            {
+                                var iconSize = DesignTokens.Icon.Small * guiHelper.uiScale;
+                                var labelContent = new GUIContent(tabLabel);
+                                var labelWidth = triggerStyle.CalcSize(labelContent).x;
+                                var totalContentWidth = iconSize + DesignTokens.Spacing.XS * guiHelper.uiScale + labelWidth;
+                                var contentStartX = tabRect.x + (tabRect.width - totalContentWidth) / 2;
+                                if (isClosable)
+                                    contentStartX -= DesignTokens.Spacing.MD * guiHelper.uiScale;
+
+                                var iconY = tabRect.y + (tabRect.height - iconSize) / 2;
+                                var iconRect = new Rect(contentStartX, iconY, iconSize, iconSize);
+                                GUI.DrawTexture(iconRect, config.TabIcons[i], ScaleMode.ScaleToFit);
+
+                                var labelStyle = new UnityHelpers.GUIStyle(triggerStyle);
+                                labelStyle.alignment = TextAnchor.MiddleLeft;
+                                var labelRect = new Rect(contentStartX + iconSize + DesignTokens.Spacing.XS * guiHelper.uiScale, tabRect.y, labelWidth, tabRect.height);
+                                GUI.Label(labelRect, tabLabel, labelStyle);
+                            }
+                            else
+                            {
+                                var labelStyle = new UnityHelpers.GUIStyle(triggerStyle);
+                                labelStyle.alignment = TextAnchor.MiddleCenter;
+                                var labelRect = isClosable ? new Rect(tabRect.x, tabRect.y, tabRect.width - DesignTokens.CloseButton.HitArea * guiHelper.uiScale, tabRect.height) : tabRect;
+                                GUI.Label(labelRect, tabLabel, labelStyle);
+                            }
+
+                            if (isClosable)
+                            {
+                                var closeButtonSize = DesignTokens.CloseButton.IconSize * guiHelper.uiScale;
+                                var closeX = tabRect.x + tabRect.width - closeButtonSize - DesignTokens.Spacing.SM * guiHelper.uiScale;
+                                var closeY = tabRect.y + (tabRect.height - closeButtonSize) / 2;
+                                var closeRect = new Rect(closeX, closeY, closeButtonSize, closeButtonSize);
+
+                                var closeStyle = new UnityHelpers.GUIStyle(GUI.skin.label);
+                                closeStyle.fontSize = Mathf.RoundToInt(DesignTokens.CloseButton.FontSize * guiHelper.uiScale);
+                                closeStyle.fontStyle = FontStyle.Bold;
+                                closeStyle.alignment = TextAnchor.MiddleCenter;
+                                closeStyle.normal.textColor = closeRect.Contains(Event.current.mousePosition) ? ThemeManager.Instance.CurrentTheme.Destructive : ThemeManager.Instance.CurrentTheme.Muted;
+
+                                GUI.Label(closeRect, "×", closeStyle);
+                            }
+
+                            GUI.enabled = true;
 
                             if (clicked && i != selectedIndex)
                             {
@@ -194,9 +402,25 @@ namespace shadcnui.GUIComponents.Layout
                                 config.OnTabChange?.Invoke(i);
                             }
 
+                            if (config.ShowIndicator && isActive)
+                            {
+                                switch (config.IndicatorStyle)
+                                {
+                                    case IndicatorStyle.Underline:
+                                        DrawUnderlineIndicator(tabRect, config.IndicatorStyle);
+                                        break;
+                                    case IndicatorStyle.Background:
+                                        DrawBackgroundIndicator(tabRect, config.IndicatorStyle);
+                                        break;
+                                    case IndicatorStyle.Border:
+                                        DrawBorderIndicator(tabRect, config.IndicatorStyle);
+                                        break;
+                                }
+                            }
+
                             if (i < (col + 1) * tabsPerColumn - 1 && i < config.TabNames.Length - 1)
                             {
-                                layoutComponents.AddSpace(2);
+                                layoutComponents.AddSpace((int)DesignTokens.Spacing.XXS);
                             }
                         }
                     }
@@ -218,11 +442,11 @@ namespace shadcnui.GUIComponents.Layout
             if (config.Position == TabPosition.Top)
             {
                 drawTabButtons();
-                config.Content?.Invoke();
+                RenderTabContent(config, newSelectedIndex);
             }
             else if (config.Position == TabPosition.Bottom)
             {
-                config.Content?.Invoke();
+                RenderTabContent(config, newSelectedIndex);
                 drawTabButtons();
             }
             else if (config.Position == TabPosition.Left)
@@ -232,9 +456,8 @@ namespace shadcnui.GUIComponents.Layout
                 {
                     layoutComponents.BeginHorizontalGroup();
                     mainHorizontalStarted = true;
-
                     drawVerticalTabButtons();
-                    config.Content?.Invoke();
+                    RenderTabContent(config, newSelectedIndex);
                 }
                 catch (Exception) { }
                 finally
@@ -256,8 +479,7 @@ namespace shadcnui.GUIComponents.Layout
                 {
                     layoutComponents.BeginHorizontalGroup();
                     mainHorizontalStarted = true;
-
-                    config.Content?.Invoke();
+                    RenderTabContent(config, newSelectedIndex);
                     drawVerticalTabButtons();
                 }
                 catch (Exception) { }
@@ -277,6 +499,56 @@ namespace shadcnui.GUIComponents.Layout
             return newSelectedIndex;
         }
 
+        private void RenderTabContent(TabsConfig config, int selectedIndex)
+        {
+            config.Content?.Invoke();
+        }
+
+        private void DrawUnderlineIndicator(Rect tabRect, IndicatorStyle style)
+        {
+            if (!tabRect.Equals(Rect.zero))
+            {
+                var indicatorColor = ThemeManager.Instance.CurrentTheme.Accent;
+                var indicatorHeight = DesignTokens.Tab.IndicatorHeight;
+                var indicatorRect = new Rect(tabRect.x, tabRect.y + tabRect.height - indicatorHeight, tabRect.width, indicatorHeight);
+
+                GUI.color = indicatorColor;
+                GUI.DrawTexture(indicatorRect, Texture2D.whiteTexture);
+                GUI.color = Color.white;
+            }
+        }
+
+        private void DrawBackgroundIndicator(Rect tabRect, IndicatorStyle style)
+        {
+            if (!tabRect.Equals(Rect.zero))
+            {
+                var indicatorColor = ThemeManager.Instance.CurrentTheme.Accent;
+                indicatorColor.a = 0.1f;
+
+                GUI.color = indicatorColor;
+                GUI.DrawTexture(tabRect, Texture2D.whiteTexture);
+                GUI.color = Color.white;
+            }
+        }
+
+        private void DrawBorderIndicator(Rect tabRect, IndicatorStyle style)
+        {
+            if (!tabRect.Equals(Rect.zero))
+            {
+                var indicatorColor = ThemeManager.Instance.CurrentTheme.Accent;
+                var borderWidth = DesignTokens.Tab.BorderWidth;
+
+                GUI.color = indicatorColor;
+                GUI.DrawTexture(new Rect(tabRect.x, tabRect.y, tabRect.width, borderWidth), Texture2D.whiteTexture);
+                GUI.DrawTexture(new Rect(tabRect.x, tabRect.y + tabRect.height - borderWidth, tabRect.width, borderWidth), Texture2D.whiteTexture);
+                GUI.DrawTexture(new Rect(tabRect.x, tabRect.y, borderWidth, tabRect.height), Texture2D.whiteTexture);
+                GUI.DrawTexture(new Rect(tabRect.x + tabRect.width - borderWidth, tabRect.y, borderWidth, tabRect.height), Texture2D.whiteTexture);
+                GUI.color = Color.white;
+            }
+        }
+        #endregion
+
+        #region Tab Content
         public void BeginTabContent(params GUILayoutOption[] options)
         {
             var styleManager = guiHelper.GetStyleManager();
@@ -288,27 +560,6 @@ namespace shadcnui.GUIComponents.Layout
             layoutComponents.EndVerticalGroup();
         }
 
-        public int TabsWithContent(TabConfig[] tabConfigs, int selectedIndex, Action<int> onTabChange = null)
-        {
-            if (tabConfigs == null || tabConfigs.Length == 0)
-                return selectedIndex;
-
-            var tabNames = new string[tabConfigs.Length];
-            for (var i = 0; i < tabConfigs.Length; i++)
-            {
-                tabNames[i] = tabConfigs[i].Name;
-            }
-
-            var newSelectedIndex = Draw(tabNames, selectedIndex, null, onTabChange, 1, TabPosition.Top);
-
-            if (newSelectedIndex >= 0 && newSelectedIndex < tabConfigs.Length)
-            {
-                BeginTabContent(GUILayout.ExpandHeight(true), GUILayout.ExpandWidth(true));
-                tabConfigs[newSelectedIndex].Content?.Invoke();
-                EndTabContent();
-            }
-
-            return newSelectedIndex;
-        }
+        #endregion
     }
 }
