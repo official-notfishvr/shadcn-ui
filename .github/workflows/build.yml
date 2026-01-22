@@ -16,6 +16,33 @@ env:
   DOTNET_CLI_TELEMETRY_OPTOUT: true
 
 jobs:
+  cleanup:
+    runs-on: ubuntu-latest
+    if: github.event_name == 'schedule'
+    permissions:
+      actions: write
+    steps:
+      - name: Delete Old Artifacts
+        uses: actions/github-script@v6
+        with:
+          script: |
+            const res = await github.rest.actions.listArtifactsForRepo({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+            })
+
+            const cutoffDate = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000)
+
+            res.data.artifacts
+              .filter(artifact => new Date(artifact.created_at) < cutoffDate)
+              .forEach(({ id }) => {
+                github.rest.actions.deleteArtifact({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  artifact_id: id,
+                })
+              })
+
   build:
     runs-on: windows-latest
     if: github.event_name != 'schedule'
