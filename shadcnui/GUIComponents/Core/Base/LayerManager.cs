@@ -142,7 +142,7 @@ namespace shadcnui.GUIComponents.Core.Base
 
                 layerRect = ClampToScreen(layerRect);
 
-                if (state.CloseOnClickOutside && Event.current.type == EventType.MouseUp && Event.current.button == 0)
+                if (state.CloseOnClickOutside && Event.current.type == EventType.MouseDown && Event.current.button == 0)
                 {
                     if (!layerRect.Contains(Event.current.mousePosition))
                     {

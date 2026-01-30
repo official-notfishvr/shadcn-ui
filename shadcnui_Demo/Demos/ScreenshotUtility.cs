@@ -320,7 +320,7 @@ namespace shadcnui_Demo.Menu
             detectedTabs.Clear();
             activeDemoName = "None";
 
-            var demoTypes = new (Type type, string name, string tabsField, string currentField)[] { (typeof(FullDemo), "FullDemo", "demoTabs", "currentDemoTab"), (typeof(ComponentShowcase), "ComponentShowcase", "showcaseTabs", "currentTab") };
+            var demoTypes = new (Type type, string name, string tabsField, string currentField)[] { (typeof(FullDemo), "FullDemo", "demoTabs", "currentDemoTab"), (typeof(ComponentShowcase), "ComponentShowcase", "demoTabs", "currentDemoTab") };
 
             foreach (var (type, name, tabsField, currentField) in demoTypes)
             {

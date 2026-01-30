@@ -349,7 +349,7 @@ namespace shadcnui.GUIComponents.Core.Utils
         public bool ShowIndicator { get; set; }
         public bool[] ClosableTabs { get; set; }
         public Action<int> OnTabClose { get; set; }
-        public bool EnableOverflowScroll { get; set; } = false;
+        public bool EnableOverflowScroll { get; set; } = true;
         public Texture2D[] TabIcons { get; set; }
 
         public TabsConfig(string[] tabNames, int selectedIndex)
@@ -767,7 +767,7 @@ namespace shadcnui.GUIComponents.Core.Utils
         public float DropdownHeight { get; set; } = 250f;
         public bool ShowPreview { get; set; } = true;
         public Action<Theme> OnThemeChanged { get; set; }
-        public GUILayoutOption[] Options { get; set; }
+        public GUILayoutOption[] Options { get; set; } = Array.Empty<GUILayoutOption>();
     }
 
     public class LayerConfig

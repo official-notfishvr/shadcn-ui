@@ -41,8 +41,14 @@ namespace shadcnui.GUIComponents.Core.Base
         {
             if (!isDisposed)
             {
-                OnBeforeDispose();
-                isDisposed = true;
+                try
+                {
+                    OnBeforeDispose();
+                }
+                finally
+                {
+                    isDisposed = true;
+                }
             }
         }
     }

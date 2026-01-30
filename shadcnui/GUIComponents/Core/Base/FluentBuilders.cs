@@ -232,7 +232,19 @@ namespace shadcnui.GUIComponents.Core.Base
             _config.Variant = _variant;
             _config.Size = _size;
             _config.Disabled = _disabled;
-            return GUI.Button(rect, _config.Text);
+            _config.Options = GetOptions();
+            
+            GUI.BeginGroup(rect);
+            GUILayout.BeginArea(new Rect(0, 0, rect.width, rect.height));
+            try
+            {
+                return Draw();
+            }
+            finally
+            {
+                GUILayout.EndArea();
+                GUI.EndGroup();
+            }
         }
     }
 
@@ -339,6 +351,7 @@ namespace shadcnui.GUIComponents.Core.Base
         {
             _config.Variant = _variant;
             _config.Disabled = _disabled;
+            _config.Options = GetOptions();
             return _helper.Input(_config);
         }
 
@@ -346,6 +359,7 @@ namespace shadcnui.GUIComponents.Core.Base
         {
             _config.Variant = _variant;
             _config.Disabled = _disabled;
+            _config.Options = GetOptions();
             return _helper.LabeledInput(_config);
         }
     }
@@ -395,8 +409,19 @@ namespace shadcnui.GUIComponents.Core.Base
             _config.Variant = _variant;
             _config.Size = _size;
             _config.Disabled = _disabled;
-            _config.Rect = rect;
-            return _helper.Toggle(_config.Text, _config.Icon, _config.Value, _config.Variant, _config.Size, _config.OnToggle, _config.Disabled, _config.Options);
+            _config.Options = GetOptions();
+            
+            GUI.BeginGroup(rect);
+            GUILayout.BeginArea(new Rect(0, 0, rect.width, rect.height));
+            try
+            {
+                return Draw();
+            }
+            finally
+            {
+                GUILayout.EndArea();
+                GUI.EndGroup();
+            }
         }
     }
 
@@ -443,7 +468,19 @@ namespace shadcnui.GUIComponents.Core.Base
             _config.Variant = _variant;
             _config.Size = _size;
             _config.Disabled = _disabled;
-            return _helper.Checkbox(rect, _config.Text, _config.Value, _config.Variant, _config.Size, _config.OnToggle, _config.Disabled);
+            _config.Options = GetOptions();
+            
+            GUI.BeginGroup(rect);
+            GUILayout.BeginArea(new Rect(0, 0, rect.width, rect.height));
+            try
+            {
+                return Draw();
+            }
+            finally
+            {
+                GUILayout.EndArea();
+                GUI.EndGroup();
+            }
         }
     }
 
@@ -490,7 +527,19 @@ namespace shadcnui.GUIComponents.Core.Base
             _config.Variant = _variant;
             _config.Size = _size;
             _config.Disabled = _disabled;
-            return _helper.Switch(rect, _config.Text, _config.Value, _config.Variant, _config.Size, _config.OnToggle, _config.Disabled);
+            _config.Options = GetOptions();
+            
+            GUI.BeginGroup(rect);
+            GUILayout.BeginArea(new Rect(0, 0, rect.width, rect.height));
+            try
+            {
+                return Draw();
+            }
+            finally
+            {
+                GUILayout.EndArea();
+                GUI.EndGroup();
+            }
         }
     }
 
@@ -1800,7 +1849,7 @@ namespace shadcnui.GUIComponents.Core.Base
         public int Draw()
         {
             _config.Options = GetOptions();
-            return _helper.Select(_config.Items, _config.SelectedIndex);
+            return _helper.Select(_config);
         }
 
         public void Open() => _helper.OpenSelect();

@@ -455,6 +455,8 @@ namespace shadcnui.GUIComponents.Core.Base
 
         public int Select(string[] items, int selectedIndex) => Execute(() => Get<Select>()?.DrawSelect(items, selectedIndex) ?? selectedIndex, "Select");
 
+        public int Select(SelectConfig config) => Execute(() => Get<Select>()?.DrawSelect(config) ?? config.SelectedIndex, "Select");
+
         public void OpenSelect() => Get<Select>()?.Open();
 
         public void CloseSelect() => Get<Select>()?.Close();

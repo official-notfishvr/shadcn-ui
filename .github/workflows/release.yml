@@ -76,7 +76,7 @@ jobs:
 
       - name: Create Release
         id: create_release
-        uses: softprops/action-gh-release@v1
+        uses: softprops/action-gh-release@v2.5.0
         with:
           tag_name: ${{ steps.get_version.outputs.version }}
           name: Release ${{ steps.get_version.outputs.version }}
@@ -84,8 +84,7 @@ jobs:
           draft: false
           prerelease: false
           generate_release_notes: true
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          token: ${{ secrets.GITHUB_TOKEN }}
 
   build-and-upload:
     name: Build ${{ matrix.configuration }}
@@ -145,20 +144,18 @@ jobs:
           Copy-Item "shadcnui_Demo/bin/$config/netstandard2.1/shadcnui_Demo.dll" "release-artifacts/shadcnui_Demo-$config.dll"
 
       - name: Upload shadcnui.dll to Release
-        uses: softprops/action-gh-release@v1
+        uses: softprops/action-gh-release@v2.5.0
         with:
           tag_name: ${{ needs.create-release.outputs.version }}
           files: release-artifacts/shadcnui-${{ matrix.configuration }}.dll
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Upload shadcnui_Demo.dll to Release
-        uses: softprops/action-gh-release@v1
+        uses: softprops/action-gh-release@v2.5.0
         with:
           tag_name: ${{ needs.create-release.outputs.version }}
           files: release-artifacts/shadcnui_Demo-${{ matrix.configuration }}.dll
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Upload build artifacts (for debugging)
         uses: actions/upload-artifact@v4

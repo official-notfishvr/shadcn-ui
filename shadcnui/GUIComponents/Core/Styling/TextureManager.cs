@@ -11,7 +11,7 @@ namespace shadcnui.GUIComponents.Core.Styling
     public class TextureManager
     {
         private readonly GUIHelper _guiHelper;
-        private readonly Dictionary<int, Texture2D> _textureCache = new();
+        private readonly Dictionary<TextureKey, Texture2D> _textureCache = new();
         private readonly List<Texture2D> _activeTextures = new();
         private Theme _cachedTheme;
         private float _cachedScale;
@@ -45,8 +45,9 @@ namespace shadcnui.GUIComponents.Core.Styling
             public readonly float BorderThickness;
             public readonly float ShadowStrength;
             public readonly int ShadowBlur;
+            public readonly float HighlightIntensity;
 
-            public TextureKey(int w, int h, int r, Color c1, Color c2, Color bc, float bt, float ss = 0, int sb = 0)
+            public TextureKey(int w, int h, int r, Color c1, Color c2, Color bc, float bt, float ss = 0, int sb = 0, float hi = 0)
             {
                 Width = w;
                 Height = h;
@@ -57,6 +58,7 @@ namespace shadcnui.GUIComponents.Core.Styling
                 BorderThickness = bt;
                 ShadowStrength = ss;
                 ShadowBlur = sb;
+                HighlightIntensity = hi;
             }
 
             public bool Equals(TextureKey other)
@@ -69,7 +71,8 @@ namespace shadcnui.GUIComponents.Core.Styling
                     && BorderColor.Equals(other.BorderColor)
                     && BorderThickness.Equals(other.BorderThickness)
                     && ShadowStrength.Equals(other.ShadowStrength)
-                    && ShadowBlur == other.ShadowBlur;
+                    && ShadowBlur == other.ShadowBlur
+                    && HighlightIntensity.Equals(other.HighlightIntensity);
             }
 
             public override int GetHashCode()
@@ -86,6 +89,7 @@ namespace shadcnui.GUIComponents.Core.Styling
                     hash = hash * 31 + BorderThickness.GetHashCode();
                     hash = hash * 31 + ShadowStrength.GetHashCode();
                     hash = hash * 31 + ShadowBlur;
+                    hash = hash * 31 + HighlightIntensity.GetHashCode();
                     return hash;
                 }
             }
@@ -151,9 +155,8 @@ namespace shadcnui.GUIComponents.Core.Styling
         public Texture2D GenerateShape(int width, int height, int radius, Color topColor, Color bottomColor, Color borderColor, float borderPx, float shadowAlpha = 0, int shadowBlur = 0)
         {
             var key = new TextureKey(width, height, radius, topColor, bottomColor, borderColor, borderPx, shadowAlpha, shadowBlur);
-            int hash = key.GetHashCode();
 
-            if (_textureCache.TryGetValue(hash, out var cached) && cached != null)
+            if (_textureCache.TryGetValue(key, out var cached) && cached != null)
                 return cached;
 
             var tex = new Texture2D(width, height, TextureFormat.RGBA32, false);
@@ -219,17 +222,16 @@ namespace shadcnui.GUIComponents.Core.Styling
 
             tex.SetPixels32(pixels);
             tex.Apply();
-            _textureCache[hash] = tex;
+            _textureCache[key] = tex;
             _activeTextures.Add(tex);
             return tex;
         }
 
         public Texture2D GenerateStyledShape(int width, int height, int radius, Color topColor, Color bottomColor, Color borderColor, float borderPx, float shadowAlpha = 0, int shadowBlur = 0, float highlightIntensity = 0.1f)
         {
-            var key = new TextureKey(width, height, radius, topColor, bottomColor, borderColor, borderPx, shadowAlpha + 1.234f, shadowBlur + 567);
-            int hash = key.GetHashCode();
+            var key = new TextureKey(width, height, radius, topColor, bottomColor, borderColor, borderPx, shadowAlpha, shadowBlur, highlightIntensity);
 
-            if (_textureCache.TryGetValue(hash, out var cached) && cached != null)
+            if (_textureCache.TryGetValue(key, out var cached) && cached != null)
                 return cached;
 
             var tex = new Texture2D(width, height, TextureFormat.RGBA32, false);
@@ -302,7 +304,7 @@ namespace shadcnui.GUIComponents.Core.Styling
 
             tex.SetPixels32(pixels);
             tex.Apply();
-            _textureCache[hash] = tex;
+            _textureCache[key] = tex;
             _activeTextures.Add(tex);
             return tex;
         }
@@ -310,16 +312,15 @@ namespace shadcnui.GUIComponents.Core.Styling
         public Texture2D GenerateSolid(Color color)
         {
             var key = new TextureKey(1, 1, 0, color, color, Color.clear, 0);
-            int hash = key.GetHashCode();
 
-            if (_textureCache.TryGetValue(hash, out var cached) && cached != null)
+            if (_textureCache.TryGetValue(key, out var cached) && cached != null)
                 return cached;
 
             var tex = new Texture2D(1, 1, TextureFormat.RGBA32, false);
             tex.SetPixel(0, 0, color);
             tex.Apply();
 
-            _textureCache[hash] = tex;
+            _textureCache[key] = tex;
             _activeTextures.Add(tex);
             return tex;
         }
@@ -327,9 +328,8 @@ namespace shadcnui.GUIComponents.Core.Styling
         public Texture2D GenerateVerticalGradient(int width, int height, Color top, Color bottom)
         {
             var key = new TextureKey(width, height, 0, top, bottom, Color.clear, 0);
-            int hash = key.GetHashCode();
 
-            if (_textureCache.TryGetValue(hash, out var cached) && cached != null)
+            if (_textureCache.TryGetValue(key, out var cached) && cached != null)
                 return cached;
 
             var tex = new Texture2D(width, height, TextureFormat.RGBA32, false);
@@ -348,7 +348,7 @@ namespace shadcnui.GUIComponents.Core.Styling
             tex.SetPixels32(pixels);
             tex.Apply();
 
-            _textureCache[hash] = tex;
+            _textureCache[key] = tex;
             _activeTextures.Add(tex);
             return tex;
         }
@@ -356,9 +356,8 @@ namespace shadcnui.GUIComponents.Core.Styling
         public Texture2D GenerateGlow(int size, Color color)
         {
             var key = new TextureKey(size, size, 0, color, color, Color.clear, -1);
-            int hash = key.GetHashCode();
 
-            if (_textureCache.TryGetValue(hash, out var cached) && cached != null)
+            if (_textureCache.TryGetValue(key, out var cached) && cached != null)
                 return cached;
 
             var tex = new Texture2D(size, size, TextureFormat.RGBA32, false);
@@ -391,7 +390,7 @@ namespace shadcnui.GUIComponents.Core.Styling
             tex.SetPixels32(pixels);
             tex.Apply();
 
-            _textureCache[hash] = tex;
+            _textureCache[key] = tex;
             _activeTextures.Add(tex);
             return tex;
         }
