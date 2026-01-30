@@ -49,7 +49,21 @@ namespace shadcnui.GUIComponents.Controls
                 }
                 else
                 {
-                    newValue = config.Options != null && config.Options.Length > 0 ? UnityHelpers.Toggle(config.Value, config.Text, toggleStyle, config.Options) : UnityHelpers.Toggle(config.Value, config.Text, toggleStyle);
+                    bool useExpandWidth = config.Size != ControlSize.Icon;
+                    if (config.Options != null && config.Options.Length > 0)
+                    {
+                        var options = new GUILayoutOption[config.Options.Length + (useExpandWidth ? 1 : 0)];
+                        config.Options.CopyTo(options, 0);
+                        if (useExpandWidth)
+                            options[config.Options.Length] = GUILayout.ExpandWidth(true);
+                        newValue = UnityHelpers.Toggle(config.Value, config.Text, toggleStyle, options);
+                    }
+                    else
+                    {
+                        newValue = useExpandWidth 
+                            ? UnityHelpers.Toggle(config.Value, config.Text, toggleStyle, GUILayout.ExpandWidth(true)) 
+                            : UnityHelpers.Toggle(config.Value, config.Text, toggleStyle);
+                    }
                 }
             }
 

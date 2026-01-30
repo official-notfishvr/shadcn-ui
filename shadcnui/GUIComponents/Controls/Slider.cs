@@ -39,7 +39,9 @@ namespace shadcnui.GUIComponents.Controls
         }
 
         private static Dictionary<TextureCacheKey, Texture2D> _textureCache = new Dictionary<TextureCacheKey, Texture2D>();
+#pragma warning disable CS0169
         private static Texture2D _whiteTexture;
+#pragma warning restore CS0169
 
         public Slider(GUIHelper helper)
             : base(helper) { }

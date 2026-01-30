@@ -1,7 +1,7 @@
 using System;
 using System.IO;
 using UnityEngine;
-#if IL2CPP_MELONLOADER
+#if IL2CPP_MELONLOADER || IL2CPP_MELONLOADER_PRE57 || Mono_Melonloader
 using MelonLoader;
 #endif
 
@@ -99,7 +99,7 @@ namespace shadcnui.GUIComponents.Core.Utils
             string levelStr = level.ToString().ToUpper();
             string formattedMessage = $"[{timestamp}] [{levelStr}] [{component}] {message}";
 
-#if IL2CPP_MELONLOADER || IL2CPP_MELONLOADER_PRE157
+#if IL2CPP_MELONLOADER || IL2CPP_MELONLOADER_PRE57 || Mono_Melonloader
             switch (level)
             {
                 case LogLevel.Trace:

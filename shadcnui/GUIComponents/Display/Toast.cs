@@ -121,7 +121,7 @@ namespace shadcnui.GUIComponents.Display
                 _activeToasts.Add(activeToast);
                 _toastCreationTimes[config.Id] = Time.time;
                 if (Time.time - _lastDrawTime > DRAW_WARNING_THRESHOLD)
-                    GUILogger.LogWarning("Toast added but DrawToasts() hasn't been called recently. Make sure to call guiHelper.DrawToasts() in your OnGUI method to render toasts.", "Toast.Show");
+                    GUILogger.LogWarning("Toast added but DrawOverlays() hasn't been called recently. Make sure to call guiHelper.DrawOverlays() in your OnGUI method to render toasts.", "Toast.Show");
             }
             catch (Exception ex)
             {
@@ -475,7 +475,7 @@ namespace shadcnui.GUIComponents.Display
                 int borderRadius = Mathf.RoundToInt(toast.BorderRadius * guiHelper.uiScale);
                 string bgKey = $"toast_bg_{toast.Variant}_{Mathf.RoundToInt(toastRect.width)}_{Mathf.RoundToInt(toastRect.height)}_{borderRadius}";
                 if (!_cachedTextures.ContainsKey(bgKey))
-                    _cachedTextures[bgKey] = styleManager.CreateRoundedRectTexture(Mathf.RoundToInt(toastRect.width), Mathf.RoundToInt(toastRect.height), borderRadius, bgColor);
+                    _cachedTextures[bgKey] = styleManager.CreateGradientRoundedRectTexture(Mathf.RoundToInt(toastRect.width), Mathf.RoundToInt(toastRect.height), borderRadius, bgColor);
                 GUIStyle bgStyle = new UnityHelpers.GUIStyle(GUI.skin.box);
                 bgStyle.normal.background = _cachedTextures[bgKey];
                 bgStyle.border = new UnityHelpers.RectOffset(borderRadius, borderRadius, borderRadius, borderRadius);

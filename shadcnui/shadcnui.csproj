@@ -510,9 +510,14 @@
         <Compile Include="GUIComponents\Controls\Select.cs" />
         <Compile Include="GUIComponents\Controls\Slider.cs" />
         <Compile Include="GUIComponents\Controls\Switch.cs" />
+        <Compile Include="GUIComponents\Controls\ThemeChanger.cs" />
         <Compile Include="GUIComponents\Controls\Toggle.cs" />
         <Compile Include="GUIComponents\Core\Base\BaseComponent.cs" />
+        <Compile Include="GUIComponents\Core\Base\FluentBuilders.cs" />
         <Compile Include="GUIComponents\Core\Base\GUIHelper.cs" />
+        <Compile Include="GUIComponents\Core\Base\LayerManager.cs" />
+        <Compile Include="GUIComponents\Core\Styling\StyleManager.Setup.cs" />
+        <Compile Include="GUIComponents\Core\Styling\TextureManager.cs" />
         <Compile Include="GUIComponents\Core\Utils\AnimationManager.cs" />
         <Compile Include="GUIComponents\Core\Utils\Config.cs" />
         <Compile Include="GUIComponents\Core\Utils\GUILogger.cs" />
@@ -520,8 +525,6 @@
         <Compile Include="GUIComponents\Core\Styling\DesignTokens.cs" />
         <Compile Include="GUIComponents\Core\Styling\StyleManager.cs" />
         <Compile Include="GUIComponents\Core\Styling\StyleManager.Getters.cs" />
-        <Compile Include="GUIComponents\Core\Styling\StyleManager.Registration.cs" />
-        <Compile Include="GUIComponents\Core\Styling\StyleManager.Setup.cs" />
         <Compile Include="GUIComponents\Core\Styling\StyleRegistry.cs" />
         <Compile Include="GUIComponents\Core\Theming\Theme.cs" />
         <Compile Include="GUIComponents\Core\Theming\ThemeManager.cs" />

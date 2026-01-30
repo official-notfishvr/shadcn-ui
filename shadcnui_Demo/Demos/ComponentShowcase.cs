@@ -14,7 +14,7 @@ namespace shadcnui_Demo.Menu
         private Vector2 scrollPosition;
 
         private int currentDemoTab = 0;
-        private Tabs.TabConfig[] demoTabs;
+        private TabConfig[] demoTabs;
 
         private string searchQuery = "";
         private bool showAdvanced = false;
@@ -43,14 +43,14 @@ namespace shadcnui_Demo.Menu
         {
             guiHelper = new GUIHelper();
 
-            demoTabs = new Tabs.TabConfig[]
+            demoTabs = new TabConfig[]
             {
-                new Tabs.TabConfig("Dashboard", DrawDashboard),
-                new Tabs.TabConfig("Components", DrawComponentShowcase),
-                new Tabs.TabConfig("Forms", DrawFormsDemo),
-                new Tabs.TabConfig("Tables", DrawTablesDemo),
-                new Tabs.TabConfig("Settings", DrawSettingsDemo),
-                new Tabs.TabConfig("Gallery", DrawGalleryDemo),
+                new TabConfig("Dashboard", DrawDashboard),
+                new TabConfig("Components", DrawComponentShowcase),
+                new TabConfig("Forms", DrawFormsDemo),
+                new TabConfig("Tables", DrawTablesDemo),
+                new TabConfig("Settings", DrawSettingsDemo),
+                new TabConfig("Gallery", DrawGalleryDemo),
             };
         }
 
@@ -76,15 +76,15 @@ namespace shadcnui_Demo.Menu
             guiHelper.UpdateGUI(showDemoWindow);
             if (guiHelper.BeginGUI())
             {
-                currentDemoTab = guiHelper.DrawTabs(
+                currentDemoTab = guiHelper.Tabs(
                     demoTabs.Select(tab => tab.Name).ToArray(),
                     currentDemoTab,
                     () =>
                     {
-                        scrollPosition = guiHelper.DrawScrollView(scrollPosition, DrawCurrentTabContent, GUILayout.Height(650));
+                        scrollPosition = guiHelper.ScrollView(scrollPosition, DrawCurrentTabContent, GUILayout.Height(650));
                     },
                     maxLines: 1,
-                    position: Tabs.TabPosition.Top
+                    position: TabPosition.Top
                 );
 
                 guiHelper.EndGUI();

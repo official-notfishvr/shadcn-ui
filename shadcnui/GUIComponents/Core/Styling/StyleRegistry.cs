@@ -9,58 +9,49 @@ namespace shadcnui.GUIComponents.Core.Styling
 
     public class StyleRegistry
     {
-        private Dictionary<(StyleComponentType, ControlVariant), StyleModifier> variantModifiers = new Dictionary<(StyleComponentType, ControlVariant), StyleModifier>();
-        private Dictionary<(StyleComponentType, ControlSize), StyleModifier> sizeModifiers = new Dictionary<(StyleComponentType, ControlSize), StyleModifier>();
-
-        private Dictionary<ControlVariant, StyleModifier> globalVariantModifiers = new Dictionary<ControlVariant, StyleModifier>();
-        private Dictionary<ControlSize, StyleModifier> globalSizeModifiers = new Dictionary<ControlSize, StyleModifier>();
+        private readonly Dictionary<(StyleComponentType, ControlVariant), StyleModifier> _variantModifiers = new();
+        private readonly Dictionary<(StyleComponentType, ControlSize), StyleModifier> _sizeModifiers = new();
+        private readonly Dictionary<ControlVariant, StyleModifier> _globalVariantModifiers = new();
+        private readonly Dictionary<ControlSize, StyleModifier> _globalSizeModifiers = new();
 
         public void RegisterVariant(StyleComponentType type, ControlVariant variant, StyleModifier modifier)
         {
-            variantModifiers[(type, variant)] = modifier;
+            _variantModifiers[(type, variant)] = modifier;
         }
 
         public void RegisterSize(StyleComponentType type, ControlSize size, StyleModifier modifier)
         {
-            sizeModifiers[(type, size)] = modifier;
+            _sizeModifiers[(type, size)] = modifier;
         }
 
         public StyleModifier GetVariantModifier(StyleComponentType type, ControlVariant variant)
         {
-            if (variantModifiers.TryGetValue((type, variant), out var modifier))
-            {
+            if (_variantModifiers.TryGetValue((type, variant), out var modifier))
                 return modifier;
-            }
 
-            if (globalVariantModifiers.TryGetValue(variant, out var globalModifier))
-            {
+            if (_globalVariantModifiers.TryGetValue(variant, out var globalModifier))
                 return globalModifier;
-            }
 
             return null;
         }
 
         public StyleModifier GetSizeModifier(StyleComponentType type, ControlSize size)
         {
-            if (sizeModifiers.TryGetValue((type, size), out var modifier))
-            {
+            if (_sizeModifiers.TryGetValue((type, size), out var modifier))
                 return modifier;
-            }
 
-            if (globalSizeModifiers.TryGetValue(size, out var globalModifier))
-            {
+            if (_globalSizeModifiers.TryGetValue(size, out var globalModifier))
                 return globalModifier;
-            }
 
             return null;
         }
 
         public void Clear()
         {
-            variantModifiers.Clear();
-            sizeModifiers.Clear();
-            globalVariantModifiers.Clear();
-            globalSizeModifiers.Clear();
+            _variantModifiers.Clear();
+            _sizeModifiers.Clear();
+            _globalVariantModifiers.Clear();
+            _globalSizeModifiers.Clear();
         }
     }
 }

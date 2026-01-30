@@ -59,7 +59,7 @@ namespace shadcnui.GUIComponents.Data
 
             layoutComponents.BeginVerticalGroup();
 
-            if (UnityHelpers.Button($"{buttonText}", styleManager.GetButtonStyle(ControlVariant.Outline, ControlSize.Default), config.Options))
+            if (guiHelper.Button($"{buttonText}", ControlVariant.Default, ControlSize.Default, null, false, 1f, config.Options))
             {
                 _openStates[config.Id] = !isOpen;
                 if (config.SelectedDate.HasValue)
@@ -127,7 +127,7 @@ namespace shadcnui.GUIComponents.Data
 
             layoutComponents.BeginVerticalGroup();
 
-            if (UnityHelpers.Button($"{buttonText}", styleManager.GetButtonStyle(ControlVariant.Outline, ControlSize.Default), config.Options))
+            if (guiHelper.Button($"{buttonText}", ControlVariant.Default, ControlSize.Default, null, false, 1f, config.Options))
             {
                 _openStates[config.Id] = !_openStates[config.Id];
 

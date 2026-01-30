@@ -19,6 +19,9 @@ namespace shadcnui.GUIComponents.Controls
 
             var layoutOptions = new List<GUILayoutOption>(config.Options ?? Array.Empty<GUILayoutOption>());
 
+            if (config.Size != ControlSize.Icon && config.Icon?.Image == null)
+                layoutOptions.Add(GUILayout.ExpandWidth(true));
+
             if (buttonStyle.fixedWidth > 0)
                 layoutOptions.Add(GUILayout.Width(buttonStyle.fixedWidth));
             if (buttonStyle.fixedHeight > 0)
