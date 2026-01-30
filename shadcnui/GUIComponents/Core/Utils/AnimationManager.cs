@@ -418,24 +418,44 @@ namespace shadcnui.GUIComponents.Core.Utils
             try
             {
                 Update(Time.deltaTime);
-                Color bg = ThemeManager.Instance.CurrentTheme.BackgroundColor;
-                GUI.color = bg;
-                GUI.DrawTexture(new Rect(0, 0, Screen.width, Screen.height), Texture2D.whiteTexture);
-                GUI.color = Color.white;
-                var styleManager = guiHelper.GetStyleManager();
-#if IL2CPP_MELONLOADER_PRE57
-                layoutComponents.BeginVerticalGroup(styleManager.GetAnimatedBoxStyle(), (Il2CppReferenceArray<GUILayoutOption>)null);
-#else
-                layoutComponents.BeginVerticalGroup(styleManager.GetAnimatedBoxStyle());
-#endif
-                _layoutGroupStarted = true;
-                return true;
             }
             catch (Exception ex)
             {
-                GUILogger.LogException(ex, "BeginGUI", "AnimationManager");
-                return false;
+                GUILogger.LogException(ex, "BeginGUI.Update", "AnimationManager");
             }
+
+            try
+            {
+                Color bg = ThemeManager.Instance?.CurrentTheme?.BackgroundColor ?? new Color(0.1f, 0.1f, 0.1f, 0.95f);
+                GUI.color = bg;
+                GUI.DrawTexture(new Rect(0, 0, Screen.width, Screen.height), Texture2D.whiteTexture);
+                GUI.color = Color.white;
+            }
+            catch (Exception ex)
+            {
+                GUILogger.LogException(ex, "BeginGUI.Background", "AnimationManager");
+                GUI.color = Color.white;
+            }
+
+            try
+            {
+                var styleManager = guiHelper.GetStyleManager();
+                var boxStyle = styleManager?.GetAnimatedBoxStyle() ?? GUI.skin.box;
+#if IL2CPP_MELONLOADER_PRE57
+                layoutComponents.BeginVerticalGroup(boxStyle, (Il2CppReferenceArray<GUILayoutOption>)null);
+#else
+                layoutComponents.BeginVerticalGroup(boxStyle);
+#endif
+                _layoutGroupStarted = true;
+            }
+            catch (Exception ex)
+            {
+                GUILogger.LogException(ex, "BeginGUI.Layout", "AnimationManager");
+                GUILayout.BeginVertical();
+                _layoutGroupStarted = true;
+            }
+
+            return true;
         }
 
         public void EndGUI()

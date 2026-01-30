@@ -24,7 +24,7 @@ namespace shadcnui_Demo.Menu
 
         // Demo State Variables
         private int currentDemoTab = 0;
-        private Tabs.TabConfig[] demoTabs;
+        private TabConfig[] demoTabs;
         private bool verticalTabsOnRight = false;
         private bool tabsOnBottom = false;
         private int componentCount = 0;
@@ -86,34 +86,34 @@ namespace shadcnui_Demo.Menu
                 img.LoadImage(imageData);
 #endif
 
-            demoTabs = new Tabs.TabConfig[]
+            demoTabs = new TabConfig[]
             {
-                new Tabs.TabConfig("Button", DrawButtonDemos),
-                new Tabs.TabConfig("Badge", DrawBadgeDemos),
-                new Tabs.TabConfig("Input", DrawInputDemos),
-                new Tabs.TabConfig("Toggle", DrawToggleDemos),
-                new Tabs.TabConfig("Checkbox", DrawCheckboxDemos),
-                new Tabs.TabConfig("Switch", DrawSwitchDemos),
-                new Tabs.TabConfig("TextArea", DrawTextAreaDemos),
-                new Tabs.TabConfig("Avatar", DrawAvatarDemos),
-                new Tabs.TabConfig("Card", DrawCardDemos),
-                new Tabs.TabConfig("Progress", DrawProgressDemos),
-                new Tabs.TabConfig("Separator", DrawSeparatorDemos),
-                new Tabs.TabConfig("Label", DrawLabelDemos),
-                new Tabs.TabConfig("Dialog", DrawDialogDemos),
-                new Tabs.TabConfig("Select", DrawSelectDemos),
-                new Tabs.TabConfig("DropdownMenu", DrawDropdownMenuDemos),
-                new Tabs.TabConfig("Popover", DrawPopoverDemos),
-                new Tabs.TabConfig("Calendar", DrawCalendarDemos),
-                new Tabs.TabConfig("DatePicker", DrawDatePickerDemos),
-                new Tabs.TabConfig("Tabs", DrawTabsDemos),
-                new Tabs.TabConfig("MenuBar", DrawMenuBar),
-                new Tabs.TabConfig("Chart", DrawChartDemos),
-                new Tabs.TabConfig("Table", DrawTableDemos),
-                new Tabs.TabConfig("DataTable", DataTableDemos),
-                new Tabs.TabConfig("Toast", DrawToastDemos),
-                new Tabs.TabConfig("Slider", DrawSliderDemos),
-                new Tabs.TabConfig("Layout", DrawLayoutDemos),
+                new TabConfig("Button", DrawButtonDemos),
+                new TabConfig("Badge", DrawBadgeDemos),
+                new TabConfig("Input", DrawInputDemos),
+                new TabConfig("Toggle", DrawToggleDemos),
+                new TabConfig("Checkbox", DrawCheckboxDemos),
+                new TabConfig("Switch", DrawSwitchDemos),
+                new TabConfig("TextArea", DrawTextAreaDemos),
+                new TabConfig("Avatar", DrawAvatarDemos),
+                new TabConfig("Card", DrawCardDemos),
+                new TabConfig("Progress", DrawProgressDemos),
+                new TabConfig("Separator", DrawSeparatorDemos),
+                new TabConfig("Label", DrawLabelDemos),
+                new TabConfig("Dialog", DrawDialogDemos),
+                new TabConfig("Select", DrawSelectDemos),
+                new TabConfig("DropdownMenu", DrawDropdownMenuDemos),
+                new TabConfig("Popover", DrawPopoverDemos),
+                new TabConfig("Calendar", DrawCalendarDemos),
+                new TabConfig("DatePicker", DrawDatePickerDemos),
+                new TabConfig("Tabs", DrawTabsDemos),
+                new TabConfig("MenuBar", DrawMenuBar),
+                new TabConfig("Chart", DrawChartDemos),
+                new TabConfig("Table", DrawTableDemos),
+                new TabConfig("DataTable", DataTableDemos),
+                new TabConfig("Toast", DrawToastDemos),
+                new TabConfig("Slider", DrawSliderDemos),
+                new TabConfig("Layout", DrawLayoutDemos),
             };
 
             componentCount = demoTabs.Length;
@@ -161,7 +161,7 @@ namespace shadcnui_Demo.Menu
             }
 
             // Draw toasts for Toast
-            guiHelper.DrawToasts();
+            guiHelper.DrawOverlay();
         }
 
         void DrawDemoWindow(int windowID)
@@ -173,13 +173,13 @@ namespace shadcnui_Demo.Menu
 
                 if (useVerticalTabs)
                 {
-                    var side = verticalTabsOnRight ? Tabs.TabSide.Right : Tabs.TabSide.Left;
+                    var side = verticalTabsOnRight ? TabSide.Right : TabSide.Left;
                     currentDemoTab = guiHelper.VerticalTabs(demoTabs.Select(tab => tab.Name).ToArray(), currentDemoTab, DrawScrollableContent, tabWidth: 160, maxLines: 2, side: side);
                 }
                 else
                 {
-                    var position = tabsOnBottom ? Tabs.TabPosition.Bottom : Tabs.TabPosition.Top;
-                    currentDemoTab = guiHelper.DrawTabs(demoTabs.Select(tab => tab.Name).ToArray(), currentDemoTab, DrawScrollableContent, maxLines: 2, position: position);
+                    var position = tabsOnBottom ? TabPosition.Bottom : TabPosition.Top;
+                    currentDemoTab = guiHelper.Tabs(demoTabs.Select(tab => tab.Name).ToArray(), currentDemoTab, DrawScrollableContent, maxLines: 2, position: position);
                 }
                 guiHelper.EndGUI();
             }
@@ -191,6 +191,8 @@ namespace shadcnui_Demo.Menu
             guiHelper.BeginHorizontalGroup();
             guiHelper.Label("shadcn/ui Library", ControlVariant.Default);
             GUILayout.FlexibleSpace();
+            guiHelper.ThemeChangerWithPreview("header_theme_changer", 180f);
+            GUILayout.Space(10);
             useVerticalTabs = guiHelper.Toggle("Vertical Tabs", useVerticalTabs);
             GUILayout.Space(10);
             if (useVerticalTabs)
@@ -204,20 +206,16 @@ namespace shadcnui_Demo.Menu
 
         void DrawScrollableContent()
         {
-            scrollPosition = guiHelper.DrawScrollView(
+            scrollPosition = guiHelper.ScrollView(
                 scrollPosition,
                 () =>
                 {
-#if IL2CPP_MELONLOADER_PRE57
-                    GUILayout.BeginVertical(new Il2CppReferenceArray<GUILayoutOption>(new GUILayoutOption[] { }));
-#else
-                    GUILayout.BeginVertical();
-#endif
+                    guiHelper.BeginVerticalGroup();
                     if (currentDemoTab >= 0 && currentDemoTab < demoTabs.Length)
                     {
                         demoTabs[currentDemoTab].Content?.Invoke();
                     }
-                    GUILayout.EndVertical();
+                    guiHelper.EndVerticalGroup();
                 },
                 GUILayout.ExpandHeight(true)
             );
@@ -382,7 +380,7 @@ namespace shadcnui_Demo.Menu
                 () =>
                 {
                     guiHelper.Label("Default");
-                    guiHelper.DrawPasswordField(200, "Default", ref passwordValue);
+                    guiHelper.PasswordField(200, "Default", ref passwordValue);
                 }
             );
 
@@ -391,13 +389,13 @@ namespace shadcnui_Demo.Menu
                 () =>
                 {
                     guiHelper.Label("Password");
-                    guiHelper.DrawPasswordField(300, "Password", ref passwordValue);
+                    guiHelper.PasswordField(300, "Password", ref passwordValue);
 
                     guiHelper.Label("Section Header");
-                    guiHelper.DrawSectionHeader("Header Example");
+                    guiHelper.SectionHeader("Header Example");
 
                     guiHelper.Label("Render Label");
-                    guiHelper.RenderLabel("Rendered Label Text", 200);
+                    guiHelper.InputLabel("Rendered Label Text", 200);
                 }
             );
 
@@ -405,10 +403,10 @@ namespace shadcnui_Demo.Menu
                 "Inputs with Icons",
                 () =>
                 {
-                    guiHelper.DrawInput("Input with Icon", img, passwordValue);
+                    guiHelper.Input("Input with Icon", img, passwordValue);
 
                     guiHelper.Label("Icon Config");
-                    guiHelper.DrawInput(
+                    guiHelper.Input(
                         "Left Icon",
                         new IconConfig(img)
                         {
@@ -417,7 +415,7 @@ namespace shadcnui_Demo.Menu
                             Spacing = 4f,
                         }
                     );
-                    guiHelper.DrawInput(
+                    guiHelper.Input(
                         "Right Icon",
                         new IconConfig(img)
                         {
@@ -671,11 +669,11 @@ namespace shadcnui_Demo.Menu
                 {
                     guiHelper.BeginHorizontalGroup();
 
-                    guiHelper.DrawCard("Standard", "Subtitle", "Content goes here.", () => guiHelper.Button("Action"), 200, 150);
+                    guiHelper.Card("Standard", "Subtitle", "Content goes here.", () => guiHelper.Button("Action"), 200, 150);
 
                     GUILayout.Space(10);
 
-                    guiHelper.DrawSimpleCard("Simple card content.", 200, 100);
+                    guiHelper.SimpleCard("Simple card content.", 200, 100);
 
                     GUILayout.Space(10);
 
@@ -694,15 +692,14 @@ namespace shadcnui_Demo.Menu
                 () =>
                 {
                     guiHelper.BeginHorizontalGroup();
-                    guiHelper.DrawCardWithImage(img, "Image Card", "Subtitle", "Content with image.", null, 200, 250);
+                    guiHelper.CardWithImage(img, "Image Card", "Subtitle", "Content with image.", null, 200, 250);
                     GUILayout.Space(10);
-                    guiHelper.DrawCardWithAvatar(img, "Avatar Card", "User Name", "Content with avatar.", null, 200, 150);
+                    guiHelper.CardWithAvatar(img, "Avatar Card", "User Name", "Content with avatar.", null, 200, 150);
                     guiHelper.EndHorizontalGroup();
                 }
             );
         }
 
-        private float animatedProgressValue = 0f;
         private float animatedProgressTarget = 0.7f;
 
         void DrawProgressDemos()
@@ -821,7 +818,7 @@ namespace shadcnui_Demo.Menu
                     if (guiHelper.Button("Open Simple Dialog"))
                         guiHelper.OpenDialog("smp_dlg");
 
-                    guiHelper.DrawDialog(
+                    guiHelper.Dialog(
                         "std_dlg",
                         "Title",
                         "Description",
@@ -833,7 +830,7 @@ namespace shadcnui_Demo.Menu
                         }
                     );
 
-                    guiHelper.DrawDialog(
+                    guiHelper.Dialog(
                         "smp_dlg",
                         () =>
                         {
@@ -855,7 +852,7 @@ namespace shadcnui_Demo.Menu
 
                     guiHelper.EndHorizontalGroup();
 
-                    guiHelper.DrawDialog(
+                    guiHelper.Dialog(
                         new DialogConfig
                         {
                             Id = "anim_dlg",
@@ -881,7 +878,7 @@ namespace shadcnui_Demo.Menu
                     if (guiHelper.Button("Click Overlay to Close"))
                         guiHelper.OpenDialog("overlay_dlg");
 
-                    guiHelper.DrawDialog(
+                    guiHelper.Dialog(
                         new DialogConfig
                         {
                             Id = "overlay_dlg",
@@ -913,7 +910,7 @@ namespace shadcnui_Demo.Menu
                         guiHelper.OpenDialog("z200_dlg");
                     guiHelper.EndHorizontalGroup();
 
-                    guiHelper.DrawDialog(
+                    guiHelper.Dialog(
                         new DialogConfig
                         {
                             Id = "z100_dlg",
@@ -931,7 +928,7 @@ namespace shadcnui_Demo.Menu
                         }
                     );
 
-                    guiHelper.DrawDialog(
+                    guiHelper.Dialog(
                         new DialogConfig
                         {
                             Id = "z200_dlg",
@@ -1066,12 +1063,7 @@ namespace shadcnui_Demo.Menu
                 () =>
                 {
                     guiHelper.Label("Tabs with disabled state - disabled tabs cannot be selected");
-                    var disabledTabConfigs = new Tabs.TabConfig[]
-                    {
-                        new Tabs.TabConfig("Enabled 1", () => guiHelper.Label("This tab is enabled")),
-                        new Tabs.TabConfig("Disabled", () => guiHelper.Label("This tab is disabled"), true),
-                        new Tabs.TabConfig("Enabled 2", () => guiHelper.Label("This tab is also enabled")),
-                    };
+                    var disabledTabConfigs = new TabConfig[] { new TabConfig("Enabled 1", () => guiHelper.Label("This tab is enabled")), new TabConfig("Disabled", () => guiHelper.Label("This tab is disabled"), true), new TabConfig("Enabled 2", () => guiHelper.Label("This tab is also enabled")) };
 
                     disabledTabIndex = guiHelper.TabsWithContent(disabledTabConfigs, disabledTabIndex);
                 }
@@ -1088,7 +1080,7 @@ namespace shadcnui_Demo.Menu
                     {
                         Content = () => guiHelper.Label("Content for selected tab"),
                         ShowIndicator = true,
-                        IndicatorStyle = Tabs.IndicatorStyle.Underline,
+                        IndicatorStyle = IndicatorStyle.Underline,
                     };
                     indicatorUnderlineIndex = guiHelper.Tabs(underlineConfig);
 
@@ -1099,7 +1091,7 @@ namespace shadcnui_Demo.Menu
                     {
                         Content = () => guiHelper.Label("Content for selected tab"),
                         ShowIndicator = true,
-                        IndicatorStyle = Tabs.IndicatorStyle.Background,
+                        IndicatorStyle = IndicatorStyle.Background,
                     };
                     indicatorBgIndex = guiHelper.Tabs(bgConfig);
 
@@ -1110,7 +1102,7 @@ namespace shadcnui_Demo.Menu
                     {
                         Content = () => guiHelper.Label("Content for selected tab"),
                         ShowIndicator = true,
-                        IndicatorStyle = Tabs.IndicatorStyle.Border,
+                        IndicatorStyle = IndicatorStyle.Border,
                     };
                     indicatorBorderIndex = guiHelper.Tabs(borderConfig);
                 }
@@ -1121,12 +1113,12 @@ namespace shadcnui_Demo.Menu
                 () =>
                 {
                     guiHelper.Label("Tabs combining multiple features");
-                    var combinedConfigs = new Tabs.TabConfig[]
+                    var combinedConfigs = new TabConfig[]
                     {
-                        new Tabs.TabConfig("Overview", () => guiHelper.Label("Overview content")),
-                        new Tabs.TabConfig("Details", () => guiHelper.Label("Details content")),
-                        new Tabs.TabConfig("Disabled", () => guiHelper.Label("This won't show"), true),
-                        new Tabs.TabConfig("Advanced", () => guiHelper.Label("Advanced content")),
+                        new TabConfig("Overview", () => guiHelper.Label("Overview content")),
+                        new TabConfig("Details", () => guiHelper.Label("Details content")),
+                        new TabConfig("Disabled", () => guiHelper.Label("This won't show"), true),
+                        new TabConfig("Advanced", () => guiHelper.Label("Advanced content")),
                     };
 
                     combinedTabIndex = guiHelper.TabsWithContent(combinedConfigs, combinedTabIndex);
@@ -1149,7 +1141,7 @@ namespace shadcnui_Demo.Menu
 
                     if (closableTabNames.Length > 0)
                     {
-                        closableTabIndex = guiHelper.DrawClosableTabs(ref closableTabNames, ref closableTabs, closableTabIndex, content: () => guiHelper.Label($"Content for {closableTabNames[Math.Min(closableTabIndex, closableTabNames.Length - 1)]}"));
+                        closableTabIndex = guiHelper.ClosableTabs(ref closableTabNames, ref closableTabs, closableTabIndex, content: () => guiHelper.Label($"Content for {closableTabNames[Math.Min(closableTabIndex, closableTabNames.Length - 1)]}"));
                     }
                     else
                     {
@@ -1339,7 +1331,7 @@ namespace shadcnui_Demo.Menu
                 "Comprehensive Data Table",
                 () =>
                 {
-                    guiHelper.DrawDataTable("main_datatable", dataTableColumns, dataTableData, showPagination: true, showSearch: true, showSelection: true, showColumnToggle: true);
+                    guiHelper.DataTable("main_datatable", dataTableColumns, dataTableData, showPagination: true, showSearch: true, showSelection: true, showColumnToggle: true);
 
                     var selected = guiHelper.GetSelectedRows("main_datatable");
                     if (selected.Count > 0)
@@ -1388,39 +1380,66 @@ namespace shadcnui_Demo.Menu
             );
 
             DrawSection(
-                "Advanced Toast Builder",
+                "Advanced Toasts",
                 () =>
                 {
-                    guiHelper.Label("Fully customized toasts using fluent API:");
+                    guiHelper.Label("Fully customized toasts using config objects:");
                     guiHelper.HorizontalSeparator();
 
                     if (guiHelper.Button("Toast with Action"))
                     {
-                        guiHelper
-                            .Toast()
-                            .Title("Confirm Action")
-                            .Description("Do you want to proceed?")
-                            .Variant(ToastVariant.Warning)
-                            .Duration(8000f)
-                            .Position(ToastPosition.Center)
-                            .Action("Confirm", () => guiHelper.ShowSuccessToast("Confirmed!", "Action was executed"))
-                            .AccentBar(true)
-                            .ProgressBar(true)
-                            .Show();
+                        guiHelper.ShowToast(new ToastConfig
+                        {
+                            Title = "Confirm Action",
+                            Description = "Do you want to proceed?",
+                            Variant = ToastVariant.Warning,
+                            DurationMs = 8000f,
+                            Position = ToastPosition.Center,
+                            ActionLabel = "Confirm",
+                            OnAction = () =>
+                                guiHelper.ShowToast(new ToastConfig
+                                {
+                                    Title = "Confirmed!",
+                                    Description = "Action was executed",
+                                    Variant = ToastVariant.Success,
+                                    DurationMs = 4000f,
+                                }),
+                            ShowAccentBar = true,
+                            ShowProgressBar = true,
+                        });
                     }
 
                     if (guiHelper.Button("Click-to-Dismiss Toast"))
                     {
-                        guiHelper.Toast().Title("Click Me!").Description("Click anywhere on this toast to dismiss").Variant(ToastVariant.Info).Duration(10000f).Position(ToastPosition.TopCenter).ClickToDismiss(true).ProgressBar(true).Show();
+                        guiHelper.ShowToast(new ToastConfig
+                        {
+                            Title = "Click Me!",
+                            Description = "Click anywhere on this toast to dismiss",
+                            Variant = ToastVariant.Info,
+                            DurationMs = 10000f,
+                            Position = ToastPosition.TopCenter,
+                            EnableClickToDismiss = true,
+                            ShowProgressBar = true,
+                        });
                     }
 
                     if (guiHelper.Button("Long-Duration Toast"))
                     {
-                        guiHelper.Toast().Title("Long Message").Description("This toast will stay for 15 seconds. Hover to pause the timer!").Variant(ToastVariant.Info).Duration(15000f).Position(ToastPosition.BottomLeft).PauseOnHover(true).HoverDelay(0.5f).AccentBar(true).ProgressBar(true).Show();
+                        guiHelper.ShowToast(new ToastConfig
+                        {
+                            Title = "Long Message",
+                            Description = "This toast will stay for 15 seconds. Hover to pause the timer!",
+                            Variant = ToastVariant.Info,
+                            DurationMs = 15000f,
+                            Position = ToastPosition.BottomLeft,
+                            EnablePauseOnHover = true,
+                            HoverPauseDelay = 0.5f,
+                            ShowAccentBar = true,
+                            ShowProgressBar = true,
+                        });
                     }
                 }
             );
-
             DrawSection(
                 "Toast Positions",
                 () =>
@@ -1430,81 +1449,156 @@ namespace shadcnui_Demo.Menu
 
                     if (guiHelper.Button("Top Left"))
                     {
-                        guiHelper.Toast().Title("Top Left").Variant(ToastVariant.Default).Position(ToastPosition.TopLeft).Duration(3000f).Show();
+                        guiHelper.ShowToast(new ToastConfig
+                        {
+                            Title = "Top Left",
+                            Variant = ToastVariant.Default,
+                            Position = ToastPosition.TopLeft,
+                            DurationMs = 3000f,
+                        });
                     }
 
                     if (guiHelper.Button("Top Center"))
                     {
-                        guiHelper.Toast().Title("Top Center").Variant(ToastVariant.Info).Position(ToastPosition.TopCenter).Duration(3000f).Show();
+                        guiHelper.ShowToast(new ToastConfig
+                        {
+                            Title = "Top Center",
+                            Variant = ToastVariant.Info,
+                            Position = ToastPosition.TopCenter,
+                            DurationMs = 3000f,
+                        });
                     }
 
                     if (guiHelper.Button("Top Right"))
                     {
-                        guiHelper.Toast().Title("Top Right").Variant(ToastVariant.Success).Position(ToastPosition.TopRight).Duration(3000f).Show();
+                        guiHelper.ShowToast(new ToastConfig
+                        {
+                            Title = "Top Right",
+                            Variant = ToastVariant.Success,
+                            Position = ToastPosition.TopRight,
+                            DurationMs = 3000f,
+                        });
                     }
 
                     if (guiHelper.Button("Center"))
                     {
-                        guiHelper.Toast().Title("Center").Description("Perfectly centered on screen").Variant(ToastVariant.Warning).Position(ToastPosition.Center).Duration(3000f).Show();
+                        guiHelper.ShowToast(new ToastConfig
+                        {
+                            Title = "Center",
+                            Description = "Perfectly centered on screen",
+                            Variant = ToastVariant.Warning,
+                            Position = ToastPosition.Center,
+                            DurationMs = 3000f,
+                        });
                     }
 
                     if (guiHelper.Button("Bottom Left"))
                     {
-                        guiHelper.Toast().Title("Bottom Left").Variant(ToastVariant.Error).Position(ToastPosition.BottomLeft).Duration(3000f).Show();
+                        guiHelper.ShowToast(new ToastConfig
+                        {
+                            Title = "Bottom Left",
+                            Variant = ToastVariant.Error,
+                            Position = ToastPosition.BottomLeft,
+                            DurationMs = 3000f,
+                        });
                     }
 
                     if (guiHelper.Button("Bottom Center"))
                     {
-                        guiHelper.Toast().Title("Bottom Center").Variant(ToastVariant.Default).Position(ToastPosition.BottomCenter).Duration(3000f).Show();
+                        guiHelper.ShowToast(new ToastConfig
+                        {
+                            Title = "Bottom Center",
+                            Variant = ToastVariant.Default,
+                            Position = ToastPosition.BottomCenter,
+                            DurationMs = 3000f,
+                        });
                     }
 
                     if (guiHelper.Button("Bottom Right"))
                     {
-                        guiHelper.Toast().Title("Bottom Right").Variant(ToastVariant.Success).Position(ToastPosition.BottomRight).Duration(3000f).Show();
+                        guiHelper.ShowToast(new ToastConfig
+                        {
+                            Title = "Bottom Right",
+                            Variant = ToastVariant.Success,
+                            Position = ToastPosition.BottomRight,
+                            DurationMs = 3000f,
+                        });
                     }
                 }
             );
 
             DrawSection(
-                "Stack Directions",
-                () =>
+    "Stack Directions",
+    () =>
+    {
+        guiHelper.Label("Show multiple toasts stacking in different directions:");
+        guiHelper.HorizontalSeparator();
+
+        if (guiHelper.Button("Stack Up"))
+        {
+            for (int i = 0; i < 3; i++)
+            {
+                guiHelper.ShowToast(new ToastConfig
                 {
-                    guiHelper.Label("Show multiple toasts stacking in different directions:");
-                    guiHelper.HorizontalSeparator();
+                    Title = $"Toast {i + 1}",
+                    Description = $"Stacking upward - Message {i + 1}",
+                    Variant = (ToastVariant)(i % 4),
+                    Position = ToastPosition.BottomRight,
+                    StackDirection = ToastStackDirection.Up,
+                    DurationMs = 5000f,
+                });
+            }
+        }
 
-                    if (guiHelper.Button("Stack Up"))
-                    {
-                        for (int i = 0; i < 3; i++)
-                        {
-                            guiHelper.Toast().Title($"Toast {i + 1}").Description($"Stacking upward - Message {i + 1}").Variant((ToastVariant)(i % 4)).Position(ToastPosition.BottomRight).StackDirection(ToastStackDirection.Up).Duration(5000f).Show();
-                        }
-                    }
+        if (guiHelper.Button("Stack Down"))
+        {
+            for (int i = 0; i < 3; i++)
+            {
+                guiHelper.ShowToast(new ToastConfig
+                {
+                    Title = $"Toast {i + 1}",
+                    Description = $"Stacking downward - Message {i + 1}",
+                    Variant = (ToastVariant)(i % 4),
+                    Position = ToastPosition.TopRight,
+                    StackDirection = ToastStackDirection.Down,
+                    DurationMs = 5000f,
+                });
+            }
+        }
 
-                    if (guiHelper.Button("Stack Down"))
-                    {
-                        for (int i = 0; i < 3; i++)
-                        {
-                            guiHelper.Toast().Title($"Toast {i + 1}").Description($"Stacking downward - Message {i + 1}").Variant((ToastVariant)(i % 4)).Position(ToastPosition.TopRight).StackDirection(ToastStackDirection.Down).Duration(5000f).Show();
-                        }
-                    }
+        if (guiHelper.Button("Stack Left"))
+        {
+            for (int i = 0; i < 3; i++)
+            {
+                guiHelper.ShowToast(new ToastConfig
+                {
+                    Title = $"Toast {i + 1}",
+                    Description = $"Stacking left - Message {i + 1}",
+                    Variant = (ToastVariant)(i % 4),
+                    Position = ToastPosition.CenterRight,
+                    StackDirection = ToastStackDirection.Left,
+                    DurationMs = 5000f,
+                });
+            }
+        }
 
-                    if (guiHelper.Button("Stack Left"))
-                    {
-                        for (int i = 0; i < 3; i++)
-                        {
-                            guiHelper.Toast().Title($"Toast {i + 1}").Description($"Stacking left - Message {i + 1}").Variant((ToastVariant)(i % 4)).Position(ToastPosition.CenterRight).StackDirection(ToastStackDirection.Left).Duration(5000f).Show();
-                        }
-                    }
-
-                    if (guiHelper.Button("Stack Right"))
-                    {
-                        for (int i = 0; i < 3; i++)
-                        {
-                            guiHelper.Toast().Title($"Toast {i + 1}").Description($"Stacking right - Message {i + 1}").Variant((ToastVariant)(i % 4)).Position(ToastPosition.CenterLeft).StackDirection(ToastStackDirection.Right).Duration(5000f).Show();
-                        }
-                    }
-                }
-            );
+        if (guiHelper.Button("Stack Right"))
+        {
+            for (int i = 0; i < 3; i++)
+            {
+                guiHelper.ShowToast(new ToastConfig
+                {
+                    Title = $"Toast {i + 1}",
+                    Description = $"Stacking right - Message {i + 1}",
+                    Variant = (ToastVariant)(i % 4),
+                    Position = ToastPosition.CenterLeft,
+                    StackDirection = ToastStackDirection.Right,
+                    DurationMs = 5000f,
+                });
+            }
+        }
+    }
+);
 
             DrawSection(
                 "Toast Management",

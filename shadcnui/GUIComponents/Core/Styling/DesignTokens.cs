@@ -2,122 +2,121 @@ namespace shadcnui.GUIComponents.Core.Styling
 {
     public static class DesignTokens
     {
-        #region Spacing (4px base unit)
         public static class Spacing
         {
             public const float None = 0f;
-            public const float XXS = 2f; // 0.5x
-            public const float XS = 4f; // 1x
-            public const float SM = 8f; // 2x
-            public const float MD = 12f; // 3x
-            public const float LG = 16f; // 4x
-            public const float XL = 24f; // 6x
-            public const float XXL = 32f; // 8x
+            public const float XXS = 2f;
+            public const float XS = 4f;
+            public const float SM = 8f;
+            public const float MD = 12f;
+            public const float LG = 16f;
+            public const float XL = 24f;
+            public const float XXL = 32f;
         }
-        #endregion
 
-        #region Border Radius
         public static class Radius
         {
             public const float None = 0f;
-            public const float SM = 4f; // Small: checkboxes, small buttons
-            public const float MD = 6f; // Medium: buttons, inputs
-            public const float LG = 8f; // Large: cards, dialogs
-            public const float XL = 12f; // Extra large: badges, pills
+            public const float SM = 4f;
+            public const float MD = 8f;
+            public const float LG = 12f;
+            public const float XL = 16f;
             public const float Full = 9999f;
         }
-        #endregion
 
-        #region Font Scale
         public static class FontScale
         {
-            public const float XS = 0.75f; // 12px at 16px base - Chart labels, hints
-            public const float SM = 0.875f; // 14px at 16px base - Body small, buttons
-            public const float MD = 1.0f; // 16px at 16px base - Body text
-            public const float LG = 1.125f; // 18px at 16px base - Subtitles
-            public const float XL = 1.25f; // 20px at 16px base - Card titles
-            public const float XXL = 1.5f; // 24px at 16px base - Headers
+            public const float XS = 0.75f;
+            public const float SM = 0.875f;
+            public const float MD = 1.0f;
+            public const float LG = 1.125f;
+            public const float XL = 1.25f;
+            public const float XXL = 1.5f;
         }
-        #endregion
 
-        #region Component Heights (consistent scale)
         public static class Height
         {
-            public const float Mini = 24f; // Mini buttons, compact elements
-            public const float Small = 32f; // Small buttons, inputs
-            public const float Default = 40f; // Default buttons, inputs
-            public const float Large = 48f; // Large buttons
-            public const float XL = 56f; // Extra large buttons
+            public const float Mini = 24f;
+            public const float Small = 32f;
+            public const float Default = 40f;
+            public const float Large = 48f;
+            public const float XL = 56f;
         }
-        #endregion
 
-        #region Component Padding
         public static class Padding
         {
-            // Button padding (horizontal, vertical)
-            public const float ButtonMiniH = 8f;
-            public const float ButtonMiniV = 4f;
-            public const float ButtonSmallH = 12f;
-            public const float ButtonSmallV = 6f;
-            public const float ButtonDefaultH = 16f;
-            public const float ButtonDefaultV = 10f;
-            public const float ButtonLargeH = 24f;
-            public const float ButtonLargeV = 14f;
+            public static class Button
+            {
+                public const float MiniH = 8f;
+                public const float MiniV = 4f;
+                public const float SmallH = 12f;
+                public const float SmallV = 6f;
+                public const float DefaultH = 16f;
+                public const float DefaultV = 10f;
+                public const float LargeH = 24f;
+                public const float LargeV = 14f;
+            }
 
-            // Input padding
-            public const float InputH = 12f;
-            public const float InputV = 10f;
+            public static class Input
+            {
+                public const float Horizontal = 12f;
+                public const float Vertical = 10f;
+            }
 
-            // Card padding
-            public const float CardH = 24f;
-            public const float CardV = 24f;
+            public static class Card
+            {
+                public const float Horizontal = 24f;
+                public const float Vertical = 24f;
+            }
 
-            // Badge padding
-            public const float BadgeH = 10f;
-            public const float BadgeV = 4f;
+            public static class Badge
+            {
+                public const float Horizontal = 10f;
+                public const float Vertical = 4f;
+            }
 
-            // Tab padding
-            public const float TabH = 16f;
-            public const float TabV = 8f;
+            public static class Tab
+            {
+                public const float Horizontal = 16f;
+                public const float Vertical = 8f;
+            }
 
-            // Table cell padding
-            public const float TableCellH = 16f;
-            public const float TableCellV = 12f;
+            public static class Table
+            {
+                public const float CellH = 16f;
+                public const float CellV = 12f;
+            }
 
-            // Dropdown item padding
-            public const float DropdownItemH = 12f;
-            public const float DropdownItemV = 8f;
+            public static class Dropdown
+            {
+                public const float ItemH = 12f;
+                public const float ItemV = 8f;
+            }
         }
-        #endregion
 
-        #region Shadows and Effects
         public static class Effects
         {
-            // Shadow intensities (0-1)
-            public const float ShadowLight = 0.08f;
-            public const float ShadowMedium = 0.12f;
-            public const float ShadowHeavy = 0.20f;
+            public const float ShadowLight = 0.10f;
+            public const float ShadowMedium = 0.16f;
+            public const float ShadowHeavy = 0.24f;
 
-            // Shadow blur sizes
-            public const int ShadowBlurSM = 4;
-            public const int ShadowBlurMD = 8;
-            public const int ShadowBlurLG = 12;
+            public const float ShadowBlurSM = 6f;
+            public const float ShadowBlurMD = 12f;
+            public const float ShadowBlurLG = 20f;
 
-            // Inner shadow for inputs
-            public const float InnerShadowIntensity = 0.08f;
-            public const int InnerShadowSize = 3;
+            public const float InnerShadowIntensity = 0.06f;
+            public const float InnerShadowSize = 2f;
 
-            // Focus ring thickness
             public const float FocusRingThickness = 2f;
 
-            // Hover state adjustments
-            public const float HoverLighten = 0.12f; // For dark themes
-            public const float HoverDarken = 0.08f; // For light themes
-            public const float ActiveDarken = 0.15f; // Pressed state
-        }
-        #endregion
+            public const float HoverLighten = 0.12f;
+            public const float HoverDarken = 0.08f;
+            public const float ActiveDarken = 0.15f;
 
-        #region Texture Sizes
+            public const float GradientIntensity = 0.10f;
+            public const float RimHighlight = 0.15f;
+        }
+
         public static class TextureSize
         {
             public const int Small = 32;
@@ -126,35 +125,27 @@ namespace shadcnui.GUIComponents.Core.Styling
             public const int Large = 256;
             public const int XL = 512;
         }
-        #endregion
 
-        #region Animation
         public static class Animation
         {
             public const float DurationFast = 0.1f;
             public const float DurationNormal = 0.2f;
             public const float DurationSlow = 0.3f;
         }
-        #endregion
 
-        #region Slider
         public static class Slider
         {
-            // Track heights
             public const float TrackMini = 4f;
             public const float TrackSmall = 6f;
             public const float TrackDefault = 8f;
             public const float TrackLarge = 10f;
 
-            // Thumb sizes
             public const float ThumbMini = 12f;
             public const float ThumbSmall = 16f;
             public const float ThumbDefault = 20f;
             public const float ThumbLarge = 24f;
         }
-        #endregion
 
-        #region Status Indicator
         public static class StatusIndicator
         {
             public const float Mini = 4f;
@@ -162,36 +153,28 @@ namespace shadcnui.GUIComponents.Core.Styling
             public const float Default = 8f;
             public const float Large = 12f;
         }
-        #endregion
 
-        #region Icons
         public static class Icon
         {
             public const float Small = 16f;
             public const float Default = 20f;
             public const float Large = 24f;
         }
-        #endregion
 
-        #region Close Button
         public static class CloseButton
         {
             public const float HitArea = 20f;
             public const float IconSize = 16f;
             public const float FontSize = 14f;
         }
-        #endregion
 
-        #region Tab
         public static class Tab
         {
             public const float Height = 36f;
             public const float IndicatorHeight = 3f;
             public const float BorderWidth = 2f;
         }
-        #endregion
 
-        #region Z-Index / Layer ordering
         public static class ZIndex
         {
             public const int Base = 0;
@@ -201,74 +184,56 @@ namespace shadcnui.GUIComponents.Core.Styling
             public const int Toast = 400;
             public const int Tooltip = 500;
         }
-        #endregion
 
-        #region Checkbox
         public static class Checkbox
         {
-            public const int Size = 20;
+            public const float Size = 20f;
         }
-        #endregion
 
-        #region Switch
         public static class Switch
         {
-            public const int Width = 40;
-            public const int Height = 22;
-            public const int Radius = 11;
-            public const int ThumbSize = 18;
-            public const int ThumbOffset = 2;
+            public const float Width = 40f;
+            public const float Height = 22f;
+            public const float Radius = 11f;
+            public const float ThumbSize = 18f;
+            public const float ThumbOffset = 2f;
         }
-        #endregion
 
-        #region Toggle
         public static class Toggle
         {
             public const int TextureSize = 32;
         }
-        #endregion
 
-        #region Avatar
         public static class Avatar
         {
             public const float CircleRadiusScale = 50f;
         }
-        #endregion
 
-        #region ProgressBar
         public static class ProgressBar
         {
             public const float Height = 10f;
             public const int TextureHeight = 16;
         }
-        #endregion
 
-        #region Separator
         public static class Separator
         {
             public const float DefaultThickness = 1f;
             public const float LargeThickness = 2f;
         }
-        #endregion
 
-        #region Badge
         public static class Badge
         {
-            public const int Height = 28;
+            public const float Height = 28f;
         }
-        #endregion
 
-        #region Calendar Day
         public static class CalendarDay
         {
             public const float Mini = 20f;
             public const float Small = 28f;
-            public const float Default = 32f; // Same as Height.Small
-            public const float Large = 40f; // Same as Height.Default
+            public const float Default = 32f;
+            public const float Large = 40f;
         }
-        #endregion
 
-        #region Toast Colors
         public static class ToastColors
         {
             public static readonly UnityEngine.Color SuccessBg = new UnityEngine.Color(0.15f, 0.35f, 0.15f, 0.95f);
@@ -293,6 +258,5 @@ namespace shadcnui.GUIComponents.Core.Styling
 
             public static readonly UnityEngine.Color Text = UnityEngine.Color.white;
         }
-        #endregion
     }
 }

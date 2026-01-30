@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using shadcnui.GUIComponents.Core.Styling;
 
 namespace shadcnui.GUIComponents.Core.Base
@@ -35,10 +35,13 @@ namespace shadcnui.GUIComponents.Core.Base
 
         public virtual void Initialize() { }
 
+        protected virtual void OnBeforeDispose() { }
+
         public virtual void Dispose()
         {
             if (!isDisposed)
             {
+                OnBeforeDispose();
                 isDisposed = true;
             }
         }

@@ -109,7 +109,7 @@ namespace shadcnui_Demo.Menu
                 return;
             }
 
-            scrollPosition = guiHelper.DrawScrollView(
+            scrollPosition = guiHelper.ScrollView(
                 scrollPosition,
                 () =>
                 {
@@ -320,7 +320,7 @@ namespace shadcnui_Demo.Menu
             detectedTabs.Clear();
             activeDemoName = "None";
 
-            var demoTypes = new (Type type, string name, string tabsField, string currentField)[] { (typeof(FullDemo), "FullDemo", "demoTabs", "currentDemoTab"), (typeof(DocsDemo), "DocsDemo", "docTabs", "currentTab"), (typeof(ComponentShowcase), "ComponentShowcase", "showcaseTabs", "currentTab") };
+            var demoTypes = new (Type type, string name, string tabsField, string currentField)[] { (typeof(FullDemo), "FullDemo", "demoTabs", "currentDemoTab"), (typeof(ComponentShowcase), "ComponentShowcase", "showcaseTabs", "currentTab") };
 
             foreach (var (type, name, tabsField, currentField) in demoTypes)
             {
@@ -346,7 +346,7 @@ namespace shadcnui_Demo.Menu
             if (field == null)
                 return;
 
-            var tabs = field.GetValue(demo) as Tabs.TabConfig[];
+            var tabs = field.GetValue(demo) as TabConfig[];
             if (tabs == null)
                 return;
 
@@ -662,9 +662,11 @@ namespace shadcnui_Demo.Menu
                 statusMessage = "Output folder doesn't exist yet";
         }
 
-        private UnityEngine.Object FindFirstObjectByType(Type type)
+        private new UnityEngine.Object FindFirstObjectByType(Type type)
         {
+#pragma warning disable CS0618
             return FindObjectOfType(type);
+#pragma warning restore CS0618
         }
     }
 }

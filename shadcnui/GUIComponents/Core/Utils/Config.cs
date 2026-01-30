@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using shadcnui.GUIComponents.Core.Styling;
+using shadcnui.GUIComponents.Core.Theming;
 using shadcnui.GUIComponents.Layout;
 using UnityEngine;
 
@@ -339,16 +340,16 @@ namespace shadcnui.GUIComponents.Core.Utils
         public Action<int> OnTabChange { get; set; }
         public Action Content { get; set; }
         public int MaxLines { get; set; }
-        public Tabs.TabPosition Position { get; set; }
-        public Tabs.TabSide Side { get; set; }
+        public TabPosition Position { get; set; }
+        public TabSide Side { get; set; }
         public float TabWidth { get; set; }
         public GUILayoutOption[] Options { get; set; }
         public bool[] DisabledTabs { get; set; }
-        public Tabs.IndicatorStyle IndicatorStyle { get; set; }
+        public IndicatorStyle IndicatorStyle { get; set; }
         public bool ShowIndicator { get; set; }
         public bool[] ClosableTabs { get; set; }
         public Action<int> OnTabClose { get; set; }
-        public bool EnableOverflowScroll { get; set; }
+        public bool EnableOverflowScroll { get; set; } = false;
         public Texture2D[] TabIcons { get; set; }
 
         public TabsConfig(string[] tabNames, int selectedIndex)
@@ -358,12 +359,12 @@ namespace shadcnui.GUIComponents.Core.Utils
             OnTabChange = null;
             Content = null;
             MaxLines = 1;
-            Position = Tabs.TabPosition.Top;
-            Side = Tabs.TabSide.Left;
+            Position = TabPosition.Top;
+            Side = TabSide.Left;
             TabWidth = 120f;
             Options = Array.Empty<GUILayoutOption>();
             DisabledTabs = new bool[tabNames?.Length ?? 0];
-            IndicatorStyle = Tabs.IndicatorStyle.Underline;
+            IndicatorStyle = IndicatorStyle.Underline;
             ShowIndicator = true;
             ClosableTabs = null;
             OnTabClose = null;
@@ -757,5 +758,28 @@ namespace shadcnui.GUIComponents.Core.Utils
             MaxValue = max;
             Options = Array.Empty<GUILayoutOption>();
         }
+    }
+
+    public class ThemeChangerConfig
+    {
+        public string Id { get; set; } = "theme_changer";
+        public float Width { get; set; } = 200f;
+        public float DropdownHeight { get; set; } = 250f;
+        public bool ShowPreview { get; set; } = true;
+        public Action<Theme> OnThemeChanged { get; set; }
+        public GUILayoutOption[] Options { get; set; }
+    }
+
+    public class LayerConfig
+    {
+        public string Id { get; set; }
+        public Vector2 OpenPosition { get; set; }
+        public float Width { get; set; } = 200f;
+        public float Height { get; set; } = 150f;
+        public int ZIndex { get; set; } = 100;
+        public bool CloseOnClickOutside { get; set; } = true;
+        public bool ShowOverlay { get; set; } = false;
+        public Action Content { get; set; }
+        public Action OnClose { get; set; }
     }
 }

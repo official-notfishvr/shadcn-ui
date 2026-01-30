@@ -8,7 +8,7 @@ namespace shadcnui_Demo.Menu
     public class DemoSelector : MonoBehaviour
     {
         private GUIHelper guiHelper;
-        private Rect selectorRect = new Rect(Screen.width / 2 - 200, Screen.height / 2 - 150, 400, 380);
+        private Rect selectorRect = new Rect(Screen.width / 2 - 200, Screen.height / 2 - 150, 400, 400);
         private bool showSelector = true;
         private GameObject currentDemo;
 
@@ -53,9 +53,9 @@ namespace shadcnui_Demo.Menu
 
                 GUILayout.Space(10);
 
-                if (guiHelper.Button("Documentation", ControlVariant.Outline, ControlSize.Default))
+                if (guiHelper.Button("Full Demo [FluentBuilders]", ControlVariant.Secondary, ControlSize.Default))
                 {
-                    LoadDemo<DocsDemo>();
+                    LoadDemo<FullDemo_FluentBuilders>();
                 }
 #if Showcase
 #if MONO

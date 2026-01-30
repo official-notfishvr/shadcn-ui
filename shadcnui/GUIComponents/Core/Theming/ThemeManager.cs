@@ -27,6 +27,8 @@ namespace shadcnui.GUIComponents.Core.Theming
             AddTheme(Theme.Olive);
             AddTheme(Theme.Cyan);
             AddTheme(Theme.BlueDark);
+            AddTheme(Theme.Rose);
+            AddTheme(Theme.Violet);
 
             if (Themes.TryGetValue("Dark", out var darkTheme))
             {
