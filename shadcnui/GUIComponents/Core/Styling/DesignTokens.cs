@@ -94,6 +94,27 @@ namespace shadcnui.GUIComponents.Core.Styling
             }
         }
 
+        [System.Obsolete("Use Padding.Button.MiniH instead", false)]
+        public const float ButtonMiniH = Padding.Button.MiniH;
+
+        [System.Obsolete("Use Padding.Input.Horizontal instead", false)]
+        public const float InputHorizontal = Padding.Input.Horizontal;
+
+        [System.Obsolete("Use Padding.Card.Horizontal instead", false)]
+        public const float CardHorizontal = Padding.Card.Horizontal;
+
+        [System.Obsolete("Use Padding.Badge.Horizontal instead", false)]
+        public const float BadgeHorizontal = Padding.Badge.Horizontal;
+
+        [System.Obsolete("Use Padding.Tab.Horizontal instead", false)]
+        public const float TabHorizontal = Padding.Tab.Horizontal;
+
+        [System.Obsolete("Use Padding.Table.CellH instead", false)]
+        public const float TableCellH = Padding.Table.CellH;
+
+        [System.Obsolete("Use Padding.Dropdown.ItemH instead", false)]
+        public const float DropdownItemH = Padding.Dropdown.ItemH;
+
         public static class Effects
         {
             public const float ShadowLight = 0.10f;

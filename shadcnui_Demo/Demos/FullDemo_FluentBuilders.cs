@@ -49,6 +49,7 @@ namespace shadcnui_Demo.Menu
         private int selectIndex = 0;
 
         private DateTime? calendarSelectedDate;
+        private bool calendarDateHandlerAttached = false;
         private DateTime? datePickerDate;
         private DateTime? datePickerWithLabelDate;
 
@@ -994,7 +995,11 @@ namespace shadcnui_Demo.Menu
                     GUILayout.BeginVertical(GUI.skin.box, GUILayout.Width(320));
                     var cal = guiHelper.GetCalendarComponents();
                     cal.SelectedDate = calendarSelectedDate;
-                    cal.OnDateSelected += d => calendarSelectedDate = d;
+                    if (!calendarDateHandlerAttached)
+                    {
+                        cal.OnDateSelected += d => calendarSelectedDate = d;
+                        calendarDateHandlerAttached = true;
+                    }
                     guiHelper.CreateCalendar().Draw();
                     GUILayout.EndVertical();
 

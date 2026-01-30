@@ -48,6 +48,44 @@ namespace shadcnui.GUIComponents.Layout
             Closable = closable;
         }
     }
+
+    public struct PillTextureKey : IEquatable<PillTextureKey>
+    {
+        public int Width;
+        public int Height;
+        public int Radius;
+        public Color Color;
+
+        public PillTextureKey(int width, int height, int radius, Color color)
+        {
+            Width = width;
+            Height = height;
+            Radius = radius;
+            Color = color;
+        }
+
+        public override bool Equals(object obj)
+        {
+            return obj is PillTextureKey key && Equals(key);
+        }
+
+        public bool Equals(PillTextureKey other)
+        {
+            return Width == other.Width && Height == other.Height && Radius == other.Radius && Color.Equals(other.Color);
+        }
+
+        public override int GetHashCode()
+        {
+            unchecked
+            {
+                var hashCode = Width.GetHashCode();
+                hashCode = (hashCode * 397) ^ Height.GetHashCode();
+                hashCode = (hashCode * 397) ^ Radius.GetHashCode();
+                hashCode = (hashCode * 397) ^ Color.GetHashCode();
+                return hashCode;
+            }
+        }
+    }
     #endregion
 
     public class TabItem
@@ -84,8 +122,11 @@ namespace shadcnui.GUIComponents.Layout
 
         #region Fields
         private int _pendingCloseIndex = -1;
-        private Action<int> _pendingCloseCallback = null;
+        private Action<int> _pendingCloseCallback;
         private Vector2 _tabScrollPosition = Vector2.zero;
+        private Dictionary<PillTextureKey, Texture2D> _pillTextureCache = new Dictionary<PillTextureKey, Texture2D>();
+        private PillTextureKey _lastPillKey;
+        private Texture2D _lastPillTexture;
         #endregion
 
         #region Constructor
@@ -581,9 +622,33 @@ namespace shadcnui.GUIComponents.Layout
             var borderWidth = TAB_BORDER_WIDTH * guiHelper.uiScale;
             var pillRect = new Rect(tabRect.x + borderWidth, tabRect.y + borderWidth, tabRect.width - borderWidth * 2, tabRect.height - borderWidth * 2);
 
-            var pillTexture = CreatePillTexture((int)pillRect.width, (int)pillRect.height, (int)(Mathf.Min(pillRect.width, pillRect.height) / 2), color);
+            var pillTexture = GetOrCreatePillTexture((int)pillRect.width, (int)pillRect.height, (int)(Mathf.Min(pillRect.width, pillRect.height) / 2), color);
 
             GUI.DrawTexture(pillRect, pillTexture);
+        }
+
+        private Texture2D GetOrCreatePillTexture(int width, int height, int radius, Color color)
+        {
+            var key = new PillTextureKey(width, height, radius, color);
+
+            if (_lastPillKey.Equals(key) && _lastPillTexture != null)
+            {
+                return _lastPillTexture;
+            }
+
+            if (_pillTextureCache.TryGetValue(key, out var cachedTexture))
+            {
+                _lastPillKey = key;
+                _lastPillTexture = cachedTexture;
+                return cachedTexture;
+            }
+
+            var newTexture = CreatePillTexture(width, height, radius, color);
+            _pillTextureCache[key] = newTexture;
+            _lastPillKey = key;
+            _lastPillTexture = newTexture;
+
+            return newTexture;
         }
 
         private Texture2D CreatePillTexture(int width, int height, int radius, Color color)
@@ -689,6 +754,27 @@ namespace shadcnui.GUIComponents.Layout
         public void EndTabContent()
         {
             layoutComponents.EndVerticalGroup();
+        }
+        #endregion
+
+        #region Cleanup
+        protected override void OnBeforeDispose()
+        {
+            base.OnBeforeDispose();
+            ClearPillTextureCache();
+        }
+
+        private void ClearPillTextureCache()
+        {
+            foreach (var texture in _pillTextureCache.Values)
+            {
+                if (texture != null)
+                {
+                    UnityEngine.Object.Destroy(texture);
+                }
+            }
+            _pillTextureCache.Clear();
+            _lastPillTexture = null;
         }
         #endregion
     }

@@ -23,7 +23,7 @@ jobs:
       actions: write
     steps:
       - name: Delete Old Artifacts
-        uses: actions/github-script@v6
+        uses: actions/github-script@v8
         with:
           script: |
             const res = await github.rest.actions.listArtifactsForRepo({
