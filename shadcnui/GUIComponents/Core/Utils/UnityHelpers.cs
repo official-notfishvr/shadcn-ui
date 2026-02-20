@@ -18,131 +18,157 @@ namespace shadcnui.GUIComponents.Core.Utils
                 get => _style.fixedWidth;
                 set => _style.fixedWidth = value;
             }
+
             public float fixedHeight
             {
                 get => _style.fixedHeight;
                 set => _style.fixedHeight = value;
             }
+
             public UnityEngine.RectOffset margin
             {
                 get => _style.margin;
                 set => _style.margin = value;
             }
+
             public bool richText
             {
                 get => _style.richText;
                 set => _style.richText = value;
             }
+
             public UnityEngine.RectOffset padding
             {
                 get => _style.padding;
                 set => _style.padding = value;
             }
+
             public UnityEngine.RectOffset border
             {
                 get => _style.border;
                 set => _style.border = value;
             }
+
             public UnityEngine.RectOffset overflow
             {
                 get => _style.overflow;
                 set => _style.overflow = value;
             }
+
             public TextAnchor alignment
             {
                 get => _style.alignment;
                 set => _style.alignment = value;
             }
+
             public FontStyle fontStyle
             {
                 get => _style.fontStyle;
                 set => _style.fontStyle = value;
             }
+
             public int fontSize
             {
                 get => _style.fontSize;
                 set => _style.fontSize = value;
             }
+
             public UnityEngine.Font font
             {
                 get => _style.font;
                 set => _style.font = value;
             }
+
             public GUIStyleState normal
             {
                 get => _style.normal;
                 set => _style.normal = value;
             }
+
             public GUIStyleState hover
             {
                 get => _style.hover;
                 set => _style.hover = value;
             }
+
             public GUIStyleState active
             {
                 get => _style.active;
                 set => _style.active = value;
             }
+
             public GUIStyleState focused
             {
                 get => _style.focused;
                 set => _style.focused = value;
             }
+
             public GUIStyleState onNormal
             {
                 get => _style.onNormal;
                 set => _style.onNormal = value;
             }
+
             public GUIStyleState onHover
             {
                 get => _style.onHover;
                 set => _style.onHover = value;
             }
+
             public GUIStyleState onActive
             {
                 get => _style.onActive;
                 set => _style.onActive = value;
             }
+
             public GUIStyleState onFocused
             {
                 get => _style.onFocused;
                 set => _style.onFocused = value;
             }
+
             public TextClipping clipping
             {
                 get => _style.clipping;
                 set => _style.clipping = value;
             }
+
             public ImagePosition imagePosition
             {
                 get => _style.imagePosition;
                 set => _style.imagePosition = value;
             }
+
             public Vector2 contentOffset
             {
                 get => _style.contentOffset;
                 set => _style.contentOffset = value;
             }
+
             public bool wordWrap
             {
                 get => _style.wordWrap;
                 set => _style.wordWrap = value;
             }
+
             public bool stretchWidth
             {
                 get => _style.stretchWidth;
                 set => _style.stretchWidth = value;
             }
+
             public bool stretchHeight
             {
                 get => _style.stretchHeight;
                 set => _style.stretchHeight = value;
             }
+
             public string name
             {
                 get => _style.name;
                 set => _style.name = value;
             }
+
             public float lineHeight => _style.lineHeight;
 
             public GUIStyle(UnityEngine.GUIStyle style)
@@ -152,6 +178,16 @@ namespace shadcnui.GUIComponents.Core.Utils
                 _style.m_Ptr = style.m_Ptr;
 #else
                 _style = new UnityEngine.GUIStyle(style);
+#endif
+            }
+
+            public GUIStyle(GUIStyle style)
+            {
+#if IL2CPP_BEPINEX
+                _style = new UnityEngine.GUIStyle();
+                _style.m_Ptr = style.GetInternalStyle().m_Ptr;
+#else
+                _style = new UnityEngine.GUIStyle(style.GetInternalStyle());
 #endif
             }
 
@@ -201,21 +237,25 @@ namespace shadcnui.GUIComponents.Core.Utils
                 get => _offset.left;
                 set => _offset.left = value;
             }
+
             public int right
             {
                 get => _offset.right;
                 set => _offset.right = value;
             }
+
             public int top
             {
                 get => _offset.top;
                 set => _offset.top = value;
             }
+
             public int bottom
             {
                 get => _offset.bottom;
                 set => _offset.bottom = value;
             }
+
             public int horizontal => _offset.horizontal;
             public int vertical => _offset.vertical;
 
@@ -296,11 +336,13 @@ namespace shadcnui.GUIComponents.Core.Utils
                 get => _content.text;
                 set => _content.text = value;
             }
+
             public Texture image
             {
                 get => _content.image;
                 set => _content.image = value;
             }
+
             public string tooltip
             {
                 get => _content.tooltip;

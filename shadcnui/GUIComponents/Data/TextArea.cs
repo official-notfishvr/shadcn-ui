@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using shadcnui.GUIComponents.Core.Base;
 using shadcnui.GUIComponents.Core.Styling;
 using shadcnui.GUIComponents.Core.Utils;
@@ -24,84 +25,11 @@ namespace shadcnui.GUIComponents.Data
                 layoutComponents.AddSpace(DesignTokens.Spacing.XS);
             }
 
-            string result;
-            if (config.Rect.HasValue)
-            {
-                result = DrawTextAreaRect(config.Rect.Value, config.Text, config.Variant, config.Placeholder, config.Disabled, config.MaxLength, config.Id);
-            }
-            else
-            {
-                result = DrawTextAreaLayout(config.Text, config.Variant, config.Placeholder, config.Disabled, config.MinHeight, config.MaxLength, config.Options, config.Id);
-            }
+            string result = config.Rect.HasValue ? DrawTextAreaRect(config) : DrawTextAreaLayout(config);
 
-            if (config.ShowCharCount)
-            {
-                layoutComponents.AddSpace(DesignTokens.Spacing.XS);
-                layoutComponents.BeginHorizontalGroup();
-                GUILayout.FlexibleSpace();
-                string countText = config.MaxLength > 0 ? $"{result?.Length ?? 0}/{config.MaxLength}" : $"{result?.Length ?? 0} characters";
-                Color countColor = (config.MaxLength > 0 && (result?.Length ?? 0) > config.MaxLength * 0.9f) ? new Color(0.9f, 0.3f, 0.3f) : new Color(0.64f, 0.64f, 0.71f);
-                var countStyle = new UnityHelpers.GUIStyle(styleManager.GetLabelStyle(ControlVariant.Muted)) { normal = { textColor = countColor } };
-                UnityHelpers.Label(countText, countStyle);
-                layoutComponents.EndHorizontalGroup();
-            }
+            DrawCharacterCount(config, styleManager, result);
 
             return result;
-        }
-        #endregion
-
-        #region Internal Drawing
-        private string DrawTextAreaLayout(string text, ControlVariant variant, string placeholder, bool disabled, float minHeight, int maxLength, GUILayoutOption[] options, string id)
-        {
-            var styleManager = guiHelper.GetStyleManager();
-            string controlName = "textarea_" + id;
-            bool focused = GUI.GetNameOfFocusedControl() == controlName;
-            GUIStyle textAreaStyle = styleManager.GetTextAreaStyle(variant, ControlSize.Default, focused);
-            float scaledMinHeight = minHeight * guiHelper.uiScale;
-
-            var layoutOptions = new System.Collections.Generic.List<GUILayoutOption>();
-            layoutOptions.Add(GUILayout.MinHeight(scaledMinHeight));
-            layoutOptions.Add(GUILayout.ExpandWidth(true));
-
-            if (options != null && options.Length > 0)
-                layoutOptions.AddRange(options);
-
-            bool wasEnabled = GUI.enabled;
-            if (disabled)
-                GUI.enabled = false;
-
-            GUI.SetNextControlName(controlName);
-            string result = UnityHelpers.TextArea(text ?? (string.IsNullOrEmpty(placeholder) ? "" : placeholder), textAreaStyle, layoutOptions.ToArray());
-
-            GUI.enabled = wasEnabled;
-
-            if (maxLength > 0 && result.Length > maxLength)
-                result = result.Substring(0, maxLength);
-
-            return disabled ? text : result;
-        }
-
-        private string DrawTextAreaRect(Rect rect, string text, ControlVariant variant, string placeholder, bool disabled, int maxLength, string id)
-        {
-            var styleManager = guiHelper.GetStyleManager();
-            string controlName = "textarea_rect_" + id;
-            bool focused = GUI.GetNameOfFocusedControl() == controlName;
-            GUIStyle textAreaStyle = styleManager.GetTextAreaStyle(variant, ControlSize.Default, focused);
-            Rect scaledRect = new Rect(rect.x * guiHelper.uiScale, rect.y * guiHelper.uiScale, rect.width * guiHelper.uiScale, rect.height * guiHelper.uiScale);
-
-            bool wasEnabled = GUI.enabled;
-            if (disabled)
-                GUI.enabled = false;
-
-            GUI.SetNextControlName(controlName);
-            string result = GUI.TextArea(scaledRect, text ?? (string.IsNullOrEmpty(placeholder) ? "" : placeholder), textAreaStyle);
-
-            GUI.enabled = wasEnabled;
-
-            if (maxLength > 0 && result.Length > maxLength)
-                result = result.Substring(0, maxLength);
-
-            return disabled ? text : result;
         }
         #endregion
 
@@ -195,7 +123,7 @@ namespace shadcnui.GUIComponents.Data
         {
             height = Mathf.Clamp(height, minHeight, maxHeight);
 
-            var layoutOptions = new System.Collections.Generic.List<GUILayoutOption>();
+            var layoutOptions = new List<GUILayoutOption>();
             layoutOptions.Add(GUILayout.Height(height * guiHelper.uiScale));
             layoutOptions.Add(GUILayout.ExpandWidth(true));
             if (options != null && options.Length > 0)
@@ -219,12 +147,91 @@ namespace shadcnui.GUIComponents.Data
             GUILayout.FlexibleSpace();
             var styleManager = guiHelper.GetStyleManager();
             if (UnityHelpers.Button("⋮⋮⋮", styleManager.GetLabelStyle(ControlVariant.Muted), new GUILayoutOption[] { GUILayout.Width(20 * guiHelper.uiScale), GUILayout.Height(10 * guiHelper.uiScale) }))
-            {
                 height = height >= maxHeight ? minHeight : height + 20f;
-            }
             layoutComponents.EndHorizontalGroup();
 
             return result;
+        }
+        #endregion
+
+        #region Private Methods
+        private string DrawTextAreaLayout(TextAreaConfig config)
+        {
+            var styleManager = guiHelper.GetStyleManager();
+            string controlName = "textarea_" + config.Id;
+            bool focused = GUI.GetNameOfFocusedControl() == controlName;
+            GUIStyle textAreaStyle = styleManager.GetTextAreaStyle(config.Variant, ControlSize.Default, focused);
+            float scaledMinHeight = config.MinHeight * guiHelper.uiScale;
+
+            var layoutOptions = new List<GUILayoutOption>();
+            layoutOptions.Add(GUILayout.MinHeight(scaledMinHeight));
+            layoutOptions.Add(GUILayout.ExpandWidth(true));
+
+            if (config.Options != null && config.Options.Length > 0)
+                layoutOptions.AddRange(config.Options);
+
+            bool wasEnabled = GUI.enabled;
+            if (config.Disabled)
+                GUI.enabled = false;
+
+            GUI.SetNextControlName(controlName);
+            string result = UnityHelpers.TextArea(config.Text ?? GetPlaceholderText(config), textAreaStyle, layoutOptions.ToArray());
+
+            GUI.enabled = wasEnabled;
+
+            return ClampLength(result, config.MaxLength);
+        }
+
+        private string DrawTextAreaRect(TextAreaConfig config)
+        {
+            var styleManager = guiHelper.GetStyleManager();
+            string controlName = "textarea_rect_" + config.Id;
+            bool focused = GUI.GetNameOfFocusedControl() == controlName;
+            GUIStyle textAreaStyle = styleManager.GetTextAreaStyle(config.Variant, ControlSize.Default, focused);
+
+            Rect scaledRect = new Rect(config.Rect.Value.x * guiHelper.uiScale, config.Rect.Value.y * guiHelper.uiScale, config.Rect.Value.width * guiHelper.uiScale, config.Rect.Value.height * guiHelper.uiScale);
+
+            bool wasEnabled = GUI.enabled;
+            if (config.Disabled)
+                GUI.enabled = false;
+
+            GUI.SetNextControlName(controlName);
+            string result = GUI.TextArea(scaledRect, config.Text ?? GetPlaceholderText(config), textAreaStyle);
+
+            GUI.enabled = wasEnabled;
+
+            return ClampLength(result, config.MaxLength);
+        }
+
+        private void DrawCharacterCount(TextAreaConfig config, StyleManager styleManager, string result)
+        {
+            if (!config.ShowCharCount)
+                return;
+
+            layoutComponents.AddSpace(DesignTokens.Spacing.XS);
+            layoutComponents.BeginHorizontalGroup();
+            GUILayout.FlexibleSpace();
+
+            string countText = config.MaxLength > 0 ? $"{result?.Length ?? 0}/{config.MaxLength}" : $"{result?.Length ?? 0} characters";
+
+            bool isNearLimit = config.MaxLength > 0 && (result?.Length ?? 0) > config.MaxLength * 0.9f;
+            Color countColor = isNearLimit ? new Color(0.9f, 0.3f, 0.3f) : new Color(0.64f, 0.64f, 0.71f);
+
+            var countStyle = new UnityHelpers.GUIStyle(styleManager.GetLabelStyle(ControlVariant.Muted)) { normal = { textColor = countColor } };
+            UnityHelpers.Label(countText, countStyle);
+            layoutComponents.EndHorizontalGroup();
+        }
+
+        private string GetPlaceholderText(TextAreaConfig config)
+        {
+            return string.IsNullOrEmpty(config.Placeholder) ? "" : config.Placeholder;
+        }
+
+        private static string ClampLength(string text, int maxLength)
+        {
+            if (maxLength <= 0 || text == null)
+                return text ?? "";
+            return text.Length > maxLength ? text.Substring(0, maxLength) : text;
         }
         #endregion
     }

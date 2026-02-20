@@ -1,11 +1,9 @@
 using System;
 using System.Collections.Generic;
-using System.IO;
 using shadcnui.GUIComponents.Core.Base;
 using shadcnui.GUIComponents.Core.Theming;
 using shadcnui.GUIComponents.Core.Utils;
 using UnityEngine;
-using Object = UnityEngine.Object;
 #if IL2CPP_MELONLOADER_PRE57
 using UnhollowerBaseLib;
 #endif
@@ -67,19 +65,6 @@ namespace shadcnui.GUIComponents.Core.Styling
         TableRow,
         TableHeader,
         TableCell,
-        Calendar,
-        CalendarWeekday,
-        CalendarDay,
-        CalendarDaySelected,
-        CalendarDayOutsideMonth,
-        CalendarDayToday,
-        CalendarDayInRange,
-        DatePicker,
-        DatePickerWeekday,
-        DatePickerDay,
-        DatePickerDaySelected,
-        DatePickerDayOutsideMonth,
-        DatePickerDayToday,
         Dialog,
         Chart,
         ChartAxis,
@@ -102,9 +87,11 @@ namespace shadcnui.GUIComponents.Core.Styling
         Toast,
         ToastTitle,
         ToastDescription,
+        Tooltip,
         SliderTrack,
         SliderThumb,
         SliderFill,
+        Navigation,
     }
 
     public readonly struct StyleKey : IEquatable<StyleKey>
@@ -153,39 +140,31 @@ namespace shadcnui.GUIComponents.Core.Styling
         private readonly Dictionary<float, int> _scaledRadiusCache = new();
         private readonly Dictionary<float, int> _scaledSpacingCache = new();
         private readonly Dictionary<float, int> _scaledHeightCache = new();
-        private float _lastUIScale = -1f;
+        private float _lastUiScale = -1f;
         #endregion
 
         #region Texture Accessors
-        private Texture2D GradientTexture => Textures?.Gradient;
-        private Texture2D GlowTexture => Textures?.Glow;
-        private Texture2D CardBackgroundTexture => Textures?.CardBackground;
-        private Texture2D TransparentTexture => Textures?.Transparent;
         private Texture2D InputFocusedTexture => Textures?.InputFocused;
-        private Texture2D ProgressBarBackgroundTexture => Textures?.ProgressBarBackground;
         private Texture2D SeparatorTexture => Textures?.Separator;
-        private Texture2D TabsBackgroundTexture => Textures?.TabsBackground;
-        private Texture2D TabsActiveTexture => Textures?.TabsActive;
-        private Texture2D BadgeTexture => Textures?.Badge;
         private Texture2D TableCellTexture => Textures?.TableCell;
-        private Texture2D CalendarBackgroundTexture => Textures?.CalendarBackground;
-        private Texture2D CalendarDayTexture => Textures?.CalendarDay;
-        private Texture2D CalendarDaySelectedTexture => Textures?.CalendarDaySelected;
-        private Texture2D DropdownMenuContentTexture => Textures?.DropdownMenuContent;
+        private Texture2D TableHeaderTexture => Textures?.TableHeader;
+        private Texture2D TableRowTexture => Textures?.TableRow;
+        private Texture2D TableRowAlternateTexture => Textures?.TableRowAlternate;
+        private Texture2D TransparentTexture => Textures?.Transparent;
+        private Texture2D TabsActiveTexture => Textures?.TabsActive;
         private Texture2D ChartContainerTexture => Textures?.ChartContainer;
         #endregion
 
         #region Base GUIStyles
         private GUIStyle _baseButtonStyle;
         private GUIStyle _baseToggleStyle;
-        private GUIStyle _baseCheckboxStyle;
+        private GUIStyle _checkboxStyle;
+        private GUIStyle _checkboxSolidStyle;
         private GUIStyle _baseSwitchStyle;
         private GUIStyle _baseInputStyle;
         private GUIStyle _baseLabelStyle;
         private GUIStyle _baseBadgeStyle;
         private GUIStyle _baseTableStyle;
-        private GUIStyle _baseCalendarStyle;
-        private GUIStyle _calendarDayStyle;
         private GUIStyle _tableCellStyle;
         private GUIStyle _cardStyle;
         private GUIStyle _tabsListStyle;
@@ -198,8 +177,12 @@ namespace shadcnui.GUIComponents.Core.Styling
         private GUIStyle _progressBarStyle;
         private GUIStyle _separatorStyle;
         private GUIStyle _avatarStyle;
-        internal GUIStyle AnimatedBoxStyle;
         private GUIStyle _baseSliderStyle;
+        private GUIStyle _tableHeaderStyle;
+        private GUIStyle _tableRowStyle;
+        private GUIStyle _tableRowAlternateStyle;
+        private GUIStyle _navigationStyle;
+        internal GUIStyle AnimatedBoxStyle;
         #endregion
 
         #region Style Cache
@@ -338,12 +321,12 @@ namespace shadcnui.GUIComponents.Core.Styling
         #region Scale Caching
         private void InvalidateScaleCaches()
         {
-            if (Mathf.Abs(_guiHelper.uiScale - _lastUIScale) > 0.001f)
+            if (Mathf.Abs(_guiHelper.uiScale - _lastUiScale) > 0.001f)
             {
                 _scaledRadiusCache.Clear();
                 _scaledSpacingCache.Clear();
                 _scaledHeightCache.Clear();
-                _lastUIScale = _guiHelper.uiScale;
+                _lastUiScale = _guiHelper.uiScale;
             }
         }
 
@@ -354,7 +337,7 @@ namespace shadcnui.GUIComponents.Core.Styling
             if (_scaledRadiusCache.TryGetValue(radius, out var cached))
                 return cached;
 
-            var scaled = Mathf.RoundToInt(radius * _guiHelper.uiScale);
+            int scaled = Mathf.RoundToInt(radius * _guiHelper.uiScale);
             _scaledRadiusCache[radius] = scaled;
             return scaled;
         }
@@ -366,7 +349,7 @@ namespace shadcnui.GUIComponents.Core.Styling
             if (_scaledSpacingCache.TryGetValue(spacing, out var cached))
                 return cached;
 
-            var scaled = Mathf.RoundToInt(spacing * _guiHelper.uiScale);
+            int scaled = Mathf.RoundToInt(spacing * _guiHelper.uiScale);
             _scaledSpacingCache[spacing] = scaled;
             return scaled;
         }
@@ -378,7 +361,7 @@ namespace shadcnui.GUIComponents.Core.Styling
             if (_scaledHeightCache.TryGetValue(height, out var cached))
                 return cached;
 
-            var scaled = Mathf.RoundToInt(height * _guiHelper.uiScale);
+            int scaled = Mathf.RoundToInt(height * _guiHelper.uiScale);
             _scaledHeightCache[height] = scaled;
             return scaled;
         }
@@ -395,29 +378,27 @@ namespace shadcnui.GUIComponents.Core.Styling
         #endregion
 
         #region Texture Creation
-        public Texture2D CreateBorderTexture(Color borderColor, int thickness) => Textures.GenerateShape(thickness * 4, thickness * 4, 0, Color.clear, Color.clear, borderColor, thickness);
-
         public Texture2D CreateSolidTexture(Color color) => Textures.GenerateSolid(color);
 
-        public Texture2D CreateGradientRoundedRectTexture(int width, int height, int radius, Color color) => Textures.GenerateShape(width, height, radius, color, color, Color.clear, 0);
+        public Texture2D CreateTexture(int width, int height, int radius, Color color) => Textures.GenerateShape(width, height, radius, color, color, Color.clear, 0);
 
-        public Texture2D CreateGradientRoundedRectTexture(int width, int height, int radius, Color topColor, Color bottomColor) => Textures.GenerateShape(width, height, radius, topColor, bottomColor, Color.clear, 0);
+        public Texture2D CreateTexture(int width, int height, int radius, Color color, Color color2) => Textures.GenerateShape(width, height, radius, color, color2, Color.clear, 0);
 
-        public Texture2D CreateFocusRingTexture(int width, int height, int radius, Color ringColor, float thickness = 2f) => Textures.GenerateShape(width, height, radius, Color.clear, Color.clear, ringColor, thickness);
+        public Texture2D CreateBorderTexture(int width, int height, int radius, Color fillColor, Color borderColor, float borderThickness = 1f) => Textures.GenerateShape(width, height, radius, fillColor, fillColor, borderColor, borderThickness);
 
-        public Texture2D CreateGradientRoundedRectWithShadowTexture(int width, int height, int radius, Color topColor, Color bottomColor, float shadowIntensity = 0.12f, int shadowBlur = 10) =>
-            Textures.GenerateShape(width, height, radius, topColor, bottomColor, Color.clear, 0, shadowIntensity, shadowBlur);
+        public Texture2D CreateBorderTexture(Color borderColor, int thickness) => Textures.GenerateShape(thickness * 4, thickness * 4, 0, Color.clear, Color.clear, borderColor, thickness);
 
-        public Texture2D CreateStyledRoundedRectWithShadow(int width, int height, int radius, Color topColor, Color bottomColor, float shadowIntensity = 0.12f, int shadowBlur = 10, float highlightIntensity = 0.1f) =>
-            Textures.GenerateStyledShape(width, height, radius, topColor, bottomColor, Color.clear, 0, shadowIntensity, shadowBlur, highlightIntensity);
+        public Texture2D CreateTexture(int width, int height, int radius, Color ringColor, float thickness = 2f) => Textures.GenerateShape(width, height, radius, Color.clear, Color.clear, ringColor, thickness);
 
-        public Texture2D CreateInnerShadowTexture(int width, int height, int radius, Color baseColor, float shadowIntensity = 0.1f, int shadowSize = 4) => Textures.GenerateShape(width, height, radius, baseColor, baseColor, Color.Lerp(baseColor, Color.black, shadowIntensity), shadowSize);
+        public Texture2D CreateTexture(int width, int height, int radius, Color topColor, Color bottomColor, float shadowIntensity = 0.12f, int shadowBlur = 10) => Textures.GenerateShape(width, height, radius, topColor, bottomColor, Color.clear, 0, shadowIntensity, shadowBlur);
 
-        public Texture2D CreateRoundedOutlineTexture(int width, int height, int radius, Color borderColor, float thickness = 1f) => Textures.GenerateShape(width, height, radius, Color.clear, Color.clear, borderColor, thickness);
+        public Texture2D CreateOutlineTexture(int width, int height, int radius, Color borderColor, float thickness = 1f) => Textures.GenerateShape(width, height, radius, Color.clear, Color.clear, borderColor, thickness);
 
-        public Texture2D CreateBorderedRoundedRectTexture(int width, int height, int radius, Color fillColor, Color borderColor, float borderThickness = 1f) => Textures.GenerateShape(width, height, radius, fillColor, fillColor, borderColor, borderThickness);
+        private Texture2D CreateBorderTexture(int width, int height, int borderThickness, Color borderColor, Color fillColor) => Textures.GenerateShape(width, height, 0, fillColor, fillColor, borderColor, borderThickness);
 
-        private Texture2D CreateBottomBorderTexture(int width, int height, int borderThickness, Color borderColor, Color fillColor) => Textures.GenerateShape(width, height, 0, fillColor, fillColor, borderColor, borderThickness);
+        public Texture2D CreateAvatarTexture(int size, int radius, Color backgroundColor, Color borderColor, float borderThickness, bool withShadow = true) => Textures.GenerateAvatarTexture(size, radius, backgroundColor, borderColor, borderThickness, withShadow);
+
+        public Texture2D CreateStatusIndicator(int size, bool isOnline) => Textures.GenerateStatusIndicator(size, isOnline);
         #endregion
 
         #region Cleanup
@@ -439,7 +420,7 @@ namespace shadcnui.GUIComponents.Core.Styling
         private readonly Dictionary<string, int> _styleHealthChecks = new();
         private List<System.Reflection.FieldInfo> _monitoredStyleFields;
 
-        private int GetStyleHealth(GUIStyle style)
+        private static int GetStyleHealth(GUIStyle style)
         {
             if (style == null)
                 return 0;
@@ -508,8 +489,7 @@ namespace shadcnui.GUIComponents.Core.Styling
 
             foreach (var field in _monitoredStyleFields)
             {
-                var style = field.GetValue(this) as GUIStyle;
-                if (style != null)
+                if (field.GetValue(this) is GUIStyle style && style != null)
                 {
                     _styleHealthChecks[field.Name] = GetStyleHealth(style);
                 }
@@ -533,14 +513,13 @@ namespace shadcnui.GUIComponents.Core.Styling
 
             foreach (var field in _monitoredStyleFields)
             {
-                var style = field.GetValue(this) as GUIStyle;
-                if (style == null)
+                if (field.GetValue(this) is not GUIStyle style || style == null)
                     continue;
 
                 string styleName = field.Name;
                 int currentHealth = GetStyleHealth(style);
 
-                if (_styleHealthChecks.TryGetValue(styleName, out var previousHealth) && previousHealth != currentHealth)
+                if (_styleHealthChecks.TryGetValue(styleName, out int previousHealth) && previousHealth != currentHealth)
                 {
                     GUILogger.LogWarning($"Style corruption detected in '{styleName}'", "StyleManager.ScanForCorruption");
                     _stylesCorruption = true;

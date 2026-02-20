@@ -189,6 +189,8 @@ namespace shadcnui.GUIComponents.Core.Base
 
     public class ButtonBuilder : IconSupportBuilder<ButtonBuilder, ButtonConfig>
     {
+        private string _tooltip;
+
         public ButtonBuilder(GUIHelper helper)
             : base(helper, new ButtonConfig("")) { }
 
@@ -216,6 +218,12 @@ namespace shadcnui.GUIComponents.Core.Base
 
         public ButtonBuilder Link() => Variant(ControlVariant.Link);
 
+        public ButtonBuilder Tooltip(string text)
+        {
+            _tooltip = text;
+            return this;
+        }
+
         public ButtonBuilder IconSize() => Size(ControlSize.Icon);
 
         public bool Draw()
@@ -224,6 +232,8 @@ namespace shadcnui.GUIComponents.Core.Base
             _config.Size = _size;
             _config.Disabled = _disabled;
             _config.Options = GetOptions();
+            if (!string.IsNullOrEmpty(_tooltip))
+                return _helper.WithTooltip(_tooltip, () => _helper.Button(_config.Text, _config.Variant, _config.Size, _config.OnClick, _config.Disabled, _config.Opacity, _config.Options));
             return _helper.Button(_config.Text, _config.Variant, _config.Size, _config.OnClick, _config.Disabled, _config.Opacity, _config.Options);
         }
 
@@ -233,7 +243,7 @@ namespace shadcnui.GUIComponents.Core.Base
             _config.Size = _size;
             _config.Disabled = _disabled;
             _config.Options = GetOptions();
-            
+
             GUI.BeginGroup(rect);
             GUILayout.BeginArea(new Rect(0, 0, rect.width, rect.height));
             try
@@ -410,7 +420,7 @@ namespace shadcnui.GUIComponents.Core.Base
             _config.Size = _size;
             _config.Disabled = _disabled;
             _config.Options = GetOptions();
-            
+
             GUI.BeginGroup(rect);
             GUILayout.BeginArea(new Rect(0, 0, rect.width, rect.height));
             try
@@ -469,7 +479,7 @@ namespace shadcnui.GUIComponents.Core.Base
             _config.Size = _size;
             _config.Disabled = _disabled;
             _config.Options = GetOptions();
-            
+
             GUI.BeginGroup(rect);
             GUILayout.BeginArea(new Rect(0, 0, rect.width, rect.height));
             try
@@ -528,7 +538,7 @@ namespace shadcnui.GUIComponents.Core.Base
             _config.Size = _size;
             _config.Disabled = _disabled;
             _config.Options = GetOptions();
-            
+
             GUI.BeginGroup(rect);
             GUILayout.BeginArea(new Rect(0, 0, rect.width, rect.height));
             try
@@ -545,6 +555,8 @@ namespace shadcnui.GUIComponents.Core.Base
 
     public class BadgeBuilder : IconSupportBuilder<BadgeBuilder, BadgeConfig>
     {
+        private string _tooltip;
+
         public BadgeBuilder(GUIHelper helper)
             : base(helper, new BadgeConfig()) { }
 
@@ -592,6 +604,12 @@ namespace shadcnui.GUIComponents.Core.Base
             return this;
         }
 
+        public BadgeBuilder Tooltip(string text)
+        {
+            _tooltip = text;
+            return this;
+        }
+
         public new BadgeBuilder Secondary() => (BadgeBuilder)base.Secondary();
 
         public new BadgeBuilder Destructive() => (BadgeBuilder)base.Destructive();
@@ -607,7 +625,10 @@ namespace shadcnui.GUIComponents.Core.Base
             _config.Variant = _variant;
             _config.Size = _size;
             _config.Options = GetOptions();
-            _helper.Badge(_config);
+            if (!string.IsNullOrEmpty(_tooltip))
+                _helper.WithTooltip(_tooltip, () => _helper.Badge(_config));
+            else
+                _helper.Badge(_config);
         }
 
         public void Draw(Rect rect)
@@ -615,7 +636,10 @@ namespace shadcnui.GUIComponents.Core.Base
             _config.Variant = _variant;
             _config.Size = _size;
             _config.Rect = rect;
-            _helper.Badge(_config);
+            if (!string.IsNullOrEmpty(_tooltip))
+                _helper.WithTooltip(_tooltip, () => _helper.Badge(_config));
+            else
+                _helper.Badge(_config);
         }
     }
 
@@ -1400,86 +1424,6 @@ namespace shadcnui.GUIComponents.Core.Base
         }
     }
 
-    public class CalendarBuilder : ComponentBuilder<CalendarBuilder, CalendarConfig>
-    {
-        public CalendarBuilder(GUIHelper helper)
-            : base(helper, new CalendarConfig()) { }
-
-        public void Draw()
-        {
-            _config.Variant = _variant;
-            _config.Size = _size;
-            _helper.Calendar(_config);
-        }
-    }
-
-    public class DatePickerBuilder : ComponentBuilder<DatePickerBuilder, DatePickerConfig>
-    {
-        public DatePickerBuilder(GUIHelper helper)
-            : base(helper, new DatePickerConfig()) { }
-
-        public DatePickerBuilder Id(string id)
-        {
-            _config.Id = id;
-            return this;
-        }
-
-        public DatePickerBuilder Placeholder(string placeholder)
-        {
-            _config.Placeholder = placeholder;
-            return this;
-        }
-
-        public DatePickerBuilder SelectedDate(DateTime? date)
-        {
-            _config.SelectedDate = date;
-            return this;
-        }
-
-        public DatePickerBuilder DatePickerLabel(string label)
-        {
-            _config.Label = label;
-            return this;
-        }
-
-        public DatePickerBuilder MinDate(DateTime? date)
-        {
-            _config.MinDate = date;
-            return this;
-        }
-
-        public DatePickerBuilder MaxDate(DateTime? date)
-        {
-            _config.MaxDate = date;
-            return this;
-        }
-
-        public DatePickerBuilder DateRange(DateTime? min, DateTime? max)
-        {
-            _config.MinDate = min;
-            _config.MaxDate = max;
-            return this;
-        }
-
-        public DatePickerBuilder StartDate(DateTime? date)
-        {
-            _config.StartDate = date;
-            return this;
-        }
-
-        public DatePickerBuilder EndDate(DateTime? date)
-        {
-            _config.EndDate = date;
-            return this;
-        }
-
-        public DateTime? Draw()
-        {
-            _config.Options = GetOptions();
-            return _helper.DatePicker(_config);
-        }
-    }
-
     public class ChartBuilder : ComponentBuilder<ChartBuilder, ChartConfig>
     {
         private readonly List<ChartSeries> _series = new List<ChartSeries>();
@@ -1994,14 +1938,6 @@ namespace shadcnui.GUIComponents.Core.Base
         public TableBuilder CreateTable() => new TableBuilder(this);
 
         public TableBuilder CreateTable(params string[] headers) => new TableBuilder(this).Headers(headers);
-
-        public CalendarBuilder CreateCalendar() => new CalendarBuilder(this);
-
-        public DatePickerBuilder CreateDatePicker() => new DatePickerBuilder(this);
-
-        public DatePickerBuilder CreateDatePicker(string id) => new DatePickerBuilder(this).Id(id);
-
-        public DatePickerBuilder CreateDatePicker(string id, string placeholder) => new DatePickerBuilder(this).Id(id).Placeholder(placeholder);
 
         public ChartBuilder CreateChart() => new ChartBuilder(this);
 

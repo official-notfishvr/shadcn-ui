@@ -41,6 +41,7 @@ namespace shadcnui.GUIComponents.Display
         public bool EnablePauseOnHover { get; set; }
         public float HoverPauseDelay { get; set; }
         public bool EnableClickToDismiss { get; set; }
+        public int ZIndex { get; set; }
 
         public ActiveToast(ToastConfig config)
         {
@@ -73,6 +74,7 @@ namespace shadcnui.GUIComponents.Display
             EnablePauseOnHover = config.EnablePauseOnHover;
             HoverPauseDelay = config.HoverPauseDelay;
             EnableClickToDismiss = config.EnableClickToDismiss;
+            ZIndex = config.ZIndex;
         }
 
         public bool IsExpired => !IsDismissing && DurationMs > 0 && ElapsedMs >= DurationMs;
@@ -99,6 +101,7 @@ namespace shadcnui.GUIComponents.Display
         public Toast(GUIHelper helper)
             : base(helper) { }
 
+        #region API
         public void Show(ToastConfig config, bool skipQueue = false)
         {
             try
@@ -475,7 +478,7 @@ namespace shadcnui.GUIComponents.Display
                 int borderRadius = Mathf.RoundToInt(toast.BorderRadius * guiHelper.uiScale);
                 string bgKey = $"toast_bg_{toast.Variant}_{Mathf.RoundToInt(toastRect.width)}_{Mathf.RoundToInt(toastRect.height)}_{borderRadius}";
                 if (!_cachedTextures.ContainsKey(bgKey))
-                    _cachedTextures[bgKey] = styleManager.CreateGradientRoundedRectTexture(Mathf.RoundToInt(toastRect.width), Mathf.RoundToInt(toastRect.height), borderRadius, bgColor);
+                    _cachedTextures[bgKey] = styleManager.CreateTexture(Mathf.RoundToInt(toastRect.width), Mathf.RoundToInt(toastRect.height), borderRadius, bgColor);
                 GUIStyle bgStyle = new UnityHelpers.GUIStyle(GUI.skin.box);
                 bgStyle.normal.background = _cachedTextures[bgKey];
                 bgStyle.border = new UnityHelpers.RectOffset(borderRadius, borderRadius, borderRadius, borderRadius);
@@ -572,5 +575,6 @@ namespace shadcnui.GUIComponents.Display
                 ids.Add(toast.Id);
             return ids;
         }
+        #endregion
     }
 }

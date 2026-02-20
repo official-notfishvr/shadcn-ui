@@ -27,14 +27,10 @@ namespace shadcnui.GUIComponents.Core.Base
 
         #region Internal Settings
 
-        internal float backgroundAlpha = 0.85f;
         internal int fontSize = 14;
-        internal int cornerRadius = 16;
-        internal bool fadeTransitionsEnabled = true;
-        internal float glowIntensity = 12.0f;
         public float uiScale = 1f;
 
-        #endregion     
+        #endregion
 
         #region Component Instances
 
@@ -83,6 +79,7 @@ namespace shadcnui.GUIComponents.Core.Base
                 _components[typeof(Tabs)] = new Tabs(this);
                 _components[typeof(MenuBar)] = new MenuBar(this);
                 _components[typeof(Table)] = new Table(this);
+                _components[typeof(Navigation)] = new Navigation(this);
 
                 _components[typeof(Label)] = new Label(this);
                 _components[typeof(Progress)] = new Progress(this);
@@ -92,10 +89,8 @@ namespace shadcnui.GUIComponents.Core.Base
                 _components[typeof(Dialog)] = new Dialog(this);
                 _components[typeof(Popover)] = new Popover(this);
                 _components[typeof(Toast)] = new Toast(this);
+                _components[typeof(Tooltip)] = new Tooltip(this);
 
-                _components[typeof(DataTable)] = new DataTable(this);
-                _components[typeof(Calendar)] = new Calendar(this);
-                _components[typeof(DatePicker)] = new DatePicker(this);
                 _components[typeof(ThemeChanger)] = new ThemeChanger(this);
 
                 GUILogger.LogInfo("GUIHelper components initialized successfully", "GUIHelper.Initialize");
@@ -129,10 +124,6 @@ namespace shadcnui.GUIComponents.Core.Base
         public StyleManager GetStyleManager() => _styleManager;
 
         public AnimationManager GetAnimationManager() => _animationManager;
-
-        public Calendar GetCalendarComponent() => Get<Calendar>();
-
-        public Calendar GetCalendarComponents() => Get<Calendar>();
 
         public Chart GetChartComponent() => Get<Chart>();
 
@@ -365,6 +356,15 @@ namespace shadcnui.GUIComponents.Core.Base
 
         #region Checkbox Components
 
+        public bool Checkbox(CheckboxConfig config, Action<bool> onToggle = null, bool disabled = false, params GUILayoutOption[] options)
+        {
+            config.OnToggle = onToggle;
+            config.Disabled = disabled;
+            if (options != null && options.Length > 0)
+                config.Options = options;
+            return Execute(() => Get<Checkbox>()?.DrawCheckbox(config) ?? config.Value, "Checkbox");
+        }
+
         public bool Checkbox(string text, bool value, ControlVariant variant = ControlVariant.Default, ControlSize size = ControlSize.Default, Action<bool> onToggle = null, bool disabled = false, params GUILayoutOption[] options)
         {
             return Execute(() => Get<Checkbox>()?.DrawCheckbox(text, value, variant, size, onToggle, disabled, options) ?? value, "Checkbox");
@@ -511,6 +511,8 @@ namespace shadcnui.GUIComponents.Core.Base
         public Vector2 ScrollView(Vector2 scrollPosition, Action drawContent, params GUILayoutOption[] options) => Execute(() => _layout?.DrawScrollView(scrollPosition, drawContent, options) ?? scrollPosition, "ScrollView");
 
         public void BeginHorizontalGroup() => Execute(() => _layout?.BeginHorizontalGroup(), "BeginHorizontalGroup");
+
+        public void BeginHorizontalGroup(params GUILayoutOption[] options) => Execute(() => _layout?.BeginHorizontalGroup(options), "BeginHorizontalGroup");
 
         public void EndHorizontalGroup() => Execute(() => _layout?.EndHorizontalGroup(), "EndHorizontalGroup");
 
@@ -727,6 +729,14 @@ namespace shadcnui.GUIComponents.Core.Base
         public void DrawOverlay()
         {
             Execute(() => Get<Toast>()?.DrawToasts(), "Toasts");
+            Execute(
+                () =>
+                {
+                    Rect clipBounds = new Rect(0, 0, Screen.width, Screen.height);
+                    Get<Tooltip>()?.FlushAndDraw(clipBounds);
+                },
+                "Tooltip"
+            );
             Execute(() => LayerManager.Instance.DrawLayers(), "DrawLayers");
         }
 
@@ -790,6 +800,18 @@ namespace shadcnui.GUIComponents.Core.Base
                 "EnableGrouping"
             );
         }
+
+        #endregion
+
+        #region Tooltip Components
+
+        public void WithTooltip(string text, Action draw) => Execute(() => Get<Tooltip>()?.WithTooltip(text, draw), "WithTooltip");
+
+        public void WithTooltip(string text, TooltipConfig config, Action draw) => Execute(() => Get<Tooltip>()?.WithTooltip(text, config, draw), "WithTooltip");
+
+        public T WithTooltip<T>(string text, Func<T> draw) => Execute(() => Get<Tooltip>() != null ? Get<Tooltip>().WithTooltip(text, draw) : (draw != null ? draw() : default), "WithTooltip");
+
+        public T WithTooltip<T>(string text, TooltipConfig config, Func<T> draw) => Execute(() => Get<Tooltip>() != null ? Get<Tooltip>().WithTooltip(text, config, draw) : (draw != null ? draw() : default), "WithTooltip");
 
         #endregion
 
@@ -957,6 +979,7 @@ namespace shadcnui.GUIComponents.Core.Base
                         tabConfigs[newIndex].Content?.Invoke();
                         EndTabContent();
                     }
+
                     return newIndex;
                 },
                 "TabsWithContent"
@@ -1017,28 +1040,14 @@ namespace shadcnui.GUIComponents.Core.Base
 
         #endregion
 
-        #region Calendar Components
+        #region Navigation Components
 
-        public void Calendar(CalendarConfig config) => Execute(() => Get<Calendar>()?.DrawCalendar(config), "Calendar");
+        public int Navigation(NavigationConfig config) => Execute(() => Get<Navigation>()?.Draw(config) ?? config?.SelectedIndex ?? 0, "Navigation");
 
-        public void Calendar() => Execute(() => Get<Calendar>()?.DrawCalendar(), "Calendar");
-
-        #endregion
-
-        #region DatePicker Components
-
-        public DateTime? DatePicker(DatePickerConfig config) => Execute(() => Get<DatePicker>()?.DrawDatePicker(config), "DatePicker");
-
-        public DateTime? DatePicker(string placeholder, DateTime? selectedDate, string id = "datepicker", params GUILayoutOption[] options) => Execute(() => Get<DatePicker>()?.DrawDatePicker(placeholder, selectedDate, id, options) ?? selectedDate, "DatePicker");
-
-        public DateTime? DatePickerWithLabel(string label, string placeholder, DateTime? selectedDate, string id = "datepicker", params GUILayoutOption[] options) =>
-            Execute(() => Get<DatePicker>()?.DrawDatePickerWithLabel(label, placeholder, selectedDate, id, options) ?? selectedDate, "DatePickerWithLabel");
-
-        public DateTime? DateRangePicker(string placeholder, DateTime? startDate, DateTime? endDate, string id = "daterange", params GUILayoutOption[] options) => Execute(() => Get<DatePicker>()?.DrawDateRangePicker(placeholder, startDate, endDate, id, options) ?? startDate, "DateRangePicker");
-
-        public void CloseDatePicker(string id) => Execute(() => Get<DatePicker>()?.CloseDatePicker(id), "CloseDatePicker");
-
-        public bool IsDatePickerOpen(string id) => Execute(() => Get<DatePicker>()?.IsDatePickerOpen(id) ?? false, "IsDatePickerOpen");
+        public int Sidebar(string[] labels, int selectedIndex, string[] icons = null, string logoText = "U", Action<int> onSelectionChanged = null, float width = 70f)
+        {
+            return Execute(() => Get<Navigation>()?.DrawSidebar(labels, selectedIndex, icons, logoText, onSelectionChanged, width) ?? selectedIndex, "Sidebar");
+        }
 
         #endregion
 
@@ -1049,29 +1058,6 @@ namespace shadcnui.GUIComponents.Core.Base
         public void ThemeChangerCompact(string id = "theme_compact") => Execute(() => Get<ThemeChanger>()?.DrawCompact(id), "ThemeChangerCompact");
 
         public void ThemeChangerWithPreview(string id = "theme_preview", float width = 220f) => Execute(() => Get<ThemeChanger>()?.DrawWithPreview(id, width), "ThemeChangerWithPreview");
-
-        #endregion
-
-        #region LayerManager Components
-
-        public bool HasOpenLayers() => LayerManager.Instance.HasOpenLayers();
-
-        #endregion
-
-        #region DataTable Components
-
-        public void DataTable(string id, List<DataTableColumn> columns, List<DataTableRow> data, bool showPagination = true, bool showSearch = true, bool showSelection = true, bool showColumnToggle = false, params GUILayoutOption[] options)
-        {
-            Execute(() => Get<DataTable>()?.DrawDataTable(id, columns, data, showPagination, showSearch, showSelection, showColumnToggle, options), "DataTable");
-        }
-
-        public DataTableColumn CreateDataTableColumn(string id, string header, string accessorKey = null) => new DataTableColumn(id, header, accessorKey);
-
-        public DataTableRow CreateDataTableRow(string id) => new DataTableRow(id);
-
-        public List<string> GetSelectedRows(string tableId) => Execute(() => Get<DataTable>()?.GetSelectedRows(tableId) ?? new List<string>(), "GetSelectedRows");
-
-        public void ClearSelection(string tableId) => Execute(() => Get<DataTable>()?.ClearSelection(tableId), "ClearSelection");
 
         #endregion
 

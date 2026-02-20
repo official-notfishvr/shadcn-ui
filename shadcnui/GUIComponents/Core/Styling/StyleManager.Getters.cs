@@ -90,24 +90,6 @@ namespace shadcnui.GUIComponents.Core.Styling
                 }
             );
 
-        private GUIStyle GetWeekdayStyle(StyleComponentType type, ControlVariant variant = ControlVariant.Default, ControlSize size = ControlSize.Default) =>
-            GetCachedStyle(
-                type,
-                variant,
-                size,
-                _baseLabelStyle ?? GUI.skin.label,
-                applyVariant: false,
-                customLogic: s =>
-                {
-                    s.fontSize = GetScaledFontSize(DesignTokens.FontScale.XS);
-                    s.fontStyle = FontStyle.Bold;
-                    s.alignment = TextAnchor.MiddleCenter;
-                    s.normal.textColor = ThemeManager.Instance.CurrentTheme.Muted;
-                }
-            );
-
-        private GUIStyle GetDayStyle(StyleComponentType type, int state, Action<GUIStyle, Theme> setup, ControlVariant variant = ControlVariant.Default, ControlSize size = ControlSize.Default) =>
-            GetCachedStyle(type, variant, size, _calendarDayStyle ?? GUI.skin.button, state, applyVariant: variant != ControlVariant.Default, customLogic: s => setup(s, ThemeManager.Instance.CurrentTheme));
         #endregion
 
         #region Style Getters - Basic
@@ -132,10 +114,6 @@ namespace shadcnui.GUIComponents.Core.Styling
         public GUIStyle GetMenuBarStyle(ControlVariant variant = ControlVariant.Default, ControlSize size = ControlSize.Default) => GetSimpleStyle(StyleComponentType.MenuBar, _menuBarStyle ?? GUIStyle.none, variant, size);
 
         public GUIStyle GetTabsListStyle(ControlVariant variant = ControlVariant.Default, ControlSize size = ControlSize.Default) => GetSimpleStyle(StyleComponentType.TabsList, _tabsListStyle ?? GUI.skin.box, variant, size);
-
-        public GUIStyle GetCalendarStyle(ControlVariant variant, ControlSize size) => GetSimpleStyle(StyleComponentType.Calendar, _baseCalendarStyle ?? GUI.skin.box, variant, size);
-
-        public GUIStyle GetDatePickerStyle(ControlVariant variant, ControlSize size) => GetSimpleStyle(StyleComponentType.DatePicker, _baseCalendarStyle ?? GUI.skin.box, variant, size);
 
         public GUIStyle GetSelectStyle(ControlVariant variant, ControlSize size) => GetSimpleStyle(StyleComponentType.SelectContent, _dropdownContentStyle ?? GUI.skin.box, variant, size);
 
@@ -267,7 +245,9 @@ namespace shadcnui.GUIComponents.Core.Styling
         #endregion
 
         #region Style Getters - Checkbox & Switch
-        public GUIStyle GetCheckboxStyle(ControlVariant variant, ControlSize size) => GetCachedStyle(StyleComponentType.Checkbox, variant, size, _baseCheckboxStyle ?? GUI.skin.toggle);
+        public GUIStyle GetCheckboxStyle(ControlVariant variant, ControlSize size) => GetCachedStyle(StyleComponentType.Checkbox, variant, size, _checkboxStyle ?? GUI.skin.toggle);
+
+        public GUIStyle GetCheckboxSolidStyle(ControlVariant variant, ControlSize size) => GetCachedStyle(StyleComponentType.Checkbox, variant, size, _checkboxSolidStyle ?? GUI.skin.toggle);
 
         public GUIStyle GetSwitchStyle(ControlVariant variant, ControlSize size) => GetCachedStyle(StyleComponentType.Switch, variant, size, _baseSwitchStyle ?? GUI.skin.toggle);
         #endregion
@@ -285,10 +265,12 @@ namespace shadcnui.GUIComponents.Core.Styling
 
             int br = shape switch
             {
-                AvatarShape.Circle => Mathf.RoundToInt(DesignTokens.Avatar.CircleRadiusScale * _guiHelper.uiScale),
+                AvatarShape.Circle => sz / 2,
                 AvatarShape.Rounded => GetScaledBorderRadius(DesignTokens.Radius.LG),
                 _ => 0,
             };
+
+            var theme = ThemeManager.Instance.CurrentTheme;
 
             return GetCachedStyle(
                 StyleComponentType.Avatar,
@@ -302,7 +284,18 @@ namespace shadcnui.GUIComponents.Core.Styling
                 {
                     s.fixedWidth = s.fixedHeight = sz;
                     s.border = new UnityHelpers.RectOffset(br, br, br, br);
-                    ApplyContainerVariant(s, variant, ThemeManager.Instance.CurrentTheme);
+                    s.padding = new UnityHelpers.RectOffset(0, 0, 0, 0);
+                    s.margin = new UnityHelpers.RectOffset(0, 0, 0, 0);
+                    s.alignment = TextAnchor.MiddleCenter;
+
+                    Color bgTop = Color.Lerp(theme.Elevated, Color.white, 0.03f);
+
+                    s.normal.background = CreateAvatarTexture(sz, br, bgTop, theme.Border, 1.5f, true);
+                    s.normal.textColor = theme.Text;
+                    s.fontSize = GetScaledFontSize(DesignTokens.Avatar.FallbackFontScale);
+                    s.fontStyle = FontStyle.Bold;
+
+                    s.hover = s.active = s.focused = s.normal;
                 }
             );
         }
@@ -351,7 +344,7 @@ namespace shadcnui.GUIComponents.Core.Styling
                 StyleComponentType.TableRow,
                 variant,
                 size,
-                GUIStyle.none,
+                _tableRowStyle ?? GUIStyle.none,
                 customLogic: s =>
                 {
                     var t = ThemeManager.Instance.CurrentTheme;
@@ -359,8 +352,8 @@ namespace shadcnui.GUIComponents.Core.Styling
                     Color borderColor = lum < 0.3f ? Color.Lerp(t.Border, Color.white, 0.1f) : Color.Lerp(t.Border, Color.clear, 0.3f);
                     Color hoverBg = lum < 0.3f ? Color.Lerp(t.Base, t.Accent, 0.08f) : Color.Lerp(t.Base, t.Accent, 0.05f);
 
-                    s.normal.background = CreateBottomBorderTexture(DesignTokens.TextureSize.Default, (int)DesignTokens.Height.Default, 1, borderColor, Color.clear);
-                    var hover = CreateBottomBorderTexture(DesignTokens.TextureSize.Default, (int)DesignTokens.Height.Default, 1, t.Border, hoverBg);
+                    s.normal.background = CreateBorderTexture(DesignTokens.TextureSize.Default, (int)DesignTokens.Height.Default, 1, borderColor, Color.clear);
+                    var hover = CreateBorderTexture(DesignTokens.TextureSize.Default, (int)DesignTokens.Height.Default, 1, t.Border, hoverBg);
                     s.hover.background = s.active.background = s.onNormal.background = hover;
                     s.fixedHeight = 0;
                     s.stretchHeight = false;
@@ -372,7 +365,7 @@ namespace shadcnui.GUIComponents.Core.Styling
                 StyleComponentType.TableHeader,
                 variant,
                 size,
-                _tableCellStyle ?? GUI.skin.label,
+                _tableHeaderStyle ?? GUI.skin.label,
                 applyVariant: false,
                 customLogic: s =>
                 {
@@ -382,75 +375,14 @@ namespace shadcnui.GUIComponents.Core.Styling
                     Color hoverBg = lum < 0.3f ? Color.Lerp(t.Secondary, t.Text, 0.12f) : Color.Lerp(t.Secondary, t.Text, 0.08f);
 
                     s.fontStyle = FontStyle.Bold;
-                    s.normal.background = CreateBottomBorderTexture(DesignTokens.TextureSize.Default, (int)DesignTokens.Height.Default, 2, t.Border, headerBg);
-                    s.hover.background = CreateBottomBorderTexture(DesignTokens.TextureSize.Default, (int)DesignTokens.Height.Default, 2, t.Accent, hoverBg);
+                    s.normal.background = CreateBorderTexture(DesignTokens.TextureSize.Default, (int)DesignTokens.Height.Default, 2, t.Border, headerBg);
+                    s.hover.background = CreateBorderTexture(DesignTokens.TextureSize.Default, (int)DesignTokens.Height.Default, 2, t.Accent, hoverBg);
                     s.normal.textColor = s.hover.textColor = t.Text;
                 }
             );
 
         public GUIStyle GetTableCellStyle(ControlVariant variant = ControlVariant.Default, ControlSize size = ControlSize.Default, TextAnchor alignment = TextAnchor.MiddleLeft) =>
             GetCachedStyle(StyleComponentType.TableCell, variant, size, _tableCellStyle ?? GUI.skin.label, (int)alignment, applyVariant: false, customLogic: s => s.alignment = alignment);
-        #endregion
-
-        #region Style Getters - Calendar & DatePicker
-        public GUIStyle GetCalendarWeekdayStyle(ControlVariant variant = ControlVariant.Default, ControlSize size = ControlSize.Default) => GetWeekdayStyle(StyleComponentType.CalendarWeekday, variant, size);
-
-        public GUIStyle GetDatePickerWeekdayStyle(ControlVariant variant = ControlVariant.Default, ControlSize size = ControlSize.Default) => GetWeekdayStyle(StyleComponentType.DatePickerWeekday, variant, size);
-
-        public GUIStyle GetCalendarDayStyle(ControlVariant variant = ControlVariant.Default, ControlSize size = ControlSize.Default) => GetCachedStyle(StyleComponentType.CalendarDay, variant, size, _calendarDayStyle ?? GUI.skin.button, applyVariant: variant != ControlVariant.Default);
-
-        public GUIStyle GetDatePickerDayStyle(ControlVariant variant = ControlVariant.Default, ControlSize size = ControlSize.Default) => GetCachedStyle(StyleComponentType.DatePickerDay, variant, size, _calendarDayStyle ?? GUI.skin.button, applyVariant: variant != ControlVariant.Default);
-
-        public GUIStyle GetCalendarDaySelectedStyle(ControlVariant variant = ControlVariant.Default, ControlSize size = ControlSize.Default) =>
-            GetDayStyle(
-                StyleComponentType.CalendarDaySelected,
-                1,
-                (s, t) =>
-                {
-                    s.normal.background = CalendarDaySelectedTexture;
-                    s.normal.textColor = t.ButtonPrimaryFg;
-                    s.hover = s.normal;
-                },
-                variant,
-                size
-            );
-
-        public GUIStyle GetDatePickerDaySelectedStyle(ControlVariant variant = ControlVariant.Default, ControlSize size = ControlSize.Default) =>
-            GetDayStyle(
-                StyleComponentType.DatePickerDaySelected,
-                1,
-                (s, t) =>
-                {
-                    s.normal.background = CalendarDaySelectedTexture;
-                    s.normal.textColor = t.ButtonPrimaryFg;
-                    s.hover = s.normal;
-                },
-                variant,
-                size
-            );
-
-        public GUIStyle GetCalendarDayOutsideMonthStyle(ControlVariant variant = ControlVariant.Default, ControlSize size = ControlSize.Default) => GetDayStyle(StyleComponentType.CalendarDayOutsideMonth, 2, (s, t) => s.normal.textColor = Color.Lerp(t.Muted, t.Base, 0.5f), variant, size);
-
-        public GUIStyle GetDatePickerDayOutsideMonthStyle(ControlVariant variant = ControlVariant.Default, ControlSize size = ControlSize.Default) => GetDayStyle(StyleComponentType.DatePickerDayOutsideMonth, 2, (s, t) => s.normal.textColor = Color.Lerp(t.Muted, t.Base, 0.5f), variant, size);
-
-        public GUIStyle GetCalendarDayTodayStyle(ControlVariant variant = ControlVariant.Default, ControlSize size = ControlSize.Default) =>
-            GetDayStyle(StyleComponentType.CalendarDayToday, 3, (s, t) => s.normal.background = CreateRoundedOutlineTexture(DesignTokens.TextureSize.Small, DesignTokens.TextureSize.Small, (int)DesignTokens.Radius.SM, t.Text, 1), variant, size);
-
-        public GUIStyle GetDatePickerDayTodayStyle(ControlVariant variant = ControlVariant.Default, ControlSize size = ControlSize.Default) =>
-            GetDayStyle(StyleComponentType.DatePickerDayToday, 3, (s, t) => s.normal.background = CreateRoundedOutlineTexture(DesignTokens.TextureSize.Small, DesignTokens.TextureSize.Small, (int)DesignTokens.Radius.SM, t.Text, 1), variant, size);
-
-        public GUIStyle GetCalendarDayInRangeStyle(ControlVariant variant = ControlVariant.Default, ControlSize size = ControlSize.Default) =>
-            GetDayStyle(
-                StyleComponentType.CalendarDayInRange,
-                4,
-                (s, t) =>
-                {
-                    s.normal.background = CreateGradientRoundedRectTexture(DesignTokens.TextureSize.Small, DesignTokens.TextureSize.Small, (int)DesignTokens.Radius.SM, t.Secondary);
-                    s.normal.textColor = t.Text;
-                },
-                variant,
-                size
-            );
         #endregion
 
         #region Style Getters - Menu & Select
@@ -468,17 +400,30 @@ namespace shadcnui.GUIComponents.Core.Styling
                 applyVariant: variant != ControlVariant.Default,
                 customLogic: s =>
                 {
+                    var t = ThemeManager.Instance.CurrentTheme;
+
                     if (isShortcut)
+                    {
                         s.alignment = TextAnchor.MiddleRight;
+                        s.normal.textColor = Color.Lerp(t.Muted, t.Text, 0.5f);
+                    }
                     else
                     {
-                        var t = ThemeManager.Instance.CurrentTheme;
+                        s.alignment = TextAnchor.MiddleLeft;
+                        s.normal.textColor = t.Text;
                         s.normal.background = TransparentTexture;
                         s.focused.background = TransparentTexture;
-                        var hover = CreateGradientRoundedRectTexture(DesignTokens.TextureSize.Default, DesignTokens.TextureSize.Small, (int)DesignTokens.Radius.SM, Color.Lerp(t.Base, t.Text, 0.12f));
-                        s.hover.background = s.active.background = s.onNormal.background = hover;
+
+                        var hoverBg = CreateTexture(DesignTokens.TextureSize.Default, DesignTokens.TextureSize.Small, (int)DesignTokens.Radius.SM, Color.Lerp(t.Accent, Color.white, 0.08f));
+
+                        s.hover.background = hoverBg;
+                        s.hover.textColor = t.Text;
+                        s.active.background = CreateTexture(DesignTokens.TextureSize.Default, DesignTokens.TextureSize.Small, (int)DesignTokens.Radius.SM, Color.Lerp(t.Accent, Color.black, 0.1f));
+                        s.active.textColor = t.Text;
+                        s.onNormal.background = hoverBg;
+
                         if (active)
-                            s.normal.background = hover;
+                            s.normal.background = hoverBg;
                     }
                 }
             );
@@ -491,11 +436,18 @@ namespace shadcnui.GUIComponents.Core.Styling
                 _dropdownContentStyle ?? GUI.skin.box,
                 customLogic: s =>
                 {
-                    s.normal.background = CreateBorderedRoundedRectTexture(DesignTokens.TextureSize.Large, DesignTokens.TextureSize.Large, (int)DesignTokens.Radius.MD, ThemeManager.Instance.CurrentTheme.Elevated, ThemeManager.Instance.CurrentTheme.Border, 1);
+                    var t = ThemeManager.Instance.CurrentTheme;
+                    Color dropdownTop = Color.Lerp(t.Elevated, Color.white, 0.015f);
+                    Color dropdownBottom = Color.Lerp(t.Elevated, Color.black, 0.025f);
+
+                    s.normal.background = CreateTexture(DesignTokens.TextureSize.Large, DesignTokens.TextureSize.Large, (int)DesignTokens.Radius.MD, dropdownTop, dropdownBottom, 0.16f, 8);
+                    s.padding = GetSpacingOffset(DesignTokens.Spacing.XS, DesignTokens.Spacing.XS);
                     s.fixedWidth = DesignTokens.TextureSize.Large;
                     s.stretchWidth = false;
                 }
             );
+
+        public GUIStyle GetNavigationStyle(ControlVariant variant = ControlVariant.Default, ControlSize size = ControlSize.Default) => GetCachedStyle(StyleComponentType.Navigation, variant, size, _navigationStyle ?? GUI.skin.box);
 
         public GUIStyle GetPopoverContentStyle(ControlVariant variant = ControlVariant.Default, ControlSize size = ControlSize.Default) =>
             GetCachedStyle(StyleComponentType.Popover, variant, size, _dropdownContentStyle ?? GUI.skin.box, customLogic: s => s.padding = GetSpacingOffset(DesignTokens.Spacing.LG, DesignTokens.Spacing.LG));
@@ -505,14 +457,36 @@ namespace shadcnui.GUIComponents.Core.Styling
         public GUIStyle GetChartAxisStyle(ControlVariant variant = ControlVariant.Default, ControlSize size = ControlSize.Default) =>
             GetLabelBasedStyle(
                 StyleComponentType.ChartAxis,
-                DesignTokens.FontScale.XS,
+                DesignTokens.Chart.AxisFontScale,
                 (s, t) =>
                 {
                     s.alignment = TextAnchor.MiddleCenter;
                     s.normal.textColor = t.Muted;
+                    s.wordWrap = true;
                 },
                 variant,
                 size
+            );
+
+        public GUIStyle GetTooltipStyle(ControlVariant variant = ControlVariant.Default, ControlSize size = ControlSize.Default) =>
+            GetCachedStyle(
+                StyleComponentType.Tooltip,
+                variant,
+                size,
+                _chartContainerStyle ?? GUI.skin.box,
+                1,
+                applyVariant: false,
+                applySizing: false,
+                customLogic: s =>
+                {
+                    var t = ThemeManager.Instance.CurrentTheme;
+                    float lum = 0.299f * t.Base.r + 0.587f * t.Base.g + 0.114f * t.Base.b;
+                    Color tooltipBg = lum < 0.3f ? Color.Lerp(t.Elevated, Color.white, 0.08f) : Color.Lerp(t.Elevated, Color.black, 0.04f);
+                    s.normal.background = CreateTexture(DesignTokens.TextureSize.Small, DesignTokens.TextureSize.Small, (int)DesignTokens.Radius.MD, tooltipBg);
+                    s.normal.textColor = t.Text;
+                    s.padding = GetSpacingOffset(DesignTokens.Spacing.MD, DesignTokens.Spacing.SM);
+                    s.border = new UnityHelpers.RectOffset((int)DesignTokens.Radius.MD, (int)DesignTokens.Radius.MD, (int)DesignTokens.Radius.MD, (int)DesignTokens.Radius.MD);
+                }
             );
 
         public GUIStyle GetSectionHeaderStyle(ControlVariant variant = ControlVariant.Default, ControlSize size = ControlSize.Default) =>

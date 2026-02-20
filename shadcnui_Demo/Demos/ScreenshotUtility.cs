@@ -450,7 +450,6 @@ namespace shadcnui_Demo.Menu
                 InvokeMethod(helper, "OpenSelect");
                 InvokeMethod(helper, "OpenPopover");
                 InvokeMethod(helper, "OpenDialog", "std_dlg");
-                TryOpenDatePicker(helper);
             }
         }
 
@@ -464,22 +463,6 @@ namespace shadcnui_Demo.Menu
         {
             var method = obj?.GetType().GetMethod(methodName, BindingFlags.Public | BindingFlags.Instance);
             method?.Invoke(obj, args.Length > 0 ? args : null);
-        }
-
-        private void TryOpenDatePicker(object helper)
-        {
-            if (helper == null)
-                return;
-
-            var getComponent = helper.GetType().GetMethod("GetComponent", BindingFlags.NonPublic | BindingFlags.Instance);
-            var datePicker = getComponent?.MakeGenericMethod(typeof(DatePicker))?.Invoke(helper, null);
-            if (datePicker == null)
-                return;
-
-            var openStatesField = datePicker.GetType().GetField("_openStates", BindingFlags.NonPublic | BindingFlags.Instance);
-            var openStates = openStatesField?.GetValue(datePicker) as System.Collections.IDictionary;
-            if (openStates != null)
-                openStates["dp1"] = true;
         }
 
         private IEnumerator CaptureAfterDelay()

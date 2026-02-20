@@ -108,23 +108,18 @@ namespace shadcnui.GUIComponents.Core.Utils
     {
         public string Text { get; set; }
         public bool Value { get; set; }
-        public ControlVariant Variant { get; set; }
-        public ControlSize Size { get; set; }
+        public ControlVariant Variant { get; set; } = ControlVariant.Default;
+        public ControlSize Size { get; set; } = ControlSize.Default;
         public Action<bool> OnToggle { get; set; }
         public bool Disabled { get; set; }
-        public Rect? Rect { get; set; }
         public IconConfig Icon { get; set; }
+        public Rect? Rect { get; set; }
         public GUILayoutOption[] Options { get; set; }
+        public bool ShowCheckmark { get; set; } = false;
 
         public CheckboxConfig()
         {
-            Variant = ControlVariant.Default;
-            Size = ControlSize.Default;
-            Disabled = false;
-            Rect = null;
-            Icon = null;
             Options = Array.Empty<GUILayoutOption>();
-            Text = "Checkbox";
         }
     }
 
@@ -232,37 +227,6 @@ namespace shadcnui.GUIComponents.Core.Utils
         }
     }
 
-    public class CalendarConfig
-    {
-        public ControlVariant Variant { get; set; }
-        public ControlSize Size { get; set; }
-
-        public CalendarConfig()
-        {
-            Variant = ControlVariant.Default;
-            Size = ControlSize.Default;
-        }
-    }
-
-    public class DatePickerConfig
-    {
-        public string Placeholder { get; set; }
-        public DateTime? SelectedDate { get; set; }
-        public DateTime? StartDate { get; set; }
-        public DateTime? EndDate { get; set; }
-        public DateTime? MinDate { get; set; }
-        public DateTime? MaxDate { get; set; }
-        public string Label { get; set; }
-        public string Id { get; set; }
-        public GUILayoutOption[] Options { get; set; }
-
-        public DatePickerConfig()
-        {
-            Id = "datepicker";
-            Options = Array.Empty<GUILayoutOption>();
-        }
-    }
-
     public class AvatarConfig
     {
         public Texture2D Image { get; set; }
@@ -349,8 +313,28 @@ namespace shadcnui.GUIComponents.Core.Utils
         public bool ShowIndicator { get; set; }
         public bool[] ClosableTabs { get; set; }
         public Action<int> OnTabClose { get; set; }
-        public bool EnableOverflowScroll { get; set; } = true;
+        public bool EnableOverflowScroll { get; set; } = false;
         public Texture2D[] TabIcons { get; set; }
+
+        public TabsConfig()
+        {
+            TabNames = Array.Empty<string>();
+            SelectedIndex = 0;
+            OnTabChange = null;
+            Content = null;
+            MaxLines = 1;
+            Position = TabPosition.Top;
+            Side = TabSide.Left;
+            TabWidth = 120f;
+            Options = Array.Empty<GUILayoutOption>();
+            DisabledTabs = Array.Empty<bool>();
+            IndicatorStyle = IndicatorStyle.Underline;
+            ShowIndicator = true;
+            ClosableTabs = null;
+            OnTabChange = null;
+            EnableOverflowScroll = false;
+            TabIcons = null;
+        }
 
         public TabsConfig(string[] tabNames, int selectedIndex)
         {
@@ -368,7 +352,7 @@ namespace shadcnui.GUIComponents.Core.Utils
             ShowIndicator = true;
             ClosableTabs = null;
             OnTabClose = null;
-            EnableOverflowScroll = true;
+            EnableOverflowScroll = false;
             TabIcons = null;
         }
     }
@@ -504,10 +488,12 @@ namespace shadcnui.GUIComponents.Core.Utils
     {
         public Action Content { get; set; }
         public GUILayoutOption[] Options { get; set; }
+        public int ZIndex { get; set; }
 
         public PopoverConfig()
         {
             Options = Array.Empty<GUILayoutOption>();
+            ZIndex = DesignTokens.ZIndex.Popover;
         }
     }
 
@@ -540,10 +526,12 @@ namespace shadcnui.GUIComponents.Core.Utils
     {
         public List<DropdownMenuItem> Items { get; set; }
         public GUILayoutOption[] Options { get; set; }
+        public int ZIndex { get; set; }
 
         public DropdownMenuConfig(List<DropdownMenuItem> items)
         {
             Items = items;
+            ZIndex = DesignTokens.ZIndex.Dropdown;
         }
     }
 
@@ -590,80 +578,6 @@ namespace shadcnui.GUIComponents.Core.Utils
             Data = new List<ChartDataPoint>();
             Visible = true;
         }
-    }
-
-    public class DataTableColumn
-    {
-        public string Id { get; set; }
-        public string Header { get; set; }
-        public string AccessorKey { get; set; }
-        public bool Sortable { get; set; } = true;
-        public bool Filterable { get; set; } = true;
-        public float Width { get; set; } = 120f;
-        public float MinWidth { get; set; } = 80f;
-        public bool CanHide { get; set; } = true;
-        public bool IsVisible { get; set; } = true;
-        public Func<object, string> CellRenderer { get; set; }
-        public TextAnchor Alignment { get; set; } = TextAnchor.MiddleLeft;
-
-        public DataTableColumn(string id, string header, string accessorKey = null)
-        {
-            Id = id;
-            Header = header;
-            AccessorKey = accessorKey ?? id;
-        }
-    }
-
-    public class DataTableRow
-    {
-        public string Id { get; set; }
-        public Dictionary<string, object> Data { get; set; } = new Dictionary<string, object>();
-        public bool Selected { get; set; } = false;
-
-        public DataTableRow(string id = null)
-        {
-            Id = id ?? Guid.NewGuid().ToString();
-        }
-
-        public T GetValue<T>(string key, T defaultValue = default(T))
-        {
-            if (Data.TryGetValue(key, out object value))
-            {
-                try
-                {
-                    return (T)Convert.ChangeType(value, typeof(T));
-                }
-                catch
-                {
-                    return defaultValue;
-                }
-            }
-            return defaultValue;
-        }
-
-        public void SetValue(string key, object value)
-        {
-            Data[key] = value;
-        }
-
-        public DataTableRow SetData(string key, object value)
-        {
-            Data[key] = value;
-            return this;
-        }
-    }
-
-    public class DataTableState
-    {
-        public string SortColumn { get; set; }
-        public bool SortAscending { get; set; } = true;
-        public string FilterText { get; set; } = "";
-        public int CurrentPage { get; set; } = 0;
-        public int PageSize { get; set; } = 10;
-        public List<string> SelectedRows { get; set; } = new List<string>();
-        public bool SelectAll { get; set; } = false;
-        public Dictionary<string, bool> ColumnVisibility { get; set; } = new Dictionary<string, bool>();
-        public bool ShowColumnToggle { get; set; } = false;
     }
 
     public enum ToastVariant
@@ -723,11 +637,13 @@ namespace shadcnui.GUIComponents.Core.Utils
         public float HoverPauseDelay { get; set; } = DesignTokens.Animation.DurationNormal;
         public bool EnableClickToDismiss { get; set; } = false;
         public bool UseSystemNotificationStyle { get; set; } = false;
+        public int ZIndex { get; set; }
 
         public ToastConfig()
         {
             Id = Guid.NewGuid().ToString();
             Options = Array.Empty<GUILayoutOption>();
+            ZIndex = DesignTokens.ZIndex.Toast;
         }
     }
 
@@ -770,6 +686,15 @@ namespace shadcnui.GUIComponents.Core.Utils
         public GUILayoutOption[] Options { get; set; } = Array.Empty<GUILayoutOption>();
     }
 
+    public class TooltipConfig
+    {
+        public float HoverDelaySeconds { get; set; } = 0.4f;
+        public float FadeDurationSeconds { get; set; } = 0.15f;
+        public float MaxWidth { get; set; } = 280f;
+        public float ShadowOffset { get; set; } = 4f;
+        public float MouseOffset { get; set; } = 12f;
+    }
+
     public class LayerConfig
     {
         public string Id { get; set; }
@@ -779,7 +704,52 @@ namespace shadcnui.GUIComponents.Core.Utils
         public int ZIndex { get; set; } = 100;
         public bool CloseOnClickOutside { get; set; } = true;
         public bool ShowOverlay { get; set; } = false;
+        public bool DrawChrome { get; set; } = true;
         public Action Content { get; set; }
         public Action OnClose { get; set; }
+    }
+
+    public class NavigationItem
+    {
+        public string Id { get; set; }
+        public string Label { get; set; }
+        public string Icon { get; set; }
+        public bool IsSelected { get; set; }
+        public bool IsDisabled { get; set; }
+        public Action OnClick { get; set; }
+
+        public NavigationItem(string id, string label, string icon = null)
+        {
+            Id = id;
+            Label = label;
+            Icon = icon;
+            IsSelected = false;
+            IsDisabled = false;
+        }
+    }
+
+    public class NavigationConfig
+    {
+        public NavigationItem[] Items { get; set; }
+        public int SelectedIndex { get; set; }
+        public float Width { get; set; }
+        public bool ShowIndicator { get; set; }
+        public IndicatorStyle IndicatorStyle { get; set; }
+        public Color IndicatorColor { get; set; }
+        public string LogoText { get; set; }
+        public Action<int> OnSelectionChanged { get; set; }
+        public GUILayoutOption[] Options { get; set; }
+
+        public NavigationConfig()
+        {
+            Items = Array.Empty<NavigationItem>();
+            SelectedIndex = 0;
+            Width = 70f;
+            ShowIndicator = true;
+            IndicatorStyle = IndicatorStyle.Border;
+            IndicatorColor = new Color(0f, 0.9f, 0.9f);
+            LogoText = "U";
+            Options = Array.Empty<GUILayoutOption>();
+        }
     }
 }

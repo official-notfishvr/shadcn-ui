@@ -528,10 +528,7 @@
         <Compile Include="GUIComponents\Core\Styling\StyleRegistry.cs" />
         <Compile Include="GUIComponents\Core\Theming\Theme.cs" />
         <Compile Include="GUIComponents\Core\Theming\ThemeManager.cs" />
-        <Compile Include="GUIComponents\Data\Calendar.cs" />
-        <Compile Include="GUIComponents\Data\DataTable.cs" />
         <Compile Include="GUIComponents\Data\TextArea.cs" />
-        <Compile Include="GUIComponents\Data\DatePicker.cs" />
         <Compile Include="GUIComponents\Display\Avatar.cs" />
         <Compile Include="GUIComponents\Display\Badge.cs" />
         <Compile Include="GUIComponents\Display\Chart.cs" />
@@ -540,9 +537,11 @@
         <Compile Include="GUIComponents\Display\Popover.cs" />
         <Compile Include="GUIComponents\Display\Progress.cs" />
         <Compile Include="GUIComponents\Display\Toast.cs" />
+        <Compile Include="GUIComponents\Display\Tooltip.cs" />
         <Compile Include="GUIComponents\Layout\Card.cs" />
         <Compile Include="GUIComponents\Layout\Layout.cs" />
         <Compile Include="GUIComponents\Layout\MenuBar.cs" />
+        <Compile Include="GUIComponents\Layout\Navigation.cs" />
         <Compile Include="GUIComponents\Layout\Separator.cs" />
         <Compile Include="GUIComponents\Layout\Table.cs" />
         <Compile Include="GUIComponents\Layout\Tabs.cs" />

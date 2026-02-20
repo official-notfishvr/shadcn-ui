@@ -13,96 +13,16 @@ namespace shadcnui.GUIComponents.Display
         public Label(GUIHelper helper)
             : base(helper) { }
 
-        private void RenderIcon(IconConfig iconConfig)
-        {
-            float scaledSize = iconConfig.Size * guiHelper.uiScale;
-            UnityHelpers.Label(iconConfig.Image, GUILayout.Width(scaledSize), GUILayout.Height(scaledSize));
-        }
-
         #region Config-based API
         public void DrawLabel(LabelConfig config)
         {
             var styleManager = guiHelper.GetStyleManager();
-            GUIStyle labelStyle = styleManager.GetLabelStyle(config.Variant);
-
-            GUIStyle scaledStyle = new UnityHelpers.GUIStyle(labelStyle);
-            scaledStyle.fontSize = Mathf.RoundToInt(labelStyle.fontSize * guiHelper.uiScale);
-
-            if (config.Disabled)
-            {
-                Color disabledColor = new Color(labelStyle.normal.textColor.r, labelStyle.normal.textColor.g, labelStyle.normal.textColor.b, 0.7f);
-                scaledStyle.normal.textColor = disabledColor;
-            }
+            GUIStyle labelStyle = ApplyLabelStyling(styleManager.GetLabelStyle(config.Variant), config);
 
             if (config.Icon?.Image != null)
-            {
-                if (config.Icon.Position == IconPosition.Left || config.Icon.Position == IconPosition.Right)
-                {
-                    GUILayout.BeginHorizontal();
-                }
-                else
-                {
-                    GUILayout.BeginVertical();
-                }
-
-                if (config.Icon.Position == IconPosition.Above)
-                {
-                    RenderIcon(config.Icon);
-                    GUILayout.Space(config.Icon.Spacing * guiHelper.uiScale);
-                }
-
-                if (config.Icon.Position == IconPosition.Left)
-                {
-                    RenderIcon(config.Icon);
-                    GUILayout.Space(config.Icon.Spacing * guiHelper.uiScale);
-                }
-
-                if (config.Rect.HasValue)
-                {
-                    Rect r = config.Rect.Value;
-                    Rect scaledRect = new Rect(r.x * guiHelper.uiScale, r.y * guiHelper.uiScale, r.width * guiHelper.uiScale, r.height * guiHelper.uiScale);
-                    GUI.Label(scaledRect, config.Text ?? "", scaledStyle);
-                }
-                else
-                {
-                    UnityHelpers.Label(config.Text ?? "", scaledStyle);
-                }
-
-                if (config.Icon.Position == IconPosition.Right)
-                {
-                    GUILayout.Space(config.Icon.Spacing * guiHelper.uiScale);
-                    RenderIcon(config.Icon);
-                }
-
-                if (config.Icon.Position == IconPosition.Below)
-                {
-                    GUILayout.Space(config.Icon.Spacing * guiHelper.uiScale);
-                    RenderIcon(config.Icon);
-                }
-
-                if (config.Icon.Position == IconPosition.Left || config.Icon.Position == IconPosition.Right)
-                {
-                    GUILayout.EndHorizontal();
-                }
-                else
-                {
-                    GUILayout.EndVertical();
-                }
-            }
+                DrawLabelWithIcon(config, labelStyle);
             else
-            {
-                if (config.Rect.HasValue)
-                {
-                    Rect r = config.Rect.Value;
-                    Rect scaledRect = new Rect(r.x * guiHelper.uiScale, r.y * guiHelper.uiScale, r.width * guiHelper.uiScale, r.height * guiHelper.uiScale);
-                    GUI.Label(scaledRect, config.Text ?? "", scaledStyle);
-                }
-                else
-                {
-                    GUILayoutOption[] autoScaledOptions = GetAutoScaledOptions(config.Options);
-                    UnityHelpers.Label(config.Text ?? "", scaledStyle, autoScaledOptions);
-                }
-            }
+                DrawBasicLabel(config, labelStyle);
         }
         #endregion
 
@@ -132,9 +52,7 @@ namespace shadcnui.GUIComponents.Display
                 }
             );
         }
-        #endregion
 
-        #region Variant Shortcuts
         public void SecondaryLabel(string text, params GUILayoutOption[] options)
         {
             DrawLabel(text, ControlVariant.Secondary, false, options);
@@ -151,13 +69,85 @@ namespace shadcnui.GUIComponents.Display
         }
         #endregion
 
-        #region Internal Helpers
-        private GUILayoutOption[] GetAutoScaledOptions(GUILayoutOption[] userOptions)
+        #region Private Methods
+        private GUIStyle ApplyLabelStyling(GUIStyle baseStyle, LabelConfig config)
         {
-            if (userOptions == null || userOptions.Length == 0)
-                return new GUILayoutOption[0];
+            GUIStyle scaledStyle = new UnityHelpers.GUIStyle(baseStyle);
+            scaledStyle.fontSize = Mathf.RoundToInt(baseStyle.fontSize * guiHelper.uiScale);
 
-            return userOptions;
+            if (config.Disabled)
+            {
+                Color disabledColor = new Color(baseStyle.normal.textColor.r, baseStyle.normal.textColor.g, baseStyle.normal.textColor.b, 0.7f);
+                scaledStyle.normal.textColor = disabledColor;
+            }
+
+            return scaledStyle;
+        }
+
+        private void DrawLabelWithIcon(LabelConfig config, GUIStyle labelStyle)
+        {
+            bool isHorizontal = config.Icon.Position == IconPosition.Left || config.Icon.Position == IconPosition.Right;
+
+            if (isHorizontal)
+                GUILayout.BeginHorizontal();
+            else
+                GUILayout.BeginVertical();
+
+            if (config.Icon.Position == IconPosition.Above)
+            {
+                RenderIcon(config.Icon);
+                GUILayout.Space(config.Icon.Spacing * guiHelper.uiScale);
+            }
+
+            if (config.Icon.Position == IconPosition.Left)
+            {
+                RenderIcon(config.Icon);
+                GUILayout.Space(config.Icon.Spacing * guiHelper.uiScale);
+            }
+
+            DrawLabelContent(config, labelStyle);
+
+            if (config.Icon.Position == IconPosition.Right)
+            {
+                GUILayout.Space(config.Icon.Spacing * guiHelper.uiScale);
+                RenderIcon(config.Icon);
+            }
+
+            if (config.Icon.Position == IconPosition.Below)
+            {
+                GUILayout.Space(config.Icon.Spacing * guiHelper.uiScale);
+                RenderIcon(config.Icon);
+            }
+
+            if (isHorizontal)
+                GUILayout.EndHorizontal();
+            else
+                GUILayout.EndVertical();
+        }
+
+        private void DrawBasicLabel(LabelConfig config, GUIStyle labelStyle)
+        {
+            DrawLabelContent(config, labelStyle);
+        }
+
+        private void DrawLabelContent(LabelConfig config, GUIStyle labelStyle)
+        {
+            if (config.Rect.HasValue)
+            {
+                Rect scaledRect = new Rect(config.Rect.Value.x * guiHelper.uiScale, config.Rect.Value.y * guiHelper.uiScale, config.Rect.Value.width * guiHelper.uiScale, config.Rect.Value.height * guiHelper.uiScale);
+                GUI.Label(scaledRect, config.Text ?? "", labelStyle);
+            }
+            else
+            {
+                GUILayoutOption[] options = config.Options ?? System.Array.Empty<GUILayoutOption>();
+                UnityHelpers.Label(config.Text ?? "", labelStyle, options);
+            }
+        }
+
+        private void RenderIcon(IconConfig iconConfig)
+        {
+            float scaledSize = iconConfig.Size * guiHelper.uiScale;
+            UnityHelpers.Label(iconConfig.Image, GUILayout.Width(scaledSize), GUILayout.Height(scaledSize));
         }
         #endregion
     }
