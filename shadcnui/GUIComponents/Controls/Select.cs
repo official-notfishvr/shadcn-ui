@@ -77,7 +77,7 @@ namespace shadcnui.GUIComponents.Controls
             int selectedIndex = config.SelectedIndex;
 
             ApplyAnimationTransform(alpha, scale, slideOffset);
-            DrawSelectContent(config, selectStyle, itemStyle, selectedIndex);
+            selectedIndex = DrawSelectContent(config, selectStyle, itemStyle, selectedIndex);
             RestoreGraphicsState();
 
             return selectedIndex;
@@ -97,27 +97,32 @@ namespace shadcnui.GUIComponents.Controls
             }
         }
 
-        private void DrawSelectContent(SelectConfig config, GUIStyle selectStyle, GUIStyle itemStyle, int selectedIndex)
+        private int DrawSelectContent(SelectConfig config, GUIStyle selectStyle, GUIStyle itemStyle, int selectedIndex)
         {
             layoutComponents.BeginVerticalGroup(selectStyle, GUILayout.MaxWidth(300), GUILayout.MaxHeight(200));
-            scrollPosition = layoutComponents.DrawScrollView(scrollPosition, () => DrawSelectItems(config, itemStyle, selectedIndex), GUILayout.ExpandWidth(true), GUILayout.MinHeight(0), GUILayout.MaxHeight(200));
+            int newIndex = selectedIndex;
+            scrollPosition = layoutComponents.DrawScrollView(scrollPosition, () => newIndex = DrawSelectItems(config, itemStyle, newIndex), GUILayout.ExpandWidth(true), GUILayout.MinHeight(0), GUILayout.MaxHeight(200));
             GUILayout.EndVertical();
 
             if (Event.current.type == EventType.Repaint)
                 _cachedSelectRect = GUILayoutUtility.GetLastRect();
+
+            return newIndex;
         }
 
-        private void DrawSelectItems(SelectConfig config, GUIStyle itemStyle, int selectedIndex)
+        private int DrawSelectItems(SelectConfig config, GUIStyle itemStyle, int selectedIndex)
         {
+            int newIndex = selectedIndex;
             for (int i = 0; i < config.Items.Length; i++)
             {
                 if (UnityHelpers.Button(config.Items[i], itemStyle))
                 {
-                    selectedIndex = i;
+                    newIndex = i;
                     config.OnChange?.Invoke(i);
                     Close();
                 }
             }
+            return newIndex;
         }
 
         private void RestoreGraphicsState()

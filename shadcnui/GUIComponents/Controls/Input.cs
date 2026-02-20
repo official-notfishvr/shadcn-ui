@@ -221,7 +221,7 @@ namespace shadcnui.GUIComponents.Controls
                 return value;
             }
 
-            var styledInput = new UnityHelpers.GUIStyle(inputStyle);
+            GUIStyle styledInput = new UnityHelpers.GUIStyle(inputStyle);
             float iconSize = config.Icon.Size * guiHelper.uiScale;
             float spacing = config.Icon.Spacing * guiHelper.uiScale;
             int paddingAddition = (int)(iconSize + spacing + DesignTokens.Spacing.XS * guiHelper.uiScale);

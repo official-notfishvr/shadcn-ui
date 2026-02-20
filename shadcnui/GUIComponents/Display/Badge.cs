@@ -112,6 +112,7 @@ namespace shadcnui.GUIComponents.Display
 
         public void AnimatedBadge(string text, ControlVariant variant = ControlVariant.Default, ControlSize size = ControlSize.Default, params GUILayoutOption[] options)
         {
+            string stableId = $"badge_{text.GetHashCode()}";
             DrawBadgeInternal(
                 new BadgeConfig
                 {
@@ -121,7 +122,7 @@ namespace shadcnui.GUIComponents.Display
                     Options = options,
                 },
                 true,
-                null
+                stableId
             );
         }
 

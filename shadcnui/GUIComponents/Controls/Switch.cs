@@ -85,7 +85,7 @@ namespace shadcnui.GUIComponents.Controls
         {
             GUILayout.BeginHorizontal();
             RenderIcon(config.Icon);
-            layoutComponents.AddSpace(config.Icon.Spacing * guiHelper.uiScale);
+            layoutComponents.AddSpace(config.Icon.Spacing);
             bool newValue = UnityHelpers.Toggle(config.Value, config.Text ?? "Switch", switchStyle);
             GUILayout.EndHorizontal();
             return newValue;

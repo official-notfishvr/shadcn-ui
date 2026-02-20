@@ -191,7 +191,10 @@ namespace shadcnui.GUIComponents.Core.Base
                     if (r.Contains(mouse))
                         break;
                     if (state.CloseOnClickOutside)
+                    {
                         topmostCloseable = id;
+                        break;
+                    }
                 }
                 if (topmostCloseable != null)
                 {

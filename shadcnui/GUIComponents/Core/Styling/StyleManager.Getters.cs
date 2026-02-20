@@ -247,7 +247,7 @@ namespace shadcnui.GUIComponents.Core.Styling
         #region Style Getters - Checkbox & Switch
         public GUIStyle GetCheckboxStyle(ControlVariant variant, ControlSize size) => GetCachedStyle(StyleComponentType.Checkbox, variant, size, _checkboxStyle ?? GUI.skin.toggle);
 
-        public GUIStyle GetCheckboxSolidStyle(ControlVariant variant, ControlSize size) => GetCachedStyle(StyleComponentType.Checkbox, variant, size, _checkboxSolidStyle ?? GUI.skin.toggle);
+        public GUIStyle GetCheckboxSolidStyle(ControlVariant variant, ControlSize size) => GetCachedStyle(StyleComponentType.CheckboxSolid, variant, size, _checkboxSolidStyle ?? GUI.skin.toggle);
 
         public GUIStyle GetSwitchStyle(ControlVariant variant, ControlSize size) => GetCachedStyle(StyleComponentType.Switch, variant, size, _baseSwitchStyle ?? GUI.skin.toggle);
         #endregion

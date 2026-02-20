@@ -1156,7 +1156,7 @@ namespace shadcnui.GUIComponents.Core.Styling
 
             Func<Color, Texture2D> checkboxTex = c => CreateTexture(sz, sz, radius, c);
 
-            _checkboxSolidStyle = Style(StyleComponentType.Checkbox)
+            _checkboxSolidStyle = Style(StyleComponentType.CheckboxSolid)
                 .FontScale(DesignTokens.FontScale.SM)
                 .Padding(DesignTokens.Spacing.SM, DesignTokens.Spacing.XS)
                 .Border(DesignTokens.Radius.SM)

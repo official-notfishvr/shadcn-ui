@@ -58,6 +58,7 @@ namespace shadcnui.GUIComponents.Core.Styling
         TabsTrigger,
         TabsContent,
         Checkbox,
+        CheckboxSolid,
         Switch,
         Badge,
         Avatar,
