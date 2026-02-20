@@ -211,15 +211,15 @@ namespace shadcnui.GUIComponents.Core.Styling
         #endregion
 
         #region Texture Factories
-        internal Func<Color, Texture2D> SolidTex(int w, int h, float r) => c => CreateGradientRoundedRectTexture(w, h, GetScaledBorderRadius(r), c);
+        internal Func<Color, Texture2D> SolidTex(int w, int h, float r) => c => CreateTexture(w, h, GetScaledBorderRadius(r), c);
 
-        internal Func<Color, Texture2D> GradientTex(int w, int h, float r) => c => CreateGradientRoundedRectWithShadowTexture(w, h, GetScaledBorderRadius(r), Color.Lerp(c, Color.white, 0.05f), c, DesignTokens.Effects.ShadowLight, (int)DesignTokens.Effects.ShadowBlurSM);
+        internal Func<Color, Texture2D> GradientTex(int w, int h, float r) => c => CreateTexture(w, h, GetScaledBorderRadius(r), Color.Lerp(c, Color.white, 0.05f), c, DesignTokens.Effects.ShadowLight, (int)DesignTokens.Effects.ShadowBlurSM);
 
-        internal Func<Color, Texture2D> OutlineTex(int w, int h, float r, float t = 1.5f) => c => CreateRoundedOutlineTexture(w, h, GetScaledBorderRadius(r), c, t);
+        internal Func<Color, Texture2D> OutlineTex(int w, int h, float r, float t = 1.5f) => c => CreateOutlineTexture(w, h, GetScaledBorderRadius(r), c, t);
 
-        internal Func<Color, Color, Texture2D> BorderedTex(int w, int h, float r, float t = 1.5f) => (f, b) => CreateBorderedRoundedRectTexture(w, h, GetScaledBorderRadius(r), f, b, t);
+        internal Func<Color, Color, Texture2D> BorderedTex(int w, int h, float r, float t = 1.5f) => (f, b) => CreateBorderTexture(w, h, GetScaledBorderRadius(r), f, b, t);
 
-        internal Func<Color, Texture2D> FocusTex(int w, int h, float r) => c => CreateFocusRingTexture(w, h, GetScaledBorderRadius(r), c, DesignTokens.Effects.FocusRingThickness);
+        internal Func<Color, Texture2D> FocusTex(int w, int h, float r) => c => CreateTexture(w, h, GetScaledBorderRadius(r), c, DesignTokens.Effects.FocusRingThickness);
 
         internal static Color Alpha(Color c, float a) => new Color(c.r, c.g, c.b, a);
 
@@ -303,10 +303,10 @@ namespace shadcnui.GUIComponents.Core.Styling
             );
 
             public static readonly SizeConfig Toggle = new SizeConfig(
-                new SizeValues(DesignTokens.FontScale.XS * 0.85f, DesignTokens.Spacing.XS, DesignTokens.Spacing.None, 0, 0),
-                new SizeValues(DesignTokens.FontScale.XS, DesignTokens.Spacing.SM, DesignTokens.Spacing.XXS, 0, 0),
-                new SizeValues(DesignTokens.FontScale.MD, DesignTokens.Spacing.SM, DesignTokens.Spacing.XS, 0, 0),
-                new SizeValues(DesignTokens.FontScale.LG, DesignTokens.Spacing.MD, DesignTokens.Spacing.SM, 0, 0)
+                SizeValues.Full(DesignTokens.FontScale.XS, DesignTokens.Padding.Button.MiniH, DesignTokens.Padding.Button.MiniV, DesignTokens.Height.Mini),
+                SizeValues.Full(DesignTokens.FontScale.XS, DesignTokens.Padding.Button.SmallH, DesignTokens.Padding.Button.SmallV, DesignTokens.Height.Small),
+                SizeValues.Full(DesignTokens.FontScale.SM, DesignTokens.Padding.Button.DefaultH, DesignTokens.Padding.Button.DefaultV, DesignTokens.Height.Default),
+                SizeValues.Full(DesignTokens.FontScale.MD, DesignTokens.Padding.Button.LargeH, DesignTokens.Padding.Button.LargeV, DesignTokens.Height.Large)
             );
 
             public static readonly SizeConfig Input = new SizeConfig(
@@ -339,14 +339,7 @@ namespace shadcnui.GUIComponents.Core.Styling
                 new SizeValues(DesignTokens.FontScale.MD, DesignTokens.Spacing.XL, DesignTokens.Spacing.XL, 0, 0)
             );
 
-            public static readonly SizeConfig CalendarDay = new SizeConfig(
-                SizeValues.Square(DesignTokens.FontScale.XS, DesignTokens.CalendarDay.Mini),
-                SizeValues.Square(DesignTokens.FontScale.XS, DesignTokens.CalendarDay.Small),
-                SizeValues.Square(DesignTokens.FontScale.SM, DesignTokens.CalendarDay.Default),
-                SizeValues.Square(DesignTokens.FontScale.MD, DesignTokens.CalendarDay.Large)
-            );
-
-            public static readonly SizeConfig ProgressBar = new SizeConfig(SizeValues.H(DesignTokens.Spacing.XXS), SizeValues.H(DesignTokens.Spacing.XS), SizeValues.H(DesignTokens.Spacing.SM), SizeValues.H(DesignTokens.Spacing.MD));
+            public static readonly SizeConfig ProgressBar = new SizeConfig(SizeValues.H(2f), SizeValues.H(3f), SizeValues.H(4f), SizeValues.H(6f));
 
             public static readonly SizeConfig Separator = new SizeConfig(SizeValues.H(DesignTokens.Separator.DefaultThickness), SizeValues.H(DesignTokens.Separator.DefaultThickness), SizeValues.H(DesignTokens.Separator.LargeThickness), SizeValues.H(DesignTokens.Separator.LargeThickness * 2));
 
@@ -368,6 +361,20 @@ namespace shadcnui.GUIComponents.Core.Styling
                 new SizeValues(DesignTokens.FontScale.XS * 0.8f, DesignTokens.Spacing.SM, DesignTokens.Spacing.None, 0, 0),
                 new SizeValues(DesignTokens.FontScale.XS * 0.85f, DesignTokens.Spacing.SM, DesignTokens.Spacing.XXS, 0, 0),
                 new SizeValues(DesignTokens.FontScale.XS, DesignTokens.Padding.Badge.Horizontal, DesignTokens.Padding.Badge.Vertical, 0, 0),
+                new SizeValues(DesignTokens.FontScale.MD, DesignTokens.Spacing.MD, DesignTokens.Spacing.SM, 0, 0)
+            );
+
+            public static readonly SizeConfig Checkbox = new SizeConfig(
+                new SizeValues(DesignTokens.FontScale.XS, DesignTokens.Spacing.SM, DesignTokens.Spacing.XS, 0, 0),
+                new SizeValues(DesignTokens.FontScale.XS, DesignTokens.Spacing.SM, DesignTokens.Spacing.XS, 0, 0),
+                new SizeValues(DesignTokens.FontScale.SM, DesignTokens.Spacing.SM, DesignTokens.Spacing.XS, 0, 0),
+                new SizeValues(DesignTokens.FontScale.MD, DesignTokens.Spacing.MD, DesignTokens.Spacing.SM, 0, 0)
+            );
+
+            public static readonly SizeConfig Switch = new SizeConfig(
+                new SizeValues(DesignTokens.FontScale.XS, DesignTokens.Spacing.SM, DesignTokens.Spacing.None, 0, 0),
+                new SizeValues(DesignTokens.FontScale.XS, DesignTokens.Spacing.SM, DesignTokens.Spacing.XS, 0, 0),
+                new SizeValues(DesignTokens.FontScale.SM, DesignTokens.Spacing.SM, DesignTokens.Spacing.XS, 0, 0),
                 new SizeValues(DesignTokens.FontScale.MD, DesignTokens.Spacing.MD, DesignTokens.Spacing.SM, 0, 0)
             );
 
@@ -431,10 +438,10 @@ namespace shadcnui.GUIComponents.Core.Styling
             SeparatorStyles();
             TabStyles();
             CheckboxStyles();
+            CheckboxSolidStyles();
             SwitchStyles();
             BadgeStyles();
             TableStyles();
-            CalendarStyles();
             DialogStyles();
             CardStyles();
             MenuStyles();
@@ -446,6 +453,7 @@ namespace shadcnui.GUIComponents.Core.Styling
             SliderStyles();
             AvatarStyles();
             DropdownStyles();
+            NavigationStyles();
         }
         #endregion
 
@@ -461,39 +469,39 @@ namespace shadcnui.GUIComponents.Core.Styling
             var bordered = BorderedTex(w, h, r);
             var focus = FocusTex(w, h, r);
 
-            Func<Color, Texture2D> btnTex = c => 
-                CreateGradientRoundedRectTexture(w, h, radius, c);
+            Func<Color, Texture2D> btnTex = c => CreateTexture(w, h, radius, Color.Lerp(c, Color.white, DesignTokens.Effects.SurfaceHighlightTop), Color.Lerp(c, Color.black, DesignTokens.Effects.SurfaceDepthBottom));
 
             _baseButtonStyle = Style(StyleComponentType.Button)
                 .FontScale(DesignTokens.FontScale.SM, FontStyle.Bold)
                 .Padding(DesignTokens.Padding.Button.DefaultH, DesignTokens.Padding.Button.DefaultV)
                 .Border(DesignTokens.Radius.MD)
                 .Align(TextAnchor.MiddleCenter)
-                .FixedHeight(DesignTokens.Height.Default)
                 .Stretch(false, false)
-                .Apply((s, t) => 
-                {
-                    s.normal.background = btnTex(t.ButtonPrimaryBg);
-                    s.normal.textColor = t.ButtonPrimaryFg;
-                    
-                    s.hover.background = btnTex(Alpha(t.ButtonPrimaryBg, 0.9f));
-                    s.hover.textColor = t.ButtonPrimaryFg;
-                    
-                    s.active.background = btnTex(Color.Lerp(t.ButtonPrimaryBg, Color.black, 0.1f));
-                    s.active.textColor = t.ButtonPrimaryFg;
-                    
-                    s.focused.background = focus(t.ButtonPrimaryFg);
-                    s.focused.textColor = t.ButtonPrimaryFg;
-                })
+                .Apply(
+                    (s, t) =>
+                    {
+                        s.normal.background = btnTex(t.ButtonPrimaryBg);
+                        s.normal.textColor = t.ButtonPrimaryFg;
+
+                        s.hover.background = btnTex(Color.Lerp(t.ButtonPrimaryBg, Color.white, 0.06f));
+                        s.hover.textColor = t.ButtonPrimaryFg;
+
+                        s.active.background = btnTex(Color.Lerp(t.ButtonPrimaryBg, Color.black, 0.12f));
+                        s.active.textColor = t.ButtonPrimaryFg;
+
+                        s.focused.background = focus(t.ButtonPrimaryFg);
+                        s.focused.textColor = t.ButtonPrimaryFg;
+                    }
+                )
                 .Variant(
                     ControlVariant.Destructive,
                     (s, t) =>
                     {
                         s.normal.background = btnTex(t.ButtonDestructiveBg);
                         s.normal.textColor = t.ButtonDestructiveFg;
-                        s.hover.background = btnTex(Alpha(t.ButtonDestructiveBg, 0.9f));
+                        s.hover.background = btnTex(Color.Lerp(t.ButtonDestructiveBg, Color.white, 0.06f));
                         s.hover.textColor = t.ButtonDestructiveFg;
-                        s.active.background = btnTex(Color.Lerp(t.ButtonDestructiveBg, Color.black, 0.1f));
+                        s.active.background = btnTex(Color.Lerp(t.ButtonDestructiveBg, Color.black, 0.12f));
                         s.active.textColor = t.ButtonDestructiveFg;
                     }
                 )
@@ -503,10 +511,10 @@ namespace shadcnui.GUIComponents.Core.Styling
                     {
                         s.normal.background = outline(t.Border);
                         s.normal.textColor = t.Text;
-                        
+
                         s.hover.background = bordered(Alpha(t.Accent, 0.1f), t.Accent);
                         s.hover.textColor = t.Text;
-                        
+
                         s.active.background = bordered(Alpha(t.Accent, 0.2f), t.Accent);
                         s.active.textColor = t.Text;
                     }
@@ -517,10 +525,10 @@ namespace shadcnui.GUIComponents.Core.Styling
                     {
                         s.normal.background = btnTex(t.ButtonSecondaryBg);
                         s.normal.textColor = t.ButtonSecondaryFg;
-                        
-                        s.hover.background = btnTex(Color.Lerp(t.ButtonSecondaryBg, Color.black, 0.05f));
+
+                        s.hover.background = btnTex(Color.Lerp(t.ButtonSecondaryBg, Color.white, IsDark(t.Base) ? 0.04f : 0.08f));
                         s.hover.textColor = t.ButtonSecondaryFg;
-                        
+
                         s.active.background = btnTex(Color.Lerp(t.ButtonSecondaryBg, Color.black, 0.1f));
                         s.active.textColor = t.ButtonSecondaryFg;
                     }
@@ -531,11 +539,11 @@ namespace shadcnui.GUIComponents.Core.Styling
                     {
                         s.normal.background = TransparentTexture;
                         s.normal.textColor = t.ButtonGhostFg;
-                        
-                        s.hover.background = btnTex(Alpha(t.Accent, 0.1f));
+
+                        s.hover.background = btnTex(new Color(t.Accent.r, t.Accent.g, t.Accent.b, 0.12f));
                         s.hover.textColor = t.ButtonGhostFg;
-                        
-                        s.active.background = btnTex(Alpha(t.Accent, 0.2f));
+
+                        s.active.background = btnTex(new Color(t.Accent.r, t.Accent.g, t.Accent.b, 0.22f));
                         s.active.textColor = t.ButtonGhostFg;
                     }
                 )
@@ -579,44 +587,45 @@ namespace shadcnui.GUIComponents.Core.Styling
             var bordered = BorderedTex(w, h, r);
             var focus = FocusTex(w, h, r);
 
-            Func<Color, Texture2D> toggleTex = c => CreateGradientRoundedRectTexture(w, h, radius, c);
+            Func<Color, Texture2D> toggleTex = c => CreateTexture(w, h, radius, c);
 
             _baseToggleStyle = Style(StyleComponentType.Toggle)
                 .FontScale(DesignTokens.FontScale.SM, FontStyle.Bold)
                 .Padding(DesignTokens.Padding.Button.DefaultH, DesignTokens.Padding.Button.DefaultV)
                 .Border(DesignTokens.Radius.MD)
                 .Align(TextAnchor.MiddleCenter)
-                .FixedHeight(DesignTokens.Height.Default)
                 .Stretch(false, false)
-                .Apply((s, t) =>
-                {
-                    Color offBg = t.ButtonPrimaryBg;
-                    Color onBg = Color.Lerp(t.ButtonPrimaryBg, t.Accent, 0.08f);
+                .Apply(
+                    (s, t) =>
+                    {
+                        Color offBg = t.ButtonPrimaryBg;
+                        Color onBg = Color.Lerp(t.ButtonPrimaryBg, t.Accent, 0.08f);
 
-                    s.normal.background = toggleTex(offBg);
-                    s.normal.textColor = t.ButtonPrimaryFg;
+                        s.normal.background = toggleTex(offBg);
+                        s.normal.textColor = t.ButtonPrimaryFg;
 
-                    s.hover.background = toggleTex(Alpha(offBg, 0.9f));
-                    s.hover.textColor = t.ButtonPrimaryFg;
+                        s.hover.background = toggleTex(Alpha(offBg, 0.9f));
+                        s.hover.textColor = t.ButtonPrimaryFg;
 
-                    s.active.background = toggleTex(Color.Lerp(offBg, Color.black, 0.1f));
-                    s.active.textColor = t.ButtonPrimaryFg;
+                        s.active.background = toggleTex(Color.Lerp(offBg, Color.black, 0.1f));
+                        s.active.textColor = t.ButtonPrimaryFg;
 
-                    s.focused.background = focus(t.ButtonPrimaryFg);
-                    s.focused.textColor = t.ButtonPrimaryFg;
+                        s.focused.background = focus(t.ButtonPrimaryFg);
+                        s.focused.textColor = t.ButtonPrimaryFg;
 
-                    s.onNormal.background = toggleTex(onBg);
-                    s.onNormal.textColor = t.ButtonPrimaryFg;
+                        s.onNormal.background = toggleTex(onBg);
+                        s.onNormal.textColor = t.ButtonPrimaryFg;
 
-                    s.onHover.background = toggleTex(Alpha(onBg, 0.9f));
-                    s.onHover.textColor = t.ButtonPrimaryFg;
+                        s.onHover.background = toggleTex(Alpha(onBg, 0.9f));
+                        s.onHover.textColor = t.ButtonPrimaryFg;
 
-                    s.onActive.background = toggleTex(Color.Lerp(onBg, Color.black, 0.1f));
-                    s.onActive.textColor = t.ButtonPrimaryFg;
+                        s.onActive.background = toggleTex(Color.Lerp(onBg, Color.black, 0.1f));
+                        s.onActive.textColor = t.ButtonPrimaryFg;
 
-                    s.onFocused.background = focus(t.ButtonPrimaryFg);
-                    s.onFocused.textColor = t.ButtonPrimaryFg;
-                })
+                        s.onFocused.background = focus(t.ButtonPrimaryFg);
+                        s.onFocused.textColor = t.ButtonPrimaryFg;
+                    }
+                )
                 .Variant(
                     ControlVariant.Destructive,
                     (s, t) =>
@@ -743,11 +752,12 @@ namespace shadcnui.GUIComponents.Core.Styling
             float r = DesignTokens.Radius.MD;
             int radius = GetScaledBorderRadius(r);
 
+            var inputBgTex = (Theme t) => CreateBorderTexture(w, h, radius, Color.Lerp(t.Base, t.Secondary, 0.5f), t.Border, 1f);
+
             _baseInputStyle = Style(StyleComponentType.Input)
                 .FontScale(DesignTokens.FontScale.SM)
                 .Padding(DesignTokens.Padding.Input.Horizontal, DesignTokens.Padding.Input.Vertical)
                 .Border(DesignTokens.Radius.MD)
-                .FixedHeight(DesignTokens.Height.Default)
                 .Margin(DesignTokens.Spacing.None, DesignTokens.Spacing.SM)
                 .Apply(
                     (s, t) =>
@@ -755,6 +765,7 @@ namespace shadcnui.GUIComponents.Core.Styling
                         s.clipping = TextClipping.Clip;
                         s.contentOffset = new Vector2(2f, 0f);
                         s.wordWrap = false;
+                        s.normal.background = inputBgTex(t);
                         s.normal.textColor = s.hover.textColor = s.focused.textColor = s.active.textColor = t.Text;
                     }
                 )
@@ -767,8 +778,8 @@ namespace shadcnui.GUIComponents.Core.Styling
                     ControlVariant.Outline,
                     (s, t) =>
                     {
-                        s.normal.background = CreateBorderedRoundedRectTexture(w, h, radius, t.Base, t.Border, 1.5f);
-                        s.focused.background = CreateFocusRingTexture(w, h, radius, t.Accent, 2f);
+                        s.normal.background = CreateBorderTexture(w, h, radius, t.Base, t.Border, 1.5f);
+                        s.focused.background = CreateTexture(w, h, radius, t.Accent, 2f);
                     }
                 )
                 .Variant(
@@ -776,7 +787,7 @@ namespace shadcnui.GUIComponents.Core.Styling
                     (s, t) =>
                     {
                         s.normal.background = TransparentTexture;
-                        s.focused.background = CreateFocusRingTexture(w, h, radius, t.Accent, 1.5f);
+                        s.focused.background = CreateTexture(w, h, radius, t.Accent, 1.5f);
                     }
                 )
                 .Variant(
@@ -786,7 +797,7 @@ namespace shadcnui.GUIComponents.Core.Styling
                         var bg = IsDark(t.Base) ? Color.Lerp(t.Secondary, t.Elevated, 0.4f) : Color.Lerp(t.Secondary, t.Base, 0.3f);
                         var solidFactory = SolidTex(w, h, radius);
                         s.normal.background = solidFactory(bg);
-                        s.focused.background = CreateFocusRingTexture(w, h, radius, t.Accent, 2f);
+                        s.focused.background = CreateTexture(w, h, radius, t.Accent, 2f);
                     }
                 )
                 .Sizes(Sizes.Input)
@@ -801,18 +812,20 @@ namespace shadcnui.GUIComponents.Core.Styling
             int br = GetScaledBorderRadius(DesignTokens.Radius.MD);
 
             Style(StyleComponentType.TextArea)
-                .Apply((s, t) =>
-                {
-                    s.normal.textColor = t.Text;
-                    s.wordWrap = true;
-                    s.padding = GetSpacingOffset(DesignTokens.Spacing.SM, DesignTokens.Spacing.SM);
-                })
+                .Apply(
+                    (s, t) =>
+                    {
+                        s.normal.textColor = t.Text;
+                        s.wordWrap = true;
+                        s.padding = GetSpacingOffset(DesignTokens.Spacing.SM, DesignTokens.Spacing.SM);
+                    }
+                )
                 .Variant(
                     ControlVariant.Outline,
                     (s, t) =>
                     {
-                        s.normal.background = CreateBorderedRoundedRectTexture(w, w, br, t.Base, t.Border, 1.5f);
-                        s.focused.background = CreateFocusRingTexture(w, w, br, t.Accent, 2f);
+                        s.normal.background = CreateBorderTexture(w, w, br, t.Base, t.Border, 1.5f);
+                        s.focused.background = CreateTexture(w, w, br, t.Accent, 2f);
                         s.border = new UnityHelpers.RectOffset(br, br, br, br);
                     }
                 )
@@ -821,7 +834,7 @@ namespace shadcnui.GUIComponents.Core.Styling
                     (s, t) =>
                     {
                         s.normal.background = TransparentTexture;
-                        s.focused.background = CreateFocusRingTexture(w, w, br, t.Accent, 1.5f);
+                        s.focused.background = CreateTexture(w, w, br, t.Accent, 1.5f);
                     }
                 )
                 .Sizes(Sizes.TextArea)
@@ -862,36 +875,40 @@ namespace shadcnui.GUIComponents.Core.Styling
             int h = (int)DesignTokens.ProgressBar.TextureHeight;
             int r = GetScaledBorderRadius(DesignTokens.Radius.LG);
 
+            var progressTrackTex = (Theme t) => CreateTexture(w, h, r, Color.Lerp(t.Secondary, Color.black, 0.08f), Color.Lerp(t.Secondary, Color.black, 0.14f));
+            var progressFillTex = (Theme t) => CreateTexture(w, h, r, Color.Lerp(t.Accent, Color.white, 0.08f), Color.Lerp(t.Accent, Color.black, 0.06f));
+
             _progressBarStyle = Style(StyleComponentType.ProgressBar)
                 .Border(DesignTokens.Radius.LG)
                 .Margin(DesignTokens.Spacing.None, DesignTokens.Spacing.SM)
-                .FixedHeight(DesignTokens.ProgressBar.Height)
                 .Stretch(true, false)
-                .Apply((s, t) => 
-                {
-                    s.normal.background = CreateSolidTexture(t.Secondary);
-                    s.hover = s.active = s.normal;
-                })
+                .Apply(
+                    (s, t) =>
+                    {
+                        s.normal.background = progressTrackTex(t);
+                        s.hover = s.active = s.normal;
+                    }
+                )
                 .Variant(
                     ControlVariant.Secondary,
                     (s, t) =>
                     {
-                        s.normal.background = CreateSolidTexture(t.Accent);
+                        s.normal.background = progressFillTex(t);
                     }
                 )
                 .Variant(
                     ControlVariant.Destructive,
                     (s, t) =>
                     {
-                         s.normal.background = CreateSolidTexture(t.Destructive);
-                         s.normal.textColor = t.ButtonDestructiveFg;
+                        s.normal.background = CreateTexture(w, h, r, Color.Lerp(t.Destructive, Color.white, 0.06f), Color.Lerp(t.Destructive, Color.black, 0.08f));
+                        s.normal.textColor = t.ButtonDestructiveFg;
                     }
                 )
                 .Variant(
                     ControlVariant.Outline,
                     (s, t) =>
                     {
-                        s.normal.background = CreateRoundedOutlineTexture(w, h, r, t.Border, 1.5f);
+                        s.normal.background = CreateOutlineTexture(w, h, r, t.Border, 1.5f);
                         s.border = new UnityHelpers.RectOffset(1, 1, 1, 1);
                     }
                 )
@@ -900,7 +917,7 @@ namespace shadcnui.GUIComponents.Core.Styling
                     ControlVariant.Muted,
                     (s, t) =>
                     {
-                        s.normal.background = CreateSolidTexture(t.Muted);
+                        s.normal.background = CreateTexture(w, h, r, Color.Lerp(t.Muted, Color.white, 0.04f), Color.Lerp(t.Muted, Color.black, 0.08f));
                     }
                 )
                 .Sizes(Sizes.ProgressBar)
@@ -911,28 +928,24 @@ namespace shadcnui.GUIComponents.Core.Styling
         #region Separator
         private void SeparatorStyles()
         {
-            _separatorStyle = Style(StyleComponentType.Separator)
-                .Background(SeparatorTexture)
-                .Padding(DesignTokens.Spacing.None, DesignTokens.Spacing.None)
-                .Border(0)
-                .FixedHeight(Mathf.Max(1, Mathf.RoundToInt(DesignTokens.Separator.DefaultThickness * _guiHelper.uiScale)))
-                .Margin(DesignTokens.Spacing.None, DesignTokens.Spacing.None)
-                .Stretch(true, false)
-                .Sizes(Sizes.Separator)
-                .Build();
+            _separatorStyle = Style(StyleComponentType.Separator).Background(SeparatorTexture).Padding(DesignTokens.Spacing.None, DesignTokens.Spacing.None).Border(0).Margin(DesignTokens.Spacing.None, DesignTokens.Spacing.None).Stretch(true, false).Sizes(Sizes.Separator).Build();
         }
         #endregion
 
         #region Tab
         private void TabStyles()
         {
+            var tabsListTop = (Theme t) => Color.Lerp(t.Secondary, Color.white, IsDark(t.Base) ? 0.02f : 0.06f);
+            var tabsListBottom = (Theme t) => Color.Lerp(t.Secondary, Color.black, IsDark(t.Base) ? 0.04f : 0.02f);
             _tabsListStyle = Style(StyleComponentType.TabsList)
-                .Apply((s, t) => s.normal.background = CreateSolidTexture(t.Secondary))
+                .Apply((s, t) => s.normal.background = CreateTexture(DesignTokens.TextureSize.Default, DesignTokens.TextureSize.Default, GetScaledBorderRadius(DesignTokens.Radius.MD), tabsListTop(t), tabsListBottom(t)))
                 .Padding(DesignTokens.Spacing.XS, DesignTokens.Spacing.XS)
                 .Border(DesignTokens.Radius.MD)
                 .Sizes(Sizes.TabsList)
                 .Build();
 
+            var tabActiveTop = (Theme t) => Color.Lerp(t.Base, Color.white, IsDark(t.Base) ? 0.04f : 0.08f);
+            var tabActiveBottom = (Theme t) => Color.Lerp(t.Base, Color.black, IsDark(t.Base) ? 0.06f : 0.02f);
             _tabsTriggerStyle = Style(StyleComponentType.TabsTrigger)
                 .Background(TransparentTexture)
                 .FontScale(DesignTokens.FontScale.SM, FontStyle.Bold)
@@ -942,26 +955,23 @@ namespace shadcnui.GUIComponents.Core.Styling
                 .Apply(
                     (s, t) =>
                     {
-                        s.normal.textColor = t.Muted;
+                        s.normal.textColor = Color.Lerp(t.Muted, t.Text, 0.6f);
                         s.normal.background = TransparentTexture;
-                        
-                        var activeBg = CreateGradientRoundedRectTexture(DesignTokens.TextureSize.Default, DesignTokens.TextureSize.Default, GetScaledBorderRadius(DesignTokens.Radius.SM), t.Base);
-                        
+
+                        var activeBg = CreateTexture(DesignTokens.TextureSize.Default, DesignTokens.TextureSize.Default, GetScaledBorderRadius(DesignTokens.Radius.SM), tabActiveTop(t), tabActiveBottom(t));
+
                         s.onNormal.textColor = t.Text;
                         s.onNormal.background = activeBg;
                         s.active = s.onNormal;
-                        
+
                         s.hover.textColor = t.Text;
-                        s.hover.background = SolidTex(DesignTokens.TextureSize.Default, DesignTokens.TextureSize.Default, DesignTokens.Radius.SM)(Alpha(t.Accent, 0.1f));
+                        s.hover.background = SolidTex(DesignTokens.TextureSize.Default, DesignTokens.TextureSize.Default, DesignTokens.Radius.SM)(new Color(t.Accent.r, t.Accent.g, t.Accent.b, 0.12f));
                     }
                 )
                 .Sizes(Sizes.Item)
                 .Build();
 
-            Style(StyleComponentType.TabsContent)
-                .Apply((s, t) => s.normal.background = TransparentTexture)
-                .Sizes(Sizes.TabsContent)
-                .Build();
+            Style(StyleComponentType.TabsContent).Apply((s, t) => s.normal.background = TransparentTexture).Sizes(Sizes.TabsContent).Build();
         }
         #endregion
 
@@ -975,49 +985,51 @@ namespace shadcnui.GUIComponents.Core.Styling
             var outline = OutlineTex(sz, sz, r, 1.5f);
             var bordered = BorderedTex(sz, sz, r, 1.5f);
 
-            Func<Color, Texture2D> checkboxTex = c => CreateGradientRoundedRectTexture(sz, sz, radius, c);
+            Func<Color, Texture2D> checkboxTex = c => CreateTexture(sz, sz, radius, c);
 
-            _baseCheckboxStyle = Style(StyleComponentType.Checkbox)
+            _checkboxStyle = Style(StyleComponentType.Checkbox)
                 .FontScale(DesignTokens.FontScale.SM)
                 .Padding(DesignTokens.Spacing.SM, DesignTokens.Spacing.XS)
                 .Border(DesignTokens.Radius.SM)
                 .Stretch(false, false)
-                .Apply((s, t) =>
-                {
-                    Color offBg = Color.Lerp(t.Accent, t.Base, 0.85f);
-                    Color offBorder = Color.Lerp(t.Accent, t.Border, 0.5f);
-                    
-                    s.normal.background = bordered(offBg, offBorder);
-                    s.normal.textColor = t.Text;
+                .Apply(
+                    (s, t) =>
+                    {
+                        Color offBg = Color.Lerp(t.Accent, t.Base, 0.85f);
+                        Color offBorder = Color.Lerp(t.Accent, t.Border, 0.5f);
 
-                    s.hover.background = bordered(Color.Lerp(offBg, t.Accent, 0.15f), t.Accent);
-                    s.hover.textColor = t.Text;
+                        s.normal.background = bordered(offBg, offBorder);
+                        s.normal.textColor = t.Text;
 
-                    s.active.background = bordered(Color.Lerp(offBg, t.Accent, 0.25f), t.Accent);
-                    s.active.textColor = t.Text;
+                        s.hover.background = bordered(Color.Lerp(offBg, t.Accent, 0.15f), t.Accent);
+                        s.hover.textColor = t.Text;
 
-                    s.focused.background = bordered(offBg, t.Accent);
-                    s.focused.textColor = t.Text;
+                        s.active.background = bordered(Color.Lerp(offBg, t.Accent, 0.25f), t.Accent);
+                        s.active.textColor = t.Text;
 
-                    s.onNormal.background = checkboxTex(t.Accent);
-                    s.onNormal.textColor = t.ButtonPrimaryFg;
+                        s.focused.background = bordered(offBg, t.Accent);
+                        s.focused.textColor = t.Text;
 
-                    s.onHover.background = checkboxTex(Color.Lerp(t.Accent, Color.white, 0.15f));
-                    s.onHover.textColor = t.ButtonPrimaryFg;
+                        s.onNormal.background = checkboxTex(t.Accent);
+                        s.onNormal.textColor = t.ButtonPrimaryFg;
 
-                    s.onActive.background = checkboxTex(Color.Lerp(t.Accent, Color.black, 0.12f));
-                    s.onActive.textColor = t.ButtonPrimaryFg;
+                        s.onHover.background = checkboxTex(Color.Lerp(t.Accent, Color.white, 0.15f));
+                        s.onHover.textColor = t.ButtonPrimaryFg;
 
-                    s.onFocused.background = checkboxTex(t.Accent);
-                    s.onFocused.textColor = t.ButtonPrimaryFg;
-                })
+                        s.onActive.background = checkboxTex(Color.Lerp(t.Accent, Color.black, 0.12f));
+                        s.onActive.textColor = t.ButtonPrimaryFg;
+
+                        s.onFocused.background = checkboxTex(t.Accent);
+                        s.onFocused.textColor = t.ButtonPrimaryFg;
+                    }
+                )
                 .Variant(
                     ControlVariant.Destructive,
                     (s, t) =>
                     {
                         Color offBg = Color.Lerp(t.Destructive, t.Base, 0.88f);
                         Color offBorder = Color.Lerp(t.Destructive, t.Border, 0.4f);
-                        
+
                         s.normal.background = bordered(offBg, offBorder);
                         s.normal.textColor = t.Text;
                         s.hover.background = bordered(Color.Lerp(offBg, t.Destructive, 0.18f), t.Destructive);
@@ -1036,7 +1048,7 @@ namespace shadcnui.GUIComponents.Core.Styling
                     (s, t) =>
                     {
                         Color offBorder = Color.Lerp(t.Border, t.Text, 0.2f);
-                        
+
                         s.normal.background = outline(offBorder);
                         s.normal.textColor = t.Text;
                         s.hover.background = bordered(Alpha(t.Accent, 0.1f), t.Accent);
@@ -1054,7 +1066,7 @@ namespace shadcnui.GUIComponents.Core.Styling
                     {
                         Color offBg = IsDark(t.Base) ? Color.Lerp(t.Base, t.Secondary, 0.6f) : Color.Lerp(t.Secondary, t.Base, 0.3f);
                         Color offBorder = Color.Lerp(t.Secondary, t.Text, 0.25f);
-                        
+
                         s.normal.background = bordered(offBg, offBorder);
                         s.normal.textColor = t.Text;
                         s.hover.background = bordered(Color.Lerp(offBg, t.Text, 0.12f), Color.Lerp(offBorder, t.Text, 0.15f));
@@ -1102,7 +1114,7 @@ namespace shadcnui.GUIComponents.Core.Styling
                     {
                         Color offBg = Color.Lerp(t.Muted, t.Base, 0.85f);
                         Color offBorder = Color.Lerp(t.Muted, t.Border, 0.5f);
-                        
+
                         s.normal.background = bordered(offBg, offBorder);
                         s.normal.textColor = t.Text;
                         s.hover.background = bordered(Color.Lerp(offBg, t.Muted, 0.15f), t.Muted);
@@ -1116,7 +1128,176 @@ namespace shadcnui.GUIComponents.Core.Styling
                         s.onActive.textColor = t.Base;
                     }
                 )
-                .Sizes(Sizes.FontOnly)
+                .Sizes(Sizes.Checkbox)
+                .Size(
+                    ControlSize.Icon,
+                    (s, t) =>
+                    {
+                        int iconSz = GetScaledHeight(DesignTokens.Checkbox.Size);
+                        s.fixedWidth = iconSz;
+                        s.fixedHeight = iconSz;
+                        s.padding = GetSpacingOffset(0, 0);
+                    }
+                )
+                .Build();
+        }
+
+        #endregion
+
+        #region CheckboxSolid
+        private void CheckboxSolidStyles()
+        {
+            int sz = (int)DesignTokens.Checkbox.Size;
+            float r = DesignTokens.Radius.SM;
+            int radius = GetScaledBorderRadius(r);
+
+            var outline = OutlineTex(sz, sz, r, 1.5f);
+            var bordered = BorderedTex(sz, sz, r, 1.5f);
+
+            Func<Color, Texture2D> checkboxTex = c => CreateTexture(sz, sz, radius, c);
+
+            _checkboxSolidStyle = Style(StyleComponentType.CheckboxSolid)
+                .FontScale(DesignTokens.FontScale.SM)
+                .Padding(DesignTokens.Spacing.SM, DesignTokens.Spacing.XS)
+                .Border(DesignTokens.Radius.SM)
+                .Stretch(false, false)
+                .Apply(
+                    (s, t) =>
+                    {
+                        Color offBg = Color.Lerp(t.Accent, t.Base, 0.85f);
+                        Color offBorder = Color.Lerp(t.Accent, t.Border, 0.5f);
+
+                        s.normal.background = bordered(offBg, offBorder);
+                        s.normal.textColor = t.Text;
+
+                        s.hover.background = bordered(Color.Lerp(offBg, t.Accent, 0.15f), t.Accent);
+                        s.hover.textColor = t.Text;
+
+                        s.active.background = bordered(Color.Lerp(offBg, t.Accent, 0.25f), t.Accent);
+                        s.active.textColor = t.Text;
+
+                        s.focused.background = bordered(offBg, t.Accent);
+                        s.focused.textColor = t.Text;
+
+                        s.onNormal.background = checkboxTex(t.Accent);
+                        s.onNormal.textColor = t.ButtonPrimaryFg;
+
+                        s.onHover.background = checkboxTex(Color.Lerp(t.Accent, Color.white, 0.15f));
+                        s.onHover.textColor = t.ButtonPrimaryFg;
+
+                        s.onActive.background = checkboxTex(Color.Lerp(t.Accent, Color.black, 0.12f));
+                        s.onActive.textColor = t.ButtonPrimaryFg;
+
+                        s.onFocused.background = checkboxTex(t.Accent);
+                        s.onFocused.textColor = t.ButtonPrimaryFg;
+                    }
+                )
+                .Variant(
+                    ControlVariant.Destructive,
+                    (s, t) =>
+                    {
+                        Color offBg = Color.Lerp(t.Destructive, t.Base, 0.88f);
+                        Color offBorder = Color.Lerp(t.Destructive, t.Border, 0.4f);
+
+                        s.normal.background = bordered(offBg, offBorder);
+                        s.normal.textColor = t.Text;
+                        s.hover.background = bordered(Color.Lerp(offBg, t.Destructive, 0.18f), t.Destructive);
+                        s.hover.textColor = t.Text;
+
+                        s.onNormal.background = checkboxTex(t.Destructive);
+                        s.onNormal.textColor = t.ButtonDestructiveFg;
+                        s.onHover.background = checkboxTex(Color.Lerp(t.Destructive, Color.white, 0.15f));
+                        s.onHover.textColor = t.ButtonDestructiveFg;
+                        s.onActive.background = checkboxTex(Color.Lerp(t.Destructive, Color.black, 0.12f));
+                        s.onActive.textColor = t.ButtonDestructiveFg;
+                    }
+                )
+                .Variant(
+                    ControlVariant.Outline,
+                    (s, t) =>
+                    {
+                        Color offBorder = Color.Lerp(t.Border, t.Text, 0.2f);
+
+                        s.normal.background = outline(offBorder);
+                        s.normal.textColor = t.Text;
+                        s.hover.background = bordered(Alpha(t.Accent, 0.1f), t.Accent);
+                        s.hover.textColor = t.Text;
+
+                        s.onNormal.background = bordered(t.Accent, t.Accent);
+                        s.onNormal.textColor = t.ButtonPrimaryFg;
+                        s.onHover.background = bordered(Color.Lerp(t.Accent, Color.white, 0.12f), t.Accent);
+                        s.onHover.textColor = t.ButtonPrimaryFg;
+                    }
+                )
+                .Variant(
+                    ControlVariant.Secondary,
+                    (s, t) =>
+                    {
+                        Color offBg = IsDark(t.Base) ? Color.Lerp(t.Base, t.Secondary, 0.6f) : Color.Lerp(t.Secondary, t.Base, 0.3f);
+                        Color offBorder = Color.Lerp(t.Secondary, t.Text, 0.25f);
+
+                        s.normal.background = bordered(offBg, offBorder);
+                        s.normal.textColor = t.Text;
+                        s.hover.background = bordered(Color.Lerp(offBg, t.Text, 0.12f), Color.Lerp(offBorder, t.Text, 0.15f));
+                        s.hover.textColor = t.Text;
+
+                        s.onNormal.background = checkboxTex(Color.Lerp(t.Secondary, t.Text, 0.4f));
+                        s.onNormal.textColor = IsDark(t.Base) ? t.Base : t.Text;
+                        s.onHover.background = checkboxTex(Color.Lerp(t.Secondary, t.Text, 0.5f));
+                        s.onHover.textColor = IsDark(t.Base) ? t.Base : t.Text;
+                    }
+                )
+                .Variant(
+                    ControlVariant.Ghost,
+                    (s, t) =>
+                    {
+                        s.normal.background = TransparentTexture;
+                        s.normal.textColor = t.Muted;
+                        s.hover.background = checkboxTex(Alpha(t.Text, 0.1f));
+                        s.hover.textColor = t.Text;
+
+                        s.onNormal.background = checkboxTex(Alpha(t.Accent, 0.2f));
+                        s.onNormal.textColor = t.Accent;
+                        s.onHover.background = checkboxTex(Alpha(t.Accent, 0.3f));
+                        s.onHover.textColor = t.Accent;
+                    }
+                )
+                .Variant(
+                    ControlVariant.Link,
+                    (s, t) =>
+                    {
+                        s.normal.background = TransparentTexture;
+                        s.normal.textColor = t.ButtonLinkColor;
+                        s.hover.background = TransparentTexture;
+                        s.hover.textColor = Color.Lerp(t.ButtonLinkColor, Color.white, 0.2f);
+
+                        s.onNormal.background = TransparentTexture;
+                        s.onNormal.textColor = Color.Lerp(t.ButtonLinkColor, t.Accent, 0.3f);
+                        s.onHover.background = TransparentTexture;
+                        s.onHover.textColor = Color.Lerp(t.ButtonLinkColor, t.Accent, 0.5f);
+                    }
+                )
+                .Variant(
+                    ControlVariant.Muted,
+                    (s, t) =>
+                    {
+                        Color offBg = Color.Lerp(t.Muted, t.Base, 0.85f);
+                        Color offBorder = Color.Lerp(t.Muted, t.Border, 0.5f);
+
+                        s.normal.background = bordered(offBg, offBorder);
+                        s.normal.textColor = t.Text;
+                        s.hover.background = bordered(Color.Lerp(offBg, t.Muted, 0.15f), t.Muted);
+                        s.hover.textColor = t.Text;
+
+                        s.onNormal.background = checkboxTex(t.Muted);
+                        s.onNormal.textColor = t.Base;
+                        s.onHover.background = checkboxTex(Color.Lerp(t.Muted, Color.white, 0.15f));
+                        s.onHover.textColor = t.Base;
+                        s.onActive.background = checkboxTex(Color.Lerp(t.Muted, Color.black, 0.12f));
+                        s.onActive.textColor = t.Base;
+                    }
+                )
+                .Sizes(Sizes.Checkbox)
                 .Size(
                     ControlSize.Icon,
                     (s, t) =>
@@ -1142,49 +1323,51 @@ namespace shadcnui.GUIComponents.Core.Styling
             var outline = OutlineTex(w, h, r, 1.5f);
             var bordered = BorderedTex(w, h, r, 1.5f);
 
-            Func<Color, Texture2D> switchTex = c => CreateGradientRoundedRectTexture(w, h, radius, c);
+            Func<Color, Texture2D> switchTex = c => CreateTexture(w, h, radius, c);
 
             _baseSwitchStyle = Style(StyleComponentType.Switch)
                 .FontScale(DesignTokens.FontScale.SM)
                 .Padding(DesignTokens.Spacing.SM, DesignTokens.Spacing.None)
                 .Border(DesignTokens.Switch.Radius)
                 .Stretch(false, false)
-                .Apply((s, t) =>
-                {
-                    Color offBg = Color.Lerp(t.Accent, t.Base, 0.85f);
-                    Color offBorder = Color.Lerp(t.Accent, t.Border, 0.5f);
-                    
-                    s.normal.background = bordered(offBg, offBorder);
-                    s.normal.textColor = t.Text;
+                .Apply(
+                    (s, t) =>
+                    {
+                        Color offBg = Color.Lerp(t.Accent, t.Base, 0.85f);
+                        Color offBorder = Color.Lerp(t.Accent, t.Border, 0.5f);
 
-                    s.hover.background = bordered(Color.Lerp(offBg, t.Accent, 0.15f), t.Accent);
-                    s.hover.textColor = t.Text;
+                        s.normal.background = bordered(offBg, offBorder);
+                        s.normal.textColor = t.Text;
 
-                    s.active.background = bordered(Color.Lerp(offBg, t.Accent, 0.25f), t.Accent);
-                    s.active.textColor = t.Text;
+                        s.hover.background = bordered(Color.Lerp(offBg, t.Accent, 0.15f), t.Accent);
+                        s.hover.textColor = t.Text;
 
-                    s.focused.background = bordered(offBg, t.Accent);
-                    s.focused.textColor = t.Text;
+                        s.active.background = bordered(Color.Lerp(offBg, t.Accent, 0.25f), t.Accent);
+                        s.active.textColor = t.Text;
 
-                    s.onNormal.background = switchTex(t.Accent);
-                    s.onNormal.textColor = t.ButtonPrimaryFg;
+                        s.focused.background = bordered(offBg, t.Accent);
+                        s.focused.textColor = t.Text;
 
-                    s.onHover.background = switchTex(Color.Lerp(t.Accent, Color.white, 0.15f));
-                    s.onHover.textColor = t.ButtonPrimaryFg;
+                        s.onNormal.background = switchTex(t.Accent);
+                        s.onNormal.textColor = t.ButtonPrimaryFg;
 
-                    s.onActive.background = switchTex(Color.Lerp(t.Accent, Color.black, 0.12f));
-                    s.onActive.textColor = t.ButtonPrimaryFg;
+                        s.onHover.background = switchTex(Color.Lerp(t.Accent, Color.white, 0.15f));
+                        s.onHover.textColor = t.ButtonPrimaryFg;
 
-                    s.onFocused.background = switchTex(t.Accent);
-                    s.onFocused.textColor = t.ButtonPrimaryFg;
-                })
+                        s.onActive.background = switchTex(Color.Lerp(t.Accent, Color.black, 0.12f));
+                        s.onActive.textColor = t.ButtonPrimaryFg;
+
+                        s.onFocused.background = switchTex(t.Accent);
+                        s.onFocused.textColor = t.ButtonPrimaryFg;
+                    }
+                )
                 .Variant(
                     ControlVariant.Destructive,
                     (s, t) =>
                     {
                         Color offBg = Color.Lerp(t.Destructive, t.Base, 0.88f);
                         Color offBorder = Color.Lerp(t.Destructive, t.Border, 0.4f);
-                        
+
                         s.normal.background = bordered(offBg, offBorder);
                         s.normal.textColor = t.Text;
                         s.hover.background = bordered(Color.Lerp(offBg, t.Destructive, 0.18f), t.Destructive);
@@ -1203,7 +1386,7 @@ namespace shadcnui.GUIComponents.Core.Styling
                     (s, t) =>
                     {
                         Color offBorder = Color.Lerp(t.Border, t.Text, 0.2f);
-                        
+
                         s.normal.background = outline(offBorder);
                         s.normal.textColor = t.Text;
                         s.hover.background = bordered(Alpha(t.Accent, 0.1f), t.Accent);
@@ -1221,7 +1404,7 @@ namespace shadcnui.GUIComponents.Core.Styling
                     {
                         Color offBg = IsDark(t.Base) ? Color.Lerp(t.Base, t.Secondary, 0.6f) : Color.Lerp(t.Secondary, t.Base, 0.3f);
                         Color offBorder = Color.Lerp(t.Secondary, t.Text, 0.25f);
-                        
+
                         s.normal.background = bordered(offBg, offBorder);
                         s.normal.textColor = t.Text;
                         s.hover.background = bordered(Color.Lerp(offBg, t.Text, 0.12f), Color.Lerp(offBorder, t.Text, 0.15f));
@@ -1269,7 +1452,7 @@ namespace shadcnui.GUIComponents.Core.Styling
                     {
                         Color offBg = Color.Lerp(t.Muted, t.Base, 0.85f);
                         Color offBorder = Color.Lerp(t.Muted, t.Border, 0.5f);
-                        
+
                         s.normal.background = bordered(offBg, offBorder);
                         s.normal.textColor = t.Text;
                         s.hover.background = bordered(Color.Lerp(offBg, t.Muted, 0.15f), t.Muted);
@@ -1283,7 +1466,7 @@ namespace shadcnui.GUIComponents.Core.Styling
                         s.onActive.textColor = t.Base;
                     }
                 )
-                .Sizes(Sizes.FontOnly)
+                .Sizes(Sizes.Switch)
                 .Size(
                     ControlSize.Icon,
                     (s, t) =>
@@ -1308,21 +1491,24 @@ namespace shadcnui.GUIComponents.Core.Styling
             var solid = SolidTex(w, h, r);
             var outline = OutlineTex(w, h, r);
 
+            Func<Color, Texture2D> badgeTex = c => CreateTexture(w, h, GetScaledBorderRadius(DesignTokens.Radius.XL), Color.Lerp(c, Color.white, 0.06f), Color.Lerp(c, Color.black, 0.06f));
             _baseBadgeStyle = Style(StyleComponentType.Badge)
                 .FontScale(DesignTokens.FontScale.XS, FontStyle.Bold)
                 .Padding(DesignTokens.Padding.Badge.Horizontal, DesignTokens.Padding.Badge.Vertical)
                 .Border(DesignTokens.Radius.XL)
                 .Align(TextAnchor.MiddleCenter)
-                .Apply((s, t) =>
-                {
-                    s.normal.textColor = t.ButtonPrimaryFg;
-                    s.normal.background = solid(t.ButtonPrimaryBg);
-                })
+                .Apply(
+                    (s, t) =>
+                    {
+                        s.normal.textColor = t.ButtonPrimaryFg;
+                        s.normal.background = badgeTex(t.ButtonPrimaryBg);
+                    }
+                )
                 .Variant(
                     ControlVariant.Destructive,
                     (s, t) =>
                     {
-                        s.normal.background = solid(t.Destructive);
+                        s.normal.background = badgeTex(t.Destructive);
                         s.normal.textColor = t.ButtonDestructiveFg;
                     }
                 )
@@ -1330,7 +1516,7 @@ namespace shadcnui.GUIComponents.Core.Styling
                     ControlVariant.Secondary,
                     (s, t) =>
                     {
-                        s.normal.background = solid(t.Secondary);
+                        s.normal.background = badgeTex(t.Secondary);
                         s.normal.textColor = t.ButtonSecondaryFg;
                     }
                 )
@@ -1346,7 +1532,7 @@ namespace shadcnui.GUIComponents.Core.Styling
                     ControlVariant.Muted,
                     (s, t) =>
                     {
-                        s.normal.background = solid(t.Muted);
+                        s.normal.background = badgeTex(t.Muted);
                         s.normal.textColor = t.Text;
                     }
                 )
@@ -1360,7 +1546,37 @@ namespace shadcnui.GUIComponents.Core.Styling
         {
             _baseTableStyle = Style(StyleComponentType.Table)
                 .Border(DesignTokens.Radius.LG)
-                .Apply((s, t) => s.normal.background = CreateBorderedRoundedRectTexture(DesignTokens.TextureSize.Default, DesignTokens.TextureSize.Default, GetScaledBorderRadius(DesignTokens.Radius.LG), t.Base, t.Border, 1f))
+                .Apply((s, t) => s.normal.background = CreateBorderTexture(DesignTokens.TextureSize.Default, DesignTokens.TextureSize.Default, GetScaledBorderRadius(DesignTokens.Radius.LG), t.Base, t.Border, 1f))
+                .Sizes(Sizes.Table)
+                .Build();
+
+            _tableHeaderStyle = Style(StyleComponentType.TableHeader)
+                .Background(TableHeaderTexture)
+                .FontScale(DesignTokens.FontScale.SM, FontStyle.Bold)
+                .Padding(DesignTokens.Padding.Table.CellH, DesignTokens.Padding.Table.CellV)
+                .Align(TextAnchor.MiddleLeft)
+                .Clipping(TextClipping.Clip)
+                .Apply((s, t) => s.normal.textColor = t.Text)
+                .Sizes(Sizes.TableHeader)
+                .Build();
+
+            _tableRowStyle = Style(StyleComponentType.TableRow)
+                .Background(TableRowTexture)
+                .FontScale(DesignTokens.FontScale.SM)
+                .Padding(DesignTokens.Padding.Table.CellH, DesignTokens.Padding.Table.CellV)
+                .Align(TextAnchor.MiddleLeft)
+                .Clipping(TextClipping.Clip)
+                .Apply((s, t) => s.normal.textColor = t.Text)
+                .Sizes(Sizes.Table)
+                .Build();
+
+            _tableRowAlternateStyle = Style(StyleComponentType.TableRow)
+                .Background(TableRowAlternateTexture)
+                .FontScale(DesignTokens.FontScale.SM)
+                .Padding(DesignTokens.Padding.Table.CellH, DesignTokens.Padding.Table.CellV)
+                .Align(TextAnchor.MiddleLeft)
+                .Clipping(TextClipping.Clip)
+                .Apply((s, t) => s.normal.textColor = t.Text)
                 .Sizes(Sizes.Table)
                 .Build();
 
@@ -1373,47 +1589,18 @@ namespace shadcnui.GUIComponents.Core.Styling
                 .Apply((s, t) => s.normal.textColor = t.Text)
                 .Sizes(Sizes.TableCell)
                 .Build();
-
-            Style(StyleComponentType.TableHeader).Sizes(Sizes.TableHeader).Build();
-        }
-        #endregion
-
-        #region Calendar
-        private void CalendarStyles()
-        {
-            _baseCalendarStyle = Style(StyleComponentType.Calendar).Background(CalendarBackgroundTexture).Padding(DesignTokens.Spacing.MD, DesignTokens.Spacing.MD).Border(DesignTokens.Radius.LG).Sizes(Sizes.Container).Build();
-
-            _calendarDayStyle = Style(StyleComponentType.CalendarDay).Background(CalendarDayTexture).FontScale(DesignTokens.FontScale.SM).Align(TextAnchor.MiddleCenter).Apply((s, t) => s.normal.textColor = s.hover.textColor = t.Text).Sizes(Sizes.CalendarDay).Build();
-
-            Style(StyleComponentType.DatePicker).Sizes(Sizes.Container).Build();
-            Style(StyleComponentType.CalendarDaySelected).Sizes(Sizes.CalendarDay).Build();
-            Style(StyleComponentType.CalendarDayOutsideMonth).Sizes(Sizes.CalendarDay).Build();
-            Style(StyleComponentType.CalendarDayToday).Sizes(Sizes.CalendarDay).Build();
-            Style(StyleComponentType.CalendarDayInRange).Sizes(Sizes.CalendarDay).Build();
-            Style(StyleComponentType.DatePickerDay).Sizes(Sizes.CalendarDay).Build();
-            Style(StyleComponentType.DatePickerDaySelected).Sizes(Sizes.CalendarDay).Build();
-            Style(StyleComponentType.DatePickerDayOutsideMonth).Sizes(Sizes.CalendarDay).Build();
-            Style(StyleComponentType.DatePickerDayToday).Sizes(Sizes.CalendarDay).Build();
         }
         #endregion
 
         #region Dialog
         private void DialogStyles()
         {
+            var dialogTop = (Theme t) => Color.Lerp(t.Elevated, Color.white, DesignTokens.Effects.SurfaceHighlightTop);
+            var dialogBottom = (Theme t) => Color.Lerp(t.Elevated, Color.black, DesignTokens.Effects.SurfaceDepthBottom);
             _dialogContentStyle = Style(StyleComponentType.Dialog)
                 .Padding(DesignTokens.Padding.Card.Horizontal, DesignTokens.Padding.Card.Vertical)
                 .Border(DesignTokens.Radius.XL)
-                .Apply(
-                    (s, t) =>
-                        s.normal.background = CreateBorderedRoundedRectTexture(
-                            DesignTokens.TextureSize.XL,
-                            DesignTokens.TextureSize.XL,
-                            GetScaledBorderRadius(DesignTokens.Radius.XL),
-                            t.Base,
-                            t.Border,
-                            1f
-                        )
-                )
+                .Apply((s, t) => s.normal.background = CreateTexture(DesignTokens.TextureSize.XL, DesignTokens.TextureSize.XL, GetScaledBorderRadius(DesignTokens.Radius.XL), dialogTop(t), dialogBottom(t), DesignTokens.Effects.ShadowElevation, (int)DesignTokens.Effects.ShadowBlurMD))
                 .Sizes(Sizes.Dialog)
                 .Build();
         }
@@ -1422,18 +1609,15 @@ namespace shadcnui.GUIComponents.Core.Styling
         #region Card
         private void CardStyles()
         {
+            var cardTop = (Theme t) => Color.Lerp(t.Base, Color.white, DesignTokens.Effects.SurfaceHighlightTop);
+            var cardBottom = (Theme t) => Color.Lerp(t.Base, Color.black, DesignTokens.Effects.SurfaceDepthBottom);
             _cardStyle = Style(StyleComponentType.Card)
-                .Apply((s, t) => 
-                {
-                     s.normal.background = CreateBorderedRoundedRectTexture(
-                        DesignTokens.TextureSize.Default, 
-                        DesignTokens.TextureSize.Default, 
-                        GetScaledBorderRadius(DesignTokens.Radius.LG), 
-                        t.Base, 
-                        t.Border, 
-                        1f
-                     );
-                })
+                .Apply(
+                    (s, t) =>
+                    {
+                        s.normal.background = CreateTexture(DesignTokens.TextureSize.Default, DesignTokens.TextureSize.Default, GetScaledBorderRadius(DesignTokens.Radius.LG), cardTop(t), cardBottom(t), DesignTokens.Effects.ShadowLight, (int)DesignTokens.Effects.ShadowBlurSM);
+                    }
+                )
                 .Padding(DesignTokens.Padding.Card.Horizontal, DesignTokens.Padding.Card.Vertical)
                 .Border(DesignTokens.Radius.LG)
                 .Stretch(false, false)
@@ -1450,12 +1634,40 @@ namespace shadcnui.GUIComponents.Core.Styling
         #region Menu
         private void MenuStyles()
         {
-            _menuBarStyle = Style(StyleComponentType.MenuBar).Background(TransparentTexture).Padding(DesignTokens.Spacing.XS, DesignTokens.Spacing.None).FixedHeight(DesignTokens.Height.Default).Align(TextAnchor.MiddleLeft).Stretch(false, false).Sizes(Sizes.MenuBar).Build();
+            int w = DesignTokens.TextureSize.Default;
+            int h = (int)DesignTokens.Height.Default;
+            float r = DesignTokens.Radius.MD;
+            int radius = GetScaledBorderRadius(r);
+
+            Color menuBarTop = Color.Lerp(ThemeManager.Instance.CurrentTheme.Elevated, Color.white, 0.02f);
+            Color menuBarBottom = Color.Lerp(ThemeManager.Instance.CurrentTheme.Elevated, Color.black, 0.03f);
+
+            _menuBarStyle = Style(StyleComponentType.MenuBar)
+                .Background(CreateTexture(w, h, radius, menuBarTop, menuBarBottom, 0.12f, 6))
+                .Padding(DesignTokens.Spacing.SM, DesignTokens.Spacing.XS)
+                .Border(DesignTokens.Radius.MD)
+                .Align(TextAnchor.MiddleLeft)
+                .Stretch(true, false)
+                .Sizes(Sizes.MenuBar)
+                .Build();
 
             Style(StyleComponentType.MenuBarItem).Sizes(Sizes.Item).Build();
             Style(StyleComponentType.DropdownMenuItem).Sizes(Sizes.Item).Build();
             Style(StyleComponentType.DropdownMenu).Sizes(Sizes.Container).Build();
-            Style(StyleComponentType.MenuDropdown).Sizes(Sizes.Container).Build();
+
+            Style(StyleComponentType.MenuDropdown)
+                .Apply(
+                    (s, t) =>
+                    {
+                        Color dropdownTop = Color.Lerp(t.Elevated, Color.white, 0.015f);
+                        Color dropdownBottom = Color.Lerp(t.Elevated, Color.black, 0.025f);
+                        s.normal.background = CreateTexture(DesignTokens.TextureSize.Large, DesignTokens.TextureSize.Large, (int)DesignTokens.Radius.MD, dropdownTop, dropdownBottom, 0.16f, 8);
+                        s.fixedWidth = DesignTokens.TextureSize.Large;
+                        s.stretchWidth = false;
+                    }
+                )
+                .Sizes(Sizes.Container)
+                .Build();
         }
         #endregion
 
@@ -1477,7 +1689,7 @@ namespace shadcnui.GUIComponents.Core.Styling
         #region Chart
         private void ChartStyles()
         {
-            _chartContainerStyle = Style(StyleComponentType.Chart).Background(ChartContainerTexture).Padding(DesignTokens.Spacing.LG, DesignTokens.Spacing.LG).Border(DesignTokens.Radius.LG).Sizes(Sizes.Container).Build();
+            _chartContainerStyle = Style(StyleComponentType.Chart).Background(ChartContainerTexture).Padding(DesignTokens.Chart.ContainerPaddingH, DesignTokens.Chart.ContainerPaddingV).Border(DesignTokens.Chart.Radius).Sizes(Sizes.Container).Build();
         }
         #endregion
 
@@ -1500,10 +1712,11 @@ namespace shadcnui.GUIComponents.Core.Styling
         #region Slider
         private void SliderStyles()
         {
+            var trackTop = (Theme t) => Color.Lerp(t.Secondary, Color.black, 0.06f);
+            var trackBottom = (Theme t) => Color.Lerp(t.Secondary, Color.black, 0.12f);
             _baseSliderStyle = Style(StyleComponentType.SliderTrack)
-                .Apply((s, t) => s.normal.background = CreateSolidTexture(t.Secondary))
+                .Apply((s, t) => s.normal.background = CreateTexture(DesignTokens.TextureSize.Default, (int)DesignTokens.Slider.TrackDefault, GetScaledBorderRadius(DesignTokens.Radius.Full), trackTop(t), trackBottom(t)))
                 .Border(DesignTokens.Radius.Full)
-                .FixedHeight(DesignTokens.Slider.TrackDefault)
                 .Stretch(true, false)
                 .Apply((s, t) => s.normal.textColor = t.Text)
                 .Sizes(Sizes.SliderTrack)
@@ -1511,14 +1724,19 @@ namespace shadcnui.GUIComponents.Core.Styling
 
             Style(StyleComponentType.SliderThumb).Sizes(Sizes.SliderThumb).Build();
 
+            var fillTop = (Theme t) => Color.Lerp(t.Accent, Color.white, 0.08f);
+            var fillBottom = (Theme t) => Color.Lerp(t.Accent, Color.black, 0.06f);
             Style(StyleComponentType.SliderFill)
-                .Variant(ControlVariant.Default, (s, t) => s.normal.background = CreateSolidTexture(t.Accent))
-                .Variant(ControlVariant.Destructive, (s, t) => s.normal.background = CreateSolidTexture(t.Destructive))
+                .Variant(ControlVariant.Default, (s, t) => s.normal.background = CreateTexture(DesignTokens.TextureSize.Default, (int)DesignTokens.Slider.TrackDefault, GetScaledBorderRadius(DesignTokens.Radius.Full), fillTop(t), fillBottom(t)))
+                .Variant(
+                    ControlVariant.Destructive,
+                    (s, t) => s.normal.background = CreateTexture(DesignTokens.TextureSize.Default, (int)DesignTokens.Slider.TrackDefault, GetScaledBorderRadius(DesignTokens.Radius.Full), Color.Lerp(t.Destructive, Color.white, 0.06f), Color.Lerp(t.Destructive, Color.black, 0.06f))
+                )
                 .Variant(
                     ControlVariant.Secondary,
-                    (s, t) => s.normal.background = CreateSolidTexture(t.Secondary)
+                    (s, t) => s.normal.background = CreateTexture(DesignTokens.TextureSize.Default, (int)DesignTokens.Slider.TrackDefault, GetScaledBorderRadius(DesignTokens.Radius.Full), Color.Lerp(t.Secondary, Color.white, 0.04f), Color.Lerp(t.Secondary, Color.black, 0.08f))
                 )
-                .Variant(ControlVariant.Muted, (s, t) => s.normal.background = CreateSolidTexture(t.Muted))
+                .Variant(ControlVariant.Muted, (s, t) => s.normal.background = CreateTexture(DesignTokens.TextureSize.Default, (int)DesignTokens.Slider.TrackDefault, GetScaledBorderRadius(DesignTokens.Radius.Full), Color.Lerp(t.Muted, Color.white, 0.04f), Color.Lerp(t.Muted, Color.black, 0.08f)))
                 .Build();
         }
         #endregion
@@ -1536,9 +1754,16 @@ namespace shadcnui.GUIComponents.Core.Styling
                 .Apply(
                     (s, t) =>
                     {
-                        s.normal.background = CreateSolidTexture(t.Muted);
+                        Color bgTop = Color.Lerp(t.Elevated, Color.white, 0.04f);
+                        Color bgBottom = Color.Lerp(t.Elevated, Color.black, 0.06f);
+
+                        s.normal.background = CreateTexture(DesignTokens.TextureSize.Default, (int)DesignTokens.Height.Default, radius, bgTop, bgBottom, 0.18f, 10);
+
                         s.normal.textColor = t.Text;
                         s.fontStyle = FontStyle.Bold;
+                        s.fontSize = GetScaledFontSize(DesignTokens.Avatar.FallbackFontScale);
+
+                        s.hover = s.active = s.focused = s.normal;
                     }
                 )
                 .Build();
@@ -1548,16 +1773,15 @@ namespace shadcnui.GUIComponents.Core.Styling
         #region Dropdown
         private void DropdownStyles()
         {
+            var dropdownTop = (Theme t) => Color.Lerp(t.Elevated, Color.white, 0.02f);
+            var dropdownBottom = (Theme t) => Color.Lerp(t.Elevated, Color.black, 0.03f);
             _dropdownContentStyle = Style(StyleComponentType.DropdownMenu)
-                .Apply((s, t) => 
-                {
-                    s.normal.background = CreateBorderedRoundedRectTexture(
-                        DesignTokens.TextureSize.Default, 64, 
-                        GetScaledBorderRadius(DesignTokens.Radius.MD), 
-                        t.Base, 
-                        t.Border, 
-                        1f);
-                })
+                .Apply(
+                    (s, t) =>
+                    {
+                        s.normal.background = CreateTexture(DesignTokens.TextureSize.Default, 64, GetScaledBorderRadius(DesignTokens.Radius.MD), dropdownTop(t), dropdownBottom(t), DesignTokens.Effects.ShadowMedium, (int)DesignTokens.Effects.ShadowBlurSM);
+                    }
+                )
                 .Padding(DesignTokens.Spacing.XS, DesignTokens.Spacing.XS)
                 .Border(DesignTokens.Radius.MD)
                 .Build();
@@ -1571,8 +1795,51 @@ namespace shadcnui.GUIComponents.Core.Styling
                     (s, t) =>
                     {
                         s.normal.textColor = t.Text;
-                        s.hover.textColor = s.active.textColor = t.ButtonPrimaryFg;
-                        s.hover.background = s.active.background = CreateSolidTexture(t.Accent);
+                        Color hoverBg = new Color(t.Accent.r, t.Accent.g, t.Accent.b, 0.14f);
+                        Color activeBg = new Color(t.Accent.r, t.Accent.g, t.Accent.b, 0.22f);
+                        s.hover.textColor = t.Text;
+                        s.hover.background = CreateTexture(DesignTokens.TextureSize.Default, (int)DesignTokens.Height.Small, GetScaledBorderRadius(DesignTokens.Radius.SM), hoverBg, hoverBg);
+                        s.active.textColor = t.Text;
+                        s.active.background = CreateTexture(DesignTokens.TextureSize.Default, (int)DesignTokens.Height.Small, GetScaledBorderRadius(DesignTokens.Radius.SM), activeBg, activeBg);
+                    }
+                )
+                .Sizes(Sizes.Item)
+                .Build();
+        }
+        #endregion
+
+        #region Navigation
+        private void NavigationStyles()
+        {
+            var navBgTop = (Theme t) => Color.Lerp(t.Secondary, Color.black, 0.08f);
+            var navBgBottom = (Theme t) => Color.Lerp(t.Secondary, Color.black, 0.12f);
+
+            _navigationStyle = Style(StyleComponentType.Navigation)
+                .Apply(
+                    (s, t) =>
+                    {
+                        s.normal.background = CreateTexture(DesignTokens.TextureSize.Default, DesignTokens.TextureSize.Default, GetScaledBorderRadius(DesignTokens.Radius.MD), navBgTop(t), navBgBottom(t));
+                        s.normal.textColor = t.Text;
+                    }
+                )
+                .Padding(DesignTokens.Spacing.SM, DesignTokens.Spacing.SM)
+                .Border(DesignTokens.Radius.MD)
+                .Build();
+
+            var navItemSelected = (Theme t) => t.Accent;
+            var navItemUnselected = (Theme t) => new Color(t.Muted.r, t.Muted.g, t.Muted.b, 0.4f);
+
+            Style(StyleComponentType.MenuBarItem)
+                .Apply(
+                    (s, t) =>
+                    {
+                        s.normal.textColor = navItemUnselected(t);
+                        s.hover.textColor = Color.Lerp(navItemUnselected(t), t.Text, 0.5f);
+                        s.onNormal.textColor = navItemSelected(t);
+                        s.onHover.textColor = Color.Lerp(navItemSelected(t), Color.white, 0.2f);
+                        s.alignment = TextAnchor.MiddleCenter;
+                        s.fontSize = GetScaledFontSize(DesignTokens.FontScale.XS);
+                        s.fontStyle = FontStyle.Bold;
                     }
                 )
                 .Sizes(Sizes.Item)

@@ -21,6 +21,22 @@ namespace shadcnui.GUIComponents.Controls
 
         public bool IsOpen => isOpen;
 
+        #region Config-based API
+        public int DrawSelect(SelectConfig config)
+        {
+            if (!isOpen)
+                return config.SelectedIndex;
+
+            var styleManager = guiHelper.GetStyleManager();
+            var animManager = guiHelper.GetAnimationManager();
+            string id = _selectId ?? "select";
+
+            int selectedIndex = DrawSelectDropdown(config, styleManager, animManager, id);
+            return selectedIndex;
+        }
+        #endregion
+
+        #region API
         public void Open(string id = "select")
         {
             _selectId = id;
@@ -43,13 +59,15 @@ namespace shadcnui.GUIComponents.Controls
             _selectId = null;
         }
 
-        public int DrawSelect(SelectConfig config)
+        public int DrawSelect(string[] items, int selectedIndex)
         {
-            if (!isOpen)
-                return config.SelectedIndex;
-            var styleManager = guiHelper.GetStyleManager();
-            var animManager = guiHelper.GetAnimationManager();
-            string id = _selectId ?? "select";
+            return DrawSelect(new SelectConfig { Items = items, SelectedIndex = selectedIndex });
+        }
+        #endregion
+
+        #region Private Methods
+        private int DrawSelectDropdown(SelectConfig config, StyleManager styleManager, AnimationManager animManager, string id)
+        {
             float alpha = animManager.GetFloat($"select_alpha_{id}", 1f);
             float scale = animManager.GetFloat($"select_scale_{id}", 1f);
             Vector2 slideOffset = animManager.GetVector2($"select_slide_{id}", Vector2.zero);
@@ -57,51 +75,61 @@ namespace shadcnui.GUIComponents.Controls
             GUIStyle selectStyle = styleManager?.GetSelectStyle(ControlVariant.Default, ControlSize.Default) ?? GUI.skin.box;
             GUIStyle itemStyle = styleManager?.GetSelectItemStyle() ?? GUI.skin.button;
             int selectedIndex = config.SelectedIndex;
-            Color prevColor = GUI.color;
-            Matrix4x4 prevMatrix = GUI.matrix;
 
+            ApplyAnimationTransform(alpha, scale, slideOffset);
+            selectedIndex = DrawSelectContent(config, selectStyle, itemStyle, selectedIndex);
+            RestoreGraphicsState();
+
+            return selectedIndex;
+        }
+
+        private void ApplyAnimationTransform(float alpha, float scale, Vector2 slideOffset)
+        {
+            var prevColor = GUI.color;
             if (alpha < 1f)
                 GUI.color = new Color(prevColor.r, prevColor.g, prevColor.b, prevColor.a * alpha);
 
-            bool needsTransform = scale < 1f || slideOffset != Vector2.zero;
-            if (needsTransform)
+            if (scale < 1f || slideOffset != Vector2.zero)
             {
                 Vector2 pivot = _cachedSelectRect.center;
+                var prevMatrix = GUI.matrix;
                 GUI.matrix = Matrix4x4.Translate(new Vector3(pivot.x, pivot.y, 0f)) * Matrix4x4.Scale(new Vector3(scale, scale, 1f)) * Matrix4x4.Translate(new Vector3(-pivot.x + slideOffset.x, -pivot.y + slideOffset.y, 0f)) * prevMatrix;
             }
+        }
 
+        private int DrawSelectContent(SelectConfig config, GUIStyle selectStyle, GUIStyle itemStyle, int selectedIndex)
+        {
             layoutComponents.BeginVerticalGroup(selectStyle, GUILayout.MaxWidth(300), GUILayout.MaxHeight(200));
-            scrollPosition = layoutComponents.DrawScrollView(
-                scrollPosition,
-                () =>
-                {
-                    for (int i = 0; i < config.Items.Length; i++)
-                    {
-                        if (UnityHelpers.Button(config.Items[i], itemStyle))
-                        {
-                            selectedIndex = i;
-                            config.OnChange?.Invoke(i);
-                            Close();
-                        }
-                    }
-                },
-                GUILayout.ExpandWidth(true),
-                GUILayout.MinHeight(0),
-                GUILayout.MaxHeight(200)
-            );
+            int newIndex = selectedIndex;
+            scrollPosition = layoutComponents.DrawScrollView(scrollPosition, () => newIndex = DrawSelectItems(config, itemStyle, newIndex), GUILayout.ExpandWidth(true), GUILayout.MinHeight(0), GUILayout.MaxHeight(200));
             GUILayout.EndVertical();
 
             if (Event.current.type == EventType.Repaint)
                 _cachedSelectRect = GUILayoutUtility.GetLastRect();
 
-            GUI.matrix = prevMatrix;
-            GUI.color = prevColor;
-            return selectedIndex;
+            return newIndex;
         }
 
-        public int DrawSelect(string[] items, int selectedIndex)
+        private int DrawSelectItems(SelectConfig config, GUIStyle itemStyle, int selectedIndex)
         {
-            return DrawSelect(new SelectConfig { Items = items, SelectedIndex = selectedIndex });
+            int newIndex = selectedIndex;
+            for (int i = 0; i < config.Items.Length; i++)
+            {
+                if (UnityHelpers.Button(config.Items[i], itemStyle))
+                {
+                    newIndex = i;
+                    config.OnChange?.Invoke(i);
+                    Close();
+                }
+            }
+            return newIndex;
         }
+
+        private void RestoreGraphicsState()
+        {
+            GUI.matrix = Matrix4x4.identity;
+            GUI.color = Color.white;
+        }
+        #endregion
     }
 }

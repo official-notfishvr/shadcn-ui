@@ -1,4 +1,5 @@
 ﻿#define Showcase
+using shadcnui_Demo.Demos;
 using shadcnui.GUIComponents.Core.Base;
 using shadcnui.GUIComponents.Core.Styling;
 using UnityEngine;
@@ -52,7 +53,14 @@ namespace shadcnui_Demo.Menu
                 }
 
                 GUILayout.Space(10);
+                /*
+                if (guiHelper.Button("RemakeOfSomethingTest Demo", ControlVariant.Secondary, ControlSize.Default))
+                {
+                    LoadDemo<RemakeOfSomethingTest>();
+                }
 
+                GUILayout.Space(10);
+                */
                 if (guiHelper.Button("Full Demo [FluentBuilders]", ControlVariant.Secondary, ControlSize.Default))
                 {
                     LoadDemo<FullDemo_FluentBuilders>();

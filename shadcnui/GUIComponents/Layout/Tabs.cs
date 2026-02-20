@@ -49,43 +49,6 @@ namespace shadcnui.GUIComponents.Layout
         }
     }
 
-    public struct PillTextureKey : IEquatable<PillTextureKey>
-    {
-        public int Width;
-        public int Height;
-        public int Radius;
-        public Color Color;
-
-        public PillTextureKey(int width, int height, int radius, Color color)
-        {
-            Width = width;
-            Height = height;
-            Radius = radius;
-            Color = color;
-        }
-
-        public override bool Equals(object obj)
-        {
-            return obj is PillTextureKey key && Equals(key);
-        }
-
-        public bool Equals(PillTextureKey other)
-        {
-            return Width == other.Width && Height == other.Height && Radius == other.Radius && Color.Equals(other.Color);
-        }
-
-        public override int GetHashCode()
-        {
-            unchecked
-            {
-                var hashCode = Width.GetHashCode();
-                hashCode = (hashCode * 397) ^ Height.GetHashCode();
-                hashCode = (hashCode * 397) ^ Radius.GetHashCode();
-                hashCode = (hashCode * 397) ^ Color.GetHashCode();
-                return hashCode;
-            }
-        }
-    }
     #endregion
 
     public class TabItem
@@ -120,19 +83,12 @@ namespace shadcnui.GUIComponents.Layout
         private const float TAB_HEIGHT = 36f;
         #endregion
 
-        #region Fields
         private int _pendingCloseIndex = -1;
         private Action<int> _pendingCloseCallback;
         private Vector2 _tabScrollPosition = Vector2.zero;
-        private Dictionary<PillTextureKey, Texture2D> _pillTextureCache = new Dictionary<PillTextureKey, Texture2D>();
-        private PillTextureKey _lastPillKey;
-        private Texture2D _lastPillTexture;
-        #endregion
 
-        #region Constructor
         public Tabs(GUIHelper helper)
             : base(helper) { }
-        #endregion
 
         #region Public Drawing API
         public int Draw(TabsConfig config)
@@ -540,145 +496,20 @@ namespace shadcnui.GUIComponents.Layout
                 return;
 
             var indicatorColor = ThemeManager.Instance.CurrentTheme.Accent;
+            var textureManager = guiHelper.GetStyleManager().Textures;
 
             switch (style)
             {
                 case IndicatorStyle.Underline:
-                    DrawUnderlineIndicator(tabRect, indicatorColor, isVertical, position);
+                    textureManager.DrawTabUnderlineIndicator(tabRect, indicatorColor, isVertical, position == TabPosition.Left, TAB_INDICATOR_HEIGHT, guiHelper.uiScale);
                     break;
                 case IndicatorStyle.Background:
-                    DrawBackgroundIndicator(tabRect, indicatorColor);
+                    textureManager.DrawTabBackgroundIndicator(tabRect, indicatorColor);
                     break;
                 case IndicatorStyle.Border:
-                    DrawBorderIndicator(tabRect, indicatorColor, isVertical, position);
-                    break;
-                case IndicatorStyle.Pill:
-                    DrawPillIndicator(tabRect, indicatorColor);
+                    textureManager.DrawTabBorderIndicator(tabRect, indicatorColor, isVertical, position == TabPosition.Left, TAB_BORDER_WIDTH, guiHelper.uiScale);
                     break;
             }
-        }
-
-        private void DrawUnderlineIndicator(Rect tabRect, Color color, bool isVertical, TabPosition position)
-        {
-            Rect indicatorRect;
-
-            if (isVertical)
-            {
-                var indicatorWidth = TAB_INDICATOR_HEIGHT * guiHelper.uiScale;
-                if (position == TabPosition.Left)
-                {
-                    indicatorRect = new Rect(tabRect.x + tabRect.width - indicatorWidth, tabRect.y, indicatorWidth, tabRect.height);
-                }
-                else // Right
-                {
-                    indicatorRect = new Rect(tabRect.x, tabRect.y, indicatorWidth, tabRect.height);
-                }
-            }
-            else
-            {
-                var indicatorHeight = TAB_INDICATOR_HEIGHT * guiHelper.uiScale;
-                indicatorRect = new Rect(tabRect.x, tabRect.y + tabRect.height - indicatorHeight, tabRect.width, indicatorHeight);
-            }
-
-            GUI.color = color;
-            GUI.DrawTexture(indicatorRect, Texture2D.whiteTexture);
-            GUI.color = Color.white;
-        }
-
-        private void DrawBackgroundIndicator(Rect tabRect, Color color)
-        {
-            var bgColor = new Color(color.r, color.g, color.b, 0.1f);
-            GUI.color = bgColor;
-            GUI.DrawTexture(tabRect, Texture2D.whiteTexture);
-            GUI.color = Color.white;
-        }
-
-        private void DrawBorderIndicator(Rect tabRect, Color color, bool isVertical, TabPosition position)
-        {
-            var borderWidth = TAB_BORDER_WIDTH * guiHelper.uiScale;
-            GUI.color = color;
-
-            if (isVertical)
-            {
-                if (position == TabPosition.Left)
-                {
-                    GUI.DrawTexture(new Rect(tabRect.x + tabRect.width - borderWidth, tabRect.y, borderWidth, tabRect.height), Texture2D.whiteTexture);
-                }
-                else
-                {
-                    GUI.DrawTexture(new Rect(tabRect.x, tabRect.y, borderWidth, tabRect.height), Texture2D.whiteTexture);
-                }
-            }
-            else
-            {
-                GUI.DrawTexture(new Rect(tabRect.x, tabRect.y + tabRect.height - borderWidth, tabRect.width, borderWidth), Texture2D.whiteTexture);
-            }
-
-            GUI.color = Color.white;
-        }
-
-        private void DrawPillIndicator(Rect tabRect, Color color)
-        {
-            var borderWidth = TAB_BORDER_WIDTH * guiHelper.uiScale;
-            var pillRect = new Rect(tabRect.x + borderWidth, tabRect.y + borderWidth, tabRect.width - borderWidth * 2, tabRect.height - borderWidth * 2);
-
-            var pillTexture = GetOrCreatePillTexture((int)pillRect.width, (int)pillRect.height, (int)(Mathf.Min(pillRect.width, pillRect.height) / 2), color);
-
-            GUI.DrawTexture(pillRect, pillTexture);
-        }
-
-        private Texture2D GetOrCreatePillTexture(int width, int height, int radius, Color color)
-        {
-            var key = new PillTextureKey(width, height, radius, color);
-
-            if (_lastPillKey.Equals(key) && _lastPillTexture != null)
-            {
-                return _lastPillTexture;
-            }
-
-            if (_pillTextureCache.TryGetValue(key, out var cachedTexture))
-            {
-                _lastPillKey = key;
-                _lastPillTexture = cachedTexture;
-                return cachedTexture;
-            }
-
-            var newTexture = CreatePillTexture(width, height, radius, color);
-            _pillTextureCache[key] = newTexture;
-            _lastPillKey = key;
-            _lastPillTexture = newTexture;
-
-            return newTexture;
-        }
-
-        private Texture2D CreatePillTexture(int width, int height, int radius, Color color)
-        {
-            var texture = new Texture2D(width, height);
-            var centerX = width / 2f;
-            var centerY = height / 2f;
-            var radiusSqr = radius * radius;
-
-            for (int y = 0; y < height; y++)
-            {
-                for (int x = 0; x < width; x++)
-                {
-                    var dx = x - centerX;
-                    var dy = y - centerY;
-                    var distanceSqr = dx * dx + dy * dy;
-
-                    if (distanceSqr <= radiusSqr)
-                    {
-                        texture.SetPixel(x, y, color);
-                    }
-                    else
-                    {
-                        texture.SetPixel(x, y, Color.clear);
-                    }
-                }
-            }
-
-            texture.Apply();
-            return texture;
         }
         #endregion
 
@@ -730,7 +561,7 @@ namespace shadcnui.GUIComponents.Layout
         {
             var styleManager = guiHelper.GetStyleManager();
             var contentStyle = styleManager?.GetTabsContentStyle() ?? GUIStyle.none;
-            
+
             layoutComponents.BeginVerticalGroup(contentStyle, GUILayout.ExpandWidth(true), GUILayout.ExpandHeight(true));
             try
             {
@@ -754,27 +585,6 @@ namespace shadcnui.GUIComponents.Layout
         public void EndTabContent()
         {
             layoutComponents.EndVerticalGroup();
-        }
-        #endregion
-
-        #region Cleanup
-        protected override void OnBeforeDispose()
-        {
-            base.OnBeforeDispose();
-            ClearPillTextureCache();
-        }
-
-        private void ClearPillTextureCache()
-        {
-            foreach (var texture in _pillTextureCache.Values)
-            {
-                if (texture != null)
-                {
-                    UnityEngine.Object.Destroy(texture);
-                }
-            }
-            _pillTextureCache.Clear();
-            _lastPillTexture = null;
         }
         #endregion
     }

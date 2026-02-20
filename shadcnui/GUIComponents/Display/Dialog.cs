@@ -30,6 +30,30 @@ namespace shadcnui.GUIComponents.Display
 
         public bool IsOpen => _isOpen;
 
+        #region Config-based API
+        public void DrawDialog(DialogConfig config)
+        {
+            if (!_isOpen || _dialogId != config.Id)
+                return;
+
+            RegisterDialog(config);
+            var styleManager = guiHelper.GetStyleManager();
+            var animManager = guiHelper.GetAnimationManager();
+
+            float animProgress = animManager.GetFloat($"dialog_alpha_{config.Id}", 1f);
+
+            bool overlayClicked = DrawOverlay(config, animProgress);
+            if (overlayClicked && config.CloseOnOverlayClick)
+            {
+                Close();
+                return;
+            }
+
+            DrawDialogWindow(config, styleManager, animManager, animProgress);
+        }
+        #endregion
+
+        #region API
         public void Open(string dialogId)
         {
             _dialogId = dialogId;
@@ -50,79 +74,6 @@ namespace shadcnui.GUIComponents.Display
             }
             _isOpen = false;
             _dialogId = null;
-        }
-
-        private void RegisterDialog(DialogConfig config)
-        {
-            _openDialogs.RemoveAll(d => d.Id == config.Id);
-            _openDialogs.Add(
-                new DialogState
-                {
-                    Id = config.Id,
-                    ZIndex = config.ZIndex,
-                    Config = config,
-                }
-            );
-            _openDialogs.Sort((a, b) => a.ZIndex.CompareTo(b.ZIndex));
-        }
-
-        public void DrawDialog(DialogConfig config)
-        {
-            if (!_isOpen || _dialogId != config.Id)
-                return;
-
-            RegisterDialog(config);
-            var styleManager = guiHelper.GetStyleManager();
-            var animManager = guiHelper.GetAnimationManager();
-
-            float animProgress = animManager.GetFloat($"dialog_alpha_{config.Id}", 1f);
-
-            bool overlayClicked = DrawOverlay(config, animProgress);
-            if (overlayClicked && config.CloseOnOverlayClick)
-            {
-                Close();
-                return;
-            }
-
-            float dialogX = (Screen.width - config.Width) / 2f;
-            float dialogY = (Screen.height - config.Height) / 2f;
-
-            Color prevColor = GUI.color;
-            Matrix4x4 prevMatrix = GUI.matrix;
-
-            if (animProgress < 1f)
-            {
-                float scale = animManager.GetFloat($"dialog_scale_{config.Id}", 1f);
-                Vector2 dialogCenter = new Vector2(dialogX + config.Width / 2f, dialogY + config.Height / 2f);
-                GUI.matrix = Matrix4x4.TRS(new Vector3(dialogCenter.x * (1 - scale), dialogCenter.y * (1 - scale), 0), Quaternion.identity, new Vector3(scale, scale, 1f));
-                GUI.color = new Color(prevColor.r, prevColor.g, prevColor.b, prevColor.a * animProgress);
-            }
-
-            layoutComponents.BeginVerticalGroup(styleManager.GetDialogContentStyle(), GUILayout.Width(config.Width), GUILayout.Height(config.Height));
-            layoutComponents.BeginHorizontalGroup();
-            layoutComponents.BeginVerticalGroup();
-            if (!string.IsNullOrEmpty(config.Title))
-                UnityHelpers.Label(config.Title, styleManager.GetLabelStyle(ControlVariant.Default, ControlSize.Large));
-            if (!string.IsNullOrEmpty(config.Description))
-                UnityHelpers.Label(config.Description, styleManager.GetLabelStyle(ControlVariant.Muted, ControlSize.Default));
-            layoutComponents.EndVerticalGroup();
-            GUILayout.FlexibleSpace();
-            if (UnityHelpers.Button("×", styleManager.GetButtonStyle(ControlVariant.Ghost, ControlSize.Default), GUILayout.Width(DesignTokens.Icon.Large), GUILayout.Height(DesignTokens.Icon.Large)))
-                Close();
-            layoutComponents.EndHorizontalGroup();
-            GUILayout.Space(DesignTokens.Spacing.LG);
-            config.Content?.Invoke();
-            if (config.Footer != null)
-            {
-                GUILayout.Space(DesignTokens.Spacing.LG);
-                layoutComponents.BeginHorizontalGroup();
-                GUILayout.FlexibleSpace();
-                config.Footer.Invoke();
-                layoutComponents.EndHorizontalGroup();
-            }
-            GUILayout.EndVertical();
-            GUI.matrix = prevMatrix;
-            GUI.color = prevColor;
         }
 
         public void DrawDialog(string dialogId, Action content, float width = 400, float height = 300)
@@ -184,6 +135,22 @@ namespace shadcnui.GUIComponents.Display
             footer?.Invoke();
             layoutComponents.EndHorizontalGroup();
         }
+        #endregion
+
+        #region Private Methods
+        private void RegisterDialog(DialogConfig config)
+        {
+            _openDialogs.RemoveAll(d => d.Id == config.Id);
+            _openDialogs.Add(
+                new DialogState
+                {
+                    Id = config.Id,
+                    ZIndex = config.ZIndex,
+                    Config = config,
+                }
+            );
+            _openDialogs.Sort((a, b) => a.ZIndex.CompareTo(b.ZIndex));
+        }
 
         private bool DrawOverlay(DialogConfig config, float animProgress)
         {
@@ -195,19 +162,85 @@ namespace shadcnui.GUIComponents.Display
             Rect overlayRect = new Rect(0, 0, Screen.width, Screen.height);
             GUI.DrawTexture(overlayRect, Texture2D.whiteTexture);
             GUI.color = prev;
+
             if (config.CloseOnOverlayClick && Event.current.type == EventType.MouseDown)
             {
                 Vector2 mousePos = Event.current.mousePosition;
                 float dialogX = (Screen.width - config.Width) / 2f;
                 float dialogY = (Screen.height - config.Height) / 2f;
                 Rect dialogRect = new Rect(dialogX, dialogY, config.Width, config.Height);
+
                 if (!dialogRect.Contains(mousePos))
                 {
                     Event.current.Use();
                     return true;
                 }
             }
+
             return false;
         }
+
+        private void DrawDialogWindow(DialogConfig config, StyleManager styleManager, AnimationManager animManager, float animProgress)
+        {
+            float dialogX = (Screen.width - config.Width) / 2f;
+            float dialogY = (Screen.height - config.Height) / 2f;
+
+            Color prevColor = GUI.color;
+            Matrix4x4 prevMatrix = GUI.matrix;
+
+            ApplyDialogAnimation(animManager, config, animProgress, dialogX, dialogY, ref prevColor);
+
+            layoutComponents.BeginVerticalGroup(styleManager.GetDialogContentStyle(), GUILayout.Width(config.Width), GUILayout.Height(config.Height));
+
+            DrawDialogHeader(config, styleManager);
+            GUILayout.Space(DesignTokens.Spacing.LG);
+            config.Content?.Invoke();
+
+            if (config.Footer != null)
+            {
+                GUILayout.Space(DesignTokens.Spacing.LG);
+                layoutComponents.BeginHorizontalGroup();
+                GUILayout.FlexibleSpace();
+                config.Footer.Invoke();
+                layoutComponents.EndHorizontalGroup();
+            }
+
+            GUILayout.EndVertical();
+
+            GUI.matrix = prevMatrix;
+            GUI.color = prevColor;
+        }
+
+        private void ApplyDialogAnimation(AnimationManager animManager, DialogConfig config, float animProgress, float dialogX, float dialogY, ref Color prevColor)
+        {
+            if (animProgress >= 1f)
+                return;
+
+            float scale = animManager.GetFloat($"dialog_scale_{config.Id}", 1f);
+            Vector2 dialogCenter = new Vector2(dialogX + config.Width / 2f, dialogY + config.Height / 2f);
+            GUI.matrix = Matrix4x4.TRS(new Vector3(dialogCenter.x * (1 - scale), dialogCenter.y * (1 - scale), 0), Quaternion.identity, new Vector3(scale, scale, 1f));
+            GUI.color = new Color(prevColor.r, prevColor.g, prevColor.b, prevColor.a * animProgress);
+        }
+
+        private void DrawDialogHeader(DialogConfig config, StyleManager styleManager)
+        {
+            layoutComponents.BeginHorizontalGroup();
+            layoutComponents.BeginVerticalGroup();
+
+            if (!string.IsNullOrEmpty(config.Title))
+                UnityHelpers.Label(config.Title, styleManager.GetLabelStyle(ControlVariant.Default, ControlSize.Large));
+
+            if (!string.IsNullOrEmpty(config.Description))
+                UnityHelpers.Label(config.Description, styleManager.GetLabelStyle(ControlVariant.Muted, ControlSize.Default));
+
+            layoutComponents.EndVerticalGroup();
+            GUILayout.FlexibleSpace();
+
+            if (UnityHelpers.Button("×", styleManager.GetButtonStyle(ControlVariant.Ghost, ControlSize.Default), GUILayout.Width(DesignTokens.Icon.Large), GUILayout.Height(DesignTokens.Icon.Large)))
+                Close();
+
+            layoutComponents.EndHorizontalGroup();
+        }
+        #endregion
     }
 }

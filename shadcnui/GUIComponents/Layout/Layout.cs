@@ -20,6 +20,8 @@ namespace shadcnui.GUIComponents.Layout
             guiHelper = helper;
         }
 
+        #region API
+
         public Vector2 DrawScrollView(Vector2 scrollPosition, Action drawContent, params GUILayoutOption[] options)
         {
 #if IL2CPP_MELONLOADER_PRE57
@@ -44,9 +46,9 @@ namespace shadcnui.GUIComponents.Layout
         public void BeginHorizontalGroup(params GUILayoutOption[] options)
         {
 #if IL2CPP_MELONLOADER_PRE57
-            GUILayout.BeginHorizontal(GUIStyle.none, EmptyOptions);
+            GUILayout.BeginHorizontal(GUIStyle.none, new Il2CppReferenceArray<GUILayoutOption>(options));
 #else
-            GUILayout.BeginHorizontal();
+            GUILayout.BeginHorizontal(options);
 #endif
         }
 
@@ -102,5 +104,7 @@ namespace shadcnui.GUIComponents.Layout
         {
             GUILayout.Space(pixels * guiHelper.uiScale);
         }
+
+        #endregion
     }
 }

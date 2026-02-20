@@ -1,3 +1,5 @@
+using UnityEngine;
+
 namespace shadcnui.GUIComponents.Core.Styling
 {
     public static class DesignTokens
@@ -94,48 +96,18 @@ namespace shadcnui.GUIComponents.Core.Styling
             }
         }
 
-        [System.Obsolete("Use Padding.Button.MiniH instead", false)]
-        public const float ButtonMiniH = Padding.Button.MiniH;
-
-        [System.Obsolete("Use Padding.Input.Horizontal instead", false)]
-        public const float InputHorizontal = Padding.Input.Horizontal;
-
-        [System.Obsolete("Use Padding.Card.Horizontal instead", false)]
-        public const float CardHorizontal = Padding.Card.Horizontal;
-
-        [System.Obsolete("Use Padding.Badge.Horizontal instead", false)]
-        public const float BadgeHorizontal = Padding.Badge.Horizontal;
-
-        [System.Obsolete("Use Padding.Tab.Horizontal instead", false)]
-        public const float TabHorizontal = Padding.Tab.Horizontal;
-
-        [System.Obsolete("Use Padding.Table.CellH instead", false)]
-        public const float TableCellH = Padding.Table.CellH;
-
-        [System.Obsolete("Use Padding.Dropdown.ItemH instead", false)]
-        public const float DropdownItemH = Padding.Dropdown.ItemH;
-
         public static class Effects
         {
             public const float ShadowLight = 0.10f;
             public const float ShadowMedium = 0.16f;
             public const float ShadowHeavy = 0.24f;
-
-            public const float ShadowBlurSM = 6f;
+            public const float ShadowElevation = 0.20f;
+            public const float ShadowBlurSM = 8f;
             public const float ShadowBlurMD = 12f;
-            public const float ShadowBlurLG = 20f;
-
-            public const float InnerShadowIntensity = 0.06f;
-            public const float InnerShadowSize = 2f;
-
-            public const float FocusRingThickness = 2f;
-
-            public const float HoverLighten = 0.12f;
-            public const float HoverDarken = 0.08f;
-            public const float ActiveDarken = 0.15f;
-
-            public const float GradientIntensity = 0.10f;
-            public const float RimHighlight = 0.15f;
+            public const float FocusRingThickness = 2.5f;
+            public const float FocusRingAlpha = 0.45f;
+            public const float SurfaceHighlightTop = 0.04f;
+            public const float SurfaceDepthBottom = 0.06f;
         }
 
         public static class TextureSize
@@ -160,7 +132,6 @@ namespace shadcnui.GUIComponents.Core.Styling
             public const float TrackSmall = 6f;
             public const float TrackDefault = 8f;
             public const float TrackLarge = 10f;
-
             public const float ThumbMini = 12f;
             public const float ThumbSmall = 16f;
             public const float ThumbDefault = 20f;
@@ -182,20 +153,6 @@ namespace shadcnui.GUIComponents.Core.Styling
             public const float Large = 24f;
         }
 
-        public static class CloseButton
-        {
-            public const float HitArea = 20f;
-            public const float IconSize = 16f;
-            public const float FontSize = 14f;
-        }
-
-        public static class Tab
-        {
-            public const float Height = 36f;
-            public const float IndicatorHeight = 3f;
-            public const float BorderWidth = 2f;
-        }
-
         public static class ZIndex
         {
             public const int Base = 0;
@@ -203,7 +160,6 @@ namespace shadcnui.GUIComponents.Core.Styling
             public const int Popover = 200;
             public const int Modal = 300;
             public const int Toast = 400;
-            public const int Tooltip = 500;
         }
 
         public static class Checkbox
@@ -216,24 +172,25 @@ namespace shadcnui.GUIComponents.Core.Styling
             public const float Width = 40f;
             public const float Height = 22f;
             public const float Radius = 11f;
-            public const float ThumbSize = 18f;
-            public const float ThumbOffset = 2f;
-        }
-
-        public static class Toggle
-        {
-            public const int TextureSize = 32;
         }
 
         public static class Avatar
         {
-            public const float CircleRadiusScale = 50f;
+            public const float BorderThickness = 2f;
+            public const float FallbackFontScale = 1.2f;
         }
 
         public static class ProgressBar
         {
-            public const float Height = 10f;
-            public const int TextureHeight = 16;
+            public const int TextureHeight = 12;
+        }
+
+        public static class Chart
+        {
+            public const float ContainerPaddingH = 16f;
+            public const float ContainerPaddingV = 16f;
+            public const float AxisFontScale = 0.8f;
+            public const float Radius = 8f;
         }
 
         public static class Separator
@@ -247,37 +204,19 @@ namespace shadcnui.GUIComponents.Core.Styling
             public const float Height = 28f;
         }
 
-        public static class CalendarDay
-        {
-            public const float Mini = 20f;
-            public const float Small = 28f;
-            public const float Default = 32f;
-            public const float Large = 40f;
-        }
-
         public static class ToastColors
         {
-            public static readonly UnityEngine.Color SuccessBg = new UnityEngine.Color(0.15f, 0.35f, 0.15f, 0.95f);
-            public static readonly UnityEngine.Color SuccessBorder = new UnityEngine.Color(0.4f, 0.8f, 0.4f, 0.5f);
-            public static readonly UnityEngine.Color SuccessAccent = new UnityEngine.Color(0.4f, 0.8f, 0.4f, 1f);
-
-            public static readonly UnityEngine.Color ErrorBg = new UnityEngine.Color(0.45f, 0.15f, 0.15f, 0.95f);
-            public static readonly UnityEngine.Color ErrorBorder = new UnityEngine.Color(1f, 0.4f, 0.4f, 0.5f);
-            public static readonly UnityEngine.Color ErrorAccent = new UnityEngine.Color(1f, 0.4f, 0.4f, 1f);
-
-            public static readonly UnityEngine.Color WarningBg = new UnityEngine.Color(0.45f, 0.35f, 0.1f, 0.95f);
-            public static readonly UnityEngine.Color WarningBorder = new UnityEngine.Color(1f, 0.8f, 0.4f, 0.5f);
-            public static readonly UnityEngine.Color WarningAccent = new UnityEngine.Color(1f, 0.8f, 0.4f, 1f);
-
-            public static readonly UnityEngine.Color InfoBg = new UnityEngine.Color(0.15f, 0.35f, 0.45f, 0.95f);
-            public static readonly UnityEngine.Color InfoBorder = new UnityEngine.Color(0.4f, 0.8f, 1f, 0.5f);
-            public static readonly UnityEngine.Color InfoAccent = new UnityEngine.Color(0.4f, 0.8f, 1f, 1f);
-
-            public static readonly UnityEngine.Color DefaultBg = new UnityEngine.Color(0.2f, 0.2f, 0.2f, 0.95f);
-            public static readonly UnityEngine.Color DefaultBorder = new UnityEngine.Color(0.5f, 0.5f, 0.5f, 0.5f);
-            public static readonly UnityEngine.Color DefaultAccent = new UnityEngine.Color(0.6f, 0.6f, 0.6f, 1f);
-
-            public static readonly UnityEngine.Color Text = UnityEngine.Color.white;
+            public static readonly Color SuccessBg = new Color(0.08f, 0.28f, 0.14f, 0.96f);
+            public static readonly Color SuccessAccent = new Color(0.35f, 0.85f, 0.45f, 1f);
+            public static readonly Color ErrorBg = new Color(0.32f, 0.10f, 0.12f, 0.96f);
+            public static readonly Color ErrorAccent = new Color(0.98f, 0.42f, 0.46f, 1f);
+            public static readonly Color WarningBg = new Color(0.32f, 0.24f, 0.06f, 0.96f);
+            public static readonly Color WarningAccent = new Color(0.98f, 0.78f, 0.32f, 1f);
+            public static readonly Color InfoBg = new Color(0.08f, 0.22f, 0.34f, 0.96f);
+            public static readonly Color InfoAccent = new Color(0.38f, 0.72f, 0.98f, 1f);
+            public static readonly Color DefaultBg = new Color(0.14f, 0.14f, 0.16f, 0.96f);
+            public static readonly Color DefaultAccent = new Color(0.72f, 0.72f, 0.76f, 1f);
+            public static readonly Color Text = Color.white;
         }
     }
 }

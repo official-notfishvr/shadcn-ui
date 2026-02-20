@@ -12,20 +12,23 @@ namespace shadcnui.GUIComponents.Core.Base
         public static LayerManager Instance => _instance ??= new LayerManager();
 
         private readonly Dictionary<string, LayerState> _layers = new Dictionary<string, LayerState>();
-        private readonly List<string> _layerOrder = new List<string>();
+        private readonly List<string> _drawOrder = new List<string>();
+        private readonly Dictionary<string, int> _windowIds = new Dictionary<string, int>();
+        private int _nextWindowId = 50000;
+        private bool _isDrawing;
+        private readonly List<string> _pendingCloses = new List<string>();
 
-        private class LayerState
+        private sealed class LayerState
         {
-            public string Id;
-            public Vector2 OpenPosition;
+            public Vector2 Position;
             public float Width;
             public float Height;
             public int ZIndex;
             public bool CloseOnClickOutside;
             public bool ShowOverlay;
+            public bool DrawChrome;
             public Action Content;
             public Action OnClose;
-            public bool IsOpen;
         }
 
         public void Open(LayerConfig config)
@@ -35,24 +38,24 @@ namespace shadcnui.GUIComponents.Core.Base
 
             var state = new LayerState
             {
-                Id = config.Id,
-                OpenPosition = config.OpenPosition,
-                Width = config.Width,
-                Height = config.Height,
+                Position = config.OpenPosition,
+                Width = Mathf.Max(1f, config.Width),
+                Height = Mathf.Max(1f, config.Height),
                 ZIndex = config.ZIndex,
                 CloseOnClickOutside = config.CloseOnClickOutside,
                 ShowOverlay = config.ShowOverlay,
+                DrawChrome = config.DrawChrome,
                 Content = config.Content,
                 OnClose = config.OnClose,
-                IsOpen = true,
             };
 
             _layers[config.Id] = state;
+            if (!_drawOrder.Contains(config.Id))
+                _drawOrder.Add(config.Id);
+            if (!_windowIds.ContainsKey(config.Id))
+                _windowIds[config.Id] = _nextWindowId++;
 
-            if (!_layerOrder.Contains(config.Id))
-                _layerOrder.Add(config.Id);
-
-            SortLayers();
+            SortDrawOrder();
         }
 
         public void Open(string id, Vector2 position, Action content, float width = 200f, float height = 150f)
@@ -71,197 +74,206 @@ namespace shadcnui.GUIComponents.Core.Base
 
         public void Close(string id)
         {
-            if (_layers.TryGetValue(id, out var state))
+            if (_isDrawing)
             {
-                state.IsOpen = false;
+                if (!_pendingCloses.Contains(id))
+                    _pendingCloses.Add(id);
+                return;
+            }
+            DoClose(id);
+        }
+
+        private void DoClose(string id)
+        {
+            if (!_layers.TryGetValue(id, out var state))
+                return;
+            try
+            {
                 state.OnClose?.Invoke();
+            }
+            finally
+            {
                 _layers.Remove(id);
-                _layerOrder.Remove(id);
+                _drawOrder.Remove(id);
             }
         }
 
         public void CloseAll()
         {
-            foreach (var id in new List<string>(_layerOrder))
+            if (_isDrawing)
             {
-                Close(id);
+                _pendingCloses.Clear();
+                _pendingCloses.AddRange(_drawOrder);
+                return;
             }
+            foreach (var id in new List<string>(_drawOrder))
+                DoClose(id);
         }
 
         public bool IsOpen(string id)
         {
-            return _layers.TryGetValue(id, out var state) && state.IsOpen;
+            return _layers.ContainsKey(id);
         }
 
         public Vector2 GetOpenPosition(string id)
         {
-            if (_layers.TryGetValue(id, out var state))
-                return state.OpenPosition;
-            return Vector2.zero;
+            return _layers.TryGetValue(id, out var state) ? state.Position : Vector2.zero;
         }
 
         public void SetPosition(string id, Vector2 position)
         {
             if (_layers.TryGetValue(id, out var state))
-                state.OpenPosition = position;
+                state.Position = position;
         }
 
         public void BringToFront(string id)
         {
-            if (_layers.TryGetValue(id, out var state))
+            if (!_layers.TryGetValue(id, out var state))
+                return;
+            int maxZ = 0;
+            foreach (var layer in _layers.Values)
             {
-                int maxZ = 100;
-                foreach (var layer in _layers.Values)
-                {
-                    if (layer.ZIndex > maxZ)
-                        maxZ = layer.ZIndex;
-                }
-                state.ZIndex = maxZ + 1;
-                SortLayers();
+                if (layer.ZIndex > maxZ)
+                    maxZ = layer.ZIndex;
             }
+            state.ZIndex = maxZ + 1;
+            SortDrawOrder();
         }
 
         public void DrawLayers()
         {
-            if (_layerOrder.Count == 0)
+            if (_drawOrder.Count == 0)
                 return;
 
-            string clickedOutsideLayer = null;
+            _isDrawing = true;
+            _pendingCloses.Clear();
 
-            foreach (var id in _layerOrder)
+            bool anyOverlay = false;
+            for (int i = _drawOrder.Count - 1; i >= 0 && !anyOverlay; i--)
             {
-                if (!_layers.TryGetValue(id, out var state) || !state.IsOpen)
+                if (_layers.TryGetValue(_drawOrder[i], out var s) && s.ShowOverlay)
+                    anyOverlay = true;
+            }
+
+            if (anyOverlay)
+                DrawOverlayOnce();
+
+            var orderSnapshot = new List<string>(_drawOrder);
+            int topmostWindowId = -1;
+
+            for (int i = 0; i < orderSnapshot.Count; i++)
+            {
+                var id = orderSnapshot[i];
+                if (!_layers.TryGetValue(id, out var state))
                     continue;
 
-                if (state.ShowOverlay)
+                Rect rect = ClampToScreen(new Rect(state.Position.x, state.Position.y, state.Width, state.Height));
+                int windowId = _windowIds.TryGetValue(id, out var wid) ? wid : _nextWindowId++;
+
+                GUI.Window(windowId, rect, (GUI.WindowFunction)(_ => DrawLayerWindow(state)), GUIContent.none, GUIStyle.none);
+
+                topmostWindowId = windowId;
+            }
+
+            if (topmostWindowId >= 0)
+                GUI.BringWindowToFront(topmostWindowId);
+
+            if (Event.current.type == EventType.MouseDown && Event.current.button == 0)
+            {
+                Vector2 mouse = Event.current.mousePosition;
+                string topmostCloseable = null;
+                for (int i = orderSnapshot.Count - 1; i >= 0; i--)
                 {
-                    DrawOverlay();
-                }
-
-                Rect layerRect = new Rect(state.OpenPosition.x, state.OpenPosition.y, state.Width, state.Height);
-
-                layerRect = ClampToScreen(layerRect);
-
-                if (state.CloseOnClickOutside && Event.current.type == EventType.MouseDown && Event.current.button == 0)
-                {
-                    if (!layerRect.Contains(Event.current.mousePosition))
+                    var id = orderSnapshot[i];
+                    if (!_layers.TryGetValue(id, out var state))
+                        continue;
+                    Rect r = ClampToScreen(new Rect(state.Position.x, state.Position.y, state.Width, state.Height));
+                    if (r.Contains(mouse))
+                        break;
+                    if (state.CloseOnClickOutside)
                     {
-                        clickedOutsideLayer = id;
+                        topmostCloseable = id;
+                        break;
                     }
                 }
-
-                int windowId = GetWindowId(id);
-
-                GUI.Window(
-                    windowId,
-                    layerRect,
-                    (GUI.WindowFunction)(
-                        wid =>
-                        {
-                            var theme = ThemeManager.Instance.CurrentTheme;
-                            Color prevColor = GUI.color;
-                            GUI.color = theme.Elevated;
-                            GUI.DrawTexture(new Rect(0, 0, state.Width, state.Height), Texture2D.whiteTexture);
-
-                            GUI.color = theme.Border;
-                            float borderWidth = 1f;
-                            GUI.DrawTexture(new Rect(0, 0, state.Width, borderWidth), Texture2D.whiteTexture);
-                            GUI.DrawTexture(new Rect(0, state.Height - borderWidth, state.Width, borderWidth), Texture2D.whiteTexture);
-                            GUI.DrawTexture(new Rect(0, 0, borderWidth, state.Height), Texture2D.whiteTexture);
-                            GUI.DrawTexture(new Rect(state.Width - borderWidth, 0, borderWidth, state.Height), Texture2D.whiteTexture);
-
-                            GUI.color = prevColor;
-
-                            state.Content?.Invoke();
-                        }
-                    ),
-                    GUIContent.none,
-                    GUIStyle.none
-                );
-
-                GUI.BringWindowToFront(windowId);
-            }
-
-            if (clickedOutsideLayer != null)
-            {
-                Close(clickedOutsideLayer);
-                Event.current.Use();
-            }
-        }
-
-        private int GetWindowId(string id)
-        {
-            return 50000 + Math.Abs(id.GetHashCode() % 10000);
-        }
-
-        public void DrawLayer(string id, Action content)
-        {
-            if (!_layers.TryGetValue(id, out var state) || !state.IsOpen)
-                return;
-
-            if (state.ShowOverlay)
-            {
-                DrawOverlay();
-            }
-
-            Rect layerRect = new Rect(state.OpenPosition.x, state.OpenPosition.y, state.Width, state.Height);
-            layerRect = ClampToScreen(layerRect);
-
-            if (state.CloseOnClickOutside && Event.current.type == EventType.MouseDown)
-            {
-                if (!layerRect.Contains(Event.current.mousePosition))
+                if (topmostCloseable != null)
                 {
-                    Close(id);
+                    _pendingCloses.Add(topmostCloseable);
                     Event.current.Use();
-                    return;
                 }
             }
 
-            GUILayout.BeginArea(layerRect);
-            content?.Invoke();
-            GUILayout.EndArea();
+            _isDrawing = false;
+            foreach (var id in _pendingCloses)
+                DoClose(id);
         }
 
-        private void DrawOverlay()
+        private void DrawLayerWindow(LayerState state)
         {
+            if (!state.DrawChrome)
+            {
+                state.Content?.Invoke();
+                return;
+            }
+            var theme = ThemeManager.Instance?.CurrentTheme;
+            if (theme == null)
+            {
+                state.Content?.Invoke();
+                return;
+            }
+
             Color prev = GUI.color;
-            Color overlayColor = ThemeManager.Instance.CurrentTheme.Overlay;
-            GUI.color = overlayColor;
+            Rect full = new Rect(0, 0, state.Width, state.Height);
+
+            GUI.color = theme.Elevated;
+            GUI.DrawTexture(full, Texture2D.whiteTexture);
+
+            float border = 1f;
+            GUI.color = theme.Border;
+            GUI.DrawTexture(new Rect(0, 0, state.Width, border), Texture2D.whiteTexture);
+            GUI.DrawTexture(new Rect(0, state.Height - border, state.Width, border), Texture2D.whiteTexture);
+            GUI.DrawTexture(new Rect(0, 0, border, state.Height), Texture2D.whiteTexture);
+            GUI.DrawTexture(new Rect(state.Width - border, 0, border, state.Height), Texture2D.whiteTexture);
+
+            GUI.color = prev;
+
+            state.Content?.Invoke();
+        }
+
+        private void DrawOverlayOnce()
+        {
+            var theme = ThemeManager.Instance?.CurrentTheme;
+            if (theme == null)
+                return;
+            Color prev = GUI.color;
+            GUI.color = theme.Overlay;
             GUI.DrawTexture(new Rect(0, 0, Screen.width, Screen.height), Texture2D.whiteTexture);
             GUI.color = prev;
         }
 
-        private Rect ClampToScreen(Rect rect)
+        private Rect ClampToScreen(Rect rect, float margin = 8f)
         {
-            float x = rect.x;
-            float y = rect.y;
-
-            if (x + rect.width > Screen.width)
-                x = Screen.width - rect.width;
-            if (y + rect.height > Screen.height)
-                y = Screen.height - rect.height;
-            if (x < 0)
-                x = 0;
-            if (y < 0)
-                y = 0;
-
+            float maxW = Screen.width - margin;
+            float maxH = Screen.height - margin;
+            float x = Mathf.Clamp(rect.x, margin, maxW - rect.width);
+            float y = Mathf.Clamp(rect.y, margin, maxH - rect.height);
             return new Rect(x, y, rect.width, rect.height);
         }
 
-        private void SortLayers()
+        private void SortDrawOrder()
         {
-            _layerOrder.Sort(
+            _drawOrder.Sort(
                 (a, b) =>
                 {
-                    int zA = _layers.TryGetValue(a, out var stateA) ? stateA.ZIndex : 0;
-                    int zB = _layers.TryGetValue(b, out var stateB) ? stateB.ZIndex : 0;
+                    int zA = _layers.TryGetValue(a, out var sa) ? sa.ZIndex : 0;
+                    int zB = _layers.TryGetValue(b, out var sb) ? sb.ZIndex : 0;
                     return zA.CompareTo(zB);
                 }
             );
         }
 
-        public int GetLayerCount() => _layerOrder.Count;
+        public int GetLayerCount() => _drawOrder.Count;
 
-        public bool HasOpenLayers() => _layerOrder.Count > 0;
+        public bool HasOpenLayers() => _drawOrder.Count > 0;
     }
 }

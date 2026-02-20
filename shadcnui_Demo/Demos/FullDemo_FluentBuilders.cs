@@ -48,20 +48,9 @@ namespace shadcnui_Demo.Menu
         private bool dropdownOpen = false;
         private int selectIndex = 0;
 
-        private DateTime? calendarSelectedDate;
-        private bool calendarDateHandlerAttached = false;
-        private DateTime? datePickerDate;
-        private DateTime? datePickerWithLabelDate;
-
-        private List<DataTableColumn> dataTableColumns;
-        private List<DataTableRow> dataTableData;
         private int[] sortColumns = new int[0];
         private bool[] sortAscending = new bool[0];
         private bool[] selectedRows = new bool[0];
-        private int currentPage = 0;
-        private string searchQuery = "";
-        private string[,] filteredData;
-        private float[] columnWidths;
 
         private List<ChartSeries> chartSeries;
 
@@ -93,13 +82,10 @@ namespace shadcnui_Demo.Menu
                 new TabConfig("Select", DrawSelectDemos),
                 new TabConfig("DropdownMenu", DrawDropdownMenuDemos),
                 new TabConfig("Popover", DrawPopoverDemos),
-                new TabConfig("Calendar", DrawCalendarDemos),
-                new TabConfig("DatePicker", DrawDatePickerDemos),
                 new TabConfig("Tabs", DrawTabsDemos),
                 new TabConfig("MenuBar", DrawMenuBar),
                 new TabConfig("Chart", DrawChartDemos),
                 new TabConfig("Table", DrawTableDemos),
-                new TabConfig("DataTable", DataTableDemos),
                 new TabConfig("Toast", DrawToastDemos),
                 new TabConfig("Slider", DrawSliderDemos),
                 new TabConfig("Layout", DrawLayoutDemos),
@@ -986,46 +972,6 @@ namespace shadcnui_Demo.Menu
             );
         }
 
-        void DrawCalendarDemos()
-        {
-            DrawSection(
-                "Calendar",
-                () =>
-                {
-                    GUILayout.BeginVertical(GUI.skin.box, GUILayout.Width(320));
-                    var cal = guiHelper.GetCalendarComponents();
-                    cal.SelectedDate = calendarSelectedDate;
-                    if (!calendarDateHandlerAttached)
-                    {
-                        cal.OnDateSelected += d => calendarSelectedDate = d;
-                        calendarDateHandlerAttached = true;
-                    }
-                    guiHelper.CreateCalendar().Draw();
-                    GUILayout.EndVertical();
-
-                    guiHelper.CreateLabel($"Selected: {calendarSelectedDate}").Draw();
-                }
-            );
-        }
-
-        void DrawDatePickerDemos()
-        {
-            DrawSection(
-                "Date Pickers",
-                () =>
-                {
-                    guiHelper.CreateLabel("Basic").Draw();
-                    datePickerDate = guiHelper.CreateDatePicker("dp1").Placeholder("Pick Date").SelectedDate(datePickerDate).Draw();
-
-                    guiHelper.CreateLabel("Labeled").Draw();
-                    datePickerWithLabelDate = guiHelper.CreateDatePicker("dp2").DatePickerLabel("Label").Placeholder("Pick Date").SelectedDate(datePickerWithLabelDate).Draw();
-
-                    guiHelper.CreateLabel("Date Range").Draw();
-                    guiHelper.CreateDatePicker("drp1").Placeholder("Pick Range").StartDate(DateTime.Now).EndDate(DateTime.Now.AddDays(7)).Draw();
-                }
-            );
-        }
-
         private int disabledTabIndex = 0;
         private int indicatorUnderlineIndex = 0;
         private int indicatorBgIndex = 0;
@@ -1228,101 +1174,6 @@ namespace shadcnui_Demo.Menu
                     guiHelper.CreateTable(headers).Data(data).Outline().Draw();
                 }
             );
-        }
-
-        void DataTableDemos()
-        {
-            if (dataTableColumns == null)
-            {
-                dataTableColumns = new List<DataTableColumn>
-                {
-                    new DataTableColumn("id", "ID") { Width = 50, Sortable = true },
-                    new DataTableColumn("name", "Name") { Width = 150, Sortable = true },
-                    new DataTableColumn("role", "Role") { Width = 100, Sortable = true },
-                };
-
-                dataTableData = new List<DataTableRow>();
-                for (int i = 0; i < 20; i++)
-                {
-                    var row = new DataTableRow(i.ToString());
-                    row.SetData("id", i.ToString());
-                    row.SetData("name", $"User {i}");
-                    row.SetData("role", i % 3 == 0 ? "Admin" : "User");
-                    dataTableData.Add(row);
-                }
-
-                columnWidths = new float[] { 50, 150, 100 };
-            }
-
-            DrawSection(
-                "Sortable Table",
-                () =>
-                {
-                    guiHelper.SortableTable(dataTableColumns.Select(c => c.Header).ToArray(), ConvertData(dataTableData), ref sortColumns, ref sortAscending, ControlVariant.Default, ControlSize.Default, (col, asc) => Debug.Log($"Sort {col} {asc}"));
-                }
-            );
-
-            DrawSection(
-                "Selectable Table",
-                () =>
-                {
-                    if (selectedRows.Length != dataTableData.Count)
-                        selectedRows = new bool[dataTableData.Count];
-                    guiHelper.SelectableTable(dataTableColumns.Select(c => c.Header).ToArray(), ConvertData(dataTableData.Take(5).ToList()), ref selectedRows, ControlVariant.Default, ControlSize.Default, (idx, sel) => Debug.Log($"Select {idx} {sel}"));
-                }
-            );
-
-            DrawSection(
-                "Paginated Table",
-                () =>
-                {
-                    guiHelper.PaginatedTable(dataTableColumns.Select(c => c.Header).ToArray(), ConvertData(dataTableData), ref currentPage, 5, ControlVariant.Default, ControlSize.Default, page => Debug.Log($"Page {page}"));
-                }
-            );
-
-            DrawSection(
-                "Searchable Table",
-                () =>
-                {
-                    guiHelper.SearchableTable(dataTableColumns.Select(c => c.Header).ToArray(), ConvertData(dataTableData), ref searchQuery, ref filteredData, ControlVariant.Default, ControlSize.Default, query => Debug.Log($"Search {query}"));
-                }
-            );
-
-            DrawSection(
-                "Resizable Table",
-                () =>
-                {
-                    guiHelper.ResizableTable(dataTableColumns.Select(c => c.Header).ToArray(), ConvertData(dataTableData.Take(5).ToList()), ref columnWidths, ControlVariant.Default, ControlSize.Default);
-                }
-            );
-
-            DrawSection(
-                "Comprehensive Data Table",
-                () =>
-                {
-                    guiHelper.DataTable("main_datatable", dataTableColumns, dataTableData, showPagination: true, showSearch: true, showSelection: true, showColumnToggle: true);
-
-                    var selected = guiHelper.GetSelectedRows("main_datatable");
-                    if (selected.Count > 0)
-                    {
-                        guiHelper.CreateLabel($"Selected IDs: {string.Join(", ", selected)}").Draw();
-                    }
-                }
-            );
-        }
-
-        private string[,] ConvertData(List<DataTableRow> rows)
-        {
-            if (rows == null || rows.Count == 0)
-                return new string[0, 0];
-            string[,] result = new string[rows.Count, 3];
-            for (int i = 0; i < rows.Count; i++)
-            {
-                result[i, 0] = rows[i].GetValue<string>("id");
-                result[i, 1] = rows[i].GetValue<string>("name");
-                result[i, 2] = rows[i].GetValue<string>("role");
-            }
-            return result;
         }
 
         void DrawToastDemos()

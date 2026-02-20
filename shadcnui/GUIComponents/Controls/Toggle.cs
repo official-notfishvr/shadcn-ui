@@ -14,12 +14,6 @@ namespace shadcnui.GUIComponents.Controls
         public Toggle(GUIHelper helper)
             : base(helper) { }
 
-        private void RenderIcon(IconConfig iconConfig)
-        {
-            float scaledSize = iconConfig.Size * guiHelper.uiScale;
-            UnityHelpers.Label(iconConfig.Image, GUILayout.Width(scaledSize), GUILayout.Height(scaledSize));
-        }
-
         #region Config-based API
         public bool DrawToggle(ToggleConfig config)
         {
@@ -30,49 +24,12 @@ namespace shadcnui.GUIComponents.Controls
             if (config.Disabled)
                 GUI.enabled = false;
 
-            bool newValue;
-
-            if (config.Icon?.Image != null)
-            {
-                GUILayout.BeginHorizontal();
-                RenderIcon(config.Icon);
-                layoutComponents.AddSpace(config.Icon.Spacing * guiHelper.uiScale);
-                newValue = UnityHelpers.Toggle(config.Value, config.Text ?? "Toggle", toggleStyle);
-                GUILayout.EndHorizontal();
-            }
-            else
-            {
-                if (config.Rect.HasValue)
-                {
-                    Rect scaledRect = new Rect(config.Rect.Value.x * guiHelper.uiScale, config.Rect.Value.y * guiHelper.uiScale, config.Rect.Value.width * guiHelper.uiScale, config.Rect.Value.height * guiHelper.uiScale);
-                    newValue = UnityHelpers.Toggle(scaledRect, config.Value, config.Text ?? "", toggleStyle);
-                }
-                else
-                {
-                    bool useExpandWidth = config.Size != ControlSize.Icon;
-                    if (config.Options != null && config.Options.Length > 0)
-                    {
-                        var options = new GUILayoutOption[config.Options.Length + (useExpandWidth ? 1 : 0)];
-                        config.Options.CopyTo(options, 0);
-                        if (useExpandWidth)
-                            options[config.Options.Length] = GUILayout.ExpandWidth(true);
-                        newValue = UnityHelpers.Toggle(config.Value, config.Text, toggleStyle, options);
-                    }
-                    else
-                    {
-                        newValue = useExpandWidth 
-                            ? UnityHelpers.Toggle(config.Value, config.Text, toggleStyle, GUILayout.ExpandWidth(true)) 
-                            : UnityHelpers.Toggle(config.Value, config.Text, toggleStyle);
-                    }
-                }
-            }
+            bool newValue = GetToggleValue(config, toggleStyle);
 
             GUI.enabled = wasEnabled;
 
             if (newValue != config.Value && !config.Disabled)
-            {
                 config.OnToggle?.Invoke(newValue);
-            }
 
             return config.Disabled ? config.Value : newValue;
         }
@@ -109,6 +66,61 @@ namespace shadcnui.GUIComponents.Controls
                     Disabled = disabled,
                 }
             );
+        }
+        #endregion
+
+        #region Private Methods
+        private bool GetToggleValue(ToggleConfig config, GUIStyle toggleStyle)
+        {
+            if (config.Icon?.Image != null)
+                return DrawToggleWithIcon(config, toggleStyle);
+
+            if (config.Rect.HasValue)
+                return DrawToggleAtRect(config, toggleStyle);
+
+            return DrawToggleLayout(config, toggleStyle);
+        }
+
+        private bool DrawToggleWithIcon(ToggleConfig config, GUIStyle toggleStyle)
+        {
+            GUILayout.BeginHorizontal();
+            RenderIcon(config.Icon);
+            layoutComponents.AddSpace(config.Icon.Spacing);
+            bool newValue = UnityHelpers.Toggle(config.Value, config.Text ?? "Toggle", toggleStyle);
+            GUILayout.EndHorizontal();
+            return newValue;
+        }
+
+        private bool DrawToggleAtRect(ToggleConfig config, GUIStyle toggleStyle)
+        {
+            Rect r = config.Rect.Value;
+            Rect scaledRect = new Rect(r.x * guiHelper.uiScale, r.y * guiHelper.uiScale, r.width * guiHelper.uiScale, r.height * guiHelper.uiScale);
+            return UnityHelpers.Toggle(scaledRect, config.Value, config.Text ?? "", toggleStyle);
+        }
+
+        private bool DrawToggleLayout(ToggleConfig config, GUIStyle toggleStyle)
+        {
+            bool useExpandWidth = config.Size != ControlSize.Icon;
+            GUILayoutOption[] options = BuildToggleLayoutOptions(config.Options, useExpandWidth);
+            return UnityHelpers.Toggle(config.Value, config.Text, toggleStyle, options);
+        }
+
+        private void RenderIcon(IconConfig iconConfig)
+        {
+            float scaledSize = iconConfig.Size * guiHelper.uiScale;
+            UnityHelpers.Label(iconConfig.Image, GUILayout.Width(scaledSize), GUILayout.Height(scaledSize));
+        }
+
+        private static GUILayoutOption[] BuildToggleLayoutOptions(GUILayoutOption[] configOptions, bool expandWidth)
+        {
+            int extra = expandWidth ? 1 : 0;
+            if (configOptions == null || configOptions.Length == 0)
+                return expandWidth ? new[] { GUILayout.ExpandWidth(true) } : Array.Empty<GUILayoutOption>();
+            var options = new GUILayoutOption[configOptions.Length + extra];
+            configOptions.CopyTo(options, 0);
+            if (expandWidth)
+                options[configOptions.Length] = GUILayout.ExpandWidth(true);
+            return options;
         }
         #endregion
     }
