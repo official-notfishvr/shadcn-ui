@@ -188,6 +188,8 @@ namespace shadcnui.GUIComponents.Core.Utils
 
         public float GetProgress(string id) => _animations.TryGetValue(id, out var state) ? state.Progress : 0f;
 
+        private int _lastBackgroundFrame = -1;
+
         public bool BeginGUI()
         {
             if (Event.current == null || Event.current.type == EventType.Repaint)
@@ -196,8 +198,11 @@ namespace shadcnui.GUIComponents.Core.Utils
                 Update(delta);
             }
 
-            if (Event.current == null || Event.current.type == EventType.Repaint)
+            if (Event.current?.type == EventType.Repaint && _lastBackgroundFrame != Time.frameCount)
+            {
+                _lastBackgroundFrame = Time.frameCount;
                 DrawBackground();
+            }
 
             BeginRootGroup();
             return true;

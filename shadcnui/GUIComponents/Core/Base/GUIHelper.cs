@@ -179,17 +179,34 @@ namespace shadcnui.GUIComponents.Core.Base
 
         public void UpdateGUI(bool isOpen) { }
 
+        private bool _scrollbarsInitialized;
+        private int _lastCheckFrame = -10;
+
         public bool BeginGUI()
         {
             return Execute(
                 () =>
                 {
+                    var evt = Event.current;
+                    var isRepaint = evt?.type == EventType.Repaint;
+                    
                     _styleManager.InitializeGUI();
-                    if (_styleManager.ScanForCorruption())
-                        _styleManager.MarkStylesCorruption();
-                    _styleManager.RefreshStylesIfCorruption();
-                    GUI.skin.horizontalScrollbar = GUIStyle.none;
-                    GUI.skin.verticalScrollbar = GUIStyle.none;
+                    
+                    if (isRepaint && Time.frameCount - _lastCheckFrame >= 10)
+                    {
+                        _lastCheckFrame = Time.frameCount;
+                        if (_styleManager.ScanForCorruption())
+                            _styleManager.MarkStylesCorruption();
+                        _styleManager.RefreshStylesIfCorruption();
+                    }
+                    
+                    if (!_scrollbarsInitialized)
+                    {
+                        GUI.skin.horizontalScrollbar = GUIStyle.none;
+                        GUI.skin.verticalScrollbar = GUIStyle.none;
+                        _scrollbarsInitialized = true;
+                    }
+                    
                     return _animationManager.BeginGUI();
                 },
                 true,

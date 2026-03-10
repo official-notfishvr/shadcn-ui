@@ -7,11 +7,11 @@ namespace shadcnui.GUIComponents.Core.Styling
     {
         private GUIStyle GetCachedStyle(StyleComponentType type, ControlVariant variant, ControlSize size, GUIStyle baseStyle, int state = 0, System.Action<GUIStyle> customize = null)
         {
-            InitializeGUI();
-
             var key = new StyleKey(type, variant, size, state);
             if (_styleCache.TryGetValue(key, out var cached))
                 return cached;
+
+            InitializeGUI();
 
             var style = CloneStyle(baseStyle);
             ApplySize(style, type, size);
