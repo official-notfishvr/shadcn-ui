@@ -60,7 +60,6 @@ namespace shadcnui_examples.Examples
                                 }
                             )
                         )
-                            ;
                         gui.EndHorizontalGroup();
                     },
                     400,
@@ -99,7 +98,6 @@ namespace shadcnui_examples.Examples
                                 }
                             )
                         )
-                            ;
                         gui.EndHorizontalGroup();
                     },
                     400,

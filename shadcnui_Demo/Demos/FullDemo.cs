@@ -71,7 +71,6 @@ namespace shadcnui_Demo.Menu
             _gui = new GUIHelper();
             _sampleTexture = CreateSampleTexture();
 
-            RegisterThemes();
             BuildDropdownItems();
             BuildDataTable();
             BuildCharts();
@@ -111,8 +110,7 @@ namespace shadcnui_Demo.Menu
         {
             _gui.BeginHorizontalGroup();
             _gui.BeginVerticalGroup();
-            _gui.Label("shadcn/ui Core Rebuild", ControlVariant.Default);
-            _gui.MutedLabel("Flat, theme-driven IMGUI components for in-game tooling.");
+            _gui.Label("shadcn/ui Core", ControlVariant.Default);
             _gui.EndVerticalGroup();
 
             GUILayout.FlexibleSpace();
@@ -530,49 +528,6 @@ namespace shadcnui_Demo.Menu
             _gui.CardContent(draw);
             _gui.EndCard();
             _gui.AddSpace(12f);
-        }
-
-        private void RegisterThemes()
-        {
-            _gui.RegisterTheme(
-                new Theme
-                {
-                    Name = "Signal Flat",
-                    Base = Theme.Hex("#0c1016"),
-                    Secondary = Theme.Hex("#151c24"),
-                    Elevated = Theme.Hex("#1a222d"),
-                    Text = Theme.Hex("#f5f7fa"),
-                    Muted = Theme.Hex("#93a1b5"),
-                    Border = Theme.Hex("#273241"),
-                    Accent = Theme.Hex("#33c5ff"),
-                    Destructive = Theme.Hex("#ef4444"),
-                    Success = Theme.Hex("#22c55e"),
-                    Warning = Theme.Hex("#f59e0b"),
-                    Info = Theme.Hex("#33c5ff"),
-                    Overlay = new Color(0f, 0f, 0f, 0.68f),
-                    Shadow = new Color(0f, 0f, 0f, 0.34f),
-                }
-            );
-
-            _gui.RegisterTheme(
-                new Theme
-                {
-                    Name = "Sand Grid",
-                    Base = Theme.Hex("#f2efe8"),
-                    Secondary = Theme.Hex("#e5dfd3"),
-                    Elevated = Theme.Hex("#faf8f2"),
-                    Text = Theme.Hex("#201d18"),
-                    Muted = Theme.Hex("#746b5f"),
-                    Border = Theme.Hex("#c8bfaf"),
-                    Accent = Theme.Hex("#cc7a00"),
-                    Destructive = Theme.Hex("#bb3e03"),
-                    Success = Theme.Hex("#588157"),
-                    Warning = Theme.Hex("#d4a373"),
-                    Info = Theme.Hex("#457b9d"),
-                    Overlay = new Color(0f, 0f, 0f, 0.22f),
-                    Shadow = new Color(0f, 0f, 0f, 0.18f),
-                }
-            );
         }
 
         private void BuildDropdownItems()

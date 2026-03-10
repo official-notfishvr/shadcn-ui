@@ -938,11 +938,9 @@ namespace shadcnui_Demo.Menu
         }
 
         // Tab state variables
-        private int disabledTabIndex = 0;
         private int indicatorUnderlineIndex = 0;
         private int indicatorBgIndex = 0;
         private int indicatorBorderIndex = 0;
-        private int combinedTabIndex = 0;
         private int closableTabIndex = 0;
         private string[] closableTabNames = new string[] { "Tab 1", "Tab 2", "Tab 3", "Tab 4" };
         private bool[] closableTabs = new bool[] { true, true, true, false };

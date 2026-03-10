@@ -349,17 +349,8 @@ namespace shadcnui.GUIComponents.Core.Utils
             if (_rootGroupStarted)
                 return;
 
-            try
-            {
-                var style = _guiHelper.GetStyleManager()?.GetAnimatedBoxStyle() ?? GUI.skin.box;
-                _layout.BeginVerticalGroup(style);
-            }
-            catch (Exception ex)
-            {
-                GUILogger.LogException(ex, nameof(BeginRootGroup), nameof(AnimationManager));
-                GUILayout.BeginVertical();
-            }
-
+            var style = _guiHelper.GetStyleManager()?.GetAnimatedBoxStyle() ?? GUI.skin.box;
+            _layout.BeginVerticalGroup(style);
             _rootGroupStarted = true;
         }
     }

@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 using shadcnui.GUIComponents.Core.Base;
 using shadcnui.GUIComponents.Core.Styling;
 using shadcnui.GUIComponents.Core.Theming;
@@ -12,33 +11,6 @@ namespace shadcnui.GUIComponents.Controls
     {
         private int _activeControlId = -1;
         private bool _isDragging = false;
-
-        private struct TextureCacheKey : IEquatable<TextureCacheKey>
-        {
-            public int Width;
-            public int Height;
-            public int Radius;
-            public Color Color;
-            public Color BorderColor;
-            public bool HasBorder;
-
-            public bool Equals(TextureCacheKey other) => Width == other.Width && Height == other.Height && Radius == other.Radius && Color.Equals(other.Color) && BorderColor.Equals(other.BorderColor) && HasBorder == other.HasBorder;
-
-            public override int GetHashCode()
-            {
-                unchecked
-                {
-                    int hash = Width * 397 ^ Height;
-                    hash = hash * 397 ^ Radius;
-                    hash = hash * 397 ^ Color.GetHashCode();
-                    hash = hash * 397 ^ BorderColor.GetHashCode();
-                    hash = hash * 397 ^ (HasBorder ? 1 : 0);
-                    return hash;
-                }
-            }
-        }
-
-        private static Dictionary<TextureCacheKey, Texture2D> _textureCache = new Dictionary<TextureCacheKey, Texture2D>();
 
         public Slider(GUIHelper helper)
             : base(helper) { }
@@ -317,21 +289,7 @@ namespace shadcnui.GUIComponents.Controls
             int width = Mathf.Max(8, Mathf.RoundToInt(rect.width));
             int height = Mathf.Max(8, Mathf.RoundToInt(rect.height));
 
-            var key = new TextureCacheKey
-            {
-                Width = width,
-                Height = height,
-                Radius = radius,
-                Color = color,
-                HasBorder = false,
-            };
-
-            if (!_textureCache.TryGetValue(key, out var texture) || texture == null)
-            {
-                texture = CreateSimpleRoundedTexture(width, height, radius, color);
-                _textureCache[key] = texture;
-            }
-
+            var texture = styleManager.CreateTexture(width, height, radius, color);
             GUI.DrawTexture(rect, texture, ScaleMode.StretchToFill);
         }
 
@@ -349,19 +307,9 @@ namespace shadcnui.GUIComponents.Controls
 
         private void DrawShadow(Rect rect, int size)
         {
-            var shadowKey = new TextureCacheKey
-            {
-                Width = size,
-                Height = size,
-                Radius = size / 2,
-                Color = new Color(0, 0, 0, 0.2f),
-                HasBorder = false,
-            };
-            if (!_textureCache.TryGetValue(shadowKey, out var shadowTex) || shadowTex == null)
-            {
-                shadowTex = CreateSimpleRoundedTexture(size, size, size / 2, new Color(0, 0, 0, 0.2f));
-                _textureCache[shadowKey] = shadowTex;
-            }
+            int radius = size / 2;
+            var shadowColor = new Color(0, 0, 0, 0.2f);
+            var shadowTex = styleManager.CreateTexture(size, size, radius, shadowColor);
             Rect shadowRect = new Rect(rect.x + 1, rect.y + 2, rect.width, rect.height);
             GUI.DrawTexture(shadowRect, shadowTex, ScaleMode.StretchToFill);
         }
@@ -369,90 +317,10 @@ namespace shadcnui.GUIComponents.Controls
         private void DrawThumbTexture(Rect rect, int size, Color color, Color borderColor)
         {
             int radius = size / 2;
-            var thumbKey = new TextureCacheKey
-            {
-                Width = size,
-                Height = size,
-                Radius = radius,
-                Color = color,
-                BorderColor = borderColor,
-                HasBorder = true,
-            };
-            if (!_textureCache.TryGetValue(thumbKey, out var thumbTex) || thumbTex == null)
-            {
-                thumbTex = CreateBorderedCircleTexture(size, color, borderColor);
-                _textureCache[thumbKey] = thumbTex;
-            }
-
+            var thumbTex = styleManager.CreateBorderTexture(size, size, radius, color, borderColor, 1f);
             GUI.DrawTexture(rect, thumbTex, ScaleMode.StretchToFill);
         }
 
-        private static Texture2D CreateSimpleRoundedTexture(int width, int height, int radius, Color color)
-        {
-            var texture = new Texture2D(width, height, TextureFormat.RGBA32, false);
-            texture.filterMode = FilterMode.Point;
-            texture.wrapMode = TextureWrapMode.Clamp;
-            var pixels = new Color[width * height];
-
-            for (int y = 0; y < height; y++)
-            {
-                for (int x = 0; x < width; x++)
-                {
-                    bool inside = IsInsideRoundedRect(x, y, width, height, radius);
-                    pixels[y * width + x] = inside ? color : Color.clear;
-                }
-            }
-
-            texture.SetPixels(pixels);
-            texture.Apply();
-            return texture;
-        }
-
-        private static bool IsInsideRoundedRect(int x, int y, int width, int height, int radius)
-        {
-            if (x < radius && y < radius)
-                return (x - radius) * (x - radius) + (y - radius) * (y - radius) <= radius * radius;
-            else if (x >= width - radius && y < radius)
-                return (x - (width - radius - 1)) * (x - (width - radius - 1)) + (y - radius) * (y - radius) <= radius * radius;
-            else if (x < radius && y >= height - radius)
-                return (x - radius) * (x - radius) + (y - (height - radius - 1)) * (y - (height - radius - 1)) <= radius * radius;
-            else if (x >= width - radius && y >= height - radius)
-                return (x - (width - radius - 1)) * (x - (width - radius - 1)) + (y - (height - radius - 1)) * (y - (height - radius - 1)) <= radius * radius;
-            return true;
-        }
-
-        private static Texture2D CreateBorderedCircleTexture(int size, Color fillColor, Color borderColor)
-        {
-            var texture = new Texture2D(size, size, TextureFormat.RGBA32, false);
-            texture.filterMode = FilterMode.Point;
-            texture.wrapMode = TextureWrapMode.Clamp;
-            var pixels = new Color[size * size];
-
-            float center = (size - 1) / 2f;
-            float outerRadius = size / 2f;
-            float innerRadius = outerRadius - 1f;
-
-            for (int y = 0; y < size; y++)
-            {
-                for (int x = 0; x < size; x++)
-                {
-                    float dx = x - center;
-                    float dy = y - center;
-                    float dist = Mathf.Sqrt(dx * dx + dy * dy);
-
-                    if (dist > outerRadius)
-                        pixels[y * size + x] = Color.clear;
-                    else if (dist > innerRadius)
-                        pixels[y * size + x] = borderColor;
-                    else
-                        pixels[y * size + x] = fillColor;
-                }
-            }
-
-            texture.SetPixels(pixels);
-            texture.Apply();
-            return texture;
-        }
         #endregion
     }
 }

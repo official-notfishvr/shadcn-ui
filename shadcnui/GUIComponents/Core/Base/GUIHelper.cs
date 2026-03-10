@@ -187,12 +187,9 @@ namespace shadcnui.GUIComponents.Core.Base
             return Execute(
                 () =>
                 {
-                    var evt = Event.current;
-                    var isRepaint = evt?.type == EventType.Repaint;
-                    
                     _styleManager.InitializeGUI();
                     
-                    if (isRepaint && Time.frameCount - _lastCheckFrame >= 10)
+                    if (Time.frameCount - _lastCheckFrame >= 60)
                     {
                         _lastCheckFrame = Time.frameCount;
                         if (_styleManager.ScanForCorruption())
