@@ -513,7 +513,6 @@
         <Compile Include="GUIComponents\Controls\ThemeChanger.cs" />
         <Compile Include="GUIComponents\Controls\Toggle.cs" />
         <Compile Include="GUIComponents\Core\Base\BaseComponent.cs" />
-        <Compile Include="GUIComponents\Core\Base\FluentBuilders.cs" />
         <Compile Include="GUIComponents\Core\Base\GUIHelper.cs" />
         <Compile Include="GUIComponents\Core\Base\LayerManager.cs" />
         <Compile Include="GUIComponents\Core\Styling\StyleManager.Setup.cs" />
@@ -528,6 +527,9 @@
         <Compile Include="GUIComponents\Core\Styling\StyleRegistry.cs" />
         <Compile Include="GUIComponents\Core\Theming\Theme.cs" />
         <Compile Include="GUIComponents\Core\Theming\ThemeManager.cs" />
+        <Compile Include="GUIComponents\Data\Calendar.cs" />
+        <Compile Include="GUIComponents\Data\DataTable.cs" />
+        <Compile Include="GUIComponents\Data\DatePicker.cs" />
         <Compile Include="GUIComponents\Data\TextArea.cs" />
         <Compile Include="GUIComponents\Display\Avatar.cs" />
         <Compile Include="GUIComponents\Display\Badge.cs" />

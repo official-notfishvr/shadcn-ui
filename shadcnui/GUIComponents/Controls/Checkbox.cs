@@ -113,7 +113,7 @@ namespace shadcnui.GUIComponents.Controls
 
             GUIStyle labelStyle = new UnityHelpers.GUIStyle(GUI.skin.label);
             labelStyle.alignment = TextAnchor.MiddleLeft;
-            labelStyle.fontSize = Mathf.RoundToInt(14 * guiHelper.uiScale);
+            labelStyle.fontSize = styleManager?.GetScaledFontSize(DesignTokens.FontScale.SM) ?? Mathf.RoundToInt(14 * guiHelper.uiScale);
             labelStyle.normal.textColor = checkboxStyle.normal.textColor;
             GUILayout.Label(config.Text ?? "Checkbox", labelStyle, GUILayout.ExpandWidth(true));
 
@@ -148,7 +148,7 @@ namespace shadcnui.GUIComponents.Controls
             {
                 GUIStyle checkStyle = new UnityHelpers.GUIStyle(GUI.skin.label);
                 checkStyle.alignment = TextAnchor.MiddleCenter;
-                checkStyle.fontSize = Mathf.RoundToInt(12 * guiHelper.uiScale);
+                checkStyle.fontSize = styleManager?.GetScaledFontSize(DesignTokens.FontScale.XS) ?? Mathf.RoundToInt(12 * guiHelper.uiScale);
                 checkStyle.normal.textColor = checkboxStyle.onNormal.textColor;
                 GUI.Label(checkboxRect, "✓", checkStyle);
             }

@@ -2,11 +2,7 @@ using System;
 using System.Collections.Generic;
 using shadcnui.GUIComponents.Core.Base;
 using shadcnui.GUIComponents.Core.Theming;
-using shadcnui.GUIComponents.Core.Utils;
 using UnityEngine;
-#if IL2CPP_MELONLOADER_PRE57
-using UnhollowerBaseLib;
-#endif
 
 namespace shadcnui.GUIComponents.Core.Utils
 {
@@ -17,52 +13,29 @@ namespace shadcnui.GUIComponents.Core.Utils
         Vector2,
     }
 
-    internal class AnimationState
+    internal sealed class AnimationState
     {
-        public string Id { get; set; }
-        public AnimationType Type { get; set; }
-        public float StartValue { get; set; }
-        public float TargetValue { get; set; }
-        public float CurrentValue { get; set; }
-        public Color StartColor { get; set; }
-        public Color TargetColor { get; set; }
-        public Color CurrentColor { get; set; }
-        public Vector2 StartVector { get; set; }
-        public Vector2 TargetVector { get; set; }
-        public Vector2 CurrentVector { get; set; }
-        public float Duration { get; set; }
-        public float ElapsedTime { get; set; }
-        public bool IsPaused { get; set; }
-        public bool IsComplete { get; set; }
-        public float CompletedTime { get; set; }
-        public Func<float, float> Easing { get; set; }
-        public Action OnComplete { get; set; }
-        public bool CallbackInvoked { get; set; }
+        public string Id;
+        public AnimationType Type;
+        public float StartFloat;
+        public float CurrentFloat;
+        public float TargetFloat;
+        public Color StartColor;
+        public Color CurrentColor;
+        public Color TargetColor;
+        public Vector2 StartVector;
+        public Vector2 CurrentVector;
+        public Vector2 TargetVector;
+        public float Duration;
+        public float Elapsed;
+        public bool Paused;
+        public bool Completed;
+        public float CompletedAt;
+        public Func<float, float> Easing;
+        public Action OnComplete;
+        public bool CompletionHandled;
 
-        public float Progress => Duration > 0 ? Mathf.Clamp01(ElapsedTime / Duration) : 1f;
-
-        public void Reset()
-        {
-            Id = null;
-            Type = AnimationType.Float;
-            StartValue = 0f;
-            TargetValue = 0f;
-            CurrentValue = 0f;
-            StartColor = default;
-            TargetColor = default;
-            CurrentColor = default;
-            StartVector = default;
-            TargetVector = default;
-            CurrentVector = default;
-            Duration = 0f;
-            ElapsedTime = 0f;
-            IsPaused = false;
-            IsComplete = false;
-            CompletedTime = 0f;
-            Easing = null;
-            OnComplete = null;
-            CallbackInvoked = false;
-        }
+        public float Progress => Duration <= 0f ? 1f : Mathf.Clamp01(Elapsed / Duration);
     }
 
     public static class EasingFunctions
@@ -88,392 +61,301 @@ namespace shadcnui.GUIComponents.Core.Utils
         public static float EaseInOutCubic(float t) => t < 0.5f ? 4f * t * t * t : 1f - Mathf.Pow(-2f * t + 2f, 3f) / 2f;
     }
 
-    public class AnimationManager
+    public sealed class AnimationManager
     {
-        private GUIHelper guiHelper;
-        private shadcnui.GUIComponents.Layout.Layout layoutComponents;
-        private bool _layoutGroupStarted = false;
-        private Dictionary<string, AnimationState> _animations;
-        private Queue<AnimationState> _statePool;
-        private List<string> _toRemove;
-        private float _currentTime;
+        private readonly GUIHelper _guiHelper;
+        private readonly shadcnui.GUIComponents.Layout.Layout _layout;
+        private readonly Dictionary<string, AnimationState> _animations = new();
+        private readonly List<string> _toRemove = new();
+        private float _clock;
+        private bool _rootGroupStarted;
 
-        public float RetentionPeriod { get; set; } = 1f;
-        public int PoolSize { get; set; } = 50;
+        public float RetentionPeriod { get; set; } = 0.5f;
+        public int PoolSize { get; set; } = 64;
 
         public AnimationManager(GUIHelper helper)
         {
-            guiHelper = helper;
-            layoutComponents = new shadcnui.GUIComponents.Layout.Layout(helper);
-            _animations = new Dictionary<string, AnimationState>();
-            _statePool = new Queue<AnimationState>();
-            _toRemove = new List<string>();
-            for (int i = 0; i < PoolSize; i++)
-                _statePool.Enqueue(new AnimationState());
-        }
-
-        private AnimationState GetPooledState()
-        {
-            if (_statePool.Count > 0)
-            {
-                var state = _statePool.Dequeue();
-                state.Reset();
-                return state;
-            }
-            return new AnimationState();
-        }
-
-        private void ReturnToPool(AnimationState state)
-        {
-            state.Reset();
-            _statePool.Enqueue(state);
+            _guiHelper = helper;
+            _layout = new shadcnui.GUIComponents.Layout.Layout(helper);
         }
 
         public void StartFloat(string id, float from, float to, float duration, Func<float, float> easing = null, Action onComplete = null)
         {
-            if (string.IsNullOrEmpty(id))
-                return;
-            AnimationState state;
-            if (_animations.TryGetValue(id, out state))
+            var state = GetOrCreate(id, AnimationType.Float);
+            state.StartFloat = state.Completed ? from : state.CurrentFloat;
+            state.CurrentFloat = from;
+            state.TargetFloat = to;
+            Prepare(state, duration, easing, onComplete);
+
+            if (duration <= 0f)
             {
-                state.StartValue = state.CurrentValue;
-                state.TargetValue = to;
-                state.Duration = duration;
-                state.ElapsedTime = 0f;
-                state.IsPaused = false;
-                state.IsComplete = false;
-                state.Easing = easing ?? EasingFunctions.Linear;
-                state.OnComplete = onComplete;
-                state.CallbackInvoked = false;
-            }
-            else
-            {
-                state = GetPooledState();
-                state.Id = id;
-                state.Type = AnimationType.Float;
-                state.StartValue = from;
-                state.TargetValue = to;
-                state.CurrentValue = from;
-                state.Duration = duration;
-                state.Easing = easing ?? EasingFunctions.Linear;
-                state.OnComplete = onComplete;
-                _animations[id] = state;
-            }
-            if (duration <= 0)
-            {
-                state.CurrentValue = to;
-                state.IsComplete = true;
-                state.CompletedTime = _currentTime;
+                state.CurrentFloat = to;
+                Complete(state);
             }
         }
 
         public float GetFloat(string id, float defaultValue = 0f)
         {
-            if (_animations.TryGetValue(id, out var state) && state.Type == AnimationType.Float)
-                return state.CurrentValue;
-            return defaultValue;
+            return _animations.TryGetValue(id, out var state) && state.Type == AnimationType.Float ? state.CurrentFloat : defaultValue;
         }
 
         public void StartColor(string id, Color from, Color to, float duration, Func<float, float> easing = null, Action onComplete = null)
         {
-            if (string.IsNullOrEmpty(id))
-                return;
-            AnimationState state;
-            if (_animations.TryGetValue(id, out state))
-            {
-                state.StartColor = state.CurrentColor;
-                state.TargetColor = to;
-                state.Duration = duration;
-                state.ElapsedTime = 0f;
-                state.IsPaused = false;
-                state.IsComplete = false;
-                state.Easing = easing ?? EasingFunctions.Linear;
-                state.OnComplete = onComplete;
-                state.CallbackInvoked = false;
-            }
-            else
-            {
-                state = GetPooledState();
-                state.Id = id;
-                state.Type = AnimationType.Color;
-                state.StartColor = from;
-                state.TargetColor = to;
-                state.CurrentColor = from;
-                state.Duration = duration;
-                state.Easing = easing ?? EasingFunctions.Linear;
-                state.OnComplete = onComplete;
-                _animations[id] = state;
-            }
-            if (duration <= 0)
+            var state = GetOrCreate(id, AnimationType.Color);
+            state.StartColor = from;
+            state.CurrentColor = from;
+            state.TargetColor = to;
+            Prepare(state, duration, easing, onComplete);
+
+            if (duration <= 0f)
             {
                 state.CurrentColor = to;
-                state.IsComplete = true;
-                state.CompletedTime = _currentTime;
+                Complete(state);
             }
         }
 
         public Color GetColor(string id, Color defaultValue = default)
         {
-            if (_animations.TryGetValue(id, out var state) && state.Type == AnimationType.Color)
-                return state.CurrentColor;
-            return defaultValue;
+            return _animations.TryGetValue(id, out var state) && state.Type == AnimationType.Color ? state.CurrentColor : defaultValue;
         }
 
         public void StartVector2(string id, Vector2 from, Vector2 to, float duration, Func<float, float> easing = null, Action onComplete = null)
         {
-            if (string.IsNullOrEmpty(id))
-                return;
-            AnimationState state;
-            if (_animations.TryGetValue(id, out state))
-            {
-                state.StartVector = state.CurrentVector;
-                state.TargetVector = to;
-                state.Duration = duration;
-                state.ElapsedTime = 0f;
-                state.IsPaused = false;
-                state.IsComplete = false;
-                state.Easing = easing ?? EasingFunctions.Linear;
-                state.OnComplete = onComplete;
-                state.CallbackInvoked = false;
-            }
-            else
-            {
-                state = GetPooledState();
-                state.Id = id;
-                state.Type = AnimationType.Vector2;
-                state.StartVector = from;
-                state.TargetVector = to;
-                state.CurrentVector = from;
-                state.Duration = duration;
-                state.Easing = easing ?? EasingFunctions.Linear;
-                state.OnComplete = onComplete;
-                _animations[id] = state;
-            }
-            if (duration <= 0)
+            var state = GetOrCreate(id, AnimationType.Vector2);
+            state.StartVector = from;
+            state.CurrentVector = from;
+            state.TargetVector = to;
+            Prepare(state, duration, easing, onComplete);
+
+            if (duration <= 0f)
             {
                 state.CurrentVector = to;
-                state.IsComplete = true;
-                state.CompletedTime = _currentTime;
+                Complete(state);
             }
         }
 
         public Vector2 GetVector2(string id, Vector2 defaultValue = default)
         {
-            if (_animations.TryGetValue(id, out var state) && state.Type == AnimationType.Vector2)
-                return state.CurrentVector;
-            return defaultValue;
+            return _animations.TryGetValue(id, out var state) && state.Type == AnimationType.Vector2 ? state.CurrentVector : defaultValue;
         }
 
         public void Pause(string id)
         {
             if (_animations.TryGetValue(id, out var state))
-                state.IsPaused = true;
+                state.Paused = true;
         }
 
         public void Resume(string id)
         {
             if (_animations.TryGetValue(id, out var state))
-                state.IsPaused = false;
+                state.Paused = false;
         }
 
         public void Cancel(string id, bool snapToTarget = false)
         {
-            if (_animations.TryGetValue(id, out var state))
+            if (!_animations.TryGetValue(id, out var state))
+                return;
+
+            if (snapToTarget)
             {
-                if (snapToTarget)
+                switch (state.Type)
                 {
-                    switch (state.Type)
-                    {
-                        case AnimationType.Float:
-                            state.CurrentValue = state.TargetValue;
-                            break;
-                        case AnimationType.Color:
-                            state.CurrentColor = state.TargetColor;
-                            break;
-                        case AnimationType.Vector2:
-                            state.CurrentVector = state.TargetVector;
-                            break;
-                    }
+                    case AnimationType.Float:
+                        state.CurrentFloat = state.TargetFloat;
+                        break;
+                    case AnimationType.Color:
+                        state.CurrentColor = state.TargetColor;
+                        break;
+                    case AnimationType.Vector2:
+                        state.CurrentVector = state.TargetVector;
+                        break;
                 }
-                state.IsComplete = true;
-                state.CompletedTime = _currentTime;
-                state.CallbackInvoked = true;
             }
+
+            Complete(state, invokeCallback: false);
         }
 
         public void Remove(string id)
         {
-            if (_animations.TryGetValue(id, out var state))
-            {
-                _animations.Remove(id);
-                ReturnToPool(state);
-            }
+            _animations.Remove(id);
         }
 
         public bool Exists(string id) => _animations.ContainsKey(id);
 
-        public bool IsActive(string id) => _animations.TryGetValue(id, out var s) && !s.IsPaused && !s.IsComplete;
+        public bool IsActive(string id) => _animations.TryGetValue(id, out var state) && !state.Completed && !state.Paused;
 
-        public bool IsComplete(string id) => _animations.TryGetValue(id, out var s) && s.IsComplete;
+        public bool IsComplete(string id) => _animations.TryGetValue(id, out var state) && state.Completed;
 
-        public float GetProgress(string id) => _animations.TryGetValue(id, out var s) ? s.Progress : 0f;
+        public float GetProgress(string id) => _animations.TryGetValue(id, out var state) ? state.Progress : 0f;
 
-        public void Update(float deltaTime)
+        public bool BeginGUI()
         {
-            _currentTime += deltaTime;
+            if (Event.current == null || Event.current.type == EventType.Repaint)
+            {
+                var delta = Time.unscaledDeltaTime > 0f ? Time.unscaledDeltaTime : Time.deltaTime;
+                Update(delta);
+            }
+
+            if (Event.current == null || Event.current.type == EventType.Repaint)
+                DrawBackground();
+
+            BeginRootGroup();
+            return true;
+        }
+
+        public void EndGUI()
+        {
+            if (!_rootGroupStarted)
+                return;
+
+            _layout.EndVerticalGroup();
+            _rootGroupStarted = false;
+        }
+
+        public void Cleanup()
+        {
+            _animations.Clear();
             _toRemove.Clear();
-            foreach (var kvp in _animations)
-            {
-                var state = kvp.Value;
-                if (state.IsPaused || state.IsComplete)
-                    continue;
-                state.ElapsedTime += deltaTime;
-                float t = state.Duration > 0 ? Mathf.Clamp01(state.ElapsedTime / state.Duration) : 1f;
-                float easedT = state.Easing != null ? state.Easing(t) : t;
-                switch (state.Type)
-                {
-                    case AnimationType.Float:
-                        state.CurrentValue = state.StartValue + (state.TargetValue - state.StartValue) * easedT;
-                        break;
-                    case AnimationType.Color:
-                        state.CurrentColor = new Color(
-                            Mathf.Clamp01(state.StartColor.r + (state.TargetColor.r - state.StartColor.r) * easedT),
-                            Mathf.Clamp01(state.StartColor.g + (state.TargetColor.g - state.StartColor.g) * easedT),
-                            Mathf.Clamp01(state.StartColor.b + (state.TargetColor.b - state.StartColor.b) * easedT),
-                            Mathf.Clamp01(state.StartColor.a + (state.TargetColor.a - state.StartColor.a) * easedT)
-                        );
-                        break;
-                    case AnimationType.Vector2:
-                        state.CurrentVector = new Vector2(state.StartVector.x + (state.TargetVector.x - state.StartVector.x) * easedT, state.StartVector.y + (state.TargetVector.y - state.StartVector.y) * easedT);
-                        break;
-                }
-                if (t >= 1f)
-                {
-                    state.IsComplete = true;
-                    state.CompletedTime = _currentTime;
-                    if (!state.CallbackInvoked && state.OnComplete != null)
-                    {
-                        state.CallbackInvoked = true;
-                        try
-                        {
-                            state.OnComplete();
-                        }
-                        catch (Exception ex)
-                        {
-                            GUILogger.LogException(ex, "OnComplete", "AnimationManager");
-                        }
-                    }
-                }
-            }
-            foreach (var kvp in _animations)
-            {
-                var state = kvp.Value;
-                if (state.IsComplete && (_currentTime - state.CompletedTime) > RetentionPeriod)
-                    _toRemove.Add(kvp.Key);
-            }
-            foreach (var id in _toRemove)
-                Remove(id);
         }
 
         public string Serialize(string id)
         {
             if (!_animations.TryGetValue(id, out var state))
                 return null;
-            return $"{state.Id}|{(int)state.Type}|{state.StartValue}|{state.TargetValue}|{state.CurrentValue}|{state.Duration}|{state.ElapsedTime}|{(state.IsPaused ? 1 : 0)}|{(state.IsComplete ? 1 : 0)}";
+
+            return $"{state.Id}|{(int)state.Type}|{state.CurrentFloat}|{state.CurrentColor.r},{state.CurrentColor.g},{state.CurrentColor.b},{state.CurrentColor.a}|{state.CurrentVector.x},{state.CurrentVector.y}|{state.Duration}|{state.Elapsed}";
         }
 
         public void Deserialize(string data)
         {
-            if (string.IsNullOrEmpty(data))
+            if (string.IsNullOrWhiteSpace(data))
                 return;
-            try
-            {
-                var parts = data.Split('|');
-                if (parts.Length < 9)
-                {
-                    GUILogger.LogWarning("Invalid animation data format", "AnimationManager.Deserialize");
-                    return;
-                }
-                var state = GetPooledState();
-                state.Id = parts[0];
-                state.Type = (AnimationType)int.Parse(parts[1]);
-                state.StartValue = float.Parse(parts[2]);
-                state.TargetValue = float.Parse(parts[3]);
-                state.CurrentValue = float.Parse(parts[4]);
-                state.Duration = float.Parse(parts[5]);
-                state.ElapsedTime = float.Parse(parts[6]);
-                state.IsPaused = parts[7] == "1";
-                state.IsComplete = parts[8] == "1";
-                state.Easing = EasingFunctions.Linear;
-                _animations[state.Id] = state;
-            }
-            catch (Exception ex)
-            {
-                GUILogger.LogException(ex, "Deserialize", "AnimationManager");
-            }
         }
 
-        public bool BeginGUI()
+        public void Update(float deltaTime)
         {
-            try
-            {
-                Update(Time.deltaTime);
-            }
-            catch (Exception ex)
-            {
-                GUILogger.LogException(ex, "BeginGUI.Update", "AnimationManager");
-            }
+            if (deltaTime <= 0f)
+                return;
 
-            try
-            {
-                Color bg = ThemeManager.Instance?.CurrentTheme?.BackgroundColor ?? new Color(0.1f, 0.1f, 0.1f, 0.95f);
-                GUI.color = bg;
-                GUI.DrawTexture(new Rect(0, 0, Screen.width, Screen.height), Texture2D.whiteTexture);
-                GUI.color = Color.white;
-            }
-            catch (Exception ex)
-            {
-                GUILogger.LogException(ex, "BeginGUI.Background", "AnimationManager");
-                GUI.color = Color.white;
-            }
-
-            try
-            {
-                var styleManager = guiHelper.GetStyleManager();
-                var boxStyle = styleManager?.GetAnimatedBoxStyle() ?? GUI.skin.box;
-#if IL2CPP_MELONLOADER_PRE57
-                layoutComponents.BeginVerticalGroup(boxStyle, (Il2CppReferenceArray<GUILayoutOption>)null);
-#else
-                layoutComponents.BeginVerticalGroup(boxStyle);
-#endif
-                _layoutGroupStarted = true;
-            }
-            catch (Exception ex)
-            {
-                GUILogger.LogException(ex, "BeginGUI.Layout", "AnimationManager");
-                GUILayout.BeginVertical();
-                _layoutGroupStarted = true;
-            }
-
-            return true;
-        }
-
-        public void EndGUI()
-        {
-            if (_layoutGroupStarted)
-            {
-                layoutComponents.EndVerticalGroup();
-                _layoutGroupStarted = false;
-            }
-            GUI.color = Color.white;
-        }
-
-        public void Cleanup()
-        {
-            foreach (var kvp in _animations)
-                ReturnToPool(kvp.Value);
-            _animations.Clear();
+            _clock += deltaTime;
             _toRemove.Clear();
+
+            foreach (var pair in _animations)
+            {
+                var state = pair.Value;
+                if (state.Paused || state.Completed)
+                    continue;
+
+                state.Elapsed += deltaTime;
+                var t = state.Easing != null ? state.Easing(state.Progress) : state.Progress;
+
+                switch (state.Type)
+                {
+                    case AnimationType.Float:
+                        state.CurrentFloat = Mathf.LerpUnclamped(state.StartFloat, state.TargetFloat, t);
+                        break;
+                    case AnimationType.Color:
+                        state.CurrentColor = Color.LerpUnclamped(state.StartColor, state.TargetColor, t);
+                        break;
+                    case AnimationType.Vector2:
+                        state.CurrentVector = Vector2.LerpUnclamped(state.StartVector, state.TargetVector, t);
+                        break;
+                }
+
+                if (state.Progress >= 1f)
+                    Complete(state);
+            }
+
+            foreach (var pair in _animations)
+            {
+                if (pair.Value.Completed && _clock - pair.Value.CompletedAt > RetentionPeriod)
+                    _toRemove.Add(pair.Key);
+            }
+
+            foreach (var id in _toRemove)
+                _animations.Remove(id);
+        }
+
+        private AnimationState GetOrCreate(string id, AnimationType type)
+        {
+            if (!_animations.TryGetValue(id, out var state))
+            {
+                state = new AnimationState { Id = id, Type = type };
+                _animations[id] = state;
+            }
+
+            state.Type = type;
+            return state;
+        }
+
+        private void Prepare(AnimationState state, float duration, Func<float, float> easing, Action onComplete)
+        {
+            state.Duration = Mathf.Max(0f, duration);
+            state.Elapsed = 0f;
+            state.Paused = false;
+            state.Completed = false;
+            state.CompletedAt = 0f;
+            state.Easing = easing ?? EasingFunctions.Linear;
+            state.OnComplete = onComplete;
+            state.CompletionHandled = false;
+        }
+
+        private void Complete(AnimationState state, bool invokeCallback = true)
+        {
+            state.Completed = true;
+            state.Paused = false;
+            state.CompletedAt = _clock;
+
+            if (!invokeCallback || state.CompletionHandled || state.OnComplete == null)
+                return;
+
+            state.CompletionHandled = true;
+
+            try
+            {
+                state.OnComplete();
+            }
+            catch (Exception ex)
+            {
+                GUILogger.LogException(ex, nameof(Complete), nameof(AnimationManager));
+            }
+        }
+
+        private void DrawBackground()
+        {
+            try
+            {
+                var theme = ThemeManager.Instance.CurrentTheme;
+                var previous = GUI.color;
+                var background = theme?.BackgroundColor ?? theme?.Base ?? new Color(0.1f, 0.1f, 0.1f, 0.95f);
+                GUI.color = background;
+                GUI.DrawTexture(new Rect(0f, 0f, Screen.width, Screen.height), Texture2D.whiteTexture);
+                GUI.color = previous;
+            }
+            catch (Exception ex)
+            {
+                GUILogger.LogException(ex, nameof(DrawBackground), nameof(AnimationManager));
+                GUI.color = Color.white;
+            }
+        }
+
+        private void BeginRootGroup()
+        {
+            if (_rootGroupStarted)
+                return;
+
+            try
+            {
+                var style = _guiHelper.GetStyleManager()?.GetAnimatedBoxStyle() ?? GUI.skin.box;
+                _layout.BeginVerticalGroup(style);
+            }
+            catch (Exception ex)
+            {
+                GUILogger.LogException(ex, nameof(BeginRootGroup), nameof(AnimationManager));
+                GUILayout.BeginVertical();
+            }
+
+            _rootGroupStarted = true;
         }
     }
 
@@ -489,14 +371,14 @@ namespace shadcnui.GUIComponents.Core.Utils
             manager.StartFloat(id, 1f, 0f, duration, easing ?? EasingFunctions.EaseOutCubic);
         }
 
-        public static void ScaleIn(this AnimationManager manager, string id, float duration = 0.2f, float fromScale = 0.95f, Func<float, float> easing = null)
+        public static void ScaleIn(this AnimationManager manager, string id, float duration = 0.2f, float fromScale = 0.96f, Func<float, float> easing = null)
         {
             manager.StartFloat(id, fromScale, 1f, duration, easing ?? EasingFunctions.EaseOutCubic);
         }
 
-        public static void ScaleOut(this AnimationManager manager, string id, float duration = 0.2f, float toScale = 0.95f, Func<float, float> easing = null)
+        public static void ScaleOut(this AnimationManager manager, string id, float duration = 0.2f, float toScale = 0.96f, Func<float, float> easing = null)
         {
-            manager.StartFloat(id, 1f, toScale, duration, easing ?? EasingFunctions.EaseOutCubic);
+            manager.StartFloat(id, 1f, toScale, duration, easing ?? EasingFunctions.EaseInCubic);
         }
 
         public static void SlideIn(this AnimationManager manager, string id, Vector2 target, Vector2 offset, float duration = 0.3f, Func<float, float> easing = null)
@@ -506,7 +388,7 @@ namespace shadcnui.GUIComponents.Core.Utils
 
         public static void SlideOut(this AnimationManager manager, string id, Vector2 current, Vector2 offset, float duration = 0.3f, Func<float, float> easing = null)
         {
-            manager.StartVector2(id, current, current + offset, duration, easing ?? EasingFunctions.EaseOutCubic);
+            manager.StartVector2(id, current, current + offset, duration, easing ?? EasingFunctions.EaseInCubic);
         }
     }
 }

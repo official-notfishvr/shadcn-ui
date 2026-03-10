@@ -42,7 +42,7 @@ namespace shadcnui.GUIComponents.Data
             state.ShowColumnToggle = showColumnToggle;
 
             var theme = styleManager?.GetTheme();
-            var tableStyle = styleManager?.GetTableStyle(ControlVariant.Default, ControlSize.Default) ?? GUI.skin.box;
+            var tableStyle = styleManager?.GetTableStyle(ControlVariant.Default, ControlSize.Small) ?? GUI.skin.box;
 
             layoutComponents.BeginVerticalGroup(tableStyle, options);
 
@@ -100,7 +100,7 @@ namespace shadcnui.GUIComponents.Data
 
             UnityHelpers.Label("Search:", labelStyle, GUILayout.Width(60 * guiHelper.uiScale));
 
-            var inputStyle = styleManager?.GetInputStyle(ControlVariant.Default) ?? GUI.skin.textField;
+            var inputStyle = styleManager?.GetInputStyle(ControlVariant.Default, ControlSize.Small) ?? GUI.skin.textField;
 
 #if IL2CPP_MELONLOADER_PRE57
             string newFilterText = GUILayout.TextField(state.FilterText ?? "", inputStyle, new Il2CppReferenceArray<GUILayoutOption>(new GUILayoutOption[] { GUILayout.Width(200 * guiHelper.uiScale) }));
@@ -123,14 +123,14 @@ namespace shadcnui.GUIComponents.Data
         private void DrawTableHeader(string id, List<DataTableColumn> columns, DataTableState state, bool showSelection, List<DataTableRow> allData)
         {
             var styleManager = guiHelper.GetStyleManager();
-            var headerStyle = styleManager?.GetTableHeaderStyle(ControlVariant.Default, ControlSize.Default) ?? GUI.skin.label;
+            var headerStyle = styleManager?.GetTableHeaderStyle(ControlVariant.Default, ControlSize.Small) ?? GUI.skin.label;
 
             layoutComponents.BeginHorizontalGroup();
 
             if (showSelection)
             {
                 bool allSelected = allData.Count > 0 && allData.All(row => state.SelectedRows.Contains(row.Id));
-                bool newSelectAll = guiHelper.Toggle("", allSelected, ControlVariant.Default, ControlSize.Default, null, false, GUILayout.Width(20 * guiHelper.uiScale));
+                bool newSelectAll = guiHelper.Toggle("", allSelected, ControlVariant.Default, ControlSize.Icon, null, false, GUILayout.Width(18 * guiHelper.uiScale), GUILayout.Height(18 * guiHelper.uiScale));
 
                 if (newSelectAll != allSelected)
                 {
@@ -164,7 +164,7 @@ namespace shadcnui.GUIComponents.Data
                         sortIcon = state.SortAscending ? " ↑" : " ↓";
                     }
 
-                    if (guiHelper.Button(headerText + sortIcon, ControlVariant.Ghost, ControlSize.Default, null, false, 1f, GUILayout.Width(column.Width * guiHelper.uiScale)))
+                    if (guiHelper.Button(headerText + sortIcon, ControlVariant.Ghost, ControlSize.Small, null, false, 1f, GUILayout.Width(column.Width * guiHelper.uiScale)))
                     {
                         if (state.SortColumn == column.Id)
                         {
@@ -196,7 +196,7 @@ namespace shadcnui.GUIComponents.Data
 
             var styleManager = guiHelper.GetStyleManager();
 
-            var rowStyle = styleManager.GetTableRowStyle(ControlVariant.Default, ControlSize.Default);
+            var rowStyle = styleManager.GetTableRowStyle(ControlVariant.Default, ControlSize.Small);
 
             for (int i = 0; i < data.Count; i++)
             {
@@ -207,7 +207,7 @@ namespace shadcnui.GUIComponents.Data
 
                 if (showSelection)
                 {
-                    bool newSelected = guiHelper.Toggle("", isSelected, ControlVariant.Default, ControlSize.Default, null, false, GUILayout.Width(20 * guiHelper.uiScale));
+                    bool newSelected = guiHelper.Toggle("", isSelected, ControlVariant.Default, ControlSize.Icon, null, false, GUILayout.Width(18 * guiHelper.uiScale), GUILayout.Height(18 * guiHelper.uiScale));
 
                     if (newSelected != isSelected)
                     {
@@ -237,7 +237,7 @@ namespace shadcnui.GUIComponents.Data
                         cellText = row.GetValue<string>(column.AccessorKey, "");
                     }
 
-                    GUIStyle customCellStyle = styleManager.GetTableCellStyle(ControlVariant.Default, ControlSize.Default, column.Alignment);
+                    GUIStyle customCellStyle = styleManager.GetTableCellStyle(ControlVariant.Default, ControlSize.Small, column.Alignment);
 
                     string displayText = cellText ?? "";
                     if (string.IsNullOrEmpty(displayText))
@@ -273,7 +273,7 @@ namespace shadcnui.GUIComponents.Data
             layoutComponents.AddSpace(DesignTokens.Spacing.SM);
             layoutComponents.BeginHorizontalGroup();
 
-            if (guiHelper.Button("← Previous", ControlVariant.Default, ControlSize.Default, null, false, 1f, GUILayout.Width(80 * guiHelper.uiScale)))
+            if (guiHelper.Button("← Previous", ControlVariant.Default, ControlSize.Small, null, false, 1f, GUILayout.Width(76 * guiHelper.uiScale)))
             {
                 if (state.CurrentPage > 0)
                     state.CurrentPage--;
@@ -288,7 +288,7 @@ namespace shadcnui.GUIComponents.Data
 
             GUILayout.FlexibleSpace();
 
-            if (guiHelper.Button("Next →", ControlVariant.Default, ControlSize.Default, null, false, 1f, GUILayout.Width(80 * guiHelper.uiScale)))
+            if (guiHelper.Button("Next →", ControlVariant.Default, ControlSize.Small, null, false, 1f, GUILayout.Width(76 * guiHelper.uiScale)))
             {
                 if (state.CurrentPage < totalPages - 1)
                     state.CurrentPage++;

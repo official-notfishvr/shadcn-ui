@@ -11,26 +11,27 @@ namespace shadcnui.GUIComponents.Core.Base
 
     public abstract class BaseComponent : IComponent
     {
-        protected GUIHelper guiHelper;
-        protected StyleManager styleManager;
-        protected Layout.Layout layoutComponents;
-        protected bool isDisposed = false;
-        private bool _initialized = false;
+        protected readonly GUIHelper guiHelper;
+        protected readonly StyleManager styleManager;
+        protected readonly Layout.Layout layoutComponents;
+        protected bool isDisposed;
 
-        public BaseComponent(GUIHelper helper)
+        private bool _initialized;
+
+        protected BaseComponent(GUIHelper helper)
         {
-            guiHelper = helper;
+            guiHelper = helper ?? throw new ArgumentNullException(nameof(helper));
             styleManager = helper.GetStyleManager();
             layoutComponents = new Layout.Layout(helper);
         }
 
         public void EnsureInitialized()
         {
-            if (!_initialized)
-            {
-                _initialized = true;
-                Initialize();
-            }
+            if (_initialized)
+                return;
+
+            _initialized = true;
+            Initialize();
         }
 
         public virtual void Initialize() { }
@@ -39,16 +40,16 @@ namespace shadcnui.GUIComponents.Core.Base
 
         public virtual void Dispose()
         {
-            if (!isDisposed)
+            if (isDisposed)
+                return;
+
+            try
             {
-                try
-                {
-                    OnBeforeDispose();
-                }
-                finally
-                {
-                    isDisposed = true;
-                }
+                OnBeforeDispose();
+            }
+            finally
+            {
+                isDisposed = true;
             }
         }
     }

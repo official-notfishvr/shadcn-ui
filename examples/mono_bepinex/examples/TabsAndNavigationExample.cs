@@ -41,80 +41,97 @@ namespace shadcnui_examples.Examples
         void DrawTabsWindow(int windowID)
         {
             gui.UpdateGUI(showWindow);
-            if (!gui.BeginGUI()) return;
+            if (!gui.BeginGUI())
+                return;
 
-            scroll = gui.ScrollView(scroll, () =>
-            {
-                gui.BeginVerticalGroup();
-
-                gui.Label("Standard Tabs", ControlVariant.Default);
-                selectedTab = gui.Tabs(tabNames, selectedTab, index =>
+            scroll = gui.ScrollView(
+                scroll,
+                () =>
                 {
-                    selectedTab = index;
-                    gui.ShowToast($"Switched to {tabNames[index]} tab");
-                });
+                    gui.BeginVerticalGroup();
 
-                gui.BeginTabContent();
-                switch (selectedTab)
-                {
-                    case 0:
-                        gui.Card("Account", "Manage your account", "Here you can update your profile information, change your avatar, and manage connected accounts.");
-                        break;
-                    case 1:
-                        gui.Card("Settings", "Application settings", "Configure application preferences, display options, and default behaviors.");
-                        break;
-                    case 2:
-                        gui.Card("Security", "Security settings", "Manage passwords, two-factor authentication, and security keys.");
-                        break;
-                    case 3:
-                        gui.Card("Notifications", "Notification preferences", "Choose which notifications you want to receive and how.");
-                        break;
-                }
-                gui.EndTabContent();
+                    gui.Label("Standard Tabs", ControlVariant.Default);
+                    selectedTab = gui.Tabs(
+                        tabNames,
+                        selectedTab,
+                        index =>
+                        {
+                            selectedTab = index;
+                            gui.ShowToast($"Switched to {tabNames[index]} tab");
+                        }
+                    );
 
-                gui.AddSpace(20);
+                    gui.BeginTabContent();
+                    switch (selectedTab)
+                    {
+                        case 0:
+                            gui.Card("Account", "Manage your account", "Here you can update your profile information, change your avatar, and manage connected accounts.");
+                            break;
+                        case 1:
+                            gui.Card("Settings", "Application settings", "Configure application preferences, display options, and default behaviors.");
+                            break;
+                        case 2:
+                            gui.Card("Security", "Security settings", "Manage passwords, two-factor authentication, and security keys.");
+                            break;
+                        case 3:
+                            gui.Card("Notifications", "Notification preferences", "Choose which notifications you want to receive and how.");
+                            break;
+                    }
+                    gui.EndTabContent();
 
-                gui.Label("Vertical Tabs (Left Side)", ControlVariant.Default);
-                gui.BeginHorizontalGroup();
+                    gui.AddSpace(20);
 
-                gui.BeginVerticalGroup(GUILayout.Width(120));
-                selectedVerticalTab = gui.VerticalTabs(new[] { "General", "Appearance", "Advanced" }, selectedVerticalTab, null, 100, 1, TabSide.Left);
-                gui.EndVerticalGroup();
+                    gui.Label("Vertical Tabs (Left Side)", ControlVariant.Default);
+                    gui.BeginHorizontalGroup();
 
-                gui.BeginVerticalGroup();
-                switch (selectedVerticalTab)
-                {
-                    case 0:
-                        gui.Label("General Settings", ControlVariant.Default);
-                        autoSave = gui.Checkbox("Enable auto-save", autoSave);
-                        showWelcome = gui.Checkbox("Show welcome screen", showWelcome);
-                        enableAnalytics = gui.Checkbox("Enable analytics", enableAnalytics);
-                        break;
-                    case 1:
-                        gui.Label("Appearance Settings", ControlVariant.Default);
-                        gui.ThemeChanger();
-                        break;
-                    case 2:
-                        gui.Label("Advanced Settings", ControlVariant.Default);
-                        cacheSize = gui.LabeledSlider("Cache size", cacheSize, 10, 100);
-                        enableExperimental = gui.Checkbox("Enable experimental features", enableExperimental);
-                        break;
-                }
-                gui.EndVerticalGroup();
+                    gui.BeginVerticalGroup(GUILayout.Width(120));
+                    selectedVerticalTab = gui.VerticalTabs(new[] { "General", "Appearance", "Advanced" }, selectedVerticalTab, null, 100, 1, TabSide.Left);
+                    gui.EndVerticalGroup();
 
-                gui.EndHorizontalGroup();
+                    gui.BeginVerticalGroup();
+                    switch (selectedVerticalTab)
+                    {
+                        case 0:
+                            gui.Label("General Settings", ControlVariant.Default);
+                            autoSave = gui.Checkbox("Enable auto-save", autoSave);
+                            showWelcome = gui.Checkbox("Show welcome screen", showWelcome);
+                            enableAnalytics = gui.Checkbox("Enable analytics", enableAnalytics);
+                            break;
+                        case 1:
+                            gui.Label("Appearance Settings", ControlVariant.Default);
+                            gui.ThemeChanger();
+                            break;
+                        case 2:
+                            gui.Label("Advanced Settings", ControlVariant.Default);
+                            cacheSize = gui.LabeledSlider("Cache size", cacheSize, 10, 100);
+                            enableExperimental = gui.Checkbox("Enable experimental features", enableExperimental);
+                            break;
+                    }
+                    gui.EndVerticalGroup();
 
-                gui.AddSpace(20);
+                    gui.EndHorizontalGroup();
 
-                gui.Label("Sidebar Navigation", ControlVariant.Default);
-                selectedSidebarItem = gui.Sidebar(sidebarItems, selectedSidebarItem, null, "APP", index =>
-                {
-                    selectedSidebarItem = index;
-                    gui.ShowSuccessToast($"Navigated to {sidebarItems[index]}");
-                }, 100);
+                    gui.AddSpace(20);
 
-                gui.EndVerticalGroup();
-            }, GUILayout.Width(windowRect.width - 20), GUILayout.Height(windowRect.height - 60));
+                    gui.Label("Sidebar Navigation", ControlVariant.Default);
+                    selectedSidebarItem = gui.Sidebar(
+                        sidebarItems,
+                        selectedSidebarItem,
+                        null,
+                        "APP",
+                        index =>
+                        {
+                            selectedSidebarItem = index;
+                            gui.ShowSuccessToast($"Navigated to {sidebarItems[index]}");
+                        },
+                        100
+                    );
+
+                    gui.EndVerticalGroup();
+                },
+                GUILayout.Width(windowRect.width - 20),
+                GUILayout.Height(windowRect.height - 60)
+            );
 
             gui.EndGUI();
             GUI.DragWindow();

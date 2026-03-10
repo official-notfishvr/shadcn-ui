@@ -260,7 +260,7 @@ namespace shadcnui.GUIComponents.Layout
         {
             layoutComponents.BeginHorizontalGroup(rowStyle);
 
-            bool newSelected = UnityHelpers.Toggle(selectedRows[rowIndex], "", GUILayout.Width(20 * guiHelper.uiScale));
+            bool newSelected = UnityHelpers.Toggle(selectedRows[rowIndex], "", GUI.skin.toggle, GUILayout.Width(20 * guiHelper.uiScale));
 
             if (newSelected != selectedRows[rowIndex])
             {

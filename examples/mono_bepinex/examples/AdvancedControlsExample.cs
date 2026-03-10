@@ -40,72 +40,91 @@ namespace shadcnui_examples.Examples
         void DrawAdvancedWindow(int windowID)
         {
             gui.UpdateGUI(showWindow);
-            if (!gui.BeginGUI()) return;
+            if (!gui.BeginGUI())
+                return;
 
-            scroll = gui.ScrollView(scroll, () =>
-            {
-                gui.BeginVerticalGroup();
-
-                gui.Label("Menu Bar", ControlVariant.Default);
-                var menuBarItems = new System.Collections.Generic.List<MenuItem>
+            scroll = gui.ScrollView(
+                scroll,
+                () =>
                 {
-                    new MenuItem("File", () => gui.ShowToast("File clicked")),
-                    new MenuItem("Edit", () => gui.ShowToast("Edit clicked")),
-                    new MenuItem("View", () => gui.ShowToast("View clicked")),
-                    new MenuItem("Help", () => gui.ShowToast("Help clicked"))
-                };
-                gui.MenuBar(menuBarItems);
+                    gui.BeginVerticalGroup();
 
-                gui.HorizontalSeparator();
+                    gui.Label("Menu Bar", ControlVariant.Default);
+                    var menuBarItems = new System.Collections.Generic.List<MenuItem>
+                    {
+                        new MenuItem("File", () => gui.ShowToast("File clicked")),
+                        new MenuItem("Edit", () => gui.ShowToast("Edit clicked")),
+                        new MenuItem("View", () => gui.ShowToast("View clicked")),
+                        new MenuItem("Help", () => gui.ShowToast("Help clicked")),
+                    };
+                    gui.MenuBar(menuBarItems);
 
-                gui.Label("Dropdown Menu", ControlVariant.Default);
-                if (gui.Button("Open Dropdown", ControlVariant.Outline))
-                    gui.OpenSelect();
+                    gui.HorizontalSeparator();
 
-                gui.Select(dropdownItems, 0);
+                    gui.Label("Dropdown Menu", ControlVariant.Default);
+                    if (gui.Button("Open Dropdown", ControlVariant.Outline))
+                        gui.OpenSelect();
 
-                gui.HorizontalSeparator();
+                    gui.Select(dropdownItems, 0);
 
-                gui.Label("Closable Tabs", ControlVariant.Default);
-                gui.ClosableTabs(ref closableTabs, ref closableTabStates, selectedClosableTab, null, index =>
-                {
-                    selectedClosableTab = index;
-                    gui.ShowToast($"Selected tab: {closableTabs[index]}");
-                });
+                    gui.HorizontalSeparator();
 
-                gui.BeginTabContent();
-                if (selectedClosableTab >= 0 && selectedClosableTab < closableTabs.Length)
-                {
-                    gui.MutedLabel($"Content for {closableTabs[selectedClosableTab]}");
-                    gui.Label("This content is shown within the selected tab.", ControlVariant.Default);
-                }
-                gui.EndTabContent();
+                    gui.Label("Closable Tabs", ControlVariant.Default);
+                    gui.ClosableTabs(
+                        ref closableTabs,
+                        ref closableTabStates,
+                        selectedClosableTab,
+                        null,
+                        index =>
+                        {
+                            selectedClosableTab = index;
+                            gui.ShowToast($"Selected tab: {closableTabs[index]}");
+                        }
+                    );
 
-                gui.HorizontalSeparator();
+                    gui.BeginTabContent();
+                    if (selectedClosableTab >= 0 && selectedClosableTab < closableTabs.Length)
+                    {
+                        gui.MutedLabel($"Content for {closableTabs[selectedClosableTab]}");
+                        gui.Label("This content is shown within the selected tab.", ControlVariant.Default);
+                    }
+                    gui.EndTabContent();
 
-                gui.Label("Resizable Text Area", ControlVariant.Default);
-                resizableText = gui.ResizableTextArea(resizableText, ref textAreaHeight, ControlVariant.Default, "Type here...", false, 60f, 200f);
-                gui.MutedLabel($"Current height: {textAreaHeight:F0}px");
+                    gui.HorizontalSeparator();
 
-                gui.HorizontalSeparator();
+                    gui.Label("Resizable Text Area", ControlVariant.Default);
+                    resizableText = gui.ResizableTextArea(resizableText, ref textAreaHeight, ControlVariant.Default, "Type here...", false, 60f, 200f);
+                    gui.MutedLabel($"Current height: {textAreaHeight:F0}px");
 
-                gui.Label("Navigation", ControlVariant.Default);
-                selectedMenuItem = gui.Sidebar(menuItems, selectedMenuItem, null, "APP", index =>
-                {
-                    gui.ShowToast($"Navigated to {menuItems[index]}");
-                }, 80);
+                    gui.HorizontalSeparator();
 
-                gui.HorizontalSeparator();
+                    gui.Label("Navigation", ControlVariant.Default);
+                    selectedMenuItem = gui.Sidebar(
+                        menuItems,
+                        selectedMenuItem,
+                        null,
+                        "APP",
+                        index =>
+                        {
+                            gui.ShowToast($"Navigated to {menuItems[index]}");
+                        },
+                        80
+                    );
 
-                gui.Label("Theme Variants", ControlVariant.Default);
-                gui.BeginHorizontalGroup();
-                gui.ThemeChangerCompact();
-                gui.AddSpace(20);
-                gui.ThemeChangerWithPreview("theme_preview", 200);
-                gui.EndHorizontalGroup();
+                    gui.HorizontalSeparator();
 
-                gui.EndVerticalGroup();
-            }, GUILayout.Width(windowRect.width - 20), GUILayout.Height(windowRect.height - 60));
+                    gui.Label("Theme Variants", ControlVariant.Default);
+                    gui.BeginHorizontalGroup();
+                    gui.ThemeChangerCompact();
+                    gui.AddSpace(20);
+                    gui.ThemeChangerWithPreview("theme_preview", 200);
+                    gui.EndHorizontalGroup();
+
+                    gui.EndVerticalGroup();
+                },
+                GUILayout.Width(windowRect.width - 20),
+                GUILayout.Height(windowRect.height - 60)
+            );
 
             gui.EndGUI();
             GUI.DragWindow();

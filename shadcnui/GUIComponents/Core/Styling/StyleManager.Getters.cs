@@ -1,301 +1,399 @@
-using System;
-using shadcnui.GUIComponents.Core.Base;
-using shadcnui.GUIComponents.Core.Theming;
 using shadcnui.GUIComponents.Core.Utils;
 using UnityEngine;
-#if IL2CPP_MELONLOADER_PRE57
-using UnhollowerBaseLib;
-#endif
 
 namespace shadcnui.GUIComponents.Core.Styling
 {
     public partial class StyleManager
     {
-        #region Variant Application
-        private void ApplyContainerVariant(GUIStyle style, ControlVariant variant, Theme theme)
+        private GUIStyle GetCachedStyle(StyleComponentType type, ControlVariant variant, ControlSize size, GUIStyle baseStyle, int state = 0, System.Action<GUIStyle> customize = null)
         {
-            switch (variant)
-            {
-                case ControlVariant.Secondary:
-                    style.normal.background = CreateSolidTexture(Color.Lerp(theme.Secondary, theme.Text, 0.05f));
-                    break;
-                case ControlVariant.Destructive:
-                    style.normal.background = CreateSolidTexture(theme.Destructive);
-                    style.normal.textColor = theme.ButtonDestructiveFg;
-                    break;
-                case ControlVariant.Outline:
-                    style.normal.background = TransparentTexture;
-                    style.border = new UnityHelpers.RectOffset(1, 1, 1, 1);
-                    break;
-                case ControlVariant.Ghost:
-                    style.normal.background = TransparentTexture;
-                    break;
-                case ControlVariant.Muted:
-                    style.normal.background = CreateSolidTexture(theme.Muted);
-                    break;
-            }
-        }
+            InitializeGUI();
 
-        private void ApplyVariantToStyle(GUIStyle style, StyleComponentType type, ControlVariant variant)
-        {
-            var modifier = Registry.GetVariantModifier(type, variant);
-            modifier?.Invoke(style, ThemeManager.Instance.CurrentTheme, _guiHelper);
-        }
-
-        private void ApplySizing(GUIStyle style, StyleComponentType type, ControlSize size)
-        {
-            var modifier = Registry.GetSizeModifier(type, size);
-            modifier?.Invoke(style, ThemeManager.Instance.CurrentTheme, _guiHelper);
-        }
-        #endregion
-
-        #region Helper Methods
-        private GUIStyle GetCachedStyle(StyleComponentType componentType, ControlVariant variant, ControlSize size, GUIStyle baseStyle, int state = 0, bool applyVariant = true, bool applySizing = true, Action<GUIStyle> customLogic = null)
-        {
-            var key = new StyleKey(componentType, variant, size, state);
-
+            var key = new StyleKey(type, variant, size, state);
             if (_styleCache.TryGetValue(key, out var cached))
-            {
-                TouchCacheEntry(key);
-                return cached.Style;
-            }
+                return cached;
 
-            var style = Style(baseStyle).Build();
-            customLogic?.Invoke(style);
+            var style = CloneStyle(baseStyle);
+            ApplySize(style, type, size);
+            ApplyVariant(style, type, variant);
+            customize?.Invoke(style);
 
-            if (applyVariant)
-                ApplyVariantToStyle(style, componentType, variant);
+            if (Registry.GetVariantModifier(type, variant) is { } variantModifier)
+                variantModifier(style, GetTheme(), _guiHelper);
 
-            if (applySizing)
-                ApplySizing(style, componentType, size);
+            if (Registry.GetSizeModifier(type, size) is { } sizeModifier)
+                sizeModifier(style, GetTheme(), _guiHelper);
 
-            AddToCache(key, style);
+            _styleCache[key] = style;
             return style;
         }
 
-        private GUIStyle GetSimpleStyle(StyleComponentType type, GUIStyle baseStyle, ControlVariant variant = ControlVariant.Default, ControlSize size = ControlSize.Default) => GetCachedStyle(type, variant, size, baseStyle);
+        private void ApplySize(GUIStyle style, StyleComponentType type, ControlSize size)
+        {
+            switch (type)
+            {
+                case StyleComponentType.Button:
+                case StyleComponentType.Toggle:
+                case StyleComponentType.Input:
+                case StyleComponentType.PasswordField:
+                case StyleComponentType.Switch:
+                    ApplyControlSize(style, size);
+                    return;
+                case StyleComponentType.Badge:
+                    ApplyChipSize(style, size);
+                    return;
+                case StyleComponentType.Label:
+                case StyleComponentType.SectionHeader:
+                case StyleComponentType.ChartAxis:
+                case StyleComponentType.CardTitle:
+                case StyleComponentType.CardDescription:
+                    ApplyFontOnlySize(style, size);
+                    return;
+            }
 
-        private GUIStyle GetLabelBasedStyle(StyleComponentType type, float fontScale, Action<GUIStyle, Theme> extraSetup = null, ControlVariant variant = ControlVariant.Default, ControlSize size = ControlSize.Default) =>
-            GetCachedStyle(
-                type,
-                variant,
-                size,
-                _baseLabelStyle ?? GUI.skin.label,
-                applyVariant: false,
-                customLogic: s =>
+            if (size == ControlSize.Large)
+                style.padding = GetSpacingOffset(DesignTokens.Spacing.LG, DesignTokens.Spacing.LG);
+            else if (size == ControlSize.Small || size == ControlSize.Mini)
+                style.padding = GetSpacingOffset(DesignTokens.Spacing.SM, DesignTokens.Spacing.SM);
+        }
+
+        private void ApplyControlSize(GUIStyle style, ControlSize size)
+        {
+            switch (size)
+            {
+                case ControlSize.Mini:
+                    style.fontSize = GetScaledFontSize(DesignTokens.FontScale.XS);
+                    style.padding = GetSpacingOffset(DesignTokens.Padding.Button.MiniH, DesignTokens.Padding.Button.MiniV);
+                    style.fixedHeight = GetMinimumControlHeight(DesignTokens.Height.Mini, style.fontSize, DesignTokens.Padding.Button.MiniV);
+                    break;
+                case ControlSize.Small:
+                    style.fontSize = GetScaledFontSize(DesignTokens.FontScale.XS);
+                    style.padding = GetSpacingOffset(DesignTokens.Padding.Button.SmallH, DesignTokens.Padding.Button.SmallV);
+                    style.fixedHeight = GetMinimumControlHeight(DesignTokens.Height.Small, style.fontSize, DesignTokens.Padding.Button.SmallV);
+                    break;
+                case ControlSize.Large:
+                    style.fontSize = GetScaledFontSize(DesignTokens.FontScale.MD);
+                    style.padding = GetSpacingOffset(DesignTokens.Padding.Button.LargeH, DesignTokens.Padding.Button.LargeV);
+                    style.fixedHeight = GetMinimumControlHeight(DesignTokens.Height.Large, style.fontSize, DesignTokens.Padding.Button.LargeV);
+                    break;
+                case ControlSize.Icon:
+                    var iconSize = GetScaledHeight(DesignTokens.Height.Default);
+                    style.fixedWidth = iconSize;
+                    style.fixedHeight = iconSize;
+                    style.padding = new RectOffset();
+                    break;
+                default:
+                    style.fontSize = GetScaledFontSize(DesignTokens.FontScale.SM);
+                    style.padding = GetSpacingOffset(DesignTokens.Padding.Button.DefaultH, DesignTokens.Padding.Button.DefaultV);
+                    style.fixedHeight = GetMinimumControlHeight(DesignTokens.Height.Default, style.fontSize, DesignTokens.Padding.Button.DefaultV);
+                    break;
+            }
+        }
+
+        private int GetMinimumControlHeight(float baseHeight, int fontSize, float verticalPadding)
+        {
+            int minHeight = GetScaledHeight(baseHeight);
+            int contentHeight = fontSize + GetScaledSpacing(verticalPadding * 2f) + GetScaledSpacing(DesignTokens.Layout.ControlTextSlack);
+            return Mathf.Max(minHeight, contentHeight);
+        }
+
+        private void ApplyChipSize(GUIStyle style, ControlSize size)
+        {
+            switch (size)
+            {
+                case ControlSize.Mini:
+                    style.fontSize = GetScaledFontSize(DesignTokens.FontScale.XS);
+                    style.padding = GetSpacingOffset(DesignTokens.Spacing.SM, DesignTokens.Spacing.XXS);
+                    break;
+                case ControlSize.Small:
+                    style.fontSize = GetScaledFontSize(DesignTokens.FontScale.XS);
+                    style.padding = GetSpacingOffset(DesignTokens.Spacing.SM, DesignTokens.Spacing.XS);
+                    break;
+                case ControlSize.Large:
+                    style.fontSize = GetScaledFontSize(DesignTokens.FontScale.MD);
+                    style.padding = GetSpacingOffset(DesignTokens.Spacing.MD, DesignTokens.Spacing.SM);
+                    break;
+                default:
+                    style.fontSize = GetScaledFontSize(DesignTokens.FontScale.SM);
+                    style.padding = GetSpacingOffset(DesignTokens.Padding.Badge.Horizontal, DesignTokens.Padding.Badge.Vertical);
+                    break;
+            }
+        }
+
+        private void ApplyFontOnlySize(GUIStyle style, ControlSize size)
+        {
+            style.fontSize = size switch
+            {
+                ControlSize.Mini => GetScaledFontSize(DesignTokens.FontScale.XS),
+                ControlSize.Small => GetScaledFontSize(DesignTokens.FontScale.XS),
+                ControlSize.Large => GetScaledFontSize(DesignTokens.FontScale.LG),
+                _ => GetScaledFontSize(DesignTokens.FontScale.SM),
+            };
+        }
+
+        private void ApplyVariant(GUIStyle style, StyleComponentType type, ControlVariant variant)
+        {
+            if (variant == ControlVariant.Default)
+                return;
+
+            var theme = GetTheme();
+
+            if (type == StyleComponentType.Label || type == StyleComponentType.SectionHeader || type == StyleComponentType.ChartAxis || type == StyleComponentType.CardTitle || type == StyleComponentType.CardDescription)
+            {
+                style.normal.textColor = variant switch
                 {
-                    var t = ThemeManager.Instance.CurrentTheme;
-                    s.fontSize = GetScaledFontSize(fontScale);
-                    extraSetup?.Invoke(s, t);
+                    ControlVariant.Destructive => theme.Destructive,
+                    ControlVariant.Link => theme.ButtonLinkColor,
+                    ControlVariant.Muted => theme.Muted,
+                    _ => style.normal.textColor,
+                };
+                return;
+            }
+
+            if (type == StyleComponentType.Input || type == StyleComponentType.PasswordField || type == StyleComponentType.TextArea)
+            {
+                var radius = GetScaledBorderRadius(DesignTokens.Radius.MD);
+                switch (variant)
+                {
+                    case ControlVariant.Outline:
+                        style.normal.background = CreateBorderTexture(128, GetScaledHeight(DesignTokens.Height.Default), radius, theme.Base, theme.Border, 1f);
+                        break;
+                    case ControlVariant.Ghost:
+                        style.normal.background = CreateTexture(128, GetScaledHeight(DesignTokens.Height.Default), radius, Color.clear);
+                        break;
+                    case ControlVariant.Secondary:
+                        style.normal.background = CreateBorderTexture(128, GetScaledHeight(DesignTokens.Height.Default), radius, theme.Secondary, theme.Border, 1f);
+                        break;
+                    case ControlVariant.Muted:
+                        style.normal.textColor = theme.Muted;
+                        break;
                 }
-            );
+                return;
+            }
 
-        #endregion
+            ApplySurfaceVariant(style, variant);
+        }
 
-        #region Style Getters - Basic
-        public GUIStyle GetButtonStyle(ControlVariant variant, ControlSize size) => GetCachedStyle(StyleComponentType.Button, variant, size, _baseButtonStyle ?? GUI.skin.button);
+        private void ApplySurfaceVariant(GUIStyle style, ControlVariant variant)
+        {
+            var theme = GetTheme();
+            var fill = theme.ButtonPrimaryBg;
+            var text = theme.ButtonPrimaryFg;
+            var border = Color.clear;
 
-        public GUIStyle GetToggleStyle(ControlVariant variant, ControlSize size) => GetCachedStyle(StyleComponentType.Toggle, variant, size, _baseToggleStyle ?? GUI.skin.button);
+            switch (variant)
+            {
+                case ControlVariant.Secondary:
+                    fill = theme.ButtonSecondaryBg;
+                    text = theme.ButtonSecondaryFg;
+                    break;
+                case ControlVariant.Destructive:
+                    fill = theme.ButtonDestructiveBg;
+                    text = theme.ButtonDestructiveFg;
+                    break;
+                case ControlVariant.Outline:
+                    fill = Color.clear;
+                    text = theme.ButtonOutlineFg;
+                    border = theme.Border;
+                    break;
+                case ControlVariant.Ghost:
+                    fill = Color.clear;
+                    text = theme.ButtonGhostFg;
+                    border = Color.clear;
+                    break;
+                case ControlVariant.Link:
+                    fill = Color.clear;
+                    text = theme.ButtonLinkColor;
+                    border = Color.clear;
+                    break;
+                case ControlVariant.Muted:
+                    fill = theme.Muted;
+                    text = theme.Base;
+                    break;
+            }
 
-        public GUIStyle GetLabelStyle(ControlVariant variant, ControlSize size = ControlSize.Default) => GetCachedStyle(StyleComponentType.Label, variant, size, _baseLabelStyle ?? GUI.skin.label, applyVariant: false);
+            var radius = style.border.left > 0 ? style.border.left : GetScaledBorderRadius(DesignTokens.Radius.SM);
+            var height = Mathf.Max(8, Mathf.RoundToInt(style.fixedHeight > 0 ? style.fixedHeight : GetScaledHeight(DesignTokens.Height.Default)));
+            style.normal.background = border == Color.clear ? CreateTexture(128, height, radius, fill) : CreateBorderTexture(128, height, radius, fill == Color.clear ? Color.clear : fill, border, 1f);
+            style.hover.background = style.normal.background;
+            style.active.background = style.normal.background;
+            style.focused.background = style.normal.background;
+            style.normal.textColor = style.hover.textColor = style.active.textColor = style.focused.textColor = text;
+        }
 
-        public GUIStyle GetProgressBarStyle(ControlVariant variant = ControlVariant.Default, ControlSize size = ControlSize.Default) => GetSimpleStyle(StyleComponentType.ProgressBar, _progressBarStyle ?? GUI.skin.box, variant, size);
+        public GUIStyle GetButtonStyle(ControlVariant variant, ControlSize size) => GetCachedStyle(StyleComponentType.Button, variant, size, _baseButtonStyle);
 
-        public GUIStyle GetBadgeStyle(ControlVariant variant, ControlSize size) => GetSimpleStyle(StyleComponentType.Badge, _baseBadgeStyle ?? GUI.skin.box, variant, size);
+        public GUIStyle GetToggleStyle(ControlVariant variant, ControlSize size) => GetCachedStyle(StyleComponentType.Toggle, variant, size, _baseToggleStyle);
 
-        public GUIStyle GetCardStyle(ControlVariant variant = ControlVariant.Default, ControlSize size = ControlSize.Default) => GetSimpleStyle(StyleComponentType.Card, _cardStyle ?? GUI.skin.box, variant, size);
+        public GUIStyle GetLabelStyle(ControlVariant variant, ControlSize size = ControlSize.Default) => GetCachedStyle(StyleComponentType.Label, variant, size, _baseLabelStyle);
 
-        public GUIStyle GetDialogContentStyle(ControlVariant variant = ControlVariant.Default, ControlSize size = ControlSize.Default) => GetSimpleStyle(StyleComponentType.Dialog, _dialogContentStyle ?? GUI.skin.box, variant, size);
+        public GUIStyle GetProgressBarStyle(ControlVariant variant = ControlVariant.Default, ControlSize size = ControlSize.Default) => GetCachedStyle(StyleComponentType.ProgressBar, variant, size, _progressBarStyle);
 
-        public GUIStyle GetChartStyle(ControlVariant variant, ControlSize size) => GetSimpleStyle(StyleComponentType.Chart, _chartContainerStyle ?? GUI.skin.box, variant, size);
+        public GUIStyle GetBadgeStyle(ControlVariant variant, ControlSize size) => GetCachedStyle(StyleComponentType.Badge, variant, size, _baseBadgeStyle);
 
-        public GUIStyle GetAnimatedBoxStyle(ControlVariant variant = ControlVariant.Default, ControlSize size = ControlSize.Large) => GetSimpleStyle(StyleComponentType.AnimatedBox, AnimatedBoxStyle ?? GUI.skin.box, variant, size);
+        public GUIStyle GetCardStyle(ControlVariant variant = ControlVariant.Default, ControlSize size = ControlSize.Default) => GetCachedStyle(StyleComponentType.Card, variant, size, _cardStyle);
 
-        public GUIStyle GetMenuBarStyle(ControlVariant variant = ControlVariant.Default, ControlSize size = ControlSize.Default) => GetSimpleStyle(StyleComponentType.MenuBar, _menuBarStyle ?? GUIStyle.none, variant, size);
+        public GUIStyle GetDialogContentStyle(ControlVariant variant = ControlVariant.Default, ControlSize size = ControlSize.Default) => GetCachedStyle(StyleComponentType.Dialog, variant, size, _dialogContentStyle);
 
-        public GUIStyle GetTabsListStyle(ControlVariant variant = ControlVariant.Default, ControlSize size = ControlSize.Default) => GetSimpleStyle(StyleComponentType.TabsList, _tabsListStyle ?? GUI.skin.box, variant, size);
+        public GUIStyle GetChartStyle(ControlVariant variant, ControlSize size) => GetCachedStyle(StyleComponentType.Chart, variant, size, _chartContainerStyle);
 
-        public GUIStyle GetSelectStyle(ControlVariant variant, ControlSize size) => GetSimpleStyle(StyleComponentType.SelectContent, _dropdownContentStyle ?? GUI.skin.box, variant, size);
+        public GUIStyle GetAnimatedBoxStyle(ControlVariant variant = ControlVariant.Default, ControlSize size = ControlSize.Large) => GetCachedStyle(StyleComponentType.AnimatedBox, variant, size, AnimatedBoxStyle);
 
-        public GUIStyle GetDropdownMenuStyle(ControlVariant variant, ControlSize size) => GetSimpleStyle(StyleComponentType.DropdownMenu, _dropdownContentStyle ?? GUI.skin.box, variant, size);
-        #endregion
+        public GUIStyle GetMenuBarStyle(ControlVariant variant = ControlVariant.Default, ControlSize size = ControlSize.Default) => GetCachedStyle(StyleComponentType.MenuBar, variant, size, _menuBarStyle);
 
-        #region Style Getters - Input
+        public GUIStyle GetTabsListStyle(ControlVariant variant = ControlVariant.Default, ControlSize size = ControlSize.Default) => GetCachedStyle(StyleComponentType.TabsList, variant, size, _tabsListStyle);
+
+        public GUIStyle GetSelectStyle(ControlVariant variant, ControlSize size) => GetCachedStyle(StyleComponentType.SelectContent, variant, size, _dropdownContentStyle);
+
+        public GUIStyle GetDropdownMenuStyle(ControlVariant variant, ControlSize size) => GetCachedStyle(StyleComponentType.DropdownMenu, variant, size, _dropdownContentStyle);
+
         public GUIStyle GetInputStyle(ControlVariant variant, ControlSize size = ControlSize.Default, bool focused = false, bool disabled = false)
         {
-            int state = (focused ? 1 : 0) | (disabled ? 2 : 0);
             return GetCachedStyle(
                 StyleComponentType.Input,
                 variant,
                 size,
-                _baseInputStyle ?? GUI.skin.textField,
-                state,
-                customLogic: s =>
+                _baseInputStyle,
+                (focused ? 1 : 0) | (disabled ? 2 : 0),
+                style =>
                 {
-                    if (disabled)
-                        s.normal.textColor = ThemeManager.Instance.CurrentTheme.Muted;
                     if (focused)
-                        s.focused.background = InputFocusedTexture;
+                        style.focused.background = CreateBorderTexture(128, Mathf.Max(28, Mathf.RoundToInt(style.fixedHeight > 0 ? style.fixedHeight : GetScaledHeight(DesignTokens.Height.Default))), GetScaledBorderRadius(DesignTokens.Radius.MD), GetTheme().Base, GetTheme().Accent, 1f);
+
+                    if (disabled)
+                    {
+                        style.normal.textColor = GetTheme().Muted;
+                        style.hover.textColor = GetTheme().Muted;
+                        style.active.textColor = GetTheme().Muted;
+                    }
                 }
             );
         }
 
         public GUIStyle GetPasswordFieldStyle(ControlVariant variant = ControlVariant.Default, ControlSize size = ControlSize.Default, bool focused = false, bool disabled = false)
         {
-            int state = (focused ? 1 : 0) | (disabled ? 2 : 0);
             return GetCachedStyle(
                 StyleComponentType.PasswordField,
                 variant,
                 size,
-                _baseInputStyle ?? GUI.skin.textField,
-                state,
-                customLogic: s =>
+                _baseInputStyle,
+                (focused ? 1 : 0) | (disabled ? 2 : 0),
+                style =>
                 {
-                    s.fontSize = _guiHelper.fontSize + 2;
-                    if (disabled)
-                        s.normal.textColor = ThemeManager.Instance.CurrentTheme.Muted;
+                    style.fontSize = GetScaledFontSize(DesignTokens.FontScale.SM);
                     if (focused)
-                        s.focused.background = InputFocusedTexture;
+                        style.focused.background = CreateBorderTexture(128, Mathf.Max(28, Mathf.RoundToInt(style.fixedHeight > 0 ? style.fixedHeight : GetScaledHeight(DesignTokens.Height.Default))), GetScaledBorderRadius(DesignTokens.Radius.MD), GetTheme().Base, GetTheme().Accent, 1f);
+                    if (disabled)
+                        style.normal.textColor = GetTheme().Muted;
                 }
             );
         }
 
-        public GUIStyle GetTextAreaStyle(ControlVariant variant = ControlVariant.Default, ControlSize size = ControlSize.Default, bool focused = false) =>
-            GetCachedStyle(
+        public GUIStyle GetTextAreaStyle(ControlVariant variant = ControlVariant.Default, ControlSize size = ControlSize.Default, bool focused = false)
+        {
+            return GetCachedStyle(
                 StyleComponentType.TextArea,
                 variant,
                 size,
-                _baseInputStyle ?? GUI.skin.textArea,
+                _baseInputStyle,
                 focused ? 1 : 0,
-                customLogic: s =>
+                style =>
                 {
-                    s.wordWrap = true;
-                    s.stretchHeight = true;
-                    s.fixedHeight = 0;
-                    s.normal.textColor = ThemeManager.Instance.CurrentTheme.Text;
+                    style.wordWrap = true;
+                    style.stretchHeight = true;
+                    style.fixedHeight = 0f;
                     if (focused)
-                        s.focused.background = InputFocusedTexture;
+                        style.focused.background = CreateBorderTexture(128, 96, GetScaledBorderRadius(DesignTokens.Radius.MD), GetTheme().Base, GetTheme().Accent, 1f);
                 }
             );
-        #endregion
+        }
 
-        #region Style Getters - Separator
         public GUIStyle GetSeparatorStyle(SeparatorOrientation orientation, ControlVariant variant = ControlVariant.Default, ControlSize size = ControlSize.Default)
         {
-            float thickness = size switch
-            {
-                ControlSize.Small => DesignTokens.Separator.DefaultThickness,
-                ControlSize.Large => DesignTokens.Separator.LargeThickness,
-                _ => DesignTokens.Separator.DefaultThickness,
-            };
-
             return GetCachedStyle(
                 StyleComponentType.Separator,
                 variant,
                 size,
-                _separatorStyle ?? GUI.skin.box,
+                _separatorStyle,
                 (int)orientation,
-                applySizing: false,
-                customLogic: s =>
+                style =>
                 {
                     if (orientation == SeparatorOrientation.Horizontal)
                     {
-                        s.fixedHeight = Mathf.Max(1, Mathf.RoundToInt(thickness * _guiHelper.uiScale));
-                        s.fixedWidth = 0;
-                        s.stretchWidth = true;
-                        s.stretchHeight = false;
+                        style.fixedHeight = size == ControlSize.Large ? GetScaledHeight(DesignTokens.Separator.LargeThickness) : GetScaledHeight(DesignTokens.Separator.DefaultThickness);
+                        style.fixedWidth = 0f;
+                        style.stretchWidth = true;
+                        style.stretchHeight = false;
                     }
                     else
                     {
-                        s.fixedWidth = Mathf.Max(1, Mathf.RoundToInt(thickness * _guiHelper.uiScale));
-                        s.fixedHeight = 0;
-                        s.stretchHeight = true;
-                        s.stretchWidth = false;
-                        s.margin = GetSpacingOffset(DesignTokens.Spacing.None, DesignTokens.Spacing.None);
+                        style.fixedWidth = size == ControlSize.Large ? GetScaledHeight(DesignTokens.Separator.LargeThickness) : GetScaledHeight(DesignTokens.Separator.DefaultThickness);
+                        style.fixedHeight = 0f;
+                        style.stretchHeight = true;
+                        style.stretchWidth = false;
                     }
                 }
             );
         }
-        #endregion
 
-        #region Style Getters - Tabs
-        public GUIStyle GetTabsTriggerStyle(bool active = false, ControlVariant variant = ControlVariant.Default, ControlSize size = ControlSize.Default) =>
-            GetCachedStyle(
+        public GUIStyle GetTabsTriggerStyle(bool active = false, ControlVariant variant = ControlVariant.Default, ControlSize size = ControlSize.Default)
+        {
+            return GetCachedStyle(
                 StyleComponentType.TabsTrigger,
                 variant,
                 size,
-                _tabsTriggerStyle ?? GUI.skin.button,
+                _tabsTriggerStyle,
                 active ? 1 : 0,
-                applyVariant: variant != ControlVariant.Default,
-                customLogic: s =>
+                style =>
                 {
-                    s.alignment = TextAnchor.MiddleCenter;
+                    style.alignment = TextAnchor.MiddleCenter;
                     if (active)
                     {
-                        var t = ThemeManager.Instance.CurrentTheme;
-                        s.normal.background = TabsActiveTexture;
-                        s.normal.textColor = t.TabsTriggerActiveFg;
-                        s.hover = s.active = s.focused = s.normal;
+                        style.normal.background = Textures.TabsActive;
+                        style.normal.textColor = GetTheme().TabsTriggerActiveFg;
                     }
                 }
             );
+        }
 
         public GUIStyle GetTabsContentStyle(ControlVariant variant = ControlVariant.Default, ControlSize size = ControlSize.Default) =>
-            GetCachedStyle(StyleComponentType.TabsContent, variant, size, GUIStyle.none, customLogic: s => s.padding = GetSpacingOffset(DesignTokens.Spacing.LG, DesignTokens.Spacing.LG));
-        #endregion
+            GetCachedStyle(StyleComponentType.TabsContent, variant, size, GUIStyle.none, 0, style => style.padding = GetSpacingOffset(DesignTokens.Spacing.LG, DesignTokens.Spacing.LG));
 
-        #region Style Getters - Checkbox & Switch
-        public GUIStyle GetCheckboxStyle(ControlVariant variant, ControlSize size) => GetCachedStyle(StyleComponentType.Checkbox, variant, size, _checkboxStyle ?? GUI.skin.toggle);
+        public GUIStyle GetCheckboxStyle(ControlVariant variant, ControlSize size) => GetCachedStyle(StyleComponentType.Checkbox, variant, size, _checkboxStyle);
 
-        public GUIStyle GetCheckboxSolidStyle(ControlVariant variant, ControlSize size) => GetCachedStyle(StyleComponentType.CheckboxSolid, variant, size, _checkboxSolidStyle ?? GUI.skin.toggle);
+        public GUIStyle GetCheckboxSolidStyle(ControlVariant variant, ControlSize size) => GetCachedStyle(StyleComponentType.CheckboxSolid, variant, size, _checkboxSolidStyle);
 
-        public GUIStyle GetSwitchStyle(ControlVariant variant, ControlSize size) => GetCachedStyle(StyleComponentType.Switch, variant, size, _baseSwitchStyle ?? GUI.skin.toggle);
-        #endregion
+        public GUIStyle GetSwitchStyle(ControlVariant variant, ControlSize size) => GetCachedStyle(StyleComponentType.Switch, variant, size, _baseSwitchStyle);
 
-        #region Style Getters - Avatar
         public GUIStyle GetAvatarStyle(ControlSize size, AvatarShape shape, ControlVariant variant = ControlVariant.Default)
         {
-            int sz = size switch
-            {
-                ControlSize.Small => GetScaledHeight(DesignTokens.Height.Small),
-                ControlSize.Large => GetScaledHeight(DesignTokens.Height.Large),
-                ControlSize.Mini => GetScaledHeight(DesignTokens.Height.Mini),
-                _ => GetScaledHeight(DesignTokens.Height.Default),
-            };
-
-            int br = shape switch
-            {
-                AvatarShape.Circle => sz / 2,
-                AvatarShape.Rounded => GetScaledBorderRadius(DesignTokens.Radius.LG),
-                _ => 0,
-            };
-
-            var theme = ThemeManager.Instance.CurrentTheme;
-
             return GetCachedStyle(
                 StyleComponentType.Avatar,
                 variant,
                 size,
-                _avatarStyle ?? GUI.skin.box,
+                _avatarStyle,
                 (int)shape,
-                applyVariant: false,
-                applySizing: false,
-                customLogic: s =>
+                style =>
                 {
-                    s.fixedWidth = s.fixedHeight = sz;
-                    s.border = new UnityHelpers.RectOffset(br, br, br, br);
-                    s.padding = new UnityHelpers.RectOffset(0, 0, 0, 0);
-                    s.margin = new UnityHelpers.RectOffset(0, 0, 0, 0);
-                    s.alignment = TextAnchor.MiddleCenter;
+                    var px = size switch
+                    {
+                        ControlSize.Mini => GetScaledHeight(DesignTokens.Height.Mini),
+                        ControlSize.Small => GetScaledHeight(DesignTokens.Height.Small),
+                        ControlSize.Large => GetScaledHeight(DesignTokens.Height.Large),
+                        _ => GetScaledHeight(DesignTokens.Height.Default),
+                    };
 
-                    Color bgTop = Color.Lerp(theme.Elevated, Color.white, 0.03f);
+                    var radius = shape switch
+                    {
+                        AvatarShape.Circle => px / 2,
+                        AvatarShape.Rounded => GetScaledBorderRadius(DesignTokens.Radius.MD),
+                        _ => 0,
+                    };
 
-                    s.normal.background = CreateAvatarTexture(sz, br, bgTop, theme.Border, 1.5f, true);
-                    s.normal.textColor = theme.Text;
-                    s.fontSize = GetScaledFontSize(DesignTokens.Avatar.FallbackFontScale);
-                    s.fontStyle = FontStyle.Bold;
-
-                    s.hover = s.active = s.focused = s.normal;
+                    style.fixedWidth = px;
+                    style.fixedHeight = px;
+                    style.border = new RectOffset(radius, radius, radius, radius);
+                    style.normal.background = CreateAvatarTexture(px, radius, GetTheme().Secondary, GetTheme().Border, DesignTokens.Avatar.BorderThickness, false);
                 }
             );
         }
@@ -303,169 +401,62 @@ namespace shadcnui.GUIComponents.Core.Styling
         public float GetStatusIndicatorSize(ControlSize size) =>
             size switch
             {
+                ControlSize.Mini => DesignTokens.StatusIndicator.Mini * _guiHelper.uiScale,
                 ControlSize.Small => DesignTokens.StatusIndicator.Small * _guiHelper.uiScale,
                 ControlSize.Large => DesignTokens.StatusIndicator.Large * _guiHelper.uiScale,
-                ControlSize.Mini => DesignTokens.StatusIndicator.Mini * _guiHelper.uiScale,
                 _ => DesignTokens.StatusIndicator.Default * _guiHelper.uiScale,
             };
-        #endregion
 
-        #region Style Getters - Table
-        public GUIStyle GetTableStyle(ControlVariant variant, ControlSize size) =>
-            GetCachedStyle(
-                StyleComponentType.Table,
-                variant,
-                size,
-                _baseTableStyle ?? GUI.skin.box,
-                customLogic: variant switch
-                {
-                    ControlVariant.Secondary => s =>
-                    {
-                        var t = ThemeManager.Instance.CurrentTheme;
-                        float lum = 0.299f * t.Base.r + 0.587f * t.Base.g + 0.114f * t.Base.b;
-                        Color tableBg = lum < 0.3f ? Color.Lerp(t.Base, t.Secondary, 0.2f) : Color.Lerp(t.Base, t.Secondary, 0.15f);
-                        s.normal.background = CreateSolidTexture(tableBg);
-                    },
-                    ControlVariant.Outline => s => s.normal.background = CreateBorderTexture(ThemeManager.Instance.CurrentTheme.Border, 1),
-                    ControlVariant.Ghost => s =>
-                    {
-                        var t = ThemeManager.Instance.CurrentTheme;
-                        float lum = 0.299f * t.Base.r + 0.587f * t.Base.g + 0.114f * t.Base.b;
-                        Color hoverBg = lum < 0.3f ? Color.Lerp(t.Base, t.Accent, 0.12f) : Color.Lerp(t.Base, t.Accent, 0.08f);
-                        var h = CreateSolidTexture(hoverBg);
-                        s.hover.background = s.active.background = h;
-                    },
-                    _ => null,
-                }
-            );
+        public GUIStyle GetTableStyle(ControlVariant variant, ControlSize size) => GetCachedStyle(StyleComponentType.Table, variant, size, _baseTableStyle);
 
-        public GUIStyle GetTableRowStyle(ControlVariant variant = ControlVariant.Default, ControlSize size = ControlSize.Default) =>
-            GetCachedStyle(
-                StyleComponentType.TableRow,
-                variant,
-                size,
-                _tableRowStyle ?? GUIStyle.none,
-                customLogic: s =>
-                {
-                    var t = ThemeManager.Instance.CurrentTheme;
-                    float lum = 0.299f * t.Base.r + 0.587f * t.Base.g + 0.114f * t.Base.b;
-                    Color borderColor = lum < 0.3f ? Color.Lerp(t.Border, Color.white, 0.1f) : Color.Lerp(t.Border, Color.clear, 0.3f);
-                    Color hoverBg = lum < 0.3f ? Color.Lerp(t.Base, t.Accent, 0.08f) : Color.Lerp(t.Base, t.Accent, 0.05f);
+        public GUIStyle GetTableRowStyle(ControlVariant variant = ControlVariant.Default, ControlSize size = ControlSize.Default) => GetCachedStyle(StyleComponentType.TableRow, variant, size, _tableRowStyle);
 
-                    s.normal.background = CreateBorderTexture(DesignTokens.TextureSize.Default, (int)DesignTokens.Height.Default, 1, borderColor, Color.clear);
-                    var hover = CreateBorderTexture(DesignTokens.TextureSize.Default, (int)DesignTokens.Height.Default, 1, t.Border, hoverBg);
-                    s.hover.background = s.active.background = s.onNormal.background = hover;
-                    s.fixedHeight = 0;
-                    s.stretchHeight = false;
-                }
-            );
-
-        public GUIStyle GetTableHeaderStyle(ControlVariant variant = ControlVariant.Default, ControlSize size = ControlSize.Default) =>
-            GetCachedStyle(
-                StyleComponentType.TableHeader,
-                variant,
-                size,
-                _tableHeaderStyle ?? GUI.skin.label,
-                applyVariant: false,
-                customLogic: s =>
-                {
-                    var t = ThemeManager.Instance.CurrentTheme;
-                    float lum = 0.299f * t.Base.r + 0.587f * t.Base.g + 0.114f * t.Base.b;
-                    Color headerBg = lum < 0.3f ? Color.Lerp(t.Secondary, t.Text, 0.08f) : t.Secondary;
-                    Color hoverBg = lum < 0.3f ? Color.Lerp(t.Secondary, t.Text, 0.12f) : Color.Lerp(t.Secondary, t.Text, 0.08f);
-
-                    s.fontStyle = FontStyle.Bold;
-                    s.normal.background = CreateBorderTexture(DesignTokens.TextureSize.Default, (int)DesignTokens.Height.Default, 2, t.Border, headerBg);
-                    s.hover.background = CreateBorderTexture(DesignTokens.TextureSize.Default, (int)DesignTokens.Height.Default, 2, t.Accent, hoverBg);
-                    s.normal.textColor = s.hover.textColor = t.Text;
-                }
-            );
+        public GUIStyle GetTableHeaderStyle(ControlVariant variant = ControlVariant.Default, ControlSize size = ControlSize.Default) => GetCachedStyle(StyleComponentType.TableHeader, variant, size, _tableHeaderStyle);
 
         public GUIStyle GetTableCellStyle(ControlVariant variant = ControlVariant.Default, ControlSize size = ControlSize.Default, TextAnchor alignment = TextAnchor.MiddleLeft) =>
-            GetCachedStyle(StyleComponentType.TableCell, variant, size, _tableCellStyle ?? GUI.skin.label, (int)alignment, applyVariant: false, customLogic: s => s.alignment = alignment);
-        #endregion
+            GetCachedStyle(StyleComponentType.TableCell, variant, size, _tableCellStyle, (int)alignment, style => style.alignment = alignment);
 
-        #region Style Getters - Menu & Select
-        public GUIStyle GetDropdownMenuItemStyle(ControlVariant variant = ControlVariant.Default, ControlSize size = ControlSize.Default) => GetCachedStyle(StyleComponentType.DropdownMenuItem, variant, size, _dropdownItemStyle ?? GUI.skin.button, applyVariant: variant != ControlVariant.Default);
+        public GUIStyle GetDropdownMenuItemStyle(ControlVariant variant = ControlVariant.Default, ControlSize size = ControlSize.Default) => GetCachedStyle(StyleComponentType.DropdownMenuItem, variant, size, _dropdownItemStyle);
 
-        public GUIStyle GetSelectItemStyle(ControlVariant variant = ControlVariant.Default, ControlSize size = ControlSize.Default) => GetCachedStyle(StyleComponentType.SelectItem, variant, size, _dropdownItemStyle ?? GUI.skin.button, applyVariant: variant != ControlVariant.Default);
+        public GUIStyle GetSelectItemStyle(ControlVariant variant = ControlVariant.Default, ControlSize size = ControlSize.Default) => GetCachedStyle(StyleComponentType.SelectItem, variant, size, _dropdownItemStyle);
 
-        public GUIStyle GetMenuBarItemStyle(ControlVariant variant = ControlVariant.Default, ControlSize size = ControlSize.Default, bool isShortcut = false, bool active = false) =>
-            GetCachedStyle(
+        public GUIStyle GetMenuBarItemStyle(ControlVariant variant = ControlVariant.Default, ControlSize size = ControlSize.Default, bool isShortcut = false, bool active = false)
+        {
+            return GetCachedStyle(
                 StyleComponentType.MenuBarItem,
                 variant,
                 size,
-                _dropdownItemStyle ?? GUI.skin.button,
+                _dropdownItemStyle,
                 (isShortcut ? 1 : 0) | (active ? 2 : 0),
-                applyVariant: variant != ControlVariant.Default,
-                customLogic: s =>
+                style =>
                 {
-                    var t = ThemeManager.Instance.CurrentTheme;
-
-                    if (isShortcut)
-                    {
-                        s.alignment = TextAnchor.MiddleRight;
-                        s.normal.textColor = Color.Lerp(t.Muted, t.Text, 0.5f);
-                    }
-                    else
-                    {
-                        s.alignment = TextAnchor.MiddleLeft;
-                        s.normal.textColor = t.Text;
-                        s.normal.background = TransparentTexture;
-                        s.focused.background = TransparentTexture;
-
-                        var hoverBg = CreateTexture(DesignTokens.TextureSize.Default, DesignTokens.TextureSize.Small, (int)DesignTokens.Radius.SM, Color.Lerp(t.Accent, Color.white, 0.08f));
-
-                        s.hover.background = hoverBg;
-                        s.hover.textColor = t.Text;
-                        s.active.background = CreateTexture(DesignTokens.TextureSize.Default, DesignTokens.TextureSize.Small, (int)DesignTokens.Radius.SM, Color.Lerp(t.Accent, Color.black, 0.1f));
-                        s.active.textColor = t.Text;
-                        s.onNormal.background = hoverBg;
-
-                        if (active)
-                            s.normal.background = hoverBg;
-                    }
+                    style.alignment = isShortcut ? TextAnchor.MiddleRight : TextAnchor.MiddleLeft;
+                    style.normal.textColor = isShortcut ? Lift(GetTheme().Muted, 0.2f) : GetTheme().Text;
+                    if (active)
+                        style.normal.background = CreateTexture(128, 32, GetScaledBorderRadius(DesignTokens.Radius.SM), Tint(GetTheme().Accent, 0.14f));
                 }
             );
+        }
 
-        public GUIStyle GetMenuDropdownStyle(ControlVariant variant = ControlVariant.Default, ControlSize size = ControlSize.Default) =>
+        public GUIStyle GetMenuDropdownStyle(ControlVariant variant = ControlVariant.Default, ControlSize size = ControlSize.Default) => GetCachedStyle(StyleComponentType.MenuDropdown, variant, size, _dropdownContentStyle);
+
+        public GUIStyle GetNavigationStyle(ControlVariant variant = ControlVariant.Default, ControlSize size = ControlSize.Default) => GetCachedStyle(StyleComponentType.Navigation, variant, size, _navigationStyle);
+
+        public GUIStyle GetPopoverContentStyle(ControlVariant variant = ControlVariant.Default, ControlSize size = ControlSize.Default) => GetCachedStyle(StyleComponentType.Popover, variant, size, _dropdownContentStyle);
+
+        public GUIStyle GetChartAxisStyle(ControlVariant variant = ControlVariant.Default, ControlSize size = ControlSize.Default) =>
             GetCachedStyle(
-                StyleComponentType.MenuDropdown,
+                StyleComponentType.ChartAxis,
                 variant,
                 size,
-                _dropdownContentStyle ?? GUI.skin.box,
-                customLogic: s =>
+                _baseLabelStyle,
+                0,
+                style =>
                 {
-                    var t = ThemeManager.Instance.CurrentTheme;
-                    Color dropdownTop = Color.Lerp(t.Elevated, Color.white, 0.015f);
-                    Color dropdownBottom = Color.Lerp(t.Elevated, Color.black, 0.025f);
-
-                    s.normal.background = CreateTexture(DesignTokens.TextureSize.Large, DesignTokens.TextureSize.Large, (int)DesignTokens.Radius.MD, dropdownTop, dropdownBottom, 0.16f, 8);
-                    s.padding = GetSpacingOffset(DesignTokens.Spacing.XS, DesignTokens.Spacing.XS);
-                    s.fixedWidth = DesignTokens.TextureSize.Large;
-                    s.stretchWidth = false;
+                    style.alignment = TextAnchor.MiddleCenter;
+                    style.normal.textColor = GetTheme().Muted;
+                    style.fontSize = GetScaledFontSize(DesignTokens.Chart.AxisFontScale);
                 }
-            );
-
-        public GUIStyle GetNavigationStyle(ControlVariant variant = ControlVariant.Default, ControlSize size = ControlSize.Default) => GetCachedStyle(StyleComponentType.Navigation, variant, size, _navigationStyle ?? GUI.skin.box);
-
-        public GUIStyle GetPopoverContentStyle(ControlVariant variant = ControlVariant.Default, ControlSize size = ControlSize.Default) =>
-            GetCachedStyle(StyleComponentType.Popover, variant, size, _dropdownContentStyle ?? GUI.skin.box, customLogic: s => s.padding = GetSpacingOffset(DesignTokens.Spacing.LG, DesignTokens.Spacing.LG));
-        #endregion
-
-        #region Style Getters - Labels & Card
-        public GUIStyle GetChartAxisStyle(ControlVariant variant = ControlVariant.Default, ControlSize size = ControlSize.Default) =>
-            GetLabelBasedStyle(
-                StyleComponentType.ChartAxis,
-                DesignTokens.Chart.AxisFontScale,
-                (s, t) =>
-                {
-                    s.alignment = TextAnchor.MiddleCenter;
-                    s.normal.textColor = t.Muted;
-                    s.wordWrap = true;
-                },
-                variant,
-                size
             );
 
         public GUIStyle GetTooltipStyle(ControlVariant variant = ControlVariant.Default, ControlSize size = ControlSize.Default) =>
@@ -473,70 +464,51 @@ namespace shadcnui.GUIComponents.Core.Styling
                 StyleComponentType.Tooltip,
                 variant,
                 size,
-                _chartContainerStyle ?? GUI.skin.box,
-                1,
-                applyVariant: false,
-                applySizing: false,
-                customLogic: s =>
+                _dropdownContentStyle,
+                0,
+                style =>
                 {
-                    var t = ThemeManager.Instance.CurrentTheme;
-                    float lum = 0.299f * t.Base.r + 0.587f * t.Base.g + 0.114f * t.Base.b;
-                    Color tooltipBg = lum < 0.3f ? Color.Lerp(t.Elevated, Color.white, 0.08f) : Color.Lerp(t.Elevated, Color.black, 0.04f);
-                    s.normal.background = CreateTexture(DesignTokens.TextureSize.Small, DesignTokens.TextureSize.Small, (int)DesignTokens.Radius.MD, tooltipBg);
-                    s.normal.textColor = t.Text;
-                    s.padding = GetSpacingOffset(DesignTokens.Spacing.MD, DesignTokens.Spacing.SM);
-                    s.border = new UnityHelpers.RectOffset((int)DesignTokens.Radius.MD, (int)DesignTokens.Radius.MD, (int)DesignTokens.Radius.MD, (int)DesignTokens.Radius.MD);
+                    style.padding = GetSpacingOffset(DesignTokens.Spacing.MD, DesignTokens.Spacing.SM);
+                    style.wordWrap = true;
                 }
             );
 
         public GUIStyle GetSectionHeaderStyle(ControlVariant variant = ControlVariant.Default, ControlSize size = ControlSize.Default) =>
-            GetLabelBasedStyle(
+            GetCachedStyle(
                 StyleComponentType.SectionHeader,
-                DesignTokens.FontScale.LG,
-                (s, t) =>
-                {
-                    s.fontStyle = FontStyle.Bold;
-                    s.normal.textColor = t.Text;
-                },
                 variant,
-                size
+                size,
+                _baseLabelStyle,
+                0,
+                style =>
+                {
+                    style.fontStyle = FontStyle.Bold;
+                    style.fontSize = GetScaledFontSize(DesignTokens.FontScale.LG);
+                    style.normal.textColor = GetTheme().Text;
+                }
             );
 
         public GUIStyle GetCardHeaderStyle(ControlVariant variant = ControlVariant.Default, ControlSize size = ControlSize.Default) =>
-            GetCachedStyle(StyleComponentType.CardHeader, variant, size, GUIStyle.none, customLogic: s => s.padding = GetSpacingOffset(DesignTokens.Spacing.LG, DesignTokens.Spacing.MD));
+            GetCachedStyle(StyleComponentType.CardHeader, variant, size, GUIStyle.none, 0, style => style.padding = GetSpacingOffset(DesignTokens.Spacing.LG, DesignTokens.Spacing.MD));
 
         public GUIStyle GetCardContentStyle(ControlVariant variant = ControlVariant.Default, ControlSize size = ControlSize.Default) =>
-            GetCachedStyle(StyleComponentType.CardContent, variant, size, GUIStyle.none, customLogic: s => s.padding = GetSpacingOffset(DesignTokens.Spacing.LG, DesignTokens.Spacing.SM));
+            GetCachedStyle(StyleComponentType.CardContent, variant, size, GUIStyle.none, 0, style => style.padding = GetSpacingOffset(DesignTokens.Spacing.LG, DesignTokens.Spacing.SM));
 
         public GUIStyle GetCardFooterStyle(ControlVariant variant = ControlVariant.Default, ControlSize size = ControlSize.Default) =>
-            GetCachedStyle(
-                StyleComponentType.CardFooter,
-                variant,
-                size,
-                GUIStyle.none,
-                customLogic: s =>
-                {
-                    s.padding = GetSpacingOffset(DesignTokens.Spacing.LG, DesignTokens.Spacing.MD);
-                    s.alignment = TextAnchor.MiddleLeft;
-                }
-            );
+            GetCachedStyle(StyleComponentType.CardFooter, variant, size, GUIStyle.none, 0, style => style.padding = GetSpacingOffset(DesignTokens.Spacing.LG, DesignTokens.Spacing.MD));
 
         public GUIStyle GetCardTitleStyle(ControlVariant variant = ControlVariant.Default, ControlSize size = ControlSize.Default) =>
             GetCachedStyle(
                 StyleComponentType.CardTitle,
                 variant,
                 size,
-                _baseLabelStyle ?? GUI.skin.label,
-                applyVariant: false,
-                customLogic: s =>
+                _baseLabelStyle,
+                0,
+                style =>
                 {
-                    var t = ThemeManager.Instance.CurrentTheme;
-                    s.fontSize = GetScaledFontSize(DesignTokens.FontScale.XL);
-                    s.fontStyle = FontStyle.Bold;
-                    s.alignment = TextAnchor.UpperLeft;
-                    s.normal.textColor = t.Text;
-                    s.wordWrap = true;
-                    s.margin = new UnityHelpers.RectOffset(0, 0, 0, (int)DesignTokens.Spacing.XS);
+                    style.fontStyle = FontStyle.Bold;
+                    style.fontSize = GetScaledFontSize(DesignTokens.FontScale.XL);
+                    style.normal.textColor = GetTheme().Text;
                 }
             );
 
@@ -545,93 +517,58 @@ namespace shadcnui.GUIComponents.Core.Styling
                 StyleComponentType.CardDescription,
                 variant,
                 size,
-                _baseLabelStyle ?? GUI.skin.label,
-                applyVariant: false,
-                customLogic: s =>
+                _baseLabelStyle,
+                0,
+                style =>
                 {
-                    var t = ThemeManager.Instance.CurrentTheme;
-                    s.fontSize = GetScaledFontSize(DesignTokens.FontScale.SM);
-                    s.alignment = TextAnchor.UpperLeft;
-                    s.normal.textColor = t.Muted;
-                    s.wordWrap = true;
+                    style.fontSize = GetScaledFontSize(DesignTokens.FontScale.SM);
+                    style.normal.textColor = GetTheme().Muted;
                 }
             );
-        #endregion
 
-        #region Size Helpers - Slider
-        public float GetSliderTrackHeight(ControlSize size)
-        {
-            float baseHeight = size switch
+        public float GetSliderTrackHeight(ControlSize size) =>
+            size switch
             {
-                ControlSize.Mini => DesignTokens.Slider.TrackMini,
-                ControlSize.Small => DesignTokens.Slider.TrackSmall,
-                ControlSize.Large => DesignTokens.Slider.TrackLarge,
-                _ => DesignTokens.Slider.TrackDefault,
+                ControlSize.Mini => DesignTokens.Slider.TrackMini * _guiHelper.uiScale,
+                ControlSize.Small => DesignTokens.Slider.TrackSmall * _guiHelper.uiScale,
+                ControlSize.Large => DesignTokens.Slider.TrackLarge * _guiHelper.uiScale,
+                _ => DesignTokens.Slider.TrackDefault * _guiHelper.uiScale,
             };
-            return baseHeight * _guiHelper.uiScale;
-        }
 
-        public float GetSliderThumbSize(ControlSize size)
-        {
-            float baseSize = size switch
+        public float GetSliderThumbSize(ControlSize size) =>
+            size switch
             {
-                ControlSize.Mini => DesignTokens.Slider.ThumbMini,
-                ControlSize.Small => DesignTokens.Slider.ThumbSmall,
-                ControlSize.Large => DesignTokens.Slider.ThumbLarge,
-                _ => DesignTokens.Slider.ThumbDefault,
+                ControlSize.Mini => DesignTokens.Slider.ThumbMini * _guiHelper.uiScale,
+                ControlSize.Small => DesignTokens.Slider.ThumbSmall * _guiHelper.uiScale,
+                ControlSize.Large => DesignTokens.Slider.ThumbLarge * _guiHelper.uiScale,
+                _ => DesignTokens.Slider.ThumbDefault * _guiHelper.uiScale,
             };
-            return baseSize * _guiHelper.uiScale;
-        }
-        #endregion
 
-        #region Color Helpers - Slider
         public Color GetSliderTrackColor(ControlVariant variant, bool disabled)
         {
-            var theme = ThemeManager.Instance.CurrentTheme;
-            Color baseColor = theme.Secondary;
-
-            if (disabled)
-                return Color.Lerp(baseColor, theme.Muted, 0.5f);
-
-            return baseColor;
+            var color = GetTheme().Secondary;
+            return disabled ? Color.Lerp(color, GetTheme().Muted, 0.5f) : color;
         }
 
         public Color GetSliderFillColor(ControlVariant variant, bool disabled)
         {
-            var theme = ThemeManager.Instance.CurrentTheme;
-            Color baseColor = variant switch
+            var color = variant switch
             {
-                ControlVariant.Destructive => theme.Destructive,
-                ControlVariant.Secondary => Color.Lerp(theme.Secondary, theme.Text, 0.3f),
-                ControlVariant.Muted => theme.Muted,
-                _ => theme.Accent,
+                ControlVariant.Destructive => GetTheme().Destructive,
+                ControlVariant.Secondary => GetTheme().ButtonSecondaryBg,
+                ControlVariant.Muted => GetTheme().Muted,
+                _ => GetTheme().Accent,
             };
 
-            if (disabled)
-                return Color.Lerp(baseColor, theme.Muted, 0.6f);
-
-            return baseColor;
+            return disabled ? Color.Lerp(color, GetTheme().Muted, 0.5f) : color;
         }
 
         public Color GetSliderThumbColor(ControlVariant variant, bool disabled)
         {
-            var theme = ThemeManager.Instance.CurrentTheme;
-            float baseLuminance = 0.299f * theme.Base.r + 0.587f * theme.Base.g + 0.114f * theme.Base.b;
-
-            Color baseColor;
-            if (baseLuminance < 0.3f)
-                baseColor = Color.Lerp(theme.Elevated, Color.white, 0.1f);
-            else
-                baseColor = theme.Elevated;
-
-            if (disabled)
-                return Color.Lerp(baseColor, theme.Muted, 0.4f);
-
-            return baseColor;
+            var color = GetTheme().Text;
+            return disabled ? Color.Lerp(color, GetTheme().Muted, 0.4f) : color;
         }
-        #endregion
 
-        #region Color Helpers - Toast
         public Color GetToastBackgroundColor(ToastVariant variant) =>
             variant switch
             {
@@ -653,6 +590,31 @@ namespace shadcnui.GUIComponents.Core.Styling
             };
 
         public Color GetToastTextColor(ToastVariant variant) => DesignTokens.ToastColors.Text;
-        #endregion
+
+        public GUIStyle GetCalendarStyle(ControlVariant variant = ControlVariant.Default, ControlSize size = ControlSize.Default) => GetCachedStyle(StyleComponentType.Calendar, variant, size, _calendarStyle);
+
+        public GUIStyle GetCalendarWeekdayStyle() => GetCachedStyle(StyleComponentType.CalendarWeekday, ControlVariant.Default, ControlSize.Default, _calendarWeekdayStyle);
+
+        public GUIStyle GetCalendarDayStyle() => GetCachedStyle(StyleComponentType.CalendarDay, ControlVariant.Default, ControlSize.Default, _calendarDayStyle);
+
+        public GUIStyle GetCalendarDaySelectedStyle() => GetCachedStyle(StyleComponentType.CalendarDaySelected, ControlVariant.Default, ControlSize.Default, _calendarDaySelectedStyle);
+
+        public GUIStyle GetCalendarDayInRangeStyle() => GetCachedStyle(StyleComponentType.CalendarDayInRange, ControlVariant.Default, ControlSize.Default, _calendarDayInRangeStyle);
+
+        public GUIStyle GetCalendarDayTodayStyle() => GetCachedStyle(StyleComponentType.CalendarDayToday, ControlVariant.Default, ControlSize.Default, _calendarDayTodayStyle);
+
+        public GUIStyle GetCalendarDayOutsideMonthStyle() => GetCachedStyle(StyleComponentType.CalendarDayOutsideMonth, ControlVariant.Default, ControlSize.Default, _calendarDayOutsideMonthStyle);
+
+        public GUIStyle GetDatePickerStyle(ControlVariant variant = ControlVariant.Default, ControlSize size = ControlSize.Default) => GetCachedStyle(StyleComponentType.DatePicker, variant, size, _datePickerStyle);
+
+        public GUIStyle GetDatePickerWeekdayStyle() => GetCachedStyle(StyleComponentType.DatePickerWeekday, ControlVariant.Default, ControlSize.Default, _datePickerWeekdayStyle);
+
+        public GUIStyle GetDatePickerDayStyle() => GetCachedStyle(StyleComponentType.DatePickerDay, ControlVariant.Default, ControlSize.Default, _datePickerDayStyle);
+
+        public GUIStyle GetDatePickerDaySelectedStyle() => GetCachedStyle(StyleComponentType.DatePickerDaySelected, ControlVariant.Default, ControlSize.Default, _datePickerDaySelectedStyle);
+
+        public GUIStyle GetDatePickerDayTodayStyle() => GetCachedStyle(StyleComponentType.DatePickerDayToday, ControlVariant.Default, ControlSize.Default, _datePickerDayTodayStyle);
+
+        public GUIStyle GetDatePickerDayOutsideMonthStyle() => GetCachedStyle(StyleComponentType.DatePickerDayOutsideMonth, ControlVariant.Default, ControlSize.Default, _datePickerDayOutsideMonthStyle);
     }
 }

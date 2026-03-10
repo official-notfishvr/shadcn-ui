@@ -39,62 +39,68 @@ namespace shadcnui_examples.Examples
         void DrawControlsWindow(int windowID)
         {
             gui.UpdateGUI(showWindow);
-            if (!gui.BeginGUI()) return;
+            if (!gui.BeginGUI())
+                return;
 
-            scroll = gui.ScrollView(scroll, () =>
-            {
-                gui.BeginVerticalGroup();
+            scroll = gui.ScrollView(
+                scroll,
+                () =>
+                {
+                    gui.BeginVerticalGroup();
 
-                gui.SectionHeader("Text Inputs");
-                gui.InputLabel("Basic Input:");
-                inputText = gui.Input(inputText, "Type something...");
+                    gui.SectionHeader("Text Inputs");
+                    gui.InputLabel("Basic Input:");
+                    inputText = gui.Input(inputText, "Type something...");
 
-                gui.InputLabel("Password Field:");
-                password = gui.PasswordField(windowRect.width - 40, "Password", ref password, '*');
+                    gui.InputLabel("Password Field:");
+                    password = gui.PasswordField(windowRect.width - 40, "Password", ref password, '*');
 
-                gui.InputLabel("Description:");
-                description = gui.TextArea(description, ControlVariant.Default, "Enter description...", false, 60f);
+                    gui.InputLabel("Description:");
+                    description = gui.TextArea(description, ControlVariant.Default, "Enter description...", false, 60f);
 
-                gui.HorizontalSeparator();
+                    gui.HorizontalSeparator();
 
-                gui.SectionHeader("Buttons");
-                gui.BeginHorizontalGroup();
-                if (gui.Button("Primary", ControlVariant.Default))
-                    gui.ShowSuccessToast("Primary clicked!");
-                if (gui.Button("Secondary", ControlVariant.Secondary))
-                    gui.ShowInfoToast("Secondary clicked!");
-                if (gui.Button("Destructive", ControlVariant.Destructive))
-                    gui.ShowErrorToast("Destructive clicked!");
-                gui.EndHorizontalGroup();
+                    gui.SectionHeader("Buttons");
+                    gui.BeginHorizontalGroup();
+                    if (gui.Button("Primary", ControlVariant.Default))
+                        gui.ShowSuccessToast("Primary clicked!");
+                    if (gui.Button("Secondary", ControlVariant.Secondary))
+                        gui.ShowInfoToast("Secondary clicked!");
+                    if (gui.Button("Destructive", ControlVariant.Destructive))
+                        gui.ShowErrorToast("Destructive clicked!");
+                    gui.EndHorizontalGroup();
 
-                gui.BeginHorizontalGroup();
-                if (gui.Button("Outline", ControlVariant.Outline))
-                    gui.ShowToast("Outline clicked!");
-                if (gui.Button("Ghost", ControlVariant.Ghost))
-                    gui.ShowToast("Ghost clicked!");
-                if (gui.Button("Link", ControlVariant.Link))
-                    gui.ShowToast("Link clicked!");
-                gui.EndHorizontalGroup();
+                    gui.BeginHorizontalGroup();
+                    if (gui.Button("Outline", ControlVariant.Outline))
+                        gui.ShowToast("Outline clicked!");
+                    if (gui.Button("Ghost", ControlVariant.Ghost))
+                        gui.ShowToast("Ghost clicked!");
+                    if (gui.Button("Link", ControlVariant.Link))
+                        gui.ShowToast("Link clicked!");
+                    gui.EndHorizontalGroup();
 
-                gui.HorizontalSeparator();
+                    gui.HorizontalSeparator();
 
-                gui.SectionHeader("Toggles & Checkboxes");
-                checkboxValue = gui.Checkbox("Enable Feature", checkboxValue);
-                toggleValue = gui.Toggle("Toggle State", toggleValue);
-                switchValue = gui.Switch("Switch Control", switchValue);
+                    gui.SectionHeader("Toggles & Checkboxes");
+                    checkboxValue = gui.Checkbox("Enable Feature", checkboxValue);
+                    toggleValue = gui.Toggle("Toggle State", toggleValue);
+                    switchValue = gui.Switch("Switch Control", switchValue);
 
-                gui.HorizontalSeparator();
+                    gui.HorizontalSeparator();
 
-                gui.SectionHeader("Slider");
-                sliderValue = gui.LabeledSlider("Volume", sliderValue, 0f, 100f, true);
+                    gui.SectionHeader("Slider");
+                    sliderValue = gui.LabeledSlider("Volume", sliderValue, 0f, 100f, true);
 
-                gui.HorizontalSeparator();
+                    gui.HorizontalSeparator();
 
-                gui.SectionHeader("Select Dropdown");
-                selectedOption = gui.Select(options, selectedOption);
+                    gui.SectionHeader("Select Dropdown");
+                    selectedOption = gui.Select(options, selectedOption);
 
-                gui.EndVerticalGroup();
-            }, GUILayout.Width(windowRect.width - 20), GUILayout.Height(windowRect.height - 60));
+                    gui.EndVerticalGroup();
+                },
+                GUILayout.Width(windowRect.width - 20),
+                GUILayout.Height(windowRect.height - 60)
+            );
 
             gui.EndGUI();
             GUI.DragWindow();

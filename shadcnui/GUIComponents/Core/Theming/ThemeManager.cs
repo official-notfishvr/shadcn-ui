@@ -3,21 +3,22 @@ using System.Collections.Generic;
 
 namespace shadcnui.GUIComponents.Core.Theming
 {
-    public class ThemeManager
+    public sealed class ThemeManager
     {
-        private static readonly Lazy<ThemeManager> _lazy = new Lazy<ThemeManager>(() => new ThemeManager());
-        public static ThemeManager Instance => _lazy.Value;
+        private static readonly Lazy<ThemeManager> _instance = new(() => new ThemeManager());
 
-        public Dictionary<string, Theme> Themes { get; private set; }
+        public static ThemeManager Instance => _instance.Value;
+
+        private readonly object _lock = new();
+
+        public Dictionary<string, Theme> Themes { get; } = new(StringComparer.OrdinalIgnoreCase);
+
         public Theme CurrentTheme { get; private set; }
 
         public event Action OnThemeChanged;
 
-        private readonly object _themeLock = new object();
-
         private ThemeManager()
         {
-            Themes = new Dictionary<string, Theme>();
             AddTheme(Theme.Dark);
             AddTheme(Theme.Light);
             AddTheme(Theme.Slate);
@@ -29,60 +30,54 @@ namespace shadcnui.GUIComponents.Core.Theming
             AddTheme(Theme.BlueDark);
             AddTheme(Theme.Rose);
             AddTheme(Theme.Violet);
-
-            if (Themes.TryGetValue("Dark", out var darkTheme))
-            {
-                CurrentTheme = darkTheme;
-            }
-            else if (Themes.Count > 0)
-            {
-                foreach (var theme in Themes.Values)
-                {
-                    CurrentTheme = theme;
-                    break;
-                }
-            }
-            else
-            {
-                throw new InvalidOperationException("ThemeManager initialization failed: no valid themes available.");
-            }
+            CurrentTheme = Themes["Dark"];
         }
 
         public void AddTheme(Theme theme)
         {
-            if (theme == null || string.IsNullOrEmpty(theme.Name))
+            if (theme == null || string.IsNullOrWhiteSpace(theme.Name))
                 return;
-            lock (_themeLock)
-            {
-                if (!Themes.ContainsKey(theme.Name))
-                    Themes[theme.Name] = theme;
-            }
+
+            lock (_lock)
+                Themes[theme.Name] = theme.Clone();
         }
 
         public bool RemoveTheme(string themeName)
         {
-            if (string.IsNullOrEmpty(themeName))
+            if (string.IsNullOrWhiteSpace(themeName))
                 return false;
-            lock (_themeLock)
+
+            lock (_lock)
             {
-                if (themeName == CurrentTheme?.Name)
+                if (CurrentTheme != null && string.Equals(CurrentTheme.Name, themeName, StringComparison.OrdinalIgnoreCase))
                     return false;
+
                 return Themes.Remove(themeName);
             }
         }
 
-        public void SetTheme(string themeName)
+        public bool SetTheme(string themeName)
         {
-            Action handler = null;
-            lock (_themeLock)
+            if (string.IsNullOrWhiteSpace(themeName))
+                return false;
+
+            Theme nextTheme;
+            lock (_lock)
             {
-                if (Themes.TryGetValue(themeName, out var theme))
-                {
-                    CurrentTheme = theme;
-                    handler = OnThemeChanged;
-                }
+                if (!Themes.TryGetValue(themeName, out nextTheme))
+                    return false;
+
+                CurrentTheme = nextTheme.Clone();
             }
-            handler?.Invoke();
+
+            OnThemeChanged?.Invoke();
+            return true;
+        }
+
+        public Theme GetTheme(string themeName)
+        {
+            lock (_lock)
+                return Themes.TryGetValue(themeName, out var theme) ? theme.Clone() : null;
         }
     }
 }

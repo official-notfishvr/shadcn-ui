@@ -1,9 +1,6 @@
 using System;
 using System.IO;
 using UnityEngine;
-#if IL2CPP_MELONLOADER || IL2CPP_MELONLOADER_PRE57 || Mono_Melonloader
-using MelonLoader;
-#endif
 
 namespace shadcnui.GUIComponents.Core.Utils
 {
@@ -18,191 +15,77 @@ namespace shadcnui.GUIComponents.Core.Utils
             Error,
         }
 
-        private static LogLevel _minLogLevel = LogLevel.Trace;
+        private static readonly object _fileLock = new();
         private static string _logFilePath;
-        private static bool _fileLoggingEnabled = false;
-        private static readonly object _fileLock = new object();
-        private static int _maxLogFileSizeBytes = 5 * 1024 * 1024;
-        private static int _maxLogFileCount = 5;
-        private static System.Collections.Generic.Queue<string> _logBuffer = new System.Collections.Generic.Queue<string>();
-        private static int _bufferFlushThreshold = 10;
+        private static LogLevel _minimumLevel = LogLevel.Warning;
 
-        public static void SetLogLevel(LogLevel level)
-        {
-            _minLogLevel = level;
-        }
+        public static void SetLogLevel(LogLevel level) => _minimumLevel = level;
 
         public static void EnableFileLogging(string filePath = null)
         {
-            if (filePath == null)
-            {
-                filePath = Path.Combine(Application.persistentDataPath, "logs", "GUILogger.log");
-            }
+            _logFilePath = string.IsNullOrWhiteSpace(filePath) ? Path.Combine(Application.persistentDataPath, "shadcnui.log") : filePath;
 
-            _logFilePath = filePath;
-            string directory = Path.GetDirectoryName(_logFilePath);
-
-            if (!Directory.Exists(directory))
-            {
+            var directory = Path.GetDirectoryName(_logFilePath);
+            if (!string.IsNullOrWhiteSpace(directory) && !Directory.Exists(directory))
                 Directory.CreateDirectory(directory);
-            }
-
-            _fileLoggingEnabled = true;
         }
 
-        public static void DisableFileLogging()
-        {
-            _fileLoggingEnabled = false;
-        }
+        public static void DisableFileLogging() => _logFilePath = null;
 
-        public static void LogTrace(string message, string component = "GUIHelper")
-        {
-            Log(LogLevel.Trace, message, component);
-        }
+        public static void LogTrace(string message, string component = "GUI") => Log(LogLevel.Trace, message, component);
 
-        public static void LogDebug(string message, string component = "GUIHelper")
-        {
-            Log(LogLevel.Debug, message, component);
-        }
+        public static void LogDebug(string message, string component = "GUI") => Log(LogLevel.Debug, message, component);
 
-        public static void LogInfo(string message, string component = "GUIHelper")
-        {
-            Log(LogLevel.Info, message, component);
-        }
+        public static void LogInfo(string message, string component = "GUI") => Log(LogLevel.Info, message, component);
 
-        public static void LogWarning(string message, string component = "GUIHelper")
-        {
-            Log(LogLevel.Warning, message, component);
-        }
+        public static void LogWarning(string message, string component = "GUI") => Log(LogLevel.Warning, message, component);
 
-        public static void LogError(string message, string component = "GUIHelper")
-        {
-            Log(LogLevel.Error, message, component);
-        }
+        public static void LogError(string message, string component = "GUI") => Log(LogLevel.Error, message, component);
 
-        public static void LogException(Exception ex, string methodName = "", string component = "GUIHelper")
+        public static void LogException(Exception exception, string methodName = "", string component = "GUI")
         {
-            string message = $"Exception in {methodName}: {ex.Message}";
-            if (!string.IsNullOrEmpty(ex.StackTrace))
-            {
-                message += $"\nStack Trace: {ex.StackTrace}";
-            }
+            if (exception == null)
+                return;
+
+            var message = string.IsNullOrWhiteSpace(methodName) ? exception.ToString() : $"[{methodName}] {exception}";
+
             Log(LogLevel.Error, message, component);
         }
 
         private static void Log(LogLevel level, string message, string component)
         {
-            if (level < _minLogLevel)
+            if (level < _minimumLevel)
                 return;
 
-            string timestamp = DateTime.Now.ToString("HH:mm:ss.fff");
-            string levelStr = level.ToString().ToUpper();
-            string formattedMessage = $"[{timestamp}] [{levelStr}] [{component}] {message}";
+            var line = $"[{DateTime.Now:HH:mm:ss}] [{level}] [{component}] {message}";
 
-#if IL2CPP_MELONLOADER || IL2CPP_MELONLOADER_PRE57 || Mono_Melonloader
             switch (level)
             {
-                case LogLevel.Trace:
-                case LogLevel.Debug:
-                case LogLevel.Info:
-                    MelonLogger.Msg(formattedMessage);
-                    break;
                 case LogLevel.Warning:
-                    MelonLogger.Warning(formattedMessage);
+                    Debug.LogWarning(line);
                     break;
                 case LogLevel.Error:
-                    MelonLogger.Error(formattedMessage);
+                    Debug.LogError(line);
+                    break;
+                default:
+                    Debug.Log(line);
                     break;
             }
-#else
-            switch (level)
-            {
-                case LogLevel.Trace:
-                case LogLevel.Debug:
-                case LogLevel.Info:
-                    Debug.Log(formattedMessage);
-                    break;
-                case LogLevel.Warning:
-                    Debug.LogWarning(formattedMessage);
-                    break;
-                case LogLevel.Error:
-                    Debug.LogError(formattedMessage);
-                    break;
-            }
-#endif
 
-            if (_fileLoggingEnabled && !string.IsNullOrEmpty(_logFilePath))
-            {
-                WriteToFile(formattedMessage);
-            }
-        }
+            if (string.IsNullOrWhiteSpace(_logFilePath))
+                return;
 
-        private static void WriteToFile(string message)
-        {
             lock (_fileLock)
             {
                 try
                 {
-                    _logBuffer.Enqueue(message);
-                    if (_logBuffer.Count >= _bufferFlushThreshold)
-                    {
-                        FlushLogBufferInternal();
-                    }
+                    File.AppendAllText(_logFilePath, line + Environment.NewLine);
                 }
-                catch (Exception ex)
+                catch
                 {
-                    Debug.LogError($"Failed to write to log file: {ex.Message}");
+                    // Logging failures should never break UI rendering.
                 }
             }
-        }
-
-        public static void FlushLogBuffer()
-        {
-            lock (_fileLock)
-            {
-                FlushLogBufferInternal();
-            }
-        }
-
-        private static void FlushLogBufferInternal()
-        {
-            if (_logBuffer.Count == 0)
-                return;
-            try
-            {
-                string batch = string.Join(Environment.NewLine, _logBuffer);
-                RotateLogFilesIfNeeded();
-                File.AppendAllText(_logFilePath, batch + Environment.NewLine);
-                _logBuffer.Clear();
-            }
-            catch (Exception ex)
-            {
-                Debug.LogError($"Failed to flush log buffer: {ex.Message}");
-            }
-        }
-
-        private static void RotateLogFilesIfNeeded()
-        {
-            if (!_fileLoggingEnabled || string.IsNullOrEmpty(_logFilePath))
-                return;
-
-            FileInfo logFile = new FileInfo(_logFilePath);
-            if (!logFile.Exists || logFile.Length < _maxLogFileSizeBytes)
-                return;
-
-            for (int i = _maxLogFileCount - 1; i >= 1; i--)
-            {
-                string oldPath = _logFilePath + "." + i;
-                string newPath = _logFilePath + "." + (i + 1);
-                if (File.Exists(oldPath))
-                {
-                    if (i == _maxLogFileCount - 1)
-                        File.Delete(oldPath);
-                    else
-                        File.Move(oldPath, newPath);
-                }
-            }
-            File.Move(_logFilePath, _logFilePath + ".1");
         }
     }
 }

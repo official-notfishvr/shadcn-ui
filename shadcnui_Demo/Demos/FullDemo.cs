@@ -1,1752 +1,742 @@
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
-using System.Reflection;
+using shadcnui.GUIComponents.Controls;
 using shadcnui.GUIComponents.Core.Base;
 using shadcnui.GUIComponents.Core.Styling;
+using shadcnui.GUIComponents.Core.Theming;
 using shadcnui.GUIComponents.Core.Utils;
 using shadcnui.GUIComponents.Layout;
 using UnityEngine;
-#if IL2CPP_MELONLOADER_PRE57
-using UnhollowerBaseLib;
-#endif
 
 namespace shadcnui_Demo.Menu
 {
     public class FullDemo : MonoBehaviour
     {
-        private GUIHelper guiHelper;
-        private Rect windowRect = new Rect(20, 20, 1450, 800);
-        private bool showDemoWindow = false;
-        private bool useVerticalTabs = false;
-        private Vector2 scrollPosition;
+        private readonly string[] _tabs = { "Overview", "Inputs", "Display", "Layout", "Data", "Overlay" };
 
-        // Demo State Variables
-        private int currentDemoTab = 0;
-        private TabConfig[] demoTabs;
-        private bool verticalTabsOnRight = false;
-        private bool tabsOnBottom = false;
-        private int componentCount = 0;
-        private Texture2D img = new Texture2D(2, 2);
+        private GUIHelper _gui;
+        private Rect _windowRect = new Rect(24f, 24f, 1420f, 860f);
+        private Vector2 _scroll;
+        private int _activeTab;
+        private Texture2D _sampleTexture;
 
-        // Input States
-        private string passwordValue = "password123";
-        private string textAreaValue = "";
-        private string outlineTextAreaValue = "Outline Text Area";
-        private string ghostTextAreaValue = "Ghost Text Area";
-        private string labeledTextAreaValue = "Labeled Text Area";
-        private float resizableTextAreaHeight = 100f;
-        private string resizableTextAreaValue = "Resizable Text Area";
+        private float _uiScale = 1f;
+        private float _fontSize = 14f;
+        private string _search = "Squad loadout";
+        private string _email = "operator@station.local";
+        private string _password = "flat-ui-demo";
+        private string _notes = "This demo is the reference surface for the rebuilt core.";
+        private float _notesHeight = 110f;
 
-        // Slider States
-        private float sliderValue = 0.5f;
-        private float sliderWithStepValue = 50f;
-        private float sliderLabeledValue = 0.75f;
-        private float sliderDisabledValue = 0.3f;
-        private float sliderDestructiveValue = 0.6f;
-        private float sliderSmallValue = 0.4f;
-        private float sliderLargeValue = 0.8f;
+        private bool _featureToggle = true;
+        private bool _compactMode;
+        private bool _alertsEnabled = true;
+        private bool _confirmDelete;
+        private float _volume = 0.72f;
+        private float _danger = 35f;
 
-        // Toggle/Switch/Checkbox States
-        private Dictionary<string, bool> toggleStates = new Dictionary<string, bool>();
+        private int _selectIndex = 1;
+        private bool _showSelect;
+        private bool _showDropdown;
+        private bool _showDialog;
+        private int _nestedTabs;
+        private int _verticalTabs;
+        private int _navigationIndex = 1;
 
-        // Dropdown/Select/Popover States
-        private bool dropdownOpen = false;
-        private int selectIndex = 0;
-        private List<DropdownMenuItem> dropdownMenuItems;
+        private DateTime? _shipDate = DateTime.Today.AddDays(3);
+        private DateTime? _meetingDate = DateTime.Today;
+        private DateTime? _rangeStart = DateTime.Today;
+        private DateTime? _rangeEnd = DateTime.Today.AddDays(5);
 
-        // Table States
-        private int[] sortColumns = new int[0];
-        private bool[] sortAscending = new bool[0];
-        private bool[] selectedRows = new bool[0];
+        private List<DropdownMenuItem> _dropdownItems;
+        private List<DataTableColumn> _dataColumns;
+        private List<DataTableRow> _dataRows;
+        private List<ChartSeries> _barSeries;
+        private List<ChartSeries> _lineSeries;
+        private List<ChartSeries> _pieSeries;
 
-        private List<ChartSeries> chartSeries;
-        private List<ChartSeries> chartSeriesMultiPoint;
-        private List<ChartSeries> chartPieSeries;
-
-        void Start()
+        private readonly string[] _tableHeaders = { "Squad", "Status", "Ping", "Loadout" };
+        private readonly string[,] _tableRows =
         {
-            guiHelper = new GUIHelper();
+            { "Alpha", "Ready", "18 ms", "Scout" },
+            { "Bravo", "Queued", "24 ms", "Medic" },
+            { "Charlie", "Ready", "31 ms", "Tank" },
+        };
 
-            // Load Image
-            byte[] imageData = LoadEmbeddedBytes("shadcnui_Demo.Img.1.png");
-#if MONO
-            if (imageData != null)
-                img.LoadImage(imageData);
-#endif
+        private readonly string[] _selectItems = { "North Wing", "Transit Hub", "Orbital Dock", "Relay Tower" };
 
-            demoTabs = new TabConfig[]
-            {
-                new TabConfig("Button", DrawButtonDemos),
-                new TabConfig("Badge", DrawBadgeDemos),
-                new TabConfig("Input", DrawInputDemos),
-                new TabConfig("Toggle", DrawToggleDemos),
-                new TabConfig("Checkbox", DrawCheckboxDemos),
-                new TabConfig("Switch", DrawSwitchDemos),
-                new TabConfig("TextArea", DrawTextAreaDemos),
-                new TabConfig("Avatar", DrawAvatarDemos),
-                new TabConfig("Card", DrawCardDemos),
-                new TabConfig("Progress", DrawProgressDemos),
-                new TabConfig("Separator", DrawSeparatorDemos),
-                new TabConfig("Label", DrawLabelDemos),
-                new TabConfig("Dialog", DrawDialogDemos),
-                new TabConfig("Select", DrawSelectDemos),
-                new TabConfig("DropdownMenu", DrawDropdownMenuDemos),
-                new TabConfig("Popover", DrawPopoverDemos),
-                new TabConfig("Tabs", DrawTabsDemos),
-                new TabConfig("MenuBar", DrawMenuBar),
-                new TabConfig("Chart", DrawChartDemos),
-                new TabConfig("Table", DrawTableDemos),
-                new TabConfig("Toast", DrawToastDemos),
-                new TabConfig("Tooltip", DrawTooltipDemos),
-                new TabConfig("Slider", DrawSliderDemos),
-                new TabConfig("Layout", DrawLayoutDemos),
-            };
+        private void Start()
+        {
+            _gui = new GUIHelper();
+            _sampleTexture = CreateSampleTexture();
 
-            componentCount = demoTabs.Length;
+            RegisterThemes();
+            BuildDropdownItems();
+            BuildDataTable();
+            BuildCharts();
         }
 
-        private byte[] LoadEmbeddedBytes(string path)
+        private void OnGUI()
         {
-            try
-            {
-                Assembly assembly = Assembly.GetExecutingAssembly();
-                using (Stream stream = assembly.GetManifestResourceStream(path))
-                {
-                    if (stream == null)
-                        return null;
-                    byte[] data = new byte[stream.Length];
-                    stream.Read(data, 0, data.Length);
-                    return data;
-                }
-            }
-            catch
-            {
-                return null;
-            }
+            _windowRect = GUI.Window(104, _windowRect, DrawWindow, string.Empty);
+            _gui.DrawOverlays();
         }
 
-        void OnGUI()
+        private void OnDestroy()
         {
-            // Todo: make the GUI auto do this
-            GUI.skin.horizontalScrollbar = GUIStyle.none;
-            GUI.skin.verticalScrollbar = GUIStyle.none;
-
-            GUILayout.BeginArea(new Rect(10, 10, 400, 60));
-            GUILayout.BeginHorizontal();
-            if (GUILayout.Button("Open Demo Window", GUILayout.Width(150), GUILayout.Height(30)))
-            {
-                showDemoWindow = !showDemoWindow;
-            }
-            GUILayout.Label($"Components: {componentCount}", GUILayout.Width(200));
-            GUILayout.EndHorizontal();
-            GUILayout.EndArea();
-
-            if (showDemoWindow)
-            {
-                windowRect = GUI.Window(101, windowRect, (GUI.WindowFunction)DrawDemoWindow, "shadcn/ui Demo - Full Showcase");
-            }
-
-            // Draw toasts for Toast
-            guiHelper.DrawOverlay();
+            _gui?.Cleanup();
+            if (_sampleTexture != null)
+                Destroy(_sampleTexture);
         }
 
-        void DrawDemoWindow(int windowID)
+        private void DrawWindow(int windowId)
         {
-            guiHelper.UpdateGUI(showDemoWindow);
-            if (guiHelper.BeginGUI())
-            {
-                DrawHeader();
+            _gui.UpdateGUI(true);
+            _gui.SetUiScale(_uiScale);
+            _gui.SetFontSize(Mathf.RoundToInt(_fontSize));
+            if (!_gui.BeginGUI())
+                return;
 
-                if (useVerticalTabs)
-                {
-                    var side = verticalTabsOnRight ? TabSide.Right : TabSide.Left;
-                    currentDemoTab = guiHelper.VerticalTabs(demoTabs.Select(tab => tab.Name).ToArray(), currentDemoTab, DrawScrollableContent, tabWidth: 160, maxLines: 2, side: side);
-                }
-                else
-                {
-                    var position = tabsOnBottom ? TabPosition.Bottom : TabPosition.Top;
-                    currentDemoTab = guiHelper.Tabs(demoTabs.Select(tab => tab.Name).ToArray(), currentDemoTab, DrawScrollableContent, maxLines: 2, position: position);
-                }
-                guiHelper.EndGUI();
-            }
+            DrawHeader();
+            _gui.HorizontalSeparator();
+
+            _activeTab = _gui.Tabs(_tabs, _activeTab, DrawBody, maxLines: 1, position: TabPosition.Top, indicatorStyle: IndicatorStyle.Background);
+
+            _gui.EndGUI();
             GUI.DragWindow();
         }
 
-        void DrawHeader()
+        private void DrawHeader()
         {
-            guiHelper.BeginHorizontalGroup();
-            guiHelper.Label("shadcn/ui Library", ControlVariant.Default);
+            _gui.BeginHorizontalGroup();
+            _gui.BeginVerticalGroup();
+            _gui.Label("shadcn/ui Core Rebuild", ControlVariant.Default);
+            _gui.MutedLabel("Flat, theme-driven IMGUI components for in-game tooling.");
+            _gui.EndVerticalGroup();
+
             GUILayout.FlexibleSpace();
-            guiHelper.ThemeChangerWithPreview("header_theme_changer", 180f);
-            GUILayout.Space(10);
-            useVerticalTabs = guiHelper.Toggle("Vertical Tabs", useVerticalTabs);
-            GUILayout.Space(10);
-            if (useVerticalTabs)
-                verticalTabsOnRight = guiHelper.Toggle("Right Side", verticalTabsOnRight);
-            else
-                tabsOnBottom = guiHelper.Toggle("Bottom Tabs", tabsOnBottom);
-            guiHelper.EndHorizontalGroup();
-            guiHelper.MutedLabel("Explore all available components, variants, and sizes.");
-            guiHelper.HorizontalSeparator();
+
+            _gui.BeginVerticalGroup(GUILayout.Width(360f));
+            _gui.ThemeChangerWithPreview("full_demo_theme", 220f);
+            _uiScale = _gui.LabeledSlider("UI Scale", _uiScale, 0.85f, 1.35f, 0.05f);
+            _fontSize = _gui.LabeledSlider("Base Font", _fontSize, 12f, 18f, 1f);
+            _gui.EndVerticalGroup();
+            _gui.EndHorizontalGroup();
         }
 
-        void DrawScrollableContent()
+        private void DrawBody()
         {
-            scrollPosition = guiHelper.ScrollView(
-                scrollPosition,
+            _scroll = _gui.ScrollView(
+                _scroll,
                 () =>
                 {
-                    guiHelper.BeginVerticalGroup();
-                    if (currentDemoTab >= 0 && currentDemoTab < demoTabs.Length)
+                    _gui.BeginVerticalGroup();
+                    switch (_activeTab)
                     {
-                        demoTabs[currentDemoTab].Content?.Invoke();
+                        case 0:
+                            DrawOverviewTab();
+                            break;
+                        case 1:
+                            DrawInputsTab();
+                            break;
+                        case 2:
+                            DrawDisplayTab();
+                            break;
+                        case 3:
+                            DrawLayoutTab();
+                            break;
+                        case 4:
+                            DrawDataTab();
+                            break;
+                        default:
+                            DrawOverlayTab();
+                            break;
                     }
-                    guiHelper.EndVerticalGroup();
+                    _gui.EndVerticalGroup();
                 },
-                GUILayout.ExpandHeight(true)
+                GUILayout.Height(_windowRect.height - 170f)
             );
         }
 
-        #region Helper Methods
-        private void DrawSection(string title, Action content)
-        {
-            guiHelper.Label(title, ControlVariant.Default);
-            guiHelper.HorizontalSeparator();
-            content?.Invoke();
-            GUILayout.Space(20);
-        }
-
-        private void DrawAllVariants(Action<ControlVariant> drawFunc)
-        {
-            guiHelper.BeginHorizontalGroup();
-            foreach (ControlVariant variant in Enum.GetValues(typeof(ControlVariant)))
-            {
-                GUILayout.BeginVertical(GUILayout.Width(100));
-                guiHelper.Label(variant.ToString(), ControlVariant.Muted);
-                drawFunc(variant);
-                GUILayout.EndVertical();
-            }
-            guiHelper.EndHorizontalGroup();
-        }
-
-        private void DrawAllSizes(Action<ControlSize> drawFunc)
-        {
-            guiHelper.BeginHorizontalGroup();
-            foreach (ControlSize size in Enum.GetValues(typeof(ControlSize)))
-            {
-                GUILayout.BeginVertical(GUILayout.Width(100));
-                guiHelper.Label(size.ToString(), ControlVariant.Muted);
-                drawFunc(size);
-                GUILayout.EndVertical();
-            }
-            guiHelper.EndHorizontalGroup();
-        }
-        #endregion
-
-        #region Demos
-        void DrawButtonDemos()
+        private void DrawOverviewTab()
         {
             DrawSection(
-                "Button Variants",
+                "Theme System",
+                "Centralized metrics, colors, typography, and live scaling.",
                 () =>
                 {
-                    DrawAllVariants(variant => guiHelper.Button("Button", variant));
+                    _gui.BeginHorizontalGroup();
+                    _gui.SimpleCard($"Theme: {_gui.CurrentTheme.Name}\nAccent: {_gui.CurrentTheme.Accent}\nRadius: {_gui.CurrentTheme.Metrics.CornerRadius}", 280f, 110f);
+                    _gui.SimpleCard($"Scale: {_uiScale:F2}\nFont: {_fontSize:F0}px\nBorder: {_gui.CurrentTheme.Metrics.BorderWidth:F1}px", 280f, 110f);
+                    _gui.CardWithImage(_sampleTexture, "Flat Surface", "Minimal chrome", "Cards, buttons, and overlays all resolve through the shared style manager.", width: 300f, height: 210f);
+                    _gui.EndHorizontalGroup();
                 }
             );
 
             DrawSection(
-                "Button Sizes",
+                "Core Controls",
+                "Representative variants and sizes.",
                 () =>
                 {
-                    DrawAllSizes(size => guiHelper.Button("Button", ControlVariant.Default, size));
+                    _gui.BeginHorizontalGroup();
+                    _gui.Button("Primary");
+                    _gui.Button("Secondary", ControlVariant.Secondary);
+                    _gui.Button("Outline", ControlVariant.Outline);
+                    _gui.Button("Ghost", ControlVariant.Ghost);
+                    _gui.Button("Delete", ControlVariant.Destructive);
+                    _gui.EndHorizontalGroup();
+
+                    _gui.BeginHorizontalGroup();
+                    _gui.Badge("Live");
+                    _gui.Badge("Muted", ControlVariant.Secondary);
+                    _gui.CountBadge(17);
+                    _gui.StatusBadge("Sync", true);
+                    _gui.ProgressBadge("Deploy", 0.64f);
+                    _gui.AnimatedBadge("Pulse");
+                    _gui.EndHorizontalGroup();
                 }
             );
 
             DrawSection(
-                "Button States",
+                "Live Samples",
+                "Every category in the rebuilt library is exercised in the tabs below.",
                 () =>
                 {
-                    guiHelper.BeginHorizontalGroup();
-                    guiHelper.Button("Normal");
-                    guiHelper.Button("Disabled", disabled: true);
-                    guiHelper.EndHorizontalGroup();
+                    _gui.BeginHorizontalGroup();
+                    _gui.AvatarWithStatus(_sampleTexture, "OP", true);
+                    _gui.Progress(0.58f, width: 240f);
+                    _gui.LabeledSeparator("Session");
+                    _gui.Label("Orbital Relay Queue", ControlVariant.Default);
+                    _gui.EndHorizontalGroup();
                 }
             );
+        }
 
+        private void DrawInputsTab()
+        {
             DrawSection(
-                "Buttons with Icons",
+                "Text Entry",
+                "Inputs, password fields, and text areas all inherit the same theme metrics.",
                 () =>
                 {
-                    guiHelper.BeginHorizontalGroup();
-                    guiHelper.Button("Button with a icon", img);
-                    guiHelper.Button("Left Icon", img, ControlVariant.Outline);
-                    guiHelper.Button("Secondary", img, ControlVariant.Secondary);
-                    guiHelper.EndHorizontalGroup();
-
-                    guiHelper.Label("Icon Positioning");
-                    guiHelper.BeginHorizontalGroup();
-                    guiHelper.Button(
-                        "Left",
-                        new IconConfig(img)
+                    _email = _gui.Input(
+                        new InputConfig
                         {
-                            Position = IconPosition.Left,
-                            Size = 14f,
-                            Spacing = 4f,
+                            Label = "Email",
+                            Value = _email,
+                            Placeholder = "name@game.local",
+                            Width = 280,
                         }
                     );
-                    guiHelper.Button(
-                        "Right",
-                        new IconConfig(img)
-                        {
-                            Position = IconPosition.Right,
-                            Size = 14f,
-                            Spacing = 4f,
-                        }
-                    );
-                    guiHelper.EndHorizontalGroup();
-                }
-            );
-        }
-
-        void DrawBadgeDemos()
-        {
-            DrawSection(
-                "Badge Variants",
-                () =>
-                {
-                    DrawAllVariants(variant => guiHelper.Badge("Badge", variant));
+                    _search = _gui.Input(_search, new IconConfig(_sampleTexture, IconPosition.Left) { Size = 14f, Spacing = 6f }, "Search command palette", width: 320);
+                    _gui.PasswordField(320f, "Access Token", ref _password);
+                    _notes = _gui.ResizableTextArea(_notes, ref _notesHeight, placeholder: "Write operator notes");
                 }
             );
 
             DrawSection(
-                "Badge Sizes",
+                "Choices",
+                "Toggles, checkboxes, switches, select, slider, and dropdown menu.",
                 () =>
                 {
-                    DrawAllSizes(size => guiHelper.Badge("Badge", ControlVariant.Default, size));
-                }
-            );
+                    _gui.BeginHorizontalGroup();
+                    _featureToggle = _gui.Toggle("Feature Flags", _featureToggle);
+                    _compactMode = _gui.Checkbox("Compact HUD", _compactMode);
+                    _alertsEnabled = _gui.Switch("Alerts", _alertsEnabled);
+                    _gui.EndHorizontalGroup();
 
-            DrawSection(
-                "Special Badges",
-                () =>
-                {
-                    guiHelper.BeginHorizontalGroup();
-                    guiHelper.CountBadge(5);
-                    guiHelper.StatusBadge("Online", true);
-                    guiHelper.ProgressBadge("Loading", 0.7f);
-                    guiHelper.RoundedBadge("Rounded", cornerRadius: 8f);
-                    guiHelper.BadgeWithIcon("Icon", img);
-                    guiHelper.EndHorizontalGroup();
+                    _volume = _gui.LabeledSlider("Effects Volume", _volume, 0f, 1f, 0.01f);
+                    _danger = _gui.LabeledSlider("Danger Threshold", _danger, 0f, 100f, 5f);
 
-                    guiHelper.Label("Badge with Icon");
-                    guiHelper.BeginHorizontalGroup();
-                    guiHelper.Badge("Icon", new IconConfig(img) { Size = 12f, Spacing = 3f });
-                    guiHelper.EndHorizontalGroup();
-                }
-            );
-
-            DrawSection(
-                "Animated Badges",
-                () =>
-                {
-                    guiHelper.Label("Badges with smooth pulse animation using AnimationManager:");
-                    guiHelper.BeginHorizontalGroup();
-                    guiHelper.AnimatedBadge("Pulse 1", "badge_anim_1");
-                    guiHelper.AnimatedBadge("Pulse 2", "badge_anim_2", ControlVariant.Destructive);
-                    guiHelper.AnimatedBadge("Pulse 3", "badge_anim_3", ControlVariant.Secondary);
-                    guiHelper.EndHorizontalGroup();
-                }
-            );
-        }
-
-        void DrawInputDemos()
-        {
-            DrawSection(
-                "Input Variants",
-                () =>
-                {
-                    guiHelper.Label("Default");
-                    guiHelper.PasswordField(200, "Default", ref passwordValue);
-                }
-            );
-
-            DrawSection(
-                "Input Types",
-                () =>
-                {
-                    guiHelper.Label("Password");
-                    guiHelper.PasswordField(300, "Password", ref passwordValue);
-
-                    guiHelper.Label("Section Header");
-                    guiHelper.SectionHeader("Header Example");
-
-                    guiHelper.Label("Render Label");
-                    guiHelper.InputLabel("Rendered Label Text", 200);
-                }
-            );
-
-            DrawSection(
-                "Inputs with Icons",
-                () =>
-                {
-                    guiHelper.Input("Input with Icon", img, passwordValue);
-
-                    guiHelper.Label("Icon Config");
-                    guiHelper.Input(
-                        "Left Icon",
-                        new IconConfig(img)
-                        {
-                            Position = IconPosition.Left,
-                            Size = 14f,
-                            Spacing = 4f,
-                        }
-                    );
-                    guiHelper.Input(
-                        "Right Icon",
-                        new IconConfig(img)
-                        {
-                            Position = IconPosition.Right,
-                            Size = 14f,
-                            Spacing = 4f,
-                        }
-                    );
-                }
-            );
-        }
-
-        void DrawToggleDemos()
-        {
-            DrawSection(
-                "Toggle Variants",
-                () =>
-                {
-                    DrawAllVariants(variant =>
+                    _gui.BeginHorizontalGroup();
+                    if (_gui.Button("Open Select", ControlVariant.Outline, ControlSize.Default))
+                        _showSelect = true;
+                    if (_showSelect)
                     {
-                        string key = $"toggle_var_{variant}";
-                        if (!toggleStates.ContainsKey(key))
-                            toggleStates[key] = false;
-                        toggleStates[key] = guiHelper.Toggle("Toggle", toggleStates[key], variant);
-                    });
-                }
-            );
-
-            DrawSection(
-                "Toggle Sizes",
-                () =>
-                {
-                    DrawAllSizes(size =>
-                    {
-                        string key = $"toggle_size_{size}";
-                        if (!toggleStates.ContainsKey(key))
-                            toggleStates[key] = false;
-                        toggleStates[key] = guiHelper.Toggle("Toggle", toggleStates[key], ControlVariant.Default, size);
-                    });
-                }
-            );
-
-            DrawSection(
-                "Toggles with Icons",
-                () =>
-                {
-                    string key = "icon_toggle";
-                    if (!toggleStates.ContainsKey(key))
-                        toggleStates[key] = false;
-                    toggleStates[key] = guiHelper.Toggle("Toggle with Icon", new IconConfig(img, IconPosition.Left), toggleStates[key]);
-
-                    guiHelper.Label("Icon Config");
-                    string leftKey = "toggle_left";
-                    if (!toggleStates.ContainsKey(leftKey))
-                        toggleStates[leftKey] = false;
-                    toggleStates[leftKey] = guiHelper.Toggle(
-                        "Left",
-                        new IconConfig(img)
-                        {
-                            Position = IconPosition.Left,
-                            Size = 14f,
-                            Spacing = 4f,
-                        },
-                        toggleStates[leftKey]
-                    );
-
-                    string rightKey = "toggle_right";
-                    if (!toggleStates.ContainsKey(rightKey))
-                        toggleStates[rightKey] = false;
-                    toggleStates[rightKey] = guiHelper.Toggle(
-                        "Right",
-                        new IconConfig(img)
-                        {
-                            Position = IconPosition.Right,
-                            Size = 14f,
-                            Spacing = 4f,
-                        },
-                        toggleStates[rightKey]
-                    );
-                }
-            );
-        }
-
-        void DrawCheckboxDemos()
-        {
-            DrawSection(
-                "Checkbox Variants",
-                () =>
-                {
-                    DrawAllVariants(variant =>
-                    {
-                        string key = $"check_var_{variant}";
-                        if (!toggleStates.ContainsKey(key))
-                            toggleStates[key] = false;
-                        toggleStates[key] = guiHelper.Checkbox("Check", toggleStates[key], variant);
-                    });
-                }
-            );
-
-            DrawSection(
-                "Checkboxes with Icons",
-                () =>
-                {
-                    string leftKey = "check_left";
-                    if (!toggleStates.ContainsKey(leftKey))
-                        toggleStates[leftKey] = false;
-                    toggleStates[leftKey] = guiHelper.Checkbox(
-                        "Left",
-                        new IconConfig(img)
-                        {
-                            Position = IconPosition.Left,
-                            Size = 14f,
-                            Spacing = 4f,
-                        },
-                        toggleStates[leftKey]
-                    );
-
-                    string rightKey = "check_right";
-                    if (!toggleStates.ContainsKey(rightKey))
-                        toggleStates[rightKey] = false;
-                    toggleStates[rightKey] = guiHelper.Checkbox(
-                        "Right",
-                        new IconConfig(img)
-                        {
-                            Position = IconPosition.Right,
-                            Size = 14f,
-                            Spacing = 4f,
-                        },
-                        toggleStates[rightKey]
-                    );
-                }
-            );
-
-            DrawSection(
-                "Checkbox Sizes",
-                () =>
-                {
-                    DrawAllSizes(size =>
-                    {
-                        string key = $"check_size_{size}";
-                        if (!toggleStates.ContainsKey(key))
-                            toggleStates[key] = false;
-                        toggleStates[key] = guiHelper.Checkbox("Check", toggleStates[key], ControlVariant.Default, size);
-                    });
-                }
-            );
-        }
-
-        void DrawSwitchDemos()
-        {
-            DrawSection(
-                "Switch Variants",
-                () =>
-                {
-                    DrawAllVariants(variant =>
-                    {
-                        string key = $"switch_var_{variant}";
-                        if (!toggleStates.ContainsKey(key))
-                            toggleStates[key] = false;
-                        toggleStates[key] = guiHelper.Switch("Switch", toggleStates[key], variant);
-                    });
-                }
-            );
-
-            DrawSection(
-                "Switch Sizes",
-                () =>
-                {
-                    DrawAllSizes(size =>
-                    {
-                        string key = $"switch_size_{size}";
-                        if (!toggleStates.ContainsKey(key))
-                            toggleStates[key] = false;
-                        toggleStates[key] = guiHelper.Switch("Switch", toggleStates[key], ControlVariant.Default, size);
-                    });
-                }
-            );
-        }
-
-        void DrawTextAreaDemos()
-        {
-            DrawSection(
-                "TextArea Variants",
-                () =>
-                {
-                    guiHelper.Label("Default");
-                    textAreaValue = guiHelper.TextArea(textAreaValue, ControlVariant.Default, "Default");
-
-                    guiHelper.Label("Outline");
-                    outlineTextAreaValue = guiHelper.OutlineTextArea(outlineTextAreaValue, "Outline");
-
-                    guiHelper.Label("Ghost");
-                    ghostTextAreaValue = guiHelper.GhostTextArea(ghostTextAreaValue, "Ghost");
-                }
-            );
-
-            DrawSection(
-                "Special TextAreas",
-                () =>
-                {
-                    guiHelper.Label("Labeled");
-                    labeledTextAreaValue = guiHelper.LabeledTextArea("Label", labeledTextAreaValue, placeholder: "Labeled");
-
-                    guiHelper.Label("Resizable");
-                    resizableTextAreaValue = guiHelper.ResizableTextArea(resizableTextAreaValue, ref resizableTextAreaHeight, placeholder: "Resize me");
-                }
-            );
-        }
-
-        void DrawAvatarDemos()
-        {
-            DrawSection(
-                "Avatar Sizes",
-                () =>
-                {
-                    DrawAllSizes(size => guiHelper.Avatar(img, "AV", size));
-                }
-            );
-
-            DrawSection(
-                "Avatar Shapes",
-                () =>
-                {
-                    guiHelper.BeginHorizontalGroup();
-                    guiHelper.Avatar(img, "CR", ControlSize.Default, AvatarShape.Circle);
-                    guiHelper.Avatar(img, "SQ", ControlSize.Default, AvatarShape.Square);
-                    guiHelper.Avatar(img, "RD", ControlSize.Default, AvatarShape.Rounded);
-                    guiHelper.EndHorizontalGroup();
-                }
-            );
-
-            DrawSection(
-                "Avatar Features",
-                () =>
-                {
-                    guiHelper.BeginHorizontalGroup();
-                    guiHelper.AvatarWithStatus(img, "ON", true);
-                    guiHelper.AvatarWithStatus(img, "OF", false);
-                    guiHelper.AvatarWithName(img, "JD", "John Doe");
-                    guiHelper.AvatarWithBorder(img, "BR", Color.cyan);
-                    guiHelper.EndHorizontalGroup();
-                }
-            );
-        }
-
-        void DrawCardDemos()
-        {
-            DrawSection(
-                "Card Types",
-                () =>
-                {
-                    guiHelper.BeginHorizontalGroup();
-
-                    guiHelper.Card("Standard", "Subtitle", "Content goes here.", () => guiHelper.Button("Action"), 200, 150);
-
-                    GUILayout.Space(10);
-
-                    guiHelper.SimpleCard("Simple card content.", 200, 100);
-
-                    GUILayout.Space(10);
-
-                    guiHelper.BeginCard(200, 150);
-                    guiHelper.CardHeader(() => guiHelper.CardTitle("Manual"));
-                    guiHelper.CardContent(() => guiHelper.Label("Content"));
-                    guiHelper.CardFooter(() => guiHelper.Button("Footer"));
-                    guiHelper.EndCard();
-
-                    guiHelper.EndHorizontalGroup();
-                }
-            );
-
-            DrawSection(
-                "Rich Cards",
-                () =>
-                {
-                    guiHelper.BeginHorizontalGroup();
-                    guiHelper.CardWithImage(img, "Image Card", "Subtitle", "Content with image.", null, 200, 250);
-                    GUILayout.Space(10);
-                    guiHelper.CardWithAvatar(img, "Avatar Card", "User Name", "Content with avatar.", null, 200, 150);
-                    guiHelper.EndHorizontalGroup();
-                }
-            );
-        }
-
-        private float animatedProgressTarget = 0.7f;
-
-        void DrawProgressDemos()
-        {
-            DrawSection(
-                "Progress Styles",
-                () =>
-                {
-                    guiHelper.Label("Standard");
-                    guiHelper.Progress(0.6f);
-
-                    guiHelper.Label("Labeled");
-                    guiHelper.LabeledProgress("Loading...", 0.4f);
-
-                    guiHelper.Label("Circular");
-                    guiHelper.BeginHorizontalGroup();
-                    guiHelper.CircularProgress(0.25f);
-                    guiHelper.CircularProgress(0.75f);
-                    guiHelper.EndHorizontalGroup();
-                }
-            );
-
-            DrawSection(
-                "Animated Progress",
-                () =>
-                {
-                    guiHelper.Label("Click buttons to animate progress smoothly:");
-                    guiHelper.BeginHorizontalGroup();
-                    if (guiHelper.Button("0%"))
-                        animatedProgressTarget = 0f;
-                    if (guiHelper.Button("25%"))
-                        animatedProgressTarget = 0.25f;
-                    if (guiHelper.Button("50%"))
-                        animatedProgressTarget = 0.5f;
-                    if (guiHelper.Button("75%"))
-                        animatedProgressTarget = 0.75f;
-                    if (guiHelper.Button("100%"))
-                        animatedProgressTarget = 1f;
-                    guiHelper.EndHorizontalGroup();
-                    guiHelper.AnimatedProgress("demo_progress", animatedProgressTarget);
-                }
-            );
-        }
-
-        void DrawSeparatorDemos()
-        {
-            DrawSection(
-                "Separators",
-                () =>
-                {
-                    guiHelper.Label("Horizontal");
-                    guiHelper.HorizontalSeparator();
-
-                    guiHelper.Label("Labeled");
-                    guiHelper.LabeledSeparator("Section");
-
-                    guiHelper.Label("Vertical (in horizontal group)");
-                    guiHelper.BeginHorizontalGroup();
-                    guiHelper.Label("Left");
-                    guiHelper.VerticalSeparator();
-                    guiHelper.Label("Right");
-                    guiHelper.EndHorizontalGroup();
-
-                    guiHelper.Label("With Spacing");
-                    guiHelper.SeparatorWithSpacing(SeparatorOrientation.Horizontal, 20, 20);
-                    guiHelper.Label("After Spacing");
-                }
-            );
-        }
-
-        void DrawLabelDemos()
-        {
-            DrawSection(
-                "Label Variants",
-                () =>
-                {
-                    DrawAllVariants(variant => guiHelper.Label("Label", variant));
-                }
-            );
-
-            DrawSection(
-                "Labels with Icons",
-                () =>
-                {
-                    guiHelper.Label(
-                        "Label with Icon",
-                        new IconConfig(img)
-                        {
-                            Position = IconPosition.Left,
-                            Size = 14f,
-                            Spacing = 4f,
-                        }
-                    );
-                    guiHelper.Label(
-                        "Muted Icon Label",
-                        new IconConfig(img)
-                        {
-                            Position = IconPosition.Left,
-                            Size = 14f,
-                            Spacing = 4f,
-                        },
-                        ControlVariant.Muted
-                    );
-                }
-            );
-        }
-
-        void DrawDialogDemos()
-        {
-            DrawSection(
-                "Dialogs",
-                () =>
-                {
-                    if (guiHelper.Button("Open Standard Dialog"))
-                        guiHelper.OpenDialog("std_dlg");
-                    if (guiHelper.Button("Open Simple Dialog"))
-                        guiHelper.OpenDialog("smp_dlg");
-
-                    guiHelper.Dialog(
-                        "std_dlg",
-                        "Title",
-                        "Description",
-                        () => guiHelper.Label("Content"),
-                        () =>
-                        {
-                            if (guiHelper.Button("Close"))
-                                guiHelper.CloseDialog();
-                        }
-                    );
-
-                    guiHelper.Dialog(
-                        "smp_dlg",
-                        () =>
-                        {
-                            guiHelper.Label("Simple Content");
-                            if (guiHelper.Button("Close"))
-                                guiHelper.CloseDialog();
-                        }
-                    );
-                }
-            );
-
-            DrawSection(
-                "Dialog with Animation",
-                () =>
-                {
-                    guiHelper.BeginHorizontalGroup();
-                    if (guiHelper.Button("Animated Dialog"))
-                        guiHelper.OpenDialog("anim_dlg");
-
-                    guiHelper.EndHorizontalGroup();
-
-                    guiHelper.Dialog(
-                        new DialogConfig
-                        {
-                            Id = "anim_dlg",
-                            Title = "Animated Dialog",
-                            Description = "This dialog opens with a fade and scale animation.",
-                            Content = () => guiHelper.Label("Watch the smooth animation!"),
-                            Footer = () =>
-                            {
-                                if (guiHelper.Button("Close"))
-                                    guiHelper.CloseDialog();
-                            },
-                            Width = 400,
-                            Height = 200,
-                        }
-                    );
-                }
-            );
-
-            DrawSection(
-                "Dialog with Overlay Click",
-                () =>
-                {
-                    if (guiHelper.Button("Click Overlay to Close"))
-                        guiHelper.OpenDialog("overlay_dlg");
-
-                    guiHelper.Dialog(
-                        new DialogConfig
-                        {
-                            Id = "overlay_dlg",
-                            Title = "Click Outside to Close",
-                            Description = "Click the dark overlay area to close this dialog.",
-                            CloseOnOverlayClick = true,
-                            Content = () => guiHelper.Label("Try clicking outside this dialog!"),
-                            Footer = () =>
-                            {
-                                if (guiHelper.Button("Or Click Here"))
-                                    guiHelper.CloseDialog();
-                            },
-                            Width = 400,
-                            Height = 200,
-                        }
-                    );
-                }
-            );
-
-            DrawSection(
-                "Dialog Z-Ordering",
-                () =>
-                {
-                    guiHelper.Label("Open multiple dialogs to see z-ordering in action.");
-                    guiHelper.BeginHorizontalGroup();
-                    if (guiHelper.Button("Dialog Z=100"))
-                        guiHelper.OpenDialog("z100_dlg");
-                    if (guiHelper.Button("Dialog Z=200"))
-                        guiHelper.OpenDialog("z200_dlg");
-                    guiHelper.EndHorizontalGroup();
-
-                    guiHelper.Dialog(
-                        new DialogConfig
-                        {
-                            Id = "z100_dlg",
-                            Title = "Z-Index: 100",
-                            Description = "This dialog has ZIndex=100 (lower priority).",
-                            ZIndex = 100,
-                            Content = () => guiHelper.Label("I should appear behind Z=200 dialog."),
-                            Footer = () =>
-                            {
-                                if (guiHelper.Button("Close"))
-                                    guiHelper.CloseDialog();
-                            },
-                            Width = 350,
-                            Height = 180,
-                        }
-                    );
-
-                    guiHelper.Dialog(
-                        new DialogConfig
-                        {
-                            Id = "z200_dlg",
-                            Title = "Z-Index: 200",
-                            Description = "This dialog has ZIndex=200 (higher priority).",
-                            ZIndex = 200,
-                            Content = () => guiHelper.Label("I should appear in front of Z=100 dialog."),
-                            Footer = () =>
-                            {
-                                if (guiHelper.Button("Close"))
-                                    guiHelper.CloseDialog();
-                            },
-                            Width = 350,
-                            Height = 180,
-                        }
-                    );
-                }
-            );
-        }
-
-        void DrawSelectDemos()
-        {
-            DrawSection(
-                "Select",
-                () =>
-                {
-                    if (guiHelper.Button("Open Select"))
-                        guiHelper.OpenSelect();
-                    if (guiHelper.IsSelectOpen())
-                    {
-                        string[] opts = { "Option 1", "Option 2", "Option 3" };
-                        selectIndex = guiHelper.Select(opts, selectIndex);
+                        _gui.OpenSelect("overview_select");
+                        _showSelect = false;
                     }
-                    guiHelper.Label($"Selected: {selectIndex}");
+                    _gui.Label($"Selected: {_selectItems[_selectIndex]}", ControlVariant.Muted);
+                    _gui.EndHorizontalGroup();
+
+                    if (_gui.IsSelectOpen())
+                        _selectIndex = _gui.Select(new SelectConfig { Items = _selectItems, SelectedIndex = _selectIndex });
+
+                    _gui.BeginHorizontalGroup();
+                    if (_gui.Button("Open Dropdown", ControlVariant.Outline, ControlSize.Default))
+                        _showDropdown = true;
+                    _gui.Label("Context menu with headers and actions.", ControlVariant.Muted);
+                    _gui.EndHorizontalGroup();
+
+                    if (_showDropdown)
+                        _gui.DropdownMenu(new DropdownMenuConfig(_dropdownItems));
+                }
+            );
+
+            DrawSection(
+                "Date Tools",
+                "Calendar, single date picker, labeled picker, and range picker.",
+                () =>
+                {
+                    _gui.BeginHorizontalGroup();
+                    _gui.Calendar(new CalendarConfig());
+                    _gui.BeginVerticalGroup(GUILayout.Width(320f));
+                    _shipDate = _gui.DatePicker("Select ship date", _shipDate, "ship_date");
+                    _meetingDate = _gui.LabeledDatePicker("Daily Sync", "Pick meeting date", _meetingDate, "meeting_date");
+                    _rangeStart = _gui.DateRangePicker("Choose maintenance range", _rangeStart, _rangeEnd, "maintenance_range");
+                    _gui.MutedLabel($"Ship: {_shipDate:MMM dd, yyyy}");
+                    _gui.MutedLabel($"Meeting: {_meetingDate:MMM dd, yyyy}");
+                    _gui.EndVerticalGroup();
+                    _gui.EndHorizontalGroup();
                 }
             );
         }
 
-        void DrawDropdownMenuDemos()
+        private void DrawDisplayTab()
         {
             DrawSection(
-                "Dropdown",
+                "Labels, Badges, Avatars",
+                "Display primitives and compact status surfaces.",
                 () =>
                 {
-                    if (guiHelper.Button("Open Dropdown"))
-                        dropdownOpen = !dropdownOpen;
-                    if (dropdownOpen)
+                    _gui.BeginHorizontalGroup();
+                    _gui.Label("Default");
+                    _gui.MutedLabel("Muted");
+                    _gui.SecondaryLabel("Secondary");
+                    _gui.DestructiveLabel("Destructive");
+                    _gui.EndHorizontalGroup();
+
+                    _gui.BeginHorizontalGroup();
+                    _gui.Badge("Outline", ControlVariant.Outline);
+                    _gui.BadgeWithIcon("Asset", _sampleTexture);
+                    _gui.RoundedBadge("Metric", cornerRadius: 2f);
+                    _gui.EndHorizontalGroup();
+
+                    _gui.BeginHorizontalGroup();
+                    _gui.Avatar(_sampleTexture, "OP", ControlSize.Default, AvatarShape.Square);
+                    _gui.AvatarWithName(_sampleTexture, "JD", "Jordan Data", showNameBelow: true);
+                    _gui.AvatarWithBorder(_sampleTexture, "AI", _gui.CurrentTheme.Accent);
+                    _gui.EndHorizontalGroup();
+                }
+            );
+
+            DrawSection(
+                "Progress",
+                "Linear, animated, labeled, and circular progress components.",
+                () =>
+                {
+                    _gui.Progress(0.34f, width: 320f);
+                    _gui.LabeledProgress("Streaming Assets", 0.67f, width: 320f);
+                    _gui.AnimatedProgress("deploy_anim", Mathf.PingPong(Time.time * 0.15f, 1f), width: 320f);
+                    _gui.BeginHorizontalGroup();
+                    _gui.CircularProgress(0.28f, 54f);
+                    _gui.CircularProgress(0.81f, 54f);
+                    _gui.EndHorizontalGroup();
+                }
+            );
+
+            DrawSection(
+                "Charts",
+                "Bar, line, and pie charts share the same chart component.",
+                () =>
+                {
+                    _gui.BeginHorizontalGroup();
+                    _gui.Chart(new ChartConfig(_barSeries, ChartType.Bar) { Size = new Vector2(320f, 200f) });
+                    _gui.Chart(new ChartConfig(_lineSeries, ChartType.Line) { Size = new Vector2(320f, 200f) });
+                    _gui.Chart(new ChartConfig(_pieSeries, ChartType.Pie) { Size = new Vector2(320f, 200f) });
+                    _gui.EndHorizontalGroup();
+                }
+            );
+        }
+
+        private void DrawLayoutTab()
+        {
+            DrawSection(
+                "Cards and Separators",
+                "Composable containers and spacing primitives.",
+                () =>
+                {
+                    _gui.BeginHorizontalGroup();
+                    _gui.Card("Mission Brief", "Flat container", "Cards can render title, description, footer actions, images, or avatars.", () => _gui.Button("Acknowledge", ControlVariant.Secondary, ControlSize.Small), 280f, 190f);
+                    _gui.CardWithAvatar(_sampleTexture, "Squad Lead", "Rhea Vale", "Avatar cards use the same shared avatar and label styles.", width: 280f, height: 190f);
+                    _gui.BeginCard(280f, 190f);
+                    _gui.CardHeader(() => _gui.CardTitle("Manual Composition"));
+                    _gui.CardContent(() =>
                     {
-                        if (dropdownMenuItems == null)
+                        _gui.Label("Compose sections directly when you need finer layout control.", ControlVariant.Muted);
+                        _gui.LabeledSeparator("Actions");
+                        _gui.ButtonGroup(() =>
                         {
-                            dropdownMenuItems = new List<DropdownMenuItem>
-                            {
-                                new DropdownMenuItem(DropdownMenuItemType.Header, "Header"),
-                                new DropdownMenuItem(DropdownMenuItemType.Item, "Item 1", () => dropdownOpen = false),
-                                new DropdownMenuItem(DropdownMenuItemType.Separator),
-                                new DropdownMenuItem(DropdownMenuItemType.Item, "Item 2", () => dropdownOpen = false),
-                            };
-                        }
-                        guiHelper.DropdownMenu(new DropdownMenuConfig(dropdownMenuItems));
-                    }
-                }
-            );
-        }
-
-        void DrawPopoverDemos()
-        {
-            DrawSection(
-                "Popover",
-                () =>
-                {
-                    if (guiHelper.Button("Open Popover"))
-                        guiHelper.OpenPopover();
-                    if (guiHelper.IsPopoverOpen())
-                    {
-                        guiHelper.Popover(() => guiHelper.Label("Popover Content"));
-                    }
-                }
-            );
-        }
-
-        // Tab state variables
-        private int disabledTabIndex = 0;
-        private int indicatorUnderlineIndex = 0;
-        private int indicatorBgIndex = 0;
-        private int indicatorBorderIndex = 0;
-        private int combinedTabIndex = 0;
-        private int closableTabIndex = 0;
-        private string[] closableTabNames = new string[] { "Tab 1", "Tab 2", "Tab 3", "Tab 4" };
-        private bool[] closableTabs = new bool[] { true, true, true, false };
-        private int iconTabIndex = 0;
-
-        void DrawTabsDemos()
-        {
-            DrawSection(
-                "Disabled Tabs",
-                () =>
-                {
-                    guiHelper.Label("Tabs with disabled state - disabled tabs cannot be selected");
-                    var disabledTabConfigs = new TabConfig[] { new TabConfig("Enabled 1", () => guiHelper.Label("This tab is enabled")), new TabConfig("Disabled", () => guiHelper.Label("This tab is disabled"), true), new TabConfig("Enabled 2", () => guiHelper.Label("This tab is also enabled")) };
-
-                    disabledTabIndex = guiHelper.TabsWithContent(disabledTabConfigs, disabledTabIndex);
+                            _gui.Button("Save", ControlVariant.Secondary, ControlSize.Small);
+                            _gui.Button("Publish", ControlVariant.Default, ControlSize.Small);
+                        });
+                    });
+                    _gui.EndCard();
+                    _gui.EndHorizontalGroup();
                 }
             );
 
             DrawSection(
-                "Tabs with Selection Indicator",
+                "Tabs and Navigation",
+                "Horizontal tabs, vertical tabs, and sidebar navigation.",
                 () =>
                 {
-                    guiHelper.Label("Tabs with different indicator styles");
+                    _nestedTabs = _gui.Tabs(new[] { "Overview", "Loadout", "Intel" }, _nestedTabs, () => _gui.SimpleCard($"Nested tab: {_nestedTabs}", 220f, 80f), maxLines: 1, position: TabPosition.Top, indicatorStyle: IndicatorStyle.Underline);
 
-                    guiHelper.Label("Underline Indicator (default)");
-                    var underlineConfig = new TabsConfig(new[] { "Tab 1", "Tab 2", "Tab 3" }, indicatorUnderlineIndex)
-                    {
-                        Content = () => guiHelper.Label("Content for selected tab"),
-                        ShowIndicator = true,
-                        IndicatorStyle = IndicatorStyle.Underline,
-                    };
-                    indicatorUnderlineIndex = guiHelper.Tabs(underlineConfig);
+                    _verticalTabs = _gui.VerticalTabs(new[] { "Status", "Map", "Logs" }, _verticalTabs, () => _gui.SimpleCard($"Vertical tab: {_verticalTabs}", 220f, 80f), tabWidth: 120f, side: TabSide.Left);
 
-                    GUILayout.Space(10);
-
-                    guiHelper.Label("Background Indicator");
-                    var bgConfig = new TabsConfig(new[] { "Tab 1", "Tab 2", "Tab 3" }, indicatorBgIndex)
-                    {
-                        Content = () => guiHelper.Label("Content for selected tab"),
-                        ShowIndicator = true,
-                        IndicatorStyle = IndicatorStyle.Background,
-                    };
-                    indicatorBgIndex = guiHelper.Tabs(bgConfig);
-
-                    GUILayout.Space(10);
-
-                    guiHelper.Label("Border Indicator");
-                    var borderConfig = new TabsConfig(new[] { "Tab 1", "Tab 2", "Tab 3" }, indicatorBorderIndex)
-                    {
-                        Content = () => guiHelper.Label("Content for selected tab"),
-                        ShowIndicator = true,
-                        IndicatorStyle = IndicatorStyle.Border,
-                    };
-                    indicatorBorderIndex = guiHelper.Tabs(borderConfig);
+                    _gui.BeginHorizontalGroup();
+                    _navigationIndex = _gui.Sidebar(new[] { "Ops", "Feed", "Settings" }, _navigationIndex, new[] { "O", "F", "S" }, "U", width: 72f);
+                    _gui.SimpleCard($"Sidebar selection: {_navigationIndex}", 220f, 80f);
+                    _gui.EndHorizontalGroup();
                 }
             );
 
-            DrawSection(
-                "Combined Features",
-                () =>
-                {
-                    guiHelper.Label("Tabs combining multiple features");
-                    var combinedConfigs = new TabConfig[]
-                    {
-                        new TabConfig("Overview", () => guiHelper.Label("Overview content")),
-                        new TabConfig("Details", () => guiHelper.Label("Details content")),
-                        new TabConfig("Disabled", () => guiHelper.Label("This won't show"), true),
-                        new TabConfig("Advanced", () => guiHelper.Label("Advanced content")),
-                    };
-
-                    combinedTabIndex = guiHelper.TabsWithContent(combinedConfigs, combinedTabIndex);
-                }
-            );
-
-            DrawSection(
-                "Main Demo Tabs",
-                () =>
-                {
-                    guiHelper.Label("See the main demo window tabs for examples of Vertical/Horizontal tabs.");
-                }
-            );
-
-            DrawSection(
-                "Closable Tabs",
-                () =>
-                {
-                    guiHelper.Label("Tabs with close buttons - click X to close a tab");
-
-                    if (closableTabNames.Length > 0)
-                    {
-                        closableTabIndex = guiHelper.ClosableTabs(ref closableTabNames, ref closableTabs, closableTabIndex, content: () => guiHelper.Label($"Content for {closableTabNames[Math.Min(closableTabIndex, closableTabNames.Length - 1)]}"));
-                    }
-                    else
-                    {
-                        guiHelper.Label("All tabs closed!");
-                    }
-
-                    GUILayout.Space(5);
-                    if (guiHelper.Button("Reset Tabs", ControlVariant.Outline))
-                    {
-                        closableTabNames = new string[] { "Tab 1", "Tab 2", "Tab 3", "Tab 4" };
-                        closableTabs = new bool[] { true, true, true, false };
-                        closableTabIndex = 0;
-                    }
-                }
-            );
-
-            DrawSection(
-                "Tabs with Icons",
-                () =>
-                {
-                    guiHelper.Label("Tabs with icons displayed alongside labels");
-
-                    var iconConfig = new TabsConfig(new[] { "Home", "Settings", "Profile", "Help" }, iconTabIndex) { Content = () => guiHelper.Label($"Content for tab {iconTabIndex + 1}"), TabIcons = new Texture2D[] { img, img, img, img } };
-                    iconTabIndex = guiHelper.Tabs(iconConfig);
-                }
-            );
-        }
-
-        private void DrawMenuBar()
-        {
             DrawSection(
                 "Menu Bar",
+                "Top-level commands with nested menu items.",
                 () =>
                 {
-                    var menuItems = new List<MenuBar.MenuItem>
+                    _gui.MenuBar(
+                        new List<MenuBar.MenuItem>
+                        {
+                            new MenuBar.MenuItem(
+                                "File",
+                                subItems: new List<MenuBar.MenuItem>
+                                {
+                                    MenuBar.MenuItem.Header("Project"),
+                                    new MenuBar.MenuItem("New Mission", () => _gui.ShowInfoToast("New Mission", "Started a new mission draft")),
+                                    new MenuBar.MenuItem("Save Layout", () => _gui.ShowSuccessToast("Saved", "Layout persisted")),
+                                    MenuBar.MenuItem.Separator(),
+                                    new MenuBar.MenuItem("Close", () => _gui.ShowWarningToast("Closed", "Session closed")),
+                                }
+                            ),
+                            new MenuBar.MenuItem("Edit", subItems: new List<MenuBar.MenuItem> { new MenuBar.MenuItem("Duplicate", () => _gui.ShowInfoToast("Duplicate", "Copied selection")), new MenuBar.MenuItem("Delete", () => _gui.ShowErrorToast("Delete", "Removed selection")) }),
+                        }
+                    );
+                }
+            );
+        }
+
+        private void DrawDataTab()
+        {
+            DrawSection(
+                "Table",
+                "Simple layout table and object-backed data table.",
+                () =>
+                {
+                    _gui.Table(_tableHeaders, _tableRows, ControlVariant.Default, ControlSize.Default, GUILayout.Width(520f));
+                    _gui.HorizontalSeparator();
+                    _gui.DataTable("ops_table", _dataColumns, _dataRows, true, true, true, false, GUILayout.Width(840f));
+                }
+            );
+        }
+
+        private void DrawOverlayTab()
+        {
+            DrawSection(
+                "Dialogs and Popovers",
+                "Modal and lightweight overlay surfaces.",
+                () =>
+                {
+                    _gui.BeginHorizontalGroup();
+                    if (_gui.Button("Open Dialog", ControlVariant.Default, ControlSize.Small))
                     {
-                        new MenuBar.MenuItem("File", null, false, new List<MenuBar.MenuItem> { new MenuBar.MenuItem("New"), new MenuBar.MenuItem("Open"), MenuBar.MenuItem.Separator(), new MenuBar.MenuItem("Exit") }),
-                        new MenuBar.MenuItem("Edit", null, false, new List<MenuBar.MenuItem> { new MenuBar.MenuItem("Cut"), new MenuBar.MenuItem("Copy"), new MenuBar.MenuItem("Paste") }),
-                    };
-                    guiHelper.MenuBar(new MenuBar.MenuBarConfig(menuItems));
+                        _showDialog = true;
+                        _gui.OpenDialog("mission_dialog");
+                    }
+                    if (_gui.Button("Open Popover", ControlVariant.Outline, ControlSize.Small))
+                        _gui.OpenPopover("status_popover");
+                    _gui.EndHorizontalGroup();
+
+                    if (_showDialog)
+                    {
+                        _gui.Dialog(
+                            new DialogConfig
+                            {
+                                Id = "mission_dialog",
+                                Title = "Launch Sequence",
+                                Description = "A themed dialog driven by the rebuilt style system.",
+                                Width = 420f,
+                                Height = 240f,
+                                CloseOnOverlayClick = true,
+                                Content = () =>
+                                {
+                                    _gui.Label("Validate the mission package before deployment.");
+                                    _gui.Checkbox("Confirm destructive action", _confirmDelete, onToggle: value => _confirmDelete = value);
+                                },
+                                Footer = () =>
+                                {
+                                    if (_gui.Button("Cancel", ControlVariant.Ghost, ControlSize.Small))
+                                    {
+                                        _showDialog = false;
+                                        _gui.CloseDialog();
+                                    }
+                                    if (_gui.Button("Deploy", ControlVariant.Destructive, ControlSize.Small))
+                                    {
+                                        _showDialog = false;
+                                        _gui.CloseDialog();
+                                        _gui.ShowSuccessToast("Deployment queued", "Launch window confirmed");
+                                    }
+                                },
+                            }
+                        );
+                    }
+
+                    if (_gui.IsPopoverOpen())
+                    {
+                        _gui.Popover(() =>
+                        {
+                            _gui.Label("Popover");
+                            _gui.MutedLabel("Use this for transient supporting information.");
+                            if (_gui.Button("Close", ControlVariant.Ghost, ControlSize.Small))
+                                _gui.ClosePopover();
+                        });
+                    }
+                }
+            );
+
+            DrawSection(
+                "Toasts and Tooltips",
+                "Transient messaging and hover guidance.",
+                () =>
+                {
+                    _gui.BeginHorizontalGroup();
+                    if (_gui.Button("Success", ControlVariant.Default, ControlSize.Small))
+                        _gui.ShowSuccessToast("Saved", "Preset updated");
+                    if (_gui.Button("Warning", ControlVariant.Outline, ControlSize.Small))
+                        _gui.ShowWarningToast("Signal Weak", "Relay strength dropped below threshold");
+                    if (_gui.Button("Error", ControlVariant.Destructive, ControlSize.Small))
+                        _gui.ShowErrorToast("Sync Failed", "Unable to refresh mission state");
+                    if (_gui.Button("Info", ControlVariant.Ghost, ControlSize.Small))
+                        _gui.ShowInfoToast("Build Info", "The demo is using the new core");
+                    _gui.EndHorizontalGroup();
+
+                    _gui.WithTooltip("Tooltips route through the layer manager and the shared theme.", () => _gui.Button("Hover Me", ControlVariant.Secondary, ControlSize.Small));
+                    _gui.MutedLabel($"Active toasts: {_gui.GetActiveToastCount()}");
                 }
             );
         }
 
-        void DrawChartDemos()
+        private void DrawSection(string title, string summary, Action draw)
         {
-            EnsureChartData();
-
-            DrawSection(
-                "All Chart Types",
-                () =>
-                {
-                    guiHelper.MutedLabel("Line, Bar, Area, Pie, Scatter (same data where applicable).");
-                    guiHelper.BeginHorizontalGroup();
-                    DrawChartBlock("Line", chartSeriesMultiPoint, ChartType.Line, 220, 160);
-                    DrawChartBlock("Bar", chartSeriesMultiPoint, ChartType.Bar, 220, 160);
-                    DrawChartBlock("Area", chartSeriesMultiPoint, ChartType.Area, 220, 160);
-                    DrawChartBlock("Pie", chartPieSeries, ChartType.Pie, 220, 160);
-                    DrawChartBlock("Scatter", chartSeriesMultiPoint, ChartType.Scatter, 220, 160);
-                    guiHelper.EndHorizontalGroup();
-                }
-            );
-
-            DrawSection(
-                "Line Chart",
-                () =>
-                {
-                    guiHelper.MutedLabel("Multi-series line chart with points.");
-                    guiHelper.Chart(new ChartConfig(chartSeriesMultiPoint, ChartType.Line) { Size = new Vector2(600, 280) });
-                }
-            );
-
-            DrawSection(
-                "Bar Chart",
-                () =>
-                {
-                    guiHelper.MutedLabel("Grouped bars, multiple series.");
-                    guiHelper.Chart(new ChartConfig(chartSeriesMultiPoint, ChartType.Bar) { Size = new Vector2(600, 280) });
-                }
-            );
-
-            DrawSection(
-                "Area Chart",
-                () =>
-                {
-                    guiHelper.MutedLabel("Filled area under the line.");
-                    guiHelper.Chart(new ChartConfig(chartSeriesMultiPoint, ChartType.Area) { Size = new Vector2(600, 280) });
-                }
-            );
-
-            DrawSection(
-                "Pie Chart",
-                () =>
-                {
-                    guiHelper.MutedLabel("Slices from one or more series; each data point is a slice.");
-                    guiHelper.Chart(new ChartConfig(chartPieSeries, ChartType.Pie) { Size = new Vector2(400, 300) });
-                }
-            );
-
-            DrawSection(
-                "Scatter Chart",
-                () =>
-                {
-                    guiHelper.MutedLabel("Data points only, no lines.");
-                    guiHelper.Chart(new ChartConfig(chartSeriesMultiPoint, ChartType.Scatter) { Size = new Vector2(600, 280) });
-                }
-            );
-        }
-
-        private void EnsureChartData()
-        {
-            if (chartSeries == null)
+            _gui.BeginCard(-1f, -1f);
+            _gui.CardHeader(() =>
             {
-                chartSeries = new List<ChartSeries>
+                _gui.CardTitle(title);
+                _gui.CardDescription(summary);
+            });
+            _gui.CardContent(draw);
+            _gui.EndCard();
+            _gui.AddSpace(12f);
+        }
+
+        private void RegisterThemes()
+        {
+            _gui.RegisterTheme(
+                new Theme
                 {
-                    new ChartSeries("S1", "Series 1", Color.cyan)
+                    Name = "Signal Flat",
+                    Base = Theme.Hex("#0c1016"),
+                    Secondary = Theme.Hex("#151c24"),
+                    Elevated = Theme.Hex("#1a222d"),
+                    Text = Theme.Hex("#f5f7fa"),
+                    Muted = Theme.Hex("#93a1b5"),
+                    Border = Theme.Hex("#273241"),
+                    Accent = Theme.Hex("#33c5ff"),
+                    Destructive = Theme.Hex("#ef4444"),
+                    Success = Theme.Hex("#22c55e"),
+                    Warning = Theme.Hex("#f59e0b"),
+                    Info = Theme.Hex("#33c5ff"),
+                    Overlay = new Color(0f, 0f, 0f, 0.68f),
+                    Shadow = new Color(0f, 0f, 0f, 0.34f),
+                }
+            );
+
+            _gui.RegisterTheme(
+                new Theme
+                {
+                    Name = "Sand Grid",
+                    Base = Theme.Hex("#f2efe8"),
+                    Secondary = Theme.Hex("#e5dfd3"),
+                    Elevated = Theme.Hex("#faf8f2"),
+                    Text = Theme.Hex("#201d18"),
+                    Muted = Theme.Hex("#746b5f"),
+                    Border = Theme.Hex("#c8bfaf"),
+                    Accent = Theme.Hex("#cc7a00"),
+                    Destructive = Theme.Hex("#bb3e03"),
+                    Success = Theme.Hex("#588157"),
+                    Warning = Theme.Hex("#d4a373"),
+                    Info = Theme.Hex("#457b9d"),
+                    Overlay = new Color(0f, 0f, 0f, 0.22f),
+                    Shadow = new Color(0f, 0f, 0f, 0.18f),
+                }
+            );
+        }
+
+        private void BuildDropdownItems()
+        {
+            _dropdownItems = new List<DropdownMenuItem>
+            {
+                new DropdownMenuItem(DropdownMenuItemType.Header, "Actions"),
+                new DropdownMenuItem(
+                    DropdownMenuItemType.Item,
+                    "Deploy",
+                    () =>
                     {
-                        Data = new List<ChartDataPoint> { new ChartDataPoint("A", 10, Color.cyan), new ChartDataPoint("B", 20, Color.cyan) },
+                        _showDropdown = false;
+                        _gui.ShowSuccessToast("Deploy", "Deployment command queued");
                     },
-                    new ChartSeries("S2", "Series 2", Color.magenta)
+                    icon: _sampleTexture
+                ),
+                new DropdownMenuItem(
+                    DropdownMenuItemType.Item,
+                    "Duplicate",
+                    () =>
                     {
-                        Data = new List<ChartDataPoint> { new ChartDataPoint("A", 15, Color.magenta), new ChartDataPoint("B", 5, Color.magenta) },
-                    },
-                };
+                        _showDropdown = false;
+                        _gui.ShowInfoToast("Duplicate", "Copied current preset");
+                    }
+                ),
+                new DropdownMenuItem(DropdownMenuItemType.Separator),
+                new DropdownMenuItem(
+                    DropdownMenuItemType.Item,
+                    "Archive",
+                    () =>
+                    {
+                        _showDropdown = false;
+                        _gui.ShowWarningToast("Archive", "Preset archived");
+                    }
+                ),
+            };
+        }
+
+        private void BuildDataTable()
+        {
+            _dataColumns = new List<DataTableColumn>
+            {
+                new DataTableColumn("squad", "Squad", "squad", 140f),
+                new DataTableColumn("lead", "Lead", "lead", 160f),
+                new DataTableColumn("status", "Status", "status", 120f),
+                new DataTableColumn("power", "Power", "power", 100f) { Alignment = TextAnchor.MiddleRight },
+            };
+
+            _dataRows = new List<DataTableRow>
+            {
+                new DataTableRow(
+                    "1",
+                    new Dictionary<string, object>
+                    {
+                        ["squad"] = "Alpha",
+                        ["lead"] = "Rhea",
+                        ["status"] = "Ready",
+                        ["power"] = 93,
+                    }
+                ),
+                new DataTableRow(
+                    "2",
+                    new Dictionary<string, object>
+                    {
+                        ["squad"] = "Bravo",
+                        ["lead"] = "Noah",
+                        ["status"] = "Queued",
+                        ["power"] = 71,
+                    }
+                ),
+                new DataTableRow(
+                    "3",
+                    new Dictionary<string, object>
+                    {
+                        ["squad"] = "Charlie",
+                        ["lead"] = "Yara",
+                        ["status"] = "Offline",
+                        ["power"] = 14,
+                    }
+                ),
+                new DataTableRow(
+                    "4",
+                    new Dictionary<string, object>
+                    {
+                        ["squad"] = "Delta",
+                        ["lead"] = "Mina",
+                        ["status"] = "Ready",
+                        ["power"] = 88,
+                    }
+                ),
+                new DataTableRow(
+                    "5",
+                    new Dictionary<string, object>
+                    {
+                        ["squad"] = "Echo",
+                        ["lead"] = "Kai",
+                        ["status"] = "Ready",
+                        ["power"] = 64,
+                    }
+                ),
+                new DataTableRow(
+                    "6",
+                    new Dictionary<string, object>
+                    {
+                        ["squad"] = "Foxtrot",
+                        ["lead"] = "Iris",
+                        ["status"] = "Queued",
+                        ["power"] = 52,
+                    }
+                ),
+            };
+        }
+
+        private void BuildCharts()
+        {
+            _barSeries = new List<ChartSeries>
+            {
+                new ChartSeries("build", "Build", Theme.Hex("#33c5ff"))
+                {
+                    Data = new List<ChartDataPoint> { new("Jan", 21), new("Feb", 35), new("Mar", 28), new("Apr", 44) },
+                },
+                new ChartSeries("ship", "Ship", Theme.Hex("#22c55e"))
+                {
+                    Data = new List<ChartDataPoint> { new("Jan", 18), new("Feb", 29), new("Mar", 33), new("Apr", 41) },
+                },
+            };
+
+            _lineSeries = new List<ChartSeries>
+            {
+                new ChartSeries("latency", "Latency", Theme.Hex("#f59e0b"))
+                {
+                    Data = new List<ChartDataPoint> { new("00", 22), new("06", 30), new("12", 18), new("18", 26), new("24", 20) },
+                },
+            };
+
+            _pieSeries = new List<ChartSeries>
+            {
+                new ChartSeries("regions", "Regions")
+                {
+                    Data = new List<ChartDataPoint> { new("NA", 42, Theme.Hex("#33c5ff")), new("EU", 31, Theme.Hex("#22c55e")), new("APAC", 19, Theme.Hex("#f59e0b")), new("LATAM", 8, Theme.Hex("#ef4444")) },
+                },
+            };
+        }
+
+        private Texture2D CreateSampleTexture()
+        {
+            var texture = new Texture2D(32, 32, TextureFormat.RGBA32, false);
+            var dark = Theme.Hex("#1f2937");
+            var light = Theme.Hex("#33c5ff");
+            var pixels = new Color[32 * 32];
+
+            for (int y = 0; y < 32; y++)
+            {
+                for (int x = 0; x < 32; x++)
+                {
+                    bool stripe = (x / 4 + y / 4) % 2 == 0;
+                    pixels[y * 32 + x] = stripe ? light : dark;
+                }
             }
 
-            if (chartSeriesMultiPoint == null)
-            {
-                chartSeriesMultiPoint = new List<ChartSeries>
-                {
-                    new ChartSeries("revenue", "Revenue", new Color(0.2f, 0.6f, 0.9f))
-                    {
-                        Data = new List<ChartDataPoint> { new ChartDataPoint("Jan", 40), new ChartDataPoint("Feb", 55), new ChartDataPoint("Mar", 45), new ChartDataPoint("Apr", 70), new ChartDataPoint("May", 65), new ChartDataPoint("Jun", 90) },
-                    },
-                    new ChartSeries("costs", "Costs", new Color(0.9f, 0.4f, 0.3f))
-                    {
-                        Data = new List<ChartDataPoint> { new ChartDataPoint("Jan", 25), new ChartDataPoint("Feb", 35), new ChartDataPoint("Mar", 30), new ChartDataPoint("Apr", 45), new ChartDataPoint("May", 50), new ChartDataPoint("Jun", 55) },
-                    },
-                };
-            }
-
-            if (chartPieSeries == null)
-            {
-                chartPieSeries = new List<ChartSeries>
-                {
-                    new ChartSeries("budget", "Budget", Color.white)
-                    {
-                        Data = new List<ChartDataPoint>
-                        {
-                            new ChartDataPoint("Dev", 35, new Color(0.2f, 0.5f, 0.9f)),
-                            new ChartDataPoint("Design", 20, new Color(0.9f, 0.5f, 0.2f)),
-                            new ChartDataPoint("QA", 15, new Color(0.2f, 0.8f, 0.4f)),
-                            new ChartDataPoint("Marketing", 18, new Color(0.7f, 0.3f, 0.9f)),
-                            new ChartDataPoint("Other", 12, new Color(0.5f, 0.5f, 0.6f)),
-                        },
-                    },
-                };
-            }
+            texture.SetPixels(pixels);
+            texture.Apply();
+            return texture;
         }
-
-        private void DrawChartBlock(string label, List<ChartSeries> series, ChartType type, float width, float height)
-        {
-            guiHelper.BeginVerticalGroup(GUILayout.Width(width + 20));
-            guiHelper.Label(label, ControlVariant.Muted);
-            guiHelper.Chart(new ChartConfig(series, type) { Size = new Vector2(width, height) });
-            guiHelper.EndVerticalGroup();
-        }
-
-        void DrawTableDemos()
-        {
-            DrawSection(
-                "Basic Tables",
-                () =>
-                {
-                    string[] headers = { "ID", "Name", "Role" };
-                    string[,] data =
-                    {
-                        { "1", "Alice", "Admin" },
-                        { "2", "Bob", "User" },
-                    };
-
-                    guiHelper.Label("Default");
-                    guiHelper.Table(headers, data);
-
-                    guiHelper.Label("Striped");
-                    guiHelper.Table(headers, data, ControlVariant.Secondary);
-
-                    guiHelper.Label("Bordered");
-                    guiHelper.Table(headers, data, ControlVariant.Outline);
-
-                    guiHelper.Label("Custom Cell Renderer");
-                    object[,] objData =
-                    {
-                        { "Item 1", 100 },
-                        { "Item 2", 200 },
-                    };
-                    guiHelper.CustomTable(
-                        new[] { "Name", "Value" },
-                        objData,
-                        (val, row, col) =>
-                        {
-                            string text = val.ToString();
-                            if (col == 1)
-                                text = $"${val}";
-                            guiHelper.Label(text);
-                        }
-                    );
-                }
-            );
-        }
-
-        void DrawToastDemos()
-        {
-            DrawSection(
-                "Quick Toast Variants",
-                () =>
-                {
-                    guiHelper.Label("Show notifications with one click:");
-                    guiHelper.HorizontalSeparator();
-
-                    if (guiHelper.Button("Success"))
-                        guiHelper.ShowSuccessToast("Success!", "Operation completed successfully");
-
-                    if (guiHelper.Button("Error"))
-                        guiHelper.ShowErrorToast("Error", "Something went wrong");
-
-                    if (guiHelper.Button("Warning"))
-                        guiHelper.ShowWarningToast("Warning", "Please be careful");
-
-                    if (guiHelper.Button("Info"))
-                        guiHelper.ShowInfoToast("Info", "Here is some information");
-                }
-            );
-
-            DrawSection(
-                "Advanced Toasts",
-                () =>
-                {
-                    guiHelper.Label("Fully customized toasts using config objects:");
-                    guiHelper.HorizontalSeparator();
-
-                    if (guiHelper.Button("Toast with Action"))
-                    {
-                        guiHelper.ShowToast(
-                            new ToastConfig
-                            {
-                                Title = "Confirm Action",
-                                Description = "Do you want to proceed?",
-                                Variant = ToastVariant.Warning,
-                                DurationMs = 8000f,
-                                Position = ToastPosition.Center,
-                                ActionLabel = "Confirm",
-                                OnAction = () =>
-                                    guiHelper.ShowToast(
-                                        new ToastConfig
-                                        {
-                                            Title = "Confirmed!",
-                                            Description = "Action was executed",
-                                            Variant = ToastVariant.Success,
-                                            DurationMs = 4000f,
-                                        }
-                                    ),
-                                ShowAccentBar = true,
-                                ShowProgressBar = true,
-                            }
-                        );
-                    }
-
-                    if (guiHelper.Button("Click-to-Dismiss Toast"))
-                    {
-                        guiHelper.ShowToast(
-                            new ToastConfig
-                            {
-                                Title = "Click Me!",
-                                Description = "Click anywhere on this toast to dismiss",
-                                Variant = ToastVariant.Info,
-                                DurationMs = 10000f,
-                                Position = ToastPosition.TopCenter,
-                                EnableClickToDismiss = true,
-                                ShowProgressBar = true,
-                            }
-                        );
-                    }
-
-                    if (guiHelper.Button("Long-Duration Toast"))
-                    {
-                        guiHelper.ShowToast(
-                            new ToastConfig
-                            {
-                                Title = "Long Message",
-                                Description = "This toast will stay for 15 seconds. Hover to pause the timer!",
-                                Variant = ToastVariant.Info,
-                                DurationMs = 15000f,
-                                Position = ToastPosition.BottomLeft,
-                                EnablePauseOnHover = true,
-                                HoverPauseDelay = 0.5f,
-                                ShowAccentBar = true,
-                                ShowProgressBar = true,
-                            }
-                        );
-                    }
-                }
-            );
-            DrawSection(
-                "Toast Positions",
-                () =>
-                {
-                    guiHelper.Label("Show toasts at different screen positions:");
-                    guiHelper.HorizontalSeparator();
-
-                    if (guiHelper.Button("Top Left"))
-                    {
-                        guiHelper.ShowToast(
-                            new ToastConfig
-                            {
-                                Title = "Top Left",
-                                Variant = ToastVariant.Default,
-                                Position = ToastPosition.TopLeft,
-                                DurationMs = 3000f,
-                            }
-                        );
-                    }
-
-                    if (guiHelper.Button("Top Center"))
-                    {
-                        guiHelper.ShowToast(
-                            new ToastConfig
-                            {
-                                Title = "Top Center",
-                                Variant = ToastVariant.Info,
-                                Position = ToastPosition.TopCenter,
-                                DurationMs = 3000f,
-                            }
-                        );
-                    }
-
-                    if (guiHelper.Button("Top Right"))
-                    {
-                        guiHelper.ShowToast(
-                            new ToastConfig
-                            {
-                                Title = "Top Right",
-                                Variant = ToastVariant.Success,
-                                Position = ToastPosition.TopRight,
-                                DurationMs = 3000f,
-                            }
-                        );
-                    }
-
-                    if (guiHelper.Button("Center"))
-                    {
-                        guiHelper.ShowToast(
-                            new ToastConfig
-                            {
-                                Title = "Center",
-                                Description = "Perfectly centered on screen",
-                                Variant = ToastVariant.Warning,
-                                Position = ToastPosition.Center,
-                                DurationMs = 3000f,
-                            }
-                        );
-                    }
-
-                    if (guiHelper.Button("Bottom Left"))
-                    {
-                        guiHelper.ShowToast(
-                            new ToastConfig
-                            {
-                                Title = "Bottom Left",
-                                Variant = ToastVariant.Error,
-                                Position = ToastPosition.BottomLeft,
-                                DurationMs = 3000f,
-                            }
-                        );
-                    }
-
-                    if (guiHelper.Button("Bottom Center"))
-                    {
-                        guiHelper.ShowToast(
-                            new ToastConfig
-                            {
-                                Title = "Bottom Center",
-                                Variant = ToastVariant.Default,
-                                Position = ToastPosition.BottomCenter,
-                                DurationMs = 3000f,
-                            }
-                        );
-                    }
-
-                    if (guiHelper.Button("Bottom Right"))
-                    {
-                        guiHelper.ShowToast(
-                            new ToastConfig
-                            {
-                                Title = "Bottom Right",
-                                Variant = ToastVariant.Success,
-                                Position = ToastPosition.BottomRight,
-                                DurationMs = 3000f,
-                            }
-                        );
-                    }
-                }
-            );
-
-            DrawSection(
-                "Stack Directions",
-                () =>
-                {
-                    guiHelper.Label("Show multiple toasts stacking in different directions:");
-                    guiHelper.HorizontalSeparator();
-
-                    if (guiHelper.Button("Stack Up"))
-                    {
-                        for (int i = 0; i < 3; i++)
-                        {
-                            guiHelper.ShowToast(
-                                new ToastConfig
-                                {
-                                    Title = $"Toast {i + 1}",
-                                    Description = $"Stacking upward - Message {i + 1}",
-                                    Variant = (ToastVariant)(i % 4),
-                                    Position = ToastPosition.BottomRight,
-                                    StackDirection = ToastStackDirection.Up,
-                                    DurationMs = 5000f,
-                                }
-                            );
-                        }
-                    }
-
-                    if (guiHelper.Button("Stack Down"))
-                    {
-                        for (int i = 0; i < 3; i++)
-                        {
-                            guiHelper.ShowToast(
-                                new ToastConfig
-                                {
-                                    Title = $"Toast {i + 1}",
-                                    Description = $"Stacking downward - Message {i + 1}",
-                                    Variant = (ToastVariant)(i % 4),
-                                    Position = ToastPosition.TopRight,
-                                    StackDirection = ToastStackDirection.Down,
-                                    DurationMs = 5000f,
-                                }
-                            );
-                        }
-                    }
-
-                    if (guiHelper.Button("Stack Left"))
-                    {
-                        for (int i = 0; i < 3; i++)
-                        {
-                            guiHelper.ShowToast(
-                                new ToastConfig
-                                {
-                                    Title = $"Toast {i + 1}",
-                                    Description = $"Stacking left - Message {i + 1}",
-                                    Variant = (ToastVariant)(i % 4),
-                                    Position = ToastPosition.CenterRight,
-                                    StackDirection = ToastStackDirection.Left,
-                                    DurationMs = 5000f,
-                                }
-                            );
-                        }
-                    }
-
-                    if (guiHelper.Button("Stack Right"))
-                    {
-                        for (int i = 0; i < 3; i++)
-                        {
-                            guiHelper.ShowToast(
-                                new ToastConfig
-                                {
-                                    Title = $"Toast {i + 1}",
-                                    Description = $"Stacking right - Message {i + 1}",
-                                    Variant = (ToastVariant)(i % 4),
-                                    Position = ToastPosition.CenterLeft,
-                                    StackDirection = ToastStackDirection.Right,
-                                    DurationMs = 5000f,
-                                }
-                            );
-                        }
-                    }
-                }
-            );
-
-            DrawSection(
-                "Toast Management",
-                () =>
-                {
-                    guiHelper.Label("Monitor and control active toasts:");
-                    guiHelper.HorizontalSeparator();
-
-                    int activeCount = guiHelper.GetActiveToastCount();
-
-                    guiHelper.Label($"Active: {activeCount}");
-
-                    if (activeCount > 0)
-                    {
-                        if (guiHelper.Button("Dismiss All Toasts"))
-                            guiHelper.DismissAllToasts();
-                    }
-                }
-            );
-        }
-
-        void DrawTooltipDemos()
-        {
-            DrawSection(
-                "Buttons with Tooltips",
-                () =>
-                {
-                    guiHelper.MutedLabel("Hover over each button to see its tooltip.");
-                    guiHelper.BeginHorizontalGroup();
-                    guiHelper.WithTooltip("Primary action", () => guiHelper.Button("Primary"));
-                    guiHelper.WithTooltip("Secondary action", () => guiHelper.Button("Secondary", ControlVariant.Secondary));
-                    guiHelper.WithTooltip("Outline style", () => guiHelper.Button("Outline", ControlVariant.Outline));
-                    guiHelper.WithTooltip("Destructive action", () => guiHelper.Button("Delete", ControlVariant.Destructive));
-                    guiHelper.WithTooltip("Ghost variant", () => guiHelper.Button("Ghost", ControlVariant.Ghost));
-                    guiHelper.EndHorizontalGroup();
-                }
-            );
-
-            DrawSection(
-                "Badges and Labels with Tooltips",
-                () =>
-                {
-                    guiHelper.MutedLabel("Hover to reveal the tooltip.");
-                    guiHelper.BeginHorizontalGroup();
-                    guiHelper.WithTooltip("Default badge", () => guiHelper.Badge("Badge"));
-                    guiHelper.WithTooltip("Secondary badge", () => guiHelper.Badge("Secondary", ControlVariant.Secondary));
-                    guiHelper.WithTooltip("Count indicator", () => guiHelper.CountBadge(42));
-                    guiHelper.WithTooltip("Muted label", () => guiHelper.MutedLabel("Hover me"));
-                    guiHelper.EndHorizontalGroup();
-                }
-            );
-
-            DrawSection(
-                "WithTooltip Pattern",
-                () =>
-                {
-                    guiHelper.MutedLabel("Any draw call can be wrapped with WithTooltip(text, draw).");
-                    guiHelper.WithTooltip("This label has a tooltip", () => guiHelper.Label("Label with tooltip"));
-                    if (!toggleStates.ContainsKey("tooltip_toggle"))
-                        toggleStates["tooltip_toggle"] = false;
-                    toggleStates["tooltip_toggle"] = guiHelper.WithTooltip("Toggle tooltip", () => guiHelper.Toggle("Toggle", toggleStates["tooltip_toggle"]));
-                }
-            );
-        }
-
-        void DrawSliderDemos()
-        {
-            DrawSection(
-                "Basic Slider",
-                () =>
-                {
-                    guiHelper.Label("Simple slider with default settings:");
-                    sliderValue = guiHelper.Slider(sliderValue, 0f, 1f);
-                    guiHelper.MutedLabel($"Value: {sliderValue:F2}");
-                }
-            );
-
-            DrawSection(
-                "Labeled Slider",
-                () =>
-                {
-                    guiHelper.Label("Slider with label and value display:");
-                    sliderLabeledValue = guiHelper.LabeledSlider("Volume", sliderLabeledValue, 0f, 1f, true);
-                }
-            );
-
-            DrawSection(
-                "Slider with Step",
-                () =>
-                {
-                    guiHelper.Label("Slider that snaps to increments of 10:");
-                    sliderWithStepValue = guiHelper.LabeledSlider("Percentage", sliderWithStepValue, 0f, 100f, 10f, true);
-                }
-            );
-
-            DrawSection(
-                "Disabled Slider",
-                () =>
-                {
-                    guiHelper.Label("Slider in disabled state:");
-                    sliderDisabledValue = guiHelper.DisabledSlider(sliderDisabledValue, 0f, 1f);
-                    guiHelper.MutedLabel("This slider cannot be interacted with");
-                }
-            );
-
-            DrawSection(
-                "Slider Variants",
-                () =>
-                {
-                    guiHelper.Label("Destructive variant:");
-                    sliderDestructiveValue = guiHelper.Slider(
-                        new SliderConfig
-                        {
-                            Value = sliderDestructiveValue,
-                            MinValue = 0f,
-                            MaxValue = 1f,
-                            Label = "Danger Level",
-                            Variant = ControlVariant.Destructive,
-                            ShowValue = true,
-                        }
-                    );
-                }
-            );
-
-            DrawSection(
-                "Slider Sizes",
-                () =>
-                {
-                    guiHelper.Label("Small slider:");
-                    sliderSmallValue = guiHelper.Slider(
-                        new SliderConfig
-                        {
-                            Value = sliderSmallValue,
-                            MinValue = 0f,
-                            MaxValue = 1f,
-                            Size = ControlSize.Small,
-                        }
-                    );
-
-                    guiHelper.AddSpace(10);
-
-                    guiHelper.Label("Large slider:");
-                    sliderLargeValue = guiHelper.Slider(
-                        new SliderConfig
-                        {
-                            Value = sliderLargeValue,
-                            MinValue = 0f,
-                            MaxValue = 1f,
-                            Size = ControlSize.Large,
-                        }
-                    );
-                }
-            );
-        }
-
-        void DrawLayoutDemos()
-        {
-            DrawSection(
-                "Layout Groups",
-                () =>
-                {
-                    guiHelper.BeginHorizontalGroup();
-                    guiHelper.Button("Left");
-                    GUILayout.FlexibleSpace();
-                    guiHelper.Button("Right");
-                    guiHelper.EndHorizontalGroup();
-                }
-            );
-        }
-        #endregion
     }
 }

@@ -1,6 +1,6 @@
-﻿using shadcnui.GUIComponents.Core.Base;
+﻿using shadcnui_examples.Examples;
+using shadcnui.GUIComponents.Core.Base;
 using shadcnui.GUIComponents.Core.Styling;
-using shadcnui_examples.Examples;
 using UnityEngine;
 
 namespace shadcnui_examples.Menu
@@ -42,53 +42,57 @@ namespace shadcnui_examples.Menu
 
                 GUILayout.Space(10);
 
-                selectorScroll = guiHelper.ScrollView(selectorScroll, () =>
-                {
-                    guiHelper.BeginVerticalGroup();
+                selectorScroll = guiHelper.ScrollView(
+                    selectorScroll,
+                    () =>
+                    {
+                        guiHelper.BeginVerticalGroup();
 
-                    guiHelper.SectionHeader("Getting Started");
-                    if (guiHelper.Button("Basic Controls", ControlVariant.Default))
-                        LoadDemo<BasicControlsExample>("BasicControlsDemo");
+                        guiHelper.SectionHeader("Getting Started");
+                        if (guiHelper.Button("Basic Controls", ControlVariant.Default))
+                            LoadDemo<BasicControlsExample>("BasicControlsDemo");
 
-                    guiHelper.AddSpace(5);
+                        guiHelper.AddSpace(5);
 
-                    if (guiHelper.Button("Layout & Cards", ControlVariant.Default))
-                        LoadDemo<LayoutExample>("LayoutDemo");
+                        if (guiHelper.Button("Layout & Cards", ControlVariant.Default))
+                            LoadDemo<LayoutExample>("LayoutDemo");
 
-                    guiHelper.HorizontalSeparator();
+                        guiHelper.HorizontalSeparator();
 
-                    guiHelper.SectionHeader("Data Display");
-                    if (guiHelper.Button("Tables", ControlVariant.Default))
-                        LoadDemo<TablesExample>("TablesDemo");
+                        guiHelper.SectionHeader("Data Display");
+                        if (guiHelper.Button("Tables", ControlVariant.Default))
+                            LoadDemo<TablesExample>("TablesDemo");
 
-                    guiHelper.AddSpace(5);
+                        guiHelper.AddSpace(5);
 
-                    if (guiHelper.Button("Charts", ControlVariant.Default))
-                        LoadDemo<ChartsExample>("ChartsDemo");
+                        if (guiHelper.Button("Charts", ControlVariant.Default))
+                            LoadDemo<ChartsExample>("ChartsDemo");
 
-                    guiHelper.AddSpace(5);
+                        guiHelper.AddSpace(5);
 
-                    if (guiHelper.Button("Display Components", ControlVariant.Default))
-                        LoadDemo<DisplayComponentsExample>("DisplayDemo");
+                        if (guiHelper.Button("Display Components", ControlVariant.Default))
+                            LoadDemo<DisplayComponentsExample>("DisplayDemo");
 
-                    guiHelper.HorizontalSeparator();
+                        guiHelper.HorizontalSeparator();
 
-                    guiHelper.SectionHeader("Navigation & Layout");
-                    if (guiHelper.Button("Tabs & Navigation", ControlVariant.Default))
-                        LoadDemo<TabsAndNavigationExample>("TabsDemo");
+                        guiHelper.SectionHeader("Navigation & Layout");
+                        if (guiHelper.Button("Tabs & Navigation", ControlVariant.Default))
+                            LoadDemo<TabsAndNavigationExample>("TabsDemo");
 
-                    guiHelper.AddSpace(5);
+                        guiHelper.AddSpace(5);
 
-                    if (guiHelper.Button("Dialogs & Overlays", ControlVariant.Default))
-                        LoadDemo<DialogsAndOverlaysExample>("DialogsDemo");
+                        if (guiHelper.Button("Dialogs & Overlays", ControlVariant.Default))
+                            LoadDemo<DialogsAndOverlaysExample>("DialogsDemo");
 
-                    guiHelper.AddSpace(5);
+                        guiHelper.AddSpace(5);
 
-                    if (guiHelper.Button("Advanced Controls", ControlVariant.Default))
-                        LoadDemo<AdvancedControlsExample>("AdvancedDemo");
+                        if (guiHelper.Button("Advanced Controls", ControlVariant.Default))
+                            LoadDemo<AdvancedControlsExample>("AdvancedDemo");
 
-                    guiHelper.EndVerticalGroup();
-                }, GUILayout.Height(250));
+                        guiHelper.EndVerticalGroup();
+                    },
+                    GUILayout.Height(250)
+                );
 
                 GUILayout.Space(15);
                 guiHelper.HorizontalSeparator();
@@ -107,7 +111,8 @@ namespace shadcnui_examples.Menu
             GUI.DragWindow();
         }
 
-        void LoadDemo<T>(string name) where T : MonoBehaviour
+        void LoadDemo<T>(string name)
+            where T : MonoBehaviour
         {
             if (currentDemo != null)
                 Destroy(currentDemo);

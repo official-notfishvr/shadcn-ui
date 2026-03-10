@@ -1,8 +1,8 @@
 using System;
 using System.Reflection;
-using shadcnui_examples.Menu;
 using BepInEx;
 using BepInEx.Logging;
+using shadcnui_examples.Menu;
 using UnityEngine;
 
 namespace shadcnui_examples

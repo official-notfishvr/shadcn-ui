@@ -1,9 +1,6 @@
 using System;
 using System.Collections.Generic;
-using shadcnui.GUIComponents.Controls;
-using shadcnui.GUIComponents.Core.Styling;
 using shadcnui.GUIComponents.Core.Utils;
-using shadcnui.GUIComponents.Data;
 using shadcnui.GUIComponents.Display;
 using shadcnui.GUIComponents.Layout;
 using UnityEngine;
@@ -12,1717 +9,953 @@ namespace shadcnui.GUIComponents.Core.Base
 {
     public abstract class FluentBuilder<TBuilder, TConfig>
         where TBuilder : FluentBuilder<TBuilder, TConfig>
+        where TConfig : class
     {
-        protected readonly GUIHelper _helper;
-        protected TConfig _config;
+        protected readonly GUIHelper Helper;
+        protected readonly TConfig Config;
 
         protected FluentBuilder(GUIHelper helper, TConfig config)
         {
-            _helper = helper;
-            _config = config;
+            Helper = helper;
+            Config = config;
         }
 
         protected TBuilder Self => (TBuilder)this;
 
-        public TConfig Build() => _config;
+        public TConfig Build() => Config;
 
         public TBuilder Configure(Action<TConfig> configure)
         {
-            configure?.Invoke(_config);
+            configure?.Invoke(Config);
             return Self;
-        }
-
-        public TBuilder When(bool condition, Func<TBuilder, TBuilder> action)
-        {
-            return condition ? action(Self) : Self;
         }
     }
 
-    public abstract class ComponentBuilder<TBuilder, TConfig> : FluentBuilder<TBuilder, TConfig>
-        where TBuilder : ComponentBuilder<TBuilder, TConfig>
+    public abstract class SizedBuilder<TBuilder, TConfig> : FluentBuilder<TBuilder, TConfig>
+        where TBuilder : SizedBuilder<TBuilder, TConfig>
         where TConfig : class
     {
-        protected ControlVariant _variant = ControlVariant.Default;
-        protected ControlSize _size = ControlSize.Default;
-        protected bool _disabled;
-        protected readonly List<GUILayoutOption> _options = new List<GUILayoutOption>();
-
-        protected ComponentBuilder(GUIHelper helper, TConfig config)
+        protected SizedBuilder(GUIHelper helper, TConfig config)
             : base(helper, config) { }
+
+        protected readonly List<GUILayoutOption> Options = new();
+        protected ControlVariant VariantValue = ControlVariant.Default;
+        protected ControlSize SizeValue = ControlSize.Default;
+        protected bool DisabledValue;
 
         public TBuilder Variant(ControlVariant variant)
         {
-            _variant = variant;
+            VariantValue = variant;
             return Self;
         }
 
         public TBuilder Size(ControlSize size)
         {
-            _size = size;
+            SizeValue = size;
             return Self;
         }
 
         public TBuilder Disabled(bool disabled = true)
         {
-            _disabled = disabled;
-            return Self;
-        }
-
-        public TBuilder Enabled(bool enabled = true)
-        {
-            _disabled = !enabled;
+            DisabledValue = disabled;
             return Self;
         }
 
         public TBuilder Width(float width)
         {
-            _options.Add(GUILayout.Width(width));
+            Options.Add(GUILayout.Width(width));
             return Self;
         }
 
         public TBuilder Height(float height)
         {
-            _options.Add(GUILayout.Height(height));
-            return Self;
-        }
-
-        public TBuilder MinWidth(float width)
-        {
-            _options.Add(GUILayout.MinWidth(width));
-            return Self;
-        }
-
-        public TBuilder MaxWidth(float width)
-        {
-            _options.Add(GUILayout.MaxWidth(width));
-            return Self;
-        }
-
-        public TBuilder MinHeight(float height)
-        {
-            _options.Add(GUILayout.MinHeight(height));
-            return Self;
-        }
-
-        public TBuilder MaxHeight(float height)
-        {
-            _options.Add(GUILayout.MaxHeight(height));
+            Options.Add(GUILayout.Height(height));
             return Self;
         }
 
         public TBuilder ExpandWidth(bool expand = true)
         {
-            _options.Add(GUILayout.ExpandWidth(expand));
+            Options.Add(GUILayout.ExpandWidth(expand));
             return Self;
         }
 
         public TBuilder ExpandHeight(bool expand = true)
         {
-            _options.Add(GUILayout.ExpandHeight(expand));
+            Options.Add(GUILayout.ExpandHeight(expand));
             return Self;
         }
-
-        public TBuilder FixedSize(float width, float height)
-        {
-            _options.Add(GUILayout.Width(width));
-            _options.Add(GUILayout.Height(height));
-            return Self;
-        }
-
-        public TBuilder Options(params GUILayoutOption[] options)
-        {
-            if (options != null)
-                _options.AddRange(options);
-            return Self;
-        }
-
-        protected GUILayoutOption[] GetOptions() => _options.Count > 0 ? _options.ToArray() : Array.Empty<GUILayoutOption>();
 
         public TBuilder Secondary() => Variant(ControlVariant.Secondary);
-
-        public TBuilder Destructive() => Variant(ControlVariant.Destructive);
 
         public TBuilder Outline() => Variant(ControlVariant.Outline);
 
         public TBuilder Ghost() => Variant(ControlVariant.Ghost);
+
+        public TBuilder Destructive() => Variant(ControlVariant.Destructive);
 
         public TBuilder Small() => Size(ControlSize.Small);
 
         public TBuilder Large() => Size(ControlSize.Large);
 
         public TBuilder Mini() => Size(ControlSize.Mini);
+
+        protected GUILayoutOption[] GetOptions() => Options.Count == 0 ? Array.Empty<GUILayoutOption>() : Options.ToArray();
     }
 
-    public abstract class IconSupportBuilder<TBuilder, TConfig> : ComponentBuilder<TBuilder, TConfig>
-        where TBuilder : IconSupportBuilder<TBuilder, TConfig>
-        where TConfig : class
+    public sealed class ButtonBuilder : SizedBuilder<ButtonBuilder, ButtonConfig>
     {
-        protected IconSupportBuilder(GUIHelper helper, TConfig config)
-            : base(helper, config) { }
-
-        protected abstract void SetIcon(IconConfig icon);
-
-        public TBuilder Icon(Texture2D icon)
-        {
-            SetIcon(new IconConfig(icon));
-            return Self;
-        }
-
-        public TBuilder Icon(Texture2D icon, IconPosition position)
-        {
-            SetIcon(new IconConfig(icon, position));
-            return Self;
-        }
-
-        public TBuilder Icon(Texture2D icon, IconPosition position, float size, float spacing)
-        {
-            SetIcon(new IconConfig(icon, position) { Size = size, Spacing = spacing });
-            return Self;
-        }
-
-        public TBuilder Icon(IconConfig icon)
-        {
-            SetIcon(icon);
-            return Self;
-        }
-    }
-
-    public class ButtonBuilder : IconSupportBuilder<ButtonBuilder, ButtonConfig>
-    {
-        private string _tooltip;
-
-        public ButtonBuilder(GUIHelper helper)
-            : base(helper, new ButtonConfig("")) { }
-
-        protected override void SetIcon(IconConfig icon) => _config.Icon = icon;
+        public ButtonBuilder(GUIHelper helper, string text = "")
+            : base(helper, new ButtonConfig(text)) { }
 
         public ButtonBuilder Text(string text)
         {
-            _config.Text = text;
+            Config.Text = text;
             return this;
         }
 
         public ButtonBuilder OnClick(Action onClick)
         {
-            _config.OnClick = onClick;
+            Config.OnClick = onClick;
+            return this;
+        }
+
+        public ButtonBuilder Icon(Texture2D image, IconPosition position = IconPosition.Left, float size = DesignTokens.Icon.Default, float spacing = DesignTokens.Spacing.XS)
+        {
+            Config.Icon = new IconConfig(image, position) { Size = size, Spacing = spacing };
             return this;
         }
 
         public ButtonBuilder Opacity(float opacity)
         {
-            _config.Opacity = opacity;
+            Config.Opacity = opacity;
             return this;
         }
-
-        public ButtonBuilder Primary() => Variant(ControlVariant.Default);
-
-        public ButtonBuilder Link() => Variant(ControlVariant.Link);
-
-        public ButtonBuilder Tooltip(string text)
-        {
-            _tooltip = text;
-            return this;
-        }
-
-        public ButtonBuilder IconSize() => Size(ControlSize.Icon);
 
         public bool Draw()
         {
-            _config.Variant = _variant;
-            _config.Size = _size;
-            _config.Disabled = _disabled;
-            _config.Options = GetOptions();
-            if (!string.IsNullOrEmpty(_tooltip))
-                return _helper.WithTooltip(_tooltip, () => _helper.Button(_config.Text, _config.Variant, _config.Size, _config.OnClick, _config.Disabled, _config.Opacity, _config.Options));
-            return _helper.Button(_config.Text, _config.Variant, _config.Size, _config.OnClick, _config.Disabled, _config.Opacity, _config.Options);
-        }
-
-        public bool Draw(Rect rect)
-        {
-            _config.Variant = _variant;
-            _config.Size = _size;
-            _config.Disabled = _disabled;
-            _config.Options = GetOptions();
-
-            GUI.BeginGroup(rect);
-            GUILayout.BeginArea(new Rect(0, 0, rect.width, rect.height));
-            try
-            {
-                return Draw();
-            }
-            finally
-            {
-                GUILayout.EndArea();
-                GUI.EndGroup();
-            }
+            Config.Variant = VariantValue;
+            Config.Size = SizeValue;
+            Config.Disabled = DisabledValue;
+            Config.Options = GetOptions();
+            return Helper.Button(Config);
         }
     }
 
-    public class LabelBuilder : IconSupportBuilder<LabelBuilder, LabelConfig>
+    public sealed class InputBuilder : SizedBuilder<InputBuilder, InputConfig>
     {
-        public LabelBuilder(GUIHelper helper)
-            : base(helper, new LabelConfig()) { }
+        private bool _labeled;
 
-        protected override void SetIcon(IconConfig icon) => _config.Icon = icon;
-
-        public LabelBuilder Text(string text)
-        {
-            _config.Text = text;
-            return this;
-        }
-
-        public LabelBuilder Muted() => Variant(ControlVariant.Muted);
-
-        public void Draw()
-        {
-            _config.Variant = _variant;
-            _config.Disabled = _disabled;
-            _config.Options = GetOptions();
-            _helper.Label(_config);
-        }
-
-        public void Draw(Rect rect)
-        {
-            _config.Variant = _variant;
-            _config.Disabled = _disabled;
-            _config.Rect = rect;
-            _helper.Label(_config);
-        }
-    }
-
-    public class InputBuilder : IconSupportBuilder<InputBuilder, InputConfig>
-    {
         public InputBuilder(GUIHelper helper)
             : base(helper, new InputConfig()) { }
 
-        protected override void SetIcon(IconConfig icon) => _config.Icon = icon;
-
         public InputBuilder Value(string value)
         {
-            _config.Value = value;
+            Config.Value = value;
             return this;
         }
 
         public InputBuilder Placeholder(string placeholder)
         {
-            _config.Placeholder = placeholder;
+            Config.Placeholder = placeholder;
+            return this;
+        }
+
+        public InputBuilder Label(string label)
+        {
+            Config.Label = label;
+            _labeled = true;
+            return this;
+        }
+
+        public InputBuilder Password(char mask = '*')
+        {
+            Config.MaskChar = mask;
+            Config.Label ??= string.Empty;
             return this;
         }
 
         public InputBuilder Focused(bool focused = true)
         {
-            _config.Focused = focused;
-            return this;
-        }
-
-        public InputBuilder OnChange(Action<string> onChange)
-        {
-            _config.OnChange = onChange;
+            Config.Focused = focused;
             return this;
         }
 
         public InputBuilder InputWidth(int width)
         {
-            _config.Width = width;
+            Config.Width = width;
             return this;
         }
 
-        public InputBuilder InputHeight(float height)
+        public InputBuilder Icon(Texture2D image, IconPosition position = IconPosition.Left, float size = DesignTokens.Icon.Default, float spacing = DesignTokens.Spacing.XS)
         {
-            _config.Height = height;
+            Config.Icon = new IconConfig(image, position) { Size = size, Spacing = spacing };
             return this;
         }
 
-        public InputBuilder InputLabel(string label)
+        public InputBuilder OnChange(Action<string> onChange)
         {
-            _config.Label = label;
-            return this;
-        }
-
-        public InputBuilder LabelVariant(ControlVariant variant)
-        {
-            _config.LabelVariant = variant;
-            return this;
-        }
-
-        public InputBuilder MaxLength(int length)
-        {
-            _config.MaxLength = length;
-            return this;
-        }
-
-        public InputBuilder Password(char maskChar = '*')
-        {
-            _config.MaskChar = maskChar;
+            Config.OnChange = onChange;
             return this;
         }
 
         public string Draw()
         {
-            _config.Variant = _variant;
-            _config.Disabled = _disabled;
-            _config.Options = GetOptions();
-            return _helper.Input(_config);
-        }
-
-        public string DrawLabeled()
-        {
-            _config.Variant = _variant;
-            _config.Disabled = _disabled;
-            _config.Options = GetOptions();
-            return _helper.LabeledInput(_config);
+            Config.Variant = VariantValue;
+            Config.Disabled = DisabledValue;
+            return _labeled ? Helper.LabeledInput(Config) : Helper.Input(Config);
         }
     }
 
-    public class ToggleBuilder : IconSupportBuilder<ToggleBuilder, ToggleConfig>
+    public sealed class ToggleBuilder : SizedBuilder<ToggleBuilder, ToggleConfig>
     {
-        public ToggleBuilder(GUIHelper helper)
-            : base(helper, new ToggleConfig()) { }
-
-        protected override void SetIcon(IconConfig icon) => _config.Icon = icon;
+        public ToggleBuilder(GUIHelper helper, string text, bool value)
+            : base(helper, new ToggleConfig { Text = text, Value = value }) { }
 
         public ToggleBuilder Text(string text)
         {
-            _config.Text = text;
+            Config.Text = text;
             return this;
         }
 
         public ToggleBuilder Value(bool value)
         {
-            _config.Value = value;
+            Config.Value = value;
+            return this;
+        }
+
+        public ToggleBuilder Icon(Texture2D image, IconPosition position = IconPosition.Left, float size = DesignTokens.Icon.Default, float spacing = DesignTokens.Spacing.XS)
+        {
+            Config.Icon = new IconConfig(image, position) { Size = size, Spacing = spacing };
             return this;
         }
 
         public ToggleBuilder OnToggle(Action<bool> onToggle)
         {
-            _config.OnToggle = onToggle;
+            Config.OnToggle = onToggle;
             return this;
         }
-
-        public new ToggleBuilder Outline() => (ToggleBuilder)base.Outline();
-
-        public new ToggleBuilder Small() => (ToggleBuilder)base.Small();
-
-        public new ToggleBuilder Large() => (ToggleBuilder)base.Large();
 
         public bool Draw()
         {
-            _config.Variant = _variant;
-            _config.Size = _size;
-            _config.Disabled = _disabled;
-            _config.Options = GetOptions();
-            return _helper.Toggle(_config.Text, _config.Icon, _config.Value, _config.Variant, _config.Size, _config.OnToggle, _config.Disabled, _config.Options);
-        }
-
-        public bool Draw(Rect rect)
-        {
-            _config.Variant = _variant;
-            _config.Size = _size;
-            _config.Disabled = _disabled;
-            _config.Options = GetOptions();
-
-            GUI.BeginGroup(rect);
-            GUILayout.BeginArea(new Rect(0, 0, rect.width, rect.height));
-            try
-            {
-                return Draw();
-            }
-            finally
-            {
-                GUILayout.EndArea();
-                GUI.EndGroup();
-            }
+            Config.Variant = VariantValue;
+            Config.Size = SizeValue;
+            Config.Disabled = DisabledValue;
+            Config.Options = GetOptions();
+            return Helper.Toggle(Config);
         }
     }
 
-    public class CheckboxBuilder : IconSupportBuilder<CheckboxBuilder, CheckboxConfig>
+    public sealed class CheckboxBuilder : SizedBuilder<CheckboxBuilder, CheckboxConfig>
     {
-        public CheckboxBuilder(GUIHelper helper)
-            : base(helper, new CheckboxConfig()) { }
+        public CheckboxBuilder(GUIHelper helper, string text, bool value)
+            : base(helper, new CheckboxConfig { Text = text, Value = value }) { }
 
-        protected override void SetIcon(IconConfig icon) => _config.Icon = icon;
-
-        public CheckboxBuilder Text(string text)
+        public CheckboxBuilder Icon(Texture2D image, IconPosition position = IconPosition.Left, float size = DesignTokens.Icon.Default, float spacing = DesignTokens.Spacing.XS)
         {
-            _config.Text = text;
-            return this;
-        }
-
-        public CheckboxBuilder Value(bool value)
-        {
-            _config.Value = value;
+            Config.Icon = new IconConfig(image, position) { Size = size, Spacing = spacing };
             return this;
         }
 
         public CheckboxBuilder OnToggle(Action<bool> onToggle)
         {
-            _config.OnToggle = onToggle;
+            Config.OnToggle = onToggle;
             return this;
         }
-
-        public new CheckboxBuilder Small() => (CheckboxBuilder)base.Small();
-
-        public new CheckboxBuilder Large() => (CheckboxBuilder)base.Large();
 
         public bool Draw()
         {
-            _config.Variant = _variant;
-            _config.Size = _size;
-            _config.Disabled = _disabled;
-            _config.Options = GetOptions();
-            return _helper.Checkbox(_config.Text, _config.Icon, _config.Value, _config.Variant, _config.Size, _config.OnToggle, _config.Disabled, _config.Options);
-        }
-
-        public bool Draw(Rect rect)
-        {
-            _config.Variant = _variant;
-            _config.Size = _size;
-            _config.Disabled = _disabled;
-            _config.Options = GetOptions();
-
-            GUI.BeginGroup(rect);
-            GUILayout.BeginArea(new Rect(0, 0, rect.width, rect.height));
-            try
-            {
-                return Draw();
-            }
-            finally
-            {
-                GUILayout.EndArea();
-                GUI.EndGroup();
-            }
+            Config.Variant = VariantValue;
+            Config.Size = SizeValue;
+            Config.Disabled = DisabledValue;
+            Config.Options = GetOptions();
+            return Helper.Checkbox(Config);
         }
     }
 
-    public class SwitchBuilder : IconSupportBuilder<SwitchBuilder, SwitchConfig>
+    public sealed class SwitchBuilder : SizedBuilder<SwitchBuilder, SwitchConfig>
     {
-        public SwitchBuilder(GUIHelper helper)
-            : base(helper, new SwitchConfig()) { }
-
-        protected override void SetIcon(IconConfig icon) => _config.Icon = icon;
-
-        public SwitchBuilder Text(string text)
-        {
-            _config.Text = text;
-            return this;
-        }
-
-        public SwitchBuilder Value(bool value)
-        {
-            _config.Value = value;
-            return this;
-        }
+        public SwitchBuilder(GUIHelper helper, string text, bool value)
+            : base(helper, new SwitchConfig { Text = text, Value = value }) { }
 
         public SwitchBuilder OnToggle(Action<bool> onToggle)
         {
-            _config.OnToggle = onToggle;
+            Config.OnToggle = onToggle;
             return this;
         }
-
-        public new SwitchBuilder Small() => (SwitchBuilder)base.Small();
-
-        public new SwitchBuilder Large() => (SwitchBuilder)base.Large();
 
         public bool Draw()
         {
-            _config.Variant = _variant;
-            _config.Size = _size;
-            _config.Disabled = _disabled;
-            _config.Options = GetOptions();
-            return _helper.Switch(_config.Text, _config.Icon, _config.Value, _config.Variant, _config.Size, _config.OnToggle, _config.Disabled, _config.Options);
-        }
-
-        public bool Draw(Rect rect)
-        {
-            _config.Variant = _variant;
-            _config.Size = _size;
-            _config.Disabled = _disabled;
-            _config.Options = GetOptions();
-
-            GUI.BeginGroup(rect);
-            GUILayout.BeginArea(new Rect(0, 0, rect.width, rect.height));
-            try
-            {
-                return Draw();
-            }
-            finally
-            {
-                GUILayout.EndArea();
-                GUI.EndGroup();
-            }
+            Config.Variant = VariantValue;
+            Config.Size = SizeValue;
+            Config.Disabled = DisabledValue;
+            Config.Options = GetOptions();
+            return Helper.Switch(Config);
         }
     }
 
-    public class BadgeBuilder : IconSupportBuilder<BadgeBuilder, BadgeConfig>
+    public sealed class LabelBuilder : SizedBuilder<LabelBuilder, LabelConfig>
     {
-        private string _tooltip;
+        public LabelBuilder(GUIHelper helper, string text = "")
+            : base(helper, new LabelConfig { Text = text }) { }
 
-        public BadgeBuilder(GUIHelper helper)
-            : base(helper, new BadgeConfig()) { }
+        public LabelBuilder Text(string text)
+        {
+            Config.Text = text;
+            return this;
+        }
 
-        protected override void SetIcon(IconConfig icon) => _config.Icon = icon;
+        public LabelBuilder Muted() => Variant(ControlVariant.Muted);
+
+        public LabelBuilder Icon(Texture2D image, IconPosition position = IconPosition.Left, float size = DesignTokens.Icon.Default, float spacing = DesignTokens.Spacing.XS)
+        {
+            Config.Icon = new IconConfig(image, position) { Size = size, Spacing = spacing };
+            return this;
+        }
+
+        public void Draw()
+        {
+            Config.Variant = VariantValue;
+            Config.Disabled = DisabledValue;
+            Config.Options = GetOptions();
+            Helper.Label(Config);
+        }
+    }
+
+    public sealed class BadgeBuilder : SizedBuilder<BadgeBuilder, BadgeConfig>
+    {
+        public BadgeBuilder(GUIHelper helper, string text = "Badge")
+            : base(helper, new BadgeConfig { Text = text }) { }
 
         public BadgeBuilder Text(string text)
         {
-            _config.Text = text;
+            Config.Text = text;
             return this;
         }
 
-        public BadgeBuilder Count(int count)
+        public BadgeBuilder Icon(Texture2D image, IconPosition position = IconPosition.Left, float size = DesignTokens.Icon.Small, float spacing = DesignTokens.Spacing.XS)
         {
-            _config.Count = count;
+            Config.Icon = new IconConfig(image, position) { Size = size, Spacing = spacing };
             return this;
         }
 
-        public BadgeBuilder MaxCount(int max)
+        public BadgeBuilder Count(int count, int maxCount = 99)
         {
-            _config.MaxCount = max;
+            Config.Count = count;
+            Config.MaxCount = maxCount;
+            Config.Text = count > maxCount ? $"{maxCount}+" : count.ToString();
             return this;
         }
 
-        public BadgeBuilder Active(bool active = true)
+        public BadgeBuilder StatusDot(bool active = true)
         {
-            _config.IsActive = active;
-            return this;
-        }
-
-        public BadgeBuilder StatusDot(bool show = true)
-        {
-            _config.ShowStatusDot = show;
+            Config.ShowStatusDot = true;
+            Config.IsActive = active;
             return this;
         }
 
         public BadgeBuilder Progress(float progress)
         {
-            _config.Progress = progress;
+            Config.Progress = progress;
             return this;
         }
 
         public BadgeBuilder CornerRadius(float radius)
         {
-            _config.CornerRadius = radius;
-            return this;
-        }
-
-        public BadgeBuilder Tooltip(string text)
-        {
-            _tooltip = text;
-            return this;
-        }
-
-        public new BadgeBuilder Secondary() => (BadgeBuilder)base.Secondary();
-
-        public new BadgeBuilder Destructive() => (BadgeBuilder)base.Destructive();
-
-        public new BadgeBuilder Outline() => (BadgeBuilder)base.Outline();
-
-        public new BadgeBuilder Small() => (BadgeBuilder)base.Small();
-
-        public new BadgeBuilder Large() => (BadgeBuilder)base.Large();
-
-        public void Draw()
-        {
-            _config.Variant = _variant;
-            _config.Size = _size;
-            _config.Options = GetOptions();
-            if (!string.IsNullOrEmpty(_tooltip))
-                _helper.WithTooltip(_tooltip, () => _helper.Badge(_config));
-            else
-                _helper.Badge(_config);
-        }
-
-        public void Draw(Rect rect)
-        {
-            _config.Variant = _variant;
-            _config.Size = _size;
-            _config.Rect = rect;
-            if (!string.IsNullOrEmpty(_tooltip))
-                _helper.WithTooltip(_tooltip, () => _helper.Badge(_config));
-            else
-                _helper.Badge(_config);
-        }
-    }
-
-    public class ProgressBuilder : ComponentBuilder<ProgressBuilder, ProgressConfig>
-    {
-        public ProgressBuilder(GUIHelper helper)
-            : base(helper, new ProgressConfig()) { }
-
-        public ProgressBuilder Value(float value)
-        {
-            _config.Value = value;
-            return this;
-        }
-
-        public ProgressBuilder ProgressWidth(float width)
-        {
-            _config.Width = width;
-            return this;
-        }
-
-        public ProgressBuilder ProgressHeight(float height)
-        {
-            _config.Height = height;
-            return this;
-        }
-
-        public ProgressBuilder ProgressSize(float size)
-        {
-            _config.Size = size;
-            return this;
-        }
-
-        public ProgressBuilder ProgressLabel(string label)
-        {
-            _config.Label = label;
-            return this;
-        }
-
-        public ProgressBuilder ShowPercentage(bool show = true)
-        {
-            _config.ShowPercentage = show;
-            return this;
-        }
-
-        public ProgressBuilder HidePercentage()
-        {
-            _config.ShowPercentage = false;
+            Config.CornerRadius = radius;
             return this;
         }
 
         public void Draw()
         {
-            _config.Options = GetOptions();
-            _helper.Progress(_config);
-        }
-
-        public void Draw(Rect rect)
-        {
-            _config.Rect = rect;
-            _helper.Progress(_config);
+            Config.Variant = VariantValue;
+            Config.Size = SizeValue;
+            Config.Options = GetOptions();
+            Helper.Badge(Config);
         }
     }
 
-    public class AvatarBuilder : ComponentBuilder<AvatarBuilder, AvatarConfig>
+    public sealed class AvatarBuilder : SizedBuilder<AvatarBuilder, AvatarConfig>
     {
-        public AvatarBuilder(GUIHelper helper)
-            : base(helper, new AvatarConfig()) { }
+        public AvatarBuilder(GUIHelper helper, Texture2D image = null)
+            : base(helper, new AvatarConfig { Image = image }) { }
 
         public AvatarBuilder Image(Texture2D image)
         {
-            _config.Image = image;
+            Config.Image = image;
             return this;
         }
 
         public AvatarBuilder Fallback(string text)
         {
-            _config.FallbackText = text;
+            Config.FallbackText = text;
             return this;
         }
 
-        public AvatarBuilder Shape(AvatarShape shape)
+        public AvatarBuilder Circle()
         {
-            _config.Shape = shape;
+            Config.Shape = AvatarShape.Circle;
             return this;
         }
 
-        public AvatarBuilder Online(bool isOnline = true)
+        public AvatarBuilder Square()
         {
-            _config.IsOnline = isOnline;
+            Config.Shape = AvatarShape.Square;
             return this;
         }
 
-        public AvatarBuilder Offline()
+        public AvatarBuilder Rounded()
         {
-            _config.IsOnline = false;
+            Config.Shape = AvatarShape.Rounded;
             return this;
         }
 
-        public AvatarBuilder Name(string name)
+        public AvatarBuilder Online(bool online = true)
         {
-            _config.Name = name;
-            return this;
-        }
-
-        public AvatarBuilder ShowNameBelow(bool show = true)
-        {
-            _config.ShowNameBelow = show;
-            return this;
-        }
-
-        public AvatarBuilder NameBelow(string name)
-        {
-            _config.Name = name;
-            _config.ShowNameBelow = true;
+            Config.IsOnline = online;
             return this;
         }
 
         public AvatarBuilder Border(Color color)
         {
-            _config.BorderColor = color;
+            Config.BorderColor = color;
             return this;
         }
 
-        public AvatarBuilder Circle() => Shape(AvatarShape.Circle);
-
-        public AvatarBuilder Square() => Shape(AvatarShape.Square);
-
-        public AvatarBuilder Rounded() => Shape(AvatarShape.Rounded);
-
-        public new AvatarBuilder Small() => (AvatarBuilder)base.Small();
-
-        public new AvatarBuilder Large() => (AvatarBuilder)base.Large();
-
-        public new AvatarBuilder Mini() => (AvatarBuilder)base.Mini();
+        public AvatarBuilder NameBelow(string name)
+        {
+            Config.Name = name;
+            Config.ShowNameBelow = true;
+            return this;
+        }
 
         public void Draw()
         {
-            _config.Size = _size;
-            _config.Options = GetOptions();
-            _helper.Avatar(_config);
-        }
-
-        public void Draw(Rect rect)
-        {
-            _config.Size = _size;
-            _config.Rect = rect;
-            _helper.Avatar(_config);
+            Config.Size = SizeValue;
+            Config.Options = GetOptions();
+            Helper.Avatar(Config);
         }
     }
 
-    public class CardBuilder : ComponentBuilder<CardBuilder, CardConfig>
+    public sealed class CardBuilder : FluentBuilder<CardBuilder, CardConfig>
     {
-        public CardBuilder(GUIHelper helper)
-            : base(helper, new CardConfig()) { }
+        public CardBuilder(GUIHelper helper, string title = null)
+            : base(helper, new CardConfig { Title = title }) { }
 
         public CardBuilder Title(string title)
         {
-            _config.Title = title;
+            Config.Title = title;
             return this;
         }
 
         public CardBuilder Description(string description)
         {
-            _config.Description = description;
+            Config.Description = description;
             return this;
         }
 
         public CardBuilder Subtitle(string subtitle)
         {
-            _config.Subtitle = subtitle;
+            Config.Subtitle = subtitle;
             return this;
         }
 
         public CardBuilder Content(string content)
         {
-            _config.Content = content;
-            return this;
-        }
-
-        public CardBuilder Header(Action header)
-        {
-            _config.HeaderContent = header;
+            Config.Content = content;
             return this;
         }
 
         public CardBuilder Footer(Action footer)
         {
-            _config.FooterContent = footer;
+            Config.FooterContent = footer;
+            return this;
+        }
+
+        public CardBuilder Header(Action header)
+        {
+            Config.HeaderContent = header;
             return this;
         }
 
         public CardBuilder Image(Texture2D image)
         {
-            _config.Image = image;
+            Config.Image = image;
             return this;
         }
 
         public CardBuilder Avatar(Texture2D avatar)
         {
-            _config.Avatar = avatar;
-            return this;
-        }
-
-        public CardBuilder CardWidth(float width)
-        {
-            _config.Width = width;
-            return this;
-        }
-
-        public CardBuilder CardHeight(float height)
-        {
-            _config.Height = height;
+            Config.Avatar = avatar;
             return this;
         }
 
         public CardBuilder CardSize(float width, float height)
         {
-            _config.Width = width;
-            _config.Height = height;
+            Config.Width = width;
+            Config.Height = height;
             return this;
         }
 
         public void Draw()
         {
-            if (_config.Image != null)
-                _helper.CardWithImage(_config.Image, _config.Title, _config.Description, _config.Content, _config.FooterContent, _config.Width, _config.Height);
-            else if (_config.Avatar != null)
-                _helper.CardWithAvatar(_config.Avatar, _config.Title, _config.Subtitle ?? _config.Description, _config.Content, _config.FooterContent, _config.Width, _config.Height);
-            else if (_config.HeaderContent != null)
-                _helper.CardWithHeader(_config.Title, _config.Description, _config.HeaderContent, _config.Content, _config.FooterContent, _config.Width, _config.Height);
-            else
-                _helper.Card(_config);
+            Helper.Card(Config);
         }
     }
 
-    public class DialogBuilder : ComponentBuilder<DialogBuilder, DialogConfig>
+    public sealed class ProgressBuilder : FluentBuilder<ProgressBuilder, ProgressConfig>
     {
-        public DialogBuilder(GUIHelper helper)
-            : base(helper, new DialogConfig()) { }
+        public ProgressBuilder(GUIHelper helper, float value = 0f)
+            : base(helper, new ProgressConfig { Value = value }) { }
 
-        public DialogBuilder Id(string id)
+        public ProgressBuilder Value(float value)
         {
-            _config.Id = id;
+            Config.Value = value;
             return this;
         }
 
-        public DialogBuilder Title(string title)
+        public ProgressBuilder ProgressLabel(string label)
         {
-            _config.Title = title;
+            Config.Label = label;
             return this;
         }
 
-        public DialogBuilder Description(string description)
+        public ProgressBuilder ProgressWidth(float width)
         {
-            _config.Description = description;
+            Config.Width = width;
             return this;
         }
 
-        public DialogBuilder Content(Action content)
+        public ProgressBuilder ProgressHeight(float height)
         {
-            _config.Content = content;
+            Config.Height = height;
             return this;
         }
 
-        public DialogBuilder Footer(Action footer)
+        public ProgressBuilder Circular(float size = DesignTokens.Height.Small)
         {
-            _config.Footer = footer;
+            Config.Size = size;
             return this;
         }
 
-        public DialogBuilder DialogWidth(float width)
+        public ProgressBuilder ShowPercentage(bool show = true)
         {
-            _config.Width = width;
+            Config.ShowPercentage = show;
             return this;
         }
 
-        public DialogBuilder DialogHeight(float height)
+        public void Draw()
         {
-            _config.Height = height;
-            return this;
+            Helper.Progress(Config);
         }
-
-        public DialogBuilder DialogSize(float width, float height)
-        {
-            _config.Width = width;
-            _config.Height = height;
-            return this;
-        }
-
-        public DialogBuilder CloseOnOverlay(bool close = true)
-        {
-            _config.CloseOnOverlayClick = close;
-            return this;
-        }
-
-        public DialogBuilder ZIndex(int zIndex)
-        {
-            _config.ZIndex = zIndex;
-            return this;
-        }
-
-        public void Draw() => _helper.Dialog(_config);
-
-        public void Open() => _helper.OpenDialog(_config.Id);
-
-        public void Close() => _helper.CloseDialog();
     }
 
-    public class SeparatorBuilder : ComponentBuilder<SeparatorBuilder, SeparatorConfig>
+    public sealed class SeparatorBuilder : FluentBuilder<SeparatorBuilder, SeparatorConfig>
     {
         public SeparatorBuilder(GUIHelper helper)
             : base(helper, new SeparatorConfig()) { }
 
-        public SeparatorBuilder Orientation(SeparatorOrientation orientation)
+        public SeparatorBuilder Horizontal()
         {
-            _config.Orientation = orientation;
+            Config.Orientation = SeparatorOrientation.Horizontal;
             return this;
         }
 
-        public SeparatorBuilder Decorative(bool decorative = true)
+        public SeparatorBuilder Vertical()
         {
-            _config.Decorative = decorative;
+            Config.Orientation = SeparatorOrientation.Vertical;
             return this;
         }
 
-        public SeparatorBuilder WithLabel(string label)
+        public SeparatorBuilder WithLabel(string text)
         {
-            _config.Text = label;
-            return this;
-        }
-
-        public SeparatorBuilder SpacingBefore(float spacing)
-        {
-            _config.SpacingBefore = spacing;
-            return this;
-        }
-
-        public SeparatorBuilder SpacingAfter(float spacing)
-        {
-            _config.SpacingAfter = spacing;
+            Config.Text = text;
             return this;
         }
 
         public SeparatorBuilder Spacing(float before, float after)
         {
-            _config.SpacingBefore = before;
-            _config.SpacingAfter = after;
+            Config.SpacingBefore = before;
+            Config.SpacingAfter = after;
             return this;
         }
-
-        public SeparatorBuilder Horizontal() => Orientation(SeparatorOrientation.Horizontal);
-
-        public SeparatorBuilder Vertical() => Orientation(SeparatorOrientation.Vertical);
 
         public void Draw()
         {
-            _config.Options = GetOptions();
-            _helper.Separator(_config);
-        }
-
-        public void Draw(Rect rect)
-        {
-            _config.Rect = rect;
-            _helper.Separator(_config);
+            Helper.Separator(Config);
         }
     }
 
-    public class SliderBuilder : ComponentBuilder<SliderBuilder, SliderConfig>
+    public sealed class SliderBuilder : SizedBuilder<SliderBuilder, SliderConfig>
     {
-        public SliderBuilder(GUIHelper helper)
-            : base(helper, new SliderConfig()) { }
+        public SliderBuilder(GUIHelper helper, float value = 0f)
+            : base(helper, new SliderConfig { Value = value }) { }
 
         public SliderBuilder Value(float value)
         {
-            _config.Value = value;
-            return this;
-        }
-
-        public SliderBuilder Min(float min)
-        {
-            _config.MinValue = min;
-            return this;
-        }
-
-        public SliderBuilder Max(float max)
-        {
-            _config.MaxValue = max;
-            return this;
-        }
-
-        public SliderBuilder Step(float step)
-        {
-            _config.Step = step;
+            Config.Value = value;
             return this;
         }
 
         public SliderBuilder Range(float min, float max)
         {
-            _config.MinValue = min;
-            _config.MaxValue = max;
+            Config.MinValue = min;
+            Config.MaxValue = max;
+            return this;
+        }
+
+        public SliderBuilder Step(float step)
+        {
+            Config.Step = step;
             return this;
         }
 
         public SliderBuilder SliderLabel(string label)
         {
-            _config.Label = label;
+            Config.Label = label;
             return this;
         }
 
         public SliderBuilder ShowValue(bool show = true)
         {
-            _config.ShowValue = show;
+            Config.ShowValue = show;
             return this;
         }
 
-        public SliderBuilder HideValue()
+        public SliderBuilder Format(string format)
         {
-            _config.ShowValue = false;
-            return this;
-        }
-
-        public SliderBuilder ValueFormat(string format)
-        {
-            _config.ValueFormat = format;
+            Config.ValueFormat = format;
             return this;
         }
 
         public SliderBuilder OnChange(Action<float> onChange)
         {
-            _config.OnChange = onChange;
+            Config.OnChange = onChange;
             return this;
         }
 
         public float Draw()
         {
-            _config.Variant = _variant;
-            _config.Size = _size;
-            _config.Disabled = _disabled;
-            _config.Options = GetOptions();
-            return _helper.Slider(_config);
+            Config.Variant = VariantValue;
+            Config.Size = SizeValue;
+            Config.Disabled = DisabledValue;
+            Config.Options = GetOptions();
+            return Helper.Slider(Config);
         }
     }
 
-    public class TextAreaBuilder : ComponentBuilder<TextAreaBuilder, TextAreaConfig>
+    public sealed class TextAreaBuilder : SizedBuilder<TextAreaBuilder, TextAreaConfig>
     {
-        public TextAreaBuilder(GUIHelper helper)
-            : base(helper, new TextAreaConfig()) { }
-
-        public TextAreaBuilder Id(string id)
-        {
-            _config.Id = id;
-            return this;
-        }
+        public TextAreaBuilder(GUIHelper helper, string text = "")
+            : base(helper, new TextAreaConfig { Text = text }) { }
 
         public TextAreaBuilder Text(string text)
         {
-            _config.Text = text;
+            Config.Text = text;
             return this;
         }
 
         public TextAreaBuilder Placeholder(string placeholder)
         {
-            _config.Placeholder = placeholder;
+            Config.Placeholder = placeholder;
             return this;
         }
 
         public TextAreaBuilder TextAreaLabel(string label)
         {
-            _config.Label = label;
+            Config.Label = label;
             return this;
         }
 
         public TextAreaBuilder TextAreaMinHeight(float height)
         {
-            _config.MinHeight = height;
+            Config.MinHeight = height;
             return this;
         }
 
         public TextAreaBuilder TextAreaMaxHeight(float height)
         {
-            _config.MaxHeight = height;
+            Config.MaxHeight = height;
             return this;
         }
 
-        public TextAreaBuilder MaxLength(int length)
+        public TextAreaBuilder MaxLength(int maxLength)
         {
-            _config.MaxLength = length;
+            Config.MaxLength = maxLength;
             return this;
         }
 
         public TextAreaBuilder ShowCharCount(bool show = true)
         {
-            _config.ShowCharCount = show;
+            Config.ShowCharCount = show;
             return this;
         }
-
-        public TextAreaBuilder HideCharCount()
-        {
-            _config.ShowCharCount = false;
-            return this;
-        }
-
-        public new TextAreaBuilder Outline() => (TextAreaBuilder)base.Outline();
-
-        public new TextAreaBuilder Ghost() => (TextAreaBuilder)base.Ghost();
 
         public string Draw()
         {
-            _config.Variant = _variant;
-            _config.Disabled = _disabled;
-            _config.Options = GetOptions();
-            return _helper.TextArea(_config);
-        }
-
-        public string Draw(Rect rect)
-        {
-            _config.Variant = _variant;
-            _config.Disabled = _disabled;
-            _config.Rect = rect;
-            return _helper.TextArea(_config);
+            Config.Variant = VariantValue;
+            Config.Disabled = DisabledValue;
+            Config.Options = GetOptions();
+            return Helper.TextArea(Config);
         }
     }
 
-    public class TabsBuilder : ComponentBuilder<TabsBuilder, TabsConfig>
+    public sealed class TableBuilder : FluentBuilder<TableBuilder, TableConfig>
     {
-        public TabsBuilder(GUIHelper helper)
-            : base(helper, new TabsConfig(Array.Empty<string>(), 0)) { }
-
-        public TabsBuilder Items(params string[] items)
-        {
-            _config.TabNames = items;
-            _config.DisabledTabs = new bool[items?.Length ?? 0];
-            return this;
-        }
-
-        public TabsBuilder SelectedIndex(int index)
-        {
-            _config.SelectedIndex = index;
-            return this;
-        }
-
-        public TabsBuilder OnTabChange(Action<int> onChange)
-        {
-            _config.OnTabChange = onChange;
-            return this;
-        }
-
-        public TabsBuilder Content(Action content)
-        {
-            _config.Content = content;
-            return this;
-        }
-
-        public TabsBuilder MaxLines(int lines)
-        {
-            _config.MaxLines = lines;
-            return this;
-        }
-
-        public TabsBuilder Position(TabPosition position)
-        {
-            _config.Position = position;
-            return this;
-        }
-
-        public TabsBuilder Side(TabSide side)
-        {
-            _config.Side = side;
-            return this;
-        }
-
-        public TabsBuilder TabWidth(float width)
-        {
-            _config.TabWidth = width;
-            return this;
-        }
-
-        public TabsBuilder DisabledTabs(params int[] indices)
-        {
-            if (_config.DisabledTabs != null)
-                foreach (var i in indices)
-                    if (i >= 0 && i < _config.DisabledTabs.Length)
-                        _config.DisabledTabs[i] = true;
-            return this;
-        }
-
-        public TabsBuilder DisabledTabs(bool[] disabled)
-        {
-            _config.DisabledTabs = disabled;
-            return this;
-        }
-
-        public TabsBuilder Indicator(IndicatorStyle style)
-        {
-            _config.IndicatorStyle = style;
-            return this;
-        }
-
-        public TabsBuilder ShowIndicator(bool show = true)
-        {
-            _config.ShowIndicator = show;
-            return this;
-        }
-
-        public TabsBuilder HideIndicator()
-        {
-            _config.ShowIndicator = false;
-            return this;
-        }
-
-        public TabsBuilder Closable(params int[] indices)
-        {
-            _config.ClosableTabs = new bool[_config.TabNames?.Length ?? 0];
-            foreach (var i in indices)
-                if (i >= 0 && i < _config.ClosableTabs.Length)
-                    _config.ClosableTabs[i] = true;
-            return this;
-        }
-
-        public TabsBuilder ClosableTabs(bool[] closable)
-        {
-            _config.ClosableTabs = closable;
-            return this;
-        }
-
-        public TabsBuilder OnTabClose(Action<int> onClose)
-        {
-            _config.OnTabClose = onClose;
-            return this;
-        }
-
-        public TabsBuilder OverflowScroll(bool enable = true)
-        {
-            _config.EnableOverflowScroll = enable;
-            return this;
-        }
-
-        public TabsBuilder Icons(params Texture2D[] icons)
-        {
-            _config.TabIcons = icons;
-            return this;
-        }
-
-        public TabsBuilder Top() => Position(TabPosition.Top);
-
-        public TabsBuilder Bottom() => Position(TabPosition.Bottom);
-
-        public TabsBuilder Left()
-        {
-            Position(TabPosition.Left);
-            return Side(TabSide.Left);
-        }
-
-        public TabsBuilder Right()
-        {
-            Position(TabPosition.Right);
-            return Side(TabSide.Right);
-        }
-
-        public int Draw()
-        {
-            _config.Options = GetOptions();
-            return _helper.Tabs(_config);
-        }
-    }
-
-    public class TableBuilder : ComponentBuilder<TableBuilder, TableConfig>
-    {
-        public TableBuilder(GUIHelper helper)
-            : base(helper, new TableConfig()) { }
+        public TableBuilder(GUIHelper helper, params string[] headers)
+            : base(helper, new TableConfig { Headers = headers ?? Array.Empty<string>() }) { }
 
         public TableBuilder Headers(params string[] headers)
         {
-            _config.Headers = headers;
+            Config.Headers = headers;
             return this;
         }
 
         public TableBuilder Data(string[,] data)
         {
-            _config.Data = data;
+            Config.Data = data;
             return this;
         }
 
-        public TableBuilder ObjectData(object[,] data)
+        public TableBuilder Variant(ControlVariant variant)
         {
-            _config.ObjectData = data;
+            Config.Variant = variant;
             return this;
         }
 
-        public TableBuilder SortColumns(params int[] columns)
+        public TableBuilder Size(ControlSize size)
         {
-            _config.SortColumns = columns;
-            return this;
-        }
-
-        public TableBuilder SortAscending(params bool[] ascending)
-        {
-            _config.SortAscending = ascending;
-            return this;
-        }
-
-        public TableBuilder OnSort(Action<int, bool> onSort)
-        {
-            _config.OnSort = onSort;
-            return this;
-        }
-
-        public TableBuilder SelectedRows(bool[] selected)
-        {
-            _config.SelectedRows = selected;
-            return this;
-        }
-
-        public TableBuilder OnSelectionChange(Action<int, bool> onChange)
-        {
-            _config.OnSelectionChange = onChange;
-            return this;
-        }
-
-        public TableBuilder CurrentPage(int page)
-        {
-            _config.CurrentPage = page;
-            return this;
-        }
-
-        public TableBuilder PageSize(int size)
-        {
-            _config.PageSize = size;
-            return this;
-        }
-
-        public TableBuilder OnPageChange(Action<int> onChange)
-        {
-            _config.OnPageChange = onChange;
-            return this;
-        }
-
-        public TableBuilder SearchQuery(string query)
-        {
-            _config.SearchQuery = query;
-            return this;
-        }
-
-        public TableBuilder FilteredData(string[,] data)
-        {
-            _config.FilteredData = data;
-            return this;
-        }
-
-        public TableBuilder OnSearch(Action<string> onSearch)
-        {
-            _config.OnSearch = onSearch;
-            return this;
-        }
-
-        public TableBuilder ColumnWidths(params float[] widths)
-        {
-            _config.ColumnWidths = widths;
-            return this;
-        }
-
-        public TableBuilder CellRenderer(Action<object, int, int> renderer)
-        {
-            _config.CellRenderer = renderer;
+            Config.Size = size;
             return this;
         }
 
         public void Draw()
         {
-            _config.Variant = _variant;
-            _config.Size = _size;
-            _config.Options = GetOptions();
-            _helper.Table(_config);
-        }
-
-        public void Draw(Rect rect)
-        {
-            _config.Variant = _variant;
-            _config.Size = _size;
-            _config.Rect = rect;
-            _helper.Table(_config);
+            Helper.Table(Config);
         }
     }
 
-    public class ChartBuilder : ComponentBuilder<ChartBuilder, ChartConfig>
+    public sealed class ChartBuilder : FluentBuilder<ChartBuilder, ChartConfig>
     {
-        private readonly List<ChartSeries> _series = new List<ChartSeries>();
-
-        public ChartBuilder(GUIHelper helper)
-            : base(helper, new ChartConfig(new List<ChartSeries>(), ChartType.Line)) { }
+        public ChartBuilder(GUIHelper helper, ChartType type = ChartType.Bar)
+            : base(helper, new ChartConfig { ChartType = type, Series = new List<ChartSeries>() }) { }
 
         public ChartBuilder Type(ChartType type)
         {
-            _config.ChartType = type;
+            Config.ChartType = type;
             return this;
         }
 
-        public ChartBuilder ChartSize(Vector2 size)
+        public ChartBuilder Series(params ChartSeries[] series)
         {
-            _config.Size = size;
+            Config.Series.AddRange(series);
             return this;
         }
 
         public ChartBuilder ChartSize(float width, float height)
         {
-            _config.Size = new Vector2(width, height);
+            Config.Size = new Vector2(width, height);
             return this;
         }
-
-        public ChartBuilder Series(ChartSeries series)
-        {
-            _series.Add(series);
-            return this;
-        }
-
-        public ChartBuilder Series(string key, string label, Color color, params ChartDataPoint[] dataPoints)
-        {
-            var series = new ChartSeries(key, label, color);
-            series.Data.AddRange(dataPoints);
-            _series.Add(series);
-            return this;
-        }
-
-        public ChartBuilder Series(string key, string label, params ChartDataPoint[] dataPoints)
-        {
-            var series = new ChartSeries(key, label);
-            series.Data.AddRange(dataPoints);
-            _series.Add(series);
-            return this;
-        }
-
-        public ChartBuilder AddDataPoint(string seriesKey, string name, float value, Color color = default)
-        {
-            var series = _series.Find(s => s.Key == seriesKey);
-            if (series != null)
-                series.Data.Add(new ChartDataPoint(name, value, color == default ? series.Color : color));
-            return this;
-        }
-
-        public ChartBuilder Line() => Type(ChartType.Line);
-
-        public ChartBuilder Bar() => Type(ChartType.Bar);
-
-        public ChartBuilder Pie() => Type(ChartType.Pie);
-
-        public ChartBuilder Area() => Type(ChartType.Area);
-
-        public ChartBuilder Scatter() => Type(ChartType.Scatter);
 
         public void Draw()
         {
-            _config.Series = _series;
-            _config.Options = GetOptions();
-            _helper.Chart(_config);
+            Helper.Chart(Config);
         }
     }
 
-    public class PopoverBuilder : ComponentBuilder<PopoverBuilder, PopoverConfig>
+    public sealed class DialogBuilder : FluentBuilder<DialogBuilder, DialogConfig>
     {
-        public PopoverBuilder(GUIHelper helper)
-            : base(helper, new PopoverConfig()) { }
+        public DialogBuilder(GUIHelper helper, string id)
+            : base(helper, new DialogConfig { Id = id }) { }
+
+        public DialogBuilder Title(string title)
+        {
+            Config.Title = title;
+            return this;
+        }
+
+        public DialogBuilder Description(string description)
+        {
+            Config.Description = description;
+            return this;
+        }
+
+        public DialogBuilder Content(Action content)
+        {
+            Config.Content = content;
+            return this;
+        }
+
+        public DialogBuilder Footer(Action footer)
+        {
+            Config.Footer = footer;
+            return this;
+        }
+
+        public DialogBuilder Size(float width, float height)
+        {
+            Config.Width = width;
+            Config.Height = height;
+            return this;
+        }
+
+        public DialogBuilder CloseOnOverlayClick(bool close = true)
+        {
+            Config.CloseOnOverlayClick = close;
+            return this;
+        }
+
+        public DialogBuilder ZIndex(int zIndex)
+        {
+            Config.ZIndex = zIndex;
+            return this;
+        }
+
+        public void Open()
+        {
+            Helper.OpenDialog(Config.Id);
+        }
+
+        public void Close()
+        {
+            Helper.CloseDialog();
+        }
+
+        public void Draw()
+        {
+            Helper.Dialog(Config);
+        }
+    }
+
+    public sealed class PopoverBuilder : FluentBuilder<PopoverBuilder, PopoverConfig>
+    {
+        private string _id = "popover";
+        private int _zIndex = -1;
+
+        public PopoverBuilder(GUIHelper helper, Action content = null)
+            : base(helper, new PopoverConfig { Content = content }) { }
 
         public PopoverBuilder Content(Action content)
         {
-            _config.Content = content;
+            Config.Content = content;
             return this;
         }
 
-        public void Draw()
+        public PopoverBuilder Id(string id)
         {
-            _config.Options = GetOptions();
-            _helper.Popover(_config);
+            _id = id;
+            return this;
         }
 
-        public void Open() => _helper.OpenPopover();
+        public PopoverBuilder ZIndex(int zIndex)
+        {
+            _zIndex = zIndex;
+            return this;
+        }
 
-        public void Close() => _helper.ClosePopover();
+        public void Open()
+        {
+            Helper.OpenPopover(_id, _zIndex);
+        }
+
+        public void Close()
+        {
+            Helper.ClosePopover();
+        }
+
+        public bool IsOpen() => Helper.IsPopoverOpen();
+
+        public void Draw()
+        {
+            Helper.Popover(Config);
+        }
     }
 
-    public class DropdownMenuBuilder : ComponentBuilder<DropdownMenuBuilder, DropdownMenuConfig>
+    public sealed class SelectBuilder : FluentBuilder<SelectBuilder, SelectConfig>
     {
-        private readonly List<DropdownMenuItem> _items = new List<DropdownMenuItem>();
+        public SelectBuilder(GUIHelper helper, int selectedIndex = 0, params string[] items)
+            : base(helper, new SelectConfig { SelectedIndex = selectedIndex, Items = items ?? Array.Empty<string>() }) { }
 
+        public SelectBuilder Items(params string[] items)
+        {
+            Config.Items = items;
+            return this;
+        }
+
+        public SelectBuilder SelectedIndex(int index)
+        {
+            Config.SelectedIndex = index;
+            return this;
+        }
+
+        public SelectBuilder OnChange(Action<int> onChange)
+        {
+            Config.OnChange = onChange;
+            return this;
+        }
+
+        public void Open(string id = "select")
+        {
+            Helper.OpenSelect(id);
+        }
+
+        public bool IsOpen() => Helper.IsSelectOpen();
+
+        public int Draw()
+        {
+            return Helper.Select(Config);
+        }
+    }
+
+    public sealed class DropdownMenuBuilder : FluentBuilder<DropdownMenuBuilder, DropdownMenuConfig>
+    {
         public DropdownMenuBuilder(GUIHelper helper)
-            : base(helper, null) { }
+            : base(helper, new DropdownMenuConfig(new List<DropdownMenuItem>())) { }
 
-        public DropdownMenuBuilder Item(string content, Action onClick = null, bool isSelected = false, Texture2D icon = null)
+        public DropdownMenuBuilder Header(string text)
         {
-            _items.Add(new DropdownMenuItem(DropdownMenuItemType.Item, content, onClick, isSelected, icon));
+            Config.Items.Add(new DropdownMenuItem(DropdownMenuItemType.Header, text));
             return this;
         }
 
-        public DropdownMenuBuilder Header(string content)
+        public DropdownMenuBuilder Separator()
         {
-            _items.Add(new DropdownMenuItem(DropdownMenuItemType.Header, content));
+            Config.Items.Add(new DropdownMenuItem(DropdownMenuItemType.Separator));
             return this;
         }
 
-        public DropdownMenuBuilder AddSeparator()
+        public DropdownMenuBuilder Item(string text, Action onClick = null, Texture2D icon = null)
         {
-            _items.Add(new DropdownMenuItem(DropdownMenuItemType.Separator));
-            return this;
-        }
-
-        public DropdownMenuBuilder SubMenu(string content, Action<DropdownMenuBuilder> buildSubMenu)
-        {
-            var subBuilder = new DropdownMenuBuilder(_helper);
-            buildSubMenu(subBuilder);
-            var item = new DropdownMenuItem(DropdownMenuItemType.Item, content);
-            item.SubItems = subBuilder._items;
-            _items.Add(item);
-            return this;
-        }
-
-        public DropdownMenuBuilder Items(params (string text, Action onClick)[] items)
-        {
-            foreach (var (text, onClick) in items)
-                _items.Add(new DropdownMenuItem(DropdownMenuItemType.Item, text, onClick));
+            Config.Items.Add(new DropdownMenuItem(DropdownMenuItemType.Item, text, onClick, false, icon));
             return this;
         }
 
         public void Draw()
         {
-            _config = new DropdownMenuConfig(_items) { Options = GetOptions() };
-            _helper.DropdownMenu(_config);
+            Helper.DropdownMenu(Config);
         }
-
-        public void Close() => _helper.CloseDropdownMenu();
     }
 
-    public class ToastBuilder : ComponentBuilder<ToastBuilder, ToastConfig>
+    public sealed class ToastBuilder : FluentBuilder<ToastBuilder, ToastConfig>
     {
-        public ToastBuilder(GUIHelper helper)
-            : base(helper, new ToastConfig()) { }
-
-        public ToastBuilder Id(string id)
-        {
-            _config.Id = id;
-            return this;
-        }
+        public ToastBuilder(GUIHelper helper, string title = null, string description = null)
+            : base(helper, new ToastConfig { Title = title, Description = description }) { }
 
         public ToastBuilder Title(string title)
         {
-            _config.Title = title;
+            Config.Title = title;
             return this;
         }
 
         public ToastBuilder Description(string description)
         {
-            _config.Description = description;
+            Config.Description = description;
             return this;
         }
 
         public ToastBuilder Variant(ToastVariant variant)
         {
-            _config.Variant = variant;
-            return this;
-        }
-
-        public ToastBuilder Duration(float ms)
-        {
-            _config.DurationMs = ms;
-            return this;
-        }
-
-        public ToastBuilder Dismissible(bool dismissible = true)
-        {
-            _config.Dismissible = dismissible;
-            return this;
-        }
-
-        public ToastBuilder Position(ToastPosition position)
-        {
-            _config.Position = position;
-            return this;
-        }
-
-        public ToastBuilder StackDirection(ToastStackDirection direction)
-        {
-            _config.StackDirection = direction;
-            return this;
-        }
-
-        public ToastBuilder Action(string label, Action onAction)
-        {
-            _config.ActionLabel = label;
-            _config.OnAction = onAction;
-            return this;
-        }
-
-        public ToastBuilder PauseOnHover(bool enable = true)
-        {
-            _config.EnablePauseOnHover = enable;
-            return this;
-        }
-
-        public ToastBuilder HoverDelay(float delay)
-        {
-            _config.HoverPauseDelay = delay;
-            return this;
-        }
-
-        public ToastBuilder ClickToDismiss(bool enable = true)
-        {
-            _config.EnableClickToDismiss = enable;
-            return this;
-        }
-
-        public ToastBuilder ProgressBar(bool show = true)
-        {
-            _config.ShowProgressBar = show;
-            return this;
-        }
-
-        public ToastBuilder HideProgressBar()
-        {
-            _config.ShowProgressBar = false;
-            return this;
-        }
-
-        public ToastBuilder AccentBar(bool show = true)
-        {
-            _config.ShowAccentBar = show;
-            return this;
-        }
-
-        public ToastBuilder HideAccentBar()
-        {
-            _config.ShowAccentBar = false;
-            return this;
-        }
-
-        public ToastBuilder ToastWidth(float width)
-        {
-            _config.Width = width;
-            return this;
-        }
-
-        public ToastBuilder ToastMinWidth(float width)
-        {
-            _config.MinWidth = width;
-            return this;
-        }
-
-        public ToastBuilder ToastMaxWidth(float width)
-        {
-            _config.MaxWidth = width;
-            return this;
-        }
-
-        public ToastBuilder ToastMinHeight(float height)
-        {
-            _config.MinHeight = height;
-            return this;
-        }
-
-        public ToastBuilder Padding(float padding)
-        {
-            _config.Padding = padding;
-            return this;
-        }
-
-        public ToastBuilder BorderRadius(float radius)
-        {
-            _config.BorderRadius = radius;
-            return this;
-        }
-
-        public ToastBuilder Margin(float margin)
-        {
-            _config.Margin = margin;
-            return this;
-        }
-
-        public ToastBuilder ToastSpacing(float spacing)
-        {
-            _config.Spacing = spacing;
-            return this;
-        }
-
-        public ToastBuilder SystemStyle(bool use = true)
-        {
-            _config.UseSystemNotificationStyle = use;
+            Config.Variant = variant;
             return this;
         }
 
@@ -1734,233 +967,121 @@ namespace shadcnui.GUIComponents.Core.Base
 
         public ToastBuilder Info() => Variant(ToastVariant.Info);
 
-        public ToastBuilder TopLeft() => Position(ToastPosition.TopLeft);
-
-        public ToastBuilder TopCenter() => Position(ToastPosition.TopCenter);
-
-        public ToastBuilder TopRight() => Position(ToastPosition.TopRight);
-
-        public ToastBuilder BottomLeft() => Position(ToastPosition.BottomLeft);
-
-        public ToastBuilder BottomCenter() => Position(ToastPosition.BottomCenter);
-
-        public ToastBuilder BottomRight() => Position(ToastPosition.BottomRight);
-
-        public ToastBuilder CenterLeft() => Position(ToastPosition.CenterLeft);
-
-        public ToastBuilder Center() => Position(ToastPosition.Center);
-
-        public ToastBuilder CenterRight() => Position(ToastPosition.CenterRight);
-
-        public ToastBuilder StackUp() => StackDirection(ToastStackDirection.Up);
-
-        public ToastBuilder StackDown() => StackDirection(ToastStackDirection.Down);
-
-        public ToastBuilder StackLeft() => StackDirection(ToastStackDirection.Left);
-
-        public ToastBuilder StackRight() => StackDirection(ToastStackDirection.Right);
-
-        public string Show()
+        public ToastBuilder Duration(float milliseconds)
         {
-            _helper.ShowToast(_config);
-            return _config.Id;
+            Config.DurationMs = milliseconds;
+            return this;
+        }
+
+        public ToastBuilder Action(string label, Action onAction)
+        {
+            Config.ActionLabel = label;
+            Config.OnAction = onAction;
+            return this;
+        }
+
+        public ToastBuilder Position(ToastPosition position)
+        {
+            Config.Position = position;
+            return this;
+        }
+
+        public ToastBuilder Stack(ToastStackDirection direction)
+        {
+            Config.StackDirection = direction;
+            return this;
+        }
+
+        public void Show()
+        {
+            Helper.ShowToast(Config);
         }
     }
 
-    public class SelectBuilder : ComponentBuilder<SelectBuilder, SelectConfig>
+    public sealed class MenuItemGroupBuilder
     {
-        public SelectBuilder(GUIHelper helper)
-            : base(helper, new SelectConfig()) { }
+        internal readonly List<MenuBar.MenuItem> Items = new();
 
-        public SelectBuilder Items(params string[] items)
+        public MenuItemGroupBuilder Item(string text, Action onClick = null, bool disabled = false, string shortcut = "")
         {
-            _config.Items = items;
+            Items.Add(new MenuBar.MenuItem(text, onClick, disabled, null, shortcut));
             return this;
         }
 
-        public SelectBuilder SelectedIndex(int index)
+        public MenuItemGroupBuilder Separator()
         {
-            _config.SelectedIndex = index;
+            Items.Add(MenuBar.MenuItem.Separator());
             return this;
         }
 
-        public SelectBuilder OnChange(Action<int> onChange)
+        public MenuItemGroupBuilder Header(string text)
         {
-            _config.OnChange = onChange;
+            Items.Add(MenuBar.MenuItem.Header(text));
             return this;
         }
-
-        public int Draw()
-        {
-            _config.Options = GetOptions();
-            return _helper.Select(_config);
-        }
-
-        public void Open() => _helper.OpenSelect();
-
-        public void Close() => _helper.CloseSelect();
-
-        public bool IsOpen() => _helper.IsSelectOpen();
     }
 
-    public class MenuBarBuilder : ComponentBuilder<MenuBarBuilder, MenuBar.MenuBarConfig>
+    public sealed class MenuBarBuilder : FluentBuilder<MenuBarBuilder, MenuBar.MenuBarConfig>
     {
-        private readonly List<MenuBar.MenuItem> _items = new List<MenuBar.MenuItem>();
-
         public MenuBarBuilder(GUIHelper helper)
-            : base(helper, null) { }
+            : base(helper, new MenuBar.MenuBarConfig(new List<MenuBar.MenuItem>())) { }
 
-        public MenuBarBuilder Item(string label, Action onClick = null)
+        public MenuBarBuilder Item(string text, Action<MenuItemGroupBuilder> children = null, Action onClick = null, bool disabled = false, string shortcut = "")
         {
-            _items.Add(new MenuBar.MenuItem(label, onClick));
-            return this;
-        }
-
-        public MenuBarBuilder Item(string label, Action<MenuBarBuilder> buildSubMenu)
-        {
-            var subBuilder = new MenuBarBuilder(_helper);
-            buildSubMenu(subBuilder);
-            _items.Add(new MenuBar.MenuItem(label, null, false, subBuilder._items));
-            return this;
-        }
-
-        public MenuBarBuilder Items(params MenuBar.MenuItem[] items)
-        {
-            _items.AddRange(items);
-            return this;
-        }
-
-        public MenuBarBuilder Separator()
-        {
-            _items.Add(MenuBar.MenuItem.Separator());
-            return this;
-        }
-
-        public MenuBarBuilder Header(string text)
-        {
-            _items.Add(MenuBar.MenuItem.Header(text));
+            var childBuilder = new MenuItemGroupBuilder();
+            children?.Invoke(childBuilder);
+            Config.Items.Add(new MenuBar.MenuItem(text, onClick, disabled, childBuilder.Items, shortcut));
             return this;
         }
 
         public void Draw()
         {
-            _config = new MenuBar.MenuBarConfig(_items) { Options = GetOptions() };
-            _helper.MenuBar(_config);
+            Helper.MenuBar(Config);
         }
     }
 
     public partial class GUIHelper
     {
-        public ButtonBuilder CreateButton() => new ButtonBuilder(this);
+        public ButtonBuilder CreateButton(string text = "") => new(this, text);
 
-        public ButtonBuilder CreateButton(string text) => new ButtonBuilder(this).Text(text);
+        public InputBuilder CreateInput() => new(this);
 
-        public ButtonBuilder CreateButton(string text, Action onClick) => new ButtonBuilder(this).Text(text).OnClick(onClick);
+        public ToggleBuilder CreateToggle(string text, bool value) => new(this, text, value);
 
-        public LabelBuilder CreateLabel() => new LabelBuilder(this);
+        public CheckboxBuilder CreateCheckbox(string text, bool value) => new(this, text, value);
 
-        public LabelBuilder CreateLabel(string text) => new LabelBuilder(this).Text(text);
+        public SwitchBuilder CreateSwitch(string text, bool value) => new(this, text, value);
 
-        public InputBuilder CreateInput() => new InputBuilder(this);
+        public LabelBuilder CreateLabel(string text = "") => new(this, text);
 
-        public InputBuilder CreateInput(string value) => new InputBuilder(this).Value(value);
+        public BadgeBuilder CreateBadge(string text = "Badge") => new(this, text);
 
-        public InputBuilder CreateInput(string value, string placeholder) => new InputBuilder(this).Value(value).Placeholder(placeholder);
+        public AvatarBuilder CreateAvatar(Texture2D image = null) => new(this, image);
 
-        public ToggleBuilder CreateToggle() => new ToggleBuilder(this);
+        public CardBuilder CreateCard(string title = null) => new(this, title);
 
-        public ToggleBuilder CreateToggle(string text, bool value) => new ToggleBuilder(this).Text(text).Value(value);
+        public ProgressBuilder CreateProgress(float value = 0f) => new(this, value);
 
-        public ToggleBuilder CreateToggle(string text, bool value, Action<bool> onToggle) => new ToggleBuilder(this).Text(text).Value(value).OnToggle(onToggle);
+        public SeparatorBuilder CreateSeparator() => new(this);
 
-        public CheckboxBuilder CreateCheckbox() => new CheckboxBuilder(this);
+        public SliderBuilder CreateSlider(float value = 0f) => new(this, value);
 
-        public CheckboxBuilder CreateCheckbox(string text, bool value) => new CheckboxBuilder(this).Text(text).Value(value);
+        public TextAreaBuilder CreateTextArea(string text = "") => new(this, text);
 
-        public CheckboxBuilder CreateCheckbox(string text, bool value, Action<bool> onToggle) => new CheckboxBuilder(this).Text(text).Value(value).OnToggle(onToggle);
+        public TableBuilder CreateTable(params string[] headers) => new(this, headers);
 
-        public SwitchBuilder CreateSwitch() => new SwitchBuilder(this);
+        public ChartBuilder CreateChart(ChartType type = ChartType.Bar) => new(this, type);
 
-        public SwitchBuilder CreateSwitch(string text, bool value) => new SwitchBuilder(this).Text(text).Value(value);
+        public DialogBuilder CreateDialog(string id) => new(this, id);
 
-        public SwitchBuilder CreateSwitch(string text, bool value, Action<bool> onToggle) => new SwitchBuilder(this).Text(text).Value(value).OnToggle(onToggle);
+        public PopoverBuilder CreatePopover(Action content = null) => new(this, content);
 
-        public BadgeBuilder CreateBadge() => new BadgeBuilder(this);
+        public SelectBuilder CreateSelect(int selectedIndex = 0, params string[] items) => new(this, selectedIndex, items);
 
-        public BadgeBuilder CreateBadge(string text) => new BadgeBuilder(this).Text(text);
+        public DropdownMenuBuilder CreateDropdownMenu() => new(this);
 
-        public BadgeBuilder CreateBadge(int count) => new BadgeBuilder(this).Count(count);
+        public ToastBuilder CreateToast(string title = null, string description = null) => new(this, title, description);
 
-        public ProgressBuilder CreateProgress() => new ProgressBuilder(this);
-
-        public ProgressBuilder CreateProgress(float value) => new ProgressBuilder(this).Value(value);
-
-        public ProgressBuilder CreateProgress(float value, string label) => new ProgressBuilder(this).Value(value).ProgressLabel(label);
-
-        public AvatarBuilder CreateAvatar() => new AvatarBuilder(this);
-
-        public AvatarBuilder CreateAvatar(Texture2D image) => new AvatarBuilder(this).Image(image);
-
-        public AvatarBuilder CreateAvatar(string fallback) => new AvatarBuilder(this).Fallback(fallback);
-
-        public CardBuilder CreateCard() => new CardBuilder(this);
-
-        public CardBuilder CreateCard(string title) => new CardBuilder(this).Title(title);
-
-        public CardBuilder CreateCard(string title, string description) => new CardBuilder(this).Title(title).Description(description);
-
-        public DialogBuilder CreateDialog() => new DialogBuilder(this);
-
-        public DialogBuilder CreateDialog(string id) => new DialogBuilder(this).Id(id);
-
-        public DialogBuilder CreateDialog(string id, string title) => new DialogBuilder(this).Id(id).Title(title);
-
-        public SeparatorBuilder CreateSeparator() => new SeparatorBuilder(this);
-
-        public SliderBuilder CreateSlider() => new SliderBuilder(this);
-
-        public SliderBuilder CreateSlider(float value) => new SliderBuilder(this).Value(value);
-
-        public SliderBuilder CreateSlider(float value, float min, float max) => new SliderBuilder(this).Value(value).Range(min, max);
-
-        public TextAreaBuilder CreateTextArea() => new TextAreaBuilder(this);
-
-        public TextAreaBuilder CreateTextArea(string text) => new TextAreaBuilder(this).Text(text);
-
-        public TextAreaBuilder CreateTextArea(string text, string placeholder) => new TextAreaBuilder(this).Text(text).Placeholder(placeholder);
-
-        public TabsBuilder CreateTabs() => new TabsBuilder(this);
-
-        public TabsBuilder CreateTabs(params string[] items) => new TabsBuilder(this).Items(items);
-
-        public TabsBuilder CreateTabs(int selectedIndex, params string[] items) => new TabsBuilder(this).Items(items).SelectedIndex(selectedIndex);
-
-        public TableBuilder CreateTable() => new TableBuilder(this);
-
-        public TableBuilder CreateTable(params string[] headers) => new TableBuilder(this).Headers(headers);
-
-        public ChartBuilder CreateChart() => new ChartBuilder(this);
-
-        public ChartBuilder CreateChart(ChartType type) => new ChartBuilder(this).Type(type);
-
-        public PopoverBuilder CreatePopover() => new PopoverBuilder(this);
-
-        public PopoverBuilder CreatePopover(Action content) => new PopoverBuilder(this).Content(content);
-
-        public DropdownMenuBuilder CreateDropdownMenu() => new DropdownMenuBuilder(this);
-
-        public ToastBuilder CreateToast() => new ToastBuilder(this);
-
-        public ToastBuilder CreateToast(string title) => new ToastBuilder(this).Title(title);
-
-        public ToastBuilder CreateToast(string title, string description) => new ToastBuilder(this).Title(title).Description(description);
-
-        public SelectBuilder CreateSelect() => new SelectBuilder(this);
-
-        public SelectBuilder CreateSelect(params string[] items) => new SelectBuilder(this).Items(items);
-
-        public SelectBuilder CreateSelect(int selectedIndex, params string[] items) => new SelectBuilder(this).Items(items).SelectedIndex(selectedIndex);
-
-        public MenuBarBuilder CreateMenuBar() => new MenuBarBuilder(this);
+        public MenuBarBuilder CreateMenuBar() => new(this);
     }
 }

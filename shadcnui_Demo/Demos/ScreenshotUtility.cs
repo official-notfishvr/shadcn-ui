@@ -91,8 +91,6 @@ namespace shadcnui_Demo.Menu
 
             if (shouldShow)
             {
-                GUI.skin.horizontalScrollbar = GUIStyle.none;
-                GUI.skin.verticalScrollbar = GUIStyle.none;
                 controlRect = GUI.Window(200, controlRect, DrawControlWindow, "Screenshot Utility");
             }
 

@@ -1,11 +1,49 @@
+using System;
 using UnityEngine;
 
 namespace shadcnui.GUIComponents.Core.Theming
 {
+    public sealed class ThemeMetrics
+    {
+        public float BorderWidth { get; set; } = 1f;
+        public float CornerRadius { get; set; } = 2f;
+        public float CompactCornerRadius { get; set; } = 1f;
+        public float SectionSpacing { get; set; } = 16f;
+        public float ControlSpacing { get; set; } = 8f;
+        public float PanelPadding { get; set; } = 16f;
+        public float ContentPadding { get; set; } = 12f;
+        public float ControlHeight { get; set; } = 34f;
+        public float CompactControlHeight { get; set; } = 28f;
+        public float LargeControlHeight { get; set; } = 42f;
+        public float TooltipMaxWidth { get; set; } = 280f;
+        public float DropdownWidth { get; set; } = 280f;
+
+        public ThemeMetrics Clone() => (ThemeMetrics)MemberwiseClone();
+    }
+
+    public sealed class ThemeTypography
+    {
+        public string[] FontFamilies { get; set; } = Array.Empty<string>();
+        public int BaseFontSize { get; set; } = 14;
+        public FontStyle HeadingWeight { get; set; } = FontStyle.Bold;
+        public FontStyle LabelWeight { get; set; } = FontStyle.Normal;
+        public FontStyle ButtonWeight { get; set; } = FontStyle.Bold;
+
+        public ThemeTypography Clone()
+        {
+            return new ThemeTypography
+            {
+                FontFamilies = (string[])FontFamilies.Clone(),
+                BaseFontSize = BaseFontSize,
+                HeadingWeight = HeadingWeight,
+                LabelWeight = LabelWeight,
+                ButtonWeight = ButtonWeight,
+            };
+        }
+    }
+
     public class Theme
     {
-        #region Properties
-
         public string Name { get; set; }
         public Color Base { get; set; }
         public Color Secondary { get; set; }
@@ -34,381 +72,132 @@ namespace shadcnui.GUIComponents.Core.Theming
         public Color TabsTriggerActiveBg { get; set; }
         public Color TabsTriggerActiveFg { get; set; }
         public Color BackgroundColor { get; set; }
+        public ThemeMetrics Metrics { get; set; } = new();
+        public ThemeTypography Typography { get; set; } = new();
 
-        #endregion
+        public Theme Clone()
+        {
+            return new Theme
+            {
+                Name = Name,
+                Base = Base,
+                Secondary = Secondary,
+                Elevated = Elevated,
+                Text = Text,
+                Muted = Muted,
+                Border = Border,
+                Accent = Accent,
+                Destructive = Destructive,
+                Success = Success,
+                Warning = Warning,
+                Info = Info,
+                Overlay = Overlay,
+                Shadow = Shadow,
+                ButtonPrimaryBg = ButtonPrimaryBg,
+                ButtonPrimaryFg = ButtonPrimaryFg,
+                ButtonDestructiveBg = ButtonDestructiveBg,
+                ButtonDestructiveFg = ButtonDestructiveFg,
+                ButtonOutlineFg = ButtonOutlineFg,
+                ButtonSecondaryBg = ButtonSecondaryBg,
+                ButtonSecondaryFg = ButtonSecondaryFg,
+                ButtonGhostFg = ButtonGhostFg,
+                ButtonLinkColor = ButtonLinkColor,
+                TabsBg = TabsBg,
+                TabsTriggerFg = TabsTriggerFg,
+                TabsTriggerActiveBg = TabsTriggerActiveBg,
+                TabsTriggerActiveFg = TabsTriggerActiveFg,
+                BackgroundColor = BackgroundColor,
+                Metrics = Metrics.Clone(),
+                Typography = Typography.Clone(),
+            };
+        }
 
         public static Color Hex(string hex)
         {
-            if (ColorUtility.TryParseHtmlString(hex, out Color color))
-                return color;
-            return Color.white;
+            return ColorUtility.TryParseHtmlString(hex, out var color) ? color : Color.white;
         }
 
-        #region Theme Definitions
-
-        public static Theme Dark =>
-            new Theme
+        private static Theme Create(
+            string name,
+            string @base,
+            string secondary,
+            string elevated,
+            string text,
+            string muted,
+            string border,
+            string accent,
+            string destructive,
+            string success,
+            string warning,
+            string info,
+            string overlay,
+            string shadow,
+            string buttonPrimaryBg,
+            string buttonPrimaryFg,
+            string buttonSecondaryBg,
+            string buttonSecondaryFg,
+            string buttonGhostFg,
+            string link,
+            string tabsBg,
+            string tabsActiveBg,
+            string tabsActiveFg
+        )
+        {
+            return new Theme
             {
-                Name = "Dark",
-                Base = Hex("#0c0c0e"),
-                Secondary = Hex("#16161a"),
-                Elevated = Hex("#111114"),
-                Text = Hex("#f8f8f8"),
-                Muted = Hex("#808496"),
-                Border = Hex("#252832"),
-                Accent = Hex("#5b8cff"),
-                Destructive = Hex("#ef4444"),
-                Success = Hex("#3cc171"),
-                Warning = Hex("#fbba42"),
-                Info = Hex("#5b8cff"),
-                Overlay = new Color(0, 0, 0, 0.6f),
-                Shadow = new Color(0, 0, 0, 0.5f),
-                ButtonPrimaryBg = Hex("#252832"),
-                ButtonPrimaryFg = Hex("#f8f8f8"),
-                ButtonDestructiveBg = Hex("#ef4444"),
-                ButtonDestructiveFg = Hex("#ffffff"),
-                ButtonOutlineFg = Hex("#f8f8f8"),
-                ButtonSecondaryBg = Hex("#1f222b"),
-                ButtonSecondaryFg = Hex("#f8f8f8"),
-                ButtonGhostFg = Hex("#f8f8f8"),
-                ButtonLinkColor = Hex("#5b8cff"),
-                TabsBg = Hex("#111114"),
-                TabsTriggerFg = Hex("#808496"),
-                TabsTriggerActiveBg = Hex("#1f222b"),
-                TabsTriggerActiveFg = Hex("#f8f8f8"),
-                BackgroundColor = Hex("#0c0c0e"),
+                Name = name,
+                Base = Hex(@base),
+                Secondary = Hex(secondary),
+                Elevated = Hex(elevated),
+                Text = Hex(text),
+                Muted = Hex(muted),
+                Border = Hex(border),
+                Accent = Hex(accent),
+                Destructive = Hex(destructive),
+                Success = Hex(success),
+                Warning = Hex(warning),
+                Info = Hex(info),
+                Overlay = Hex(overlay),
+                Shadow = Hex(shadow),
+                ButtonPrimaryBg = Hex(buttonPrimaryBg),
+                ButtonPrimaryFg = Hex(buttonPrimaryFg),
+                ButtonDestructiveBg = Hex(destructive),
+                ButtonDestructiveFg = Color.white,
+                ButtonOutlineFg = Hex(text),
+                ButtonSecondaryBg = Hex(buttonSecondaryBg),
+                ButtonSecondaryFg = Hex(buttonSecondaryFg),
+                ButtonGhostFg = Hex(buttonGhostFg),
+                ButtonLinkColor = Hex(link),
+                TabsBg = Hex(tabsBg),
+                TabsTriggerFg = Hex(muted),
+                TabsTriggerActiveBg = Hex(tabsActiveBg),
+                TabsTriggerActiveFg = Hex(tabsActiveFg),
+                BackgroundColor = Hex(@base),
             };
+        }
 
-        public static Theme Light =>
-            new Theme
-            {
-                Name = "Light",
-                Base = Hex("#ffffff"),
-                Secondary = Hex("#f4f5f7"),
-                Elevated = Hex("#ffffff"),
-                Text = Hex("#101217"),
-                Muted = Hex("#656d7d"),
-                Border = Hex("#e1e3e7"),
-                Accent = Hex("#2268de"),
-                Destructive = Hex("#dc3232"),
-                Success = Hex("#1a8e4f"),
-                Warning = Hex("#de8c18"),
-                Info = Hex("#2268de"),
-                Overlay = new Color(0, 0, 0, 0.3f),
-                Shadow = new Color(0, 0, 0, 0.08f),
-                ButtonPrimaryBg = Hex("#101217"),
-                ButtonPrimaryFg = Hex("#fafafa"),
-                ButtonDestructiveBg = Hex("#dc3232"),
-                ButtonDestructiveFg = Hex("#ffffff"),
-                ButtonOutlineFg = Hex("#101217"),
-                ButtonSecondaryBg = Hex("#efeff2"),
-                ButtonSecondaryFg = Hex("#101217"),
-                ButtonGhostFg = Hex("#101217"),
-                ButtonLinkColor = Hex("#2268de"),
-                TabsBg = Hex("#f4f5f7"),
-                TabsTriggerFg = Hex("#656d7d"),
-                TabsTriggerActiveBg = Hex("#ffffff"),
-                TabsTriggerActiveFg = Hex("#101217"),
-                BackgroundColor = Hex("#ffffff"),
-            };
+        public static Theme Dark => Create("Dark", "#101214", "#171a1f", "#14181c", "#f3f5f7", "#9099a4", "#242a31", "#5aa2ff", "#d94b4b", "#2fbf71", "#e0a43b", "#5aa2ff", "#99000000", "#55000000", "#1b2026", "#f3f5f7", "#171c22", "#f3f5f7", "#e8edf3", "#7bb6ff", "#14181c", "#20262d", "#f3f5f7");
 
-        public static Theme Zinc =>
-            new Theme
-            {
-                Name = "Zinc",
-                Base = Hex("#030406"),
-                Secondary = Hex("#101318"),
-                Elevated = Hex("#090c10"),
-                Text = Hex("#f0f3f7"),
-                Muted = Hex("#7b848f"),
-                Border = Hex("#191f27"),
-                Accent = Hex("#5c89ba"),
-                Destructive = Hex("#dc3f4a"),
-                Success = Hex("#1a8e4f"),
-                Warning = Hex("#fbba42"),
-                Info = Hex("#3b82f6"),
-                Overlay = new Color(0, 0, 0, 0.8f),
-                Shadow = new Color(0, 0, 0, 0.5f),
-                ButtonPrimaryBg = Hex("#5c89ba"),
-                ButtonPrimaryFg = Hex("#fcfdfe"),
-                ButtonDestructiveBg = Hex("#dc3f4a"),
-                ButtonDestructiveFg = Hex("#f0f3f7"),
-                ButtonOutlineFg = Hex("#f0f3f7"),
-                ButtonSecondaryBg = Hex("#101318"),
-                ButtonSecondaryFg = Hex("#f0f3f7"),
-                ButtonGhostFg = Hex("#f0f3f7"),
-                ButtonLinkColor = Hex("#5c89ba"),
-                TabsBg = Hex("#090c10"),
-                TabsTriggerFg = Hex("#7b848f"),
-                TabsTriggerActiveBg = Hex("#101318"),
-                TabsTriggerActiveFg = Hex("#f0f3f7"),
-                BackgroundColor = Hex("#030406"),
-            };
+        public static Theme Light => Create("Light", "#f7f7f8", "#eceef0", "#ffffff", "#15181c", "#66707c", "#d9dde2", "#0f6bff", "#d44242", "#1ea85d", "#d48b19", "#2e7df6", "#66000000", "#15000000", "#15181c", "#ffffff", "#eceef0", "#15181c", "#15181c", "#0f6bff", "#eceef0", "#ffffff", "#15181c");
 
-        public static Theme Slate =>
-            new Theme
-            {
-                Name = "Slate",
-                Base = Hex("#020617"),
-                Secondary = Hex("#0f172a"),
-                Elevated = Hex("#0b1120"),
-                Text = Hex("#f1f5f9"),
-                Muted = Hex("#64748b"),
-                Border = Hex("#1e293b"),
-                Accent = Hex("#6d90ad"),
-                Destructive = Hex("#ef4444"),
-                Success = Hex("#10b981"),
-                Warning = Hex("#f59e0b"),
-                Info = Hex("#3b82f6"),
-                Overlay = new Color(0, 0, 0, 0.5f),
-                Shadow = new Color(0, 0, 0, 0.3f),
-                ButtonPrimaryBg = Hex("#6d90ad"),
-                ButtonPrimaryFg = Hex("#f8fafc"),
-                ButtonDestructiveBg = Hex("#ef4444"),
-                ButtonDestructiveFg = Hex("#ffffff"),
-                ButtonOutlineFg = Hex("#f1f5f9"),
-                ButtonSecondaryBg = Hex("#1e293b"),
-                ButtonSecondaryFg = Hex("#f1f5f9"),
-                ButtonGhostFg = Hex("#f1f5f9"),
-                ButtonLinkColor = Hex("#6d90ad"),
-                BackgroundColor = Hex("#020617"),
-                TabsBg = Hex("#0b1120"),
-                TabsTriggerFg = Hex("#64748b"),
-                TabsTriggerActiveBg = Hex("#0f172a"),
-                TabsTriggerActiveFg = Hex("#f1f5f9"),
-            };
+        public static Theme Slate => Create("Slate", "#111827", "#162033", "#131c2b", "#eff4ff", "#94a3b8", "#25324a", "#4da3ff", "#ef4444", "#22c55e", "#f59e0b", "#38bdf8", "#a0000000", "#66000000", "#1b283d", "#eff4ff", "#1a2435", "#eff4ff", "#eff4ff", "#4da3ff", "#131c2b", "#1b283d", "#eff4ff");
 
-        public static Theme Gray =>
-            new Theme
-            {
-                Name = "Gray",
-                Base = Hex("#030303"),
-                Secondary = Hex("#111111"),
-                Elevated = Hex("#0a0a0a"),
-                Text = Hex("#f2f2f2"),
-                Muted = Hex("#71717a"),
-                Border = Hex("#27272a"),
-                Accent = Hex("#3b82f6"),
-                Destructive = Hex("#ef4444"),
-                Success = Hex("#22c55e"),
-                Warning = Hex("#f59e0b"),
-                Info = Hex("#3b82f6"),
-                Overlay = new Color(0, 0, 0, 0.5f),
-                Shadow = new Color(0, 0, 0, 0.3f),
-                ButtonPrimaryBg = Hex("#27272a"),
-                ButtonPrimaryFg = Hex("#f2f2f2"),
-                ButtonDestructiveBg = Hex("#ef4444"),
-                ButtonDestructiveFg = Hex("#ffffff"),
-                ButtonOutlineFg = Hex("#f2f2f2"),
-                ButtonSecondaryBg = Hex("#27272a"),
-                ButtonSecondaryFg = Hex("#f2f2f2"),
-                ButtonGhostFg = Hex("#f2f2f2"),
-                ButtonLinkColor = Hex("#3b82f6"),
-                BackgroundColor = Hex("#030303"),
-                TabsBg = Hex("#0a0a0a"),
-                TabsTriggerFg = Hex("#71717a"),
-                TabsTriggerActiveBg = Hex("#111111"),
-                TabsTriggerActiveFg = Hex("#f2f2f2"),
-            };
+        public static Theme Gray => Create("Gray", "#111111", "#191919", "#141414", "#f5f5f5", "#9b9b9b", "#282828", "#7f8ea3", "#e05252", "#3fbf73", "#e3a546", "#6ea8ff", "#99000000", "#66000000", "#1d1d1d", "#f5f5f5", "#191919", "#f5f5f5", "#f5f5f5", "#88a4c4", "#141414", "#1d1d1d", "#f5f5f5");
 
-        public static Theme Stone =>
-            new Theme
-            {
-                Name = "Stone",
-                Base = Hex("#0c0a09"),
-                Secondary = Hex("#1c1917"),
-                Elevated = Hex("#141312"),
-                Text = Hex("#fafaf9"),
-                Muted = Hex("#78716c"),
-                Border = Hex("#292524"),
-                Accent = Hex("#b45309"),
-                Destructive = Hex("#ef4444"),
-                Success = Hex("#22c55e"),
-                Warning = Hex("#f59e0b"),
-                Info = Hex("#3b82f6"),
-                Overlay = new Color(0, 0, 0, 0.5f),
-                Shadow = new Color(0, 0, 0, 0.3f),
-                ButtonPrimaryBg = Hex("#292524"),
-                ButtonPrimaryFg = Hex("#fafaf9"),
-                ButtonDestructiveBg = Hex("#ef4444"),
-                ButtonDestructiveFg = Hex("#ffffff"),
-                ButtonOutlineFg = Hex("#fafaf9"),
-                ButtonSecondaryBg = Hex("#292524"),
-                ButtonSecondaryFg = Hex("#fafaf9"),
-                ButtonGhostFg = Hex("#fafaf9"),
-                ButtonLinkColor = Hex("#b45309"),
-                BackgroundColor = Hex("#0c0a09"),
-                TabsBg = Hex("#141312"),
-                TabsTriggerFg = Hex("#78716c"),
-                TabsTriggerActiveBg = Hex("#1c1917"),
-                TabsTriggerActiveFg = Hex("#fafaf9"),
-            };
+        public static Theme Zinc => Create("Zinc", "#15161a", "#1c1f24", "#181b20", "#f3f4f6", "#979da6", "#2a2f37", "#4f8ee8", "#de4c4c", "#34c56f", "#e2a33b", "#63a6ff", "#9a000000", "#66000000", "#21252c", "#f3f4f6", "#1c1f24", "#f3f4f6", "#f3f4f6", "#79a8ff", "#181b20", "#20242b", "#f3f4f6");
 
-        public static Theme Olive =>
-            new Theme
-            {
-                Name = "Olive",
-                Base = Hex("#040604"),
-                Secondary = Hex("#0e130e"),
-                Elevated = Hex("#090c09"),
-                Text = Hex("#f5f7f5"),
-                Muted = Hex("#848f84"),
-                Border = Hex("#192119"),
-                Accent = Hex("#6dba6d"),
-                Destructive = Hex("#ef4444"),
-                Success = Hex("#22c55e"),
-                Warning = Hex("#f59e0b"),
-                Info = Hex("#3b82f6"),
-                Overlay = new Color(0, 0, 0, 0.5f),
-                Shadow = new Color(0, 0, 0, 0.3f),
-                ButtonPrimaryBg = Hex("#192119"),
-                ButtonPrimaryFg = Hex("#f5f7f5"),
-                ButtonDestructiveBg = Hex("#ef4444"),
-                ButtonDestructiveFg = Hex("#ffffff"),
-                ButtonOutlineFg = Hex("#f5f7f5"),
-                ButtonSecondaryBg = Hex("#192119"),
-                ButtonSecondaryFg = Hex("#f5f7f5"),
-                ButtonGhostFg = Hex("#f5f7f5"),
-                ButtonLinkColor = Hex("#6dba6d"),
-                BackgroundColor = Hex("#040604"),
-                TabsBg = Hex("#090c09"),
-                TabsTriggerFg = Hex("#848f84"),
-                TabsTriggerActiveBg = Hex("#0e130e"),
-                TabsTriggerActiveFg = Hex("#f5f7f5"),
-            };
+        public static Theme Stone => Create("Stone", "#171311", "#211c18", "#1c1715", "#faf7f3", "#9a8f86", "#2e2621", "#c98244", "#d94b4b", "#35b76b", "#d9a045", "#6aa7ff", "#9a000000", "#66000000", "#231d19", "#faf7f3", "#211c18", "#faf7f3", "#faf7f3", "#c98244", "#1c1715", "#241f1a", "#faf7f3");
 
-        public static Theme Cyan =>
-            new Theme
-            {
-                Name = "Cyan",
-                Base = Hex("#020507"),
-                Secondary = Hex("#0b1317"),
-                Elevated = Hex("#060c0f"),
-                Text = Hex("#f3f7f9"),
-                Muted = Hex("#7f97a3"),
-                Border = Hex("#162329"),
-                Accent = Hex("#39baba"),
-                Destructive = Hex("#ef4444"),
-                Success = Hex("#22c55e"),
-                Warning = Hex("#f59e0b"),
-                Info = Hex("#3b82f6"),
-                Overlay = new Color(0, 0, 0, 0.5f),
-                Shadow = new Color(0, 0, 0, 0.3f),
-                ButtonPrimaryBg = Hex("#162329"),
-                ButtonPrimaryFg = Hex("#f3f7f9"),
-                ButtonDestructiveBg = Hex("#ef4444"),
-                ButtonDestructiveFg = Hex("#ffffff"),
-                ButtonOutlineFg = Hex("#f3f7f9"),
-                ButtonSecondaryBg = Hex("#162329"),
-                ButtonSecondaryFg = Hex("#f3f7f9"),
-                ButtonGhostFg = Hex("#f3f7f9"),
-                ButtonLinkColor = Hex("#39baba"),
-                BackgroundColor = Hex("#020507"),
-                TabsBg = Hex("#060c0f"),
-                TabsTriggerFg = Hex("#7f97a3"),
-                TabsTriggerActiveBg = Hex("#0b1317"),
-                TabsTriggerActiveFg = Hex("#f3f7f9"),
-            };
+        public static Theme Olive => Create("Olive", "#12150f", "#1a1f17", "#161b13", "#f4f6ef", "#8e9886", "#2a3224", "#80b35c", "#d94b4b", "#43bd71", "#d2a43c", "#63a6ff", "#9a000000", "#66000000", "#1d2319", "#f4f6ef", "#1a1f17", "#f4f6ef", "#f4f6ef", "#8ec96a", "#161b13", "#1e241a", "#f4f6ef");
+
+        public static Theme Cyan => Create("Cyan", "#0f171a", "#152025", "#121c20", "#eff9fb", "#90a8ad", "#26353a", "#3fb8d5", "#d94b4b", "#33bd78", "#dfa63d", "#51bbf4", "#99000000", "#66000000", "#1a2529", "#eff9fb", "#152025", "#eff9fb", "#eff9fb", "#3fb8d5", "#121c20", "#1b282d", "#eff9fb");
 
         public static Theme BlueDark =>
-            new Theme
-            {
-                Name = "BlueDark",
-                Base = Hex("#050912"),
-                Secondary = Hex("#101726"),
-                Elevated = Hex("#0b101d"),
-                Text = Hex("#f5f8ff"),
-                Muted = Hex("#7f8ba3"),
-                Border = Hex("#192335"),
-                Accent = Hex("#5182f4"),
-                Destructive = Hex("#ef4444"),
-                Success = Hex("#22c55e"),
-                Warning = Hex("#f59e0b"),
-                Info = Hex("#3b82f6"),
-                Overlay = new Color(0, 0, 0, 0.5f),
-                Shadow = new Color(0, 0, 0, 0.3f),
-                ButtonPrimaryBg = Hex("#192335"),
-                ButtonPrimaryFg = Hex("#f5f8ff"),
-                ButtonDestructiveBg = Hex("#ef4444"),
-                ButtonDestructiveFg = Hex("#ffffff"),
-                ButtonOutlineFg = Hex("#f5f8ff"),
-                ButtonSecondaryBg = Hex("#192335"),
-                ButtonSecondaryFg = Hex("#f5f8ff"),
-                ButtonGhostFg = Hex("#f5f8ff"),
-                ButtonLinkColor = Hex("#5182f4"),
-                BackgroundColor = Hex("#050912"),
-                TabsBg = Hex("#0b101d"),
-                TabsTriggerFg = Hex("#7f8ba3"),
-                TabsTriggerActiveBg = Hex("#101726"),
-                TabsTriggerActiveFg = Hex("#f5f8ff"),
-            };
+            Create("BlueDark", "#0f1623", "#162033", "#121b2b", "#eff4ff", "#92a0ba", "#25324a", "#5e91ff", "#df5050", "#37bc73", "#dfa43e", "#5fa9ff", "#9d000000", "#66000000", "#1a263a", "#eff4ff", "#162033", "#eff4ff", "#eff4ff", "#7ba7ff", "#121b2b", "#1c2940", "#eff4ff");
 
-        public static Theme Rose =>
-            new Theme
-            {
-                Name = "Rose",
-                Base = Hex("#070406"),
-                Secondary = Hex("#130b10"),
-                Elevated = Hex("#0e090c"),
-                Text = Hex("#faf5f8"),
-                Muted = Hex("#977784"),
-                Border = Hex("#211319"),
-                Accent = Hex("#f45c89"),
-                Destructive = Hex("#ef4444"),
-                Success = Hex("#22c55e"),
-                Warning = Hex("#f59e0b"),
-                Info = Hex("#3b82f6"),
-                Overlay = new Color(0, 0, 0, 0.5f),
-                Shadow = new Color(0, 0, 0, 0.3f),
-                ButtonPrimaryBg = Hex("#211319"),
-                ButtonPrimaryFg = Hex("#faf5f8"),
-                ButtonDestructiveBg = Hex("#ef4444"),
-                ButtonDestructiveFg = Hex("#ffffff"),
-                ButtonOutlineFg = Hex("#faf5f8"),
-                ButtonSecondaryBg = Hex("#211319"),
-                ButtonSecondaryFg = Hex("#faf5f8"),
-                ButtonGhostFg = Hex("#faf5f8"),
-                ButtonLinkColor = Hex("#f45c89"),
-                BackgroundColor = Hex("#070406"),
-                TabsBg = Hex("#0e090c"),
-                TabsTriggerFg = Hex("#977784"),
-                TabsTriggerActiveBg = Hex("#130b10"),
-                TabsTriggerActiveFg = Hex("#faf5f8"),
-            };
+        public static Theme Rose => Create("Rose", "#1a1216", "#25171d", "#1f1419", "#fff3f8", "#b296a1", "#38242c", "#e97ea9", "#df4d67", "#3abc74", "#e1aa46", "#6ea8ff", "#9a000000", "#66000000", "#2a1a21", "#fff3f8", "#25171d", "#fff3f8", "#fff3f8", "#e97ea9", "#1f1419", "#2a1b22", "#fff3f8");
 
         public static Theme Violet =>
-            new Theme
-            {
-                Name = "Violet",
-                Base = Hex("#050409"),
-                Secondary = Hex("#0f0b14"),
-                Elevated = Hex("#0b0810"),
-                Text = Hex("#f8f5ff"),
-                Muted = Hex("#8b779f"),
-                Border = Hex("#1d1326"),
-                Accent = Hex("#9b5cf4"),
-                Destructive = Hex("#ef4444"),
-                Success = Hex("#22c55e"),
-                Warning = Hex("#f59e0b"),
-                Info = Hex("#3b82f6"),
-                Overlay = new Color(0, 0, 0, 0.5f),
-                Shadow = new Color(0, 0, 0, 0.3f),
-                ButtonPrimaryBg = Hex("#1d1326"),
-                ButtonPrimaryFg = Hex("#f8f5ff"),
-                ButtonDestructiveBg = Hex("#ef4444"),
-                ButtonDestructiveFg = Hex("#ffffff"),
-                ButtonOutlineFg = Hex("#f8f5ff"),
-                ButtonSecondaryBg = Hex("#1d1326"),
-                ButtonSecondaryFg = Hex("#f8f5ff"),
-                ButtonGhostFg = Hex("#f8f5ff"),
-                ButtonLinkColor = Hex("#9b5cf4"),
-                BackgroundColor = Hex("#050409"),
-                TabsBg = Hex("#0b0810"),
-                TabsTriggerFg = Hex("#8b779f"),
-                TabsTriggerActiveBg = Hex("#0f0b14"),
-                TabsTriggerActiveFg = Hex("#f8f5ff"),
-            };
-
-        #endregion
+            Create("Violet", "#161222", "#21192f", "#1b1528", "#faf4ff", "#a793bd", "#322643", "#a07bff", "#df4b63", "#39bc74", "#e0a644", "#6ea8ff", "#99000000", "#66000000", "#261d37", "#faf4ff", "#21192f", "#faf4ff", "#faf4ff", "#a07bff", "#1b1528", "#261d37", "#faf4ff");
     }
 }

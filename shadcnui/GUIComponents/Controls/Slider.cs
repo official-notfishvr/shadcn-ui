@@ -387,35 +387,11 @@ namespace shadcnui.GUIComponents.Controls
             GUI.DrawTexture(rect, thumbTex, ScaleMode.StretchToFill);
         }
 
-        private static Texture2D CreateCircleTexture(int size, Color color)
-        {
-            var texture = new Texture2D(size, size, TextureFormat.RGBA32, false);
-            texture.filterMode = FilterMode.Bilinear;
-            var pixels = new Color[size * size];
-
-            float center = (size - 1) / 2f;
-            float radius = size / 2f;
-
-            for (int y = 0; y < size; y++)
-            {
-                for (int x = 0; x < size; x++)
-                {
-                    float dx = x - center;
-                    float dy = y - center;
-                    float dist = Mathf.Sqrt(dx * dx + dy * dy);
-                    pixels[y * size + x] = dist <= radius ? color : Color.clear;
-                }
-            }
-
-            texture.SetPixels(pixels);
-            texture.Apply();
-            return texture;
-        }
-
         private static Texture2D CreateSimpleRoundedTexture(int width, int height, int radius, Color color)
         {
             var texture = new Texture2D(width, height, TextureFormat.RGBA32, false);
-            texture.filterMode = FilterMode.Bilinear;
+            texture.filterMode = FilterMode.Point;
+            texture.wrapMode = TextureWrapMode.Clamp;
             var pixels = new Color[width * height];
 
             for (int y = 0; y < height; y++)
@@ -448,7 +424,8 @@ namespace shadcnui.GUIComponents.Controls
         private static Texture2D CreateBorderedCircleTexture(int size, Color fillColor, Color borderColor)
         {
             var texture = new Texture2D(size, size, TextureFormat.RGBA32, false);
-            texture.filterMode = FilterMode.Bilinear;
+            texture.filterMode = FilterMode.Point;
+            texture.wrapMode = TextureWrapMode.Clamp;
             var pixels = new Color[size * size];
 
             float center = (size - 1) / 2f;

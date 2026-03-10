@@ -56,10 +56,6 @@ namespace shadcnui_Demo.Menu
 
         void OnGUI()
         {
-            // Todo: make the GUI auto do this
-            GUI.skin.horizontalScrollbar = GUIStyle.none;
-            GUI.skin.verticalScrollbar = GUIStyle.none;
-
             if (GUI.Button(new Rect(10, 10, 150, 30), "Open Demo Window"))
             {
                 showDemoWindow = !showDemoWindow;
