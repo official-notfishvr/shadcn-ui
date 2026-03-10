@@ -54,11 +54,8 @@ namespace shadcnui_examples.Examples
                     selectedTab = gui.Tabs(
                         tabNames,
                         selectedTab,
-                        index =>
-                        {
-                            selectedTab = index;
-                            gui.ShowToast($"Switched to {tabNames[index]} tab");
-                        }
+                        null,
+                        index => gui.ShowToast($"Switched to {tabNames[index]} tab")
                     );
 
                     gui.BeginTabContent();
@@ -85,7 +82,7 @@ namespace shadcnui_examples.Examples
                     gui.BeginHorizontalGroup();
 
                     gui.BeginVerticalGroup(GUILayout.Width(120));
-                    selectedVerticalTab = gui.VerticalTabs(new[] { "General", "Appearance", "Advanced" }, selectedVerticalTab, null, 100, 1, TabSide.Left);
+                    selectedVerticalTab = gui.VerticalTabs(new[] { "General", "Appearance", "Advanced" }, selectedVerticalTab, null, null, 100f, 1, TabSide.Left);
                     gui.EndVerticalGroup();
 
                     gui.BeginVerticalGroup();

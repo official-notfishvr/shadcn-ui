@@ -52,19 +52,19 @@ namespace shadcnui_examples.Examples
                         new ChartSeries("sales", "Sales", new Color(0.2f, 0.6f, 1f)) { Data = CreateDataPoints("sales", 120, 200, 150, 80, 70, 110, 130) },
                         new ChartSeries("revenue", "Revenue", new Color(0.3f, 0.8f, 0.4f)) { Data = CreateDataPoints("revenue", 100, 180, 140, 90, 60, 100, 120) },
                     };
-                    gui.Chart(barSeries, ChartType.Bar, new Vector2(500, 200));
+                    gui.Chart(new ChartConfig(barSeries, ChartType.Bar) { Size = new Vector2(500, 200) });
 
                     gui.AddSpace(20);
 
                     gui.Label("Line Chart", ControlVariant.Default);
                     var lineSeries = new List<ChartSeries> { new ChartSeries("visitors", "Visitors", new Color(0.9f, 0.4f, 0.4f)) { Data = CreateDataPoints("visitors", 30, 45, 35, 50, 40, 60, 55) } };
-                    gui.Chart(lineSeries, ChartType.Line, new Vector2(500, 150));
+                    gui.Chart(new ChartConfig(lineSeries, ChartType.Line) { Size = new Vector2(500, 150) });
 
                     gui.AddSpace(20);
 
                     gui.Label("Area Chart", ControlVariant.Default);
                     var areaSeries = new List<ChartSeries> { new ChartSeries("growth", "Growth", new Color(0.5f, 0.3f, 0.9f, 0.6f)) { Data = CreateDataPoints("growth", 20, 25, 35, 40, 45, 55, 65) } };
-                    gui.Chart(areaSeries, ChartType.Area, new Vector2(500, 150));
+                    gui.Chart(new ChartConfig(areaSeries, ChartType.Area) { Size = new Vector2(500, 150) });
 
                     gui.AddSpace(20);
 
@@ -76,7 +76,7 @@ namespace shadcnui_examples.Examples
                         new ChartSeries("catC", "Category C", new Color(0.9f, 0.4f, 0.4f)) { Data = CreateDataPoints("catC", 20) },
                         new ChartSeries("catD", "Category D", new Color(0.9f, 0.7f, 0.2f)) { Data = CreateDataPoints("catD", 20) },
                     };
-                    gui.Chart(pieSeries, ChartType.Pie, new Vector2(200, 200));
+                    gui.Chart(new ChartConfig(pieSeries, ChartType.Pie) { Size = new Vector2(200, 200) });
 
                     gui.EndVerticalGroup();
                 },

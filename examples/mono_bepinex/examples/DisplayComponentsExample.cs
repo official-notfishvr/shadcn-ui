@@ -66,7 +66,7 @@ namespace shadcnui_examples.Examples
                     gui.AddSpace(10);
 
                     gui.BeginHorizontalGroup();
-                    gui.PillBadge("Pill Badge");
+                    gui.RoundedBadge("Pill Badge", ControlVariant.Default, ControlSize.Default, DesignTokens.Radius.Full);
                     gui.AddSpace(5);
                     gui.RoundedBadge("Rounded", ControlVariant.Default, ControlSize.Default, 8f);
                     gui.AddSpace(5);

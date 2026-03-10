@@ -1,5 +1,6 @@
 using shadcnui.GUIComponents.Core.Base;
 using shadcnui.GUIComponents.Core.Styling;
+using shadcnui.GUIComponents.Core.Utils;
 using UnityEngine;
 
 namespace shadcnui_examples.Examples
@@ -62,23 +63,48 @@ namespace shadcnui_examples.Examples
                     gui.AddSpace(20);
 
                     gui.Label("Sortable Table", ControlVariant.Default);
-                    gui.SortableTable(headers, data, ref sortColumns, ref sortAscending, ControlVariant.Default, ControlSize.Default, (col, asc) => gui.ShowToast($"Sorted by column {col} {(asc ? "ascending" : "descending")}"));
+                    gui.Table(new TableConfig
+                    {
+                        Headers = headers,
+                        Data = data,
+                        SortColumns = sortColumns,
+                        SortAscending = sortAscending,
+                        OnSort = (col, asc) => gui.ShowToast($"Sorted by column {col} {(asc ? "ascending" : "descending")}")
+                    });
 
                     gui.AddSpace(20);
 
                     gui.Label("Selectable Table", ControlVariant.Default);
-                    gui.SelectableTable(headers, data, ref selectedRows, ControlVariant.Default, ControlSize.Default, (row, selected) => gui.ShowToast($"Row {row} {(selected ? "selected" : "deselected")}"));
+                    gui.Table(new TableConfig
+                    {
+                        Headers = headers,
+                        Data = data,
+                        SelectedRows = selectedRows,
+                        OnSelectionChange = (row, selected) => gui.ShowToast($"Row {row} {(selected ? "selected" : "deselected")}")
+                    });
 
                     gui.AddSpace(20);
 
                     gui.Label("Paginated Table (Page Size: 3)", ControlVariant.Default);
-                    gui.PaginatedTable(headers, data, ref currentPage, 3, ControlVariant.Default, ControlSize.Default, page => gui.ShowToast($"Page {page + 1}"));
+                    gui.Table(new TableConfig
+                    {
+                        Headers = headers,
+                        Data = data,
+                        CurrentPage = currentPage,
+                        PageSize = 3,
+                        OnPageChange = page => gui.ShowToast($"Page {page + 1}")
+                    });
 
                     gui.AddSpace(20);
 
                     gui.Label("Searchable Table", ControlVariant.Default);
                     searchQuery = gui.Input(searchQuery, "Search...");
-                    gui.SearchableTable(headers, data, ref searchQuery, ref filteredData, ControlVariant.Default, ControlSize.Default);
+                    gui.Table(new TableConfig
+                    {
+                        Headers = headers,
+                        Data = filteredData,
+                        SearchQuery = searchQuery
+                    });
 
                     gui.EndVerticalGroup();
                 },
