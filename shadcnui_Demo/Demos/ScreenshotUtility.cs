@@ -1,7 +1,4 @@
-#define Showcase
 #if MONO
-
-#if Showcase
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -12,43 +9,41 @@ using shadcnui.GUIComponents.Core.Base;
 using shadcnui.GUIComponents.Core.Styling;
 using shadcnui.GUIComponents.Core.Theming;
 using shadcnui.GUIComponents.Layout;
-using shadcnui.GUIComponents.Data;
 using UnityEngine;
 
 namespace shadcnui_Demo.Menu
 {
     public class ScreenshotUtility : MonoBehaviour
     {
-        private GUIHelper guiHelper;
-        private Rect controlRect = new Rect(20, 20, 450, 550);
-        private bool showControls = true;
-        private bool hideWhileCapturing = true;
+        private GUIHelper _gui;
+        private Rect _windowRect = new Rect(20, 20, 400, 600);
+        private Vector2 _scrollPos;
 
-        private string outputFolder = "Screenshots";
-        private bool useTimestamp = false;
-        private bool organizeByTheme = true;
-        private int padding = 0;
+        private bool _showWindow = true;
+        private bool _hideWhileCapturing = false;
+        private bool _openOverlaysBeforeCapture = false;
 
-        private bool isCapturing = false;
-        private int currentTabIndex = 0;
-        private int currentThemeIndex = 0;
-        private bool captureAllThemes = false;
-        private List<string> themesToCapture = new List<string>();
+        private string _outputFolder = "Screenshots";
+        private bool _useTimestamp = false;
+        private int _padding = 4;
+        private float _tabDelay = 0.4f;
+        private float _overlayDelay = 0.3f;
 
-        private float tabSwitchDelay = 0.5f;
-        private float menuOpenDelay = 0.3f;
-        private float nextCaptureTime = 0f;
+        private bool _isCapturing = false;
+        private int _currentTab = 0;
+        private int _currentTheme = 0;
+        private int _capturedCount = 0;
+        private int _totalCaptures = 0;
+        private string _status = "Ready";
+        private float _nextActionTime = 0f;
 
-        private MonoBehaviour activeDemo;
-        private string activeDemoName = "None";
-        private List<TabInfo> detectedTabs = new List<TabInfo>();
+        private List<DemoInfo> _detectedDemos = new List<DemoInfo>();
+        private DemoInfo _activeDemo;
+        private List<string> _themes = new List<string>();
+        private string _originalTheme;
+        private bool _captureAllThemes = false;
 
-        private string statusMessage = "Ready";
-        private int totalCaptures = 0;
-        private int capturedCount = 0;
-        private Vector2 scrollPosition;
-        private Vector2 tabListScroll;
-        private bool showTabList = false;
+        private CaptureMode _captureMode = CaptureMode.WindowOnly;
 
         private enum CaptureMode
         {
@@ -56,392 +51,410 @@ namespace shadcnui_Demo.Menu
             FullScreen,
         }
 
-        private CaptureMode captureMode = CaptureMode.WindowOnly;
-
-        private string originalTheme;
-
-        private class TabInfo
+        private class DemoInfo
         {
+            public MonoBehaviour Instance;
             public string Name;
-            public int Index;
+            public string[] TabNames;
+            public string TabField;
+            public string IndexField;
+            public string WindowRectField;
+            public string WindowVisibleField;
 
-            public TabInfo(string name, int index)
+            public DemoInfo(MonoBehaviour instance, string name, string[] tabs, string tabField, string indexField, string windowRectField, string windowVisibleField = null)
             {
+                Instance = instance;
                 Name = name;
-                Index = index;
+                TabNames = tabs;
+                TabField = tabField;
+                IndexField = indexField;
+                WindowRectField = windowRectField;
+                WindowVisibleField = windowVisibleField;
             }
         }
 
         void Start()
         {
-            guiHelper = new GUIHelper();
+            _gui = new GUIHelper();
             EnsureOutputFolder();
-            DetectActiveDemo();
+            DetectDemos();
         }
 
         void Update()
         {
-            if (activeDemo == null && Time.frameCount % 60 == 0)
-                DetectActiveDemo();
+            if (!_isCapturing && Time.frameCount % 120 == 0)
+                DetectDemos();
         }
 
         void OnGUI()
         {
-            bool shouldShow = showControls && !(hideWhileCapturing && isCapturing);
+            if (!_showWindow || (_hideWhileCapturing && _isCapturing))
+                return;
 
-            if (shouldShow)
-            {
-                controlRect = GUI.Window(200, controlRect, DrawControlWindow, "Screenshot Utility");
-            }
+            _windowRect = GUI.Window(9999, _windowRect, DrawWindow, "Screenshot Utility");
 
-            if (isCapturing && Time.time >= nextCaptureTime)
+            if (_isCapturing && Time.time >= _nextActionTime)
                 ProcessCaptureQueue();
         }
 
-        void DrawControlWindow(int windowID)
+        void DrawWindow(int id)
         {
-            guiHelper.UpdateGUI(showControls);
-            if (!guiHelper.BeginGUI())
+            _gui.UpdateGUI(_showWindow);
+            if (!_gui.BeginGUI())
             {
                 GUI.DragWindow();
                 return;
             }
 
-            scrollPosition = guiHelper.ScrollView(
-                scrollPosition,
+            _scrollPos = _gui.ScrollView(
+                _scrollPos,
                 () =>
                 {
-                    guiHelper.BeginVerticalGroup();
-                    GUILayout.Space(10);
-                    guiHelper.Label("Screenshot Utility", ControlVariant.Default);
-                    guiHelper.MutedLabel("Capture demo screenshots automatically");
-                    guiHelper.HorizontalSeparator();
-                    GUILayout.Space(5);
-                    DrawDemoInfo();
+                    DrawDemoSelector();
+                    _gui.HorizontalSeparator();
                     DrawSettings();
-                    DrawCaptureStatus();
-                    DrawCaptureButtons();
-                    DrawFooter();
+                    _gui.HorizontalSeparator();
+                    DrawStatus();
+                    _gui.HorizontalSeparator();
+                    DrawActions();
                 },
                 GUILayout.ExpandHeight(true)
             );
 
-            guiHelper.EndGUI();
+            _gui.EndGUI();
             GUI.DragWindow();
         }
 
-        private void DrawDemoInfo()
+        void DrawDemoSelector()
         {
-            guiHelper.BeginCard(400);
-            guiHelper.CardContent(() =>
+            _gui.Label("Target Demo", ControlVariant.Default);
+
+            if (_detectedDemos.Count == 0)
             {
-                guiHelper.BeginHorizontalGroup();
-                guiHelper.Label($"Demo: {activeDemoName}", ControlVariant.Default);
-                GUILayout.FlexibleSpace();
-                guiHelper.Label($"{detectedTabs.Count} tabs", ControlVariant.Muted);
-                guiHelper.EndHorizontalGroup();
-
-                if (activeDemo == null)
-                {
-                    GUILayout.Space(5);
-                    guiHelper.Label("No demo detected", ControlVariant.Destructive);
-                }
-                else if (detectedTabs.Count > 0)
-                {
-                    GUILayout.Space(5);
-                    if (guiHelper.Button(showTabList ? "Hide Tabs" : "Show Tabs", ControlVariant.Ghost, ControlSize.Small))
-                        showTabList = !showTabList;
-
-                    if (showTabList)
-                    {
-                        GUILayout.Space(5);
-                        tabListScroll = GUILayout.BeginScrollView(tabListScroll, GUILayout.Height(100));
-                        foreach (var tab in detectedTabs)
-                            guiHelper.MutedLabel($"  {tab.Index + 1}. {tab.Name}");
-                        GUILayout.EndScrollView();
-                    }
-                }
-            });
-            guiHelper.EndCard();
-
-            GUILayout.Space(5);
-            if (guiHelper.Button("Refresh Detection", ControlVariant.Outline, ControlSize.Small))
-                DetectActiveDemo();
-            GUILayout.Space(10);
-        }
-
-        private void DrawSettings()
-        {
-            guiHelper.HorizontalSeparator();
-            GUILayout.Space(5);
-            guiHelper.Label("Settings", ControlVariant.Default);
-            GUILayout.Space(5);
-
-            guiHelper.BeginHorizontalGroup();
-            guiHelper.Label("Folder:", ControlVariant.Muted);
-            outputFolder = GUILayout.TextField(outputFolder, GUILayout.Width(200));
-            guiHelper.EndHorizontalGroup();
-
-            GUILayout.Space(5);
-
-            guiHelper.BeginHorizontalGroup();
-            guiHelper.Label("Mode:", ControlVariant.Muted);
-            if (guiHelper.Button("Window", captureMode == CaptureMode.WindowOnly ? ControlVariant.Default : ControlVariant.Ghost, ControlSize.Small))
-                captureMode = CaptureMode.WindowOnly;
-            if (guiHelper.Button("Full Screen", captureMode == CaptureMode.FullScreen ? ControlVariant.Default : ControlVariant.Ghost, ControlSize.Small))
-                captureMode = CaptureMode.FullScreen;
-            guiHelper.EndHorizontalGroup();
-
-            if (captureMode == CaptureMode.WindowOnly)
-            {
-                GUILayout.Space(5);
-                guiHelper.BeginHorizontalGroup();
-                guiHelper.Label($"Padding: {padding}px", ControlVariant.Muted);
-                GUILayout.FlexibleSpace();
-                guiHelper.EndHorizontalGroup();
-                padding = Mathf.RoundToInt(GUILayout.HorizontalSlider(padding, 0, 50, GUILayout.Width(200)));
+                _gui.Label("No demos detected", ControlVariant.Destructive);
+                if (_gui.Button("Scan Again", ControlVariant.Outline, ControlSize.Small))
+                    DetectDemos();
+                return;
             }
 
-            GUILayout.Space(5);
+            for (int i = 0; i < _detectedDemos.Count; i++)
+            {
+                var demo = _detectedDemos[i];
+                bool isActive = _activeDemo == demo;
 
-            guiHelper.BeginHorizontalGroup();
-            guiHelper.Label($"Tab delay: {tabSwitchDelay:F1}s", ControlVariant.Muted);
-            GUILayout.FlexibleSpace();
-            guiHelper.EndHorizontalGroup();
-            tabSwitchDelay = GUILayout.HorizontalSlider(tabSwitchDelay, 0.2f, 2.0f, GUILayout.Width(200));
+                _gui.BeginHorizontalGroup();
+                if (_gui.Button(demo.Name, isActive ? ControlVariant.Default : ControlVariant.Ghost, ControlSize.Small))
+                    _activeDemo = demo;
 
-            guiHelper.BeginHorizontalGroup();
-            guiHelper.Label($"Menu delay: {menuOpenDelay:F1}s", ControlVariant.Muted);
-            GUILayout.FlexibleSpace();
-            guiHelper.EndHorizontalGroup();
-            menuOpenDelay = GUILayout.HorizontalSlider(menuOpenDelay, 0.1f, 1.0f, GUILayout.Width(200));
+                _gui.Label($"{demo.TabNames?.Length ?? 0} tabs", ControlVariant.Muted);
+                _gui.EndHorizontalGroup();
+            }
 
-            GUILayout.Space(5);
-
-            guiHelper.BeginHorizontalGroup();
-            hideWhileCapturing = guiHelper.Checkbox("Hide while capturing", hideWhileCapturing);
-            guiHelper.EndHorizontalGroup();
-
-            guiHelper.BeginHorizontalGroup();
-            useTimestamp = guiHelper.Checkbox("Add timestamp to filename", useTimestamp);
-            guiHelper.EndHorizontalGroup();
-
-            guiHelper.BeginHorizontalGroup();
-            organizeByTheme = guiHelper.Checkbox("Organize by theme folder", organizeByTheme);
-            guiHelper.EndHorizontalGroup();
-
-            GUILayout.Space(10);
+            if (_activeDemo != null)
+            {
+                _gui.MutedLabel($"Selected: {_activeDemo.Name}");
+                if (_activeDemo.TabNames != null && _activeDemo.TabNames.Length > 0)
+                {
+                    _gui.BeginHorizontalGroup();
+                    for (int i = 0; i < Math.Min(_activeDemo.TabNames.Length, 6); i++)
+                    {
+                        _gui.Badge(_activeDemo.TabNames[i], ControlVariant.Outline, ControlSize.Small);
+                    }
+                    if (_activeDemo.TabNames.Length > 6)
+                        _gui.Label($"+{_activeDemo.TabNames.Length - 6} more", ControlVariant.Muted);
+                    _gui.EndHorizontalGroup();
+                }
+            }
         }
 
-        private void DrawCaptureStatus()
+        void DrawSettings()
         {
-            guiHelper.HorizontalSeparator();
-            GUILayout.Space(5);
-            guiHelper.Label("Status", ControlVariant.Default);
-            GUILayout.Space(5);
+            _gui.Label("Settings", ControlVariant.Default);
 
-            if (isCapturing)
+            _gui.BeginHorizontalGroup();
+            _gui.Label("Folder:", ControlVariant.Muted);
+            _outputFolder = GUILayout.TextField(_outputFolder, GUILayout.Width(180));
+            _gui.EndHorizontalGroup();
+
+            _gui.BeginHorizontalGroup();
+            _gui.Label("Mode:", ControlVariant.Muted);
+            if (_gui.Button("Window", _captureMode == CaptureMode.WindowOnly ? ControlVariant.Default : ControlVariant.Ghost, ControlSize.Small))
+                _captureMode = CaptureMode.WindowOnly;
+            if (_gui.Button("Screen", _captureMode == CaptureMode.FullScreen ? ControlVariant.Default : ControlVariant.Ghost, ControlSize.Small))
+                _captureMode = CaptureMode.FullScreen;
+            _gui.EndHorizontalGroup();
+
+            if (_captureMode == CaptureMode.WindowOnly)
             {
-                string themeInfo = captureAllThemes ? $" (Theme {currentThemeIndex + 1}/{themesToCapture.Count})" : "";
-                guiHelper.Label($"Capturing: {capturedCount}/{totalCaptures}{themeInfo}", ControlVariant.Default);
-                guiHelper.Progress((float)capturedCount / Mathf.Max(1, totalCaptures), 380);
+                _gui.BeginHorizontalGroup();
+                _gui.Label($"Padding: {_padding}px", ControlVariant.Muted);
+                GUILayout.FlexibleSpace();
+                _gui.EndHorizontalGroup();
+                _padding = Mathf.RoundToInt(GUILayout.HorizontalSlider(_padding, 0, 50, GUILayout.Width(200)));
+            }
 
-                GUILayout.Space(5);
-                if (currentTabIndex < detectedTabs.Count)
+            _gui.BeginHorizontalGroup();
+            _gui.Label($"Tab Delay: {_tabDelay:F1}s", ControlVariant.Muted);
+            GUILayout.FlexibleSpace();
+            _gui.EndHorizontalGroup();
+            _tabDelay = GUILayout.HorizontalSlider(_tabDelay, 0.1f, 1.0f, GUILayout.Width(200));
+
+            _gui.BeginHorizontalGroup();
+            _gui.Label($"Overlay Delay: {_overlayDelay:F1}s", ControlVariant.Muted);
+            GUILayout.FlexibleSpace();
+            _gui.EndHorizontalGroup();
+            _overlayDelay = GUILayout.HorizontalSlider(_overlayDelay, 0.1f, 1.0f, GUILayout.Width(200));
+
+            _hideWhileCapturing = _gui.Checkbox("Hide utility while capturing", _hideWhileCapturing);
+            _openOverlaysBeforeCapture = _gui.Checkbox("Open dialogs/dropdowns before capture", _openOverlaysBeforeCapture);
+            _useTimestamp = _gui.Checkbox("Add timestamp to filenames", _useTimestamp);
+        }
+
+        void DrawStatus()
+        {
+            _gui.Label("Status", ControlVariant.Default);
+
+            if (_isCapturing)
+            {
+                string themeInfo = _captureAllThemes ? $" (Theme {_currentTheme + 1}/{_themes.Count})" : "";
+                _gui.Label($"Progress: {_capturedCount}/{_totalCaptures}{themeInfo}", ControlVariant.Default);
+                _gui.Progress((float)_capturedCount / Mathf.Max(1, _totalCaptures), 360);
+
+                if (_activeDemo != null && _currentTab < (_activeDemo.TabNames?.Length ?? 0))
                 {
-                    string currentTheme = captureAllThemes && currentThemeIndex < themesToCapture.Count ? themesToCapture[currentThemeIndex] : ThemeManager.Instance.CurrentTheme?.Name ?? "Unknown";
-                    guiHelper.MutedLabel($"Current: {detectedTabs[currentTabIndex].Name} ({currentTheme})");
+                    string themeName = _captureAllThemes && _currentTheme < _themes.Count ? _themes[_currentTheme] : ThemeManager.Instance.CurrentTheme?.Name ?? "Default";
+                    _gui.MutedLabel($"Capturing: {_activeDemo.TabNames[_currentTab]} ({themeName})");
                 }
             }
             else
             {
-                guiHelper.Label(statusMessage, ControlVariant.Muted);
+                _gui.Label(_status, ControlVariant.Muted);
             }
-
-            GUILayout.Space(10);
         }
 
-        private void DrawCaptureButtons()
+        void DrawActions()
         {
-            guiHelper.HorizontalSeparator();
-            GUILayout.Space(5);
+            bool canCapture = !_isCapturing && _activeDemo != null && (_activeDemo.TabNames?.Length ?? 0) > 0;
 
-            bool canCapture = !isCapturing && activeDemo != null && detectedTabs.Count > 0;
-
-            if (isCapturing)
+            if (_isCapturing)
             {
-                if (guiHelper.Button("Stop Capture", ControlVariant.Destructive, ControlSize.Default))
-                    StopCaptureSequence();
+                if (_gui.Button("Stop Capture", ControlVariant.Destructive, ControlSize.Default))
+                    StopCapture();
             }
             else
             {
                 GUI.enabled = canCapture;
 
-                if (guiHelper.Button("Capture Current Tab", ControlVariant.Secondary, ControlSize.Default))
-                    CaptureSingleTab();
+                if (_gui.Button("Capture Current Tab", ControlVariant.Secondary, ControlSize.Default))
+                    CaptureSingle();
 
                 GUILayout.Space(5);
 
-                if (guiHelper.Button("Capture All Tabs", ControlVariant.Default, ControlSize.Default))
-                    StartCaptureSequence(false);
+                if (_gui.Button("Capture All Tabs", ControlVariant.Default, ControlSize.Default))
+                    StartCapture(false);
 
                 GUILayout.Space(5);
 
                 int themeCount = ThemeManager.Instance.Themes?.Count ?? 0;
-                if (guiHelper.Button($"Capture All Themes ({themeCount})", ControlVariant.Default, ControlSize.Default))
-                    StartCaptureSequence(true);
+                if (_gui.Button($"All Tabs & Themes ({themeCount})", ControlVariant.Default, ControlSize.Default))
+                    StartCapture(true);
 
                 GUI.enabled = true;
             }
 
             GUILayout.Space(5);
 
-            if (guiHelper.Button("Open Output Folder", ControlVariant.Outline, ControlSize.Small))
+            _gui.BeginHorizontalGroup();
+            if (_gui.Button("Open Folder", ControlVariant.Outline, ControlSize.Small))
                 OpenOutputFolder();
-
-            GUILayout.Space(10);
-        }
-
-        private void DrawFooter()
-        {
-            guiHelper.BeginHorizontalGroup();
             GUILayout.FlexibleSpace();
-            if (guiHelper.Button("Close", ControlVariant.Ghost, ControlSize.Small))
-                showControls = false;
-            guiHelper.EndHorizontalGroup();
-            GUILayout.EndVertical();
+            if (_gui.Button("Close", ControlVariant.Ghost, ControlSize.Small))
+                _showWindow = false;
+            _gui.EndHorizontalGroup();
         }
 
-        private void DetectActiveDemo()
+        void DetectDemos()
         {
-            activeDemo = null;
-            detectedTabs.Clear();
-            activeDemoName = "None";
+            _detectedDemos.Clear();
 
-            var demoTypes = new (Type type, string name, string tabsField, string currentField)[] { (typeof(FullDemo), "FullDemo", "demoTabs", "currentDemoTab"), (typeof(ComponentShowcase), "ComponentShowcase", "demoTabs", "currentDemoTab") };
+            DetectDemo<FullDemo>("FullDemo", "_tabs", "_activeTab", "_windowRect");
+            DetectDemo<FullDemo_old>("FullDemo_old", "demoTabs", "currentDemoTab", "windowRect", "showDemoWindow");
 
-            foreach (var (type, name, tabsField, currentField) in demoTypes)
+            if (_activeDemo == null || (_activeDemo.Instance == null && _detectedDemos.Count > 0))
+                _activeDemo = _detectedDemos.FirstOrDefault();
+
+            _status = _detectedDemos.Count > 0 ? $"Found {_detectedDemos.Count} demo(s)" : "No demos detected";
+        }
+
+        void DetectDemo<T>(string name, string tabField, string indexField, string windowRectField, string windowVisibleField = null) where T : MonoBehaviour
+        {
+            var instance = FindFirstObjectByType<T>();
+            if (instance == null) return;
+
+            string[] tabNames = ExtractTabNames(instance, tabField);
+            var demo = new DemoInfo(instance, name, tabNames, tabField, indexField, windowRectField, windowVisibleField);
+            _detectedDemos.Add(demo);
+        }
+
+        string[] ExtractTabNames(MonoBehaviour instance, string tabFieldName)
+        {
+            if (instance == null) return Array.Empty<string>();
+
+            FieldInfo field = instance.GetType().GetField(tabFieldName, BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Instance);
+            if (field == null) return Array.Empty<string>();
+
+            object value = field.GetValue(instance);
+
+            if (value is string[] strArray)
+                return strArray;
+
+            if (value is Array array)
             {
-                var demo = FindFirstObjectByType(type) as MonoBehaviour;
-                if (demo != null)
+                var names = new List<string>();
+                for (int i = 0; i < array.Length; i++)
                 {
-                    activeDemo = demo;
-                    activeDemoName = name;
-                    ExtractTabs(demo, tabsField);
-                    statusMessage = $"Found {name} with {detectedTabs.Count} tabs";
-                    return;
+                    object item = array.GetValue(i);
+                    if (item == null) continue;
+
+                    PropertyInfo nameProp = item.GetType().GetProperty("Name");
+                    if (nameProp != null)
+                    {
+                        object nameValue = nameProp.GetValue(item);
+                        if (nameValue != null)
+                            names.Add(nameValue.ToString());
+                    }
+                    else
+                    {
+                        FieldInfo nameField = item.GetType().GetField("Name");
+                        if (nameField != null)
+                        {
+                            object nameValue = nameField.GetValue(item);
+                            if (nameValue != null)
+                                names.Add(nameValue.ToString());
+                        }
+                    }
                 }
+                return names.ToArray();
             }
 
-            statusMessage = "No demo detected";
+            return Array.Empty<string>();
         }
 
-        private void ExtractTabs(MonoBehaviour demo, string tabsFieldName)
+        void StartCapture(bool allThemes)
         {
-            detectedTabs.Clear();
-
-            var field = demo.GetType().GetField(tabsFieldName, BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Public);
-            if (field == null)
-                return;
-
-            var tabs = field.GetValue(demo) as TabConfig[];
-            if (tabs == null)
-                return;
-
-            for (int i = 0; i < tabs.Length; i++)
-                detectedTabs.Add(new TabInfo(tabs[i].Name, i));
-        }
-
-        private void StartCaptureSequence(bool allThemes)
-        {
-            if (activeDemo == null || detectedTabs.Count == 0)
+            if (_activeDemo == null || (_activeDemo.TabNames?.Length ?? 0) == 0)
             {
-                statusMessage = "No demo or tabs to capture";
+                _status = "No demo or tabs to capture";
                 return;
             }
 
             EnsureOutputFolder();
 
-            captureAllThemes = allThemes;
-            currentTabIndex = 0;
-            currentThemeIndex = 0;
-            capturedCount = 0;
-            isCapturing = true;
+            _captureAllThemes = allThemes;
+            _currentTab = 0;
+            _currentTheme = 0;
+            _capturedCount = 0;
+            _isCapturing = true;
 
             if (allThemes)
             {
-                themesToCapture = ThemeManager.Instance.Themes.Keys.ToList();
-                totalCaptures = detectedTabs.Count * themesToCapture.Count;
-                originalTheme = ThemeManager.Instance.CurrentTheme?.Name ?? "Dark";
-                ThemeManager.Instance.SetTheme(themesToCapture[0]);
+                _themes = ThemeManager.Instance.Themes?.Keys?.ToList() ?? new List<string>();
+                _totalCaptures = (_activeDemo.TabNames?.Length ?? 0) * _themes.Count;
+                _originalTheme = ThemeManager.Instance.CurrentTheme?.Name ?? "Dark";
+                if (_themes.Count > 0)
+                    ThemeManager.Instance.SetTheme(_themes[0]);
             }
             else
             {
-                themesToCapture.Clear();
-                totalCaptures = detectedTabs.Count;
+                _themes.Clear();
+                _totalCaptures = _activeDemo.TabNames?.Length ?? 0;
             }
 
-            nextCaptureTime = Time.time + tabSwitchDelay;
-            statusMessage = "Starting capture...";
+            _nextActionTime = Time.time + _tabDelay;
+            _status = "Starting capture...";
+
+            EnsureDemoWindowVisible();
         }
 
-        private void StopCaptureSequence()
+        void StopCapture()
         {
-            isCapturing = false;
-            statusMessage = $"Stopped. Captured {capturedCount}/{totalCaptures}";
+            _isCapturing = false;
+            _status = $"Stopped. Captured {_capturedCount}/{_totalCaptures}";
 
-            if (captureAllThemes && !string.IsNullOrEmpty(originalTheme))
-                ThemeManager.Instance.SetTheme(originalTheme);
+            if (_captureAllThemes && !string.IsNullOrEmpty(_originalTheme))
+                ThemeManager.Instance.SetTheme(_originalTheme);
         }
 
-        private void ProcessCaptureQueue()
+        void ProcessCaptureQueue()
         {
-            if (currentTabIndex >= detectedTabs.Count)
+            if (_activeDemo == null || _activeDemo.Instance == null)
             {
-                if (captureAllThemes && currentThemeIndex + 1 < themesToCapture.Count)
+                StopCapture();
+                return;
+            }
+
+            int tabCount = _activeDemo.TabNames?.Length ?? 0;
+
+            if (_currentTab >= tabCount)
+            {
+                if (_captureAllThemes && _currentTheme + 1 < _themes.Count)
                 {
-                    currentThemeIndex++;
-                    currentTabIndex = 0;
-                    ThemeManager.Instance.SetTheme(themesToCapture[currentThemeIndex]);
-                    nextCaptureTime = Time.time + tabSwitchDelay;
+                    _currentTheme++;
+                    _currentTab = 0;
+                    ThemeManager.Instance.SetTheme(_themes[_currentTheme]);
+                    _nextActionTime = Time.time + _tabDelay;
                     return;
                 }
 
-                isCapturing = false;
-                statusMessage = $"Complete! {capturedCount} screenshots saved";
+                _isCapturing = false;
+                _status = $"Complete! {_capturedCount} screenshots saved";
 
-                if (captureAllThemes && !string.IsNullOrEmpty(originalTheme))
-                    ThemeManager.Instance.SetTheme(originalTheme);
+                if (_captureAllThemes && !string.IsNullOrEmpty(_originalTheme))
+                    ThemeManager.Instance.SetTheme(_originalTheme);
 
                 return;
             }
 
-            SwitchToTab(currentTabIndex);
-            StartCoroutine(CaptureAfterDelay());
-            nextCaptureTime = Time.time + tabSwitchDelay + menuOpenDelay + 0.5f;
+            SetTabIndex(_currentTab);
+            StartCoroutine(CaptureWithDelay());
+            _nextActionTime = Time.time + _tabDelay + _overlayDelay + 0.3f;
         }
 
-        private void SwitchToTab(int tabIndex)
+        void SetTabIndex(int index)
         {
-            if (activeDemo == null)
-                return;
+            if (_activeDemo?.Instance == null) return;
 
-            string fieldName = activeDemoName == "FullDemo" ? "currentDemoTab" : "currentTab";
-            var field = activeDemo.GetType().GetField(fieldName, BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Public);
-
-            if (field != null)
-                field.SetValue(activeDemo, tabIndex);
+            FieldInfo field = _activeDemo.Instance.GetType().GetField(_activeDemo.IndexField, BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Instance);
+            field?.SetValue(_activeDemo.Instance, index);
         }
 
-        private void OpenAllMenus()
+        void EnsureDemoWindowVisible()
         {
-            if (activeDemo == null)
-                return;
+            if (_activeDemo?.Instance == null || string.IsNullOrEmpty(_activeDemo.WindowVisibleField)) return;
 
-            var guiHelperField = activeDemo.GetType().GetField("guiHelper", BindingFlags.NonPublic | BindingFlags.Instance);
-            object helper = guiHelperField?.GetValue(activeDemo);
+            FieldInfo field = _activeDemo.Instance.GetType().GetField(_activeDemo.WindowVisibleField, BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Instance);
+            if (field?.FieldType == typeof(bool))
+                field.SetValue(_activeDemo.Instance, true);
+        }
 
-            SetFieldValue(activeDemo, "dropdownOpen", true);
+        void OpenOverlays()
+        {
+            if (_activeDemo?.Instance == null || !_openOverlaysBeforeCapture) return;
+
+            SetFieldValue(_activeDemo.Instance, "dropdownOpen", true);
+            SetFieldValue(_activeDemo.Instance, "_showDropdown", true);
+            SetFieldValue(_activeDemo.Instance, "_showDialog", true);
+            SetFieldValue(_activeDemo.Instance, "_showSelect", true);
+
+            InvokeMethod(_activeDemo.Instance, "OpenSelect");
+            InvokeMethod(_activeDemo.Instance, "OpenPopover");
+            InvokeMethod(_activeDemo.Instance, "OpenDialog", "std_dlg");
+
+            FieldInfo helperField = _activeDemo.Instance.GetType().GetField("guiHelper", BindingFlags.NonPublic | BindingFlags.Instance);
+            object helper = helperField?.GetValue(_activeDemo.Instance);
+
+            helperField = _activeDemo.Instance.GetType().GetField("_gui", BindingFlags.NonPublic | BindingFlags.Instance);
+            helper = helper ?? helperField?.GetValue(_activeDemo.Instance);
 
             if (helper != null)
             {
@@ -451,101 +464,195 @@ namespace shadcnui_Demo.Menu
             }
         }
 
-        private void SetFieldValue(object obj, string fieldName, object value)
+        void SetFieldValue(object obj, string fieldName, object value)
         {
-            var field = obj?.GetType().GetField(fieldName, BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Public);
+            if (obj == null) return;
+            FieldInfo field = obj.GetType().GetField(fieldName, BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Instance);
             field?.SetValue(obj, value);
         }
 
-        private void InvokeMethod(object obj, string methodName, params object[] args)
+        void InvokeMethod(object obj, string methodName, params object[] args)
         {
-            var method = obj?.GetType().GetMethod(methodName, BindingFlags.Public | BindingFlags.Instance);
+            if (obj == null) return;
+            MethodInfo method = obj.GetType().GetMethod(methodName, BindingFlags.Public | BindingFlags.Instance | BindingFlags.NonPublic);
             method?.Invoke(obj, args.Length > 0 ? args : null);
         }
 
-        private IEnumerator CaptureAfterDelay()
+        IEnumerator CaptureWithDelay()
         {
             yield return new WaitForEndOfFrame();
             yield return new WaitForSeconds(0.1f);
 
-            OpenAllMenus();
+            OpenOverlays();
 
-            yield return new WaitForSeconds(menuOpenDelay);
+            yield return new WaitForSeconds(_overlayDelay);
             yield return new WaitForEndOfFrame();
+            yield return new WaitForSeconds(0.05f);
 
-            string tabName = detectedTabs[currentTabIndex].Name;
-            string themeName = captureAllThemes && currentThemeIndex < themesToCapture.Count ? themesToCapture[currentThemeIndex] : ThemeManager.Instance.CurrentTheme?.Name ?? "Default";
+            string tabName = _currentTab < (_activeDemo.TabNames?.Length ?? 0) ? _activeDemo.TabNames[_currentTab] : "Unknown";
+            string themeName = _captureAllThemes && _currentTheme < _themes.Count ? _themes[_currentTheme] : ThemeManager.Instance.CurrentTheme?.Name ?? "Default";
 
-            string fileName = BuildFileName(tabName, themeName, currentTabIndex + 1);
-            string fullPath = BuildFilePath(fileName, themeName);
+            string fileName = BuildFileName(tabName, themeName, _currentTab + 1);
+            string filePath = BuildFilePath(fileName, themeName);
 
-            EnsureDirectory(Path.GetDirectoryName(fullPath));
+            EnsureDirectory(Path.GetDirectoryName(filePath));
 
             Rect captureRect = GetCaptureRect();
             if (captureRect.width > 0 && captureRect.height > 0)
             {
-                CaptureArea(captureRect, fullPath);
-                capturedCount++;
-                statusMessage = $"Captured: {tabName}";
+                CaptureRegion(captureRect, filePath);
+                _capturedCount++;
+                _status = $"Captured: {tabName}";
+            }
+            else
+            {
+                _status = $"Bad rect for {tabName}: {captureRect}";
             }
 
-            currentTabIndex++;
+            _currentTab++;
+            yield break;
         }
 
-        private string BuildFileName(string tabName, string themeName, int index)
+        void CaptureSingle()
+        {
+            if (_activeDemo == null)
+            {
+                _status = "ERROR: _activeDemo is null";
+                return;
+            }
+            if (_activeDemo.Instance == null)
+            {
+                _status = "ERROR: _activeDemo.Instance is null";
+                return;
+            }
+            if (_activeDemo.TabNames == null || _activeDemo.TabNames.Length == 0)
+            {
+                _status = "ERROR: No tabs detected";
+                return;
+            }
+
+            _status = "Starting capture coroutine...";
+            StartCoroutine(CaptureSingleCoroutine());
+        }
+
+        IEnumerator CaptureSingleCoroutine()
+        {
+            EnsureOutputFolder();
+            EnsureDemoWindowVisible();
+
+            int currentIndex = GetTabIndex();
+            string tabName = currentIndex >= 0 && currentIndex < (_activeDemo.TabNames?.Length ?? 0) ? _activeDemo.TabNames[currentIndex] : "Unknown";
+            string themeName = ThemeManager.Instance.CurrentTheme?.Name ?? "Default";
+
+            _status = $"Capturing {tabName}...";
+
+            bool wasVisible = _showWindow;
+            if (_hideWhileCapturing)
+                _showWindow = false;
+
+            yield return new WaitForEndOfFrame();
+            yield return new WaitForSeconds(0.1f);
+
+            OpenOverlays();
+
+            yield return new WaitForSeconds(_overlayDelay);
+            yield return new WaitForEndOfFrame();
+            yield return new WaitForSeconds(0.05f);
+
+            string fileName = BuildFileName(tabName, themeName, currentIndex + 1);
+            string filePath = BuildFilePath(fileName, themeName);
+
+            EnsureDirectory(Path.GetDirectoryName(filePath));
+
+            Rect captureRect = GetCaptureRect();
+
+            if (captureRect.width > 0 && captureRect.height > 0)
+            {
+                CaptureRegion(captureRect, filePath);
+                _status = $"Saved: {fileName}";
+            }
+            else
+            {
+                _status = $"Bad capture rect: {captureRect}";
+            }
+
+            if (_hideWhileCapturing)
+                _showWindow = wasVisible;
+
+            yield break;
+        }
+
+        int GetTabIndex()
+        {
+            if (_activeDemo?.Instance == null) return 0;
+
+            FieldInfo field = _activeDemo.Instance.GetType().GetField(_activeDemo.IndexField, BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Instance);
+            if (field == null) return 0;
+
+            object value = field.GetValue(_activeDemo.Instance);
+            return value is int i ? i : 0;
+        }
+
+        string BuildFileName(string tabName, string themeName, int index)
         {
             string sanitizedTab = SanitizeFileName(tabName);
-            string timestamp = useTimestamp ? $"_{DateTime.Now:yyyyMMdd_HHmmss}" : "";
+            string timestamp = _useTimestamp ? $"_{DateTime.Now:yyyyMMdd_HHmmss}" : "";
 
-            if (captureAllThemes)
-                return $"{activeDemoName}_{themeName}_{index:D2}_{sanitizedTab}{timestamp}.png";
+            if (_captureAllThemes)
+                return $"{_activeDemo.Name}_{themeName}_{index:D2}_{sanitizedTab}{timestamp}.png";
             else
-                return $"{activeDemoName}_{index:D2}_{sanitizedTab}{timestamp}.png";
+                return $"{_activeDemo.Name}_{index:D2}_{sanitizedTab}{timestamp}.png";
         }
 
-        private string BuildFilePath(string fileName, string themeName)
+        string BuildFilePath(string fileName, string themeName)
         {
-            string basePath = Path.Combine(Application.dataPath, "..", outputFolder);
-
-            if (captureAllThemes && organizeByTheme)
-                return Path.Combine(basePath, themeName, fileName);
-            else
-                return Path.Combine(basePath, fileName);
+            string basePath = Path.Combine(Application.dataPath, "..", _outputFolder);
+            return Path.Combine(basePath, fileName);
         }
 
-        private Rect GetCaptureRect()
+        Rect GetCaptureRect()
         {
-            if (captureMode == CaptureMode.FullScreen)
+            if (_captureMode == CaptureMode.FullScreen)
                 return new Rect(0, 0, Screen.width, Screen.height);
 
-            var field = activeDemo?.GetType().GetField("windowRect", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Public);
-            if (field == null)
-                return new Rect(0, 0, Screen.width, Screen.height);
-
-            Rect windowRect = (Rect)field.GetValue(activeDemo);
-
-            if (padding > 0)
+            if (_activeDemo?.Instance == null)
             {
-                windowRect.x -= padding;
-                windowRect.y -= padding;
-                windowRect.width += padding * 2;
-                windowRect.height += padding * 2;
+                _status = "ERROR: No demo instance for capture rect";
+                return new Rect(0, 0, Screen.width, Screen.height);
             }
 
-            return windowRect;
+            FieldInfo field = _activeDemo.Instance.GetType().GetField(_activeDemo.WindowRectField, BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Instance);
+            if (field == null)
+            {
+                _status = $"ERROR: Field '{_activeDemo.WindowRectField}' not found on {_activeDemo.Name}";
+                return new Rect(0, 0, Screen.width, Screen.height);
+            }
+
+            if (field.FieldType != typeof(Rect))
+            {
+                _status = $"ERROR: Field '{_activeDemo.WindowRectField}' is not a Rect";
+                return new Rect(0, 0, Screen.width, Screen.height);
+            }
+
+            Rect rect = (Rect)field.GetValue(_activeDemo.Instance);
+
+            if (_padding > 0)
+            {
+                rect.x -= _padding;
+                rect.y -= _padding;
+                rect.width += _padding * 2;
+                rect.height += _padding * 2;
+            }
+
+            return rect;
         }
 
-        private void CaptureArea(Rect rect, string filePath)
+        void CaptureRegion(Rect rect, string filePath)
         {
-            int x = Mathf.FloorToInt(rect.x);
-            int y = Mathf.FloorToInt(Screen.height - rect.y - rect.height);
-            int width = Mathf.FloorToInt(rect.width);
-            int height = Mathf.FloorToInt(rect.height);
-
-            x = Mathf.Max(0, x);
-            y = Mathf.Max(0, y);
-            width = Mathf.Min(width, Screen.width - x);
-            height = Mathf.Min(height, Screen.height - y);
+            int x = Mathf.FloorToInt(Mathf.Max(0, rect.x));
+            int y = Mathf.FloorToInt(Mathf.Max(0, Screen.height - rect.y - rect.height));
+            int width = Mathf.FloorToInt(Mathf.Min(rect.width, Screen.width - x));
+            int height = Mathf.FloorToInt(Mathf.Min(rect.height, Screen.height - y));
 
             if (width <= 0 || height <= 0)
                 return;
@@ -556,100 +663,44 @@ namespace shadcnui_Demo.Menu
 
             byte[] bytes = screenshot.EncodeToPNG();
             File.WriteAllBytes(filePath, bytes);
-
             Destroy(screenshot);
         }
 
-        private void CaptureSingleTab()
+        void EnsureOutputFolder()
         {
-            if (activeDemo == null || detectedTabs.Count == 0)
-            {
-                statusMessage = "No demo or tabs detected";
-                return;
-            }
-
-            StartCoroutine(CaptureSingleTabCoroutine());
+            string path = Path.Combine(Application.dataPath, "..", _outputFolder);
+            EnsureDirectory(path);
         }
 
-        private IEnumerator CaptureSingleTabCoroutine()
-        {
-            EnsureOutputFolder();
-
-            string fieldName = activeDemoName == "FullDemo" ? "currentDemoTab" : "currentTab";
-            var field = activeDemo.GetType().GetField(fieldName, BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Public);
-
-            int tabIndex = field != null ? (int)field.GetValue(activeDemo) : 0;
-            string tabName = tabIndex < detectedTabs.Count ? detectedTabs[tabIndex].Name : "Unknown";
-            string themeName = ThemeManager.Instance.CurrentTheme?.Name ?? "Default";
-
-            bool wasVisible = showControls;
-            if (hideWhileCapturing)
-                showControls = false;
-
-            yield return new WaitForEndOfFrame();
-            yield return new WaitForSeconds(0.1f);
-
-            OpenAllMenus();
-
-            yield return new WaitForSeconds(menuOpenDelay);
-            yield return new WaitForEndOfFrame();
-
-            string fileName = BuildFileName(tabName, themeName, tabIndex + 1);
-            string fullPath = BuildFilePath(fileName, themeName);
-
-            EnsureDirectory(Path.GetDirectoryName(fullPath));
-
-            Rect captureRect = GetCaptureRect();
-            if (captureRect.width > 0 && captureRect.height > 0)
-            {
-                CaptureArea(captureRect, fullPath);
-                statusMessage = $"Captured: {tabName}";
-            }
-            else
-            {
-                statusMessage = "Failed to get capture area";
-            }
-
-            if (hideWhileCapturing)
-                showControls = wasVisible;
-        }
-
-        private void EnsureOutputFolder()
-        {
-            string fullPath = Path.Combine(Application.dataPath, "..", outputFolder);
-            EnsureDirectory(fullPath);
-        }
-
-        private void EnsureDirectory(string path)
+        void EnsureDirectory(string path)
         {
             if (!string.IsNullOrEmpty(path) && !Directory.Exists(path))
                 Directory.CreateDirectory(path);
         }
 
-        private string SanitizeFileName(string fileName)
+        string SanitizeFileName(string name)
         {
+            if (string.IsNullOrEmpty(name)) return "unnamed";
             foreach (char c in Path.GetInvalidFileNameChars())
-                fileName = fileName.Replace(c, '_');
-            return fileName.Replace(' ', '_');
+                name = name.Replace(c, '_');
+            return name.Replace(' ', '_');
         }
 
-        private void OpenOutputFolder()
+        void OpenOutputFolder()
         {
-            string fullPath = Path.Combine(Application.dataPath, "..", outputFolder);
-
-            if (Directory.Exists(fullPath))
-                System.Diagnostics.Process.Start(fullPath);
+            string path = Path.Combine(Application.dataPath, "..", _outputFolder);
+            if (Directory.Exists(path))
+                System.Diagnostics.Process.Start(path);
             else
-                statusMessage = "Output folder doesn't exist yet";
+                _status = "Folder doesn't exist yet";
         }
 
-        private new UnityEngine.Object FindFirstObjectByType(Type type)
+        T FindFirstObjectByType<T>() where T : MonoBehaviour
         {
 #pragma warning disable CS0618
-            return FindObjectOfType(type);
+            return UnityEngine.Object.FindObjectOfType<T>();
 #pragma warning restore CS0618
         }
     }
 }
-#endif
 #endif
