@@ -32,7 +32,6 @@ namespace shadcnui.GUIComponents.Core.Base
         private readonly List<string> _pendingClose = new();
         private int _nextWindowId = 50000;
         private bool _drawing;
-        private LayerState _currentLayer;
 
         private LayerManager() { }
 
@@ -147,11 +146,9 @@ namespace shadcnui.GUIComponents.Core.Base
 
                 var rect = ClampToScreen(new Rect(layer.Position.x, layer.Position.y, layer.Width, layer.Height));
                 layer.Position = rect.position;
-                _currentLayer = layer;
                 GUI.Window(layer.WindowId, rect, (GUI.WindowFunction)DrawWindowCallback, string.Empty, GUIStyle.none);
                 topWindowId = layer.WindowId;
             }
-            _currentLayer = null;
 
             if (topWindowId >= 0)
                 GUI.BringWindowToFront(topWindowId);
@@ -164,10 +161,16 @@ namespace shadcnui.GUIComponents.Core.Base
                 CloseNow(id);
         }
 
-        private void DrawWindowCallback(int id)
+        private void DrawWindowCallback(int windowId)
         {
-            if (_layers.TryGetValue(_currentLayer?.Id ?? string.Empty, out var layer))
-                DrawLayer(layer);
+            foreach (var layer in _layers.Values)
+            {
+                if (layer.WindowId == windowId)
+                {
+                    DrawLayer(layer);
+                    return;
+                }
+            }
         }
 
         private void DrawLayer(LayerState layer)
@@ -194,26 +197,6 @@ namespace shadcnui.GUIComponents.Core.Base
             GUI.DrawTexture(new Rect(rect.x, rect.y, border, rect.height), Texture2D.whiteTexture);
             GUI.DrawTexture(new Rect(rect.xMax - border, rect.y, border, rect.height), Texture2D.whiteTexture);
             GUI.color = previous;
-        }
-
-        private void DrawOverlay()
-        {
-            var theme = ThemeManager.Instance.CurrentTheme;
-            var previous = GUI.color;
-            GUI.color = theme.Overlay;
-            GUI.DrawTexture(new Rect(0f, 0f, Screen.width, Screen.height), Texture2D.whiteTexture);
-            GUI.color = previous;
-        }
-
-        private bool NeedsOverlay()
-        {
-            foreach (var id in _drawOrder)
-            {
-                if (_layers.TryGetValue(id, out var layer) && layer.ShowOverlay)
-                    return true;
-            }
-
-            return false;
         }
 
         private void HandleOutsideClick(List<string> order)
