@@ -8,7 +8,7 @@ on:
   release:
     types: [published]
   schedule:
-    - cron: '0 0 * * *'
+    - cron: "0 0 * * *"
   workflow_dispatch:
 
 env:
@@ -48,7 +48,8 @@ jobs:
     if: github.event_name != 'schedule'
     strategy:
       matrix:
-        configuration: [IL2CPP_Melonloader, IL2CPP_BepInEx, Mono_Melonloader, Mono_BepInEx]
+        configuration:
+          [IL2CPP_Melonloader, IL2CPP_BepInEx, Mono_Melonloader, Mono_BepInEx]
       fail-fast: false
 
     steps:
@@ -73,7 +74,7 @@ jobs:
         if: always()
         with:
           name: shadcnui-build-${{ matrix.configuration }}
-          path: shadcnui/bin/${{ matrix.configuration }}/shadcnui.dll
+          path: shadcnui/bin/${{ matrix.configuration }}/netstandard2.1/shadcnui.dll
           if-no-files-found: error
           retention-days: 30
 
@@ -92,7 +93,8 @@ jobs:
     if: github.event_name == 'release' && github.event.action == 'published'
     strategy:
       matrix:
-        configuration: [IL2CPP_Melonloader, IL2CPP_BepInEx, Mono_Melonloader, Mono_BepInEx]
+        configuration:
+          [IL2CPP_Melonloader, IL2CPP_BepInEx, Mono_Melonloader, Mono_BepInEx]
 
     steps:
       - name: Download all artifacts
@@ -106,14 +108,14 @@ jobs:
         run: |
           $release_url = "${{ github.event.release.upload_url }}"
           $config = "${{ matrix.configuration }}"
-          
+
           $dll_path = "./artifacts/shadcnui-build-$config/shadcnui.dll"
           $testing_dll_path = "./artifacts/shadcnui_Demo-build-$config/shadcnui_Demo.dll"
-          
+
           if (Test-Path $dll_path) {
             gh release upload ${{ github.event.release.tag_name }} "$dll_path#shadcnui-$config.dll" --clobber
           }
-          
+
           if (Test-Path $testing_dll_path) {
             gh release upload ${{ github.event.release.tag_name }} "$testing_dll_path#shadcnui_Demo-$config.dll" --clobber
           }
@@ -123,7 +125,8 @@ jobs:
     if: github.event_name == 'schedule'
     strategy:
       matrix:
-        configuration: [IL2CPP_Melonloader, IL2CPP_BepInEx, Mono_Melonloader, Mono_BepInEx]
+        configuration:
+          [IL2CPP_Melonloader, IL2CPP_BepInEx, Mono_Melonloader, Mono_BepInEx]
       fail-fast: false
 
     steps:
@@ -148,7 +151,7 @@ jobs:
         if: always()
         with:
           name: shadcnui-nightly-${{ github.run_number }}-${{ matrix.configuration }}
-          path: shadcnui/bin/${{ matrix.configuration }}/shadcnui.dll
+          path: shadcnui/bin/${{ matrix.configuration }}/netstandard2.1/shadcnui.dll
           if-no-files-found: error
           retention-days: 14
 

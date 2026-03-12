@@ -16,7 +16,6 @@
         <DefineConstants>TRACE;IL2CPP_MELONLOADER_PRE57</DefineConstants>
         <ErrorReport>prompt</ErrorReport>
         <WarningLevel>4</WarningLevel>
-        <PlatformTarget>x64</PlatformTarget>
     </PropertyGroup>
     <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'IL2CPP_MELONLOADER|AnyCPU' ">
         <DebugType>pdbonly</DebugType>
@@ -25,7 +24,6 @@
         <DefineConstants>TRACE;IL2CPP_MELONLOADER</DefineConstants>
         <ErrorReport>prompt</ErrorReport>
         <WarningLevel>4</WarningLevel>
-        <PlatformTarget>x64</PlatformTarget>
     </PropertyGroup>
     <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'IL2CPP_BepInEx|AnyCPU' ">
         <DebugType>pdbonly</DebugType>
@@ -34,7 +32,6 @@
         <DefineConstants>TRACE;IL2CPP_BEPINEX</DefineConstants>
         <ErrorReport>prompt</ErrorReport>
         <WarningLevel>4</WarningLevel>
-        <PlatformTarget>x64</PlatformTarget>
     </PropertyGroup>
     <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Mono_Melonloader|AnyCPU' ">
         <DebugType>pdbonly</DebugType>
