@@ -51,12 +51,7 @@ namespace shadcnui_examples.Examples
                     gui.BeginVerticalGroup();
 
                     gui.Label("Standard Tabs", ControlVariant.Default);
-                    selectedTab = gui.Tabs(
-                        tabNames,
-                        selectedTab,
-                        null,
-                        index => gui.ShowToast($"Switched to {tabNames[index]} tab")
-                    );
+                    selectedTab = gui.Tabs(tabNames, selectedTab, null, index => gui.ShowToast($"Switched to {tabNames[index]} tab"));
 
                     gui.BeginTabContent();
                     switch (selectedTab)

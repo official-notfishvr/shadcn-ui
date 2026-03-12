@@ -11,6 +11,10 @@
         <PublicizerClearCacheOnClean>true</PublicizerClearCacheOnClean>
     </PropertyGroup>
     <ItemGroup>
+      <None Remove="Directory.Build.props" />
+      <None Remove="Directory.Build.targets" />
+    </ItemGroup>
+    <ItemGroup>
         <ProjectReference Include="..\shadcnui\shadcnui.csproj" />
     </ItemGroup>
     <!-- Embed the UI lib -->

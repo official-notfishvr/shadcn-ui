@@ -286,10 +286,12 @@ namespace shadcnui_Demo.Menu
             _status = _detectedDemos.Count > 0 ? $"Found {_detectedDemos.Count} demo(s)" : "No demos detected";
         }
 
-        void DetectDemo<T>(string name, string tabField, string indexField, string windowRectField, string windowVisibleField = null) where T : MonoBehaviour
+        void DetectDemo<T>(string name, string tabField, string indexField, string windowRectField, string windowVisibleField = null)
+            where T : MonoBehaviour
         {
             var instance = FindFirstObjectByType<T>();
-            if (instance == null) return;
+            if (instance == null)
+                return;
 
             string[] tabNames = ExtractTabNames(instance, tabField);
             var demo = new DemoInfo(instance, name, tabNames, tabField, indexField, windowRectField, windowVisibleField);
@@ -298,10 +300,12 @@ namespace shadcnui_Demo.Menu
 
         string[] ExtractTabNames(MonoBehaviour instance, string tabFieldName)
         {
-            if (instance == null) return Array.Empty<string>();
+            if (instance == null)
+                return Array.Empty<string>();
 
             FieldInfo field = instance.GetType().GetField(tabFieldName, BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Instance);
-            if (field == null) return Array.Empty<string>();
+            if (field == null)
+                return Array.Empty<string>();
 
             object value = field.GetValue(instance);
 
@@ -314,7 +318,8 @@ namespace shadcnui_Demo.Menu
                 for (int i = 0; i < array.Length; i++)
                 {
                     object item = array.GetValue(i);
-                    if (item == null) continue;
+                    if (item == null)
+                        continue;
 
                     PropertyInfo nameProp = item.GetType().GetProperty("Name");
                     if (nameProp != null)
@@ -422,7 +427,8 @@ namespace shadcnui_Demo.Menu
 
         void SetTabIndex(int index)
         {
-            if (_activeDemo?.Instance == null) return;
+            if (_activeDemo?.Instance == null)
+                return;
 
             FieldInfo field = _activeDemo.Instance.GetType().GetField(_activeDemo.IndexField, BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Instance);
             field?.SetValue(_activeDemo.Instance, index);
@@ -430,7 +436,8 @@ namespace shadcnui_Demo.Menu
 
         void EnsureDemoWindowVisible()
         {
-            if (_activeDemo?.Instance == null || string.IsNullOrEmpty(_activeDemo.WindowVisibleField)) return;
+            if (_activeDemo?.Instance == null || string.IsNullOrEmpty(_activeDemo.WindowVisibleField))
+                return;
 
             FieldInfo field = _activeDemo.Instance.GetType().GetField(_activeDemo.WindowVisibleField, BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Instance);
             if (field?.FieldType == typeof(bool))
@@ -439,7 +446,8 @@ namespace shadcnui_Demo.Menu
 
         void OpenOverlays()
         {
-            if (_activeDemo?.Instance == null || !_openOverlaysBeforeCapture) return;
+            if (_activeDemo?.Instance == null || !_openOverlaysBeforeCapture)
+                return;
 
             SetFieldValue(_activeDemo.Instance, "dropdownOpen", true);
             SetFieldValue(_activeDemo.Instance, "_showDropdown", true);
@@ -466,14 +474,16 @@ namespace shadcnui_Demo.Menu
 
         void SetFieldValue(object obj, string fieldName, object value)
         {
-            if (obj == null) return;
+            if (obj == null)
+                return;
             FieldInfo field = obj.GetType().GetField(fieldName, BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Instance);
             field?.SetValue(obj, value);
         }
 
         void InvokeMethod(object obj, string methodName, params object[] args)
         {
-            if (obj == null) return;
+            if (obj == null)
+                return;
             MethodInfo method = obj.GetType().GetMethod(methodName, BindingFlags.Public | BindingFlags.Instance | BindingFlags.NonPublic);
             method?.Invoke(obj, args.Length > 0 ? args : null);
         }
@@ -584,10 +594,12 @@ namespace shadcnui_Demo.Menu
 
         int GetTabIndex()
         {
-            if (_activeDemo?.Instance == null) return 0;
+            if (_activeDemo?.Instance == null)
+                return 0;
 
             FieldInfo field = _activeDemo.Instance.GetType().GetField(_activeDemo.IndexField, BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Instance);
-            if (field == null) return 0;
+            if (field == null)
+                return 0;
 
             object value = field.GetValue(_activeDemo.Instance);
             return value is int i ? i : 0;
@@ -680,7 +692,8 @@ namespace shadcnui_Demo.Menu
 
         string SanitizeFileName(string name)
         {
-            if (string.IsNullOrEmpty(name)) return "unnamed";
+            if (string.IsNullOrEmpty(name))
+                return "unnamed";
             foreach (char c in Path.GetInvalidFileNameChars())
                 name = name.Replace(c, '_');
             return name.Replace(' ', '_');
@@ -695,7 +708,8 @@ namespace shadcnui_Demo.Menu
                 _status = "Folder doesn't exist yet";
         }
 
-        T FindFirstObjectByType<T>() where T : MonoBehaviour
+        T FindFirstObjectByType<T>()
+            where T : MonoBehaviour
         {
 #pragma warning disable CS0618
             return UnityEngine.Object.FindObjectOfType<T>();
