@@ -708,12 +708,10 @@ namespace shadcnui_Demo.Menu
                 _status = "Folder doesn't exist yet";
         }
 
-        T FindFirstObjectByType<T>()
+        new T FindFirstObjectByType<T>()
             where T : MonoBehaviour
         {
-#pragma warning disable CS0618
-            return UnityEngine.Object.FindObjectOfType<T>();
-#pragma warning restore CS0618
+            return UnityEngine.Object.FindFirstObjectByType<T>();
         }
     }
 }

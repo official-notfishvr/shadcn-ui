@@ -236,7 +236,7 @@ namespace shadcnui.GUIComponents.Core.Styling
         {
             var h = GetScaledSpacing(horizontal);
             var v = GetScaledSpacing(vertical);
-            return new RectOffset(h, h, v, v);
+            return new UnityHelpers.RectOffset(h, h, v, v);
         }
 
         public Texture2D CreateSolidTexture(Color color) => Textures.GenerateSolid(color);
@@ -293,7 +293,7 @@ namespace shadcnui.GUIComponents.Core.Styling
 
         private GUIStyle CloneStyle(GUIStyle source)
         {
-            var clone = source != null ? new GUIStyle(source) : new GUIStyle();
+            var clone = source != null ? new UnityHelpers.GUIStyle(source) : new UnityHelpers.GUIStyle();
             if (CustomFont != null)
                 clone.font = CustomFont;
             return clone;

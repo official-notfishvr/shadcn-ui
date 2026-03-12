@@ -392,7 +392,7 @@ namespace shadcnui.GUIComponents.Core.Styling
 
                     style.fixedWidth = px;
                     style.fixedHeight = px;
-                    style.border = new RectOffset(radius, radius, radius, radius);
+                    style.border = new UnityHelpers.RectOffset(radius, radius, radius, radius);
                     style.normal.background = CreateAvatarTexture(px, radius, GetTheme().Secondary, GetTheme().Border, DesignTokens.Avatar.BorderThickness, false);
                 }
             );

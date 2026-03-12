@@ -151,12 +151,12 @@ namespace shadcnui.GUIComponents.Core.Utils
 
             public GUIStyle(UnityEngine.GUIStyle style)
             {
-                _style = style != null ? new UnityEngine.GUIStyle(style) : new UnityEngine.GUIStyle();
-            }
-
-            public GUIStyle(GUIStyle style)
-            {
-                _style = style != null ? new UnityEngine.GUIStyle(style._style) : new UnityEngine.GUIStyle();
+#if IL2CPP_BEPINEX
+                _style = new UnityEngine.GUIStyle();
+                _style.m_Ptr = style.m_Ptr;
+#else
+                _style = new UnityEngine.GUIStyle(style);
+#endif
             }
 
             public static implicit operator UnityEngine.GUIStyle(GUIStyle style) => style?._style;
@@ -206,7 +206,13 @@ namespace shadcnui.GUIComponents.Core.Utils
 
             public RectOffset(int left, int right, int top, int bottom)
             {
-                _offset = new UnityEngine.RectOffset(left, right, top, bottom);
+                _offset = new UnityEngine.RectOffset
+                {
+                    left = left,
+                    right = right,
+                    top = top,
+                    bottom = bottom,
+                };
             }
 
             public static implicit operator UnityEngine.RectOffset(RectOffset offset) => offset?._offset;
@@ -275,7 +281,11 @@ namespace shadcnui.GUIComponents.Core.Utils
 
             public GUIContent(string text, Texture image)
             {
+#if IL2CPP_MELONLOADER || IL2CPP_BEPINEX
+                _content = new UnityEngine.GUIContent(text, image, string.Empty);
+#else
                 _content = new UnityEngine.GUIContent(text, image);
+#endif
             }
 
             public GUIContent(string text, string tooltip)
@@ -285,7 +295,11 @@ namespace shadcnui.GUIComponents.Core.Utils
 
             public GUIContent(string text, Texture image, string tooltip)
             {
+#if IL2CPP_MELONLOADER
+                _content = new UnityEngine.GUIContent(text) { image = image, tooltip = tooltip };
+#else
                 _content = new UnityEngine.GUIContent(text, image, tooltip);
+#endif
             }
 
             public static implicit operator UnityEngine.GUIContent(GUIContent content) => content?._content;

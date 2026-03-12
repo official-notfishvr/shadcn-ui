@@ -1,4 +1,5 @@
 using shadcnui.GUIComponents.Core.Theming;
+using shadcnui.GUIComponents.Core.Utils;
 using UnityEngine;
 
 namespace shadcnui.GUIComponents.Core.Styling
@@ -24,7 +25,7 @@ namespace shadcnui.GUIComponents.Core.Styling
             ApplyCheckedState(_checkboxSolidStyle, theme.Accent, theme.Base, theme.Accent);
             ApplyCheckedState(_baseSwitchStyle, theme.Accent, theme.Base, theme.Accent);
             _progressBarStyle = MakePanelStyle(theme.Secondary, Color.clear, DesignTokens.Radius.Full, 0f, 0f);
-            _separatorStyle = new GUIStyle(GUI.skin.box)
+            _separatorStyle = new UnityHelpers.GUIStyle(GUI.skin.box)
             {
                 normal = { background = Textures.Separator },
                 margin = new RectOffset(),
@@ -62,7 +63,7 @@ namespace shadcnui.GUIComponents.Core.Styling
             _datePickerDayOutsideMonthStyle = MakeCalendarDayStyle(Color.clear, theme.Muted, Color.clear);
             AnimatedBoxStyle = CloneStyle(GUIStyle.none);
             AnimatedBoxStyle.padding = GetSpacingOffset(metrics.PanelPadding, metrics.PanelPadding);
-            AnimatedBoxStyle.margin = new RectOffset(0, 0, 0, 0);
+            AnimatedBoxStyle.margin = new UnityHelpers.RectOffset(0, 0, 0, 0);
             AnimatedBoxStyle.normal.textColor = theme.Text;
         }
 
@@ -80,8 +81,8 @@ namespace shadcnui.GUIComponents.Core.Styling
             style.onFocused.background = style.focused.background;
             style.onNormal.textColor = style.onHover.textColor = style.onActive.textColor = style.onFocused.textColor = text;
             style.padding = GetSpacingOffset(paddingH, paddingV);
-            style.margin = new RectOffset(0, 0, 0, 0);
-            style.border = new RectOffset(0, 0, 0, 0);
+            style.margin = new UnityHelpers.RectOffset(0, 0, 0, 0);
+            style.border = new UnityHelpers.RectOffset(0, 0, 0, 0);
             style.alignment = TextAnchor.MiddleCenter;
             style.fontSize = GetScaledFontSize(DesignTokens.FontScale.SM);
             style.fontStyle = fontStyle;
@@ -99,8 +100,8 @@ namespace shadcnui.GUIComponents.Core.Styling
             style.active.background = style.focused.background;
             style.normal.textColor = style.hover.textColor = style.focused.textColor = style.active.textColor = text;
             style.padding = GetSpacingOffset(DesignTokens.Padding.Input.Horizontal, DesignTokens.Padding.Input.Vertical);
-            style.margin = new RectOffset(0, 0, 0, 0);
-            style.border = new RectOffset(0, 0, 0, 0);
+            style.margin = new UnityHelpers.RectOffset(0, 0, 0, 0);
+            style.border = new UnityHelpers.RectOffset(0, 0, 0, 0);
             style.fontSize = GetScaledFontSize(DesignTokens.FontScale.SM);
             return style;
         }
@@ -115,8 +116,8 @@ namespace shadcnui.GUIComponents.Core.Styling
             style.fontSize = GetScaledFontSize(DesignTokens.FontScale.SM);
             style.fontStyle = fontStyle;
             style.wordWrap = true;
-            style.margin = new RectOffset(0, 0, 0, 0);
-            style.padding = new RectOffset(0, 0, 0, 0);
+            style.margin = new UnityHelpers.RectOffset(0, 0, 0, 0);
+            style.padding = new UnityHelpers.RectOffset(0, 0, 0, 0);
             return style;
         }
 
@@ -125,8 +126,8 @@ namespace shadcnui.GUIComponents.Core.Styling
             var style = CloneStyle(GUI.skin.box);
             style.normal.background = CreateBorderTexture(256, 256, GetScaledBorderRadius(radius), fill, border, border == Color.clear ? 0f : 1f);
             style.padding = GetSpacingOffset(paddingH, paddingV);
-            style.margin = new RectOffset(0, 0, 0, 0);
-            style.border = new RectOffset(0, 0, 0, 0);
+            style.margin = new UnityHelpers.RectOffset(0, 0, 0, 0);
+            style.border = new UnityHelpers.RectOffset(0, 0, 0, 0);
             style.normal.textColor = GetTheme().Text;
             return style;
         }
@@ -161,9 +162,9 @@ namespace shadcnui.GUIComponents.Core.Styling
             style.alignment = TextAnchor.MiddleCenter;
             style.fontStyle = FontStyle.Bold;
             style.fontSize = GetScaledFontSize(DesignTokens.Avatar.FallbackFontScale);
-            style.padding = new RectOffset();
-            style.margin = new RectOffset();
-            style.border = new RectOffset(size / 2, size / 2, size / 2, size / 2);
+            style.padding = new UnityHelpers.RectOffset();
+            style.margin = new UnityHelpers.RectOffset();
+            style.border = new UnityHelpers.RectOffset(size / 2, size / 2, size / 2, size / 2);
             style.fixedWidth = size;
             style.fixedHeight = size;
             return style;
@@ -176,8 +177,8 @@ namespace shadcnui.GUIComponents.Core.Styling
             style.hover.background = style.normal.background;
             style.active.background = style.normal.background;
             style.normal.textColor = style.hover.textColor = style.active.textColor = text;
-            style.padding = new RectOffset(0, 0, 0, 0);
-            style.margin = new RectOffset(0, 0, 0, 0);
+            style.padding = new UnityHelpers.RectOffset(0, 0, 0, 0);
+            style.margin = new UnityHelpers.RectOffset(0, 0, 0, 0);
             style.alignment = TextAnchor.MiddleCenter;
             style.fontSize = GetScaledFontSize(DesignTokens.FontScale.SM);
             return style;

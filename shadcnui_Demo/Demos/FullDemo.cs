@@ -78,7 +78,7 @@ namespace shadcnui_Demo.Menu
 
         private void OnGUI()
         {
-            _windowRect = GUI.Window(104, _windowRect, DrawWindow, string.Empty);
+            _windowRect = GUI.Window(104, _windowRect, (GUI.WindowFunction)DrawWindow, string.Empty);
             _gui.DrawOverlays();
         }
 

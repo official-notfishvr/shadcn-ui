@@ -32,6 +32,7 @@ namespace shadcnui.GUIComponents.Core.Base
         private readonly List<string> _pendingClose = new();
         private int _nextWindowId = 50000;
         private bool _drawing;
+        private LayerState _currentLayer;
 
         private LayerManager() { }
 
@@ -129,15 +130,13 @@ namespace shadcnui.GUIComponents.Core.Base
 
         public void DrawLayers()
         {
-            if (_drawOrder.Count == 0)
+            if (_layers.Count == 0)
                 return;
 
             _drawing = true;
             _pendingClose.Clear();
 
-            if (NeedsOverlay())
-                DrawOverlay();
-
+            SortDrawOrder();
             var order = new List<string>(_drawOrder);
             var topWindowId = -1;
 
@@ -148,9 +147,11 @@ namespace shadcnui.GUIComponents.Core.Base
 
                 var rect = ClampToScreen(new Rect(layer.Position.x, layer.Position.y, layer.Width, layer.Height));
                 layer.Position = rect.position;
-                GUI.Window(layer.WindowId, rect, _ => DrawLayer(layer), GUIContent.none, GUIStyle.none);
+                _currentLayer = layer;
+                GUI.Window(layer.WindowId, rect, (GUI.WindowFunction)DrawWindowCallback, string.Empty, GUIStyle.none);
                 topWindowId = layer.WindowId;
             }
+            _currentLayer = null;
 
             if (topWindowId >= 0)
                 GUI.BringWindowToFront(topWindowId);
@@ -161,6 +162,12 @@ namespace shadcnui.GUIComponents.Core.Base
 
             foreach (var id in _pendingClose)
                 CloseNow(id);
+        }
+
+        private void DrawWindowCallback(int id)
+        {
+            if (_layers.TryGetValue(_currentLayer?.Id ?? string.Empty, out var layer))
+                DrawLayer(layer);
         }
 
         private void DrawLayer(LayerState layer)

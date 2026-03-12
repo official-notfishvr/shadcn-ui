@@ -6,6 +6,8 @@
         <LangVersion>10.0</LangVersion>
         <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
         <Configurations>IL2CPP_MELONLOADER_PRE57;IL2CPP_MELONLOADER;IL2CPP_BepInEx;Mono_Melonloader;Mono_BepInEx</Configurations>
+        <NoWarn>$(NoWarn);MSB3270;MSB3277</NoWarn>
+        <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
     </PropertyGroup>
     <PropertyGroup>
         <PublicizerClearCacheOnClean>true</PublicizerClearCacheOnClean>
