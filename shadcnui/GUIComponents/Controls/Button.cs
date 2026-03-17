@@ -59,7 +59,9 @@ namespace shadcnui.GUIComponents.Controls
         private bool DrawBasic(ButtonConfig config, GUIStyle style, List<GUILayoutOption> options)
         {
             var content = new UnityHelpers.GUIContent(config.Text ?? string.Empty);
-            return UnityHelpers.Button(content, style, options.ToArray());
+            var rect = GUILayoutUtility.GetRect(content, style, options.ToArray());
+            bool hovered = rect.Contains(Event.current.mousePosition);
+            return DrawButtonRect(rect, content, style, hovered && !config.IsDisabled);
         }
 
         private bool DrawWithIcon(ButtonConfig config, GUIStyle style, List<GUILayoutOption> options)
@@ -74,28 +76,31 @@ namespace shadcnui.GUIComponents.Controls
 
             if (icon.Position == IconPosition.Above)
             {
-                RenderIcon(icon);
+                RenderIcon(icon, false);
                 layoutComponents.AddSpace(icon.Spacing * guiHelper.uiScale);
             }
 
             if (icon.Position == IconPosition.Left)
             {
-                RenderIcon(icon);
+                RenderIcon(icon, false);
                 layoutComponents.AddSpace(icon.Spacing * guiHelper.uiScale);
             }
 
-            bool clicked = DrawBasic(config, style, options);
+            var content = new UnityHelpers.GUIContent(config.Text ?? string.Empty);
+            var rect = GUILayoutUtility.GetRect(content, style, options.ToArray());
+            bool hovered = rect.Contains(Event.current.mousePosition);
+            bool clicked = DrawButtonRect(rect, content, style, hovered && !config.IsDisabled);
 
             if (icon.Position == IconPosition.Right)
             {
                 layoutComponents.AddSpace(icon.Spacing * guiHelper.uiScale);
-                RenderIcon(icon);
+                RenderIcon(icon, hovered && !config.IsDisabled);
             }
 
             if (icon.Position == IconPosition.Below)
             {
                 layoutComponents.AddSpace(icon.Spacing * guiHelper.uiScale);
-                RenderIcon(icon);
+                RenderIcon(icon, hovered && !config.IsDisabled);
             }
 
             if (horizontal)
@@ -106,13 +111,31 @@ namespace shadcnui.GUIComponents.Controls
             return clicked;
         }
 
-        private void RenderIcon(IconConfig iconConfig)
+        private bool DrawButtonRect(Rect rect, UnityHelpers.GUIContent content, GUIStyle style, bool hovered)
+        {
+            if (hovered)
+            {
+                float offset = DesignTokens.Spacing.XXS * guiHelper.uiScale;
+                var lifted = new Rect(rect.x, rect.y - offset, rect.width, rect.height);
+                return UnityHelpers.Button(lifted, content, style);
+            }
+
+            return UnityHelpers.Button(rect, content, style);
+        }
+
+        private void RenderIcon(IconConfig iconConfig, bool hovered)
         {
             if (iconConfig?.Image == null)
                 return;
 
             float scaledSize = iconConfig.Size * guiHelper.uiScale;
-            UnityHelpers.Label(iconConfig.Image, GUILayout.Width(scaledSize), GUILayout.Height(scaledSize));
+            var rect = GUILayoutUtility.GetRect(scaledSize, scaledSize, GUILayout.Width(scaledSize), GUILayout.Height(scaledSize));
+            if (hovered)
+            {
+                float offset = DesignTokens.Spacing.XXS * guiHelper.uiScale;
+                rect = new Rect(rect.x, rect.y - offset, rect.width, rect.height);
+            }
+            GUI.DrawTexture(rect, iconConfig.Image, ScaleMode.ScaleToFit);
         }
     }
 }

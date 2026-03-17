@@ -80,7 +80,7 @@ namespace shadcnui.GUIComponents.Display
             GUI.Box(rect, GUIContent.none, style);
 
             string text = $"{Mathf.Clamp01(value) * 100f:0}%";
-            var labelStyle = new GUIStyle(styleManager?.GetLabelStyle(ControlVariant.Default, ControlSize.Default) ?? GUI.skin.label) { alignment = TextAnchor.MiddleCenter };
+            var labelStyle = new UnityHelpers.GUIStyle(styleManager?.GetLabelStyle(ControlVariant.Default, ControlSize.Default) ?? GUI.skin.label) { alignment = TextAnchor.MiddleCenter };
             GUI.Label(rect, text, labelStyle);
         }
 

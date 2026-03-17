@@ -413,7 +413,7 @@ namespace shadcnui.GUIComponents.Core.Styling
 
         public GUIStyle GetTableHeaderStyle(ControlVariant variant = ControlVariant.Default, ControlSize size = ControlSize.Default) => GetCachedStyle(StyleComponentType.TableHeader, variant, size, _tableHeaderStyle);
 
-        public GUIStyle GetTableCellStyle(ControlVariant variant = ControlVariant.Default, ControlSize size = ControlSize.Default, TextAnchor alignment = TextAnchor.MiddleLeft) =>
+        public UnityHelpers.GUIStyle GetTableCellStyle(ControlVariant variant = ControlVariant.Default, ControlSize size = ControlSize.Default, TextAnchor alignment = TextAnchor.MiddleLeft) =>
             GetCachedStyle(StyleComponentType.TableCell, variant, size, _tableCellStyle, (int)alignment, style => style.alignment = alignment);
 
         public GUIStyle GetDropdownMenuItemStyle(ControlVariant variant = ControlVariant.Default, ControlSize size = ControlSize.Default) => GetCachedStyle(StyleComponentType.DropdownMenuItem, variant, size, _dropdownItemStyle);

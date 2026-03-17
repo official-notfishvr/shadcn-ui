@@ -37,8 +37,6 @@ namespace shadcnui_Demo.Menu
         private float _danger = 35f;
 
         private int _selectIndex = 1;
-        private bool _showSelect;
-        private bool _showDropdown;
         private bool _showDialog;
         private int _nestedTabs;
         private int _verticalTabs;
@@ -577,7 +575,6 @@ namespace shadcnui_Demo.Menu
                     "Deploy",
                     () =>
                     {
-                        _showDropdown = false;
                         _gui.ShowSuccessToast("Deploy", "Deployment command queued");
                     },
                     icon: _sampleTexture
@@ -587,7 +584,6 @@ namespace shadcnui_Demo.Menu
                     "Duplicate",
                     () =>
                     {
-                        _showDropdown = false;
                         _gui.ShowInfoToast("Duplicate", "Copied current preset");
                     }
                 ),
@@ -597,7 +593,6 @@ namespace shadcnui_Demo.Menu
                     "Archive",
                     () =>
                     {
-                        _showDropdown = false;
                         _gui.ShowWarningToast("Archive", "Preset archived");
                     }
                 ),

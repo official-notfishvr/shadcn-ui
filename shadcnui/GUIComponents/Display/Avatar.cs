@@ -118,7 +118,7 @@ namespace shadcnui.GUIComponents.Display
         private void DrawFallback(Rect rect, AvatarConfig config)
         {
             string text = !string.IsNullOrEmpty(config.FallbackText) ? config.FallbackText : "?";
-            var labelStyle = new GUIStyle(styleManager?.GetLabelStyle(ControlVariant.Default, config.Size) ?? GUI.skin.label) { alignment = TextAnchor.MiddleCenter };
+            var labelStyle = new UnityHelpers.GUIStyle(styleManager?.GetLabelStyle(ControlVariant.Default, config.Size) ?? GUI.skin.label) { alignment = TextAnchor.MiddleCenter };
             GUI.Label(rect, text, labelStyle);
         }
 

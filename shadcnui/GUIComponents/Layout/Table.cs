@@ -236,8 +236,8 @@ namespace shadcnui.GUIComponents.Layout
             var tableStyle = styleManager?.GetTableStyle(config.Variant, config.Size) ?? GUI.skin.box;
             var headerStyle = styleManager?.GetTableHeaderStyle(config.Variant, config.Size) ?? GUI.skin.label;
             var cellStyle = styleManager?.GetTableCellStyle(config.Variant, config.Size) ?? GUI.skin.label;
-            var rowStyle = styleManager?.GetTableRowStyle(config.Variant, config.Size) ?? GUIStyle.none;
-            var altRowStyle = new UnityEngine.GUIStyle(rowStyle);
+            UnityHelpers.GUIStyle rowStyle = styleManager?.GetTableRowStyle(config.Variant, config.Size) ?? GUIStyle.none;
+            var altRowStyle = new UnityHelpers.GUIStyle(rowStyle);
 
             if (styleManager?.Textures?.TableRowAlternate != null)
                 altRowStyle.normal.background = styleManager.Textures.TableRowAlternate;
@@ -320,7 +320,7 @@ namespace shadcnui.GUIComponents.Layout
             layoutComponents.EndHorizontalGroup();
         }
 
-        private void DrawRow(TableConfig config, GUIStyle rowStyle, GUIStyle cellStyle, int rowIndex, int colCount, float[] widths, bool selectable, bool useObjects)
+        private void DrawRow(TableConfig config, UnityHelpers.GUIStyle rowStyle, UnityHelpers.GUIStyle cellStyle, int rowIndex, int colCount, float[] widths, bool selectable, bool useObjects)
         {
             layoutComponents.BeginHorizontalGroup(rowStyle);
 

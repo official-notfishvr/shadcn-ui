@@ -139,7 +139,7 @@ namespace shadcnui.GUIComponents.Display
         private void DrawEmpty(Rect rect)
         {
             var style = styleManager?.GetLabelStyle(ControlVariant.Muted, ControlSize.Default) ?? GUI.skin.label;
-            var centered = new GUIStyle(style) { alignment = TextAnchor.MiddleCenter };
+            var centered = new UnityHelpers.GUIStyle(style) { alignment = TextAnchor.MiddleCenter };
             GUI.Label(rect, "No data", centered);
         }
 

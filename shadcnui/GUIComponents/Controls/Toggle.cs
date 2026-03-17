@@ -46,19 +46,22 @@ namespace shadcnui.GUIComponents.Controls
                 layoutComponents.BeginHorizontalGroup();
                 RenderIcon(config.Icon);
                 layoutComponents.AddSpace(config.Icon.Spacing * guiHelper.uiScale);
-                bool value = UnityHelpers.Toggle(config.Value, label, style, options.ToArray());
+                bool value = DrawToggleRect(config.Value, label, style, options.ToArray(), config.IsDisabled);
                 layoutComponents.EndHorizontalGroup();
                 return value;
             }
 
-            return UnityHelpers.Toggle(config.Value, label, style, options.ToArray());
+            return DrawToggleRect(config.Value, label, style, options.ToArray(), config.IsDisabled);
         }
 
         private bool DrawRect(BoolControlConfigBase config, GUIStyle style)
         {
             Rect r = config.Rect.Value;
             Rect scaledRect = new Rect(r.x * guiHelper.uiScale, r.y * guiHelper.uiScale, r.width * guiHelper.uiScale, r.height * guiHelper.uiScale);
-            return UnityHelpers.Toggle(scaledRect, config.Value, config.Label ?? string.Empty, style);
+            bool hovered = scaledRect.Contains(Event.current.mousePosition);
+            float offset = hovered && !config.IsDisabled ? DesignTokens.Spacing.XXS * guiHelper.uiScale : 0f;
+            var rect = offset > 0f ? new Rect(scaledRect.x, scaledRect.y - offset, scaledRect.width, scaledRect.height) : scaledRect;
+            return UnityHelpers.Toggle(rect, config.Value, config.Label ?? string.Empty, style);
         }
 
         private List<GUILayoutOption> BuildLayoutOptions(BoolControlConfigBase config)
@@ -76,6 +79,16 @@ namespace shadcnui.GUIComponents.Controls
 
             float scaledSize = iconConfig.Size * guiHelper.uiScale;
             UnityHelpers.Label(iconConfig.Image, GUILayout.Width(scaledSize), GUILayout.Height(scaledSize));
+        }
+
+        private bool DrawToggleRect(bool value, string label, GUIStyle style, GUILayoutOption[] options, bool disabled)
+        {
+            var content = new UnityHelpers.GUIContent(label ?? string.Empty);
+            var rect = GUILayoutUtility.GetRect(content, style, options);
+            bool hovered = rect.Contains(Event.current.mousePosition) && !disabled;
+            float offset = hovered ? DesignTokens.Spacing.XXS * guiHelper.uiScale : 0f;
+            var drawRect = offset > 0f ? new Rect(rect.x, rect.y - offset, rect.width, rect.height) : rect;
+            return UnityHelpers.Toggle(drawRect, value, content, style);
         }
     }
 }

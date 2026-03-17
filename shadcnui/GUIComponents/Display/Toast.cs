@@ -192,20 +192,20 @@ namespace shadcnui.GUIComponents.Display
             float padding = cfg.Padding * guiHelper.uiScale;
             Rect content = new Rect(rect.x + padding, rect.y + padding, rect.width - padding * 2, rect.height - padding * 2);
 
-            var titleStyle = new GUIStyle(styleManager?.GetLabelStyle(ControlVariant.Default, ControlSize.Default) ?? GUI.skin.label) { normal = { textColor = textColor } };
-            var descStyle = new GUIStyle(styleManager?.GetLabelStyle(ControlVariant.Muted, ControlSize.Default) ?? GUI.skin.label) { normal = { textColor = textColor }, wordWrap = true };
+            var titleStyle = new UnityHelpers.GUIStyle(styleManager?.GetLabelStyle(ControlVariant.Default, ControlSize.Default) ?? GUI.skin.label) { normal = { textColor = textColor } };
+            var descStyle = new UnityHelpers.GUIStyle(styleManager?.GetLabelStyle(ControlVariant.Muted, ControlSize.Default) ?? GUI.skin.label) { normal = { textColor = textColor }, wordWrap = true };
 
             float y = content.y;
             if (!string.IsNullOrEmpty(cfg.Title))
             {
-                float h = titleStyle.CalcHeight(new GUIContent(cfg.Title), content.width);
+                float h = titleStyle.CalcHeight(new UnityHelpers.GUIContent(cfg.Title), content.width);
                 GUI.Label(new Rect(content.x, y, content.width, h), cfg.Title, titleStyle);
                 y += h + 4f * guiHelper.uiScale;
             }
 
             if (!string.IsNullOrEmpty(cfg.Description))
             {
-                float h = descStyle.CalcHeight(new GUIContent(cfg.Description), content.width);
+                float h = descStyle.CalcHeight(new UnityHelpers.GUIContent(cfg.Description), content.width);
                 GUI.Label(new Rect(content.x, y, content.width, h), cfg.Description, descStyle);
                 y += h + 6f * guiHelper.uiScale;
             }
