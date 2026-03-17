@@ -50,8 +50,8 @@ namespace shadcnui.GUIComponents.Display
         #region Layout & Bounds
         private GUILayoutOption[] BuildChartLayoutOptions(ChartConfig config)
         {
-            if (config.Options != null && config.Options.Length > 0)
-                return config.Options;
+            if (config.LayoutOptions != null && config.LayoutOptions.Length > 0)
+                return config.LayoutOptions;
 
             return new[] { GUILayout.Width(config.Size.x), GUILayout.Height(config.Size.y), GUILayout.ExpandWidth(true), GUILayout.ExpandHeight(true) };
         }

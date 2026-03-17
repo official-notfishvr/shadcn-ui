@@ -59,7 +59,7 @@ namespace shadcnui.GUIComponents.Data
 
             layoutComponents.BeginVerticalGroup();
 
-            if (guiHelper.Button($"{buttonText}", ControlVariant.Default, ControlSize.Default, null, false, 1f, config.Options))
+            if (guiHelper.Button($"{buttonText}", ControlVariant.Default, ControlSize.Default, null, false, 1f, config.LayoutOptions))
             {
                 _openStates[config.Id] = !isOpen;
                 if (config.SelectedDate.HasValue)
@@ -127,7 +127,7 @@ namespace shadcnui.GUIComponents.Data
 
             layoutComponents.BeginVerticalGroup();
 
-            if (guiHelper.Button($"{buttonText}", ControlVariant.Default, ControlSize.Default, null, false, 1f, config.Options))
+            if (guiHelper.Button($"{buttonText}", ControlVariant.Default, ControlSize.Default, null, false, 1f, config.LayoutOptions))
             {
                 _openStates[config.Id] = !_openStates[config.Id];
 
@@ -167,7 +167,7 @@ namespace shadcnui.GUIComponents.Data
                     Placeholder = placeholder,
                     SelectedDate = selectedDate,
                     Id = id,
-                    Options = options,
+                    LayoutOptions = options,
                 }
             );
         }
@@ -181,7 +181,7 @@ namespace shadcnui.GUIComponents.Data
                     Placeholder = placeholder,
                     SelectedDate = selectedDate,
                     Id = id,
-                    Options = options,
+                    LayoutOptions = options,
                 }
             );
         }
@@ -195,7 +195,7 @@ namespace shadcnui.GUIComponents.Data
                     StartDate = startDate,
                     EndDate = endDate,
                     Id = id,
-                    Options = options,
+                    LayoutOptions = options,
                 }
             );
         }

@@ -39,14 +39,14 @@ namespace shadcnui.GUIComponents.Data
             return DrawTextArea(
                 new TextAreaConfig
                 {
-                    Text = text,
+                    Value = text,
                     Variant = variant,
                     Placeholder = placeholder,
-                    Disabled = disabled,
+                    IsDisabled = disabled,
                     MinHeight = minHeight,
                     MaxLength = maxLength,
                     ShowCharCount = false,
-                    Options = options,
+                    LayoutOptions = options,
                 }
             );
         }
@@ -56,10 +56,10 @@ namespace shadcnui.GUIComponents.Data
             return DrawTextArea(
                 new TextAreaConfig
                 {
-                    Text = text,
+                    Value = text,
                     Variant = variant,
                     Placeholder = placeholder,
-                    Disabled = disabled,
+                    IsDisabled = disabled,
                     MaxLength = maxLength,
                     ShowCharCount = false,
                     Rect = rect,
@@ -72,14 +72,14 @@ namespace shadcnui.GUIComponents.Data
             return DrawTextArea(
                 new TextAreaConfig
                 {
-                    Text = text,
+                    Value = text,
                     Variant = ControlVariant.Outline,
                     Placeholder = placeholder,
-                    Disabled = disabled,
+                    IsDisabled = disabled,
                     MinHeight = minHeight,
                     MaxLength = maxLength,
                     ShowCharCount = false,
-                    Options = options,
+                    LayoutOptions = options,
                 }
             );
         }
@@ -89,14 +89,14 @@ namespace shadcnui.GUIComponents.Data
             return DrawTextArea(
                 new TextAreaConfig
                 {
-                    Text = text,
+                    Value = text,
                     Variant = ControlVariant.Ghost,
                     Placeholder = placeholder,
-                    Disabled = disabled,
+                    IsDisabled = disabled,
                     MinHeight = minHeight,
                     MaxLength = maxLength,
                     ShowCharCount = false,
-                    Options = options,
+                    LayoutOptions = options,
                 }
             );
         }
@@ -106,15 +106,15 @@ namespace shadcnui.GUIComponents.Data
             return DrawTextArea(
                 new TextAreaConfig
                 {
-                    Text = text,
+                    Value = text,
                     Label = label,
                     Variant = variant,
                     Placeholder = placeholder,
-                    Disabled = disabled,
+                    IsDisabled = disabled,
                     MinHeight = minHeight,
                     MaxLength = maxLength,
                     ShowCharCount = showCharCount,
-                    Options = options,
+                    LayoutOptions = options,
                 }
             );
         }
@@ -132,14 +132,14 @@ namespace shadcnui.GUIComponents.Data
             string result = DrawTextArea(
                 new TextAreaConfig
                 {
-                    Text = text,
+                    Value = text,
                     Variant = variant,
                     Placeholder = placeholder,
-                    Disabled = disabled,
+                    IsDisabled = disabled,
                     MinHeight = height,
                     MaxLength = maxLength,
                     ShowCharCount = false,
-                    Options = layoutOptions.ToArray(),
+                    LayoutOptions = layoutOptions.ToArray(),
                 }
             );
 
@@ -167,15 +167,15 @@ namespace shadcnui.GUIComponents.Data
             layoutOptions.Add(GUILayout.MinHeight(scaledMinHeight));
             layoutOptions.Add(GUILayout.ExpandWidth(true));
 
-            if (config.Options != null && config.Options.Length > 0)
-                layoutOptions.AddRange(config.Options);
+            if (config.LayoutOptions != null && config.LayoutOptions.Length > 0)
+                layoutOptions.AddRange(config.LayoutOptions);
 
             bool wasEnabled = GUI.enabled;
-            if (config.Disabled)
+            if (config.IsDisabled)
                 GUI.enabled = false;
 
             GUI.SetNextControlName(controlName);
-            string result = UnityHelpers.TextArea(config.Text ?? GetPlaceholderText(config), textAreaStyle, layoutOptions.ToArray());
+            string result = UnityHelpers.TextArea(config.Value ?? GetPlaceholderText(config), textAreaStyle, layoutOptions.ToArray());
 
             GUI.enabled = wasEnabled;
 
@@ -192,11 +192,11 @@ namespace shadcnui.GUIComponents.Data
             Rect scaledRect = new Rect(config.Rect.Value.x * guiHelper.uiScale, config.Rect.Value.y * guiHelper.uiScale, config.Rect.Value.width * guiHelper.uiScale, config.Rect.Value.height * guiHelper.uiScale);
 
             bool wasEnabled = GUI.enabled;
-            if (config.Disabled)
+            if (config.IsDisabled)
                 GUI.enabled = false;
 
             GUI.SetNextControlName(controlName);
-            string result = GUI.TextArea(scaledRect, config.Text ?? GetPlaceholderText(config), textAreaStyle);
+            string result = GUI.TextArea(scaledRect, config.Value ?? GetPlaceholderText(config), textAreaStyle);
 
             GUI.enabled = wasEnabled;
 
@@ -212,13 +212,13 @@ namespace shadcnui.GUIComponents.Data
             layoutComponents.BeginHorizontalGroup();
             GUILayout.FlexibleSpace();
 
-            string countText = config.MaxLength > 0 ? $"{result?.Length ?? 0}/{config.MaxLength}" : $"{result?.Length ?? 0} characters";
+            string countValue = config.MaxLength > 0 ? $"{result?.Length ?? 0}/{config.MaxLength}" : $"{result?.Length ?? 0} characters";
 
             bool isNearLimit = config.MaxLength > 0 && (result?.Length ?? 0) > config.MaxLength * 0.9f;
             Color countColor = isNearLimit ? new Color(0.9f, 0.3f, 0.3f) : new Color(0.64f, 0.64f, 0.71f);
 
             var countStyle = new UnityHelpers.GUIStyle(styleManager.GetLabelStyle(ControlVariant.Muted)) { normal = { textColor = countColor } };
-            UnityHelpers.Label(countText, countStyle);
+            UnityHelpers.Label(countValue, countStyle);
             layoutComponents.EndHorizontalGroup();
         }
 

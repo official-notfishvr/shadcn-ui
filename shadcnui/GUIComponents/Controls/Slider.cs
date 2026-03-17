@@ -26,7 +26,7 @@ namespace shadcnui.GUIComponents.Controls
                 float result = config.Value;
                 bool wasEnabled = GUI.enabled;
 
-                if (config.Disabled)
+                if (config.IsDisabled)
                     GUI.enabled = false;
 
                 DrawSliderLabel(config);
@@ -34,10 +34,10 @@ namespace shadcnui.GUIComponents.Controls
 
                 GUI.enabled = wasEnabled;
 
-                if (!Mathf.Approximately(result, config.Value) && !config.Disabled)
-                    config.OnChange?.Invoke(result);
+                if (!Mathf.Approximately(result, config.Value) && !config.IsDisabled)
+                    config.OnValueChanged?.Invoke(result);
 
-                return config.Disabled ? config.Value : result;
+                return config.IsDisabled ? config.Value : result;
             }
             catch (Exception ex)
             {
@@ -78,7 +78,7 @@ namespace shadcnui.GUIComponents.Controls
                     Value = value,
                     MinValue = min,
                     MaxValue = max,
-                    Options = options,
+                    LayoutOptions = options,
                 }
             );
         }
@@ -92,7 +92,7 @@ namespace shadcnui.GUIComponents.Controls
                     MinValue = min,
                     MaxValue = max,
                     Step = step,
-                    Options = options,
+                    LayoutOptions = options,
                 }
             );
         }
@@ -107,7 +107,7 @@ namespace shadcnui.GUIComponents.Controls
                     MinValue = min,
                     MaxValue = max,
                     ShowValue = showValue,
-                    Options = options,
+                    LayoutOptions = options,
                 }
             );
         }
@@ -123,7 +123,7 @@ namespace shadcnui.GUIComponents.Controls
                     MaxValue = max,
                     Step = step,
                     ShowValue = showValue,
-                    Options = options,
+                    LayoutOptions = options,
                 }
             );
         }
@@ -136,8 +136,8 @@ namespace shadcnui.GUIComponents.Controls
                     Value = value,
                     MinValue = min,
                     MaxValue = max,
-                    Disabled = true,
-                    Options = options,
+                    IsDisabled = true,
+                    LayoutOptions = options,
                 }
             );
         }
@@ -183,8 +183,8 @@ namespace shadcnui.GUIComponents.Controls
 
         private Rect GetSliderRect(SliderConfig config, float totalHeight)
         {
-            if (config.Options != null && config.Options.Length > 0)
-                return GUILayoutUtility.GetRect(100f * guiHelper.uiScale, totalHeight, config.Options);
+            if (config.LayoutOptions != null && config.LayoutOptions.Length > 0)
+                return GUILayoutUtility.GetRect(100f * guiHelper.uiScale, totalHeight, config.LayoutOptions);
             return GUILayoutUtility.GetRect(GUIContent.none, GUI.skin.horizontalSlider, GUILayout.Height(totalHeight), GUILayout.ExpandWidth(true));
         }
 
@@ -193,9 +193,9 @@ namespace shadcnui.GUIComponents.Controls
             float trackY = sliderRect.y + (totalHeight - trackHeight) / 2f;
             Rect trackRect = new Rect(sliderRect.x + thumbSize / 2f, trackY, sliderRect.width - thumbSize, trackHeight);
 
-            Color trackColor = styleManager.GetSliderTrackColor(config.Variant, config.Disabled);
-            Color fillColor = styleManager.GetSliderFillColor(config.Variant, config.Disabled);
-            Color thumbColor = styleManager.GetSliderThumbColor(config.Variant, config.Disabled);
+            Color trackColor = styleManager.GetSliderTrackColor(config.Variant, config.IsDisabled);
+            Color fillColor = styleManager.GetSliderFillColor(config.Variant, config.IsDisabled);
+            Color thumbColor = styleManager.GetSliderThumbColor(config.Variant, config.IsDisabled);
 
             float normalizedValue = ValueToNormalized(config.Value, config.MinValue, config.MaxValue);
             float fillWidth = trackRect.width * normalizedValue;
@@ -213,14 +213,14 @@ namespace shadcnui.GUIComponents.Controls
             float thumbY = sliderRect.y + (totalHeight - thumbSize) / 2f;
             Rect thumbRect = new Rect(thumbX, thumbY, thumbSize, thumbSize);
 
-            DrawCachedThumb(thumbRect, thumbColor, config.Disabled);
+            DrawCachedThumb(thumbRect, thumbColor, config.IsDisabled);
 
             return config.Value;
         }
 
         private float HandleSliderInput(Rect sliderRect, Rect trackRect, SliderConfig config, Rect thumbRect)
         {
-            if (config.Disabled)
+            if (config.IsDisabled)
                 return config.Value;
 
             int controlId = GUIUtility.GetControlID(FocusType.Passive);

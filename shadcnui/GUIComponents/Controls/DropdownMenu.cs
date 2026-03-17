@@ -31,7 +31,7 @@ namespace shadcnui.GUIComponents.Controls
             }
             if (!_isOpen)
                 Open(config.Items, "dropdown", config.ZIndex);
-            DrawDropdownMenu(config.Options);
+            DrawDropdownMenu(config.LayoutOptions);
         }
         #endregion
 

@@ -21,22 +21,22 @@ namespace shadcnui.GUIComponents.Controls
             GUIStyle switchStyle = styleManager?.GetSwitchStyle(config.Variant, config.Size) ?? GUI.skin.toggle;
 
             bool wasEnabled = GUI.enabled;
-            if (config.Disabled)
+            if (config.IsDisabled)
                 GUI.enabled = false;
 
             bool newValue = GetSwitchValue(config, switchStyle);
 
             GUI.enabled = wasEnabled;
 
-            if (newValue != config.Value && !config.Disabled)
-                config.OnToggle?.Invoke(newValue);
+            if (newValue != config.Value && !config.IsDisabled)
+                config.OnValueChanged?.Invoke(newValue);
 
-            return config.Disabled ? config.Value : newValue;
+            return config.IsDisabled ? config.Value : newValue;
         }
         #endregion
 
         #region API
-        public bool DrawSwitch(string text, bool value, ControlVariant variant = ControlVariant.Default, ControlSize size = ControlSize.Default, Action<bool> onToggle = null, bool disabled = false, params GUILayoutOption[] options)
+        public bool DrawSwitch(string text, bool value, ControlVariant variant = ControlVariant.Default, ControlSize size = ControlSize.Default, Action<bool> OnValueChanged = null, bool IsDisabled = false, params GUILayoutOption[] options)
         {
             return DrawSwitch(
                 new SwitchConfig
@@ -45,14 +45,14 @@ namespace shadcnui.GUIComponents.Controls
                     Value = value,
                     Variant = variant,
                     Size = size,
-                    OnToggle = onToggle,
-                    Disabled = disabled,
-                    Options = options,
+                    OnValueChanged = OnValueChanged,
+                    IsDisabled = IsDisabled,
+                    LayoutOptions = options,
                 }
             );
         }
 
-        public bool DrawSwitch(Rect rect, string text, bool value, ControlVariant variant = ControlVariant.Default, ControlSize size = ControlSize.Default, Action<bool> onToggle = null, bool disabled = false)
+        public bool DrawSwitch(Rect rect, string text, bool value, ControlVariant variant = ControlVariant.Default, ControlSize size = ControlSize.Default, Action<bool> OnValueChanged = null, bool IsDisabled = false)
         {
             return DrawSwitch(
                 new SwitchConfig
@@ -62,8 +62,8 @@ namespace shadcnui.GUIComponents.Controls
                     Value = value,
                     Variant = variant,
                     Size = size,
-                    OnToggle = onToggle,
-                    Disabled = disabled,
+                    OnValueChanged = OnValueChanged,
+                    IsDisabled = IsDisabled,
                 }
             );
         }
@@ -101,7 +101,7 @@ namespace shadcnui.GUIComponents.Controls
         private bool DrawSwitchLayout(SwitchConfig config, GUIStyle switchStyle)
         {
             bool useExpandWidth = config.Size != ControlSize.Icon;
-            GUILayoutOption[] options = BuildToggleLayoutOptions(config.Options, useExpandWidth);
+            GUILayoutOption[] options = BuildToggleLayoutOptions(config.LayoutOptions, useExpandWidth);
             return UnityHelpers.Toggle(config.Value, config.Text ?? "Switch", switchStyle, options);
         }
 

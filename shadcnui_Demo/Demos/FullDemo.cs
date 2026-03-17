@@ -159,7 +159,6 @@ namespace shadcnui_Demo.Menu
 
         private void DrawOverviewTab()
         {
-
             DrawSection(
                 "Core Controls",
                 "Representative variants and sizes.",

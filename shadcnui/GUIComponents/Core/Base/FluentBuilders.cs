@@ -136,8 +136,8 @@ namespace shadcnui.GUIComponents.Core.Base
         {
             Config.Variant = VariantValue;
             Config.Size = SizeValue;
-            Config.Disabled = DisabledValue;
-            Config.Options = GetOptions();
+            Config.IsDisabled = DisabledValue;
+            Config.LayoutOptions = GetOptions();
             return Helper.Button(Config);
         }
     }
@@ -170,14 +170,14 @@ namespace shadcnui.GUIComponents.Core.Base
 
         public InputBuilder Password(char mask = '*')
         {
-            Config.MaskChar = mask;
+            Config.MaskCharacter = mask;
             Config.Label ??= string.Empty;
             return this;
         }
 
         public InputBuilder Focused(bool focused = true)
         {
-            Config.Focused = focused;
+            Config.IsFocused = focused;
             return this;
         }
 
@@ -195,14 +195,14 @@ namespace shadcnui.GUIComponents.Core.Base
 
         public InputBuilder OnChange(Action<string> onChange)
         {
-            Config.OnChange = onChange;
+            Config.OnValueChanged = onChange;
             return this;
         }
 
         public string Draw()
         {
             Config.Variant = VariantValue;
-            Config.Disabled = DisabledValue;
+            Config.IsDisabled = DisabledValue;
             return _labeled ? Helper.LabeledInput(Config) : Helper.Input(Config);
         }
     }
@@ -232,7 +232,7 @@ namespace shadcnui.GUIComponents.Core.Base
 
         public ToggleBuilder OnToggle(Action<bool> onToggle)
         {
-            Config.OnToggle = onToggle;
+            Config.OnValueChanged = onToggle;
             return this;
         }
 
@@ -240,8 +240,8 @@ namespace shadcnui.GUIComponents.Core.Base
         {
             Config.Variant = VariantValue;
             Config.Size = SizeValue;
-            Config.Disabled = DisabledValue;
-            Config.Options = GetOptions();
+            Config.IsDisabled = DisabledValue;
+            Config.LayoutOptions = GetOptions();
             return Helper.Toggle(Config);
         }
     }
@@ -259,7 +259,7 @@ namespace shadcnui.GUIComponents.Core.Base
 
         public CheckboxBuilder OnToggle(Action<bool> onToggle)
         {
-            Config.OnToggle = onToggle;
+            Config.OnValueChanged = onToggle;
             return this;
         }
 
@@ -267,8 +267,8 @@ namespace shadcnui.GUIComponents.Core.Base
         {
             Config.Variant = VariantValue;
             Config.Size = SizeValue;
-            Config.Disabled = DisabledValue;
-            Config.Options = GetOptions();
+            Config.IsDisabled = DisabledValue;
+            Config.LayoutOptions = GetOptions();
             return Helper.Checkbox(Config);
         }
     }
@@ -280,7 +280,7 @@ namespace shadcnui.GUIComponents.Core.Base
 
         public SwitchBuilder OnToggle(Action<bool> onToggle)
         {
-            Config.OnToggle = onToggle;
+            Config.OnValueChanged = onToggle;
             return this;
         }
 
@@ -288,8 +288,8 @@ namespace shadcnui.GUIComponents.Core.Base
         {
             Config.Variant = VariantValue;
             Config.Size = SizeValue;
-            Config.Disabled = DisabledValue;
-            Config.Options = GetOptions();
+            Config.IsDisabled = DisabledValue;
+            Config.LayoutOptions = GetOptions();
             return Helper.Switch(Config);
         }
     }
@@ -316,8 +316,8 @@ namespace shadcnui.GUIComponents.Core.Base
         public void Draw()
         {
             Config.Variant = VariantValue;
-            Config.Disabled = DisabledValue;
-            Config.Options = GetOptions();
+            Config.IsDisabled = DisabledValue;
+            Config.LayoutOptions = GetOptions();
             Helper.Label(Config);
         }
     }
@@ -370,7 +370,7 @@ namespace shadcnui.GUIComponents.Core.Base
         {
             Config.Variant = VariantValue;
             Config.Size = SizeValue;
-            Config.Options = GetOptions();
+            Config.LayoutOptions = GetOptions();
             Helper.Badge(Config);
         }
     }
@@ -432,7 +432,7 @@ namespace shadcnui.GUIComponents.Core.Base
         public void Draw()
         {
             Config.Size = SizeValue;
-            Config.Options = GetOptions();
+            Config.LayoutOptions = GetOptions();
             Helper.Avatar(Config);
         }
     }
@@ -630,7 +630,7 @@ namespace shadcnui.GUIComponents.Core.Base
 
         public SliderBuilder OnChange(Action<float> onChange)
         {
-            Config.OnChange = onChange;
+            Config.OnValueChanged = onChange;
             return this;
         }
 
@@ -638,8 +638,8 @@ namespace shadcnui.GUIComponents.Core.Base
         {
             Config.Variant = VariantValue;
             Config.Size = SizeValue;
-            Config.Disabled = DisabledValue;
-            Config.Options = GetOptions();
+            Config.IsDisabled = DisabledValue;
+            Config.LayoutOptions = GetOptions();
             return Helper.Slider(Config);
         }
     }
@@ -647,11 +647,11 @@ namespace shadcnui.GUIComponents.Core.Base
     public sealed class TextAreaBuilder : SizedBuilder<TextAreaBuilder, TextAreaConfig>
     {
         public TextAreaBuilder(GUIHelper helper, string text = "")
-            : base(helper, new TextAreaConfig { Text = text }) { }
+            : base(helper, new TextAreaConfig { Value = text }) { }
 
         public TextAreaBuilder Text(string text)
         {
-            Config.Text = text;
+            Config.Value = text;
             return this;
         }
 
@@ -694,8 +694,8 @@ namespace shadcnui.GUIComponents.Core.Base
         public string Draw()
         {
             Config.Variant = VariantValue;
-            Config.Disabled = DisabledValue;
-            Config.Options = GetOptions();
+            Config.IsDisabled = DisabledValue;
+            Config.LayoutOptions = GetOptions();
             return Helper.TextArea(Config);
         }
     }
@@ -703,17 +703,17 @@ namespace shadcnui.GUIComponents.Core.Base
     public sealed class TableBuilder : FluentBuilder<TableBuilder, TableConfig>
     {
         public TableBuilder(GUIHelper helper, params string[] headers)
-            : base(helper, new TableConfig { Headers = headers ?? Array.Empty<string>() }) { }
+            : base(helper, new TableConfig { ColumnHeaders = headers ?? Array.Empty<string>() }) { }
 
         public TableBuilder Headers(params string[] headers)
         {
-            Config.Headers = headers;
+            Config.ColumnHeaders = headers;
             return this;
         }
 
         public TableBuilder Data(string[,] data)
         {
-            Config.Data = data;
+            Config.Rows = data;
             return this;
         }
 
@@ -891,7 +891,7 @@ namespace shadcnui.GUIComponents.Core.Base
 
         public SelectBuilder OnChange(Action<int> onChange)
         {
-            Config.OnChange = onChange;
+            Config.OnSelectionChanged = onChange;
             return this;
         }
 

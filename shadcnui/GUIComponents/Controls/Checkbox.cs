@@ -21,22 +21,22 @@ namespace shadcnui.GUIComponents.Controls
             GUIStyle checkboxStyle = styleManager?.GetCheckboxStyle(config.Variant, config.Size) ?? GUI.skin.toggle;
 
             bool wasEnabled = GUI.enabled;
-            if (config.Disabled)
+            if (config.IsDisabled)
                 GUI.enabled = false;
 
             bool newValue = GetCheckboxValue(config, checkboxStyle);
 
             GUI.enabled = wasEnabled;
 
-            if (newValue != config.Value && !config.Disabled)
-                config.OnToggle?.Invoke(newValue);
+            if (newValue != config.Value && !config.IsDisabled)
+                config.OnValueChanged?.Invoke(newValue);
 
-            return config.Disabled ? config.Value : newValue;
+            return config.IsDisabled ? config.Value : newValue;
         }
         #endregion
 
         #region API
-        public bool DrawCheckbox(string text, bool value, ControlVariant variant = ControlVariant.Default, ControlSize size = ControlSize.Default, Action<bool> onToggle = null, bool disabled = false, params GUILayoutOption[] options)
+        public bool DrawCheckbox(string text, bool value, ControlVariant variant = ControlVariant.Default, ControlSize size = ControlSize.Default, Action<bool> OnValueChanged = null, bool IsDisabled = false, params GUILayoutOption[] options)
         {
             return DrawCheckbox(
                 new CheckboxConfig
@@ -45,14 +45,14 @@ namespace shadcnui.GUIComponents.Controls
                     Value = value,
                     Variant = variant,
                     Size = size,
-                    OnToggle = onToggle,
-                    Disabled = disabled,
-                    Options = options,
+                    OnValueChanged = OnValueChanged,
+                    IsDisabled = IsDisabled,
+                    LayoutOptions = options,
                 }
             );
         }
 
-        public bool DrawCheckbox(Rect rect, string text, bool value, ControlVariant variant = ControlVariant.Default, ControlSize size = ControlSize.Default, Action<bool> onToggle = null, bool disabled = false)
+        public bool DrawCheckbox(Rect rect, string text, bool value, ControlVariant variant = ControlVariant.Default, ControlSize size = ControlSize.Default, Action<bool> OnValueChanged = null, bool IsDisabled = false)
         {
             return DrawCheckbox(
                 new CheckboxConfig
@@ -62,8 +62,8 @@ namespace shadcnui.GUIComponents.Controls
                     Value = value,
                     Variant = variant,
                     Size = size,
-                    OnToggle = onToggle,
-                    Disabled = disabled,
+                    OnValueChanged = OnValueChanged,
+                    IsDisabled = IsDisabled,
                 }
             );
         }
@@ -102,7 +102,7 @@ namespace shadcnui.GUIComponents.Controls
 
         private bool DrawCheckboxLayout(CheckboxConfig config, GUIStyle checkboxStyle, bool useExpandWidth)
         {
-            GUILayoutOption[] options = BuildToggleLayoutOptions(config.Options, useExpandWidth);
+            GUILayoutOption[] options = BuildToggleLayoutOptions(config.LayoutOptions, useExpandWidth);
 
             if (!config.ShowCheckmark)
             {

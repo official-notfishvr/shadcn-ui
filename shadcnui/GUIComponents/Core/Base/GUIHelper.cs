@@ -304,9 +304,9 @@ namespace shadcnui.GUIComponents.Core.Base
                     Variant = v,
                     Size = sz,
                     OnClick = onClick,
-                    Disabled = disabled,
+                    IsDisabled = disabled,
                     Opacity = opacity,
-                    Options = opts ?? Array.Empty<GUILayoutOption>(),
+                    LayoutOptions = opts ?? Array.Empty<GUILayoutOption>(),
                 }
             );
 
@@ -318,8 +318,8 @@ namespace shadcnui.GUIComponents.Core.Base
                     Variant = v,
                     Size = sz,
                     OnClick = onClick,
-                    Disabled = disabled,
-                    Options = opts ?? Array.Empty<GUILayoutOption>(),
+                    IsDisabled = disabled,
+                    LayoutOptions = opts ?? Array.Empty<GUILayoutOption>(),
                 }
             );
 
@@ -365,10 +365,10 @@ namespace shadcnui.GUIComponents.Core.Base
                     Icon = icon,
                     Placeholder = placeholder,
                     Variant = v,
-                    Disabled = disabled,
-                    Focused = focused,
+                    IsDisabled = disabled,
+                    IsFocused = focused,
                     Width = width,
-                    OnChange = onChange,
+                    OnValueChanged = onChange,
                 }
             );
 
@@ -428,10 +428,10 @@ namespace shadcnui.GUIComponents.Core.Base
                     Placeholder = placeholder,
                     Variant = iv,
                     LabelVariant = lv,
-                    Disabled = disabled,
-                    Focused = focused,
+                    IsDisabled = disabled,
+                    IsFocused = focused,
                     Width = inputWidth,
-                    OnChange = onChange,
+                    OnValueChanged = onChange,
                 }
             );
 
@@ -452,10 +452,10 @@ namespace shadcnui.GUIComponents.Core.Base
                         {
                             Value = s,
                             Label = label,
-                            MaskChar = mask,
+                            MaskCharacter = mask,
                             Variant = v,
-                            Disabled = disabled,
-                            OnChange = onChange,
+                            IsDisabled = disabled,
+                            OnValueChanged = onChange,
                         }
                     ),
                 val,
@@ -541,9 +541,9 @@ namespace shadcnui.GUIComponents.Core.Base
                     Value = val,
                     Variant = v,
                     Size = sz,
-                    OnToggle = onToggle,
-                    Disabled = disabled,
-                    Options = opts ?? Array.Empty<GUILayoutOption>(),
+                    OnValueChanged = onToggle,
+                    IsDisabled = disabled,
+                    LayoutOptions = opts ?? Array.Empty<GUILayoutOption>(),
                 }
             );
 
@@ -587,9 +587,9 @@ namespace shadcnui.GUIComponents.Core.Base
                     Value = val,
                     Variant = v,
                     Size = sz,
-                    OnToggle = onToggle,
-                    Disabled = disabled,
-                    Options = opts ?? Array.Empty<GUILayoutOption>(),
+                    OnValueChanged = onToggle,
+                    IsDisabled = disabled,
+                    LayoutOptions = opts ?? Array.Empty<GUILayoutOption>(),
                     ShowCheckmark = showCheckmark,
                 }
             );
@@ -618,9 +618,9 @@ namespace shadcnui.GUIComponents.Core.Base
                     Value = val,
                     Variant = v,
                     Size = sz,
-                    OnToggle = onToggle,
-                    Disabled = disabled,
-                    Options = opts ?? Array.Empty<GUILayoutOption>(),
+                    OnValueChanged = onToggle,
+                    IsDisabled = disabled,
+                    LayoutOptions = opts ?? Array.Empty<GUILayoutOption>(),
                 }
             );
 
@@ -674,9 +674,9 @@ namespace shadcnui.GUIComponents.Core.Base
                     Value = val,
                     Variant = v,
                     Size = sz,
-                    OnToggle = onToggle,
-                    Disabled = disabled,
-                    Options = opts ?? Array.Empty<GUILayoutOption>(),
+                    OnValueChanged = onToggle,
+                    IsDisabled = disabled,
+                    LayoutOptions = opts ?? Array.Empty<GUILayoutOption>(),
                 }
             );
 
@@ -730,11 +730,11 @@ namespace shadcnui.GUIComponents.Core.Base
                             MinValue = min,
                             MaxValue = max,
                             Step = step,
-                            OnChange = onChange,
+                            OnValueChanged = onChange,
                             Variant = v,
                             Size = sz,
-                            Disabled = disabled,
-                            Options = opts ?? Array.Empty<GUILayoutOption>(),
+                            IsDisabled = disabled,
+                            LayoutOptions = opts ?? Array.Empty<GUILayoutOption>(),
                         }
                     ),
                 val,
@@ -775,13 +775,13 @@ namespace shadcnui.GUIComponents.Core.Base
                             MinValue = min,
                             MaxValue = max,
                             Step = step,
-                            OnChange = onChange,
+                            OnValueChanged = onChange,
                             Variant = v,
                             Size = sz,
-                            Disabled = disabled,
+                            IsDisabled = disabled,
                             ShowValue = showValue,
                             ValueFormat = fmt,
-                            Options = opts ?? Array.Empty<GUILayoutOption>(),
+                            LayoutOptions = opts ?? Array.Empty<GUILayoutOption>(),
                         }
                     ),
                 val,
@@ -808,7 +808,7 @@ namespace shadcnui.GUIComponents.Core.Base
                             MinValue = absMin,
                             MaxValue = maxVal,
                             Step = 0f,
-                            Options = opts ?? Array.Empty<GUILayoutOption>(),
+                            LayoutOptions = opts ?? Array.Empty<GUILayoutOption>(),
                         }
                     ),
                 minVal,
@@ -824,7 +824,7 @@ namespace shadcnui.GUIComponents.Core.Base
                             MinValue = lo,
                             MaxValue = absMax,
                             Step = 0f,
-                            Options = opts ?? Array.Empty<GUILayoutOption>(),
+                            LayoutOptions = opts ?? Array.Empty<GUILayoutOption>(),
                         }
                     ),
                 maxVal,
@@ -870,7 +870,7 @@ namespace shadcnui.GUIComponents.Core.Base
                 {
                     Items = items ?? Array.Empty<string>(),
                     SelectedIndex = idx,
-                    OnChange = onChange,
+                    OnSelectionChanged = onChange,
                 }
             );
 
@@ -889,7 +889,7 @@ namespace shadcnui.GUIComponents.Core.Base
         // Dropdown menu
         public void DropdownMenu(DropdownMenuConfig cfg) => Execute(() => _dropdownMenu.Draw(cfg), nameof(DropdownMenu));
 
-        public void DropdownMenu(List<DropdownMenuItem> items, int zIndex = -1, params GUILayoutOption[] opts) => DropdownMenu(new DropdownMenuConfig(items) { ZIndex = zIndex >= 0 ? zIndex : DesignTokens.ZIndex.Dropdown, Options = opts ?? Array.Empty<GUILayoutOption>() });
+        public void DropdownMenu(List<DropdownMenuItem> items, int zIndex = -1, params GUILayoutOption[] opts) => DropdownMenu(new DropdownMenuConfig(items) { ZIndex = zIndex >= 0 ? zIndex : DesignTokens.ZIndex.Dropdown, LayoutOptions = opts ?? Array.Empty<GUILayoutOption>() });
 
         public void OpenDropdownMenu(List<DropdownMenuItem> items, string id = "dropdown", int zIndex = -1) => Execute(() => _dropdownMenu.Open(items, id, zIndex), nameof(OpenDropdownMenu));
 
@@ -916,10 +916,10 @@ namespace shadcnui.GUIComponents.Core.Base
                 nameof(TextArea),
                 s =>
                 {
-                    cfg.Text = s;
+                    cfg.Value = s;
                     return _textArea.DrawTextArea(cfg);
                 },
-                cfg.Text,
+                cfg.Value,
                 key
             );
         }
@@ -995,8 +995,8 @@ namespace shadcnui.GUIComponents.Core.Base
                     Text = text,
                     Icon = icon,
                     Variant = v,
-                    Disabled = disabled,
-                    Options = opts ?? Array.Empty<GUILayoutOption>(),
+                    IsDisabled = disabled,
+                    LayoutOptions = opts ?? Array.Empty<GUILayoutOption>(),
                 }
             );
 
@@ -1025,7 +1025,7 @@ namespace shadcnui.GUIComponents.Core.Base
                     Icon = icon,
                     Variant = v,
                     Size = sz,
-                    Options = opts ?? Array.Empty<GUILayoutOption>(),
+                    LayoutOptions = opts ?? Array.Empty<GUILayoutOption>(),
                 }
             );
 
@@ -1230,7 +1230,7 @@ namespace shadcnui.GUIComponents.Core.Base
 
         public void VerticalSeparator(params GUILayoutOption[] opts) => Separator(SeparatorOrientation.Vertical, true, opts);
 
-        public void LabeledSeparator(string text, params GUILayoutOption[] opts) => Separator(new SeparatorConfig { Text = text, Options = opts ?? Array.Empty<GUILayoutOption>() });
+        public void LabeledSeparator(string text, params GUILayoutOption[] opts) => Separator(new SeparatorConfig { Text = text, LayoutOptions = opts ?? Array.Empty<GUILayoutOption>() });
 
         public void SeparatorWithSpacing(SeparatorOrientation o, float before, float after, params GUILayoutOption[] opts) =>
             Separator(
@@ -1239,7 +1239,7 @@ namespace shadcnui.GUIComponents.Core.Base
                     Orientation = o,
                     SpacingBefore = before,
                     SpacingAfter = after,
-                    Options = opts ?? Array.Empty<GUILayoutOption>(),
+                    LayoutOptions = opts ?? Array.Empty<GUILayoutOption>(),
                 }
             );
 
@@ -1248,7 +1248,7 @@ namespace shadcnui.GUIComponents.Core.Base
         {
             if (cfg == null)
                 return Execute(() => _tabs.Draw(cfg), 0, nameof(Tabs));
-            string key = cfg.TabNames?.Length > 0 ? string.Join("|", cfg.TabNames) : null;
+            string key = cfg.TabLabels?.Length > 0 ? string.Join("|", cfg.TabLabels) : null;
             return ExecStatefulInt(
                 nameof(Tabs),
                 s =>
@@ -1274,7 +1274,7 @@ namespace shadcnui.GUIComponents.Core.Base
                 new TabsConfig(tabNames, idx)
                 {
                     Content = content,
-                    OnTabChange = onTabChange,
+                    OnSelectionChanged = onTabChange,
                     MaxLines = maxLines,
                     Position = position,
                     IndicatorStyle = indicatorStyle,
@@ -1301,7 +1301,7 @@ namespace shadcnui.GUIComponents.Core.Base
                 new TabsConfig(tabNames, idx)
                 {
                     Content = content,
-                    OnTabChange = onTabChange,
+                    OnSelectionChanged = onTabChange,
                     MaxLines = maxLines,
                     Position = side == TabSide.Right ? TabPosition.Right : TabPosition.Left,
                     TabWidth = tabWidth,
@@ -1459,7 +1459,7 @@ namespace shadcnui.GUIComponents.Core.Base
                     Placeholder = placeholder,
                     SelectedDate = date,
                     Id = id,
-                    Options = opts ?? Array.Empty<GUILayoutOption>(),
+                    LayoutOptions = opts ?? Array.Empty<GUILayoutOption>(),
                 }
             );
 
@@ -1478,7 +1478,7 @@ namespace shadcnui.GUIComponents.Core.Base
                     MinDate = min,
                     MaxDate = max,
                     Id = id,
-                    Options = opts ?? Array.Empty<GUILayoutOption>(),
+                    LayoutOptions = opts ?? Array.Empty<GUILayoutOption>(),
                 }
             );
 
@@ -1520,7 +1520,7 @@ namespace shadcnui.GUIComponents.Core.Base
                     Placeholder = placeholder,
                     SelectedDate = date,
                     Id = id,
-                    Options = opts ?? Array.Empty<GUILayoutOption>(),
+                    LayoutOptions = opts ?? Array.Empty<GUILayoutOption>(),
                 }
             );
 
@@ -1540,7 +1540,7 @@ namespace shadcnui.GUIComponents.Core.Base
                     MinDate = min,
                     MaxDate = max,
                     Id = id,
-                    Options = opts ?? Array.Empty<GUILayoutOption>(),
+                    LayoutOptions = opts ?? Array.Empty<GUILayoutOption>(),
                 }
             );
 
@@ -1570,7 +1570,7 @@ namespace shadcnui.GUIComponents.Core.Base
                             MinDate = min,
                             MaxDate = max,
                             Id = id,
-                            Options = opts ?? Array.Empty<GUILayoutOption>(),
+                            LayoutOptions = opts ?? Array.Empty<GUILayoutOption>(),
                         }
                     ),
                 start,

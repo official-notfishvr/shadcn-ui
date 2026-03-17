@@ -119,7 +119,7 @@ namespace shadcnui.GUIComponents.Controls
                 if (UnityHelpers.Button(config.Items[i], itemStyle))
                 {
                     newIndex = i;
-                    config.OnChange?.Invoke(i);
+                    config.OnSelectionChanged?.Invoke(i);
                     Close();
                 }
             }

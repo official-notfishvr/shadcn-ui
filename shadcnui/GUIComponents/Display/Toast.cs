@@ -52,7 +52,7 @@ namespace shadcnui.GUIComponents.Display
             DurationMs = config.DurationMs;
             OnAction = config.OnAction;
             ActionLabel = config.ActionLabel;
-            Dismissible = config.Dismissible;
+            Dismissible = config.IsDismissible;
             ElapsedMs = 0f;
             Height = 0f;
             Width = config.Width;

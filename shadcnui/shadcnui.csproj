@@ -50,8 +50,8 @@
         <WarningLevel>4</WarningLevel>
     </PropertyGroup>
     <ItemGroup>
-      <None Remove="Directory.Build.props" />
-      <None Remove="Directory.Build.targets" />
+        <None Remove="Directory.Build.props" />
+        <None Remove="Directory.Build.targets" />
     </ItemGroup>
     <ItemGroup>
         <Reference Include="Unity.Addressables">

@@ -18,7 +18,7 @@ namespace shadcnui.GUIComponents.Controls
             GUIStyle buttonStyle = styleManager?.GetButtonStyle(config.Variant, config.Size) ?? GUI.skin.button;
             var layoutOptions = BuildLayoutOptions(config, buttonStyle);
 
-            ApplyDisabledState(config.Disabled);
+            ApplyDisabledState(config.IsDisabled);
             var originalColor = GUI.color;
             GUI.color = new Color(originalColor.r, originalColor.g, originalColor.b, originalColor.a * config.Opacity);
 
@@ -27,15 +27,15 @@ namespace shadcnui.GUIComponents.Controls
             GUI.color = originalColor;
             GUI.enabled = true;
 
-            if (clicked && !config.Disabled)
+            if (clicked && !config.IsDisabled)
                 config.OnClick?.Invoke();
 
-            return clicked && !config.Disabled;
+            return clicked && !config.IsDisabled;
         }
         #endregion
 
         #region API
-        public bool DrawButton(string text, ControlVariant variant = ControlVariant.Default, ControlSize size = ControlSize.Default, Action onClick = null, bool disabled = false, float opacity = 1f, params GUILayoutOption[] options)
+        public bool DrawButton(string text, ControlVariant variant = ControlVariant.Default, ControlSize size = ControlSize.Default, Action onClick = null, bool IsDisabled = false, float opacity = 1f, params GUILayoutOption[] options)
         {
             return DrawButton(
                 new ButtonConfig(text)
@@ -43,14 +43,14 @@ namespace shadcnui.GUIComponents.Controls
                     Variant = variant,
                     Size = size,
                     OnClick = onClick,
-                    Disabled = disabled,
+                    IsDisabled = IsDisabled,
                     Opacity = opacity,
-                    Options = options,
+                    LayoutOptions = options,
                 }
             );
         }
 
-        public bool DrawButton(string text, Texture2D icon, ControlVariant variant = ControlVariant.Default, ControlSize size = ControlSize.Default, Action onClick = null, bool disabled = false, float opacity = 1f, params GUILayoutOption[] options)
+        public bool DrawButton(string text, Texture2D icon, ControlVariant variant = ControlVariant.Default, ControlSize size = ControlSize.Default, Action onClick = null, bool IsDisabled = false, float opacity = 1f, params GUILayoutOption[] options)
         {
             return DrawButton(
                 new ButtonConfig(text)
@@ -59,9 +59,9 @@ namespace shadcnui.GUIComponents.Controls
                     Variant = variant,
                     Size = size,
                     OnClick = onClick,
-                    Disabled = disabled,
+                    IsDisabled = IsDisabled,
                     Opacity = opacity,
-                    Options = options,
+                    LayoutOptions = options,
                 }
             );
         }
@@ -87,7 +87,7 @@ namespace shadcnui.GUIComponents.Controls
         #region Private Methods
         private List<GUILayoutOption> BuildLayoutOptions(ButtonConfig config, GUIStyle buttonStyle)
         {
-            var layoutOptions = new List<GUILayoutOption>(config.Options ?? Array.Empty<GUILayoutOption>());
+            var layoutOptions = new List<GUILayoutOption>(config.LayoutOptions ?? Array.Empty<GUILayoutOption>());
 
             if (config.Size != ControlSize.Icon && config.Icon?.Image == null)
                 layoutOptions.Add(GUILayout.ExpandWidth(true));
@@ -125,18 +125,18 @@ namespace shadcnui.GUIComponents.Controls
             var rect = GUILayoutUtility.GetRect(content, buttonStyle, layoutOptions.ToArray());
             bool isHovered = rect.Contains(Event.current.mousePosition);
 
-            bool clicked = DrawButtonRect(rect, content, buttonStyle, isHovered && !config.Disabled);
+            bool clicked = DrawButtonRect(rect, content, buttonStyle, isHovered && !config.IsDisabled);
 
             if (config.Icon.Position == IconPosition.Right)
             {
                 layoutComponents.AddSpace(config.Icon.Spacing * guiHelper.uiScale);
-                RenderIcon(config.Icon, isHovered && !config.Disabled);
+                RenderIcon(config.Icon, isHovered && !config.IsDisabled);
             }
 
             if (config.Icon.Position == IconPosition.Below)
             {
                 layoutComponents.AddSpace(config.Icon.Spacing * guiHelper.uiScale);
-                RenderIcon(config.Icon, isHovered && !config.Disabled);
+                RenderIcon(config.Icon, isHovered && !config.IsDisabled);
             }
 
             if (isHorizontal)
@@ -152,7 +152,7 @@ namespace shadcnui.GUIComponents.Controls
             var content = new UnityHelpers.GUIContent(config.Text ?? "");
             var rect = GUILayoutUtility.GetRect(content, buttonStyle, layoutOptions.ToArray());
             bool isHovered = rect.Contains(Event.current.mousePosition);
-            return DrawButtonRect(rect, content, buttonStyle, isHovered && !config.Disabled);
+            return DrawButtonRect(rect, content, buttonStyle, isHovered && !config.IsDisabled);
         }
 
         private bool DrawButtonRect(Rect rect, UnityHelpers.GUIContent content, GUIStyle buttonStyle, bool isHovered)

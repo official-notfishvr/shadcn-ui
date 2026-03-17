@@ -31,7 +31,7 @@ namespace shadcnui.GUIComponents.Controls
             string buttonText = currentTheme?.Name ?? "Select Theme";
             string dropdownIcon = LayerManager.Instance.IsOpen(config.Id) ? " ^" : " v";
 
-            var buttonOptions = config.Options ?? new[] { GUILayout.Width(config.Width) };
+            var buttonOptions = config.LayoutOptions ?? new[] { GUILayout.Width(config.Width) };
             if (UnityHelpers.Button(buttonText + dropdownIcon, buttonStyle, buttonOptions))
                 HandleThemeButtonClick(config);
 

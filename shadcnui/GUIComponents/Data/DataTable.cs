@@ -148,13 +148,12 @@ namespace shadcnui.GUIComponents.Data
                     {
                         state.SelectedRows.Clear();
                     }
-                    state.SelectAll = newSelectAll;
                 }
             }
 
             foreach (var column in columns)
             {
-                if (column.Sortable)
+                if (column.IsSortable)
                 {
                     string headerText = column.Header;
                     string sortIcon = "";
@@ -308,7 +307,7 @@ namespace shadcnui.GUIComponents.Data
 
             return data.Where(row =>
                 {
-                    foreach (var column in columns.Where(c => c.Filterable))
+                    foreach (var column in columns.Where(c => c.IsFilterable))
                     {
                         string cellValue = row.GetValue<string>(column.AccessorKey, "");
                         if (cellValue.ToLower().Contains(filterText.ToLower()))
@@ -325,7 +324,7 @@ namespace shadcnui.GUIComponents.Data
                 return data;
 
             var column = columns.FirstOrDefault(c => c.Id == sortColumn);
-            if (column == null || !column.Sortable)
+            if (column == null || !column.IsSortable)
                 return data;
 
             return ascending ? data.OrderBy(row => row.GetValue<string>(column.AccessorKey, "")).ToList() : data.OrderByDescending(row => row.GetValue<string>(column.AccessorKey, "")).ToList();
@@ -359,7 +358,6 @@ namespace shadcnui.GUIComponents.Data
             if (_tableStates.ContainsKey(id))
             {
                 _tableStates[id].SelectedRows.Clear();
-                _tableStates[id].SelectAll = false;
             }
         }
 

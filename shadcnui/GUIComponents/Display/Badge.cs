@@ -33,7 +33,7 @@ namespace shadcnui.GUIComponents.Display
                     Text = text,
                     Variant = variant,
                     Size = size,
-                    Options = options,
+                    LayoutOptions = options,
                 }
             );
         }
@@ -60,7 +60,7 @@ namespace shadcnui.GUIComponents.Display
                     Icon = icon != null ? new IconConfig(icon) : null,
                     Variant = variant,
                     Size = size,
-                    Options = options,
+                    LayoutOptions = options,
                 }
             );
         }
@@ -76,7 +76,7 @@ namespace shadcnui.GUIComponents.Display
                     Size = size,
                     Count = count,
                     MaxCount = maxCount,
-                    Options = options,
+                    LayoutOptions = options,
                 }
             );
         }
@@ -91,7 +91,7 @@ namespace shadcnui.GUIComponents.Display
                     ShowStatusDot = true,
                     Variant = variant,
                     Size = size,
-                    Options = options,
+                    LayoutOptions = options,
                 }
             );
         }
@@ -105,7 +105,7 @@ namespace shadcnui.GUIComponents.Display
                     Progress = progress,
                     Variant = variant,
                     Size = size,
-                    Options = options,
+                    LayoutOptions = options,
                 }
             );
         }
@@ -119,7 +119,7 @@ namespace shadcnui.GUIComponents.Display
                     Text = text,
                     Variant = variant,
                     Size = size,
-                    Options = options,
+                    LayoutOptions = options,
                 },
                 true,
                 stableId
@@ -134,7 +134,7 @@ namespace shadcnui.GUIComponents.Display
                     Text = text,
                     Variant = variant,
                     Size = size,
-                    Options = options,
+                    LayoutOptions = options,
                 },
                 true,
                 animationId
@@ -150,7 +150,7 @@ namespace shadcnui.GUIComponents.Display
                     Variant = variant,
                     Size = size,
                     CornerRadius = cornerRadius,
-                    Options = options,
+                    LayoutOptions = options,
                 }
             );
         }
@@ -244,7 +244,7 @@ namespace shadcnui.GUIComponents.Display
             if (config.Rect.HasValue)
                 DrawBadgeRect(config, badgeStyle);
             else
-                UnityHelpers.Label(config.Text ?? "Badge", badgeStyle, config.Options);
+                UnityHelpers.Label(config.Text ?? "Badge", badgeStyle, config.LayoutOptions);
 
             if (horizontalGroupStarted)
                 layoutComponents.EndHorizontalGroup();

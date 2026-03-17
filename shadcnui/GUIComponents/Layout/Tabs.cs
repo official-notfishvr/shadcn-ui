@@ -93,7 +93,7 @@ namespace shadcnui.GUIComponents.Layout
         #region Public Drawing API
         public int Draw(TabsConfig config)
         {
-            if (config.TabNames == null || config.TabNames.Length == 0)
+            if (config.TabLabels == null || config.TabLabels.Length == 0)
             {
                 config.Content?.Invoke();
                 return config.SelectedIndex;
@@ -115,7 +115,7 @@ namespace shadcnui.GUIComponents.Layout
             {
                 ClosableTabs = closableTabs,
                 Content = content,
-                OnTabChange = onTabChange,
+                OnSelectionChanged = onTabChange,
             };
 
             return HandleAutoClose(ref tabNames, ref closableTabs, ref selectedIndex, config);
@@ -126,7 +126,7 @@ namespace shadcnui.GUIComponents.Layout
         #region Core Drawing Logic
         private int DrawTabs(TabsConfig config)
         {
-            var selectedIndex = Mathf.Clamp(config.SelectedIndex, 0, config.TabNames.Length - 1);
+            var selectedIndex = Mathf.Clamp(config.SelectedIndex, 0, config.TabLabels.Length - 1);
             var newSelectedIndex = selectedIndex;
 
             switch (config.Position)
@@ -184,7 +184,7 @@ namespace shadcnui.GUIComponents.Layout
 
         private int DrawMultiLineTabs(TabsConfig config, int selectedIndex, bool isVertical)
         {
-            var tabCount = config.TabNames.Length;
+            var tabCount = config.TabLabels.Length;
             var localStyleManager = guiHelper.GetStyleManager();
 
             if (config.MaxLines <= 1)
@@ -222,11 +222,11 @@ namespace shadcnui.GUIComponents.Layout
                 {
                     layoutComponents.BeginVerticalGroup(localStyleManager.GetTabsListStyle(), GUILayout.Width(config.TabWidth * guiHelper.uiScale));
 
-                    for (var i = 0; i < config.TabNames.Length; i++)
+                    for (var i = 0; i < config.TabLabels.Length; i++)
                     {
                         newSelectedIndex = DrawSingleTab(config, localStyleManager, i, selectedIndex, newSelectedIndex, true);
 
-                        if (i < config.TabNames.Length - 1)
+                        if (i < config.TabLabels.Length - 1)
                         {
                             layoutComponents.AddSpace((int)(DesignTokens.Spacing.XXS * guiHelper.uiScale));
                         }
@@ -236,11 +236,11 @@ namespace shadcnui.GUIComponents.Layout
                 {
                     layoutComponents.BeginHorizontalGroup(localStyleManager.GetTabsListStyle());
 
-                    for (var i = 0; i < config.TabNames.Length; i++)
+                    for (var i = 0; i < config.TabLabels.Length; i++)
                     {
                         newSelectedIndex = DrawSingleTab(config, localStyleManager, i, selectedIndex, newSelectedIndex);
 
-                        if (i < config.TabNames.Length - 1)
+                        if (i < config.TabLabels.Length - 1)
                         {
                             layoutComponents.AddSpace((int)(DesignTokens.Spacing.XXS * guiHelper.uiScale));
                         }
@@ -270,7 +270,7 @@ namespace shadcnui.GUIComponents.Layout
         private int DrawMultiLineHorizontalTabs(TabsConfig config, StyleManager localStyleManager, int selectedIndex, int tabsPerLine)
         {
             var newSelectedIndex = selectedIndex;
-            var totalLines = Mathf.Min(config.MaxLines, (int)Mathf.Ceil((float)config.TabNames.Length / tabsPerLine));
+            var totalLines = Mathf.Min(config.MaxLines, (int)Mathf.Ceil((float)config.TabLabels.Length / tabsPerLine));
 
             if (config.EnableOverflowScroll)
             {
@@ -286,11 +286,11 @@ namespace shadcnui.GUIComponents.Layout
                 {
                     layoutComponents.BeginHorizontalGroup();
 
-                    for (var i = line * tabsPerLine; i < (line + 1) * tabsPerLine && i < config.TabNames.Length; i++)
+                    for (var i = line * tabsPerLine; i < (line + 1) * tabsPerLine && i < config.TabLabels.Length; i++)
                     {
                         newSelectedIndex = DrawSingleTab(config, localStyleManager, i, selectedIndex, newSelectedIndex);
 
-                        if (i < (line + 1) * tabsPerLine - 1 && i < config.TabNames.Length - 1)
+                        if (i < (line + 1) * tabsPerLine - 1 && i < config.TabLabels.Length - 1)
                         {
                             layoutComponents.AddSpace((int)(DesignTokens.Spacing.XXS * guiHelper.uiScale));
                         }
@@ -320,7 +320,7 @@ namespace shadcnui.GUIComponents.Layout
         private int DrawVerticalTabColumns(TabsConfig config, StyleManager localStyleManager, int selectedIndex, int tabsPerColumn)
         {
             var newSelectedIndex = selectedIndex;
-            var totalColumns = Mathf.Min(config.MaxLines, (int)Mathf.Ceil((float)config.TabNames.Length / tabsPerColumn));
+            var totalColumns = Mathf.Min(config.MaxLines, (int)Mathf.Ceil((float)config.TabLabels.Length / tabsPerColumn));
 
             if (config.EnableOverflowScroll)
             {
@@ -336,11 +336,11 @@ namespace shadcnui.GUIComponents.Layout
                 {
                     layoutComponents.BeginVerticalGroup(GUILayout.Width(config.TabWidth * guiHelper.uiScale));
 
-                    for (var i = col * tabsPerColumn; i < (col + 1) * tabsPerColumn && i < config.TabNames.Length; i++)
+                    for (var i = col * tabsPerColumn; i < (col + 1) * tabsPerColumn && i < config.TabLabels.Length; i++)
                     {
                         newSelectedIndex = DrawSingleTab(config, localStyleManager, i, selectedIndex, newSelectedIndex, true);
 
-                        if (i < (col + 1) * tabsPerColumn - 1 && i < config.TabNames.Length - 1)
+                        if (i < (col + 1) * tabsPerColumn - 1 && i < config.TabLabels.Length - 1)
                         {
                             layoutComponents.AddSpace((int)(DesignTokens.Spacing.XXS * guiHelper.uiScale));
                         }
@@ -375,7 +375,7 @@ namespace shadcnui.GUIComponents.Layout
             var isClosable = config.ClosableTabs != null && index < config.ClosableTabs.Length && config.ClosableTabs[index];
 
             var triggerStyle = localStyleManager.GetTabsTriggerStyle(isActive);
-            var tabLabel = config.TabNames[index] ?? $"Tab {index + 1}";
+            var tabLabel = config.TabLabels[index] ?? $"Tab {index + 1}";
 
             GUILayoutOption[] layoutOptions;
             if (isVertical)
@@ -384,7 +384,7 @@ namespace shadcnui.GUIComponents.Layout
             }
             else
             {
-                layoutOptions = config.Options ?? new[] { GUILayout.Height(TAB_HEIGHT * guiHelper.uiScale) };
+                layoutOptions = config.LayoutOptions ?? new[] { GUILayout.Height(TAB_HEIGHT * guiHelper.uiScale) };
             }
 
             GUI.enabled = !isDisabled;
@@ -412,7 +412,7 @@ namespace shadcnui.GUIComponents.Layout
             if (clicked && index != selectedIndex)
             {
                 currentNewIndex = index;
-                config.OnTabChange?.Invoke(index);
+                config.OnSelectionChanged?.Invoke(index);
             }
 
             if (config.ShowIndicator && isActive)
@@ -462,7 +462,7 @@ namespace shadcnui.GUIComponents.Layout
             if (Event.current.type == EventType.MouseDown && Event.current.button == 0 && closeButtonRect.Contains(Event.current.mousePosition))
             {
                 _pendingCloseIndex = index;
-                _pendingCloseCallback = config.OnTabClose;
+                _pendingCloseCallback = config.OnTabClosed;
                 Event.current.Use();
                 return true;
             }

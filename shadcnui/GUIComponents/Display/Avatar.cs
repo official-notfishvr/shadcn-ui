@@ -51,7 +51,7 @@ namespace shadcnui.GUIComponents.Display
                     FallbackText = fallbackText,
                     Size = size,
                     Shape = shape,
-                    Options = options,
+                    LayoutOptions = options,
                 }
             );
         }
@@ -80,7 +80,7 @@ namespace shadcnui.GUIComponents.Display
                     Size = size,
                     Shape = shape,
                     IsOnline = isOnline,
-                    Options = options,
+                    LayoutOptions = options,
                 }
             );
         }
@@ -96,7 +96,7 @@ namespace shadcnui.GUIComponents.Display
                     Size = size,
                     Shape = shape,
                     ShowNameBelow = showNameBelow,
-                    Options = options,
+                    LayoutOptions = options,
                 }
             );
         }
@@ -111,7 +111,7 @@ namespace shadcnui.GUIComponents.Display
                     BorderColor = borderColor,
                     Size = size,
                     Shape = shape,
-                    Options = options,
+                    LayoutOptions = options,
                 }
             );
         }
@@ -127,7 +127,7 @@ namespace shadcnui.GUIComponents.Display
             borderedStyle.normal.background = borderTexture;
             borderedStyle.alignment = TextAnchor.MiddleCenter;
             borderedStyle.padding = new UnityHelpers.RectOffset(borderSize, borderSize, borderSize, borderSize);
-            layoutComponents.BeginVerticalGroup(borderedStyle, config.Options);
+            layoutComponents.BeginVerticalGroup(borderedStyle, config.LayoutOptions);
         }
 
         private void BeginNameLayout(AvatarConfig config)
@@ -176,7 +176,7 @@ namespace shadcnui.GUIComponents.Display
         {
             var styleManager = guiHelper.GetStyleManager();
             GUIStyle avatarStyle = styleManager.GetAvatarStyle(config.Size, config.Shape);
-            GUILayoutOption[] layoutOptions = config.Options ?? System.Array.Empty<GUILayoutOption>();
+            GUILayoutOption[] layoutOptions = config.LayoutOptions ?? System.Array.Empty<GUILayoutOption>();
 
             if (config.Image != null)
                 UnityHelpers.Label(config.Image, avatarStyle, layoutOptions);

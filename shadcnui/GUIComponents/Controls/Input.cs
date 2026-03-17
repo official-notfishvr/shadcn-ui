@@ -19,24 +19,24 @@ namespace shadcnui.GUIComponents.Controls
         public string DrawInput(InputConfig config)
         {
             var styleManager = guiHelper.GetStyleManager();
-            GUIStyle inputStyle = styleManager?.GetInputStyle(config.Variant, ControlSize.Default, config.Focused, config.Disabled) ?? GUI.skin.textField;
+            GUIStyle inputStyle = styleManager?.GetInputStyle(config.Variant, ControlSize.Default, config.IsFocused, config.IsDisabled) ?? GUI.skin.textField;
 
             var originalColor = GUI.color;
-            ApplyDisabledColor(originalColor, config.Disabled);
+            ApplyDisabledColor(originalColor, config.IsDisabled);
 
             string newValue = config.Icon?.Image != null ? DrawInputWithIcon(config, inputStyle) : DrawBasicInput(config, inputStyle);
 
             GUI.color = originalColor;
 
-            if (!config.Disabled && newValue != config.Value && config.OnChange != null)
-                config.OnChange.Invoke(newValue);
+            if (!config.IsDisabled && newValue != config.Value && config.OnValueChanged != null)
+                config.OnValueChanged.Invoke(newValue);
 
-            return config.Disabled ? config.Value : newValue;
+            return config.IsDisabled ? config.Value : newValue;
         }
 
         public string DrawLabeledInput(InputConfig config)
         {
-            DrawLabel(config.Label, config.LabelVariant, -1, config.Disabled);
+            DrawLabel(config.Label, config.LabelVariant, -1, config.IsDisabled);
             layoutComponents.AddSpace(DesignTokens.Spacing.XS);
             return DrawInput(config);
         }
@@ -47,7 +47,7 @@ namespace shadcnui.GUIComponents.Controls
 
             if (!string.IsNullOrEmpty(config.Label))
             {
-                DrawLabel(config.Label, ControlVariant.Default, -1, config.Disabled);
+                DrawLabel(config.Label, ControlVariant.Default, -1, config.IsDisabled);
                 layoutComponents.AddSpace(DesignTokens.Spacing.XS);
             }
 
@@ -60,7 +60,7 @@ namespace shadcnui.GUIComponents.Controls
 
             if (!string.IsNullOrEmpty(config.Label))
             {
-                DrawLabel(config.Label, ControlVariant.Default, -1, config.Disabled);
+                DrawLabel(config.Label, ControlVariant.Default, -1, config.IsDisabled);
                 layoutComponents.AddSpace(DesignTokens.Spacing.XS);
             }
 
@@ -71,7 +71,7 @@ namespace shadcnui.GUIComponents.Controls
 
         #region API
 
-        public string DrawInput(string value, string placeholder = "", ControlVariant variant = ControlVariant.Default, bool disabled = false, bool focused = false, int width = -1, Action<string> onChange = null)
+        public string DrawInput(string value, string placeholder = "", ControlVariant variant = ControlVariant.Default, bool disabled = false, bool focused = false, int width = -1, Action<string> OnValueChanged = null)
         {
             return DrawInput(
                 new InputConfig
@@ -79,15 +79,15 @@ namespace shadcnui.GUIComponents.Controls
                     Value = value,
                     Placeholder = placeholder,
                     Variant = variant,
-                    Disabled = disabled,
-                    Focused = focused,
+                    IsDisabled = disabled,
+                    IsFocused = focused,
                     Width = width,
-                    OnChange = onChange,
+                    OnValueChanged = OnValueChanged,
                 }
             );
         }
 
-        public string DrawInput(string value, Texture2D icon, string placeholder = "", ControlVariant variant = ControlVariant.Default, bool disabled = false, bool focused = false, int width = -1, Action<string> onChange = null)
+        public string DrawInput(string value, Texture2D icon, string placeholder = "", ControlVariant variant = ControlVariant.Default, bool disabled = false, bool focused = false, int width = -1, Action<string> OnValueChanged = null)
         {
             return DrawInput(
                 new InputConfig
@@ -96,15 +96,15 @@ namespace shadcnui.GUIComponents.Controls
                     Icon = icon != null ? new IconConfig(icon) : null,
                     Placeholder = placeholder,
                     Variant = variant,
-                    Disabled = disabled,
-                    Focused = focused,
+                    IsDisabled = disabled,
+                    IsFocused = focused,
                     Width = width,
-                    OnChange = onChange,
+                    OnValueChanged = OnValueChanged,
                 }
             );
         }
 
-        public string DrawLabeledInput(string label, string value, string placeholder = "", ControlVariant inputVariant = ControlVariant.Default, ControlVariant labelVariant = ControlVariant.Default, bool disabled = false, int inputWidth = -1, Action<string> onChange = null)
+        public string DrawLabeledInput(string label, string value, string placeholder = "", ControlVariant inputVariant = ControlVariant.Default, ControlVariant labelVariant = ControlVariant.Default, bool disabled = false, int inputWidth = -1, Action<string> OnValueChanged = null)
         {
             return DrawLabeledInput(
                 new InputConfig
@@ -114,35 +114,35 @@ namespace shadcnui.GUIComponents.Controls
                     Placeholder = placeholder,
                     Variant = inputVariant,
                     LabelVariant = labelVariant,
-                    Disabled = disabled,
+                    IsDisabled = disabled,
                     Width = inputWidth,
-                    OnChange = onChange,
+                    OnValueChanged = OnValueChanged,
                 }
             );
         }
 
-        public string DrawPasswordField(string value, string label = "", char maskChar = '*', ControlVariant variant = ControlVariant.Default, bool disabled = false, Action<string> onChange = null)
+        public string DrawPasswordField(string value, string label = "", char MaskCharacter = '*', ControlVariant variant = ControlVariant.Default, bool disabled = false, Action<string> OnValueChanged = null)
         {
             return DrawPasswordField(
                 new InputConfig
                 {
                     Value = value,
                     Label = label,
-                    MaskChar = maskChar,
+                    MaskCharacter = MaskCharacter,
                     Variant = variant,
-                    Disabled = disabled,
-                    OnChange = onChange,
+                    IsDisabled = disabled,
+                    OnValueChanged = OnValueChanged,
                 }
             );
         }
 
-        public string DrawPasswordField(float windowWidth, string label, ref string password, char maskChar = '*')
+        public string DrawPasswordField(float windowWidth, string label, ref string password, char MaskCharacter = '*')
         {
-            password = DrawPasswordField(password, label, maskChar, ControlVariant.Default, false, null);
+            password = DrawPasswordField(password, label, MaskCharacter, ControlVariant.Default, false, null);
             return password;
         }
 
-        public string DrawTextArea(string value, string label = "", string placeholder = "", int maxLength = 1000, float height = 60f, bool disabled = false, bool focused = false, Action<string> onChange = null)
+        public string DrawTextArea(string value, string label = "", string placeholder = "", int maxLength = 1000, float height = 60f, bool disabled = false, bool focused = false, Action<string> OnValueChanged = null)
         {
             return DrawTextArea(
                 new InputConfig
@@ -152,9 +152,9 @@ namespace shadcnui.GUIComponents.Controls
                     Placeholder = placeholder,
                     MaxLength = maxLength,
                     Height = height,
-                    Disabled = disabled,
-                    Focused = focused,
-                    OnChange = onChange,
+                    IsDisabled = disabled,
+                    IsFocused = focused,
+                    OnValueChanged = OnValueChanged,
                 }
             );
         }
@@ -267,34 +267,34 @@ namespace shadcnui.GUIComponents.Controls
         {
             GUIStyle passwordStyle = styleManager.GetPasswordFieldStyle();
             var originalColor = GUI.color;
-            ApplyDisabledColor(originalColor, config.Disabled);
+            ApplyDisabledColor(originalColor, config.IsDisabled);
 
-            string newValue = UnityHelpers.PasswordField(config.Value ?? "", config.MaskChar, passwordStyle, GUILayout.Height(DesignTokens.Height.Default * guiHelper.uiScale));
+            string newValue = UnityHelpers.PasswordField(config.Value ?? "", config.MaskCharacter, passwordStyle, GUILayout.Height(DesignTokens.Height.Default * guiHelper.uiScale));
 
             GUI.color = originalColor;
             layoutComponents.AddSpace(DesignTokens.Spacing.MD);
 
-            if (newValue != config.Value && !config.Disabled && config.OnChange != null)
-                config.OnChange.Invoke(newValue);
+            if (newValue != config.Value && !config.IsDisabled && config.OnValueChanged != null)
+                config.OnValueChanged.Invoke(newValue);
 
-            return config.Disabled ? config.Value : newValue;
+            return config.IsDisabled ? config.Value : newValue;
         }
 
         private string DrawTextAreaStyled(InputConfig config, StyleManager styleManager)
         {
-            GUIStyle textAreaStyle = styleManager.GetTextAreaStyle(ControlVariant.Default, ControlSize.Default, config.Focused);
+            GUIStyle textAreaStyle = styleManager.GetTextAreaStyle(ControlVariant.Default, ControlSize.Default, config.IsFocused);
             var originalColor = GUI.color;
-            ApplyDisabledColor(originalColor, config.Disabled);
+            ApplyDisabledColor(originalColor, config.IsDisabled);
 
             string newValue = UnityHelpers.TextArea(config.Value ?? "", config.MaxLength, textAreaStyle, GUILayout.Height(config.Height * guiHelper.uiScale));
 
             GUI.color = originalColor;
             layoutComponents.AddSpace(DesignTokens.Spacing.MD);
 
-            if (newValue != config.Value && !config.Disabled && config.OnChange != null)
-                config.OnChange.Invoke(newValue);
+            if (newValue != config.Value && !config.IsDisabled && config.OnValueChanged != null)
+                config.OnValueChanged.Invoke(newValue);
 
-            return config.Disabled ? config.Value : newValue;
+            return config.IsDisabled ? config.Value : newValue;
         }
 
         private void RenderIcon(IconConfig iconConfig)

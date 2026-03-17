@@ -25,7 +25,7 @@ namespace shadcnui.GUIComponents.Display
 
             if (config.Size > 0)
             {
-                DrawCircularProgressInternal(targetValue, config.Size, config.Options);
+                DrawCircularProgressInternal(targetValue, config.Size, config.LayoutOptions);
                 return;
             }
 
@@ -43,7 +43,7 @@ namespace shadcnui.GUIComponents.Display
                     Value = value,
                     Width = width,
                     Height = height,
-                    Options = options,
+                    LayoutOptions = options,
                 }
             );
         }
@@ -61,7 +61,7 @@ namespace shadcnui.GUIComponents.Display
                     Value = value,
                     Width = width,
                     Height = height,
-                    Options = options,
+                    LayoutOptions = options,
                 },
                 id
             );
@@ -77,7 +77,7 @@ namespace shadcnui.GUIComponents.Display
                     Width = width,
                     Height = height,
                     ShowPercentage = showPercentage,
-                    Options = options,
+                    LayoutOptions = options,
                 }
             );
         }
@@ -89,7 +89,7 @@ namespace shadcnui.GUIComponents.Display
                 {
                     Value = value,
                     Size = size,
-                    Options = options,
+                    LayoutOptions = options,
                 }
             );
         }
@@ -165,7 +165,7 @@ namespace shadcnui.GUIComponents.Display
             if (config.Rect.HasValue)
                 DrawProgressRect(config.Rect.Value, displayValue, styleManager);
             else
-                DrawProgressLayout(displayValue, config.Width, config.Height, config.Options, styleManager);
+                DrawProgressLayout(displayValue, config.Width, config.Height, config.LayoutOptions, styleManager);
         }
 
         private void DrawProgressLayout(float value, float width, float height, GUILayoutOption[] options, StyleManager styleManager)
@@ -235,7 +235,7 @@ namespace shadcnui.GUIComponents.Display
                     Width = config.Width,
                     Height = config.Height,
                     ShowPercentage = config.ShowPercentage,
-                    Options = config.Options,
+                    LayoutOptions = config.LayoutOptions,
                 }
             );
         }

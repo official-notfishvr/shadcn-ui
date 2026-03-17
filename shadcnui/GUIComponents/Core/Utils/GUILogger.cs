@@ -81,10 +81,7 @@ namespace shadcnui.GUIComponents.Core.Utils
                 {
                     File.AppendAllText(_logFilePath, line + Environment.NewLine);
                 }
-                catch
-                {
-                    // Logging failures should never break UI rendering.
-                }
+                catch { }
             }
         }
     }

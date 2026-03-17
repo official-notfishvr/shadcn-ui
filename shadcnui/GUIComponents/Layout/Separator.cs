@@ -29,7 +29,7 @@ namespace shadcnui.GUIComponents.Layout
             else if (config.Rect.HasValue)
                 DrawSeparatorRect(config.Rect.Value, config.Orientation);
             else
-                DrawSeparatorInternal(config.Orientation, config.Options);
+                DrawSeparatorInternal(config.Orientation, config.LayoutOptions);
 
             if (config.SpacingAfter > 0)
                 GUILayout.Space(config.SpacingAfter * guiHelper.uiScale);
@@ -43,10 +43,10 @@ namespace shadcnui.GUIComponents.Layout
                 new SeparatorConfig
                 {
                     Orientation = orientation,
-                    Decorative = decorative,
+                    IsDecorative = decorative,
                     SpacingBefore = 0,
                     SpacingAfter = 0,
-                    Options = options,
+                    LayoutOptions = options,
                 }
             );
         }
@@ -59,7 +59,7 @@ namespace shadcnui.GUIComponents.Layout
                     Orientation = SeparatorOrientation.Horizontal,
                     SpacingBefore = 0,
                     SpacingAfter = 0,
-                    Options = options,
+                    LayoutOptions = options,
                 }
             );
         }
@@ -72,7 +72,7 @@ namespace shadcnui.GUIComponents.Layout
                     Orientation = SeparatorOrientation.Vertical,
                     SpacingBefore = 0,
                     SpacingAfter = 0,
-                    Options = options,
+                    LayoutOptions = options,
                 }
             );
         }
@@ -98,7 +98,7 @@ namespace shadcnui.GUIComponents.Layout
                     Orientation = orientation,
                     SpacingBefore = spacingBefore,
                     SpacingAfter = spacingAfter,
-                    Options = options,
+                    LayoutOptions = options,
                 }
             );
         }
@@ -111,7 +111,7 @@ namespace shadcnui.GUIComponents.Layout
                     Text = text,
                     SpacingBefore = 0,
                     SpacingAfter = 0,
-                    Options = options,
+                    LayoutOptions = options,
                 }
             );
         }
@@ -157,11 +157,11 @@ namespace shadcnui.GUIComponents.Layout
 #else
             GUILayout.BeginHorizontal();
 #endif
-            DrawSeparatorInternal(SeparatorOrientation.Horizontal, config.Options);
+            DrawSeparatorInternal(SeparatorOrientation.Horizontal, config.LayoutOptions);
             GUILayout.Space(DesignTokens.Spacing.SM * guiHelper.uiScale);
             UnityHelpers.Label(config.Text, styleManager.GetLabelStyle(ControlVariant.Muted));
             GUILayout.Space(DesignTokens.Spacing.SM * guiHelper.uiScale);
-            DrawSeparatorInternal(SeparatorOrientation.Horizontal, config.Options);
+            DrawSeparatorInternal(SeparatorOrientation.Horizontal, config.LayoutOptions);
             GUILayout.EndHorizontal();
         }
         #endregion

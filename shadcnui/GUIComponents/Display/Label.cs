@@ -34,8 +34,8 @@ namespace shadcnui.GUIComponents.Display
                 {
                     Text = text,
                     Variant = variant,
-                    Disabled = disabled,
-                    Options = options,
+                    IsDisabled = disabled,
+                    LayoutOptions = options,
                 }
             );
         }
@@ -48,7 +48,7 @@ namespace shadcnui.GUIComponents.Display
                     Rect = rect,
                     Text = text,
                     Variant = variant,
-                    Disabled = disabled,
+                    IsDisabled = disabled,
                 }
             );
         }
@@ -75,7 +75,7 @@ namespace shadcnui.GUIComponents.Display
             GUIStyle scaledStyle = new UnityHelpers.GUIStyle(baseStyle);
             scaledStyle.fontSize = Mathf.RoundToInt(baseStyle.fontSize * guiHelper.uiScale);
 
-            if (config.Disabled)
+            if (config.IsDisabled)
             {
                 Color disabledColor = new Color(baseStyle.normal.textColor.r, baseStyle.normal.textColor.g, baseStyle.normal.textColor.b, 0.7f);
                 scaledStyle.normal.textColor = disabledColor;
@@ -139,7 +139,7 @@ namespace shadcnui.GUIComponents.Display
             }
             else
             {
-                GUILayoutOption[] options = config.Options ?? System.Array.Empty<GUILayoutOption>();
+                GUILayoutOption[] options = config.LayoutOptions ?? System.Array.Empty<GUILayoutOption>();
                 UnityHelpers.Label(config.Text ?? "", labelStyle, options);
             }
         }
