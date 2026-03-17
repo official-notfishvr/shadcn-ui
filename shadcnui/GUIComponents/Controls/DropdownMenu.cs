@@ -103,7 +103,7 @@ namespace shadcnui.GUIComponents.Controls
 
         private void DrawMenuContent(StyleManager styleManager, GUILayoutOption[] options)
         {
-            float dropdownWidth = Mathf.Max(guiHelper.CurrentTheme.Metrics.DropdownWidth * guiHelper.uiScale, 280f * guiHelper.uiScale);
+            float dropdownWidth = Mathf.Max(280f * guiHelper.uiScale, 280f * guiHelper.uiScale);
             var layoutOptions = new List<GUILayoutOption> { GUILayout.Width(dropdownWidth), GUILayout.MinHeight(0), GUILayout.MaxHeight(220f * guiHelper.uiScale) };
             if (options != null)
                 layoutOptions.AddRange(options);

@@ -228,7 +228,7 @@ namespace shadcnui.GUIComponents.Core.Styling
 
         public int GetScaledFontSize(float scale = 1f)
         {
-            var baseSize = _guiHelper.fontSize > 0 ? _guiHelper.fontSize : GetTheme().Typography.BaseFontSize;
+            var baseSize = _guiHelper.fontSize > 0 ? _guiHelper.fontSize : 14;
             return Mathf.Max(8, Mathf.RoundToInt(baseSize * scale * _guiHelper.uiScale));
         }
 

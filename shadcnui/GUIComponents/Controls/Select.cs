@@ -99,7 +99,7 @@ namespace shadcnui.GUIComponents.Controls
 
         private int DrawSelectContent(SelectConfig config, GUIStyle selectStyle, GUIStyle itemStyle, int selectedIndex)
         {
-            float dropdownWidth = Mathf.Max(guiHelper.CurrentTheme.Metrics.DropdownWidth * guiHelper.uiScale, 280f * guiHelper.uiScale);
+            float dropdownWidth = Mathf.Max(280f * guiHelper.uiScale, 280f * guiHelper.uiScale);
             layoutComponents.BeginVerticalGroup(selectStyle, GUILayout.Width(dropdownWidth), GUILayout.MaxHeight(220f * guiHelper.uiScale));
             int newIndex = selectedIndex;
             scrollPosition = layoutComponents.DrawScrollView(scrollPosition, () => newIndex = DrawSelectItems(config, itemStyle, newIndex), GUILayout.ExpandWidth(true), GUILayout.MinHeight(0), GUILayout.MaxHeight(220f * guiHelper.uiScale));

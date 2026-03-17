@@ -186,7 +186,7 @@ namespace shadcnui.GUIComponents.Core.Base
             var theme = ThemeManager.Instance.CurrentTheme;
             var rect = new Rect(0f, 0f, width, height);
             var previous = GUI.color;
-            var border = Mathf.Max(1f, theme.Metrics.BorderWidth);
+            var border = Mathf.Max(1f, 1f);
 
             GUI.color = theme.Elevated;
             GUI.DrawTexture(rect, Texture2D.whiteTexture);

@@ -3,45 +3,6 @@ using UnityEngine;
 
 namespace shadcnui.GUIComponents.Core.Theming
 {
-    public sealed class ThemeMetrics
-    {
-        public float BorderWidth { get; set; } = 1f;
-        public float CornerRadius { get; set; } = 2f;
-        public float CompactCornerRadius { get; set; } = 1f;
-        public float SectionSpacing { get; set; } = 16f;
-        public float ControlSpacing { get; set; } = 8f;
-        public float PanelPadding { get; set; } = 16f;
-        public float ContentPadding { get; set; } = 12f;
-        public float ControlHeight { get; set; } = 34f;
-        public float CompactControlHeight { get; set; } = 28f;
-        public float LargeControlHeight { get; set; } = 42f;
-        public float TooltipMaxWidth { get; set; } = 280f;
-        public float DropdownWidth { get; set; } = 280f;
-
-        public ThemeMetrics Clone() => (ThemeMetrics)MemberwiseClone();
-    }
-
-    public sealed class ThemeTypography
-    {
-        public string[] FontFamilies { get; set; } = Array.Empty<string>();
-        public int BaseFontSize { get; set; } = 14;
-        public FontStyle HeadingWeight { get; set; } = FontStyle.Bold;
-        public FontStyle LabelWeight { get; set; } = FontStyle.Normal;
-        public FontStyle ButtonWeight { get; set; } = FontStyle.Bold;
-
-        public ThemeTypography Clone()
-        {
-            return new ThemeTypography
-            {
-                FontFamilies = (string[])FontFamilies.Clone(),
-                BaseFontSize = BaseFontSize,
-                HeadingWeight = HeadingWeight,
-                LabelWeight = LabelWeight,
-                ButtonWeight = ButtonWeight,
-            };
-        }
-    }
-
     public class Theme
     {
         public string Name { get; set; }
@@ -72,8 +33,6 @@ namespace shadcnui.GUIComponents.Core.Theming
         public Color TabsTriggerActiveBg { get; set; }
         public Color TabsTriggerActiveFg { get; set; }
         public Color BackgroundColor { get; set; }
-        public ThemeMetrics Metrics { get; set; } = new();
-        public ThemeTypography Typography { get; set; } = new();
 
         public Theme Clone()
         {
@@ -107,8 +66,6 @@ namespace shadcnui.GUIComponents.Core.Theming
                 TabsTriggerActiveBg = TabsTriggerActiveBg,
                 TabsTriggerActiveFg = TabsTriggerActiveFg,
                 BackgroundColor = BackgroundColor,
-                Metrics = Metrics.Clone(),
-                Typography = Typography.Clone(),
             };
         }
 

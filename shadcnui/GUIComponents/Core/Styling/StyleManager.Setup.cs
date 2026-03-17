@@ -9,9 +9,8 @@ namespace shadcnui.GUIComponents.Core.Styling
         private void CreateBaseStyles()
         {
             var theme = GetTheme();
-            var metrics = theme.Metrics;
 
-            _baseButtonStyle = MakeControlStyle(theme.ButtonPrimaryBg, theme.ButtonPrimaryFg, DesignTokens.Padding.Button.DefaultH, DesignTokens.Padding.Button.DefaultV, DesignTokens.Radius.MD, theme.Border, theme.Typography.ButtonWeight);
+            _baseButtonStyle = MakeControlStyle(theme.ButtonPrimaryBg, theme.ButtonPrimaryFg, DesignTokens.Padding.Button.DefaultH, DesignTokens.Padding.Button.DefaultV, DesignTokens.Radius.MD, theme.Border, FontStyle.Bold);
             _baseToggleStyle = MakeControlStyle(theme.Secondary, theme.Text, DesignTokens.Padding.Button.DefaultH, DesignTokens.Padding.Button.DefaultV, DesignTokens.Radius.MD, theme.Border, FontStyle.Bold);
             _baseInputStyle = MakeInputStyle(theme.Base, theme.Text, theme.Border);
             _baseLabelStyle = MakeLabelStyle(theme.Text);
@@ -48,21 +47,21 @@ namespace shadcnui.GUIComponents.Core.Styling
             _chartContainerStyle = MakePanelStyle(theme.Elevated, theme.Border, DesignTokens.Chart.Radius, DesignTokens.Chart.ContainerPaddingH, DesignTokens.Chart.ContainerPaddingV);
             _avatarStyle = MakeAvatarStyle(theme);
             _navigationStyle = MakePanelStyle(theme.Elevated, theme.Border, DesignTokens.Radius.SM, DesignTokens.Spacing.SM, DesignTokens.Spacing.SM);
-            _calendarStyle = MakePanelStyle(theme.Elevated, theme.Border, DesignTokens.Radius.MD, metrics.ContentPadding, metrics.ContentPadding);
+            _calendarStyle = MakePanelStyle(theme.Elevated, theme.Border, DesignTokens.Radius.MD, 12f, 12f);
             _calendarWeekdayStyle = MakeLabelStyle(theme.Muted, FontStyle.Bold);
             _calendarDayStyle = MakeCalendarDayStyle(theme.Base, theme.Text, theme.Border);
             _calendarDaySelectedStyle = MakeCalendarDayStyle(theme.Accent, theme.Base, theme.Accent);
             _calendarDayInRangeStyle = MakeCalendarDayStyle(Tint(theme.Accent, 0.18f), theme.Text, theme.Accent);
             _calendarDayTodayStyle = MakeCalendarDayStyle(theme.Secondary, theme.Text, theme.Accent);
             _calendarDayOutsideMonthStyle = MakeCalendarDayStyle(Color.clear, theme.Muted, Color.clear);
-            _datePickerStyle = MakePanelStyle(theme.Elevated, theme.Border, DesignTokens.Radius.MD, metrics.ContentPadding, metrics.ContentPadding);
+            _datePickerStyle = MakePanelStyle(theme.Elevated, theme.Border, DesignTokens.Radius.MD, 12f, 12f);
             _datePickerWeekdayStyle = MakeLabelStyle(theme.Muted, FontStyle.Bold);
             _datePickerDayStyle = MakeCalendarDayStyle(theme.Base, theme.Text, theme.Border);
             _datePickerDaySelectedStyle = MakeCalendarDayStyle(theme.Accent, theme.Base, theme.Accent);
             _datePickerDayTodayStyle = MakeCalendarDayStyle(theme.Secondary, theme.Text, theme.Accent);
             _datePickerDayOutsideMonthStyle = MakeCalendarDayStyle(Color.clear, theme.Muted, Color.clear);
             AnimatedBoxStyle = CloneStyle(GUIStyle.none);
-            AnimatedBoxStyle.padding = GetSpacingOffset(metrics.PanelPadding, metrics.PanelPadding);
+            AnimatedBoxStyle.padding = GetSpacingOffset(16f, 16f);
             AnimatedBoxStyle.margin = new UnityHelpers.RectOffset(0, 0, 0, 0);
             AnimatedBoxStyle.normal.textColor = theme.Text;
         }

@@ -159,18 +159,6 @@ namespace shadcnui_Demo.Menu
 
         private void DrawOverviewTab()
         {
-            DrawSection(
-                "Theme System",
-                "Centralized metrics, colors, typography, and live scaling.",
-                () =>
-                {
-                    _gui.BeginHorizontalGroup();
-                    _gui.SimpleCard($"Theme: {_gui.CurrentTheme.Name}\nAccent: {_gui.CurrentTheme.Accent}\nRadius: {_gui.CurrentTheme.Metrics.CornerRadius}", 280f, 110f);
-                    _gui.SimpleCard($"Scale: {_uiScale:F2}\nFont: {_fontSize:F0}px\nBorder: {_gui.CurrentTheme.Metrics.BorderWidth:F1}px", 280f, 110f);
-                    _gui.CardWithImage(_sampleTexture, "Flat Surface", "Minimal chrome", "Cards, buttons, and overlays all resolve through the shared style manager.", width: 300f, height: 210f);
-                    _gui.EndHorizontalGroup();
-                }
-            );
 
             DrawSection(
                 "Core Controls",
