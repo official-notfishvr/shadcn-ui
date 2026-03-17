@@ -1,13 +1,8 @@
-using System.Collections.Generic;
+using System;
 using shadcnui.GUIComponents.Core.Base;
 using shadcnui.GUIComponents.Core.Styling;
 using shadcnui.GUIComponents.Core.Utils;
 using UnityEngine;
-#if IL2CPP_MELONLOADER_PRE57
-using UnhollowerBaseLib;
-#elif IL2CPP_BEPINEX
-using Il2CppInterop.Runtime.InteropTypes.Arrays;
-#endif
 
 namespace shadcnui.GUIComponents.Layout
 {
@@ -16,154 +11,67 @@ namespace shadcnui.GUIComponents.Layout
         public Separator(GUIHelper helper)
             : base(helper) { }
 
-        #region Config-based API
         public void DrawSeparator(SeparatorConfig config)
         {
-            var styleManager = guiHelper.GetStyleManager();
+            config ??= new SeparatorConfig();
 
-            if (config.SpacingBefore > 0)
-                GUILayout.Space(config.SpacingBefore * guiHelper.uiScale);
+            if (config.SpacingBefore > 0f)
+                layoutComponents.AddSpace(config.SpacingBefore);
 
-            if (!string.IsNullOrEmpty(config.Text))
-                DrawLabeledSeparator(config, styleManager);
-            else if (config.Rect.HasValue)
-                DrawSeparatorRect(config.Rect.Value, config.Orientation);
+            if (string.IsNullOrEmpty(config.Text) || config.Orientation == SeparatorOrientation.Vertical)
+            {
+                DrawLine(config);
+            }
             else
-                DrawSeparatorInternal(config.Orientation, config.LayoutOptions);
+            {
+                DrawLabeledLine(config);
+            }
 
-            if (config.SpacingAfter > 0)
-                GUILayout.Space(config.SpacingAfter * guiHelper.uiScale);
+            if (config.SpacingAfter > 0f)
+                layoutComponents.AddSpace(config.SpacingAfter);
         }
-        #endregion
 
-        #region API
-        public void DrawSeparator(SeparatorOrientation orientation = SeparatorOrientation.Horizontal, bool decorative = true, params GUILayoutOption[] options)
+        public void DrawSeparator(SeparatorOrientation orientation = SeparatorOrientation.Horizontal, bool decorative = true, params GUILayoutOption[] opts)
         {
             DrawSeparator(
                 new SeparatorConfig
                 {
                     Orientation = orientation,
                     IsDecorative = decorative,
-                    SpacingBefore = 0,
-                    SpacingAfter = 0,
-                    LayoutOptions = options,
+                    LayoutOptions = opts ?? Array.Empty<GUILayoutOption>(),
                 }
             );
         }
 
-        public void HorizontalSeparator(params GUILayoutOption[] options)
+        private void DrawLine(SeparatorConfig config)
         {
-            DrawSeparator(
-                new SeparatorConfig
-                {
-                    Orientation = SeparatorOrientation.Horizontal,
-                    SpacingBefore = 0,
-                    SpacingAfter = 0,
-                    LayoutOptions = options,
-                }
-            );
-        }
+            var style = styleManager?.GetSeparatorStyle(config.Orientation, config.Variant, config.Size) ?? GUIStyle.none;
 
-        public void VerticalSeparator(params GUILayoutOption[] options)
-        {
-            DrawSeparator(
-                new SeparatorConfig
-                {
-                    Orientation = SeparatorOrientation.Vertical,
-                    SpacingBefore = 0,
-                    SpacingAfter = 0,
-                    LayoutOptions = options,
-                }
-            );
-        }
-
-        public void DrawSeparator(Rect rect, SeparatorOrientation orientation = SeparatorOrientation.Horizontal)
-        {
-            DrawSeparator(
-                new SeparatorConfig
-                {
-                    Rect = rect,
-                    Orientation = orientation,
-                    SpacingBefore = 0,
-                    SpacingAfter = 0,
-                }
-            );
-        }
-
-        public void SeparatorWithSpacing(SeparatorOrientation orientation = SeparatorOrientation.Horizontal, float spacingBefore = DesignTokens.Spacing.SM, float spacingAfter = DesignTokens.Spacing.SM, params GUILayoutOption[] options)
-        {
-            DrawSeparator(
-                new SeparatorConfig
-                {
-                    Orientation = orientation,
-                    SpacingBefore = spacingBefore,
-                    SpacingAfter = spacingAfter,
-                    LayoutOptions = options,
-                }
-            );
-        }
-
-        public void LabeledSeparator(string text, params GUILayoutOption[] options)
-        {
-            DrawSeparator(
-                new SeparatorConfig
-                {
-                    Text = text,
-                    SpacingBefore = 0,
-                    SpacingAfter = 0,
-                    LayoutOptions = options,
-                }
-            );
-        }
-        #endregion
-
-        #region Private Methods
-        private void DrawSeparatorInternal(SeparatorOrientation orientation, GUILayoutOption[] options)
-        {
-            var styleManager = guiHelper.GetStyleManager();
-            GUIStyle separatorStyle = styleManager.GetSeparatorStyle(orientation);
-
-            var layoutOptions = new List<GUILayoutOption>();
-
-            if (orientation == SeparatorOrientation.Horizontal)
+            if (config.Orientation == SeparatorOrientation.Horizontal)
             {
-                layoutOptions.Add(GUILayout.Height(Mathf.RoundToInt(1 * guiHelper.uiScale)));
-                layoutOptions.Add(GUILayout.ExpandWidth(true));
+                UnityHelpers.Box(string.Empty, style, config.LayoutOptions);
             }
             else
             {
-                layoutOptions.Add(GUILayout.Width(Mathf.RoundToInt(1 * guiHelper.uiScale)));
-                layoutOptions.Add(GUILayout.ExpandHeight(true));
+                UnityHelpers.Box(string.Empty, style, config.LayoutOptions);
             }
-
-            if (options != null && options.Length > 0)
-                layoutOptions.AddRange(options);
-
-            UnityHelpers.Box(UnityHelpers.GUIContent.none, separatorStyle, layoutOptions.ToArray());
         }
 
-        private void DrawSeparatorRect(Rect rect, SeparatorOrientation orientation)
+        private void DrawLabeledLine(SeparatorConfig config)
         {
-            var styleManager = guiHelper.GetStyleManager();
-            GUIStyle separatorStyle = styleManager.GetSeparatorStyle(orientation);
-            Rect scaledRect = new Rect(rect.x * guiHelper.uiScale, rect.y * guiHelper.uiScale, rect.width * guiHelper.uiScale, rect.height * guiHelper.uiScale);
-            GUI.Box(scaledRect, UnityHelpers.GUIContent.none, separatorStyle);
-        }
+            var lineStyle = styleManager?.GetSeparatorStyle(SeparatorOrientation.Horizontal, config.Variant, config.Size) ?? GUIStyle.none;
+            var labelStyle = styleManager?.GetLabelStyle(ControlVariant.Muted, ControlSize.Small) ?? GUI.skin.label;
+            var spacing = DesignTokens.Spacing.SM * guiHelper.uiScale;
 
-        private void DrawLabeledSeparator(SeparatorConfig config, StyleManager styleManager)
-        {
-#if IL2CPP_BEPINEX || IL2CPP_MELONLOADER_PRE57
-            GUILayout.BeginHorizontal(new Il2CppReferenceArray<GUILayoutOption>(0));
-#else
-            GUILayout.BeginHorizontal();
-#endif
-            DrawSeparatorInternal(SeparatorOrientation.Horizontal, config.LayoutOptions);
-            GUILayout.Space(DesignTokens.Spacing.SM * guiHelper.uiScale);
-            UnityHelpers.Label(config.Text, styleManager.GetLabelStyle(ControlVariant.Muted));
-            GUILayout.Space(DesignTokens.Spacing.SM * guiHelper.uiScale);
-            DrawSeparatorInternal(SeparatorOrientation.Horizontal, config.LayoutOptions);
-            GUILayout.EndHorizontal();
+            layoutComponents.BeginHorizontalGroup();
+
+            UnityHelpers.Box(string.Empty, lineStyle, GUILayout.ExpandWidth(true));
+            layoutComponents.AddSpace(spacing);
+            UnityHelpers.Label(config.Text, labelStyle, GUILayout.ExpandWidth(false));
+            layoutComponents.AddSpace(spacing);
+            UnityHelpers.Box(string.Empty, lineStyle, GUILayout.ExpandWidth(true));
+
+            layoutComponents.EndHorizontalGroup();
         }
-        #endregion
     }
 }

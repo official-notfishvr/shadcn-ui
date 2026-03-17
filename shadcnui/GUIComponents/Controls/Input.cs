@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using shadcnui.GUIComponents.Core.Base;
 using shadcnui.GUIComponents.Core.Styling;
 using shadcnui.GUIComponents.Core.Utils;
@@ -11,312 +12,207 @@ namespace shadcnui.GUIComponents.Controls
 {
     public class Input : BaseComponent
     {
+        private readonly HashSet<string> _autoFocused = new();
+
         public Input(GUIHelper helper)
             : base(helper) { }
 
-        #region Config-based API
-
-        public string DrawInput(InputConfig config)
+        public string Draw(InputConfig config)
         {
-            var styleManager = guiHelper.GetStyleManager();
-            GUIStyle inputStyle = styleManager?.GetInputStyle(config.Variant, ControlSize.Default, config.IsFocused, config.IsDisabled) ?? GUI.skin.textField;
+            if (config == null)
+                return string.Empty;
 
-            var originalColor = GUI.color;
-            ApplyDisabledColor(originalColor, config.IsDisabled);
-
-            string newValue = config.Icon?.Image != null ? DrawInputWithIcon(config, inputStyle) : DrawBasicInput(config, inputStyle);
-
-            GUI.color = originalColor;
-
-            if (!config.IsDisabled && newValue != config.Value && config.OnValueChanged != null)
-                config.OnValueChanged.Invoke(newValue);
-
-            return config.IsDisabled ? config.Value : newValue;
-        }
-
-        public string DrawLabeledInput(InputConfig config)
-        {
-            DrawLabel(config.Label, config.LabelVariant, -1, config.IsDisabled);
-            layoutComponents.AddSpace(DesignTokens.Spacing.XS);
-            return DrawInput(config);
-        }
-
-        public string DrawPasswordField(InputConfig config)
-        {
-            var styleManager = guiHelper.GetStyleManager();
+            string id = ResolveId(config.Id, config.Label, config.Placeholder);
+            string controlName = "input_" + id;
 
             if (!string.IsNullOrEmpty(config.Label))
             {
-                DrawLabel(config.Label, ControlVariant.Default, -1, config.IsDisabled);
+                DrawLabel(config);
                 layoutComponents.AddSpace(DesignTokens.Spacing.XS);
             }
 
-            return DrawPasswordFieldStyled(config, styleManager);
-        }
-
-        public string DrawTextArea(InputConfig config)
-        {
-            var styleManager = guiHelper.GetStyleManager();
-
-            if (!string.IsNullOrEmpty(config.Label))
+            bool focused = GUI.GetNameOfFocusedControl() == controlName;
+            if (config.AutoFocus && !_autoFocused.Contains(id))
             {
-                DrawLabel(config.Label, ControlVariant.Default, -1, config.IsDisabled);
-                layoutComponents.AddSpace(DesignTokens.Spacing.XS);
+                GUI.FocusControl(controlName);
+                _autoFocused.Add(id);
+                focused = true;
             }
 
-            return DrawTextAreaStyled(config, styleManager);
+            GUIStyle inputStyle = styleManager?.GetInputStyle(config.Variant, config.Size, focused, config.IsDisabled) ?? GUI.skin.textField;
+
+            bool prevEnabled = GUI.enabled;
+            if (config.IsDisabled)
+                GUI.enabled = false;
+
+            GUI.SetNextControlName(controlName);
+
+            string value = DrawInputField(config, inputStyle, controlName);
+
+            GUI.enabled = prevEnabled;
+
+            DrawPlaceholderIfNeeded(config, inputStyle, focused, value);
+            DrawHelperOrError(config);
+
+            if (!config.IsDisabled && value != config.Value)
+                config.OnValueChanged?.Invoke(value);
+
+            return config.IsDisabled ? (config.Value ?? string.Empty) : value;
         }
 
-        #endregion
-
-        #region API
-
-        public string DrawInput(string value, string placeholder = "", ControlVariant variant = ControlVariant.Default, bool disabled = false, bool focused = false, int width = -1, Action<string> OnValueChanged = null)
+        private string DrawInputField(InputConfig config, GUIStyle inputStyle, string controlName)
         {
-            return DrawInput(
-                new InputConfig
-                {
-                    Value = value,
-                    Placeholder = placeholder,
-                    Variant = variant,
-                    IsDisabled = disabled,
-                    IsFocused = focused,
-                    Width = width,
-                    OnValueChanged = OnValueChanged,
-                }
-            );
-        }
-
-        public string DrawInput(string value, Texture2D icon, string placeholder = "", ControlVariant variant = ControlVariant.Default, bool disabled = false, bool focused = false, int width = -1, Action<string> OnValueChanged = null)
-        {
-            return DrawInput(
-                new InputConfig
-                {
-                    Value = value,
-                    Icon = icon != null ? new IconConfig(icon) : null,
-                    Placeholder = placeholder,
-                    Variant = variant,
-                    IsDisabled = disabled,
-                    IsFocused = focused,
-                    Width = width,
-                    OnValueChanged = OnValueChanged,
-                }
-            );
-        }
-
-        public string DrawLabeledInput(string label, string value, string placeholder = "", ControlVariant inputVariant = ControlVariant.Default, ControlVariant labelVariant = ControlVariant.Default, bool disabled = false, int inputWidth = -1, Action<string> OnValueChanged = null)
-        {
-            return DrawLabeledInput(
-                new InputConfig
-                {
-                    Label = label,
-                    Value = value,
-                    Placeholder = placeholder,
-                    Variant = inputVariant,
-                    LabelVariant = labelVariant,
-                    IsDisabled = disabled,
-                    Width = inputWidth,
-                    OnValueChanged = OnValueChanged,
-                }
-            );
-        }
-
-        public string DrawPasswordField(string value, string label = "", char MaskCharacter = '*', ControlVariant variant = ControlVariant.Default, bool disabled = false, Action<string> OnValueChanged = null)
-        {
-            return DrawPasswordField(
-                new InputConfig
-                {
-                    Value = value,
-                    Label = label,
-                    MaskCharacter = MaskCharacter,
-                    Variant = variant,
-                    IsDisabled = disabled,
-                    OnValueChanged = OnValueChanged,
-                }
-            );
-        }
-
-        public string DrawPasswordField(float windowWidth, string label, ref string password, char MaskCharacter = '*')
-        {
-            password = DrawPasswordField(password, label, MaskCharacter, ControlVariant.Default, false, null);
-            return password;
-        }
-
-        public string DrawTextArea(string value, string label = "", string placeholder = "", int maxLength = 1000, float height = 60f, bool disabled = false, bool focused = false, Action<string> OnValueChanged = null)
-        {
-            return DrawTextArea(
-                new InputConfig
-                {
-                    Value = value,
-                    Label = label,
-                    Placeholder = placeholder,
-                    MaxLength = maxLength,
-                    Height = height,
-                    IsDisabled = disabled,
-                    IsFocused = focused,
-                    OnValueChanged = OnValueChanged,
-                }
-            );
-        }
-
-        public void DrawTextArea(float windowWidth, string label, ref string text, int maxLength, float height = 60f)
-        {
-            text = DrawTextArea(text, label, "", maxLength, height, false, false, null);
-        }
-
-        public void DrawLabel(string text, ControlVariant variant = ControlVariant.Default, int width = -1, bool disabled = false)
-        {
-            var styleManager = guiHelper.GetStyleManager();
-            GUIStyle labelStyle = styleManager?.GetLabelStyle(variant) ?? GUI.skin.label;
-
-            var originalColor = GUI.color;
-            ApplyDisabledColor(originalColor, disabled);
-
-            if (width > 0)
-                UnityHelpers.Label(text ?? "", labelStyle, GUILayout.Width(width));
-            else
-                UnityHelpers.Label(text ?? "", labelStyle);
-
-            GUI.color = originalColor;
-        }
-
-        public void DrawSectionHeader(string title)
-        {
-            var styleManager = guiHelper.GetStyleManager();
-            layoutComponents.AddSpace(DesignTokens.Spacing.SM * 0.5f);
-            UnityHelpers.Label(title, styleManager?.GetSectionHeaderStyle() ?? GUI.skin.label);
-            layoutComponents.AddSpace(DesignTokens.Spacing.XXS);
-        }
-
-        public void RenderLabel(string text, int width = -1)
-        {
-            DrawLabel(text, ControlVariant.Default, width, false);
-        }
-
-        #endregion
-
-        #region Private Methods
-
-        private string DrawInputWithIcon(InputConfig config, GUIStyle inputStyle)
-        {
-            if (config.Icon.Position == IconPosition.Above || config.Icon.Position == IconPosition.Below)
+            if (config.Icon?.Image != null && (config.Icon.Position == IconPosition.Above || config.Icon.Position == IconPosition.Below))
             {
                 layoutComponents.BeginVerticalGroup();
-
                 if (config.Icon.Position == IconPosition.Above)
                 {
                     RenderIcon(config.Icon);
                     layoutComponents.AddSpace(config.Icon.Spacing * guiHelper.uiScale);
                 }
 
-                string value = DrawBasicInput(config, inputStyle);
+                string val = DrawField(config, inputStyle, controlName);
 
                 if (config.Icon.Position == IconPosition.Below)
                 {
                     layoutComponents.AddSpace(config.Icon.Spacing * guiHelper.uiScale);
                     RenderIcon(config.Icon);
                 }
-
                 layoutComponents.EndVerticalGroup();
-                return value;
+                return val;
             }
 
             GUIStyle styledInput = new UnityHelpers.GUIStyle(inputStyle);
-            float iconSize = config.Icon.Size * guiHelper.uiScale;
-            float spacing = config.Icon.Spacing * guiHelper.uiScale;
-            int paddingAddition = (int)(iconSize + spacing + DesignTokens.Spacing.XS * guiHelper.uiScale);
-
-            if (config.Icon.Position == IconPosition.Left)
+            if (config.Icon?.Image != null)
             {
-                styledInput.padding.left += paddingAddition;
+                float iconSize = config.Icon.Size * guiHelper.uiScale;
+                float spacing = config.Icon.Spacing * guiHelper.uiScale;
+                int paddingAddition = Mathf.RoundToInt(iconSize + spacing);
+
+                if (config.Icon.Position == IconPosition.Left)
+                    styledInput.padding.left += paddingAddition;
+                else if (config.Icon.Position == IconPosition.Right)
+                    styledInput.padding.right += paddingAddition;
             }
-            else if (config.Icon.Position == IconPosition.Right)
-            {
-                styledInput.padding.right += paddingAddition;
-            }
 
-            string newValue = DrawBasicInput(config, styledInput);
-            Rect lastRect = GUILayoutUtility.GetLastRect();
+            string value = DrawField(config, styledInput, controlName);
 
-            if (Event.current.type == EventType.Repaint)
+            if (config.Icon?.Image != null && Event.current.type == EventType.Repaint)
             {
+                Rect rect = GUILayoutUtility.GetLastRect();
+                float iconSize = config.Icon.Size * guiHelper.uiScale;
+                float y = rect.y + (rect.height - iconSize) / 2f;
+
                 if (config.Icon.Position == IconPosition.Left)
                 {
-                    Rect iconRect = new Rect(lastRect.x + DesignTokens.Spacing.XS * guiHelper.uiScale, lastRect.y + (lastRect.height - iconSize) / 2, iconSize, iconSize);
+                    Rect iconRect = new Rect(rect.x + DesignTokens.Spacing.XS * guiHelper.uiScale, y, iconSize, iconSize);
                     RenderIcon(config.Icon, iconRect);
                 }
                 else if (config.Icon.Position == IconPosition.Right)
                 {
-                    Rect iconRect = new Rect(lastRect.x + lastRect.width - iconSize - DesignTokens.Spacing.XS * guiHelper.uiScale, lastRect.y + (lastRect.height - iconSize) / 2, iconSize, iconSize);
+                    Rect iconRect = new Rect(rect.x + rect.width - iconSize - DesignTokens.Spacing.XS * guiHelper.uiScale, y, iconSize, iconSize);
                     RenderIcon(config.Icon, iconRect);
                 }
             }
 
-            return newValue;
+            return value;
         }
 
-        private string DrawBasicInput(InputConfig config, GUIStyle inputStyle)
+        private string DrawField(InputConfig config, GUIStyle style, string controlName)
         {
+            var options = BuildLayoutOptions(config);
+            string current = config.Value ?? string.Empty;
+
+            if (config.InputKind == InputKind.Password)
+            {
+                return UnityHelpers.PasswordField(current, config.MaskCharacter, style, options.ToArray());
+            }
+
+            if (config.MaxLength > 0)
+                return UnityHelpers.TextField(current, config.MaxLength, style, options.ToArray());
+
+            return UnityHelpers.TextField(current, style, options.ToArray());
+        }
+
+        private List<GUILayoutOption> BuildLayoutOptions(InputConfig config)
+        {
+            var options = new List<GUILayoutOption>(config.LayoutOptions ?? Array.Empty<GUILayoutOption>());
+
+            float height = config.Height > 0 ? config.Height : DesignTokens.Height.Default;
+            options.Add(GUILayout.Height(height * guiHelper.uiScale));
+
             if (config.Width > 0)
-                return UnityHelpers.TextField(config.Value ?? "", inputStyle, GUILayout.Width(config.Width * guiHelper.uiScale), GUILayout.Height(DesignTokens.Height.Default * guiHelper.uiScale));
+                options.Add(GUILayout.Width(config.Width * guiHelper.uiScale));
             else
-                return UnityHelpers.TextField(config.Value ?? "", inputStyle, GUILayout.Height(DesignTokens.Height.Default * guiHelper.uiScale));
+                options.Add(GUILayout.ExpandWidth(true));
+
+            return options;
         }
 
-        private string DrawPasswordFieldStyled(InputConfig config, StyleManager styleManager)
+        private void DrawLabel(InputConfig config)
         {
-            GUIStyle passwordStyle = styleManager.GetPasswordFieldStyle();
-            var originalColor = GUI.color;
-            ApplyDisabledColor(originalColor, config.IsDisabled);
-
-            string newValue = UnityHelpers.PasswordField(config.Value ?? "", config.MaskCharacter, passwordStyle, GUILayout.Height(DesignTokens.Height.Default * guiHelper.uiScale));
-
-            GUI.color = originalColor;
-            layoutComponents.AddSpace(DesignTokens.Spacing.MD);
-
-            if (newValue != config.Value && !config.IsDisabled && config.OnValueChanged != null)
-                config.OnValueChanged.Invoke(newValue);
-
-            return config.IsDisabled ? config.Value : newValue;
+            GUIStyle labelStyle = styleManager?.GetLabelStyle(config.LabelVariant, config.Size) ?? GUI.skin.label;
+            UnityHelpers.Label(config.Label ?? string.Empty, labelStyle);
         }
 
-        private string DrawTextAreaStyled(InputConfig config, StyleManager styleManager)
+        private void DrawHelperOrError(InputConfig config)
         {
-            GUIStyle textAreaStyle = styleManager.GetTextAreaStyle(ControlVariant.Default, ControlSize.Default, config.IsFocused);
-            var originalColor = GUI.color;
-            ApplyDisabledColor(originalColor, config.IsDisabled);
+            if (!string.IsNullOrEmpty(config.ErrorText))
+            {
+                layoutComponents.AddSpace(DesignTokens.Spacing.XXS);
+                GUIStyle errorStyle = styleManager?.GetLabelStyle(ControlVariant.Destructive, config.Size) ?? GUI.skin.label;
+                UnityHelpers.Label(config.ErrorText, errorStyle);
+                return;
+            }
 
-            string newValue = UnityHelpers.TextArea(config.Value ?? "", config.MaxLength, textAreaStyle, GUILayout.Height(config.Height * guiHelper.uiScale));
+            if (!string.IsNullOrEmpty(config.HelperText))
+            {
+                layoutComponents.AddSpace(DesignTokens.Spacing.XXS);
+                GUIStyle helperStyle = styleManager?.GetLabelStyle(ControlVariant.Muted, config.Size) ?? GUI.skin.label;
+                UnityHelpers.Label(config.HelperText, helperStyle);
+            }
+        }
 
-            GUI.color = originalColor;
-            layoutComponents.AddSpace(DesignTokens.Spacing.MD);
+        private void DrawPlaceholderIfNeeded(InputConfig config, GUIStyle inputStyle, bool focused, string value)
+        {
+            if (focused || !string.IsNullOrEmpty(value) || string.IsNullOrEmpty(config.Placeholder))
+                return;
 
-            if (newValue != config.Value && !config.IsDisabled && config.OnValueChanged != null)
-                config.OnValueChanged.Invoke(newValue);
+            Rect rect = GUILayoutUtility.GetLastRect();
+            var placeholderStyle = new UnityHelpers.GUIStyle(inputStyle);
+            placeholderStyle.normal.textColor = styleManager?.GetTheme().Muted ?? new Color(0.64f, 0.64f, 0.71f, 1f);
 
-            return config.IsDisabled ? config.Value : newValue;
+            Rect textRect = new Rect(rect.x + inputStyle.padding.left, rect.y + inputStyle.padding.top, rect.width - inputStyle.padding.horizontal, rect.height - inputStyle.padding.vertical);
+
+            GUI.Label(textRect, config.Placeholder, placeholderStyle);
+        }
+
+        private string ResolveId(string id, string label, string placeholder)
+        {
+            if (!string.IsNullOrEmpty(id))
+                return id;
+            if (!string.IsNullOrEmpty(label))
+                return label;
+            if (!string.IsNullOrEmpty(placeholder))
+                return placeholder;
+            return Guid.NewGuid().ToString("N");
         }
 
         private void RenderIcon(IconConfig iconConfig)
         {
+            if (iconConfig?.Image == null)
+                return;
+
             float scaledSize = iconConfig.Size * guiHelper.uiScale;
             UnityHelpers.Label(iconConfig.Image, GUILayout.Width(scaledSize), GUILayout.Height(scaledSize));
         }
 
         private void RenderIcon(IconConfig iconConfig, Rect rect)
         {
-            if (iconConfig.Image != null)
-            {
-                GUI.DrawTexture(rect, iconConfig.Image, ScaleMode.ScaleToFit);
-            }
-        }
+            if (iconConfig?.Image == null)
+                return;
 
-        private void ApplyDisabledColor(Color originalColor, bool disabled)
-        {
-            if (disabled)
-                GUI.color = new Color(originalColor.r, originalColor.g, originalColor.b, 0.5f);
+            GUI.DrawTexture(rect, iconConfig.Image, ScaleMode.ScaleToFit);
         }
-
-        #endregion
     }
 }

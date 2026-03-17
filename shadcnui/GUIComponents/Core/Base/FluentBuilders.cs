@@ -144,8 +144,6 @@ namespace shadcnui.GUIComponents.Core.Base
 
     public sealed class InputBuilder : SizedBuilder<InputBuilder, InputConfig>
     {
-        private bool _labeled;
-
         public InputBuilder(GUIHelper helper)
             : base(helper, new InputConfig()) { }
 
@@ -164,20 +162,20 @@ namespace shadcnui.GUIComponents.Core.Base
         public InputBuilder Label(string label)
         {
             Config.Label = label;
-            _labeled = true;
             return this;
         }
 
         public InputBuilder Password(char mask = '*')
         {
             Config.MaskCharacter = mask;
+            Config.InputKind = InputKind.Password;
             Config.Label ??= string.Empty;
             return this;
         }
 
         public InputBuilder Focused(bool focused = true)
         {
-            Config.IsFocused = focused;
+            Config.AutoFocus = focused;
             return this;
         }
 
@@ -203,18 +201,18 @@ namespace shadcnui.GUIComponents.Core.Base
         {
             Config.Variant = VariantValue;
             Config.IsDisabled = DisabledValue;
-            return _labeled ? Helper.LabeledInput(Config) : Helper.Input(Config);
+            return Helper.Input(Config);
         }
     }
 
     public sealed class ToggleBuilder : SizedBuilder<ToggleBuilder, ToggleConfig>
     {
         public ToggleBuilder(GUIHelper helper, string text, bool value)
-            : base(helper, new ToggleConfig { Text = text, Value = value }) { }
+            : base(helper, new ToggleConfig { Label = text, Value = value }) { }
 
         public ToggleBuilder Text(string text)
         {
-            Config.Text = text;
+            Config.Label = text;
             return this;
         }
 
@@ -249,7 +247,7 @@ namespace shadcnui.GUIComponents.Core.Base
     public sealed class CheckboxBuilder : SizedBuilder<CheckboxBuilder, CheckboxConfig>
     {
         public CheckboxBuilder(GUIHelper helper, string text, bool value)
-            : base(helper, new CheckboxConfig { Text = text, Value = value }) { }
+            : base(helper, new CheckboxConfig { Label = text, Value = value }) { }
 
         public CheckboxBuilder Icon(Texture2D image, IconPosition position = IconPosition.Left, float size = DesignTokens.Icon.Default, float spacing = DesignTokens.Spacing.XS)
         {
@@ -276,7 +274,7 @@ namespace shadcnui.GUIComponents.Core.Base
     public sealed class SwitchBuilder : SizedBuilder<SwitchBuilder, SwitchConfig>
     {
         public SwitchBuilder(GUIHelper helper, string text, bool value)
-            : base(helper, new SwitchConfig { Text = text, Value = value }) { }
+            : base(helper, new SwitchConfig { Label = text, Value = value }) { }
 
         public SwitchBuilder OnToggle(Action<bool> onToggle)
         {
@@ -875,11 +873,11 @@ namespace shadcnui.GUIComponents.Core.Base
     public sealed class SelectBuilder : FluentBuilder<SelectBuilder, SelectConfig>
     {
         public SelectBuilder(GUIHelper helper, int selectedIndex = 0, params string[] items)
-            : base(helper, new SelectConfig { SelectedIndex = selectedIndex, Items = items ?? Array.Empty<string>() }) { }
+            : base(helper, new SelectConfig { SelectedIndex = selectedIndex, Options = items == null ? Array.Empty<SelectOption>() : Array.ConvertAll(items, t => new SelectOption(t, t)) }) { }
 
         public SelectBuilder Items(params string[] items)
         {
-            Config.Items = items;
+            Config.Options = items == null ? Array.Empty<SelectOption>() : Array.ConvertAll(items, t => new SelectOption(t, t));
             return this;
         }
 
@@ -895,12 +893,12 @@ namespace shadcnui.GUIComponents.Core.Base
             return this;
         }
 
-        public void Open(string id = "select")
+        public void Open(Rect anchorRect)
         {
-            Helper.OpenSelect(id);
+            Helper.OpenSelect(Config, anchorRect);
         }
 
-        public bool IsOpen() => Helper.IsSelectOpen();
+        public bool IsOpen() => Helper.IsSelectOpen(Config.Id);
 
         public int Draw()
         {
@@ -927,7 +925,7 @@ namespace shadcnui.GUIComponents.Core.Base
 
         public DropdownMenuBuilder Item(string text, Action onClick = null, Texture2D icon = null)
         {
-            Config.Items.Add(new DropdownMenuItem(DropdownMenuItemType.Item, text, onClick, false, icon));
+            Config.Items.Add(new DropdownMenuItem(DropdownMenuItemType.Item, text, onClick, icon));
             return this;
         }
 

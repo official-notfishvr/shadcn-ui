@@ -75,8 +75,22 @@ namespace shadcnui_examples.Examples
                     "Update your profile information.",
                     () =>
                     {
-                        gui.LabeledInput("Name", dialogName, "Enter your name");
-                        gui.LabeledInput("Email", dialogEmail, "Enter your email");
+                        dialogName = gui.Input(
+                            new InputConfig
+                            {
+                                Label = "Name",
+                                Value = dialogName,
+                                Placeholder = "Enter your name",
+                            }
+                        );
+                        dialogEmail = gui.Input(
+                            new InputConfig
+                            {
+                                Label = "Email",
+                                Value = dialogEmail,
+                                Placeholder = "Enter your email",
+                            }
+                        );
                         dialogSubscribe = gui.Checkbox("Subscribe to newsletter", dialogSubscribe);
                     },
                     () =>
@@ -184,7 +198,7 @@ namespace shadcnui_examples.Examples
                         "Enter your username here",
                         () =>
                         {
-                            gui.InputLabel("Username:");
+                            gui.Label("Username:");
                             gui.Input("", "username");
                         }
                     );

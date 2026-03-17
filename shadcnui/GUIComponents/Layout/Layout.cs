@@ -1,6 +1,5 @@
 using System;
 using shadcnui.GUIComponents.Core.Base;
-using shadcnui.GUIComponents.Core.Styling;
 using UnityEngine;
 #if IL2CPP_MELONLOADER_PRE57
 using UnhollowerBaseLib;
@@ -13,14 +12,13 @@ namespace shadcnui.GUIComponents.Layout
 #if IL2CPP_MELONLOADER_PRE57
         public static readonly Il2CppReferenceArray<GUILayoutOption> EmptyOptions = new Il2CppReferenceArray<GUILayoutOption>(0);
 #endif
-        private GUIHelper guiHelper;
+
+        private readonly GUIHelper _guiHelper;
 
         public Layout(GUIHelper helper)
         {
-            guiHelper = helper;
+            _guiHelper = helper;
         }
-
-        #region API
 
         public Vector2 DrawScrollView(Vector2 scrollPosition, Action drawContent, params GUILayoutOption[] options)
         {
@@ -61,28 +59,25 @@ namespace shadcnui.GUIComponents.Layout
 #endif
         }
 
-        public void EndHorizontalGroup()
-        {
-            GUILayout.EndHorizontal();
-        }
+        public void EndHorizontalGroup() => GUILayout.EndHorizontal();
 
         public void BeginVerticalGroup()
         {
-            GUIStyle boxStyle = GUIStyle.none;
+            var style = GUIStyle.none;
 #if IL2CPP_MELONLOADER_PRE57
-            GUILayout.BeginVertical(boxStyle, EmptyOptions);
+            GUILayout.BeginVertical(style, EmptyOptions);
 #else
-            GUILayout.BeginVertical(boxStyle);
+            GUILayout.BeginVertical(style);
 #endif
         }
 
         public void BeginVerticalGroup(params GUILayoutOption[] options)
         {
-            GUIStyle boxStyle = GUIStyle.none;
+            var style = GUIStyle.none;
 #if IL2CPP_MELONLOADER_PRE57
-            GUILayout.BeginVertical(boxStyle, new Il2CppReferenceArray<GUILayoutOption>(options));
+            GUILayout.BeginVertical(style, new Il2CppReferenceArray<GUILayoutOption>(options));
 #else
-            GUILayout.BeginVertical(boxStyle, options);
+            GUILayout.BeginVertical(style, options);
 #endif
         }
 
@@ -95,16 +90,8 @@ namespace shadcnui.GUIComponents.Layout
 #endif
         }
 
-        public void EndVerticalGroup()
-        {
-            GUILayout.EndVertical();
-        }
+        public void EndVerticalGroup() => GUILayout.EndVertical();
 
-        public void AddSpace(float pixels)
-        {
-            GUILayout.Space(pixels * guiHelper.uiScale);
-        }
-
-        #endregion
+        public void AddSpace(float pixels) => GUILayout.Space(pixels * _guiHelper.uiScale);
     }
 }

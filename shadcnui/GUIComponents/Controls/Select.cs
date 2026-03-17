@@ -1,136 +1,205 @@
+using System;
+using System.Collections.Generic;
 using shadcnui.GUIComponents.Core.Base;
 using shadcnui.GUIComponents.Core.Styling;
 using shadcnui.GUIComponents.Core.Utils;
 using UnityEngine;
-#if IL2CPP_MELONLOADER_PRE57
-using UnhollowerBaseLib;
-#endif
 
 namespace shadcnui.GUIComponents.Controls
 {
     public class Select : BaseComponent
     {
-        private bool isOpen;
-        private Vector2 scrollPosition;
-        private string _selectId;
-        private const float AnimationDuration = DesignTokens.Animation.DurationFast;
-        private Rect _cachedSelectRect;
+        private readonly Dictionary<string, Vector2> _scrollPositions = new();
+        private readonly Dictionary<string, Rect> _anchorRects = new();
+        private readonly Dictionary<string, int> _pendingSelection = new();
 
         public Select(GUIHelper helper)
             : base(helper) { }
 
-        public bool IsOpen => isOpen;
-
-        #region Config-based API
-        public int DrawSelect(SelectConfig config)
+        public int Draw(SelectConfig config)
         {
-            if (!isOpen)
-                return config.SelectedIndex;
+            if (config == null)
+                return 0;
 
-            var styleManager = guiHelper.GetStyleManager();
-            var animManager = guiHelper.GetAnimationManager();
-            string id = _selectId ?? "select";
-
-            int selectedIndex = DrawSelectDropdown(config, styleManager, animManager, id);
-            return selectedIndex;
-        }
-        #endregion
-
-        #region API
-        public void Open(string id = "select")
-        {
-            _selectId = id;
-            isOpen = true;
-            var animManager = guiHelper.GetAnimationManager();
-            animManager.FadeIn($"select_alpha_{id}", AnimationDuration, EasingFunctions.EaseOutCubic);
-            animManager.ScaleIn($"select_scale_{id}", AnimationDuration, 0.95f, EasingFunctions.EaseOutCubic);
-            animManager.SlideIn($"select_slide_{id}", Vector2.zero, new Vector2(0, -DesignTokens.Spacing.MD), AnimationDuration, EasingFunctions.EaseOutCubic);
-        }
-
-        public void Close()
-        {
-            if (_selectId != null)
+            string id = ResolveId(config.Id, config.Label, "select");
+            if (_pendingSelection.TryGetValue(id, out int pending))
             {
-                var animManager = guiHelper.GetAnimationManager();
-                animManager.FadeOut($"select_alpha_{_selectId}", AnimationDuration * 0.8f, EasingFunctions.EaseInCubic);
-                animManager.ScaleOut($"select_scale_{_selectId}", AnimationDuration * 0.8f, 0.95f, EasingFunctions.EaseInCubic);
+                _pendingSelection.Remove(id);
+                config.SelectedIndex = pending;
             }
-            isOpen = false;
-            _selectId = null;
-        }
 
-        public int DrawSelect(string[] items, int selectedIndex)
-        {
-            return DrawSelect(new SelectConfig { Items = items, SelectedIndex = selectedIndex });
-        }
-        #endregion
+            DrawLabel(config);
 
-        #region Private Methods
-        private int DrawSelectDropdown(SelectConfig config, StyleManager styleManager, AnimationManager animManager, string id)
-        {
-            float alpha = animManager.GetFloat($"select_alpha_{id}", 1f);
-            float scale = animManager.GetFloat($"select_scale_{id}", 1f);
-            Vector2 slideOffset = animManager.GetVector2($"select_slide_{id}", Vector2.zero);
+            GUIStyle buttonStyle = styleManager?.GetButtonStyle(config.Variant, config.Size) ?? GUI.skin.button;
+            string label = GetSelectedLabel(config) ?? config.Placeholder ?? "Select";
+            string arrow = LayerManager.Instance.IsOpen(id) ? " ^" : " v";
 
-            GUIStyle selectStyle = styleManager?.GetSelectStyle(ControlVariant.Default, ControlSize.Default) ?? GUI.skin.box;
-            GUIStyle itemStyle = styleManager?.GetSelectItemStyle() ?? GUI.skin.button;
-            int selectedIndex = config.SelectedIndex;
-
-            ApplyAnimationTransform(alpha, scale, slideOffset);
-            selectedIndex = DrawSelectContent(config, selectStyle, itemStyle, selectedIndex);
-            RestoreGraphicsState();
-
-            return selectedIndex;
-        }
-
-        private void ApplyAnimationTransform(float alpha, float scale, Vector2 slideOffset)
-        {
-            var prevColor = GUI.color;
-            if (alpha < 1f)
-                GUI.color = new Color(prevColor.r, prevColor.g, prevColor.b, prevColor.a * alpha);
-
-            if (scale < 1f || slideOffset != Vector2.zero)
-            {
-                Vector2 pivot = _cachedSelectRect.center;
-                var prevMatrix = GUI.matrix;
-                GUI.matrix = Matrix4x4.Translate(new Vector3(pivot.x, pivot.y, 0f)) * Matrix4x4.Scale(new Vector3(scale, scale, 1f)) * Matrix4x4.Translate(new Vector3(-pivot.x + slideOffset.x, -pivot.y + slideOffset.y, 0f)) * prevMatrix;
-            }
-        }
-
-        private int DrawSelectContent(SelectConfig config, GUIStyle selectStyle, GUIStyle itemStyle, int selectedIndex)
-        {
-            float dropdownWidth = Mathf.Max(280f * guiHelper.uiScale, 280f * guiHelper.uiScale);
-            layoutComponents.BeginVerticalGroup(selectStyle, GUILayout.Width(dropdownWidth), GUILayout.MaxHeight(220f * guiHelper.uiScale));
-            int newIndex = selectedIndex;
-            scrollPosition = layoutComponents.DrawScrollView(scrollPosition, () => newIndex = DrawSelectItems(config, itemStyle, newIndex), GUILayout.ExpandWidth(true), GUILayout.MinHeight(0), GUILayout.MaxHeight(220f * guiHelper.uiScale));
-            GUILayout.EndVertical();
+            var options = BuildTriggerOptions(config);
+            bool clicked = UnityHelpers.Button(label + arrow, buttonStyle, options.ToArray());
 
             if (Event.current.type == EventType.Repaint)
-                _cachedSelectRect = GUILayoutUtility.GetLastRect();
+                _anchorRects[id] = GUILayoutUtility.GetLastRect();
 
-            return newIndex;
-        }
-
-        private int DrawSelectItems(SelectConfig config, GUIStyle itemStyle, int selectedIndex)
-        {
-            int newIndex = selectedIndex;
-            for (int i = 0; i < config.Items.Length; i++)
+            if (clicked)
             {
-                if (UnityHelpers.Button(config.Items[i], itemStyle))
-                {
-                    newIndex = i;
-                    config.OnSelectionChanged?.Invoke(i);
-                    Close();
-                }
+                if (LayerManager.Instance.IsOpen(id))
+                    Close(id);
+                else
+                    Open(config, GetAnchorRect(id));
             }
-            return newIndex;
+
+            if (LayerManager.Instance.IsOpen(id))
+                UpdatePosition(id, config);
+
+            return config.SelectedIndex;
         }
 
-        private void RestoreGraphicsState()
+        public int DrawMenu(SelectConfig config)
         {
-            GUI.matrix = Matrix4x4.identity;
-            GUI.color = Color.white;
+            if (config == null)
+                return 0;
+
+            string id = ResolveId(config.Id, config.Label, "select");
+            return DrawMenuInternal(id, config);
         }
-        #endregion
+
+        public void Open(SelectConfig config, Rect anchorRect)
+        {
+            if (config == null)
+                return;
+
+            string id = ResolveId(config.Id, config.Label, "select");
+            _anchorRects[id] = anchorRect;
+
+            Vector2 screenPos = GUIUtility.GUIToScreenPoint(new Vector2(anchorRect.x, anchorRect.yMax + 4));
+            LayerManager.Instance.Open(
+                new LayerConfig
+                {
+                    Id = id,
+                    OpenPosition = screenPos,
+                    Width = GetMenuWidth(config, anchorRect),
+                    Height = GetMenuHeight(config),
+                    CloseOnClickOutside = true,
+                    ZIndex = DesignTokens.ZIndex.Dropdown,
+                    Content = () => DrawMenuInternal(id, config),
+                }
+            );
+        }
+
+        public void Close(string id) => LayerManager.Instance.Close(id);
+
+        public bool IsOpen(string id) => LayerManager.Instance.IsOpen(id);
+
+        private int DrawMenuInternal(string id, SelectConfig config)
+        {
+            GUIStyle menuStyle = styleManager?.GetSelectStyle(config.Variant, config.Size) ?? GUI.skin.box;
+            GUIStyle itemStyle = styleManager?.GetSelectItemStyle() ?? GUI.skin.button;
+
+            float width = GetMenuWidth(config, GetAnchorRect(id));
+            float height = GetMenuHeight(config);
+
+            layoutComponents.BeginVerticalGroup(menuStyle, GUILayout.Width(width), GUILayout.MaxHeight(height));
+
+            Vector2 scroll = _scrollPositions.TryGetValue(id, out var pos) ? pos : Vector2.zero;
+            scroll = layoutComponents.DrawScrollView(scroll, () => DrawItems(id, config, itemStyle), GUILayout.ExpandWidth(true), GUILayout.MinHeight(0), GUILayout.MaxHeight(height));
+            _scrollPositions[id] = scroll;
+
+            layoutComponents.EndVerticalGroup();
+
+            return config.SelectedIndex;
+        }
+
+        private void DrawItems(string id, SelectConfig config, GUIStyle itemStyle)
+        {
+            if (config.Options == null || config.Options.Length == 0)
+            {
+                GUIStyle muted = styleManager?.GetLabelStyle(ControlVariant.Muted, config.Size) ?? GUI.skin.label;
+                UnityHelpers.Label("No options", muted);
+                return;
+            }
+
+            for (int i = 0; i < config.Options.Length; i++)
+            {
+                var opt = config.Options[i];
+                bool prevEnabled = GUI.enabled;
+                if (opt != null && opt.IsDisabled)
+                    GUI.enabled = false;
+
+                string text = opt?.Label ?? string.Empty;
+                if (UnityHelpers.Button(text, itemStyle))
+                {
+                    _pendingSelection[id] = i;
+                    config.OnSelectionChanged?.Invoke(i);
+                    if (config.CloseOnSelect)
+                        Close(id);
+                }
+
+                GUI.enabled = prevEnabled;
+            }
+        }
+
+        private void DrawLabel(SelectConfig config)
+        {
+            if (string.IsNullOrEmpty(config.Label))
+                return;
+
+            GUIStyle labelStyle = styleManager?.GetLabelStyle(config.LabelVariant, config.Size) ?? GUI.skin.label;
+            UnityHelpers.Label(config.Label, labelStyle);
+            layoutComponents.AddSpace(DesignTokens.Spacing.XS);
+        }
+
+        private List<GUILayoutOption> BuildTriggerOptions(SelectConfig config)
+        {
+            var options = new List<GUILayoutOption>(config.LayoutOptions ?? Array.Empty<GUILayoutOption>());
+            if (config.Width > 0)
+                options.Add(GUILayout.Width(config.Width * guiHelper.uiScale));
+            else
+                options.Add(GUILayout.ExpandWidth(true));
+            return options;
+        }
+
+        private Rect GetAnchorRect(string id)
+        {
+            return _anchorRects.TryGetValue(id, out var rect) ? rect : new Rect(0, 0, 240, 30);
+        }
+
+        private float GetMenuWidth(SelectConfig config, Rect anchor)
+        {
+            if (config.Width > 0)
+                return config.Width * guiHelper.uiScale;
+            return Mathf.Max(anchor.width, 200f * guiHelper.uiScale);
+        }
+
+        private float GetMenuHeight(SelectConfig config)
+        {
+            return Mathf.Max(120f * guiHelper.uiScale, config.MaxHeight * guiHelper.uiScale);
+        }
+
+        private void UpdatePosition(string id, SelectConfig config)
+        {
+            Rect anchor = GetAnchorRect(id);
+            Vector2 screenPos = GUIUtility.GUIToScreenPoint(new Vector2(anchor.x, anchor.yMax + 4));
+            LayerManager.Instance.SetPosition(id, screenPos);
+        }
+
+        private string GetSelectedLabel(SelectConfig config)
+        {
+            if (config.Options == null || config.Options.Length == 0)
+                return null;
+
+            if (config.SelectedIndex < 0 || config.SelectedIndex >= config.Options.Length)
+                return null;
+
+            return config.Options[config.SelectedIndex]?.Label;
+        }
+
+        private string ResolveId(string id, string label, string fallback)
+        {
+            if (!string.IsNullOrEmpty(id))
+                return id;
+            if (!string.IsNullOrEmpty(label))
+                return label;
+            return fallback;
+        }
     }
 }

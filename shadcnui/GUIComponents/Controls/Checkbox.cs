@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using shadcnui.GUIComponents.Core.Base;
 using shadcnui.GUIComponents.Core.Styling;
 using shadcnui.GUIComponents.Core.Utils;
@@ -14,181 +15,67 @@ namespace shadcnui.GUIComponents.Controls
         public Checkbox(GUIHelper helper)
             : base(helper) { }
 
-        #region Config-based API
-        public bool DrawCheckbox(CheckboxConfig config)
+        public bool Draw(CheckboxConfig config)
         {
-            var styleManager = guiHelper.GetStyleManager();
-            GUIStyle checkboxStyle = styleManager?.GetCheckboxStyle(config.Variant, config.Size) ?? GUI.skin.toggle;
+            if (config == null)
+                return false;
 
-            bool wasEnabled = GUI.enabled;
+            GUIStyle checkboxStyle = config.ShowCheckmark ? (styleManager?.GetCheckboxStyle(config.Variant, config.Size) ?? GUI.skin.toggle) : (styleManager?.GetCheckboxSolidStyle(config.Variant, config.Size) ?? GUI.skin.toggle);
+
+            bool prevEnabled = GUI.enabled;
             if (config.IsDisabled)
                 GUI.enabled = false;
 
-            bool newValue = GetCheckboxValue(config, checkboxStyle);
+            bool newValue = config.Rect.HasValue ? DrawRect(config, checkboxStyle) : DrawLayout(config, checkboxStyle);
 
-            GUI.enabled = wasEnabled;
+            GUI.enabled = prevEnabled;
 
             if (newValue != config.Value && !config.IsDisabled)
                 config.OnValueChanged?.Invoke(newValue);
 
             return config.IsDisabled ? config.Value : newValue;
         }
-        #endregion
 
-        #region API
-        public bool DrawCheckbox(string text, bool value, ControlVariant variant = ControlVariant.Default, ControlSize size = ControlSize.Default, Action<bool> OnValueChanged = null, bool IsDisabled = false, params GUILayoutOption[] options)
+        private bool DrawLayout(BoolControlConfigBase config, GUIStyle style)
         {
-            return DrawCheckbox(
-                new CheckboxConfig
-                {
-                    Text = text,
-                    Value = value,
-                    Variant = variant,
-                    Size = size,
-                    OnValueChanged = OnValueChanged,
-                    IsDisabled = IsDisabled,
-                    LayoutOptions = options,
-                }
-            );
-        }
-
-        public bool DrawCheckbox(Rect rect, string text, bool value, ControlVariant variant = ControlVariant.Default, ControlSize size = ControlSize.Default, Action<bool> OnValueChanged = null, bool IsDisabled = false)
-        {
-            return DrawCheckbox(
-                new CheckboxConfig
-                {
-                    Rect = rect,
-                    Text = text,
-                    Value = value,
-                    Variant = variant,
-                    Size = size,
-                    OnValueChanged = OnValueChanged,
-                    IsDisabled = IsDisabled,
-                }
-            );
-        }
-        #endregion
-
-        #region Private Methods
-        private bool GetCheckboxValue(CheckboxConfig config, GUIStyle checkboxStyle)
-        {
-            bool useExpandWidth = config.Size != ControlSize.Icon;
+            var options = BuildLayoutOptions(config);
+            string label = config.Label ?? string.Empty;
 
             if (config.Icon?.Image != null)
-                return DrawCheckboxWithIcon(config, checkboxStyle);
+            {
+                layoutComponents.BeginHorizontalGroup();
+                RenderIcon(config.Icon);
+                layoutComponents.AddSpace(config.Icon.Spacing * guiHelper.uiScale);
+                bool value = UnityHelpers.Toggle(config.Value, label, style, options.ToArray());
+                layoutComponents.EndHorizontalGroup();
+                return value;
+            }
 
-            if (config.Rect.HasValue)
-                return DrawCheckboxAtRect(config, checkboxStyle);
-
-            return DrawCheckboxLayout(config, checkboxStyle, useExpandWidth);
+            return UnityHelpers.Toggle(config.Value, label, style, options.ToArray());
         }
 
-        private bool DrawCheckboxWithIcon(CheckboxConfig config, GUIStyle checkboxStyle)
-        {
-            GUILayout.BeginHorizontal();
-            RenderIcon(config.Icon);
-            layoutComponents.AddSpace(config.Icon.Spacing);
-            bool newValue = UnityHelpers.Toggle(config.Value, config.Text ?? "Checkbox", checkboxStyle);
-            GUILayout.EndHorizontal();
-            return newValue;
-        }
-
-        private bool DrawCheckboxAtRect(CheckboxConfig config, GUIStyle checkboxStyle)
+        private bool DrawRect(BoolControlConfigBase config, GUIStyle style)
         {
             Rect r = config.Rect.Value;
             Rect scaledRect = new Rect(r.x * guiHelper.uiScale, r.y * guiHelper.uiScale, r.width * guiHelper.uiScale, r.height * guiHelper.uiScale);
-            return UnityHelpers.Toggle(scaledRect, config.Value, config.Text ?? "Checkbox", checkboxStyle);
+            return UnityHelpers.Toggle(scaledRect, config.Value, config.Label ?? string.Empty, style);
         }
 
-        private bool DrawCheckboxLayout(CheckboxConfig config, GUIStyle checkboxStyle, bool useExpandWidth)
+        private List<GUILayoutOption> BuildLayoutOptions(BoolControlConfigBase config)
         {
-            GUILayoutOption[] options = BuildToggleLayoutOptions(config.LayoutOptions, useExpandWidth);
-
-            if (!config.ShowCheckmark)
-            {
-                return UnityHelpers.Toggle(config.Value, config.Text ?? "Checkbox", checkboxStyle, options);
-            }
-
-            GUILayout.BeginHorizontal(options);
-
-            GUIStyle labelStyle = new UnityHelpers.GUIStyle(GUI.skin.label);
-            labelStyle.alignment = TextAnchor.MiddleLeft;
-            labelStyle.fontSize = styleManager?.GetScaledFontSize(DesignTokens.FontScale.SM) ?? Mathf.RoundToInt(14 * guiHelper.uiScale);
-            labelStyle.normal.textColor = checkboxStyle.normal.textColor;
-            GUILayout.Label(config.Text ?? "Checkbox", labelStyle, GUILayout.ExpandWidth(true));
-
-            GUILayout.FlexibleSpace();
-
-            float checkboxSize = 20 * guiHelper.uiScale;
-            Rect checkboxRect = GUILayoutUtility.GetRect(checkboxSize, checkboxSize, GUILayout.Width(checkboxSize), GUILayout.Height(checkboxSize));
-
-            GUIStyle boxStyle = new UnityHelpers.GUIStyle(GUI.skin.box);
-
-            if (config.ShowCheckmark)
-            {
-                if (config.Value)
-                    boxStyle.normal.background = checkboxStyle.onNormal.background ?? checkboxStyle.normal.background;
-                else
-                    boxStyle.normal.background = checkboxStyle.normal.background;
-            }
-            else
-            {
-                var styleManager = guiHelper.GetStyleManager();
-                GUIStyle solidStyle = styleManager?.GetCheckboxSolidStyle(config.Variant, config.Size) ?? checkboxStyle;
-
-                if (config.Value)
-                    boxStyle.normal.background = solidStyle.onNormal.background ?? solidStyle.normal.background;
-                else
-                    boxStyle.normal.background = solidStyle.normal.background;
-            }
-
-            GUI.Box(checkboxRect, GUIContent.none, boxStyle);
-
-            if (config.Value && config.ShowCheckmark)
-            {
-                GUIStyle checkStyle = new UnityHelpers.GUIStyle(GUI.skin.label);
-                checkStyle.alignment = TextAnchor.MiddleCenter;
-                checkStyle.fontSize = styleManager?.GetScaledFontSize(DesignTokens.FontScale.XS) ?? Mathf.RoundToInt(12 * guiHelper.uiScale);
-                checkStyle.normal.textColor = checkboxStyle.onNormal.textColor;
-                GUI.Label(checkboxRect, "✓", checkStyle);
-            }
-
-            if (Event.current.type == EventType.MouseDown && checkboxRect.Contains(Event.current.mousePosition))
-            {
-                Event.current.Use();
-                GUILayout.EndHorizontal();
-                return !config.Value;
-            }
-
-            GUILayout.EndHorizontal();
-
-            Rect rowRect = GUILayoutUtility.GetLastRect();
-            if (Event.current.type == EventType.MouseDown && rowRect.Contains(Event.current.mousePosition) && !checkboxRect.Contains(Event.current.mousePosition))
-            {
-                Event.current.Use();
-                return !config.Value;
-            }
-
-            return config.Value;
-        }
-
-        private static GUILayoutOption[] BuildToggleLayoutOptions(GUILayoutOption[] configOptions, bool expandWidth)
-        {
-            int extra = expandWidth ? 1 : 0;
-            if (configOptions == null || configOptions.Length == 0)
-                return expandWidth ? new[] { GUILayout.ExpandWidth(true) } : Array.Empty<GUILayoutOption>();
-            var options = new GUILayoutOption[configOptions.Length + extra];
-            configOptions.CopyTo(options, 0);
-            if (expandWidth)
-                options[configOptions.Length] = GUILayout.ExpandWidth(true);
+            var options = new List<GUILayoutOption>(config.LayoutOptions ?? Array.Empty<GUILayoutOption>());
+            if (config.FullRowClick)
+                options.Add(GUILayout.ExpandWidth(true));
             return options;
         }
 
         private void RenderIcon(IconConfig iconConfig)
         {
+            if (iconConfig?.Image == null)
+                return;
+
             float scaledSize = iconConfig.Size * guiHelper.uiScale;
             UnityHelpers.Label(iconConfig.Image, GUILayout.Width(scaledSize), GUILayout.Height(scaledSize));
         }
-        #endregion
     }
 }

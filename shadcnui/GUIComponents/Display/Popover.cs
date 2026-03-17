@@ -3,15 +3,12 @@ using shadcnui.GUIComponents.Core.Base;
 using shadcnui.GUIComponents.Core.Styling;
 using shadcnui.GUIComponents.Core.Utils;
 using UnityEngine;
-#if IL2CPP_MELONLOADER_PRE57
-using UnhollowerBaseLib;
-#endif
 
 namespace shadcnui.GUIComponents.Display
 {
     public class Popover : BaseComponent
     {
-        private bool isOpen;
+        private bool _isOpen;
         private string _currentId;
         private int _currentZIndex;
         private const float AnimationDuration = DesignTokens.Animation.DurationFast;
@@ -19,49 +16,37 @@ namespace shadcnui.GUIComponents.Display
         public Popover(GUIHelper helper)
             : base(helper) { }
 
-        public bool IsOpen => isOpen;
+        public bool IsOpen => _isOpen;
 
-        #region Config-based API
         public void DrawPopover(PopoverConfig config)
         {
-            if (!isOpen)
+            if (!_isOpen || config == null)
                 return;
 
-            var animManager = guiHelper.GetAnimationManager();
             string id = _currentId ?? "popover";
-            float alpha = animManager.GetFloat($"popover_alpha_{id}", 1f);
-            float scale = animManager.GetFloat($"popover_scale_{id}", 1f);
-            Vector2 slideOffset = animManager.GetVector2($"popover_slide_{id}", Vector2.zero);
+            var anim = guiHelper.GetAnimationManager();
+            float alpha = anim.GetFloat($"popover_alpha_{id}", 1f);
+            float scale = anim.GetFloat($"popover_scale_{id}", 1f);
+            Vector2 slide = anim.GetVector2($"popover_slide_{id}", Vector2.zero);
 
-            ApplyPopoverAnimation(alpha, scale, slideOffset);
-            DrawPopoverContent(config);
-            RestoreGraphicsState();
-        }
-        #endregion
+            var prevMatrix = GUI.matrix;
+            var prevColor = GUI.color;
 
-        #region API
-        public void Open(string id = "popover", int zIndex = -1)
-        {
-            _currentId = id;
-            _currentZIndex = zIndex >= 0 ? zIndex : DesignTokens.ZIndex.Popover;
-            isOpen = true;
+            if (alpha < 1f)
+                GUI.color = new Color(prevColor.r, prevColor.g, prevColor.b, prevColor.a * alpha);
 
-            var animManager = guiHelper.GetAnimationManager();
-            animManager.FadeIn($"popover_alpha_{id}", AnimationDuration, EasingFunctions.EaseOutCubic);
-            animManager.ScaleIn($"popover_scale_{id}", AnimationDuration, 0.9f, EasingFunctions.EaseOutCubic);
-            animManager.SlideIn($"popover_slide_{id}", Vector2.zero, new Vector2(0, -DesignTokens.Spacing.XL), AnimationDuration, EasingFunctions.EaseOutCubic);
-        }
-
-        public void Close()
-        {
-            if (_currentId != null)
+            if (scale < 1f || slide != Vector2.zero)
             {
-                var animManager = guiHelper.GetAnimationManager();
-                animManager.FadeOut($"popover_alpha_{_currentId}", AnimationDuration * 0.8f, EasingFunctions.EaseInCubic);
-                animManager.ScaleOut($"popover_scale_{_currentId}", AnimationDuration * 0.8f, 0.9f, EasingFunctions.EaseInCubic);
+                GUIUtility.ScaleAroundPivot(new Vector2(scale, scale), Vector2.zero);
+                GUI.matrix = Matrix4x4.Translate(new Vector3(slide.x, slide.y, 0f)) * GUI.matrix;
             }
-            isOpen = false;
-            _currentId = null;
+
+            layoutComponents.BeginVerticalGroup(styleManager?.GetPopoverContentStyle() ?? GUI.skin.box, GUILayout.MaxWidth(320), GUILayout.MaxHeight(220));
+            config.Content?.Invoke();
+            layoutComponents.EndVerticalGroup();
+
+            GUI.matrix = prevMatrix;
+            GUI.color = prevColor;
         }
 
         public void DrawPopover(Action content)
@@ -69,35 +54,31 @@ namespace shadcnui.GUIComponents.Display
             DrawPopover(new PopoverConfig { Content = content });
         }
 
-        public int GetZIndex() => _currentZIndex;
-        #endregion
-
-        #region Private Methods
-        private void ApplyPopoverAnimation(float alpha, float scale, Vector2 slideOffset)
+        public void Open(string id = "popover", int zIndex = -1)
         {
-            Color prevColor = GUI.color;
-            if (alpha < 1f)
-                GUI.color = new Color(prevColor.r, prevColor.g, prevColor.b, prevColor.a * alpha);
+            _currentId = id;
+            _currentZIndex = zIndex >= 0 ? zIndex : DesignTokens.ZIndex.Popover;
+            _isOpen = true;
 
-            if (scale < 1f || slideOffset != Vector2.zero)
+            var anim = guiHelper.GetAnimationManager();
+            anim.FadeIn($"popover_alpha_{id}", AnimationDuration, EasingFunctions.EaseOutCubic);
+            anim.ScaleIn($"popover_scale_{id}", AnimationDuration, 0.92f, EasingFunctions.EaseOutCubic);
+            anim.SlideIn($"popover_slide_{id}", Vector2.zero, new Vector2(0, -DesignTokens.Spacing.LG), AnimationDuration, EasingFunctions.EaseOutCubic);
+        }
+
+        public void Close()
+        {
+            if (_currentId != null)
             {
-                GUIUtility.ScaleAroundPivot(new Vector3(scale, scale, 1f), Vector2.zero);
-                GUI.matrix = Matrix4x4.Translate(new Vector3(slideOffset.x, slideOffset.y, 0f)) * GUI.matrix;
+                var anim = guiHelper.GetAnimationManager();
+                anim.FadeOut($"popover_alpha_{_currentId}", AnimationDuration * 0.8f, EasingFunctions.EaseInCubic);
+                anim.ScaleOut($"popover_scale_{_currentId}", AnimationDuration * 0.8f, 0.92f, EasingFunctions.EaseInCubic);
             }
+
+            _isOpen = false;
+            _currentId = null;
         }
 
-        private void DrawPopoverContent(PopoverConfig config)
-        {
-            layoutComponents.BeginVerticalGroup(guiHelper.GetStyleManager().GetPopoverContentStyle(), GUILayout.MaxWidth(300), GUILayout.MaxHeight(200));
-            config.Content?.Invoke();
-            GUILayout.EndVertical();
-        }
-
-        private void RestoreGraphicsState()
-        {
-            GUI.matrix = Matrix4x4.identity;
-            GUI.color = Color.white;
-        }
-        #endregion
+        public int GetZIndex() => _currentZIndex;
     }
 }

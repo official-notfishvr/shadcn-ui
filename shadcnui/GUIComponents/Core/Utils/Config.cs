@@ -18,7 +18,15 @@ namespace shadcnui.GUIComponents.Core.Utils
         }
     }
 
-    public abstract class RectConfigBase : GuiConfigBase
+    public abstract class ComponentConfigBase : GuiConfigBase
+    {
+        public string Id { get; set; }
+        public ControlVariant Variant { get; set; } = ControlVariant.Default;
+        public ControlSize Size { get; set; } = ControlSize.Default;
+        public bool IsDisabled { get; set; }
+    }
+
+    public abstract class RectConfigBase : ComponentConfigBase // not being used that might maybe fully move off?
     {
         public Rect? Rect { get; set; }
     }
@@ -77,6 +85,12 @@ namespace shadcnui.GUIComponents.Core.Utils
         Left,
         Right,
     }
+
+    public enum InputKind
+    {
+        Text,
+        Password,
+    }
     #endregion
 
     #region Shared Configs
@@ -105,13 +119,26 @@ namespace shadcnui.GUIComponents.Core.Utils
     #endregion
 
     #region Control Configs
-    public class ButtonConfig : GuiConfigBase
+    public abstract class LabeledControlConfigBase : RectConfigBase
+    {
+        public string Label { get; set; }
+        public ControlVariant LabelVariant { get; set; } = ControlVariant.Default;
+        public string HelperText { get; set; }
+        public string ErrorText { get; set; }
+    }
+
+    public abstract class BoolControlConfigBase : LabeledControlConfigBase
+    {
+        public bool Value { get; set; }
+        public IconConfig Icon { get; set; }
+        public bool FullRowClick { get; set; } = true;
+        public Action<bool> OnValueChanged { get; set; }
+    }
+
+    public class ButtonConfig : ComponentConfigBase
     {
         public string Text { get; set; }
         public IconConfig Icon { get; set; }
-        public ControlVariant Variant { get; set; } = ControlVariant.Default;
-        public ControlSize Size { get; set; } = ControlSize.Default;
-        public bool IsDisabled { get; set; }
         public float Opacity { get; set; } = 1f;
         public Action OnClick { get; set; }
 
@@ -123,68 +150,37 @@ namespace shadcnui.GUIComponents.Core.Utils
         }
     }
 
-    public class InputConfig : GuiConfigBase
+    public class InputConfig : LabeledControlConfigBase
     {
         public string Value { get; set; }
         public string Placeholder { get; set; }
-        public string Label { get; set; }
         public IconConfig Icon { get; set; }
-        public ControlVariant Variant { get; set; } = ControlVariant.Default;
-        public ControlVariant LabelVariant { get; set; } = ControlVariant.Default;
-        public bool IsDisabled { get; set; }
-        public bool IsFocused { get; set; }
         public int Width { get; set; } = -1;
         public float Height { get; set; } = 60f;
         public char MaskCharacter { get; set; } = '*';
         public int MaxLength { get; set; } = 1000;
+        public bool AutoFocus { get; set; }
+        public InputKind InputKind { get; set; } = InputKind.Text;
         public Action<string> OnValueChanged { get; set; }
     }
 
-    public class CheckboxConfig : RectConfigBase
+    public class CheckboxConfig : BoolControlConfigBase
     {
-        public string Text { get; set; }
-        public bool Value { get; set; }
-        public IconConfig Icon { get; set; }
-        public ControlVariant Variant { get; set; } = ControlVariant.Default;
-        public ControlSize Size { get; set; } = ControlSize.Default;
-        public bool IsDisabled { get; set; }
         public bool ShowCheckmark { get; set; }
-        public Action<bool> OnValueChanged { get; set; }
     }
 
-    public class SwitchConfig : RectConfigBase
-    {
-        public string Text { get; set; } = "Switch";
-        public bool Value { get; set; }
-        public IconConfig Icon { get; set; }
-        public ControlVariant Variant { get; set; } = ControlVariant.Default;
-        public ControlSize Size { get; set; } = ControlSize.Default;
-        public bool IsDisabled { get; set; }
-        public Action<bool> OnValueChanged { get; set; }
-    }
+    public class SwitchConfig : BoolControlConfigBase { }
 
-    public class ToggleConfig : RectConfigBase
-    {
-        public string Text { get; set; }
-        public bool Value { get; set; }
-        public IconConfig Icon { get; set; }
-        public ControlVariant Variant { get; set; } = ControlVariant.Default;
-        public ControlSize Size { get; set; } = ControlSize.Default;
-        public bool IsDisabled { get; set; }
-        public Action<bool> OnValueChanged { get; set; }
-    }
+    public class ToggleConfig : BoolControlConfigBase { }
 
-    public class SliderConfig : GuiConfigBase
+    public class SliderConfig : ComponentConfigBase
     {
+        public string Label { get; set; }
         public float Value { get; set; }
         public float MinValue { get; set; }
         public float MaxValue { get; set; } = 1f;
         public float Step { get; set; }
-        public string Label { get; set; }
         public string ValueFormat { get; set; } = "F2";
-        public ControlVariant Variant { get; set; } = ControlVariant.Default;
-        public ControlSize Size { get; set; } = ControlSize.Default;
-        public bool IsDisabled { get; set; }
         public bool ShowValue { get; set; } = true;
         public Action<float> OnValueChanged { get; set; }
 
@@ -202,22 +198,44 @@ namespace shadcnui.GUIComponents.Core.Utils
     {
         private static int _counter;
 
-        public string Id { get; set; } = "textarea_" + System.Threading.Interlocked.Increment(ref _counter);
         public string Value { get; set; }
         public string Placeholder { get; set; }
         public string Label { get; set; }
-        public ControlVariant Variant { get; set; } = ControlVariant.Default;
-        public bool IsDisabled { get; set; }
         public float MinHeight { get; set; } = 60f;
         public float MaxHeight { get; set; } = 300f;
         public int MaxLength { get; set; } = -1;
         public bool ShowCharCount { get; set; } = true;
+
+        public TextAreaConfig()
+        {
+            Id = "textarea_" + System.Threading.Interlocked.Increment(ref _counter);
+        }
     }
 
-    public class SelectConfig : GuiConfigBase
+    public class SelectOption
     {
-        public string[] Items { get; set; } = Array.Empty<string>();
+        public string Id { get; set; }
+        public string Label { get; set; }
+        public Texture2D Icon { get; set; }
+        public bool IsDisabled { get; set; }
+
+        public SelectOption() { }
+
+        public SelectOption(string id, string label)
+        {
+            Id = id;
+            Label = label;
+        }
+    }
+
+    public class SelectConfig : LabeledControlConfigBase
+    {
+        public SelectOption[] Options { get; set; } = Array.Empty<SelectOption>();
         public int SelectedIndex { get; set; }
+        public string Placeholder { get; set; } = "Select...";
+        public float Width { get; set; } = -1f;
+        public float MaxHeight { get; set; } = 220f;
+        public bool CloseOnSelect { get; set; } = true;
         public Action<int> OnSelectionChanged { get; set; }
     }
     #endregion
@@ -228,8 +246,6 @@ namespace shadcnui.GUIComponents.Core.Utils
         public string[] ColumnHeaders { get; set; }
         public string[,] Rows { get; set; }
         public object[,] ObjectRows { get; set; }
-        public ControlVariant Variant { get; set; } = ControlVariant.Default;
-        public ControlSize Size { get; set; } = ControlSize.Default;
         public int[] SortColumnIndices { get; set; }
         public bool[] SortAscending { get; set; }
         public bool[] SelectedRowFlags { get; set; }
@@ -245,7 +261,7 @@ namespace shadcnui.GUIComponents.Core.Utils
         public Action<object, int, int> CellRenderer { get; set; }
     }
 
-    public class TabsConfig : GuiConfigBase
+    public class TabsConfig : ComponentConfigBase
     {
         public string[] TabLabels { get; set; } = Array.Empty<string>();
         public int SelectedIndex { get; set; }
@@ -273,7 +289,7 @@ namespace shadcnui.GUIComponents.Core.Utils
         }
     }
 
-    public class CardConfig : GuiConfigBase
+    public class CardConfig : ComponentConfigBase
     {
         public string Title { get; set; }
         public string Subtitle { get; set; }
@@ -313,7 +329,7 @@ namespace shadcnui.GUIComponents.Core.Utils
         }
     }
 
-    public class NavigationConfig : GuiConfigBase
+    public class NavigationConfig : ComponentConfigBase
     {
         public NavigationItem[] Items { get; set; } = Array.Empty<NavigationItem>();
         public int SelectedIndex { get; set; }
@@ -325,9 +341,8 @@ namespace shadcnui.GUIComponents.Core.Utils
         public Action<int> OnSelectionChanged { get; set; }
     }
 
-    public class LayerConfig
+    public class LayerConfig : ComponentConfigBase
     {
-        public string Id { get; set; }
         public Vector2 OpenPosition { get; set; }
         public float Width { get; set; } = 200f;
         public float Height { get; set; } = 150f;
@@ -345,8 +360,6 @@ namespace shadcnui.GUIComponents.Core.Utils
     {
         public string Text { get; set; }
         public IconConfig Icon { get; set; }
-        public ControlVariant Variant { get; set; } = ControlVariant.Default;
-        public bool IsDisabled { get; set; }
     }
 
     public class AvatarConfig : RectConfigBase
@@ -354,7 +367,6 @@ namespace shadcnui.GUIComponents.Core.Utils
         public Texture2D Image { get; set; }
         public string FallbackText { get; set; }
         public string Name { get; set; }
-        public ControlSize Size { get; set; } = ControlSize.Default;
         public AvatarShape Shape { get; set; } = AvatarShape.Circle;
         public Color BorderColor { get; set; } = Color.clear;
         public bool IsOnline { get; set; }
@@ -365,8 +377,6 @@ namespace shadcnui.GUIComponents.Core.Utils
     {
         public string Text { get; set; } = "Badge";
         public IconConfig Icon { get; set; }
-        public ControlVariant Variant { get; set; } = ControlVariant.Default;
-        public ControlSize Size { get; set; } = ControlSize.Default;
         public int Count { get; set; }
         public int MaxCount { get; set; } = 99;
         public float Progress { get; set; }
@@ -385,7 +395,7 @@ namespace shadcnui.GUIComponents.Core.Utils
         public bool ShowPercentage { get; set; } = true;
     }
 
-    public class ChartConfig : GuiConfigBase
+    public class ChartConfig : ComponentConfigBase
     {
         public List<ChartSeries> Series { get; set; }
         public ChartType ChartType { get; set; }
@@ -400,9 +410,8 @@ namespace shadcnui.GUIComponents.Core.Utils
         }
     }
 
-    public class DialogConfig
+    public class DialogConfig : ComponentConfigBase
     {
-        public string Id { get; set; }
         public string Title { get; set; }
         public string Description { get; set; }
         public Action Content { get; set; }
@@ -411,9 +420,14 @@ namespace shadcnui.GUIComponents.Core.Utils
         public float Height { get; set; } = 300f;
         public bool CloseOnOverlayClick { get; set; }
         public int ZIndex { get; set; } = DesignTokens.ZIndex.Modal;
+
+        public DialogConfig()
+        {
+            Id = Guid.NewGuid().ToString();
+        }
     }
 
-    public class TooltipConfig
+    public class TooltipConfig : ComponentConfigBase
     {
         public float HoverDelaySeconds { get; set; } = 0.4f;
         public float MaxWidth { get; set; } = 280f;
@@ -421,13 +435,12 @@ namespace shadcnui.GUIComponents.Core.Utils
         public float MouseOffset { get; set; } = 12f;
     }
 
-    public class ToastConfig : GuiConfigBase
+    public class ToastConfig : ComponentConfigBase
     {
-        public string Id { get; set; } = Guid.NewGuid().ToString();
         public string Title { get; set; }
         public string Description { get; set; }
         public string ActionLabel { get; set; }
-        public ToastVariant Variant { get; set; } = ToastVariant.Default;
+        public new ToastVariant Variant { get; set; } = ToastVariant.Default;
         public ToastPosition Position { get; set; } = ToastPosition.BottomRight;
         public ToastStackDirection StackDirection { get; set; } = ToastStackDirection.Up;
         public float DurationMs { get; set; } = 5000f;
@@ -447,25 +460,27 @@ namespace shadcnui.GUIComponents.Core.Utils
         public bool EnableClickToDismiss { get; set; }
         public int ZIndex { get; set; } = DesignTokens.ZIndex.Toast;
         public Action OnAction { get; set; }
+
+        public ToastConfig()
+        {
+            Id = Guid.NewGuid().ToString();
+        }
     }
     #endregion
 
     #region Data Configs
-    public class CalendarConfig : GuiConfigBase
+    public class CalendarConfig : ComponentConfigBase
     {
-        public ControlVariant Variant { get; set; } = ControlVariant.Default;
-        public ControlSize Size { get; set; } = ControlSize.Default;
         public DateTime? SelectedDate { get; set; }
         public List<DateTime> DisabledDates { get; set; } = new();
         public List<(DateTime Start, DateTime End)> Ranges { get; set; } = new();
         public Action<DateTime> OnDateSelected { get; set; }
     }
 
-    public class DatePickerConfig : GuiConfigBase
+    public class DatePickerConfig : ComponentConfigBase
     {
         private static int _counter;
 
-        public string Id { get; set; } = "datepicker_" + System.Threading.Interlocked.Increment(ref _counter);
         public string Label { get; set; }
         public string Placeholder { get; set; } = "Select date";
         public DateTime? SelectedDate { get; set; }
@@ -473,6 +488,11 @@ namespace shadcnui.GUIComponents.Core.Utils
         public DateTime? EndDate { get; set; }
         public DateTime? MinDate { get; set; }
         public DateTime? MaxDate { get; set; }
+
+        public DatePickerConfig()
+        {
+            Id = "datepicker_" + System.Threading.Interlocked.Increment(ref _counter);
+        }
     }
 
     public class DataTableColumn
@@ -547,34 +567,42 @@ namespace shadcnui.GUIComponents.Core.Utils
     public class DropdownMenuItem
     {
         public DropdownMenuItemType Type { get; set; }
-        public GUIContent Content { get; set; }
+        public string Text { get; set; }
+        public Texture2D Icon { get; set; }
+        public bool IsDisabled { get; set; }
         public Action OnClick { get; set; }
-        public bool IsSelected { get; set; }
         public List<DropdownMenuItem> SubItems { get; set; } = new();
 
-        public DropdownMenuItem(DropdownMenuItemType type, string text = null, Action onClick = null, bool isSelected = false, Texture2D icon = null)
+        public DropdownMenuItem(DropdownMenuItemType type, string text = null, Action onClick = null, Texture2D icon = null, bool isDisabled = false)
         {
             Type = type;
-            Content = new UnityHelpers.GUIContent(text, icon);
+            Text = text;
+            Icon = icon;
             OnClick = onClick;
-            IsSelected = isSelected;
+            IsDisabled = isDisabled;
         }
     }
 
-    public class DropdownMenuConfig : GuiConfigBase
+    public class DropdownMenuConfig : ComponentConfigBase
     {
-        public List<DropdownMenuItem> Items { get; set; }
+        public List<DropdownMenuItem> Items { get; set; } = new();
+        public float Width { get; set; } = 240f;
+        public float MaxHeight { get; set; } = 220f;
+        public bool CloseOnSelect { get; set; } = true;
+        public bool CloseOnClickOutside { get; set; } = true;
         public int ZIndex { get; set; } = DesignTokens.ZIndex.Dropdown;
+        public Func<bool> Trigger { get; set; }
+        public Rect? AnchorRect { get; set; }
 
         public DropdownMenuConfig() { }
 
         public DropdownMenuConfig(List<DropdownMenuItem> items)
         {
-            Items = items;
+            Items = items ?? new List<DropdownMenuItem>();
         }
     }
 
-    public class PopoverConfig : GuiConfigBase
+    public class PopoverConfig : ComponentConfigBase
     {
         public Action Content { get; set; }
     }
@@ -619,13 +647,17 @@ namespace shadcnui.GUIComponents.Core.Utils
     #endregion
 
     #region Theme Configs
-    public class ThemeChangerConfig : GuiConfigBase
+    public class ThemeChangerConfig : ComponentConfigBase
     {
-        public string Id { get; set; } = "theme_changer";
         public float Width { get; set; } = 200f;
         public float DropdownHeight { get; set; } = 250f;
         public bool ShowPreview { get; set; } = true;
         public Action<Theme> OnThemeChanged { get; set; }
+
+        public ThemeChangerConfig()
+        {
+            Id = "theme_changer";
+        }
     }
     #endregion
 }

@@ -13,172 +13,112 @@ namespace shadcnui.GUIComponents.Data
 {
     public class Calendar : BaseComponent
     {
-        #region State
+        private static readonly string[] WeekdaysSunday = { "Su", "Mo", "Tu", "We", "Th", "Fr", "Sa" };
+        private static readonly string[] WeekdaysMonday = { "Mo", "Tu", "We", "Th", "Fr", "Sa", "Su" };
 
-        private DateTime displayedMonth;
-
-        public DateTime? SelectedDate { get; set; }
-
-        public List<(DateTime Start, DateTime End)> Ranges { get; set; }
-        private DateTime? pendingRangeStart;
-
-        public List<DateTime> DisabledDates { get; set; }
-        public Action<DateTime> OnDateSelected { get; set; }
-
-        private bool showMonthDropdown;
-        private bool showYearDropdown;
-        private static readonly string[] DayOfWeekShort = { "Su", "Mo", "Tu", "We", "Th", "Fr", "Sa" };
-        private const float AnimationDuration = DesignTokens.Animation.DurationNormal;
-
-        #endregion
-
-        #region Lifecycle
+        private readonly Dictionary<string, DateTime> _displayMonths = new();
+        private readonly Dictionary<string, DateTime?> _pendingRangeStart = new();
 
         public Calendar(GUIHelper helper)
             : base(helper) { }
 
-        public override void Initialize()
-        {
-            this.displayedMonth = DateTime.Today;
-            this.Ranges = new List<(DateTime Start, DateTime End)>();
-            this.DisabledDates = new List<DateTime>();
-        }
-
-        public override void Dispose()
-        {
-            Ranges?.Clear();
-            DisabledDates?.Clear();
-            base.Dispose();
-        }
-
-        #endregion
-
-        #region Config-based API
-
         public void DrawCalendar(CalendarConfig config = null)
         {
-            EnsureInitialized();
-            var styleManager = guiHelper.GetStyleManager();
-            config = config ?? new CalendarConfig();
+            config ??= new CalendarConfig();
+            string id = ResolveId(config.Id, "calendar");
 
-            layoutComponents.BeginVerticalGroup(styleManager.GetCalendarStyle(config.Variant, config.Size));
+            if (!_displayMonths.ContainsKey(id))
+                _displayMonths[id] = config.SelectedDate ?? DateTime.Today;
 
-            DrawHeader(styleManager);
-            DrawWeekdays(styleManager);
-            DrawDays(styleManager);
+            var style = styleManager?.GetCalendarStyle(config.Variant, config.Size) ?? GUI.skin.box;
+            layoutComponents.BeginVerticalGroup(style, config.LayoutOptions ?? Array.Empty<GUILayoutOption>());
+
+            DrawHeader(id, config);
+            layoutComponents.AddSpace(DesignTokens.Spacing.SM);
+            DrawWeekdays(config);
+            DrawDays(id, config);
 
             layoutComponents.EndVerticalGroup();
         }
 
-        #endregion
-
-        #region Internal Drawing
-
-        private void DrawHeader(StyleManager styleManager)
+        private void DrawHeader(string id, CalendarConfig config)
         {
+            var buttonStyle = styleManager?.GetButtonStyle(ControlVariant.Ghost, ControlSize.Default) ?? GUI.skin.button;
+
             layoutComponents.BeginHorizontalGroup();
 
-            GUIStyle buttonGhostStyle = styleManager.GetButtonStyle(ControlVariant.Ghost, ControlSize.Default);
+            if (UnityHelpers.Button("<", buttonStyle))
+                _displayMonths[id] = _displayMonths[id].AddMonths(-1);
 
-            if (UnityHelpers.Button("<", buttonGhostStyle))
-            {
-                displayedMonth = displayedMonth.AddMonths(-1);
-                var animManager = guiHelper.GetAnimationManager();
-                animManager.StartFloat($"calendar_month_shift", 0f, 1f, AnimationDuration, EasingFunctions.EaseOutCubic);
-            }
+            GUILayout.FlexibleSpace();
 
-            if (showMonthDropdown) { }
-            else
-            {
-                if (UnityHelpers.Button(displayedMonth.ToString("MMMM"), buttonGhostStyle))
-                {
-                    showMonthDropdown = true;
-                    var animManager = guiHelper.GetAnimationManager();
-                    animManager.FadeIn($"calendar_month_dropdown", AnimationDuration, EasingFunctions.EaseOutCubic);
-                }
-            }
+            UnityHelpers.Label(_displayMonths[id].ToString("MMMM yyyy"), styleManager?.GetLabelStyle(ControlVariant.Default, ControlSize.Default) ?? GUI.skin.label);
 
-            if (showYearDropdown) { }
-            else
-            {
-                if (UnityHelpers.Button(displayedMonth.ToString("yyyy"), buttonGhostStyle))
-                {
-                    showYearDropdown = true;
-                    var animManager = guiHelper.GetAnimationManager();
-                    animManager.FadeIn($"calendar_year_dropdown", AnimationDuration, EasingFunctions.EaseOutCubic);
-                }
-            }
+            GUILayout.FlexibleSpace();
 
-            if (UnityHelpers.Button(">", buttonGhostStyle))
-            {
-                displayedMonth = displayedMonth.AddMonths(1);
-                var animManager = guiHelper.GetAnimationManager();
-                animManager.StartFloat($"calendar_month_shift", 0f, 1f, AnimationDuration, EasingFunctions.EaseOutCubic);
-            }
+            if (UnityHelpers.Button(">", buttonStyle))
+                _displayMonths[id] = _displayMonths[id].AddMonths(1);
 
             layoutComponents.EndHorizontalGroup();
         }
 
-        private void DrawWeekdays(StyleManager styleManager)
+        private void DrawWeekdays(CalendarConfig config)
         {
+            var weekdayStyle = styleManager?.GetCalendarWeekdayStyle() ?? GUI.skin.label;
+            var labels = WeekdaysSunday;
+
             layoutComponents.BeginHorizontalGroup();
-            GUIStyle weekdayStyle = styleManager.GetCalendarWeekdayStyle();
             for (int i = 0; i < 7; i++)
             {
-                UnityHelpers.Label(DayOfWeekShort[i], weekdayStyle);
+                UnityHelpers.Label(labels[i], weekdayStyle, GUILayout.Width(36f * guiHelper.uiScale));
             }
             layoutComponents.EndHorizontalGroup();
         }
 
-        private void DrawDays(StyleManager styleManager)
+        private void DrawDays(string id, CalendarConfig config)
         {
-            int daysInMonth = DateTime.DaysInMonth(displayedMonth.Year, displayedMonth.Month);
-            int firstDayOfMonth = (int)new DateTime(displayedMonth.Year, displayedMonth.Month, 1).DayOfWeek;
+            var displayed = _displayMonths[id];
+            DateTime firstOfMonth = new DateTime(displayed.Year, displayed.Month, 1);
+            int daysInMonth = DateTime.DaysInMonth(displayed.Year, displayed.Month);
+            int firstDayIndex = (int)firstOfMonth.DayOfWeek;
 
             int dayCounter = 1;
-            for (int i = 0; i < 6; i++)
+            for (int row = 0; row < 6; row++)
             {
                 layoutComponents.BeginHorizontalGroup();
-                for (int j = 0; j < 7; j++)
+                for (int col = 0; col < 7; col++)
                 {
-                    if ((i == 0 && j < firstDayOfMonth) || dayCounter > daysInMonth)
+                    if ((row == 0 && col < firstDayIndex) || dayCounter > daysInMonth)
                     {
-                        UnityHelpers.Label("", styleManager.GetCalendarDayOutsideMonthStyle());
+                        UnityHelpers.Label(string.Empty, styleManager?.GetCalendarDayOutsideMonthStyle() ?? GUI.skin.label, GUILayout.Width(36f * guiHelper.uiScale));
+                        continue;
                     }
-                    else
-                    {
-                        var currentDay = new DateTime(displayedMonth.Year, displayedMonth.Month, dayCounter);
-                        bool isDisabled = DisabledDates.Contains(currentDay.Date);
 
-                        GUIStyle dayStyle = styleManager.GetCalendarDayStyle();
-                        if (isDisabled)
-                        {
-                            dayStyle = styleManager.GetCalendarDayStyle();
-                        }
-                        else if (SelectedDate.HasValue && SelectedDate.Value.Date == currentDay.Date)
-                        {
-                            dayStyle = styleManager.GetCalendarDaySelectedStyle();
-                        }
-                        else if (Ranges.Any(r => currentDay.Date >= r.Start.Date && currentDay.Date <= r.End.Date))
-                        {
-                            dayStyle = styleManager.GetCalendarDayInRangeStyle();
-                        }
-                        else if (currentDay.Date == DateTime.Today)
-                        {
-                            dayStyle = styleManager.GetCalendarDayTodayStyle();
-                        }
+                    var currentDay = new DateTime(displayed.Year, displayed.Month, dayCounter);
+                    bool isDisabled = config.DisabledDates?.Any(d => d.Date == currentDay.Date) == true;
+                    bool isSelected = config.SelectedDate.HasValue && config.SelectedDate.Value.Date == currentDay.Date;
+                    bool isToday = currentDay.Date == DateTime.Today;
+                    bool inRange = config.Ranges?.Any(r => currentDay.Date >= r.Start.Date && currentDay.Date <= r.End.Date) == true;
 
-                        if (UnityHelpers.Button(dayCounter.ToString(), dayStyle))
-                        {
-                            if (!isDisabled)
-                            {
-                                HandleDateSelection(currentDay);
-                                var animManager = guiHelper.GetAnimationManager();
-                                animManager.StartFloat($"calendar_day_select_{dayCounter}", 0f, 1f, AnimationDuration * 0.5f, EasingFunctions.EaseOutCubic);
-                            }
-                        }
-                        dayCounter++;
-                    }
+                    GUIStyle dayStyle = styleManager?.GetCalendarDayStyle() ?? GUI.skin.button;
+                    if (isDisabled)
+                        dayStyle = styleManager?.GetCalendarDayStyle() ?? GUI.skin.button;
+                    else if (isSelected)
+                        dayStyle = styleManager?.GetCalendarDaySelectedStyle() ?? GUI.skin.button;
+                    else if (inRange)
+                        dayStyle = styleManager?.GetCalendarDayInRangeStyle() ?? GUI.skin.button;
+                    else if (isToday)
+                        dayStyle = styleManager?.GetCalendarDayTodayStyle() ?? GUI.skin.button;
+
+                    bool wasEnabled = GUI.enabled;
+                    if (isDisabled)
+                        GUI.enabled = false;
+
+                    if (UnityHelpers.Button(dayCounter.ToString(), dayStyle, GUILayout.Width(36f * guiHelper.uiScale), GUILayout.Height(28f * guiHelper.uiScale)))
+                        HandleSelection(id, currentDay, config);
+
+                    GUI.enabled = wasEnabled;
+                    dayCounter++;
                 }
                 layoutComponents.EndHorizontalGroup();
                 if (dayCounter > daysInMonth)
@@ -186,32 +126,33 @@ namespace shadcnui.GUIComponents.Data
             }
         }
 
-        #endregion
-
-        #region Selection Handling
-
-        private void HandleDateSelection(DateTime date)
+        private void HandleSelection(string id, DateTime date, CalendarConfig config)
         {
-            if (pendingRangeStart.HasValue)
+            if (!_pendingRangeStart.TryGetValue(id, out var pending))
             {
-                var start = pendingRangeStart.Value;
-                var end = date >= start ? date : start;
-
-                Ranges.Add((start, end));
-                pendingRangeStart = null;
+                _pendingRangeStart[id] = date;
             }
             else
             {
-                pendingRangeStart = date;
+                if (pending.HasValue)
+                {
+                    var start = pending.Value;
+                    var end = date >= start ? date : start;
+                    config.Ranges ??= new List<(DateTime Start, DateTime End)>();
+                    config.Ranges.Add((start, end));
+                    _pendingRangeStart[id] = null;
+                }
             }
 
-            SelectedDate = date;
-            if (OnDateSelected != null)
-            {
-                OnDateSelected(date);
-            }
+            config.SelectedDate = date;
+            config.OnDateSelected?.Invoke(date);
         }
 
-        #endregion
+        private static string ResolveId(string id, string fallback)
+        {
+            if (!string.IsNullOrEmpty(id))
+                return id;
+            return fallback;
+        }
     }
 }

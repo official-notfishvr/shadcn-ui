@@ -15,6 +15,7 @@ namespace shadcnui_examples.Examples
         private string[] dropdownItems = new[] { "New File", "Open...", "Save", "Save As...", "Exit" };
         private string[] menuItems = new[] { "File", "Edit", "View", "Help" };
         private int selectedMenuItem = 0;
+        private int selectedDropdownItem = 0;
 
         private string resizableText = "This is a resizable text area. Drag the handle at the bottom to resize.";
         private float textAreaHeight = 80f;
@@ -62,10 +63,7 @@ namespace shadcnui_examples.Examples
                     gui.HorizontalSeparator();
 
                     gui.Label("Dropdown Menu", ControlVariant.Default);
-                    if (gui.Button("Open Dropdown", ControlVariant.Outline))
-                        gui.OpenSelect();
-
-                    gui.Select(dropdownItems, 0);
+                    selectedDropdownItem = gui.Select(null, dropdownItems, selectedDropdownItem);
 
                     gui.HorizontalSeparator();
 
@@ -115,9 +113,23 @@ namespace shadcnui_examples.Examples
 
                     gui.Label("Theme Variants", ControlVariant.Default);
                     gui.BeginHorizontalGroup();
-                    gui.ThemeChangerCompact();
+                    gui.ThemeChanger(
+                        new shadcnui.GUIComponents.Core.Utils.ThemeChangerConfig
+                        {
+                            Id = "theme_compact",
+                            Width = 120f,
+                            ShowPreview = false,
+                        }
+                    );
                     gui.AddSpace(20);
-                    gui.ThemeChangerWithPreview("theme_preview", 200);
+                    gui.ThemeChanger(
+                        new shadcnui.GUIComponents.Core.Utils.ThemeChangerConfig
+                        {
+                            Id = "theme_preview",
+                            Width = 200f,
+                            ShowPreview = true,
+                        }
+                    );
                     gui.EndHorizontalGroup();
 
                     gui.EndVerticalGroup();

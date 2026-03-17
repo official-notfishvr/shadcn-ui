@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using shadcnui.GUIComponents.Core.Base;
 using shadcnui.GUIComponents.Core.Styling;
@@ -8,191 +9,241 @@ namespace shadcnui.GUIComponents.Controls
 {
     public class DropdownMenu : BaseComponent
     {
-        private bool _isOpen;
-        private Vector2 _scrollPosition;
-        private readonly Stack<List<DropdownMenuItem>> _menuStack = new Stack<List<DropdownMenuItem>>();
-        private string _menuId;
-        private int _currentZIndex;
-        private const float AnimationDuration = DesignTokens.Animation.DurationFast;
-        private Rect _cachedDropdownRect;
+        private readonly Dictionary<string, Vector2> _scrollPositions = new();
+        private readonly Dictionary<string, Rect> _anchorRects = new();
+        private readonly Dictionary<string, Stack<List<DropdownMenuItem>>> _menuStacks = new();
+        private readonly Dictionary<string, bool> _inlineOpen = new();
 
         public DropdownMenu(GUIHelper helper)
             : base(helper) { }
 
-        public bool IsOpen => _isOpen;
-
-        #region Config-based API
         public void Draw(DropdownMenuConfig config)
         {
-            if (config?.Items == null || config.Items.Count == 0)
-            {
-                Close();
-                return;
-            }
-            if (!_isOpen)
-                Open(config.Items, "dropdown", config.ZIndex);
-            DrawDropdownMenu(config.LayoutOptions);
-        }
-        #endregion
-
-        #region API
-        public void Open(List<DropdownMenuItem> rootItems, string id = "dropdown", int zIndex = -1)
-        {
-            _menuStack.Clear();
-            _menuStack.Push(rootItems);
-            _isOpen = true;
-            _menuId = id;
-            _currentZIndex = zIndex >= 0 ? zIndex : DesignTokens.ZIndex.Dropdown;
-
-            var animManager = guiHelper.GetAnimationManager();
-            animManager.FadeIn($"dropdown_alpha_{id}", AnimationDuration, EasingFunctions.EaseOutCubic);
-            animManager.ScaleIn($"dropdown_scale_{id}", AnimationDuration, 0.95f, EasingFunctions.EaseOutCubic);
-            animManager.SlideIn($"dropdown_slide_{id}", Vector2.zero, new Vector2(0, -DesignTokens.Spacing.LG), AnimationDuration, EasingFunctions.EaseOutCubic);
-        }
-
-        public void Close()
-        {
-            if (_menuId != null)
-            {
-                var animManager = guiHelper.GetAnimationManager();
-                animManager.FadeOut($"dropdown_alpha_{_menuId}", AnimationDuration * 0.8f, EasingFunctions.EaseInCubic);
-                animManager.ScaleOut($"dropdown_scale_{_menuId}", AnimationDuration * 0.8f, 0.95f, EasingFunctions.EaseInCubic);
-            }
-            _menuStack.Clear();
-            _isOpen = false;
-            _menuId = null;
-        }
-
-        public int GetZIndex() => _currentZIndex;
-        #endregion
-
-        #region Private Methods
-        private void DrawDropdownMenu(GUILayoutOption[] options)
-        {
-            if (!_isOpen || _menuStack.Count == 0)
+            if (config == null)
                 return;
 
-            var styleManager = guiHelper.GetStyleManager();
-            var animManager = guiHelper.GetAnimationManager();
-            string id = _menuId ?? "dropdown";
+            string id = ResolveId(config.Id, "dropdown");
 
-            float alpha = animManager.GetFloat($"dropdown_alpha_{id}", 1f);
-            float scale = animManager.GetFloat($"dropdown_scale_{id}", 1f);
-            Vector2 slideOffset = animManager.GetVector2($"dropdown_slide_{id}", Vector2.zero);
-
-            ApplyAnimationEffects(alpha, scale, slideOffset);
-            DrawMenuContent(styleManager, options);
-
-            GUI.matrix = Matrix4x4.identity;
-            GUI.color = Color.white;
-        }
-
-        private void ApplyAnimationEffects(float alpha, float scale, Vector2 slideOffset)
-        {
-            var prevColor = GUI.color;
-            if (alpha < 1f)
-                GUI.color = new Color(prevColor.r, prevColor.g, prevColor.b, prevColor.a * alpha);
-
-            if (scale < 1f || slideOffset != Vector2.zero)
+            if (config.Trigger == null && !config.AnchorRect.HasValue)
             {
-                Vector2 pivot = _cachedDropdownRect.center;
-                var prevMatrix = GUI.matrix;
-                GUI.matrix = Matrix4x4.Translate(new Vector3(pivot.x, pivot.y, 0f)) * Matrix4x4.Scale(new Vector3(scale, scale, 1f)) * Matrix4x4.Translate(new Vector3(-pivot.x + slideOffset.x, -pivot.y + slideOffset.y, 0f)) * prevMatrix;
+                if (config.Items == null || config.Items.Count == 0)
+                {
+                    CloseInline(id);
+                    return;
+                }
+
+                if (!IsInlineOpen(id))
+                    OpenInline(id, config);
+
+                DrawInline(id, config);
+                return;
             }
+
+            if (config.Trigger != null)
+            {
+                bool clicked = config.Trigger();
+                if (Event.current.type == EventType.Repaint)
+                    _anchorRects[id] = GUILayoutUtility.GetLastRect();
+
+                if (clicked)
+                {
+                    if (IsOpen(id))
+                        Close(id);
+                    else
+                        Open(config, GetAnchorRect(id));
+                }
+            }
+
+            if (config.AnchorRect.HasValue)
+                _anchorRects[id] = config.AnchorRect.Value;
+
+            if (IsOpen(id))
+                UpdatePosition(id);
         }
 
-        private void DrawMenuContent(StyleManager styleManager, GUILayoutOption[] options)
+        public void Open(DropdownMenuConfig config, Rect anchorRect)
         {
-            float dropdownWidth = Mathf.Max(280f * guiHelper.uiScale, 280f * guiHelper.uiScale);
-            var layoutOptions = new List<GUILayoutOption> { GUILayout.Width(dropdownWidth), GUILayout.MinHeight(0), GUILayout.MaxHeight(220f * guiHelper.uiScale) };
-            if (options != null)
-                layoutOptions.AddRange(options);
+            if (config == null)
+                return;
 
-            GUIStyle contentStyle = styleManager.GetDropdownMenuStyle(ControlVariant.Default, ControlSize.Default);
-            GUIStyle itemStyle = styleManager.GetDropdownMenuItemStyle();
-            GUIStyle separatorStyle = styleManager.GetSeparatorStyle(SeparatorOrientation.Horizontal, ControlVariant.Default, ControlSize.Default);
+            string id = ResolveId(config.Id, "dropdown");
+            _anchorRects[id] = anchorRect;
+            _menuStacks[id] = BuildStack(config.Items);
 
-            layoutComponents.BeginVerticalGroup(contentStyle, layoutOptions.ToArray());
-            _scrollPosition = layoutComponents.DrawScrollView(_scrollPosition, () => DrawMenuItems(itemStyle, separatorStyle), GUILayout.ExpandWidth(true), GUILayout.ExpandHeight(true));
+            Vector2 screenPos = GUIUtility.GUIToScreenPoint(new Vector2(anchorRect.x, anchorRect.yMax + 4));
+            LayerManager.Instance.Open(
+                new LayerConfig
+                {
+                    Id = id,
+                    OpenPosition = screenPos,
+                    Width = GetMenuWidth(config, anchorRect),
+                    Height = GetMenuHeight(config),
+                    CloseOnClickOutside = config.CloseOnClickOutside,
+                    ZIndex = config.ZIndex,
+                    Content = () => DrawMenuInternal(id, config),
+                }
+            );
+        }
+
+        public void Close(string id)
+        {
+            LayerManager.Instance.Close(id);
+            CloseInline(id);
+            _menuStacks.Remove(id);
+        }
+
+        public bool IsOpen(string id) => LayerManager.Instance.IsOpen(id) || IsInlineOpen(id);
+
+        private void DrawMenuInternal(string id, DropdownMenuConfig config)
+        {
+            var menuStyle = styleManager?.GetDropdownMenuStyle(config.Variant, config.Size) ?? GUI.skin.box;
+            var itemStyle = styleManager?.GetDropdownMenuItemStyle() ?? GUI.skin.button;
+            var separatorStyle = styleManager?.GetSeparatorStyle(SeparatorOrientation.Horizontal, ControlVariant.Default, config.Size) ?? GUI.skin.box;
+            var headerStyle = styleManager?.GetLabelStyle(ControlVariant.Muted, config.Size) ?? GUI.skin.label;
+
+            float width = GetMenuWidth(config, GetAnchorRect(id));
+            float height = GetMenuHeight(config);
+
+            layoutComponents.BeginVerticalGroup(menuStyle, GUILayout.Width(width), GUILayout.MaxHeight(height));
+
+            Vector2 scroll = _scrollPositions.TryGetValue(id, out var pos) ? pos : Vector2.zero;
+            scroll = layoutComponents.DrawScrollView(scroll, () => DrawItems(id, config, itemStyle, separatorStyle, headerStyle), GUILayout.ExpandWidth(true), GUILayout.MinHeight(0), GUILayout.MaxHeight(height));
+            _scrollPositions[id] = scroll;
+
             layoutComponents.EndVerticalGroup();
-
-            if (Event.current.type == EventType.Repaint)
-                _cachedDropdownRect = GUILayoutUtility.GetLastRect();
         }
 
-        private void DrawMenuItems(GUIStyle itemStyle, GUIStyle separatorStyle)
+        private void DrawInline(string id, DropdownMenuConfig config)
         {
-            if (_menuStack.Count > 1)
+            var menuStyle = styleManager?.GetDropdownMenuStyle(config.Variant, config.Size) ?? GUI.skin.box;
+            var itemStyle = styleManager?.GetDropdownMenuItemStyle() ?? GUI.skin.button;
+            var separatorStyle = styleManager?.GetSeparatorStyle(SeparatorOrientation.Horizontal, ControlVariant.Default, config.Size) ?? GUI.skin.box;
+            var headerStyle = styleManager?.GetLabelStyle(ControlVariant.Muted, config.Size) ?? GUI.skin.label;
+
+            float width = GetMenuWidth(config, GetAnchorRect(id));
+            float height = GetMenuHeight(config);
+
+            layoutComponents.BeginVerticalGroup(menuStyle, GUILayout.Width(width), GUILayout.MaxHeight(height));
+
+            Vector2 scroll = _scrollPositions.TryGetValue(id, out var pos) ? pos : Vector2.zero;
+            scroll = layoutComponents.DrawScrollView(scroll, () => DrawItems(id, config, itemStyle, separatorStyle, headerStyle), GUILayout.ExpandWidth(true), GUILayout.MinHeight(0), GUILayout.MaxHeight(height));
+            _scrollPositions[id] = scroll;
+
+            layoutComponents.EndVerticalGroup();
+        }
+
+        private void DrawItems(string id, DropdownMenuConfig config, GUIStyle itemStyle, GUIStyle separatorStyle, GUIStyle headerStyle)
+        {
+            if (!_menuStacks.TryGetValue(id, out var stack) || stack.Count == 0)
+                return;
+
+            if (stack.Count > 1)
             {
                 if (UnityHelpers.Button("<- Back", itemStyle))
                 {
-                    _menuStack.Pop();
+                    stack.Pop();
                     return;
                 }
-                UnityHelpers.Box("", separatorStyle);
+                UnityHelpers.Box(string.Empty, separatorStyle);
             }
 
-            var currentItems = _menuStack.Peek();
-            foreach (var item in currentItems)
-                DrawMenuItem(item);
-        }
-
-        private void DrawMenuItem(DropdownMenuItem item)
-        {
-            var styleManager = guiHelper.GetStyleManager();
-            GUIStyle headerStyle = styleManager.GetLabelStyle(ControlVariant.Muted, ControlSize.Small);
-            GUIStyle separatorStyle = styleManager.GetSeparatorStyle(SeparatorOrientation.Horizontal, ControlVariant.Default, ControlSize.Default);
-            GUIStyle itemStyle = styleManager.GetDropdownMenuItemStyle();
-
-            switch (item.Type)
+            var items = stack.Peek();
+            foreach (var item in items)
             {
-                case DropdownMenuItemType.Header:
-#if IL2CPP_MELONLOADER_PRE57
-                    GUILayout.Label(item.Content, headerStyle, shadcnui.GUIComponents.Layout.Layout.EmptyOptions);
-#else
-                    GUILayout.Label(item.Content, headerStyle);
-#endif
-                    break;
-
-                case DropdownMenuItemType.Separator:
-                    UnityHelpers.Box("", separatorStyle);
-                    break;
-
-                case DropdownMenuItemType.Item:
-                    HandleMenuItemClick(item, itemStyle);
-                    break;
+                switch (item.Type)
+                {
+                    case DropdownMenuItemType.Header:
+                        UnityHelpers.Label(item.Text ?? string.Empty, headerStyle);
+                        break;
+                    case DropdownMenuItemType.Separator:
+                        UnityHelpers.Box(string.Empty, separatorStyle);
+                        break;
+                    case DropdownMenuItemType.Item:
+                        DrawMenuItem(id, config, item, itemStyle, stack);
+                        break;
+                }
             }
         }
 
-        private void HandleMenuItemClick(DropdownMenuItem item, GUIStyle itemStyle)
+        private void DrawMenuItem(string id, DropdownMenuConfig config, DropdownMenuItem item, GUIStyle itemStyle, Stack<List<DropdownMenuItem>> stack)
         {
-            if (item.SubItems != null && item.SubItems.Count > 0)
+            bool prevEnabled = GUI.enabled;
+            if (item.IsDisabled)
+                GUI.enabled = false;
+
+            bool hasChildren = item.SubItems != null && item.SubItems.Count > 0;
+            string label = item.Text ?? string.Empty;
+            if (hasChildren)
+                label += " >";
+
+            if (UnityHelpers.Button(label, itemStyle))
             {
-#if IL2CPP_MELONLOADER_PRE57
-                if (GUILayout.Button(item.Content, itemStyle, shadcnui.GUIComponents.Layout.Layout.EmptyOptions))
-                    _menuStack.Push(item.SubItems);
-#else
-                if (GUILayout.Button(item.Content, itemStyle))
-                    _menuStack.Push(item.SubItems);
-#endif
-            }
-            else
-            {
-#if IL2CPP_MELONLOADER_PRE57
-                if (GUILayout.Button(item.Content, itemStyle, shadcnui.GUIComponents.Layout.Layout.EmptyOptions))
+                if (hasChildren)
+                {
+                    stack.Push(item.SubItems);
+                }
+                else
                 {
                     item.OnClick?.Invoke();
-                    Close();
+                    if (config.CloseOnSelect)
+                        Close(id);
                 }
-#else
-                if (GUILayout.Button(item.Content, itemStyle))
-                {
-                    item.OnClick?.Invoke();
-                    Close();
-                }
-#endif
             }
+
+            GUI.enabled = prevEnabled;
         }
-        #endregion
+
+        private Stack<List<DropdownMenuItem>> BuildStack(List<DropdownMenuItem> root)
+        {
+            var stack = new Stack<List<DropdownMenuItem>>();
+            stack.Push(root ?? new List<DropdownMenuItem>());
+            return stack;
+        }
+
+        private bool IsInlineOpen(string id) => _inlineOpen.TryGetValue(id, out var open) && open;
+
+        private void OpenInline(string id, DropdownMenuConfig config)
+        {
+            _menuStacks[id] = BuildStack(config.Items);
+            _inlineOpen[id] = true;
+        }
+
+        private void CloseInline(string id)
+        {
+            if (string.IsNullOrEmpty(id))
+                return;
+            _inlineOpen[id] = false;
+        }
+
+        private Rect GetAnchorRect(string id)
+        {
+            return _anchorRects.TryGetValue(id, out var rect) ? rect : new Rect(0, 0, 240, 30);
+        }
+
+        private float GetMenuWidth(DropdownMenuConfig config, Rect anchor)
+        {
+            if (config.Width > 0)
+                return config.Width * guiHelper.uiScale;
+            return Mathf.Max(anchor.width, 200f * guiHelper.uiScale);
+        }
+
+        private float GetMenuHeight(DropdownMenuConfig config)
+        {
+            return Mathf.Max(120f * guiHelper.uiScale, config.MaxHeight * guiHelper.uiScale);
+        }
+
+        private void UpdatePosition(string id)
+        {
+            Rect anchor = GetAnchorRect(id);
+            Vector2 screenPos = GUIUtility.GUIToScreenPoint(new Vector2(anchor.x, anchor.yMax + 4));
+            LayerManager.Instance.SetPosition(id, screenPos);
+        }
+
+        private string ResolveId(string id, string fallback)
+        {
+            if (!string.IsNullOrEmpty(id))
+                return id;
+            return fallback;
+        }
     }
 }

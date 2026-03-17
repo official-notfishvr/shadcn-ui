@@ -11,105 +11,71 @@ namespace shadcnui.GUIComponents.Controls
 {
     public class ThemeChanger : BaseComponent
     {
-        private const float AnimationDuration = DesignTokens.Animation.DurationFast;
         private Vector2 _scrollPosition;
         private Rect _triggerRect;
 
         public ThemeChanger(GUIHelper helper)
             : base(helper) { }
 
-        #region Config-based API
-        public void Draw(ThemeChangerConfig config = null)
+        public void Draw(ThemeChangerConfig config)
         {
             config ??= new ThemeChangerConfig();
-            var styleManager = guiHelper.GetStyleManager();
+            string id = ResolveId(config.Id, "theme_changer");
+
             var themeManager = ThemeManager.Instance;
             var currentTheme = themeManager.CurrentTheme;
 
             GUIStyle buttonStyle = styleManager?.GetButtonStyle(ControlVariant.Outline, ControlSize.Default) ?? GUI.skin.button;
-
             string buttonText = currentTheme?.Name ?? "Select Theme";
-            string dropdownIcon = LayerManager.Instance.IsOpen(config.Id) ? " ^" : " v";
+            string dropdownIcon = LayerManager.Instance.IsOpen(id) ? " ^" : " v";
 
             var buttonOptions = config.LayoutOptions ?? new[] { GUILayout.Width(config.Width) };
             if (UnityHelpers.Button(buttonText + dropdownIcon, buttonStyle, buttonOptions))
-                HandleThemeButtonClick(config);
+            {
+                ToggleDropdown(config, id);
+            }
 
             if (Event.current.type == EventType.Repaint)
                 _triggerRect = GUILayoutUtility.GetLastRect();
 
-            UpdateDropdownPosition(config);
+            UpdateDropdownPosition(id);
         }
-        #endregion
 
-        #region API
-        public void DrawCompact(string id = "theme_compact")
+        private void ToggleDropdown(ThemeChangerConfig config, string id)
         {
-            Draw(
-                new ThemeChangerConfig
+            if (LayerManager.Instance.IsOpen(id))
+            {
+                LayerManager.Instance.Close(id);
+                return;
+            }
+
+            Vector2 screenPos = GUIUtility.GUIToScreenPoint(new Vector2(_triggerRect.x, _triggerRect.yMax + 4));
+            LayerManager.Instance.Open(
+                new LayerConfig
                 {
                     Id = id,
-                    Width = 120f,
-                    ShowPreview = false,
+                    OpenPosition = screenPos,
+                    Width = config.Width,
+                    Height = config.DropdownHeight,
+                    CloseOnClickOutside = true,
+                    ZIndex = DesignTokens.ZIndex.Dropdown,
+                    Content = () => DrawThemeList(config),
                 }
             );
         }
 
-        public void DrawWithPreview(string id = "theme_preview", float width = 220f)
+        private void UpdateDropdownPosition(string id)
         {
-            Draw(
-                new ThemeChangerConfig
-                {
-                    Id = id,
-                    Width = width,
-                    ShowPreview = true,
-                }
-            );
-        }
-        #endregion
+            if (!LayerManager.Instance.IsOpen(id))
+                return;
 
-        #region Private Methods
-        private void HandleThemeButtonClick(ThemeChangerConfig config)
-        {
-            if (LayerManager.Instance.IsOpen(config.Id))
-            {
-                LayerManager.Instance.Close(config.Id);
-            }
-            else
-            {
-                Vector2 screenPos = GUIUtility.GUIToScreenPoint(new Vector2(_triggerRect.x, _triggerRect.yMax + 4));
-
-                LayerManager.Instance.Open(
-                    new LayerConfig
-                    {
-                        Id = config.Id,
-                        OpenPosition = screenPos,
-                        Width = config.Width,
-                        Height = config.DropdownHeight,
-                        CloseOnClickOutside = true,
-                        ZIndex = DesignTokens.ZIndex.Dropdown,
-                        Content = () =>
-                        {
-                            var styleManager = guiHelper.GetStyleManager();
-                            var themeManager = ThemeManager.Instance;
-                            DrawThemeList(config, themeManager, styleManager);
-                        },
-                    }
-                );
-            }
+            Vector2 screenPos = GUIUtility.GUIToScreenPoint(new Vector2(_triggerRect.x, _triggerRect.yMax + 4));
+            LayerManager.Instance.SetPosition(id, screenPos);
         }
 
-        private void UpdateDropdownPosition(ThemeChangerConfig config)
+        private void DrawThemeList(ThemeChangerConfig config)
         {
-            if (LayerManager.Instance.IsOpen(config.Id))
-            {
-                Vector2 screenPos = GUIUtility.GUIToScreenPoint(new Vector2(_triggerRect.x, _triggerRect.yMax + 4));
-                LayerManager.Instance.SetPosition(config.Id, screenPos);
-            }
-        }
-
-        private void DrawThemeList(ThemeChangerConfig config, ThemeManager themeManager, StyleManager styleManager)
-        {
+            var themeManager = ThemeManager.Instance;
             var themes = themeManager.Themes.Values.ToList();
             var currentTheme = themeManager.CurrentTheme;
 
@@ -117,7 +83,6 @@ namespace shadcnui.GUIComponents.Controls
             GUIStyle itemStyle = styleManager?.GetSelectItemStyle() ?? GUI.skin.button;
 
             GUILayout.BeginVertical(boxStyle);
-
             _scrollPosition = GUILayout.BeginScrollView(_scrollPosition, GUILayout.Width(config.Width - 10), GUILayout.Height(config.DropdownHeight - 20));
 
             foreach (var theme in themes)
@@ -147,7 +112,7 @@ namespace shadcnui.GUIComponents.Controls
                 themeManager.SetTheme(theme.Name);
                 guiHelper.GetStyleManager()?.MarkStylesCorruption();
                 config.OnThemeChanged?.Invoke(theme);
-                LayerManager.Instance.Close(config.Id);
+                LayerManager.Instance.Close(config.Id ?? "theme_changer");
             }
 
             GUILayout.EndHorizontal();
@@ -190,6 +155,12 @@ namespace shadcnui.GUIComponents.Controls
             GUI.DrawTexture(new Rect(rect.x, rect.y, thickness, rect.height), Texture2D.whiteTexture);
             GUI.DrawTexture(new Rect(rect.xMax - thickness, rect.y, thickness, rect.height), Texture2D.whiteTexture);
         }
-        #endregion
+
+        private string ResolveId(string id, string fallback)
+        {
+            if (!string.IsNullOrEmpty(id))
+                return id;
+            return fallback;
+        }
     }
 }

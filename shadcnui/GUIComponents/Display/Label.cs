@@ -1,3 +1,4 @@
+using System;
 using shadcnui.GUIComponents.Core.Base;
 using shadcnui.GUIComponents.Core.Styling;
 using shadcnui.GUIComponents.Core.Utils;
@@ -13,20 +14,29 @@ namespace shadcnui.GUIComponents.Display
         public Label(GUIHelper helper)
             : base(helper) { }
 
-        #region Config-based API
         public void DrawLabel(LabelConfig config)
         {
-            var styleManager = guiHelper.GetStyleManager();
-            GUIStyle labelStyle = ApplyLabelStyling(styleManager.GetLabelStyle(config.Variant), config);
+            if (config == null)
+                return;
 
-            if (config.Icon?.Image != null)
-                DrawLabelWithIcon(config, labelStyle);
+            GUIStyle style = styleManager?.GetLabelStyle(config.Variant, config.Size) ?? GUI.skin.label;
+            bool prevEnabled = GUI.enabled;
+            if (config.IsDisabled)
+                GUI.enabled = false;
+
+            if (config.Rect.HasValue)
+            {
+                Rect rect = ScaleRect(config.Rect.Value);
+                DrawLabelContent(rect, config, style);
+            }
             else
-                DrawBasicLabel(config, labelStyle);
-        }
-        #endregion
+            {
+                DrawLabelLayout(config, style);
+            }
 
-        #region API
+            GUI.enabled = prevEnabled;
+        }
+
         public void DrawLabel(string text, ControlVariant variant = ControlVariant.Default, bool disabled = false, params GUILayoutOption[] options)
         {
             DrawLabel(
@@ -35,7 +45,7 @@ namespace shadcnui.GUIComponents.Display
                     Text = text,
                     Variant = variant,
                     IsDisabled = disabled,
-                    LayoutOptions = options,
+                    LayoutOptions = options ?? Array.Empty<GUILayoutOption>(),
                 }
             );
         }
@@ -45,110 +55,101 @@ namespace shadcnui.GUIComponents.Display
             DrawLabel(
                 new LabelConfig
                 {
-                    Rect = rect,
                     Text = text,
                     Variant = variant,
                     IsDisabled = disabled,
+                    Rect = rect,
                 }
             );
         }
 
-        public void SecondaryLabel(string text, params GUILayoutOption[] options)
+        private void DrawLabelLayout(LabelConfig config, GUIStyle style)
         {
-            DrawLabel(text, ControlVariant.Secondary, false, options);
-        }
-
-        public void MutedLabel(string text, params GUILayoutOption[] options)
-        {
-            DrawLabel(text, ControlVariant.Muted, false, options);
-        }
-
-        public void DestructiveLabel(string text, params GUILayoutOption[] options)
-        {
-            DrawLabel(text, ControlVariant.Destructive, false, options);
-        }
-        #endregion
-
-        #region Private Methods
-        private GUIStyle ApplyLabelStyling(GUIStyle baseStyle, LabelConfig config)
-        {
-            GUIStyle scaledStyle = new UnityHelpers.GUIStyle(baseStyle);
-            scaledStyle.fontSize = Mathf.RoundToInt(baseStyle.fontSize * guiHelper.uiScale);
-
-            if (config.IsDisabled)
+            if (config.Icon?.Image == null)
             {
-                Color disabledColor = new Color(baseStyle.normal.textColor.r, baseStyle.normal.textColor.g, baseStyle.normal.textColor.b, 0.7f);
-                scaledStyle.normal.textColor = disabledColor;
+                UnityHelpers.Label(config.Text ?? string.Empty, style, config.LayoutOptions);
+                return;
             }
 
-            return scaledStyle;
+            DrawWithIcon(config, style);
         }
 
-        private void DrawLabelWithIcon(LabelConfig config, GUIStyle labelStyle)
+        private void DrawLabelContent(Rect rect, LabelConfig config, GUIStyle style)
         {
-            bool isHorizontal = config.Icon.Position == IconPosition.Left || config.Icon.Position == IconPosition.Right;
+            if (config.Icon?.Image == null)
+            {
+                GUI.Label(rect, config.Text ?? string.Empty, style);
+                return;
+            }
 
-            if (isHorizontal)
-                GUILayout.BeginHorizontal();
+            GUI.BeginGroup(rect);
+            DrawWithIcon(
+                new LabelConfig
+                {
+                    Text = config.Text,
+                    Icon = config.Icon,
+                    Variant = config.Variant,
+                    Size = config.Size,
+                },
+                style
+            );
+            GUI.EndGroup();
+        }
+
+        private void DrawWithIcon(LabelConfig config, GUIStyle style)
+        {
+            var icon = config.Icon;
+            bool horizontal = icon.Position == IconPosition.Left || icon.Position == IconPosition.Right;
+
+            if (horizontal)
+                layoutComponents.BeginHorizontalGroup();
             else
-                GUILayout.BeginVertical();
+                layoutComponents.BeginVerticalGroup();
 
-            if (config.Icon.Position == IconPosition.Above)
+            if (icon.Position == IconPosition.Above)
             {
-                RenderIcon(config.Icon);
-                GUILayout.Space(config.Icon.Spacing * guiHelper.uiScale);
+                DrawIcon(icon);
+                layoutComponents.AddSpace(icon.Spacing * guiHelper.uiScale);
             }
 
-            if (config.Icon.Position == IconPosition.Left)
+            if (icon.Position == IconPosition.Left)
             {
-                RenderIcon(config.Icon);
-                GUILayout.Space(config.Icon.Spacing * guiHelper.uiScale);
+                DrawIcon(icon);
+                layoutComponents.AddSpace(icon.Spacing * guiHelper.uiScale);
             }
 
-            DrawLabelContent(config, labelStyle);
+            UnityHelpers.Label(config.Text ?? string.Empty, style, config.LayoutOptions);
 
-            if (config.Icon.Position == IconPosition.Right)
+            if (icon.Position == IconPosition.Right)
             {
-                GUILayout.Space(config.Icon.Spacing * guiHelper.uiScale);
-                RenderIcon(config.Icon);
+                layoutComponents.AddSpace(icon.Spacing * guiHelper.uiScale);
+                DrawIcon(icon);
             }
 
-            if (config.Icon.Position == IconPosition.Below)
+            if (icon.Position == IconPosition.Below)
             {
-                GUILayout.Space(config.Icon.Spacing * guiHelper.uiScale);
-                RenderIcon(config.Icon);
+                layoutComponents.AddSpace(icon.Spacing * guiHelper.uiScale);
+                DrawIcon(icon);
             }
 
-            if (isHorizontal)
-                GUILayout.EndHorizontal();
+            if (horizontal)
+                layoutComponents.EndHorizontalGroup();
             else
-                GUILayout.EndVertical();
+                layoutComponents.EndVerticalGroup();
         }
 
-        private void DrawBasicLabel(LabelConfig config, GUIStyle labelStyle)
+        private void DrawIcon(IconConfig icon)
         {
-            DrawLabelContent(config, labelStyle);
+            if (icon?.Image == null)
+                return;
+
+            float size = icon.Size * guiHelper.uiScale;
+            UnityHelpers.Label(icon.Image, GUILayout.Width(size), GUILayout.Height(size));
         }
 
-        private void DrawLabelContent(LabelConfig config, GUIStyle labelStyle)
+        private Rect ScaleRect(Rect rect)
         {
-            if (config.Rect.HasValue)
-            {
-                Rect scaledRect = new Rect(config.Rect.Value.x * guiHelper.uiScale, config.Rect.Value.y * guiHelper.uiScale, config.Rect.Value.width * guiHelper.uiScale, config.Rect.Value.height * guiHelper.uiScale);
-                GUI.Label(scaledRect, config.Text ?? "", labelStyle);
-            }
-            else
-            {
-                GUILayoutOption[] options = config.LayoutOptions ?? System.Array.Empty<GUILayoutOption>();
-                UnityHelpers.Label(config.Text ?? "", labelStyle, options);
-            }
+            return new Rect(rect.x * guiHelper.uiScale, rect.y * guiHelper.uiScale, rect.width * guiHelper.uiScale, rect.height * guiHelper.uiScale);
         }
-
-        private void RenderIcon(IconConfig iconConfig)
-        {
-            float scaledSize = iconConfig.Size * guiHelper.uiScale;
-            UnityHelpers.Label(iconConfig.Image, GUILayout.Width(scaledSize), GUILayout.Height(scaledSize));
-        }
-        #endregion
     }
 }

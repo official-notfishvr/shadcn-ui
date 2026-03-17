@@ -116,9 +116,34 @@ namespace shadcnui_Demo.Menu
             GUILayout.FlexibleSpace();
 
             _gui.BeginVerticalGroup(GUILayout.Width(360f));
-            _gui.ThemeChangerWithPreview("full_demo_theme", 220f);
-            _uiScale = _gui.LabeledSlider("UI Scale", _uiScale, 0.85f, 1.35f, 0.05f);
-            _fontSize = _gui.LabeledSlider("Base Font", _fontSize, 12f, 18f, 1f);
+            _gui.ThemeChanger(
+                new ThemeChangerConfig
+                {
+                    Id = "full_demo_theme",
+                    Width = 220f,
+                    ShowPreview = true,
+                }
+            );
+            _uiScale = _gui.Slider(
+                new SliderConfig
+                {
+                    Label = "UI Scale",
+                    Value = _uiScale,
+                    MinValue = 0.85f,
+                    MaxValue = 1.35f,
+                    Step = 0.05f,
+                }
+            );
+            _fontSize = _gui.Slider(
+                new SliderConfig
+                {
+                    Label = "Base Font",
+                    Value = _fontSize,
+                    MinValue = 12f,
+                    MaxValue = 18f,
+                    Step = 1f,
+                }
+            );
             _gui.EndVerticalGroup();
             _gui.EndHorizontalGroup();
         }
@@ -214,8 +239,23 @@ namespace shadcnui_Demo.Menu
                             Width = 280,
                         }
                     );
-                    _search = _gui.Input(_search, new IconConfig(_sampleTexture, IconPosition.Left) { Size = 14f, Spacing = 6f }, "Search command palette", width: 320);
-                    _gui.PasswordField(320f, "Access Token", ref _password);
+                    _search = _gui.Input(
+                        new InputConfig
+                        {
+                            Value = _search,
+                            Placeholder = "Search command palette",
+                            Icon = new IconConfig(_sampleTexture, IconPosition.Left) { Size = 14f, Spacing = 6f },
+                            Width = 320,
+                        }
+                    );
+                    _password = _gui.Password(
+                        new InputConfig
+                        {
+                            Value = _password,
+                            Label = "Access Token",
+                            Width = 320,
+                        }
+                    );
                     _notes = _gui.ResizableTextArea(_notes, ref _notesHeight, placeholder: "Write operator notes");
                 }
             );
@@ -231,31 +271,41 @@ namespace shadcnui_Demo.Menu
                     _alertsEnabled = _gui.Switch("Alerts", _alertsEnabled);
                     _gui.EndHorizontalGroup();
 
-                    _volume = _gui.LabeledSlider("Effects Volume", _volume, 0f, 1f, 0.01f);
-                    _danger = _gui.LabeledSlider("Danger Threshold", _danger, 0f, 100f, 5f);
+                    _volume = _gui.Slider(
+                        new SliderConfig
+                        {
+                            Label = "Effects Volume",
+                            Value = _volume,
+                            MinValue = 0f,
+                            MaxValue = 1f,
+                            Step = 0.01f,
+                        }
+                    );
+                    _danger = _gui.Slider(
+                        new SliderConfig
+                        {
+                            Label = "Danger Threshold",
+                            Value = _danger,
+                            MinValue = 0f,
+                            MaxValue = 100f,
+                            Step = 5f,
+                        }
+                    );
+
+                    _selectIndex = _gui.Select(
+                        new SelectConfig
+                        {
+                            Label = "Select Location",
+                            Options = Array.ConvertAll(_selectItems, t => new SelectOption(t, t)),
+                            SelectedIndex = _selectIndex,
+                        }
+                    );
 
                     _gui.BeginHorizontalGroup();
-                    if (_gui.Button("Open Select", ControlVariant.Outline, ControlSize.Default))
-                        _showSelect = true;
-                    if (_showSelect)
-                    {
-                        _gui.OpenSelect("overview_select");
-                        _showSelect = false;
-                    }
-                    _gui.Label($"Selected: {_selectItems[_selectIndex]}", ControlVariant.Muted);
-                    _gui.EndHorizontalGroup();
-
-                    if (_gui.IsSelectOpen())
-                        _selectIndex = _gui.Select(new SelectConfig { Items = _selectItems, SelectedIndex = _selectIndex });
-
-                    _gui.BeginHorizontalGroup();
-                    if (_gui.Button("Open Dropdown", ControlVariant.Outline, ControlSize.Default))
-                        _showDropdown = true;
                     _gui.Label("Context menu with headers and actions.", ControlVariant.Muted);
                     _gui.EndHorizontalGroup();
 
-                    if (_showDropdown)
-                        _gui.DropdownMenu(new DropdownMenuConfig(_dropdownItems));
+                    _gui.DropdownMenu(new DropdownMenuConfig(_dropdownItems) { Id = "overview_dropdown", Trigger = () => _gui.Button("Open Dropdown", ControlVariant.Outline, ControlSize.Default) });
                 }
             );
 

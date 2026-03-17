@@ -48,19 +48,27 @@ namespace shadcnui_examples.Examples
                 {
                     gui.BeginVerticalGroup();
 
-                    gui.SectionHeader("Text Inputs");
-                    gui.InputLabel("Basic Input:");
+                    gui.Label("Text Inputs");
+                    gui.Label("Basic Input:");
                     inputText = gui.Input(inputText, "Type something...");
 
-                    gui.InputLabel("Password Field:");
-                    password = gui.PasswordField(windowRect.width - 40, "Password", ref password, '*');
+                    gui.Label("Password Field:");
+                    password = gui.Password(
+                        new shadcnui.GUIComponents.Core.Utils.InputConfig
+                        {
+                            Value = password,
+                            Label = "Password",
+                            MaskCharacter = '*',
+                            Width = Mathf.RoundToInt(windowRect.width - 40),
+                        }
+                    );
 
-                    gui.InputLabel("Description:");
+                    gui.Label("Description:");
                     description = gui.TextArea(description, ControlVariant.Default, "Enter description...", false, 60f);
 
                     gui.HorizontalSeparator();
 
-                    gui.SectionHeader("Buttons");
+                    gui.Label("Buttons");
                     gui.BeginHorizontalGroup();
                     if (gui.Button("Primary", ControlVariant.Default))
                         gui.ShowSuccessToast("Primary clicked!");
@@ -81,20 +89,28 @@ namespace shadcnui_examples.Examples
 
                     gui.HorizontalSeparator();
 
-                    gui.SectionHeader("Toggles & Checkboxes");
+                    gui.Label("Toggles & Checkboxes");
                     checkboxValue = gui.Checkbox("Enable Feature", checkboxValue);
                     toggleValue = gui.Toggle("Toggle State", toggleValue);
                     switchValue = gui.Switch("Switch Control", switchValue);
 
                     gui.HorizontalSeparator();
 
-                    gui.SectionHeader("Slider");
-                    sliderValue = gui.LabeledSlider("Volume", sliderValue, 0f, 100f, true);
+                    gui.Label("Slider");
+                    sliderValue = gui.Slider(
+                        new shadcnui.GUIComponents.Core.Utils.SliderConfig
+                        {
+                            Label = "Volume",
+                            Value = sliderValue,
+                            MinValue = 0f,
+                            MaxValue = 100f,
+                        }
+                    );
 
                     gui.HorizontalSeparator();
 
-                    gui.SectionHeader("Select Dropdown");
-                    selectedOption = gui.Select(options, selectedOption);
+                    gui.Label("Select Dropdown");
+                    selectedOption = gui.Select(null, options, selectedOption);
 
                     gui.EndVerticalGroup();
                 },

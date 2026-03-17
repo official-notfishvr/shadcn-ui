@@ -1,30 +1,41 @@
-using System.Collections.Generic;
+using System;
 using shadcnui.GUIComponents.Core.Base;
 using shadcnui.GUIComponents.Core.Styling;
 using shadcnui.GUIComponents.Core.Utils;
 using UnityEngine;
-#if IL2CPP_MELONLOADER_PRE57
-using UnhollowerBaseLib;
-#endif
 
 namespace shadcnui.GUIComponents.Display
 {
     public class Badge : BaseComponent
     {
-        private Dictionary<string, bool> _pulseStarted = new Dictionary<string, bool>();
-        private int _animatedBadgeCounter = 0;
-
         public Badge(GUIHelper helper)
             : base(helper) { }
 
-        #region Config-based API
         public void DrawBadge(BadgeConfig config)
         {
-            DrawBadgeInternal(config, false, null);
-        }
-        #endregion
+            if (config == null)
+                return;
 
-        #region API
+            string text = ResolveText(config);
+            GUIStyle badgeStyle = styleManager?.GetBadgeStyle(config.Variant, config.Size) ?? GUI.skin.label;
+
+            layoutComponents.BeginHorizontalGroup(badgeStyle, config.LayoutOptions ?? Array.Empty<GUILayoutOption>());
+
+            if (config.ShowStatusDot)
+                DrawStatusDot(config.IsActive);
+
+            if (config.Icon?.Image != null)
+            {
+                DrawIcon(config.Icon);
+                layoutComponents.AddSpace(Mathf.Max(2f, config.Icon.Spacing) * guiHelper.uiScale);
+            }
+
+            var labelStyle = styleManager?.GetLabelStyle(ControlVariant.Default, config.Size) ?? GUI.skin.label;
+            UnityHelpers.Label(text, labelStyle);
+
+            layoutComponents.EndHorizontalGroup();
+        }
+
         public void DrawBadge(string text, ControlVariant variant = ControlVariant.Default, ControlSize size = ControlSize.Default, params GUILayoutOption[] options)
         {
             DrawBadge(
@@ -33,20 +44,7 @@ namespace shadcnui.GUIComponents.Display
                     Text = text,
                     Variant = variant,
                     Size = size,
-                    LayoutOptions = options,
-                }
-            );
-        }
-
-        public void DrawBadge(Rect rect, string text, ControlVariant variant = ControlVariant.Default, ControlSize size = ControlSize.Default)
-        {
-            DrawBadge(
-                new BadgeConfig
-                {
-                    Rect = rect,
-                    Text = text,
-                    Variant = variant,
-                    Size = size,
+                    LayoutOptions = options ?? Array.Empty<GUILayoutOption>(),
                 }
             );
         }
@@ -60,25 +58,15 @@ namespace shadcnui.GUIComponents.Display
                     Icon = icon != null ? new IconConfig(icon) : null,
                     Variant = variant,
                     Size = size,
-                    LayoutOptions = options,
+                    LayoutOptions = options ?? Array.Empty<GUILayoutOption>(),
                 }
             );
         }
 
         public void CountBadge(int count, ControlVariant variant = ControlVariant.Default, ControlSize size = ControlSize.Default, int maxCount = 99, params GUILayoutOption[] options)
         {
-            string displayText = count > maxCount ? $"{maxCount}+" : count.ToString();
-            DrawBadge(
-                new BadgeConfig
-                {
-                    Text = displayText,
-                    Variant = variant,
-                    Size = size,
-                    Count = count,
-                    MaxCount = maxCount,
-                    LayoutOptions = options,
-                }
-            );
+            string text = count > maxCount ? $"{maxCount}+" : count.ToString();
+            DrawBadge(text, variant, size, options);
         }
 
         public void StatusBadge(string text, bool isActive, ControlVariant variant = ControlVariant.Default, ControlSize size = ControlSize.Default, params GUILayoutOption[] options)
@@ -87,210 +75,74 @@ namespace shadcnui.GUIComponents.Display
                 new BadgeConfig
                 {
                     Text = text,
-                    IsActive = isActive,
-                    ShowStatusDot = true,
                     Variant = variant,
                     Size = size,
-                    LayoutOptions = options,
+                    ShowStatusDot = true,
+                    IsActive = isActive,
+                    LayoutOptions = options ?? Array.Empty<GUILayoutOption>(),
                 }
             );
         }
 
         public void ProgressBadge(string text, float progress, ControlVariant variant = ControlVariant.Default, ControlSize size = ControlSize.Default, params GUILayoutOption[] options)
         {
-            DrawBadge(
-                new BadgeConfig
-                {
-                    Text = text,
-                    Progress = progress,
-                    Variant = variant,
-                    Size = size,
-                    LayoutOptions = options,
-                }
-            );
-        }
-
-        public void AnimatedBadge(string text, ControlVariant variant = ControlVariant.Default, ControlSize size = ControlSize.Default, params GUILayoutOption[] options)
-        {
-            string stableId = $"badge_{text.GetHashCode()}";
-            DrawBadgeInternal(
-                new BadgeConfig
-                {
-                    Text = text,
-                    Variant = variant,
-                    Size = size,
-                    LayoutOptions = options,
-                },
-                true,
-                stableId
-            );
-        }
-
-        public void AnimatedBadge(string text, string animationId, ControlVariant variant = ControlVariant.Default, ControlSize size = ControlSize.Default, params GUILayoutOption[] options)
-        {
-            DrawBadgeInternal(
-                new BadgeConfig
-                {
-                    Text = text,
-                    Variant = variant,
-                    Size = size,
-                    LayoutOptions = options,
-                },
-                true,
-                animationId
-            );
+            string value = $"{text} {(progress * 100f):0}%";
+            DrawBadge(value, variant, size, options);
         }
 
         public void RoundedBadge(string text, ControlVariant variant = ControlVariant.Default, ControlSize size = ControlSize.Default, float cornerRadius = DesignTokens.Radius.XL, params GUILayoutOption[] options)
         {
-            DrawBadge(
-                new BadgeConfig
-                {
-                    Text = text,
-                    Variant = variant,
-                    Size = size,
-                    CornerRadius = cornerRadius,
-                    LayoutOptions = options,
-                }
-            );
+            DrawBadge(text, variant, size, options);
         }
 
-        public void PillBadge(string text, ControlVariant variant = ControlVariant.Default, ControlSize size = ControlSize.Default, params GUILayoutOption[] options)
+        public void AnimatedBadge(string text, ControlVariant variant = ControlVariant.Default, ControlSize size = ControlSize.Default, params GUILayoutOption[] options) => AnimatedBadge(text, $"badge_{text}", variant, size, options);
+
+        public void AnimatedBadge(string text, string animId, ControlVariant variant = ControlVariant.Default, ControlSize size = ControlSize.Default, params GUILayoutOption[] options)
         {
-            RoundedBadge(text, variant, size, DesignTokens.Radius.Full, options);
-        }
-        #endregion
-
-        #region Private Methods
-        private void DrawBadgeInternal(BadgeConfig config, bool isAnimated, string animationId)
-        {
-            var styleManager = guiHelper.GetStyleManager();
-            GUIStyle badgeStyle = styleManager.GetBadgeStyle(config.Variant, config.Size);
-            Color originalColor = GUI.color;
-
-            ApplyAnimationColor(isAnimated, animationId, ref originalColor, ref badgeStyle);
-            ApplyCornerRadius(config, ref badgeStyle);
-
-            bool verticalGroupStarted = config.Progress > 0;
-            if (verticalGroupStarted)
-                layoutComponents.BeginVerticalGroup();
-
-            DrawBadgeContent(config, badgeStyle, styleManager);
-
-            if (config.Progress > 0)
-                DrawProgressBar(config, styleManager);
-
-            if (verticalGroupStarted)
-                layoutComponents.EndVerticalGroup();
-
-            if (isAnimated)
-                GUI.color = originalColor;
-        }
-
-        private void ApplyAnimationColor(bool isAnimated, string animationId, ref Color originalColor, ref GUIStyle badgeStyle)
-        {
-            if (!isAnimated)
-                return;
-
-            string animId = animationId ?? $"badge_pulse_{_animatedBadgeCounter++}";
             var animManager = guiHelper.GetAnimationManager();
-
-            if (!_pulseStarted.ContainsKey(animId) || !_pulseStarted[animId])
-            {
-                animManager.StartFloat(animId, 0.7f, 1f, 0.5f, EasingFunctions.EaseInOut, () => animManager.StartFloat(animId, 1f, 0.7f, 0.5f, EasingFunctions.EaseInOut));
-                _pulseStarted[animId] = true;
-            }
-
-            if (animManager.IsComplete(animId))
-            {
-                float current = animManager.GetFloat(animId, 1f);
-                if (current <= 0.71f)
-                    animManager.StartFloat(animId, 0.7f, 1f, 0.5f, EasingFunctions.EaseInOut);
-                else
-                    animManager.StartFloat(animId, 1f, 0.7f, 0.5f, EasingFunctions.EaseInOut);
-            }
+            if (!animManager.Exists(animId))
+                animManager.StartFloat(animId, 0.7f, 1f, DesignTokens.Animation.DurationNormal, EasingFunctions.EaseInOutCubic);
 
             float alpha = animManager.GetFloat(animId, 1f);
-            GUI.color = new Color(originalColor.r, originalColor.g, originalColor.b, alpha);
+            Color prev = GUI.color;
+            GUI.color = new Color(prev.r, prev.g, prev.b, prev.a * alpha);
+            DrawBadge(text, variant, size, options);
+            GUI.color = prev;
         }
 
-        private void ApplyCornerRadius(BadgeConfig config, ref GUIStyle badgeStyle)
+        private string ResolveText(BadgeConfig config)
         {
-            if (config.CornerRadius <= 0 || config.CornerRadius == DesignTokens.Radius.XL)
-                return;
-
-            var roundedStyle = new UnityHelpers.GUIStyle(badgeStyle);
-            int r = Mathf.RoundToInt(config.CornerRadius * guiHelper.uiScale);
-            roundedStyle.border = new UnityHelpers.RectOffset(r, r, r, r);
-            roundedStyle.padding = new UnityHelpers.RectOffset(badgeStyle.padding.left + (int)DesignTokens.Spacing.XS, badgeStyle.padding.right + (int)DesignTokens.Spacing.XS, badgeStyle.padding.top + (int)DesignTokens.Spacing.XXS, badgeStyle.padding.bottom + (int)DesignTokens.Spacing.XXS);
-            badgeStyle = roundedStyle;
-        }
-
-        private void DrawBadgeContent(BadgeConfig config, GUIStyle badgeStyle, StyleManager styleManager)
-        {
-            bool horizontalGroupStarted = config.Icon?.Image != null || config.ShowStatusDot;
-            if (horizontalGroupStarted)
-                layoutComponents.BeginHorizontalGroup();
-
-            if (config.ShowStatusDot)
-                DrawStatusDot(config);
-
-            if (config.Icon?.Image != null)
+            if (config.Count > 0)
             {
-                RenderIcon(config.Icon);
-                layoutComponents.AddSpace(config.Icon.Spacing * guiHelper.uiScale);
+                int max = config.MaxCount > 0 ? config.MaxCount : 99;
+                return config.Count > max ? $"{max}+" : config.Count.ToString();
             }
 
-            if (config.Rect.HasValue)
-                DrawBadgeRect(config, badgeStyle);
-            else
-                UnityHelpers.Label(config.Text ?? "Badge", badgeStyle, config.LayoutOptions);
+            if (config.Progress > 0f)
+                return $"{config.Text} {(config.Progress * 100f):0}%";
 
-            if (horizontalGroupStarted)
-                layoutComponents.EndHorizontalGroup();
+            return config.Text ?? "Badge";
         }
 
-        private void DrawBadgeRect(BadgeConfig config, GUIStyle badgeStyle)
+        private void DrawIcon(IconConfig icon)
         {
-            Rect scaledRect = new Rect(config.Rect.Value.x * guiHelper.uiScale, config.Rect.Value.y * guiHelper.uiScale, config.Rect.Value.width * guiHelper.uiScale, config.Rect.Value.height * guiHelper.uiScale);
-            UnityHelpers.Label(scaledRect, config.Text ?? "Badge", badgeStyle);
+            float size = icon.Size * guiHelper.uiScale;
+            UnityHelpers.Label(icon.Image, GUILayout.Width(size), GUILayout.Height(size));
         }
 
-        private void DrawStatusDot(BadgeConfig config)
+        private void DrawStatusDot(bool isActive)
         {
-            var styleManager = guiHelper.GetStyleManager();
-            Color dotColor = config.IsActive ? Color.green : Color.gray;
-            GUIStyle dotStyle = new UnityHelpers.GUIStyle(GUI.skin.box);
-            dotStyle.normal.background = styleManager.CreateSolidTexture(dotColor);
-            dotStyle.fixedWidth = DesignTokens.StatusIndicator.Default * guiHelper.uiScale;
-            dotStyle.fixedHeight = DesignTokens.StatusIndicator.Default * guiHelper.uiScale;
-            dotStyle.border = new UnityHelpers.RectOffset(0, 0, 0, 0);
-            dotStyle.padding = new UnityHelpers.RectOffset(0, 0, 0, 0);
-            dotStyle.margin = new UnityHelpers.RectOffset(0, 0, 0, 0);
-            UnityHelpers.Label("", dotStyle);
-            layoutComponents.AddSpace(DesignTokens.Spacing.XS);
-        }
+            float size = 6f * guiHelper.uiScale;
+            var theme = styleManager?.GetTheme();
+            Color dot = isActive ? (theme?.Accent ?? Color.green) : (theme?.Muted ?? Color.gray);
 
-        private void DrawProgressBar(BadgeConfig config, StyleManager styleManager)
-        {
+            Rect rect = GUILayoutUtility.GetRect(size, size, GUILayout.Width(size), GUILayout.Height(size));
+            Color prev = GUI.color;
+            GUI.color = dot;
+            GUI.DrawTexture(rect, Texture2D.whiteTexture);
+            GUI.color = prev;
+
             layoutComponents.AddSpace(DesignTokens.Spacing.XXS);
-            Rect progressRect = GUILayoutUtility.GetRect(60 * guiHelper.uiScale, DesignTokens.Spacing.XS * guiHelper.uiScale);
-
-            GUIStyle bgStyle = new UnityHelpers.GUIStyle(GUI.skin.box);
-            bgStyle.normal.background = styleManager.CreateSolidTexture(Color.gray);
-            GUI.Box(progressRect, "", bgStyle);
-
-            Rect fillRect = new Rect(progressRect.x, progressRect.y, progressRect.width * Mathf.Clamp01(config.Progress), progressRect.height);
-            GUIStyle fillStyle = new UnityHelpers.GUIStyle(GUI.skin.box);
-            fillStyle.normal.background = styleManager.CreateSolidTexture(Color.green);
-            GUI.Box(fillRect, "", fillStyle);
         }
-
-        private void RenderIcon(IconConfig iconConfig)
-        {
-            float scaledSize = iconConfig.Size * guiHelper.uiScale;
-            UnityHelpers.Label(iconConfig.Image, GUILayout.Width(scaledSize), GUILayout.Height(scaledSize));
-        }
-        #endregion
     }
 }

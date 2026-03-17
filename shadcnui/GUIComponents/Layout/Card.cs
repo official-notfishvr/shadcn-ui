@@ -1,12 +1,8 @@
 using System;
-using System.Collections.Generic;
 using shadcnui.GUIComponents.Core.Base;
 using shadcnui.GUIComponents.Core.Styling;
 using shadcnui.GUIComponents.Core.Utils;
 using UnityEngine;
-#if IL2CPP_MELONLOADER_PRE57
-using UnhollowerBaseLib;
-#endif
 
 namespace shadcnui.GUIComponents.Layout
 {
@@ -15,139 +11,71 @@ namespace shadcnui.GUIComponents.Layout
         public Card(GUIHelper helper)
             : base(helper) { }
 
-        #region Config-based API
         public void DrawCard(CardConfig config)
         {
-            BeginCard(config.Width, config.Height);
-            DrawCardHeader(config);
-            DrawCardImage(config);
-            DrawCardContent(config);
-            DrawCardFooter(config);
+            if (config == null)
+                return;
+
+            BeginCard(config.Width, config.Height, config.Variant, config.Size);
+
+            if (config.Image != null)
+            {
+                DrawImage(config.Image);
+                layoutComponents.AddSpace(DesignTokens.Spacing.SM);
+            }
+
+            if (config.HeaderContent != null || !string.IsNullOrEmpty(config.Title) || !string.IsNullOrEmpty(config.Subtitle) || !string.IsNullOrEmpty(config.Description) || config.Avatar != null)
+            {
+                CardHeader(() => DrawHeaderContent(config));
+            }
+
+            if (!string.IsNullOrEmpty(config.Content))
+            {
+                CardContent(() =>
+                {
+                    var textStyle = styleManager?.GetLabelStyle(ControlVariant.Default, ControlSize.Default) ?? GUI.skin.label;
+                    UnityHelpers.Label(config.Content, textStyle);
+                });
+            }
+
+            if (config.FooterContent != null)
+                CardFooter(config.FooterContent);
+
             EndCard();
         }
-        #endregion
 
-        #region API
-        public void BeginCard(float width = -1, float height = -1)
-        {
-            var styleManager = guiHelper.GetStyleManager();
-            var options = new List<GUILayoutOption>();
-            if (width > 0)
-                options.Add(GUILayout.Width(width * guiHelper.uiScale));
-            if (height > 0)
-                options.Add(GUILayout.Height(height * guiHelper.uiScale));
-
-            layoutComponents.BeginVerticalGroup(styleManager.GetCardStyle(), options.ToArray());
-        }
-
-        public void EndCard()
-        {
-            layoutComponents.EndVerticalGroup();
-        }
-
-        public void CardHeader(Action content)
-        {
-            var styleManager = guiHelper.GetStyleManager();
-            layoutComponents.BeginVerticalGroup(styleManager.GetCardHeaderStyle());
-            content();
-            layoutComponents.EndVerticalGroup();
-        }
-
-        public void CardTitle(string title)
-        {
-            var styleManager = guiHelper.GetStyleManager();
-            UnityHelpers.Label(title, styleManager.GetCardTitleStyle());
-        }
-
-        public void CardDescription(string description)
-        {
-            var styleManager = guiHelper.GetStyleManager();
-            UnityHelpers.Label(description, styleManager.GetCardDescriptionStyle());
-        }
-
-        public void CardContent(Action content)
-        {
-            var styleManager = guiHelper.GetStyleManager();
-            layoutComponents.BeginVerticalGroup(styleManager.GetCardContentStyle());
-            content();
-            layoutComponents.EndVerticalGroup();
-        }
-
-        public void CardFooter(Action content)
-        {
-            var styleManager = guiHelper.GetStyleManager();
-            layoutComponents.BeginHorizontalGroup(styleManager.GetCardFooterStyle());
-            content();
-            layoutComponents.EndHorizontalGroup();
-        }
-
-        public void CardImage(Texture2D image, float height = 150)
-        {
-#if IL2CPP_MELONLOADER_PRE57
-            var rect = GUILayoutUtility.GetRect(0, height, new Il2CppReferenceArray<GUILayoutOption>(new GUILayoutOption[] { GUILayout.ExpandWidth(true) }));
-#else
-            var rect = GUILayoutUtility.GetRect(0, height, GUILayout.ExpandWidth(true));
-#endif
-            GUI.DrawTexture(rect, image, ScaleMode.ScaleAndCrop);
-        }
-
-        public void CardWithAvatar(Texture2D avatar, string title, string subtitle)
-        {
-            var styleManager = guiHelper.GetStyleManager();
-            layoutComponents.BeginHorizontalGroup(styleManager.GetCardHeaderStyle());
-            guiHelper.Avatar(avatar, "");
-            layoutComponents.BeginVerticalGroup();
-            CardTitle(title);
-            CardDescription(subtitle);
-            layoutComponents.EndVerticalGroup();
-            layoutComponents.EndHorizontalGroup();
-        }
-
-        public void CardHeader(string title, string description, Action Actions)
-        {
-            var styleManager = guiHelper.GetStyleManager();
-            layoutComponents.BeginHorizontalGroup(styleManager.GetCardHeaderStyle());
-            layoutComponents.BeginVerticalGroup();
-            CardTitle(title);
-            CardDescription(description);
-            layoutComponents.EndVerticalGroup();
-            GUILayout.FlexibleSpace();
-            Actions();
-            layoutComponents.EndHorizontalGroup();
-        }
-
-        public void DrawCard(string title, string description, string content, Action footerContent = null, float width = -1, float height = -1)
+        public void DrawCard(string title, string desc, string content, Action footer = null, float width = -1f, float height = -1f)
         {
             DrawCard(
                 new CardConfig
                 {
                     Title = title,
-                    Description = description,
+                    Description = desc,
                     Content = content,
-                    FooterContent = footerContent,
+                    FooterContent = footer,
                     Width = width,
                     Height = height,
                 }
             );
         }
 
-        public void DrawCardWithImage(Texture2D image, string title, string description, string content, Action footerContent = null, float width = -1, float height = -1)
+        public void DrawCardWithImage(Texture2D img, string title, string desc, string content, Action footer = null, float width = -1f, float height = -1f)
         {
             DrawCard(
                 new CardConfig
                 {
-                    Image = image,
+                    Image = img,
                     Title = title,
-                    Description = description,
+                    Description = desc,
                     Content = content,
-                    FooterContent = footerContent,
+                    FooterContent = footer,
                     Width = width,
                     Height = height,
                 }
             );
         }
 
-        public void DrawCardWithAvatar(Texture2D avatar, string title, string subtitle, string content, Action footerContent = null, float width = -1, float height = -1)
+        public void DrawCardWithAvatar(Texture2D avatar, string title, string subtitle, string content, Action footer = null, float width = -1f, float height = -1f)
         {
             DrawCard(
                 new CardConfig
@@ -156,30 +84,14 @@ namespace shadcnui.GUIComponents.Layout
                     Title = title,
                     Subtitle = subtitle,
                     Content = content,
-                    FooterContent = footerContent,
+                    FooterContent = footer,
                     Width = width,
                     Height = height,
                 }
             );
         }
 
-        public void DrawCardWithHeader(string title, string description, Action header, string content, Action footerContent = null, float width = -1, float height = -1)
-        {
-            DrawCard(
-                new CardConfig
-                {
-                    Title = title,
-                    Description = description,
-                    HeaderContent = header,
-                    Content = content,
-                    FooterContent = footerContent,
-                    Width = width,
-                    Height = height,
-                }
-            );
-        }
-
-        public void DrawSimpleCard(string content, float width = -1, float height = -1)
+        public void DrawSimpleCard(string content, float width = -1f, float height = -1f)
         {
             DrawCard(
                 new CardConfig
@@ -190,54 +102,112 @@ namespace shadcnui.GUIComponents.Layout
                 }
             );
         }
-        #endregion
 
-        #region Private Methods
-        private void DrawCardHeader(CardConfig config)
+        public void BeginCard(float width = -1f, float height = -1f) => BeginCard(width, height, ControlVariant.Default, ControlSize.Default);
+
+        public void BeginCard(float width, float height, ControlVariant variant, ControlSize size)
+        {
+            var style = styleManager?.GetCardStyle(variant, size) ?? GUI.skin.box;
+            var options = BuildSizeOptions(width, height);
+            layoutComponents.BeginVerticalGroup(style, options);
+        }
+
+        public void EndCard() => layoutComponents.EndVerticalGroup();
+
+        public void CardHeader(Action content)
+        {
+            var headerStyle = styleManager?.GetCardHeaderStyle() ?? GUIStyle.none;
+            layoutComponents.BeginVerticalGroup(headerStyle);
+            content?.Invoke();
+            layoutComponents.EndVerticalGroup();
+        }
+
+        public void CardTitle(string title)
+        {
+            if (string.IsNullOrEmpty(title))
+                return;
+            var titleStyle = styleManager?.GetCardTitleStyle() ?? GUI.skin.label;
+            UnityHelpers.Label(title, titleStyle);
+        }
+
+        public void CardDescription(string description)
+        {
+            if (string.IsNullOrEmpty(description))
+                return;
+            var descStyle = styleManager?.GetCardDescriptionStyle() ?? GUI.skin.label;
+            UnityHelpers.Label(description, descStyle);
+        }
+
+        public void CardContent(Action content)
+        {
+            var contentStyle = styleManager?.GetCardContentStyle() ?? GUIStyle.none;
+            layoutComponents.BeginVerticalGroup(contentStyle);
+            content?.Invoke();
+            layoutComponents.EndVerticalGroup();
+        }
+
+        public void CardFooter(Action content)
+        {
+            var footerStyle = styleManager?.GetCardFooterStyle() ?? GUIStyle.none;
+            layoutComponents.BeginHorizontalGroup(footerStyle);
+            content?.Invoke();
+            layoutComponents.EndHorizontalGroup();
+        }
+
+        private void DrawHeaderContent(CardConfig config)
         {
             if (config.Avatar != null)
             {
-                CardWithAvatar(config.Avatar, config.Title, config.Subtitle);
+                layoutComponents.BeginHorizontalGroup();
+                DrawAvatar(config.Avatar);
+                layoutComponents.AddSpace(DesignTokens.Spacing.SM);
+                layoutComponents.BeginVerticalGroup();
+                CardTitle(config.Title);
+                if (!string.IsNullOrEmpty(config.Subtitle))
+                    CardDescription(config.Subtitle);
+                if (!string.IsNullOrEmpty(config.Description))
+                    CardDescription(config.Description);
+                layoutComponents.EndVerticalGroup();
+                layoutComponents.EndHorizontalGroup();
+                return;
             }
-            else if (config.HeaderContent != null)
-            {
-                CardHeader(config.Title, config.Description, config.HeaderContent);
-            }
-            else if (!string.IsNullOrEmpty(config.Title) || !string.IsNullOrEmpty(config.Description))
-            {
-                CardHeader(() =>
-                {
-                    if (!string.IsNullOrEmpty(config.Title))
-                        CardTitle(config.Title);
-                    if (!string.IsNullOrEmpty(config.Description))
-                        CardDescription(config.Description);
-                });
-            }
+
+            CardTitle(config.Title);
+            if (!string.IsNullOrEmpty(config.Subtitle))
+                CardDescription(config.Subtitle);
+            if (!string.IsNullOrEmpty(config.Description))
+                CardDescription(config.Description);
+            config.HeaderContent?.Invoke();
         }
 
-        private void DrawCardImage(CardConfig config)
+        private void DrawImage(Texture2D image)
         {
-            if (config.Image != null)
-                CardImage(config.Image);
+            if (image == null)
+                return;
+
+            var height = 140f * guiHelper.uiScale;
+            var rect = GUILayoutUtility.GetRect(0f, height, GUILayout.ExpandWidth(true));
+            GUI.DrawTexture(rect, image, ScaleMode.ScaleToFit);
         }
 
-        private void DrawCardContent(CardConfig config)
+        private void DrawAvatar(Texture2D image)
         {
-            if (!string.IsNullOrEmpty(config.Content))
-            {
-                CardContent(() =>
-                {
-                    var styleManager = guiHelper.GetStyleManager();
-                    UnityHelpers.Label(config.Content, styleManager.GetLabelStyle(ControlVariant.Default));
-                });
-            }
+            if (image == null)
+                return;
+
+            var size = DesignTokens.Height.Small * guiHelper.uiScale;
+            var rect = GUILayoutUtility.GetRect(size, size, GUILayout.Width(size), GUILayout.Height(size));
+            GUI.DrawTexture(rect, image, ScaleMode.ScaleToFit);
         }
 
-        private void DrawCardFooter(CardConfig config)
+        private GUILayoutOption[] BuildSizeOptions(float width, float height)
         {
-            if (config.FooterContent != null)
-                CardFooter(config.FooterContent);
+            var options = new System.Collections.Generic.List<GUILayoutOption>();
+            if (width > 0f)
+                options.Add(GUILayout.Width(width * guiHelper.uiScale));
+            if (height > 0f)
+                options.Add(GUILayout.Height(height * guiHelper.uiScale));
+            return options.ToArray();
         }
-        #endregion
     }
 }

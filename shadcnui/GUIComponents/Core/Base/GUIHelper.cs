@@ -68,12 +68,16 @@ namespace shadcnui.GUIComponents.Core.Base
             _v2Input = new();
         private readonly Dictionary<int, DateTime?> _dateState = new(),
             _dateInput = new();
+        private readonly Dictionary<string, bool> _legacySelectOpen = new();
+        private const string LegacySelectId = "legacy_select";
 
         internal int fontSize = 14;
         public float uiScale = 1f;
 
         private bool _scrollbarsInitialized;
         private int _lastCheckFrame = -10;
+        internal Rect _rootGuiScreenRect;
+        internal bool _rootGuiScreenRectValid;
 
         public GUIHelper()
         {
@@ -204,6 +208,8 @@ namespace shadcnui.GUIComponents.Core.Base
                 () =>
                 {
                     _styleManager.InitializeGUI();
+                    _rootGuiScreenRect = CaptureGuiScreenRect();
+                    _rootGuiScreenRectValid = true;
                     if (Time.frameCount - _lastCheckFrame >= 60)
                     {
                         _lastCheckFrame = Time.frameCount;
@@ -231,9 +237,26 @@ namespace shadcnui.GUIComponents.Core.Base
             Execute(
                 () =>
                 {
-                    LayerManager.Instance.DrawLayers();
-                    _toast.DrawToasts();
-                    _tooltip.FlushAndDraw(new Rect(0f, 0f, Screen.width, Screen.height));
+                    var prevMatrix = GUI.matrix;
+                    var prevColor = GUI.color;
+                    var prevEnabled = GUI.enabled;
+
+                    GUI.matrix = Matrix4x4.identity;
+                    GUI.color = Color.white;
+                    GUI.enabled = true;
+
+                    try
+                    {
+                        LayerManager.Instance.DrawLayers();
+                        _toast.DrawToasts();
+                        _tooltip.FlushAndDraw(new Rect(0f, 0f, Screen.width, Screen.height));
+                    }
+                    finally
+                    {
+                        GUI.matrix = prevMatrix;
+                        GUI.color = prevColor;
+                        GUI.enabled = prevEnabled;
+                    }
                 },
                 nameof(DrawOverlays)
             );
@@ -258,6 +281,8 @@ namespace shadcnui.GUIComponents.Core.Base
             _v2Input.Clear();
             _dateState.Clear();
             _dateInput.Clear();
+            _legacySelectOpen.Clear();
+            _rootGuiScreenRectValid = false;
         }
 
         public void Dispose() => Cleanup();
@@ -287,410 +312,354 @@ namespace shadcnui.GUIComponents.Core.Base
 
         public void FlexSpace() => GUILayout.FlexibleSpace();
 
-        // Button
-        public bool Button(ButtonConfig cfg) => Execute(() => _button.DrawButton(cfg), false, nameof(Button));
+        public void ButtonGroup(Action draw, bool horizontal = true, float spacing = 6f)
+        {
+            Execute(
+                () =>
+                {
+                    if (horizontal)
+                        _layout.BeginHorizontalGroup();
+                    else
+                        _layout.BeginVerticalGroup();
 
-        public bool Button(string text, ControlVariant v = ControlVariant.Default, ControlSize sz = ControlSize.Default, Action onClick = null, bool disabled = false, float opacity = 1f, params GUILayoutOption[] opts) =>
-            Execute(() => _button.DrawButton(text, v, sz, onClick, disabled, opacity, opts), false, nameof(Button));
+                    draw?.Invoke();
+
+                    if (horizontal)
+                        _layout.EndHorizontalGroup();
+                    else
+                        _layout.EndVerticalGroup();
+                },
+                nameof(ButtonGroup)
+            );
+        }
+
+        // Button
+        public bool Button(ButtonConfig cfg) => Execute(() => _button.Draw(cfg), false, nameof(Button));
+
+        public bool Button(string text, ControlVariant v, ControlSize sz = ControlSize.Default, Action onClick = null, bool disabled = false, float opacity = 1f, params GUILayoutOption[] opts) =>
+            Button(
+                new ButtonConfig
+                {
+                    Text = text,
+                    Variant = v,
+                    Size = sz,
+                    IsDisabled = disabled,
+                    Opacity = opacity,
+                    OnClick = onClick,
+                    LayoutOptions = opts ?? Array.Empty<GUILayoutOption>(),
+                }
+            );
 
         public bool Button(string text, Texture2D icon, ControlVariant v = ControlVariant.Default, ControlSize sz = ControlSize.Default, Action onClick = null, bool disabled = false, float opacity = 1f, params GUILayoutOption[] opts) =>
-            Execute(() => _button.DrawButton(text, icon, v, sz, onClick, disabled, opacity, opts), false, nameof(Button));
+            Button(
+                new ButtonConfig
+                {
+                    Text = text,
+                    Icon = icon != null ? new IconConfig(icon) : null,
+                    Variant = v,
+                    Size = sz,
+                    IsDisabled = disabled,
+                    Opacity = opacity,
+                    OnClick = onClick,
+                    LayoutOptions = opts ?? Array.Empty<GUILayoutOption>(),
+                }
+            );
 
         public bool Button(string text, IconConfig icon, ControlVariant v = ControlVariant.Default, ControlSize sz = ControlSize.Default, Action onClick = null, bool disabled = false, float opacity = 1f, params GUILayoutOption[] opts) =>
             Button(
-                new ButtonConfig(text)
+                new ButtonConfig
                 {
+                    Text = text,
                     Icon = icon,
                     Variant = v,
                     Size = sz,
-                    OnClick = onClick,
                     IsDisabled = disabled,
                     Opacity = opacity,
+                    OnClick = onClick,
                     LayoutOptions = opts ?? Array.Empty<GUILayoutOption>(),
                 }
             );
 
-        public bool IconButton(IconConfig icon, ControlVariant v = ControlVariant.Default, ControlSize sz = ControlSize.Default, Action onClick = null, bool disabled = false, params GUILayoutOption[] opts) =>
+        public bool Button(string text, Action onClick = null, ControlVariant v = ControlVariant.Default, ControlSize sz = ControlSize.Default, bool disabled = false, float opacity = 1f, IconConfig icon = null, params GUILayoutOption[] opts) =>
             Button(
-                new ButtonConfig(string.Empty)
+                new ButtonConfig
                 {
+                    Text = text,
                     Icon = icon,
                     Variant = v,
                     Size = sz,
-                    OnClick = onClick,
                     IsDisabled = disabled,
+                    Opacity = opacity,
+                    OnClick = onClick,
                     LayoutOptions = opts ?? Array.Empty<GUILayoutOption>(),
                 }
             );
-
-        public bool LinkButton(string text, Action onClick = null, params GUILayoutOption[] opts) => Button(text, ControlVariant.Link, ControlSize.Default, onClick, false, 1f, opts);
-
-        public void ButtonGroup(Action draw, bool horizontal = true, float spacing = 5f) => Execute(() => _button.ButtonGroup(draw, horizontal, spacing), nameof(ButtonGroup));
 
         // Input
         public string Input(InputConfig cfg)
         {
             if (cfg == null)
-                return Execute(() => _input.DrawInput(cfg), string.Empty, nameof(Input));
-            int id = GetStateId(nameof(Input), cfg.Label ?? cfg.Placeholder);
-            cfg.Value = GetStringState(id, cfg.Value);
-            var r = Execute(() => _input.DrawInput(cfg), cfg.Value, nameof(Input));
-            SetStringState(id, r);
-            return r;
+                return Execute(() => _input.Draw(cfg), string.Empty, nameof(Input));
+            string key = cfg.Id ?? cfg.Label ?? cfg.Placeholder;
+            return ExecStatefulStr(
+                nameof(Input),
+                s =>
+                {
+                    cfg.Value = s;
+                    return _input.Draw(cfg);
+                },
+                cfg.Value,
+                key
+            );
         }
 
-        public string Input(string val, string placeholder = "", ControlVariant v = ControlVariant.Default, bool disabled = false, bool focused = false, int width = -1, Action<string> onChange = null) =>
-            ExecStatefulStr(nameof(Input), s => _input.DrawInput(s, placeholder, v, disabled, focused, width, onChange), val, placeholder);
-
-        public string Input(ref string val, string placeholder = "", ControlVariant v = ControlVariant.Default, bool disabled = false, bool focused = false, int width = -1, Action<string> onChange = null)
-        {
-            val = Input(val, placeholder, v, disabled, focused, width, onChange);
-            return val;
-        }
-
-        public string Input(string val, Texture2D icon, string placeholder = "", ControlVariant v = ControlVariant.Default, bool disabled = false, bool focused = false, int width = -1, Action<string> onChange = null) =>
-            ExecStatefulStr(nameof(Input), s => _input.DrawInput(s, icon, placeholder, v, disabled, focused, width, onChange), val, placeholder);
-
-        public string Input(ref string val, Texture2D icon, string placeholder = "", ControlVariant v = ControlVariant.Default, bool disabled = false, bool focused = false, int width = -1, Action<string> onChange = null)
-        {
-            val = Input(val, icon, placeholder, v, disabled, focused, width, onChange);
-            return val;
-        }
-
-        public string Input(string val, IconConfig icon, string placeholder = "", ControlVariant v = ControlVariant.Default, bool disabled = false, bool focused = false, int width = -1, Action<string> onChange = null) =>
+        public string Input(string value, string placeholder = "", string label = null, Action<string> onChange = null, ControlVariant v = ControlVariant.Default, ControlSize sz = ControlSize.Default, bool disabled = false, params GUILayoutOption[] opts) =>
             Input(
                 new InputConfig
                 {
-                    Value = val,
-                    Icon = icon,
+                    Value = value,
                     Placeholder = placeholder,
+                    Label = label,
                     Variant = v,
+                    Size = sz,
                     IsDisabled = disabled,
-                    IsFocused = focused,
-                    Width = width,
                     OnValueChanged = onChange,
+                    LayoutOptions = opts ?? Array.Empty<GUILayoutOption>(),
                 }
             );
 
-        public string Input(ref string val, IconConfig icon, string placeholder = "", ControlVariant v = ControlVariant.Default, bool disabled = false, bool focused = false, int width = -1, Action<string> onChange = null)
-        {
-            val = Input(val, icon, placeholder, v, disabled, focused, width, onChange);
-            return val;
-        }
-
-        public float NumericInput(float val, float min = float.MinValue, float max = float.MaxValue, string placeholder = "0", int width = -1, Action<float> onChange = null)
-        {
-            string str = ExecStatefulStr(nameof(NumericInput), s => _input.DrawInput(s, placeholder, ControlVariant.Default, false, false, width, null), val.ToString("G"), placeholder);
-            if (float.TryParse(str, out float parsed))
-            {
-                parsed = Mathf.Clamp(parsed, min, max);
-                onChange?.Invoke(parsed);
-                return parsed;
-            }
-            return val;
-        }
-
-        public string SearchInput(string val, string placeholder = "Search...", int width = -1, Action<string> onChange = null) => Input(val, new IconConfig { }, placeholder, ControlVariant.Default, false, false, width, onChange);
-
-        public string SearchInput(ref string val, string placeholder = "Search...", int width = -1, Action<string> onChange = null)
-        {
-            val = SearchInput(val, placeholder, width, onChange);
-            return val;
-        }
-
-        public string LabeledInput(InputConfig cfg)
-        {
-            if (cfg == null)
-                return Execute(() => _input.DrawLabeledInput(cfg), string.Empty, nameof(LabeledInput));
-            int id = GetStateId(nameof(LabeledInput), cfg.Label ?? cfg.Placeholder);
-            cfg.Value = GetStringState(id, cfg.Value);
-            var r = Execute(() => _input.DrawLabeledInput(cfg), cfg.Value, nameof(LabeledInput));
-            SetStringState(id, r);
-            return r;
-        }
-
-        public string LabeledInput(string label, string val, string placeholder = "", ControlVariant iv = ControlVariant.Default, ControlVariant lv = ControlVariant.Default, bool disabled = false, int inputWidth = -1, Action<string> onChange = null) =>
-            ExecStatefulStr(nameof(LabeledInput), s => _input.DrawLabeledInput(label, s, placeholder, iv, lv, disabled, inputWidth, onChange), val, label);
-
-        public string LabeledInput(ref string val, string label, string placeholder = "", ControlVariant iv = ControlVariant.Default, ControlVariant lv = ControlVariant.Default, bool disabled = false, int inputWidth = -1, Action<string> onChange = null)
-        {
-            val = LabeledInput(label, val, placeholder, iv, lv, disabled, inputWidth, onChange);
-            return val;
-        }
-
-        public string LabeledInput(string label, string val, IconConfig icon, string placeholder = "", ControlVariant iv = ControlVariant.Default, ControlVariant lv = ControlVariant.Default, bool disabled = false, bool focused = false, int inputWidth = -1, Action<string> onChange = null) =>
-            LabeledInput(
+        public string Input(string placeholder, Texture2D icon, string value = "", ControlVariant v = ControlVariant.Default, ControlSize sz = ControlSize.Default, bool disabled = false, params GUILayoutOption[] opts) =>
+            Input(
                 new InputConfig
                 {
-                    Label = label,
-                    Value = val,
-                    Icon = icon,
+                    Value = value,
                     Placeholder = placeholder,
-                    Variant = iv,
-                    LabelVariant = lv,
+                    Icon = icon != null ? new IconConfig(icon) : null,
+                    Variant = v,
+                    Size = sz,
                     IsDisabled = disabled,
-                    IsFocused = focused,
-                    Width = inputWidth,
-                    OnValueChanged = onChange,
+                    LayoutOptions = opts ?? Array.Empty<GUILayoutOption>(),
                 }
             );
 
-        public string LabeledInput(ref string val, string label, IconConfig icon, string placeholder = "", ControlVariant iv = ControlVariant.Default, ControlVariant lv = ControlVariant.Default, bool disabled = false, bool focused = false, int inputWidth = -1, Action<string> onChange = null)
-        {
-            val = LabeledInput(label, val, icon, placeholder, iv, lv, disabled, focused, inputWidth, onChange);
-            return val;
-        }
-
-        public string PasswordField(InputConfig cfg) => Execute(() => _input.DrawPasswordField(cfg), cfg?.Value ?? string.Empty, nameof(PasswordField));
-
-        public string PasswordField(string val, string label = "", char mask = '*', ControlVariant v = ControlVariant.Default, bool disabled = false, Action<string> onChange = null) =>
-            ExecStatefulStr(
-                nameof(PasswordField),
-                s =>
-                    PasswordField(
-                        new InputConfig
-                        {
-                            Value = s,
-                            Label = label,
-                            MaskCharacter = mask,
-                            Variant = v,
-                            IsDisabled = disabled,
-                            OnValueChanged = onChange,
-                        }
-                    ),
-                val,
-                label
+        public string Input(string placeholder, IconConfig icon, string value = "", ControlVariant v = ControlVariant.Default, ControlSize sz = ControlSize.Default, bool disabled = false, params GUILayoutOption[] opts) =>
+            Input(
+                new InputConfig
+                {
+                    Value = value,
+                    Placeholder = placeholder,
+                    Icon = icon,
+                    Variant = v,
+                    Size = sz,
+                    IsDisabled = disabled,
+                    LayoutOptions = opts ?? Array.Empty<GUILayoutOption>(),
+                }
             );
 
-        public string PasswordField(ref string val, string label = "", char mask = '*', ControlVariant v = ControlVariant.Default, bool disabled = false, Action<string> onChange = null)
+        public string Password(InputConfig cfg)
         {
-            val = PasswordField(val, label, mask, v, disabled, onChange);
-            return val;
+            if (cfg != null)
+                cfg.InputKind = InputKind.Password;
+            return Input(cfg);
         }
 
-        public string PasswordField(float windowWidth, string label, ref string password, char mask = '*')
+        public string Password(string value, string label = null, char mask = '*', Action<string> onChange = null, ControlVariant v = ControlVariant.Default, ControlSize sz = ControlSize.Default, bool disabled = false, params GUILayoutOption[] opts) =>
+            Password(
+                new InputConfig
+                {
+                    Value = value,
+                    Label = label,
+                    MaskCharacter = mask,
+                    Variant = v,
+                    Size = sz,
+                    IsDisabled = disabled,
+                    OnValueChanged = onChange,
+                    LayoutOptions = opts ?? Array.Empty<GUILayoutOption>(),
+                }
+            );
+
+        public string PasswordField(float width, string placeholder, ref string value, ControlVariant v = ControlVariant.Default, ControlSize sz = ControlSize.Default, bool disabled = false)
         {
-            try
-            {
-                return _input.DrawPasswordField(windowWidth, label, ref password, mask);
-            }
-            catch (Exception ex)
-            {
-                GUILogger.LogException(ex, nameof(PasswordField), nameof(GUIHelper));
-                return password ?? string.Empty;
-            }
+            var options = width > 0 ? new[] { GUILayout.Width(width * uiScale) } : Array.Empty<GUILayoutOption>();
+            value = Password(
+                new InputConfig
+                {
+                    Value = value,
+                    Placeholder = placeholder,
+                    Variant = v,
+                    Size = sz,
+                    IsDisabled = disabled,
+                    InputKind = InputKind.Password,
+                    LayoutOptions = options,
+                }
+            );
+            return value;
         }
-
-        public void MultilineInput(float windowWidth, string label, ref string text, int maxLength, float height = 60f)
-        {
-            try
-            {
-                _input.DrawTextArea(windowWidth, label, ref text, maxLength, height);
-            }
-            catch (Exception ex)
-            {
-                GUILogger.LogException(ex, nameof(MultilineInput), nameof(GUIHelper));
-            }
-        }
-
-        public void SectionHeader(string title) => Execute(() => _input.DrawSectionHeader(title), nameof(SectionHeader));
-
-        public void InputLabel(string text, int width = -1) => Execute(() => _input.DrawLabel(text, ControlVariant.Default, width), nameof(InputLabel));
 
         // Toggle
         public bool Toggle(ToggleConfig cfg)
         {
             if (cfg == null)
-                return Execute(() => _toggle.DrawToggle(cfg), false, nameof(Toggle));
+                return Execute(() => _toggle.Draw(cfg), false, nameof(Toggle));
+            string key = cfg.Id ?? cfg.Label;
             return ExecStatefulBool(
                 nameof(Toggle),
                 s =>
                 {
                     cfg.Value = s;
-                    return _toggle.DrawToggle(cfg);
+                    return _toggle.Draw(cfg);
                 },
                 cfg.Value,
-                string.IsNullOrEmpty(cfg.Text) ? null : cfg.Text
+                key
             );
         }
 
-        public bool Toggle(string text, bool val, ControlVariant v = ControlVariant.Default, ControlSize sz = ControlSize.Default, Action<bool> onToggle = null, bool disabled = false, params GUILayoutOption[] opts) =>
-            ExecStatefulBool(nameof(Toggle), s => _toggle.DrawToggle(text, s, v, sz, onToggle, disabled, opts), val, text);
-
-        public bool Toggle(string text, ref bool val, ControlVariant v = ControlVariant.Default, ControlSize sz = ControlSize.Default, Action<bool> onToggle = null, bool disabled = false, params GUILayoutOption[] opts)
-        {
-            val = Toggle(text, val, v, sz, onToggle, disabled, opts);
-            return val;
-        }
-
-        public bool Toggle(Rect rect, string text, bool val, ControlVariant v = ControlVariant.Default, ControlSize sz = ControlSize.Default, Action<bool> onToggle = null, bool disabled = false) =>
-            ExecStatefulBool(nameof(Toggle) + "Rect", s => _toggle.DrawToggle(rect, text, s, v, sz, onToggle, disabled), val, text);
-
-        public bool Toggle(Rect rect, string text, ref bool val, ControlVariant v = ControlVariant.Default, ControlSize sz = ControlSize.Default, Action<bool> onToggle = null, bool disabled = false)
-        {
-            val = Toggle(rect, text, val, v, sz, onToggle, disabled);
-            return val;
-        }
-
-        public bool Toggle(string text, IconConfig icon, bool val, ControlVariant v = ControlVariant.Default, ControlSize sz = ControlSize.Default, Action<bool> onToggle = null, bool disabled = false, params GUILayoutOption[] opts) =>
+        public bool Toggle(string label, bool value, Action<bool> onToggle = null, ControlVariant v = ControlVariant.Default, ControlSize sz = ControlSize.Default, bool disabled = false, params GUILayoutOption[] opts) =>
             Toggle(
                 new ToggleConfig
                 {
-                    Text = text,
-                    Icon = icon,
-                    Value = val,
+                    Label = label,
+                    Value = value,
                     Variant = v,
                     Size = sz,
-                    OnValueChanged = onToggle,
                     IsDisabled = disabled,
+                    OnValueChanged = onToggle,
                     LayoutOptions = opts ?? Array.Empty<GUILayoutOption>(),
                 }
             );
 
-        public bool Toggle(string text, IconConfig icon, ref bool val, ControlVariant v = ControlVariant.Default, ControlSize sz = ControlSize.Default, Action<bool> onToggle = null, bool disabled = false, params GUILayoutOption[] opts)
-        {
-            val = Toggle(text, icon, val, v, sz, onToggle, disabled, opts);
-            return val;
-        }
+        public bool Toggle(string label, bool value, ControlVariant v, ControlSize sz = ControlSize.Default, Action<bool> onToggle = null, bool disabled = false, params GUILayoutOption[] opts) =>
+            Toggle(
+                new ToggleConfig
+                {
+                    Label = label,
+                    Value = value,
+                    Variant = v,
+                    Size = sz,
+                    IsDisabled = disabled,
+                    OnValueChanged = onToggle,
+                    LayoutOptions = opts ?? Array.Empty<GUILayoutOption>(),
+                }
+            );
+
+        public bool Toggle(string label, IconConfig icon, bool value, Action<bool> onToggle = null, ControlVariant v = ControlVariant.Default, ControlSize sz = ControlSize.Default, bool disabled = false, params GUILayoutOption[] opts) =>
+            Toggle(
+                new ToggleConfig
+                {
+                    Label = label,
+                    Icon = icon,
+                    Value = value,
+                    Variant = v,
+                    Size = sz,
+                    IsDisabled = disabled,
+                    OnValueChanged = onToggle,
+                    LayoutOptions = opts ?? Array.Empty<GUILayoutOption>(),
+                }
+            );
+
+        public bool Toggle(string label, Texture2D icon, bool value, Action<bool> onToggle = null, ControlVariant v = ControlVariant.Default, ControlSize sz = ControlSize.Default, bool disabled = false, params GUILayoutOption[] opts) =>
+            Toggle(label, icon != null ? new IconConfig(icon) : null, value, onToggle, v, sz, disabled, opts);
 
         // Checkbox
         public bool Checkbox(CheckboxConfig cfg)
         {
             if (cfg == null)
-                return Execute(() => _checkbox.DrawCheckbox(cfg), false, nameof(Checkbox));
+                return Execute(() => _checkbox.Draw(cfg), false, nameof(Checkbox));
+            string key = cfg.Id ?? cfg.Label;
             return ExecStatefulBool(
                 nameof(Checkbox),
                 s =>
                 {
                     cfg.Value = s;
-                    return _checkbox.DrawCheckbox(cfg);
+                    return _checkbox.Draw(cfg);
                 },
                 cfg.Value,
-                string.IsNullOrEmpty(cfg.Text) ? null : cfg.Text
+                key
             );
         }
 
-        public bool Checkbox(string text, bool val, ControlVariant v = ControlVariant.Default, ControlSize sz = ControlSize.Default, Action<bool> onToggle = null, bool disabled = false, params GUILayoutOption[] opts) =>
-            ExecStatefulBool(nameof(Checkbox), s => _checkbox.DrawCheckbox(text, s, v, sz, onToggle, disabled, opts), val, text);
-
-        public bool Checkbox(string text, ref bool val, ControlVariant v = ControlVariant.Default, ControlSize sz = ControlSize.Default, Action<bool> onToggle = null, bool disabled = false, params GUILayoutOption[] opts)
-        {
-            val = Checkbox(text, val, v, sz, onToggle, disabled, opts);
-            return val;
-        }
-
-        public bool Checkbox(string text, bool val, bool showCheckmark, ControlVariant v = ControlVariant.Default, ControlSize sz = ControlSize.Default, Action<bool> onToggle = null, bool disabled = false, params GUILayoutOption[] opts) =>
+        public bool Checkbox(string label, bool value, bool showCheckmark = true, Action<bool> onToggle = null, ControlVariant v = ControlVariant.Default, ControlSize sz = ControlSize.Default, bool disabled = false, params GUILayoutOption[] opts) =>
             Checkbox(
                 new CheckboxConfig
                 {
-                    Text = text,
-                    Value = val,
-                    Variant = v,
-                    Size = sz,
-                    OnValueChanged = onToggle,
-                    IsDisabled = disabled,
-                    LayoutOptions = opts ?? Array.Empty<GUILayoutOption>(),
+                    Label = label,
+                    Value = value,
                     ShowCheckmark = showCheckmark,
-                }
-            );
-
-        public bool Checkbox(string text, ref bool val, bool showCheckmark, ControlVariant v = ControlVariant.Default, ControlSize sz = ControlSize.Default, Action<bool> onToggle = null, bool disabled = false, params GUILayoutOption[] opts)
-        {
-            val = Checkbox(text, val, showCheckmark, v, sz, onToggle, disabled, opts);
-            return val;
-        }
-
-        public bool Checkbox(Rect rect, string text, bool val, ControlVariant v = ControlVariant.Default, ControlSize sz = ControlSize.Default, Action<bool> onToggle = null, bool disabled = false) =>
-            ExecStatefulBool(nameof(Checkbox) + "Rect", s => _checkbox.DrawCheckbox(rect, text, s, v, sz, onToggle, disabled), val, text);
-
-        public bool Checkbox(Rect rect, string text, ref bool val, ControlVariant v = ControlVariant.Default, ControlSize sz = ControlSize.Default, Action<bool> onToggle = null, bool disabled = false)
-        {
-            val = Checkbox(rect, text, val, v, sz, onToggle, disabled);
-            return val;
-        }
-
-        public bool Checkbox(string text, IconConfig icon, bool val, ControlVariant v = ControlVariant.Default, ControlSize sz = ControlSize.Default, Action<bool> onToggle = null, bool disabled = false, params GUILayoutOption[] opts) =>
-            Checkbox(
-                new CheckboxConfig
-                {
-                    Text = text,
-                    Icon = icon,
-                    Value = val,
                     Variant = v,
                     Size = sz,
-                    OnValueChanged = onToggle,
                     IsDisabled = disabled,
+                    OnValueChanged = onToggle,
                     LayoutOptions = opts ?? Array.Empty<GUILayoutOption>(),
                 }
             );
 
-        public bool Checkbox(string text, IconConfig icon, ref bool val, ControlVariant v = ControlVariant.Default, ControlSize sz = ControlSize.Default, Action<bool> onToggle = null, bool disabled = false, params GUILayoutOption[] opts)
-        {
-            val = Checkbox(text, icon, val, v, sz, onToggle, disabled, opts);
-            return val;
-        }
+        public bool Checkbox(string label, bool value, ControlVariant v, ControlSize sz = ControlSize.Default, Action<bool> onToggle = null, bool disabled = false, params GUILayoutOption[] opts) =>
+            Checkbox(
+                new CheckboxConfig
+                {
+                    Label = label,
+                    Value = value,
+                    ShowCheckmark = true,
+                    Variant = v,
+                    Size = sz,
+                    IsDisabled = disabled,
+                    OnValueChanged = onToggle,
+                    LayoutOptions = opts ?? Array.Empty<GUILayoutOption>(),
+                }
+            );
 
         // Switch
         public bool Switch(SwitchConfig cfg)
         {
             if (cfg == null)
-                return Execute(() => _switch.DrawSwitch(cfg), false, nameof(Switch));
+                return Execute(() => _switch.Draw(cfg), false, nameof(Switch));
+            string key = cfg.Id ?? cfg.Label;
             return ExecStatefulBool(
                 nameof(Switch),
                 s =>
                 {
                     cfg.Value = s;
-                    return _switch.DrawSwitch(cfg);
+                    return _switch.Draw(cfg);
                 },
                 cfg.Value,
-                string.IsNullOrEmpty(cfg.Text) ? null : cfg.Text
+                key
             );
         }
 
-        public bool Switch(string text, bool val, ControlVariant v = ControlVariant.Default, ControlSize sz = ControlSize.Default, Action<bool> onToggle = null, bool disabled = false, params GUILayoutOption[] opts) =>
-            ExecStatefulBool(nameof(Switch), s => _switch.DrawSwitch(text, s, v, sz, onToggle, disabled, opts), val, text);
-
-        public bool Switch(string text, ref bool val, ControlVariant v = ControlVariant.Default, ControlSize sz = ControlSize.Default, Action<bool> onToggle = null, bool disabled = false, params GUILayoutOption[] opts)
-        {
-            val = Switch(text, val, v, sz, onToggle, disabled, opts);
-            return val;
-        }
-
-        public bool Switch(Rect rect, string text, bool val, ControlVariant v = ControlVariant.Default, ControlSize sz = ControlSize.Default, Action<bool> onToggle = null, bool disabled = false) =>
-            ExecStatefulBool(nameof(Switch) + "Rect", s => _switch.DrawSwitch(rect, text, s, v, sz, onToggle, disabled), val, text);
-
-        public bool Switch(Rect rect, string text, ref bool val, ControlVariant v = ControlVariant.Default, ControlSize sz = ControlSize.Default, Action<bool> onToggle = null, bool disabled = false)
-        {
-            val = Switch(rect, text, val, v, sz, onToggle, disabled);
-            return val;
-        }
-
-        public bool Switch(string text, IconConfig icon, bool val, ControlVariant v = ControlVariant.Default, ControlSize sz = ControlSize.Default, Action<bool> onToggle = null, bool disabled = false, params GUILayoutOption[] opts) =>
+        public bool Switch(string label, bool value, Action<bool> onToggle = null, ControlVariant v = ControlVariant.Default, ControlSize sz = ControlSize.Default, bool disabled = false, params GUILayoutOption[] opts) =>
             Switch(
                 new SwitchConfig
                 {
-                    Text = text,
-                    Icon = icon,
-                    Value = val,
+                    Label = label,
+                    Value = value,
                     Variant = v,
                     Size = sz,
-                    OnValueChanged = onToggle,
                     IsDisabled = disabled,
+                    OnValueChanged = onToggle,
                     LayoutOptions = opts ?? Array.Empty<GUILayoutOption>(),
                 }
             );
 
-        public bool Switch(string text, IconConfig icon, ref bool val, ControlVariant v = ControlVariant.Default, ControlSize sz = ControlSize.Default, Action<bool> onToggle = null, bool disabled = false, params GUILayoutOption[] opts)
-        {
-            val = Switch(text, icon, val, v, sz, onToggle, disabled, opts);
-            return val;
-        }
+        public bool Switch(string label, bool value, ControlVariant v, ControlSize sz = ControlSize.Default, Action<bool> onToggle = null, bool disabled = false, params GUILayoutOption[] opts) =>
+            Switch(
+                new SwitchConfig
+                {
+                    Label = label,
+                    Value = value,
+                    Variant = v,
+                    Size = sz,
+                    IsDisabled = disabled,
+                    OnValueChanged = onToggle,
+                    LayoutOptions = opts ?? Array.Empty<GUILayoutOption>(),
+                }
+            );
 
         // Slider
         public float Slider(SliderConfig cfg)
         {
             if (cfg == null)
                 return Execute(() => _slider.Draw(cfg), 0f, nameof(Slider));
+            string key = cfg.Id ?? cfg.Label;
             return ExecStatefulFloat(
                 nameof(Slider),
                 s =>
@@ -699,212 +668,222 @@ namespace shadcnui.GUIComponents.Core.Base
                     return _slider.Draw(cfg);
                 },
                 cfg.Value,
-                string.IsNullOrEmpty(cfg.Label) ? null : cfg.Label
+                key
             );
         }
 
-        public float Slider(float val, float min = 0f, float max = 1f, params GUILayoutOption[] opts) => ExecStatefulFloat(nameof(Slider), s => _slider.Draw(s, min, max, opts), val, null);
-
-        public float Slider(float val, float min, float max, float step, params GUILayoutOption[] opts) => ExecStatefulFloat(nameof(Slider), s => _slider.Draw(s, min, max, step, opts), val, null);
-
-        public float Slider(ref float val, float min = 0f, float max = 1f, params GUILayoutOption[] opts)
-        {
-            val = Slider(val, min, max, opts);
-            return val;
-        }
-
-        public float Slider(ref float val, float min, float max, float step, params GUILayoutOption[] opts)
-        {
-            val = Slider(val, min, max, step, opts);
-            return val;
-        }
-
-        public float Slider(float val, float min, float max, float step, Action<float> onChange, ControlVariant v = ControlVariant.Default, ControlSize sz = ControlSize.Default, bool disabled = false, params GUILayoutOption[] opts) =>
-            ExecStatefulFloat(
-                nameof(Slider),
-                s =>
-                    _slider.Draw(
-                        new SliderConfig
-                        {
-                            Value = s,
-                            MinValue = min,
-                            MaxValue = max,
-                            Step = step,
-                            OnValueChanged = onChange,
-                            Variant = v,
-                            Size = sz,
-                            IsDisabled = disabled,
-                            LayoutOptions = opts ?? Array.Empty<GUILayoutOption>(),
-                        }
-                    ),
-                val,
-                null
+        public float Slider(
+            float value,
+            float min,
+            float max,
+            float step = 0f,
+            string label = null,
+            Action<float> onChange = null,
+            ControlVariant v = ControlVariant.Default,
+            ControlSize sz = ControlSize.Default,
+            bool disabled = false,
+            bool showValue = true,
+            string format = "F2",
+            params GUILayoutOption[] opts
+        ) =>
+            Slider(
+                new SliderConfig
+                {
+                    Label = label,
+                    Value = value,
+                    MinValue = min,
+                    MaxValue = max,
+                    Step = step,
+                    Variant = v,
+                    Size = sz,
+                    IsDisabled = disabled,
+                    ShowValue = showValue,
+                    ValueFormat = format,
+                    OnValueChanged = onChange,
+                    LayoutOptions = opts ?? Array.Empty<GUILayoutOption>(),
+                }
             );
 
-        public float Slider(ref float val, float min, float max, float step, Action<float> onChange, ControlVariant v = ControlVariant.Default, ControlSize sz = ControlSize.Default, bool disabled = false, params GUILayoutOption[] opts)
-        {
-            val = Slider(val, min, max, step, onChange, v, sz, disabled, opts);
-            return val;
-        }
-
-        public float LabeledSlider(string label, float val, float min, float max, bool showValue = true, params GUILayoutOption[] opts) => ExecStatefulFloat(nameof(LabeledSlider), s => _slider.LabeledSlider(label, s, min, max, showValue, opts), val, label);
-
-        public float LabeledSlider(string label, float val, float min, float max, float step, bool showValue = true, params GUILayoutOption[] opts) => ExecStatefulFloat(nameof(LabeledSlider), s => _slider.LabeledSlider(label, s, min, max, step, showValue, opts), val, label);
-
-        public float LabeledSlider(string label, ref float val, float min, float max, bool showValue = true, params GUILayoutOption[] opts)
-        {
-            val = LabeledSlider(label, val, min, max, showValue, opts);
-            return val;
-        }
-
-        public float LabeledSlider(string label, ref float val, float min, float max, float step, bool showValue = true, params GUILayoutOption[] opts)
-        {
-            val = LabeledSlider(label, val, min, max, step, showValue, opts);
-            return val;
-        }
-
-        public float LabeledSlider(string label, float val, float min, float max, float step, Action<float> onChange, ControlVariant v = ControlVariant.Default, ControlSize sz = ControlSize.Default, bool disabled = false, bool showValue = true, string fmt = "F2", params GUILayoutOption[] opts) =>
-            ExecStatefulFloat(
-                nameof(LabeledSlider),
-                s =>
-                    _slider.Draw(
-                        new SliderConfig
-                        {
-                            Label = label,
-                            Value = s,
-                            MinValue = min,
-                            MaxValue = max,
-                            Step = step,
-                            OnValueChanged = onChange,
-                            Variant = v,
-                            Size = sz,
-                            IsDisabled = disabled,
-                            ShowValue = showValue,
-                            ValueFormat = fmt,
-                            LayoutOptions = opts ?? Array.Empty<GUILayoutOption>(),
-                        }
-                    ),
-                val,
-                label
+        public float LabeledSlider(string label, float value, float min, float max, bool showValue = true, ControlVariant v = ControlVariant.Default, ControlSize sz = ControlSize.Default, bool disabled = false, string format = "F2", params GUILayoutOption[] opts) =>
+            Slider(
+                new SliderConfig
+                {
+                    Label = label,
+                    Value = value,
+                    MinValue = min,
+                    MaxValue = max,
+                    Step = 0f,
+                    Variant = v,
+                    Size = sz,
+                    IsDisabled = disabled,
+                    ShowValue = showValue,
+                    ValueFormat = format,
+                    LayoutOptions = opts ?? Array.Empty<GUILayoutOption>(),
+                }
             );
 
-        public float LabeledSlider(string label, ref float val, float min, float max, float step, Action<float> onChange, ControlVariant v = ControlVariant.Default, ControlSize sz = ControlSize.Default, bool disabled = false, bool showValue = true, string fmt = "F2", params GUILayoutOption[] opts)
-        {
-            val = LabeledSlider(label, val, min, max, step, onChange, v, sz, disabled, showValue, fmt, opts);
-            return val;
-        }
-
-        public float DisabledSlider(float val, float min = 0f, float max = 1f, params GUILayoutOption[] opts) => Execute(() => _slider.DisabledSlider(val, min, max, opts), val, nameof(DisabledSlider));
-
-        public (float min, float max) RangeSlider(float minVal, float maxVal, float absMin, float absMax, string label = null, Action<float, float> onChange = null, params GUILayoutOption[] opts)
-        {
-            float lo = ExecStatefulFloat(
-                nameof(RangeSlider) + "Min",
-                s =>
-                    _slider.Draw(
-                        new SliderConfig
-                        {
-                            Value = s,
-                            MinValue = absMin,
-                            MaxValue = maxVal,
-                            Step = 0f,
-                            LayoutOptions = opts ?? Array.Empty<GUILayoutOption>(),
-                        }
-                    ),
-                minVal,
-                label + "lo"
+        public float LabeledSlider(string label, float value, float min, float max, float step, bool showValue = true, ControlVariant v = ControlVariant.Default, ControlSize sz = ControlSize.Default, bool disabled = false, string format = "F2", params GUILayoutOption[] opts) =>
+            Slider(
+                new SliderConfig
+                {
+                    Label = label,
+                    Value = value,
+                    MinValue = min,
+                    MaxValue = max,
+                    Step = step,
+                    Variant = v,
+                    Size = sz,
+                    IsDisabled = disabled,
+                    ShowValue = showValue,
+                    ValueFormat = format,
+                    LayoutOptions = opts ?? Array.Empty<GUILayoutOption>(),
+                }
             );
-            float hi = ExecStatefulFloat(
-                nameof(RangeSlider) + "Max",
-                s =>
-                    _slider.Draw(
-                        new SliderConfig
-                        {
-                            Value = s,
-                            MinValue = lo,
-                            MaxValue = absMax,
-                            Step = 0f,
-                            LayoutOptions = opts ?? Array.Empty<GUILayoutOption>(),
-                        }
-                    ),
-                maxVal,
-                label + "hi"
+
+        public float DisabledSlider(float value, float min, float max, float step = 0f, bool showValue = true, string format = "F2", ControlVariant v = ControlVariant.Default, ControlSize sz = ControlSize.Default, params GUILayoutOption[] opts) =>
+            Slider(
+                new SliderConfig
+                {
+                    Value = value,
+                    MinValue = min,
+                    MaxValue = max,
+                    Step = step,
+                    Variant = v,
+                    Size = sz,
+                    IsDisabled = true,
+                    ShowValue = showValue,
+                    ValueFormat = format,
+                    LayoutOptions = opts ?? Array.Empty<GUILayoutOption>(),
+                }
             );
-            if (lo > hi)
-                lo = hi;
-            if (!string.IsNullOrEmpty(label))
-                Label(label);
-            onChange?.Invoke(lo, hi);
-            return (lo, hi);
-        }
 
         // Select
         public int Select(SelectConfig cfg)
         {
             if (cfg == null)
-                return Execute(() => _select.DrawSelect(cfg), 0, nameof(Select));
-            string key = cfg.Items?.Length > 0 ? string.Join("|", cfg.Items) : null;
+                return Execute(() => _select.Draw(cfg), 0, nameof(Select));
+            string key = cfg.Id ?? cfg.Label ?? "select";
             return ExecStatefulInt(
                 nameof(Select),
                 s =>
                 {
                     cfg.SelectedIndex = s;
-                    return _select.DrawSelect(cfg);
+                    return _select.Draw(cfg);
                 },
                 cfg.SelectedIndex,
                 key
             );
         }
 
-        public int Select(string[] items, int idx) => ExecStatefulInt(nameof(Select), s => _select.DrawSelect(items, s), idx, null);
-
-        public int Select(string[] items, ref int idx)
+        public int Select(string label, string[] items, int selectedIndex, Action<int> onChange = null, ControlVariant v = ControlVariant.Default, ControlSize sz = ControlSize.Default, bool disabled = false, params GUILayoutOption[] opts)
         {
-            idx = Select(items, idx);
-            return idx;
-        }
-
-        public int Select(string[] items, int idx, Action<int> onChange) =>
-            Select(
+            var options = items == null ? Array.Empty<SelectOption>() : Array.ConvertAll(items, t => new SelectOption(t, t));
+            return Select(
                 new SelectConfig
                 {
-                    Items = items ?? Array.Empty<string>(),
-                    SelectedIndex = idx,
+                    Label = label,
+                    Options = options,
+                    SelectedIndex = selectedIndex,
+                    Variant = v,
+                    Size = sz,
+                    IsDisabled = disabled,
                     OnSelectionChanged = onChange,
+                    LayoutOptions = opts ?? Array.Empty<GUILayoutOption>(),
                 }
             );
-
-        public int Select(string[] items, ref int idx, Action<int> onChange)
-        {
-            idx = Select(items, idx, onChange);
-            return idx;
         }
 
-        public void OpenSelect(string id = "select") => Execute(() => _select.Open(id), nameof(OpenSelect));
+        public int Select(string[] items, int selectedIndex, Action<int> onChange = null, ControlVariant v = ControlVariant.Default, ControlSize sz = ControlSize.Default, bool disabled = false, params GUILayoutOption[] opts)
+        {
+            var options = items == null ? Array.Empty<SelectOption>() : Array.ConvertAll(items, t => new SelectOption(t, t));
+            int result = selectedIndex;
+            var cfg = new SelectConfig
+            {
+                Id = LegacySelectId,
+                Options = options,
+                SelectedIndex = selectedIndex,
+                Variant = v,
+                Size = sz,
+                IsDisabled = disabled,
+                OnSelectionChanged = i =>
+                {
+                    result = i;
+                    onChange?.Invoke(i);
+                },
+                LayoutOptions = opts ?? Array.Empty<GUILayoutOption>(),
+            };
 
-        public void CloseSelect() => Execute(_select.Close, nameof(CloseSelect));
+            bool wasEnabled = GUI.enabled;
+            if (disabled)
+                GUI.enabled = false;
+            Execute(() => _select.DrawMenu(cfg), nameof(SelectMenu));
+            GUI.enabled = wasEnabled;
 
-        public bool IsSelectOpen() => _select.IsOpen;
+            if (result != selectedIndex)
+                _legacySelectOpen[LegacySelectId] = false;
 
-        // Dropdown menu
+            return result;
+        }
+
+        public int SelectMenu(SelectConfig cfg) => Execute(() => _select.DrawMenu(cfg), 0, nameof(SelectMenu));
+
+        public void OpenSelect() => OpenSelect(LegacySelectId);
+
+        public void OpenSelect(string id)
+        {
+            if (string.IsNullOrEmpty(id))
+                id = LegacySelectId;
+            _legacySelectOpen[id] = true;
+        }
+
+        public void OpenSelect(SelectConfig cfg, Rect anchorRect) => Execute(() => _select.Open(cfg, anchorRect), nameof(OpenSelect));
+
+        public void CloseSelect() => CloseSelect(LegacySelectId);
+
+        public void CloseSelect(string id) =>
+            Execute(
+                () =>
+                {
+                    _select.Close(id);
+                    if (_legacySelectOpen.ContainsKey(id))
+                        _legacySelectOpen[id] = false;
+                },
+                nameof(CloseSelect)
+            );
+
+        public bool IsSelectOpen() => IsSelectOpen(LegacySelectId);
+
+        public bool IsSelectOpen(string id) =>
+            Execute(
+                () =>
+                {
+                    if (_select.IsOpen(id))
+                        return true;
+                    return _legacySelectOpen.TryGetValue(id, out bool open) && open;
+                },
+                false,
+                nameof(IsSelectOpen)
+            );
+
         public void DropdownMenu(DropdownMenuConfig cfg) => Execute(() => _dropdownMenu.Draw(cfg), nameof(DropdownMenu));
 
-        public void DropdownMenu(List<DropdownMenuItem> items, int zIndex = -1, params GUILayoutOption[] opts) => DropdownMenu(new DropdownMenuConfig(items) { ZIndex = zIndex >= 0 ? zIndex : DesignTokens.ZIndex.Dropdown, LayoutOptions = opts ?? Array.Empty<GUILayoutOption>() });
+        public void OpenDropdownMenu(DropdownMenuConfig cfg, Rect anchorRect) => Execute(() => _dropdownMenu.Open(cfg, anchorRect), nameof(OpenDropdownMenu));
 
-        public void OpenDropdownMenu(List<DropdownMenuItem> items, string id = "dropdown", int zIndex = -1) => Execute(() => _dropdownMenu.Open(items, id, zIndex), nameof(OpenDropdownMenu));
+        public void CloseDropdownMenu(string id) => Execute(() => _dropdownMenu.Close(id), nameof(CloseDropdownMenu));
 
-        public void CloseDropdownMenu() => Execute(_dropdownMenu.Close, nameof(CloseDropdownMenu));
+        public bool IsDropdownMenuOpen(string id) => Execute(() => _dropdownMenu.IsOpen(id), false, nameof(IsDropdownMenuOpen));
 
-        public bool IsDropdownMenuOpen() => Execute(() => _dropdownMenu.IsOpen, false, nameof(IsDropdownMenuOpen));
+        public void ThemeChanger(ThemeChangerConfig cfg) => Execute(() => _themeChanger.Draw(cfg), nameof(ThemeChanger));
 
-        public int GetDropdownMenuZIndex() => Execute(() => _dropdownMenu.GetZIndex(), DesignTokens.ZIndex.Dropdown, nameof(GetDropdownMenuZIndex));
-
-        // Theme changer
-        public void ThemeChanger(ThemeChangerConfig cfg = null) => Execute(() => _themeChanger.Draw(cfg), nameof(ThemeChanger));
-
-        public void ThemeChangerCompact(string id = "theme_compact") => Execute(() => _themeChanger.DrawCompact(id), nameof(ThemeChangerCompact));
-
-        public void ThemeChangerWithPreview(string id = "theme_preview", float width = 220f) => Execute(() => _themeChanger.DrawWithPreview(id, width), nameof(ThemeChangerWithPreview));
+        public void ThemeChangerWithPreview(string id = "theme_changer", float width = 200f) =>
+            ThemeChanger(
+                new ThemeChangerConfig
+                {
+                    Id = id,
+                    Width = width,
+                    ShowPreview = true,
+                }
+            );
 
         // TextArea
         public string TextArea(TextAreaConfig cfg)
@@ -979,6 +958,26 @@ namespace shadcnui.GUIComponents.Core.Base
                 GUILogger.LogException(ex, nameof(ResizableTextArea), nameof(GUIHelper));
                 return text ?? string.Empty;
             }
+        }
+
+        public void SectionHeader(string text)
+        {
+            Execute(
+                () =>
+                {
+                    var style = _styleManager?.GetSectionHeaderStyle(ControlVariant.Default, ControlSize.Default) ?? GUI.skin.label;
+                    UnityHelpers.Label(text, style);
+                },
+                nameof(SectionHeader)
+            );
+        }
+
+        public void InputLabel(string text, float width = -1f)
+        {
+            if (width > 0f)
+                Label(text, ControlVariant.Default, false, GUILayout.Width(width * uiScale));
+            else
+                Label(text, ControlVariant.Default);
         }
 
         // Label
@@ -1103,35 +1102,6 @@ namespace shadcnui.GUIComponents.Core.Base
         public void Dialog(string id, Action content, float width = 400f, float height = 300f) => Execute(() => _dialog.DrawDialog(id, content, width, height), nameof(Dialog));
 
         public void Dialog(string id, string title, string desc, Action content, Action footer = null, float width = 400f, float height = 300f) => Execute(() => _dialog.DrawDialog(id, title, desc, content, footer, width, height), nameof(Dialog));
-
-        public bool ConfirmDialog(string id, string title, string message, string confirmLabel = "OK", string cancelLabel = "Cancel", Action onConfirm = null, Action onCancel = null, float width = 360f, float height = 180f)
-        {
-            bool confirmed = false;
-            Dialog(
-                id,
-                title,
-                message,
-                content: null,
-                footer: () =>
-                {
-                    if (Button(confirmLabel, ControlVariant.Default))
-                    {
-                        confirmed = true;
-                        onConfirm?.Invoke();
-                        CloseDialog();
-                    }
-                    AddSpace(8f);
-                    if (Button(cancelLabel, ControlVariant.Secondary))
-                    {
-                        onCancel?.Invoke();
-                        CloseDialog();
-                    }
-                },
-                width: width,
-                height: height
-            );
-            return confirmed;
-        }
 
         // Popover
         public void OpenPopover(string id = "popover", int zIndex = -1) => Execute(() => _popover.Open(id, zIndex), nameof(OpenPopover));
@@ -1415,13 +1385,6 @@ namespace shadcnui.GUIComponents.Core.Base
             Execute(
                 () =>
                 {
-                    if (cfg != null)
-                    {
-                        _calendar.SelectedDate = cfg.SelectedDate;
-                        _calendar.Ranges = cfg.Ranges ?? new List<(DateTime, DateTime)>();
-                        _calendar.DisabledDates = cfg.DisabledDates ?? new List<DateTime>();
-                        _calendar.OnDateSelected = cfg.OnDateSelected;
-                    }
                     _calendar.DrawCalendar(cfg);
                 },
                 nameof(Calendar)
@@ -1813,6 +1776,52 @@ namespace shadcnui.GUIComponents.Core.Base
                 GUILogger.LogException(ex, op, nameof(GUIHelper));
                 return fallback;
             }
+        }
+
+        internal Rect GetRootGuiScreenRect()
+        {
+            if (!_rootGuiScreenRectValid)
+            {
+                _rootGuiScreenRect = CaptureGuiScreenRect();
+                _rootGuiScreenRectValid = true;
+            }
+            return _rootGuiScreenRect;
+        }
+
+        private Rect CaptureGuiScreenRect()
+        {
+            Rect clip = GetClipRect();
+            Vector2 origin = GUIUtility.GUIToScreenPoint(Vector2.zero);
+            return new Rect(origin.x + clip.x, origin.y + clip.y, clip.width, clip.height);
+        }
+
+        private Rect GetClipRect()
+        {
+            try
+            {
+                var guiClip = typeof(GUI).Assembly.GetType("UnityEngine.GUIClip");
+                var topRectMethod = guiClip?.GetMethod("GetTopRect", System.Reflection.BindingFlags.Static | System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.NonPublic);
+                if (topRectMethod != null)
+                {
+                    object val = topRectMethod.Invoke(null, null);
+                    if (val is Rect topRect && topRect.width > 1f && topRect.height > 1f)
+                        return topRect;
+                }
+
+                var prop = guiClip?.GetProperty("visibleRect", System.Reflection.BindingFlags.Static | System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.NonPublic);
+                if (prop != null)
+                {
+                    object value = prop.GetValue(null, null);
+                    if (value is Rect rect && rect.width > 1f && rect.height > 1f)
+                        return rect;
+                }
+            }
+            catch
+            {
+                // ignored
+            }
+
+            return new Rect(0f, 0f, Screen.width, Screen.height);
         }
     }
 }

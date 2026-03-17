@@ -10,356 +10,162 @@ namespace shadcnui.GUIComponents.Display
 {
     public class Chart : BaseComponent
     {
-        private const float PADDING_LEFT = 40f;
-        private const float PADDING_RIGHT = 20f;
-        private const float PADDING_TOP = 20f;
-        private const float PADDING_BOTTOM = 20f;
-        private const float GRID_LINE_COUNT = 4f;
-        private const float LINE_THICKNESS = 2f;
-        private const float POINT_RADIUS = 4f;
-        private const float BAR_GAP_RATIO = 0.1f;
-        private const float BAR_GROUP_FILL_RATIO = 0.8f;
-        private const float PIE_RADIUS_RATIO = 0.8f;
-        private const float PIE_SEGMENT_ANGLE_STEP = 10f;
-        private static readonly float Deg2Rad = (float)Math.PI / 180f;
-
-        private Rect _chartRect;
-        private Rect _plotRect;
-        private float _plotWidth;
-        private float _plotHeight;
+        private static readonly Texture2D WhiteTex = Texture2D.whiteTexture;
 
         public Chart(GUIHelper helper)
             : base(helper) { }
 
-        #region Config-based API
         public void DrawChart(ChartConfig config)
         {
-            if (config?.Series == null)
+            if (config == null)
                 return;
 
-            GUILayoutOption[] layoutOptions = BuildChartLayoutOptions(config);
-            layoutComponents.BeginVerticalGroup(styleManager.GetChartStyle(ControlVariant.Default, ControlSize.Default), layoutOptions);
-            DrawChartContent(config);
-            layoutComponents.EndVerticalGroup();
-        }
-        #endregion
+            Vector2 size = config.Size;
+            if (size.x <= 0 || size.y <= 0)
+                size = new Vector2(320f, 220f);
 
-        #region API
-        #endregion
+            var controlSize = ((ComponentConfigBase)config).Size;
+            GUIStyle style = styleManager?.GetChartStyle(config.Variant, controlSize) ?? GUI.skin.box;
 
-        #region Layout & Bounds
-        private GUILayoutOption[] BuildChartLayoutOptions(ChartConfig config)
-        {
-            if (config.LayoutOptions != null && config.LayoutOptions.Length > 0)
-                return config.LayoutOptions;
+            Rect rect = GUILayoutUtility.GetRect(size.x * guiHelper.uiScale, size.y * guiHelper.uiScale, config.LayoutOptions);
+            GUI.Box(rect, GUIContent.none, style);
 
-            return new[] { GUILayout.Width(config.Size.x), GUILayout.Height(config.Size.y), GUILayout.ExpandWidth(true), GUILayout.ExpandHeight(true) };
-        }
-
-        private void UpdatePlotBounds()
-        {
-            _plotWidth = _chartRect.width - PADDING_LEFT - PADDING_RIGHT;
-            _plotHeight = _chartRect.height - PADDING_TOP - PADDING_BOTTOM;
-            _plotRect = new Rect(_chartRect.x + PADDING_LEFT, _chartRect.y + PADDING_TOP, _plotWidth, _plotHeight);
-        }
-
-        private Vector2 DataToPlot(int dataIndex, int dataCount, float value, float maxValue)
-        {
-            if (dataCount <= 0 || maxValue <= 0f)
-                return new Vector2(_plotRect.x, _plotRect.yMax);
-
-            float t = dataCount > 1 ? dataIndex / (float)(dataCount - 1) : 0f;
-            float x = _plotRect.x + t * _plotWidth;
-            float y = _plotRect.yMax - (value / maxValue) * _plotHeight;
-            return new Vector2(x, y);
-        }
-        #endregion
-
-        #region Chart Rendering
-        private void DrawChartContent(ChartConfig config)
-        {
-#if IL2CPP_MELONLOADER_PRE57
-            var options = new UnhollowerBaseLib.Il2CppReferenceArray<GUILayoutOption>(new GUILayoutOption[] { GUILayout.ExpandWidth(true), GUILayout.ExpandHeight(true) });
-            Rect chartArea = GUILayoutUtility.GetRect(config.Size.x, config.Size.y, options);
-#else
-            Rect chartArea = GUILayoutUtility.GetRect(config.Size.x, config.Size.y, GUILayout.ExpandWidth(true), GUILayout.ExpandHeight(true));
-#endif
-
-            if (Event.current.type != EventType.Repaint)
+            if (config.Series == null || config.Series.Count == 0)
+            {
+                DrawEmpty(rect);
                 return;
-
-            _chartRect = chartArea;
-            UpdatePlotBounds();
-
-            var visible = config.Series.Where(s => s != null && s.Visible).ToList();
-            if (visible.Count == 0)
-                return;
+            }
 
             switch (config.ChartType)
             {
-                case ChartType.Line:
-                    RenderLineChart(visible);
-                    break;
                 case ChartType.Bar:
-                    RenderBarChart(visible);
+                    DrawBarChart(rect, config.Series);
                     break;
+                case ChartType.Line:
                 case ChartType.Area:
-                    RenderAreaChart(visible);
+                case ChartType.Scatter:
+                    DrawLineChart(rect, config.Series);
                     break;
                 case ChartType.Pie:
-                    RenderPieChart(visible);
-                    break;
-                case ChartType.Scatter:
-                    RenderScatterChart(visible);
+                    DrawPieLegend(rect, config.Series);
                     break;
             }
         }
 
-        private void RenderLineChart(List<ChartSeries> series)
+        private void DrawBarChart(Rect rect, List<ChartSeries> series)
         {
-            DrawGrid();
-            DrawAxes(series);
-            float maxVal = GetMaxValue(series);
-            foreach (var s in series)
+            var data = series.SelectMany(s => s.Data).ToList();
+            if (data.Count == 0)
             {
-                if (s?.Data == null || s.Data.Count < 2)
-                    continue;
-                DrawLineSeries(s, s.Data.Count, maxVal);
-            }
-        }
-
-        private void DrawLineSeries(ChartSeries series, int dataCount, float maxValue)
-        {
-            var points = new Vector2[series.Data.Count];
-            for (int i = 0; i < series.Data.Count; i++)
-                points[i] = DataToPlot(i, dataCount, series.Data[i].Value, maxValue);
-
-            for (int i = 0; i < points.Length - 1; i++)
-                DrawLine(points[i], points[i + 1], series.Color, LINE_THICKNESS);
-
-            foreach (var p in points)
-            {
-                DrawCircle(p, POINT_RADIUS, series.Color);
-                DrawCircle(p, POINT_RADIUS * 0.5f, Color.white);
-            }
-        }
-
-        private void RenderBarChart(List<ChartSeries> series)
-        {
-            DrawGrid();
-            DrawAxes(series);
-
-            int dataCount = series.Max(s => s.Data?.Count ?? 0);
-            if (dataCount == 0)
+                DrawEmpty(rect);
                 return;
+            }
 
-            float maxVal = GetMaxValue(series);
-            float groupWidth = _plotWidth / dataCount;
-            float barWidth = (groupWidth * BAR_GROUP_FILL_RATIO) / series.Count;
-            float gap = groupWidth * BAR_GAP_RATIO;
+            float max = Mathf.Max(1f, data.Max(d => d.Value));
+            int groupCount = series.Max(s => s.Data.Count);
 
-            for (int i = 0; i < dataCount; i++)
+            float padding = 12f * guiHelper.uiScale;
+            Rect plot = new Rect(rect.x + padding, rect.y + padding, rect.width - padding * 2, rect.height - padding * 2);
+
+            float groupWidth = plot.width / Mathf.Max(1, groupCount);
+            float barWidth = groupWidth / Mathf.Max(1, series.Count) * 0.7f;
+
+            for (int i = 0; i < groupCount; i++)
             {
-                float groupX = _plotRect.x + i * groupWidth + gap;
-                for (int si = 0; si < series.Count; si++)
+                for (int s = 0; s < series.Count; s++)
                 {
-                    var s = series[si];
-                    if (s?.Data == null || i >= s.Data.Count)
+                    var ser = series[s];
+                    if (i >= ser.Data.Count)
                         continue;
-                    float val = s.Data[i].Value;
-                    float h = maxVal > 0 ? (val / maxVal) * _plotHeight : 0f;
-                    float bx = groupX + si * barWidth;
-                    float by = _plotRect.yMax - h;
-                    DrawRect(new Rect(bx, by, barWidth - 2f, h), s.Data[i].Color != default ? s.Data[i].Color : s.Color);
+
+                    float value = ser.Data[i].Value;
+                    float height = (value / max) * plot.height;
+                    float x = plot.x + i * groupWidth + s * barWidth + (groupWidth - barWidth * series.Count) * 0.5f;
+                    float y = plot.yMax - height;
+
+                    DrawRect(new Rect(x, y, barWidth, height), ser.Data[i].Color == default ? ser.Color : ser.Data[i].Color);
                 }
             }
         }
 
-        private void RenderAreaChart(List<ChartSeries> series)
+        private void DrawLineChart(Rect rect, List<ChartSeries> series)
         {
-            DrawGrid();
-            DrawAxes(series);
-            float maxVal = GetMaxValue(series);
-            foreach (var s in series)
+            var data = series.SelectMany(s => s.Data).ToList();
+            if (data.Count == 0)
             {
-                if (s?.Data == null || s.Data.Count < 2)
+                DrawEmpty(rect);
+                return;
+            }
+
+            float max = Mathf.Max(1f, data.Max(d => d.Value));
+            int maxPoints = series.Max(s => s.Data.Count);
+
+            float padding = 12f * guiHelper.uiScale;
+            Rect plot = new Rect(rect.x + padding, rect.y + padding, rect.width - padding * 2, rect.height - padding * 2);
+
+            foreach (var ser in series)
+            {
+                if (ser.Data.Count < 2)
                     continue;
-                DrawAreaSeries(s, s.Data.Count, maxVal);
-            }
-        }
 
-        private void DrawAreaSeries(ChartSeries series, int dataCount, float maxValue)
-        {
-            int n = series.Data.Count;
-            var pts = new Vector2[n + 2];
-            pts[0] = new Vector2(_plotRect.x, _plotRect.yMax);
-            for (int i = 0; i < n; i++)
-                pts[i + 1] = DataToPlot(i, dataCount, series.Data[i].Value, maxValue);
-            pts[n + 1] = new Vector2(_plotRect.xMax, _plotRect.yMax);
-
-            Color fillColor = new Color(series.Color.r, series.Color.g, series.Color.b, 0.3f);
-            for (int i = 0; i < pts.Length - 1; i++)
-                DrawLine(pts[i], pts[i + 1], fillColor, 1f);
-            for (int i = 1; i < pts.Length - 2; i++)
-                DrawLine(pts[i], pts[i + 1], series.Color, LINE_THICKNESS);
-        }
-
-        private void RenderPieChart(List<ChartSeries> series)
-        {
-            float total = GetTotalValue(series);
-            if (total <= 0f)
-                return;
-
-            Vector2 center = _chartRect.center;
-            float radius = Mathf.Min(_chartRect.width, _chartRect.height) * 0.5f * PIE_RADIUS_RATIO;
-            float currentAngle = 0f;
-
-            foreach (var s in series)
-            {
-                if (s?.Data == null)
-                    continue;
-                foreach (var pt in s.Data)
+                for (int i = 0; i < ser.Data.Count - 1; i++)
                 {
-                    float sliceAngle = (pt.Value / total) * 360f;
-                    if (sliceAngle > 0f)
-                    {
-                        DrawPieSlice(center, radius, currentAngle, sliceAngle, pt.Color != default ? pt.Color : s.Color);
-                        currentAngle += sliceAngle;
-                    }
+                    float x0 = plot.x + (i / (float)Mathf.Max(1, maxPoints - 1)) * plot.width;
+                    float x1 = plot.x + ((i + 1) / (float)Mathf.Max(1, maxPoints - 1)) * plot.width;
+                    float y0 = plot.yMax - (ser.Data[i].Value / max) * plot.height;
+                    float y1 = plot.yMax - (ser.Data[i + 1].Value / max) * plot.height;
+
+                    DrawLine(new Vector2(x0, y0), new Vector2(x1, y1), ser.Data[i].Color == default ? ser.Color : ser.Data[i].Color, 2f * guiHelper.uiScale);
                 }
             }
         }
 
-        private void DrawPieSlice(Vector2 center, float radius, float startAngleDeg, float sliceAngleDeg, Color color)
+        private void DrawPieLegend(Rect rect, List<ChartSeries> series)
         {
-            int segments = Mathf.Max(3, Mathf.RoundToInt(sliceAngleDeg / PIE_SEGMENT_ANGLE_STEP));
-            float step = sliceAngleDeg / segments;
-            float startRad = startAngleDeg * Deg2Rad;
-            Vector2 prev = center + new Vector2(Mathf.Cos(startRad), Mathf.Sin(startRad)) * radius;
+            float padding = 12f * guiHelper.uiScale;
+            Rect legend = new Rect(rect.x + padding, rect.y + padding, rect.width - padding * 2, rect.height - padding * 2);
 
-            for (int i = 1; i <= segments; i++)
+            var labelStyle = styleManager?.GetLabelStyle(ControlVariant.Default, ControlSize.Default) ?? GUI.skin.label;
+            float y = legend.y;
+            foreach (var ser in series)
             {
-                float angleRad = (startAngleDeg + step * i) * Deg2Rad;
-                Vector2 next = center + new Vector2(Mathf.Cos(angleRad), Mathf.Sin(angleRad)) * radius;
-                DrawLine(center, prev, color, 1f);
-                DrawLine(prev, next, color, 1f);
-                prev = next;
-            }
-            DrawLine(center, prev, color, 1f);
-        }
-
-        private void RenderScatterChart(List<ChartSeries> series)
-        {
-            DrawGrid();
-            DrawAxes(series);
-            float maxVal = GetMaxValue(series);
-            foreach (var s in series)
-            {
-                if (s?.Data == null)
-                    continue;
-                int dataCount = s.Data.Count;
-                for (int i = 0; i < s.Data.Count; i++)
-                {
-                    Vector2 p = DataToPlot(i, dataCount > 1 ? dataCount : 1, s.Data[i].Value, maxVal);
-                    DrawCircle(p, POINT_RADIUS, s.Color);
-                }
+                var color = ser.Color == default ? new Color(0.2f, 0.6f, 1f) : ser.Color;
+                DrawRect(new Rect(legend.x, y + 4f, 10f, 10f), color);
+                GUI.Label(new Rect(legend.x + 16f, y, legend.width - 16f, 20f), ser.Label ?? ser.Key ?? "Series", labelStyle);
+                y += 20f;
             }
         }
 
-        private void DrawGrid()
+        private void DrawEmpty(Rect rect)
         {
-            var theme = styleManager?.GetTheme();
-            if (theme == null)
-                return;
-            Color gridColor = new Color(theme.Border.r, theme.Border.g, theme.Border.b, 0.3f);
-            for (int i = 1; i <= GRID_LINE_COUNT; i++)
-            {
-                float y = _plotRect.y + (_plotHeight / (GRID_LINE_COUNT + 1)) * i;
-                DrawLine(new Vector2(_plotRect.x, y), new Vector2(_plotRect.xMax, y), gridColor, 1f);
-            }
-        }
-
-        private void DrawAxes(List<ChartSeries> series)
-        {
-            var theme = styleManager?.GetTheme();
-            if (theme == null || styleManager == null)
-                return;
-
-            Color axisColor = new Color(theme.Muted.r, theme.Muted.g, theme.Muted.b, 0.5f);
-            DrawLine(new Vector2(_plotRect.x, _plotRect.yMax), new Vector2(_plotRect.xMax, _plotRect.yMax), axisColor, 1f);
-
-            if (series.Count == 0 || series[0].Data == null || series[0].Data.Count == 0 || _plotWidth <= 0)
-                return;
-
-            int labelCount = series[0].Data.Count;
-            float labelWidth = _plotWidth / labelCount;
-            GUIStyle axisStyle = styleManager?.GetChartAxisStyle() ?? GUI.skin.label;
-
-            for (int i = 0; i < labelCount; i++)
-            {
-                float x = _plotRect.x + (i + 0.5f) * labelWidth;
-                string label = series[0].Data[i].Name;
-                if (label != null && label.Length > 3)
-                    label = label.Substring(0, 3);
-                Rect labelRect = new Rect(x - 15f, _plotRect.yMax + 2f, 30f, 18f);
-                if (labelRect.width > 0 && labelRect.height > 0)
-                {
-                    Color prev = GUI.color;
-                    GUI.color = theme.Muted;
-                    GUI.Label(labelRect, label ?? "", axisStyle);
-                    GUI.color = prev;
-                }
-            }
-        }
-
-        private float GetMaxValue(IEnumerable<ChartSeries> series)
-        {
-            float max = series.Where(s => s?.Data != null).SelectMany(s => s.Data).Select(d => d.Value).DefaultIfEmpty(0f).Max();
-            return max > 0f ? max : 1f;
-        }
-
-        private float GetTotalValue(IEnumerable<ChartSeries> series)
-        {
-            return series.Where(s => s?.Data != null).SelectMany(s => s.Data).Sum(d => d.Value);
-        }
-        #endregion
-
-        #region Primitives
-        private void DrawLine(Vector2 start, Vector2 end, Color color, float width)
-        {
-            if (Event.current.type != EventType.Repaint)
-                return;
-            Color prev = GUI.color;
-            GUI.color = color;
-            Vector2 d = end - start;
-            float angle = Mathf.Atan2(d.y, d.x) * Mathf.Rad2Deg;
-            float len = d.magnitude;
-            Matrix4x4 m = GUI.matrix;
-            GUIUtility.RotateAroundPivot(angle, start);
-            GUI.DrawTexture(new Rect(start.x, start.y - width * 0.5f, len, width), Texture2D.whiteTexture);
-            GUI.matrix = m;
-            GUI.color = prev;
-        }
-
-        private void DrawCircle(Vector2 center, float radius, Color color)
-        {
-            if (Event.current.type != EventType.Repaint)
-                return;
-            Color prev = GUI.color;
-            GUI.color = color;
-            GUI.DrawTexture(new Rect(center.x - radius, center.y - radius, radius * 2f, radius * 2f), Texture2D.whiteTexture);
-            GUI.color = prev;
+            var style = styleManager?.GetLabelStyle(ControlVariant.Muted, ControlSize.Default) ?? GUI.skin.label;
+            var centered = new GUIStyle(style) { alignment = TextAnchor.MiddleCenter };
+            GUI.Label(rect, "No data", centered);
         }
 
         private void DrawRect(Rect rect, Color color)
         {
-            if (Event.current.type != EventType.Repaint)
-                return;
             Color prev = GUI.color;
-            GUI.color = color;
-            GUI.DrawTexture(rect, Texture2D.whiteTexture);
+            GUI.color = color == default ? new Color(0.2f, 0.6f, 1f) : color;
+            GUI.DrawTexture(rect, WhiteTex);
             GUI.color = prev;
         }
-        #endregion
+
+        private void DrawLine(Vector2 a, Vector2 b, Color color, float width)
+        {
+            Color prev = GUI.color;
+            Matrix4x4 prevMatrix = GUI.matrix;
+
+            float angle = Vector3.Angle(b - a, Vector2.right);
+            if (a.y > b.y)
+                angle = -angle;
+
+            GUI.color = color == default ? new Color(0.2f, 0.6f, 1f) : color;
+            GUIUtility.RotateAroundPivot(angle, a);
+            GUI.DrawTexture(new Rect(a.x, a.y - width / 2f, (b - a).magnitude, width), WhiteTex);
+
+            GUI.matrix = prevMatrix;
+            GUI.color = prev;
+        }
     }
 }

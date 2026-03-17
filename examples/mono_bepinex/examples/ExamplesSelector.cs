@@ -48,7 +48,7 @@ namespace shadcnui_examples.Menu
                     {
                         guiHelper.BeginVerticalGroup();
 
-                        guiHelper.SectionHeader("Getting Started");
+                        guiHelper.Label("Getting Started", ControlVariant.Default);
                         if (guiHelper.Button("Basic Controls", ControlVariant.Default))
                             LoadDemo<BasicControlsExample>("BasicControlsDemo");
 
@@ -59,7 +59,7 @@ namespace shadcnui_examples.Menu
 
                         guiHelper.HorizontalSeparator();
 
-                        guiHelper.SectionHeader("Data Display");
+                        guiHelper.Label("Data Display", ControlVariant.Default);
                         if (guiHelper.Button("Tables", ControlVariant.Default))
                             LoadDemo<TablesExample>("TablesDemo");
 
@@ -75,7 +75,7 @@ namespace shadcnui_examples.Menu
 
                         guiHelper.HorizontalSeparator();
 
-                        guiHelper.SectionHeader("Navigation & Layout");
+                        guiHelper.Label("Navigation & Layout", ControlVariant.Default);
                         if (guiHelper.Button("Tabs & Navigation", ControlVariant.Default))
                             LoadDemo<TabsAndNavigationExample>("TabsDemo");
 

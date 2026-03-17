@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using shadcnui.GUIComponents.Core.Base;
 using shadcnui.GUIComponents.Core.Styling;
@@ -14,26 +15,27 @@ namespace shadcnui.GUIComponents.Data
         public TextArea(GUIHelper helper)
             : base(helper) { }
 
-        #region Config-based API
         public string DrawTextArea(TextAreaConfig config)
         {
-            var styleManager = guiHelper.GetStyleManager();
+            if (config == null)
+                return string.Empty;
 
             if (!string.IsNullOrEmpty(config.Label))
             {
-                UnityHelpers.Label(config.Label, styleManager.GetLabelStyle(ControlVariant.Default));
+                UnityHelpers.Label(config.Label, styleManager?.GetLabelStyle(ControlVariant.Default, ControlSize.Default) ?? GUI.skin.label);
                 layoutComponents.AddSpace(DesignTokens.Spacing.XS);
             }
 
-            string result = config.Rect.HasValue ? DrawTextAreaRect(config) : DrawTextAreaLayout(config);
+            string value = config.Rect.HasValue ? DrawRectTextArea(config) : DrawLayoutTextArea(config);
+            if (config.MaxLength > 0 && value.Length > config.MaxLength)
+                value = value.Substring(0, config.MaxLength);
 
-            DrawCharacterCount(config, styleManager, result);
+            if (config.ShowCharCount)
+                DrawCharacterCount(config, value);
 
-            return result;
+            return value;
         }
-        #endregion
 
-        #region API
         public string DrawTextArea(string text, ControlVariant variant = ControlVariant.Default, string placeholder = "", bool disabled = false, float minHeight = 60f, int maxLength = -1, params GUILayoutOption[] options)
         {
             return DrawTextArea(
@@ -46,7 +48,7 @@ namespace shadcnui.GUIComponents.Data
                     MinHeight = minHeight,
                     MaxLength = maxLength,
                     ShowCharCount = false,
-                    LayoutOptions = options,
+                    LayoutOptions = options ?? Array.Empty<GUILayoutOption>(),
                 }
             );
         }
@@ -67,39 +69,9 @@ namespace shadcnui.GUIComponents.Data
             );
         }
 
-        public string OutlineTextArea(string text, string placeholder = "", bool disabled = false, float minHeight = 60f, int maxLength = -1, params GUILayoutOption[] options)
-        {
-            return DrawTextArea(
-                new TextAreaConfig
-                {
-                    Value = text,
-                    Variant = ControlVariant.Outline,
-                    Placeholder = placeholder,
-                    IsDisabled = disabled,
-                    MinHeight = minHeight,
-                    MaxLength = maxLength,
-                    ShowCharCount = false,
-                    LayoutOptions = options,
-                }
-            );
-        }
+        public string OutlineTextArea(string text, string placeholder = "", bool disabled = false, float minHeight = 60f, int maxLength = -1, params GUILayoutOption[] options) => DrawTextArea(text, ControlVariant.Outline, placeholder, disabled, minHeight, maxLength, options);
 
-        public string GhostTextArea(string text, string placeholder = "", bool disabled = false, float minHeight = 60f, int maxLength = -1, params GUILayoutOption[] options)
-        {
-            return DrawTextArea(
-                new TextAreaConfig
-                {
-                    Value = text,
-                    Variant = ControlVariant.Ghost,
-                    Placeholder = placeholder,
-                    IsDisabled = disabled,
-                    MinHeight = minHeight,
-                    MaxLength = maxLength,
-                    ShowCharCount = false,
-                    LayoutOptions = options,
-                }
-            );
-        }
+        public string GhostTextArea(string text, string placeholder = "", bool disabled = false, float minHeight = 60f, int maxLength = -1, params GUILayoutOption[] options) => DrawTextArea(text, ControlVariant.Ghost, placeholder, disabled, minHeight, maxLength, options);
 
         public string LabeledTextArea(string label, string text, ControlVariant variant = ControlVariant.Default, string placeholder = "", bool disabled = false, float minHeight = 60f, int maxLength = -1, bool showCharCount = true, params GUILayoutOption[] options)
         {
@@ -114,7 +86,7 @@ namespace shadcnui.GUIComponents.Data
                     MinHeight = minHeight,
                     MaxLength = maxLength,
                     ShowCharCount = showCharCount,
-                    LayoutOptions = options,
+                    LayoutOptions = options ?? Array.Empty<GUILayoutOption>(),
                 }
             );
         }
@@ -123,9 +95,7 @@ namespace shadcnui.GUIComponents.Data
         {
             height = Mathf.Clamp(height, minHeight, maxHeight);
 
-            var layoutOptions = new List<GUILayoutOption>();
-            layoutOptions.Add(GUILayout.Height(height * guiHelper.uiScale));
-            layoutOptions.Add(GUILayout.ExpandWidth(true));
+            var layoutOptions = new List<GUILayoutOption> { GUILayout.Height(height * guiHelper.uiScale), GUILayout.ExpandWidth(true) };
             if (options != null && options.Length > 0)
                 layoutOptions.AddRange(options);
 
@@ -145,94 +115,91 @@ namespace shadcnui.GUIComponents.Data
 
             layoutComponents.BeginHorizontalGroup();
             GUILayout.FlexibleSpace();
-            var styleManager = guiHelper.GetStyleManager();
-            if (UnityHelpers.Button("⋮⋮⋮", styleManager.GetLabelStyle(ControlVariant.Muted), new GUILayoutOption[] { GUILayout.Width(20 * guiHelper.uiScale), GUILayout.Height(10 * guiHelper.uiScale) }))
+            var gripStyle = styleManager?.GetLabelStyle(ControlVariant.Muted, ControlSize.Default) ?? GUI.skin.label;
+            if (UnityHelpers.Button("⋮⋮⋮", gripStyle, GUILayout.Width(20f * guiHelper.uiScale), GUILayout.Height(10f * guiHelper.uiScale)))
                 height = height >= maxHeight ? minHeight : height + 20f;
             layoutComponents.EndHorizontalGroup();
 
             return result;
         }
-        #endregion
 
-        #region Private Methods
-        private string DrawTextAreaLayout(TextAreaConfig config)
+        private string DrawLayoutTextArea(TextAreaConfig config)
         {
-            var styleManager = guiHelper.GetStyleManager();
             string controlName = "textarea_" + config.Id;
             bool focused = GUI.GetNameOfFocusedControl() == controlName;
-            GUIStyle textAreaStyle = styleManager.GetTextAreaStyle(config.Variant, ControlSize.Default, focused);
-            float scaledMinHeight = config.MinHeight * guiHelper.uiScale;
+            var style = styleManager?.GetTextAreaStyle(config.Variant, config.Size, focused) ?? GUI.skin.textArea;
 
-            var layoutOptions = new List<GUILayoutOption>();
-            layoutOptions.Add(GUILayout.MinHeight(scaledMinHeight));
-            layoutOptions.Add(GUILayout.ExpandWidth(true));
+            var options = new List<GUILayoutOption> { GUILayout.MinHeight(config.MinHeight * guiHelper.uiScale), GUILayout.MaxHeight(config.MaxHeight * guiHelper.uiScale), GUILayout.ExpandWidth(true) };
 
             if (config.LayoutOptions != null && config.LayoutOptions.Length > 0)
-                layoutOptions.AddRange(config.LayoutOptions);
+                options.AddRange(config.LayoutOptions);
 
             bool wasEnabled = GUI.enabled;
             if (config.IsDisabled)
                 GUI.enabled = false;
 
             GUI.SetNextControlName(controlName);
-            string result = UnityHelpers.TextArea(config.Value ?? GetPlaceholderText(config), textAreaStyle, layoutOptions.ToArray());
+            string value = UnityHelpers.TextArea(config.Value ?? string.Empty, style, options.ToArray());
 
             GUI.enabled = wasEnabled;
 
-            return ClampLength(result, config.MaxLength);
+            DrawPlaceholderIfNeeded(config, style, focused);
+            return value;
         }
 
-        private string DrawTextAreaRect(TextAreaConfig config)
+        private string DrawRectTextArea(TextAreaConfig config)
         {
-            var styleManager = guiHelper.GetStyleManager();
             string controlName = "textarea_rect_" + config.Id;
             bool focused = GUI.GetNameOfFocusedControl() == controlName;
-            GUIStyle textAreaStyle = styleManager.GetTextAreaStyle(config.Variant, ControlSize.Default, focused);
+            var style = styleManager?.GetTextAreaStyle(config.Variant, config.Size, focused) ?? GUI.skin.textArea;
 
-            Rect scaledRect = new Rect(config.Rect.Value.x * guiHelper.uiScale, config.Rect.Value.y * guiHelper.uiScale, config.Rect.Value.width * guiHelper.uiScale, config.Rect.Value.height * guiHelper.uiScale);
+            Rect rect = config.Rect ?? new Rect(0, 0, 200, 80);
+            Rect scaled = new Rect(rect.x * guiHelper.uiScale, rect.y * guiHelper.uiScale, rect.width * guiHelper.uiScale, rect.height * guiHelper.uiScale);
 
             bool wasEnabled = GUI.enabled;
             if (config.IsDisabled)
                 GUI.enabled = false;
 
             GUI.SetNextControlName(controlName);
-            string result = GUI.TextArea(scaledRect, config.Value ?? GetPlaceholderText(config), textAreaStyle);
+            string value = GUI.TextArea(scaled, config.Value ?? string.Empty, style);
 
             GUI.enabled = wasEnabled;
 
-            return ClampLength(result, config.MaxLength);
+            DrawPlaceholderIfNeeded(config, style, focused, scaled);
+            return value;
         }
 
-        private void DrawCharacterCount(TextAreaConfig config, StyleManager styleManager, string result)
+        private void DrawPlaceholderIfNeeded(TextAreaConfig config, GUIStyle style, bool focused, Rect? rectOverride = null)
         {
-            if (!config.ShowCharCount)
+            if (focused || string.IsNullOrEmpty(config.Placeholder))
                 return;
 
+            string value = config.Value ?? string.Empty;
+            if (!string.IsNullOrEmpty(value))
+                return;
+
+            Rect rect = rectOverride ?? GUILayoutUtility.GetLastRect();
+            var placeholder = new UnityHelpers.GUIStyle(style) { normal = { textColor = styleManager?.GetTheme().Muted ?? new Color(0.64f, 0.64f, 0.71f, 1f) } };
+
+            Rect textRect = new Rect(rect.x + style.padding.left, rect.y + style.padding.top, rect.width - style.padding.horizontal, rect.height - style.padding.vertical);
+
+            GUI.Label(textRect, config.Placeholder, placeholder);
+        }
+
+        private void DrawCharacterCount(TextAreaConfig config, string value)
+        {
             layoutComponents.AddSpace(DesignTokens.Spacing.XS);
             layoutComponents.BeginHorizontalGroup();
             GUILayout.FlexibleSpace();
 
-            string countValue = config.MaxLength > 0 ? $"{result?.Length ?? 0}/{config.MaxLength}" : $"{result?.Length ?? 0} characters";
+            string count = config.MaxLength > 0 ? $"{value.Length}/{config.MaxLength}" : $"{value.Length} characters";
+            bool nearLimit = config.MaxLength > 0 && value.Length >= config.MaxLength * 0.9f;
+            var style = new UnityHelpers.GUIStyle(styleManager?.GetLabelStyle(ControlVariant.Muted, ControlSize.Default) ?? GUI.skin.label);
+            if (nearLimit)
+                style.normal.textColor = new Color(0.9f, 0.3f, 0.3f);
 
-            bool isNearLimit = config.MaxLength > 0 && (result?.Length ?? 0) > config.MaxLength * 0.9f;
-            Color countColor = isNearLimit ? new Color(0.9f, 0.3f, 0.3f) : new Color(0.64f, 0.64f, 0.71f);
-
-            var countStyle = new UnityHelpers.GUIStyle(styleManager.GetLabelStyle(ControlVariant.Muted)) { normal = { textColor = countColor } };
-            UnityHelpers.Label(countValue, countStyle);
+            UnityHelpers.Label(count, style);
             layoutComponents.EndHorizontalGroup();
         }
-
-        private string GetPlaceholderText(TextAreaConfig config)
-        {
-            return string.IsNullOrEmpty(config.Placeholder) ? "" : config.Placeholder;
-        }
-
-        private static string ClampLength(string text, int maxLength)
-        {
-            if (maxLength <= 0 || text == null)
-                return text ?? "";
-            return text.Length > maxLength ? text.Substring(0, maxLength) : text;
-        }
-        #endregion
     }
 }

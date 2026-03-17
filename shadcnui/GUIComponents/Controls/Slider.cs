@@ -10,12 +10,11 @@ namespace shadcnui.GUIComponents.Controls
     public class Slider : BaseComponent
     {
         private int _activeControlId = -1;
-        private bool _isDragging = false;
+        private bool _isDragging;
 
         public Slider(GUIHelper helper)
             : base(helper) { }
 
-        #region Config-based API
         public float Draw(SliderConfig config)
         {
             if (config == null)
@@ -24,7 +23,7 @@ namespace shadcnui.GUIComponents.Controls
             try
             {
                 float result = config.Value;
-                bool wasEnabled = GUI.enabled;
+                bool prevEnabled = GUI.enabled;
 
                 if (config.IsDisabled)
                     GUI.enabled = false;
@@ -32,7 +31,7 @@ namespace shadcnui.GUIComponents.Controls
                 DrawSliderLabel(config);
                 result = DrawSliderTrack(config);
 
-                GUI.enabled = wasEnabled;
+                GUI.enabled = prevEnabled;
 
                 if (!Mathf.Approximately(result, config.Value) && !config.IsDisabled)
                     config.OnValueChanged?.Invoke(result);
@@ -41,13 +40,11 @@ namespace shadcnui.GUIComponents.Controls
             }
             catch (Exception ex)
             {
-                GUILogger.LogException(ex, "Draw", "Slider");
+                GUILogger.LogException(ex, nameof(Draw), nameof(Slider));
                 return config.Value;
             }
         }
-        #endregion
 
-        #region API
         public static float CalculateValue(float normalizedPosition, float min, float max)
         {
             normalizedPosition = Mathf.Clamp01(normalizedPosition);
@@ -70,80 +67,6 @@ namespace shadcnui.GUIComponents.Controls
             return Mathf.Clamp01((value - min) / (max - min));
         }
 
-        public float Draw(float value, float min = 0f, float max = 1f, params GUILayoutOption[] options)
-        {
-            return Draw(
-                new SliderConfig
-                {
-                    Value = value,
-                    MinValue = min,
-                    MaxValue = max,
-                    LayoutOptions = options,
-                }
-            );
-        }
-
-        public float Draw(float value, float min, float max, float step, params GUILayoutOption[] options)
-        {
-            return Draw(
-                new SliderConfig
-                {
-                    Value = value,
-                    MinValue = min,
-                    MaxValue = max,
-                    Step = step,
-                    LayoutOptions = options,
-                }
-            );
-        }
-
-        public float LabeledSlider(string label, float value, float min, float max, bool showValue = true, params GUILayoutOption[] options)
-        {
-            return Draw(
-                new SliderConfig
-                {
-                    Label = label,
-                    Value = value,
-                    MinValue = min,
-                    MaxValue = max,
-                    ShowValue = showValue,
-                    LayoutOptions = options,
-                }
-            );
-        }
-
-        public float LabeledSlider(string label, float value, float min, float max, float step, bool showValue = true, params GUILayoutOption[] options)
-        {
-            return Draw(
-                new SliderConfig
-                {
-                    Label = label,
-                    Value = value,
-                    MinValue = min,
-                    MaxValue = max,
-                    Step = step,
-                    ShowValue = showValue,
-                    LayoutOptions = options,
-                }
-            );
-        }
-
-        public float DisabledSlider(float value, float min = 0f, float max = 1f, params GUILayoutOption[] options)
-        {
-            return Draw(
-                new SliderConfig
-                {
-                    Value = value,
-                    MinValue = min,
-                    MaxValue = max,
-                    IsDisabled = true,
-                    LayoutOptions = options,
-                }
-            );
-        }
-        #endregion
-
-        #region Private Methods
         private void DrawSliderLabel(SliderConfig config)
         {
             if (string.IsNullOrEmpty(config.Label))
@@ -175,7 +98,7 @@ namespace shadcnui.GUIComponents.Controls
             if (Event.current.type != EventType.Repaint)
             {
                 Rect trackRect = new Rect(sliderRect.x + thumbSize / 2f, sliderRect.y, sliderRect.width - thumbSize, trackHeight);
-                return HandleSliderInput(sliderRect, trackRect, config, Rect.zero);
+                return HandleSliderInput(sliderRect, trackRect, config);
             }
 
             return DrawSliderRepaint(sliderRect, config, trackHeight, thumbSize, totalHeight);
@@ -218,7 +141,7 @@ namespace shadcnui.GUIComponents.Controls
             return config.Value;
         }
 
-        private float HandleSliderInput(Rect sliderRect, Rect trackRect, SliderConfig config, Rect thumbRect)
+        private float HandleSliderInput(Rect sliderRect, Rect trackRect, SliderConfig config)
         {
             if (config.IsDisabled)
                 return config.Value;
@@ -232,11 +155,9 @@ namespace shadcnui.GUIComponents.Controls
                 case EventType.MouseDown:
                     HandleMouseDown(evt, sliderRect, controlId, trackRect, config, ref newValue);
                     break;
-
                 case EventType.MouseDrag:
                     HandleMouseDrag(evt, controlId, trackRect, config, ref newValue);
                     break;
-
                 case EventType.MouseUp:
                     HandleMouseUp(evt, controlId);
                     break;
@@ -320,7 +241,5 @@ namespace shadcnui.GUIComponents.Controls
             var thumbTex = styleManager.CreateBorderTexture(size, size, radius, color, borderColor, 1f);
             GUI.DrawTexture(rect, thumbTex, ScaleMode.StretchToFill);
         }
-
-        #endregion
     }
 }
