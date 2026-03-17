@@ -10,15 +10,15 @@ namespace shadcnui.GUIComponents.Core.Styling
         {
             var theme = GetTheme();
 
-            _baseButtonStyle = MakeControlStyle(theme.ButtonPrimaryBg, theme.ButtonPrimaryFg, DesignTokens.Padding.Button.DefaultH, DesignTokens.Padding.Button.DefaultV, DesignTokens.Radius.MD, theme.Border, FontStyle.Bold);
-            _baseToggleStyle = MakeControlStyle(theme.Secondary, theme.Text, DesignTokens.Padding.Button.DefaultH, DesignTokens.Padding.Button.DefaultV, DesignTokens.Radius.MD, theme.Border, FontStyle.Bold);
-            _baseInputStyle = MakeInputStyle(theme.Base, theme.Text, theme.Border);
+            _baseButtonStyle = MakeControlStyle(theme.ButtonPrimaryBg, theme.ButtonPrimaryFg, DesignTokens.Padding.Button.DefaultH, DesignTokens.Padding.Button.DefaultV, DesignTokens.Radius.MD, Color.clear, FontStyle.Bold);
+            _baseToggleStyle = MakeControlStyle(theme.Secondary, theme.Text, DesignTokens.Padding.Button.DefaultH, DesignTokens.Padding.Button.DefaultV, DesignTokens.Radius.MD, Color.clear, FontStyle.Bold);
+            _baseInputStyle = MakeInputStyle(theme.Base, theme.Text, Color.clear);
             _baseLabelStyle = MakeLabelStyle(theme.Text);
             _baseBadgeStyle = MakeChipStyle(theme.ButtonPrimaryBg, theme.ButtonPrimaryFg);
-            _baseTableStyle = MakePanelStyle(theme.Base, theme.Border, DesignTokens.Radius.MD, DesignTokens.Padding.Table.CellH, DesignTokens.Padding.Table.CellV);
-            _checkboxStyle = MakeControlStyle(theme.Base, theme.Text, DesignTokens.Spacing.SM, DesignTokens.Spacing.XS, DesignTokens.Radius.SM, theme.Border, FontStyle.Normal);
-            _checkboxSolidStyle = MakeControlStyle(theme.Accent, theme.Base, DesignTokens.Spacing.SM, DesignTokens.Spacing.XS, DesignTokens.Radius.SM, theme.Accent, FontStyle.Bold);
-            _baseSwitchStyle = MakeControlStyle(theme.Base, theme.Text, DesignTokens.Spacing.SM, DesignTokens.Spacing.XS, DesignTokens.Radius.Full, theme.Border, FontStyle.Normal);
+            _baseTableStyle = MakePanelStyle(theme.Base, Color.clear, DesignTokens.Radius.MD, DesignTokens.Padding.Table.CellH, DesignTokens.Padding.Table.CellV);
+            _checkboxStyle = MakeControlStyle(theme.Base, theme.Text, DesignTokens.Spacing.SM, DesignTokens.Spacing.XS, DesignTokens.Radius.SM, Color.clear, FontStyle.Normal);
+            _checkboxSolidStyle = MakeControlStyle(theme.Accent, theme.Base, DesignTokens.Spacing.SM, DesignTokens.Spacing.XS, DesignTokens.Radius.SM, Color.clear, FontStyle.Bold);
+            _baseSwitchStyle = MakeControlStyle(theme.Base, theme.Text, DesignTokens.Spacing.SM, DesignTokens.Spacing.XS, DesignTokens.Radius.Full, Color.clear, FontStyle.Normal);
             ApplyCheckedState(_baseToggleStyle, theme.Accent, theme.Base, theme.Accent);
             ApplyCheckedState(_checkboxStyle, theme.Accent, theme.Base, theme.Accent);
             ApplyCheckedState(_checkboxSolidStyle, theme.Accent, theme.Base, theme.Accent);
@@ -36,7 +36,7 @@ namespace shadcnui.GUIComponents.Core.Styling
             _tableHeaderStyle = MakeLabelStyle(theme.Text, FontStyle.Bold);
             _tableHeaderStyle.normal.background = Textures.TableHeader;
             _tableHeaderStyle.padding = GetSpacingOffset(DesignTokens.Padding.Table.CellH, DesignTokens.Padding.Table.CellV);
-            _tableRowStyle = MakePanelStyle(theme.Base, theme.Border, 0f, 0f, 0f);
+            _tableRowStyle = new UnityHelpers.GUIStyle(GUIStyle.none) { normal = { background = null } };
             _tableCellStyle = MakeLabelStyle(theme.Text);
             _tableCellStyle.padding = GetSpacingOffset(DesignTokens.Padding.Table.CellH, DesignTokens.Padding.Table.CellV);
             _dialogContentStyle = MakePanelStyle(theme.Elevated, theme.Border, DesignTokens.Radius.LG, DesignTokens.Padding.Card.Horizontal, DesignTokens.Padding.Card.Vertical);
@@ -138,9 +138,9 @@ namespace shadcnui.GUIComponents.Core.Styling
             var hoverFill = Lift(fill, 0.04f);
             var activeFill = Lower(fill, 0.06f);
 
-            style.onNormal.background = CreateBorderTexture(128, height, radius, fill, border, 1f);
-            style.onHover.background = CreateBorderTexture(128, height, radius, hoverFill, border, 1f);
-            style.onActive.background = CreateBorderTexture(128, height, radius, activeFill, border, 1f);
+            style.onNormal.background = CreateBorderTexture(128, height, radius, fill, Color.clear, 0f);
+            style.onHover.background = CreateBorderTexture(128, height, radius, hoverFill, Color.clear, 0f);
+            style.onActive.background = CreateBorderTexture(128, height, radius, activeFill, Color.clear, 0f);
             style.onFocused.background = style.onHover.background;
             style.onNormal.textColor = style.onHover.textColor = style.onActive.textColor = style.onFocused.textColor = text;
         }

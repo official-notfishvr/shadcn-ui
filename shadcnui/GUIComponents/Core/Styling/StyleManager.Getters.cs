@@ -156,13 +156,13 @@ namespace shadcnui.GUIComponents.Core.Styling
                 switch (variant)
                 {
                     case ControlVariant.Outline:
-                        style.normal.background = CreateBorderTexture(128, GetScaledHeight(DesignTokens.Height.Default), radius, theme.Base, theme.Border, 1f);
+                        style.normal.background = CreateBorderTexture(128, GetScaledHeight(DesignTokens.Height.Default), radius, theme.Base, Color.clear, 0f);
                         break;
                     case ControlVariant.Ghost:
                         style.normal.background = CreateTexture(128, GetScaledHeight(DesignTokens.Height.Default), radius, Color.clear);
                         break;
                     case ControlVariant.Secondary:
-                        style.normal.background = CreateBorderTexture(128, GetScaledHeight(DesignTokens.Height.Default), radius, theme.Secondary, theme.Border, 1f);
+                        style.normal.background = CreateBorderTexture(128, GetScaledHeight(DesignTokens.Height.Default), radius, theme.Secondary, Color.clear, 0f);
                         break;
                     case ControlVariant.Muted:
                         style.normal.textColor = theme.Muted;
@@ -258,7 +258,7 @@ namespace shadcnui.GUIComponents.Core.Styling
                 style =>
                 {
                     if (focused)
-                        style.focused.background = CreateBorderTexture(128, Mathf.Max(28, Mathf.RoundToInt(style.fixedHeight > 0 ? style.fixedHeight : GetScaledHeight(DesignTokens.Height.Default))), GetScaledBorderRadius(DesignTokens.Radius.MD), GetTheme().Base, GetTheme().Accent, 1f);
+                        style.focused.background = CreateBorderTexture(128, Mathf.Max(28, Mathf.RoundToInt(style.fixedHeight > 0 ? style.fixedHeight : GetScaledHeight(DesignTokens.Height.Default))), GetScaledBorderRadius(DesignTokens.Radius.MD), GetTheme().Base, Color.clear, 0f);
 
                     if (disabled)
                     {
@@ -282,7 +282,7 @@ namespace shadcnui.GUIComponents.Core.Styling
                 {
                     style.fontSize = GetScaledFontSize(DesignTokens.FontScale.SM);
                     if (focused)
-                        style.focused.background = CreateBorderTexture(128, Mathf.Max(28, Mathf.RoundToInt(style.fixedHeight > 0 ? style.fixedHeight : GetScaledHeight(DesignTokens.Height.Default))), GetScaledBorderRadius(DesignTokens.Radius.MD), GetTheme().Base, GetTheme().Accent, 1f);
+                        style.focused.background = CreateBorderTexture(128, Mathf.Max(28, Mathf.RoundToInt(style.fixedHeight > 0 ? style.fixedHeight : GetScaledHeight(DesignTokens.Height.Default))), GetScaledBorderRadius(DesignTokens.Radius.MD), GetTheme().Base, Color.clear, 0f);
                     if (disabled)
                         style.normal.textColor = GetTheme().Muted;
                 }
@@ -303,7 +303,7 @@ namespace shadcnui.GUIComponents.Core.Styling
                     style.stretchHeight = true;
                     style.fixedHeight = 0f;
                     if (focused)
-                        style.focused.background = CreateBorderTexture(128, 96, GetScaledBorderRadius(DesignTokens.Radius.MD), GetTheme().Base, GetTheme().Accent, 1f);
+                        style.focused.background = CreateBorderTexture(128, 96, GetScaledBorderRadius(DesignTokens.Radius.MD), GetTheme().Base, Color.clear, 0f);
                 }
             );
         }

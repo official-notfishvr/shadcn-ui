@@ -320,7 +320,6 @@ namespace shadcnui.GUIComponents.Data
 
         private void DrawColumnMenuOverlay(string id, DataTableState state, List<DataTableColumn> columns)
         {
-            // Overlay draws via LayerManager; no inline content here.
         }
 
         private void DrawColumnMenu(string tableId, List<DataTableColumn> columns)
