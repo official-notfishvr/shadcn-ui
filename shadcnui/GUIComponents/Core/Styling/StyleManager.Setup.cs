@@ -69,9 +69,12 @@ namespace shadcnui.GUIComponents.Core.Styling
         private GUIStyle MakeControlStyle(Color background, Color text, float paddingH, float paddingV, float radius, Color border, FontStyle fontStyle)
         {
             var style = CloneStyle(GUI.skin.button);
-            style.normal.background = CreateBorderTexture(128, GetScaledHeight(DesignTokens.Height.Default), GetScaledBorderRadius(radius), background, border == Color.clear ? background : border, border == Color.clear ? 0f : 1f);
-            style.hover.background = CreateBorderTexture(128, GetScaledHeight(DesignTokens.Height.Default), GetScaledBorderRadius(radius), Lift(background, 0.06f), border == Color.clear ? Lift(background, 0.06f) : border, border == Color.clear ? 0f : 1f);
-            style.active.background = CreateBorderTexture(128, GetScaledHeight(DesignTokens.Height.Default), GetScaledBorderRadius(radius), Lower(background, 0.08f), border == Color.clear ? Lower(background, 0.08f) : border, border == Color.clear ? 0f : 1f);
+            int r = GetScaledBorderRadius(radius);
+            int height = GetScaledHeight(DesignTokens.Height.Default);
+            bool hasBorder = border != Color.clear;
+            style.normal.background = CreateBorderTexture(128, height, r, background, hasBorder ? border : background, hasBorder ? 1f : 0f);
+            style.hover.background = CreateBorderTexture(128, height, r, Lift(background, 0.06f), hasBorder ? Lift(border, 0.06f) : Lift(background, 0.06f), hasBorder ? 1f : 0f);
+            style.active.background = CreateBorderTexture(128, height, r, Lower(background, 0.08f), hasBorder ? Lower(border, 0.08f) : Lower(background, 0.08f), hasBorder ? 1f : 0f);
             style.focused.background = style.hover.background;
             style.normal.textColor = style.hover.textColor = style.active.textColor = style.focused.textColor = text;
             style.onNormal.background = style.normal.background;
@@ -81,7 +84,7 @@ namespace shadcnui.GUIComponents.Core.Styling
             style.onNormal.textColor = style.onHover.textColor = style.onActive.textColor = style.onFocused.textColor = text;
             style.padding = GetSpacingOffset(paddingH, paddingV);
             style.margin = new UnityHelpers.RectOffset(0, 0, 0, 0);
-            style.border = new UnityHelpers.RectOffset(0, 0, 0, 0);
+            style.border = hasBorder ? new UnityHelpers.RectOffset(1, 1, 1, 1) : new UnityHelpers.RectOffset(0, 0, 0, 0);
             style.alignment = TextAnchor.MiddleCenter;
             style.fontSize = GetScaledFontSize(DesignTokens.FontScale.SM);
             style.fontStyle = fontStyle;
@@ -93,14 +96,16 @@ namespace shadcnui.GUIComponents.Core.Styling
         private GUIStyle MakeInputStyle(Color background, Color text, Color border)
         {
             var style = CloneStyle(GUI.skin.textField);
-            style.normal.background = CreateBorderTexture(128, GetScaledHeight(DesignTokens.Height.Default), GetScaledBorderRadius(DesignTokens.Radius.MD), background, border, 1f);
-            style.focused.background = CreateBorderTexture(128, GetScaledHeight(DesignTokens.Height.Default), GetScaledBorderRadius(DesignTokens.Radius.MD), background, GetTheme().Accent, 1f);
+            int radius = GetScaledBorderRadius(DesignTokens.Radius.MD);
+            int height = GetScaledHeight(DesignTokens.Height.Default);
+            style.normal.background = CreateBorderTexture(128, height, radius, background, border, 1f);
+            style.focused.background = CreateBorderTexture(128, height, radius, background, GetTheme().Accent, 1f);
             style.hover.background = style.normal.background;
             style.active.background = style.focused.background;
             style.normal.textColor = style.hover.textColor = style.focused.textColor = style.active.textColor = text;
             style.padding = GetSpacingOffset(DesignTokens.Padding.Input.Horizontal, DesignTokens.Padding.Input.Vertical);
             style.margin = new UnityHelpers.RectOffset(0, 0, 0, 0);
-            style.border = new UnityHelpers.RectOffset(0, 0, 0, 0);
+            style.border = new UnityHelpers.RectOffset(1, 1, 1, 1);
             style.fontSize = GetScaledFontSize(DesignTokens.FontScale.SM);
             return style;
         }
@@ -123,10 +128,12 @@ namespace shadcnui.GUIComponents.Core.Styling
         private GUIStyle MakePanelStyle(Color fill, Color border, float radius, float paddingH, float paddingV)
         {
             var style = CloneStyle(GUI.skin.box);
-            style.normal.background = CreateBorderTexture(256, 256, GetScaledBorderRadius(radius), fill, border, border == Color.clear ? 0f : 1f);
+            int r = GetScaledBorderRadius(radius);
+            bool hasBorder = border != Color.clear;
+            style.normal.background = CreateBorderTexture(256, 256, r, fill, border, hasBorder ? 1f : 0f);
             style.padding = GetSpacingOffset(paddingH, paddingV);
             style.margin = new UnityHelpers.RectOffset(0, 0, 0, 0);
-            style.border = new UnityHelpers.RectOffset(0, 0, 0, 0);
+            style.border = hasBorder ? new UnityHelpers.RectOffset(1, 1, 1, 1) : new UnityHelpers.RectOffset(0, 0, 0, 0);
             style.normal.textColor = GetTheme().Text;
             return style;
         }
@@ -137,12 +144,14 @@ namespace shadcnui.GUIComponents.Core.Styling
             var radius = GetScaledBorderRadius(DesignTokens.Radius.MD);
             var hoverFill = Lift(fill, 0.04f);
             var activeFill = Lower(fill, 0.06f);
+            bool hasBorder = border != Color.clear;
 
-            style.onNormal.background = CreateBorderTexture(128, height, radius, fill, Color.clear, 0f);
-            style.onHover.background = CreateBorderTexture(128, height, radius, hoverFill, Color.clear, 0f);
-            style.onActive.background = CreateBorderTexture(128, height, radius, activeFill, Color.clear, 0f);
+            style.onNormal.background = CreateBorderTexture(128, height, radius, fill, hasBorder ? border : fill, hasBorder ? 1f : 0f);
+            style.onHover.background = CreateBorderTexture(128, height, radius, hoverFill, hasBorder ? Lift(border, 0.04f) : hoverFill, hasBorder ? 1f : 0f);
+            style.onActive.background = CreateBorderTexture(128, height, radius, activeFill, hasBorder ? Lower(border, 0.06f) : activeFill, hasBorder ? 1f : 0f);
             style.onFocused.background = style.onHover.background;
             style.onNormal.textColor = style.onHover.textColor = style.onActive.textColor = style.onFocused.textColor = text;
+            style.border = hasBorder ? new UnityHelpers.RectOffset(1, 1, 1, 1) : new UnityHelpers.RectOffset(0, 0, 0, 0);
         }
 
         private GUIStyle MakeChipStyle(Color fill, Color text)

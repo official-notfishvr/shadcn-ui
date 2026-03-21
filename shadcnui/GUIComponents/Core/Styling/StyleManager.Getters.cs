@@ -116,19 +116,17 @@ namespace shadcnui.GUIComponents.Core.Styling
         private void ApplyAppearanceColors(GUIStyle style, ComponentAppearance appearance)
         {
             bool hasFill = appearance.BackgroundColor.HasValue;
-            bool hasBorder = appearance.BorderColor.HasValue;
             bool hasText = appearance.ForegroundColor.HasValue;
 
-            if (hasFill || hasBorder)
+            if (hasFill)
             {
-                var fill = appearance.BackgroundColor ?? Color.clear;
-                var border = appearance.BorderColor ?? fill;
+                var fill = appearance.BackgroundColor.Value;
                 var radius = GetScaledBorderRadius(appearance.BorderRadius ?? DesignTokens.Radius.MD);
-                var borderThickness = appearance.BorderThickness ?? (hasBorder ? 1f : 0f);
                 var height = Mathf.Max(8, Mathf.RoundToInt(style.fixedHeight > 0 ? style.fixedHeight : GetScaledHeight(DesignTokens.Height.Default)));
                 var styleWidth = style.fixedWidth > 0 ? style.fixedWidth : 512f;
                 var textureWidth = Mathf.Min(1024, Mathf.Max(128, Mathf.RoundToInt(styleWidth)));
-                var background = borderThickness > 0f ? CreateBorderTexture(textureWidth, height, radius, fill, border, borderThickness) : CreateTexture(textureWidth, height, radius, fill);
+                
+                Texture2D background = CreateTexture(textureWidth, height, radius, fill);
 
                 style.normal.background = background;
                 style.hover.background = background;
