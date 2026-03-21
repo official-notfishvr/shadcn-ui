@@ -30,7 +30,7 @@ namespace shadcnui.GUIComponents.Controls
 
             DrawLabel(config);
 
-            GUIStyle buttonStyle = styleManager?.GetButtonStyle(config.Variant, config.Size) ?? GUI.skin.button;
+            GUIStyle buttonStyle = styleManager?.GetButtonStyle(config.Variant, config.Size, config.Appearance) ?? GUI.skin.button;
             string label = GetSelectedLabel(config) ?? config.Placeholder ?? "Select";
             string arrow = LayerManager.Instance.IsOpen(id) ? " ^" : " v";
 
@@ -92,8 +92,8 @@ namespace shadcnui.GUIComponents.Controls
 
         private int DrawMenuInternal(string id, SelectConfig config)
         {
-            GUIStyle menuStyle = styleManager?.GetSelectStyle(config.Variant, config.Size) ?? GUI.skin.box;
-            GUIStyle itemStyle = styleManager?.GetSelectItemStyle() ?? GUI.skin.button;
+            GUIStyle menuStyle = styleManager?.GetSelectStyle(config.Variant, config.Size, config.Appearance) ?? GUI.skin.box;
+            GUIStyle itemStyle = styleManager?.GetSelectItemStyle(ControlVariant.Default, config.Size, config.Appearance) ?? GUI.skin.button;
 
             float width = GetMenuWidth(config, GetAnchorRect(id));
             float height = GetMenuHeight(config);
@@ -113,7 +113,7 @@ namespace shadcnui.GUIComponents.Controls
         {
             if (config.Options == null || config.Options.Length == 0)
             {
-                GUIStyle muted = styleManager?.GetLabelStyle(ControlVariant.Muted, config.Size) ?? GUI.skin.label;
+                GUIStyle muted = styleManager?.GetLabelStyle(ControlVariant.Muted, config.Size, config.Appearance) ?? GUI.skin.label;
                 UnityHelpers.Label("No options", muted);
                 return;
             }
@@ -143,7 +143,7 @@ namespace shadcnui.GUIComponents.Controls
             if (string.IsNullOrEmpty(config.Label))
                 return;
 
-            GUIStyle labelStyle = styleManager?.GetLabelStyle(config.LabelVariant, config.Size) ?? GUI.skin.label;
+            GUIStyle labelStyle = styleManager?.GetLabelStyle(config.LabelVariant, config.Size, config.Appearance) ?? GUI.skin.label;
             UnityHelpers.Label(config.Label, labelStyle);
             layoutComponents.AddSpace(DesignTokens.Spacing.XS);
         }

@@ -96,10 +96,10 @@ namespace shadcnui.GUIComponents.Controls
 
         private void DrawMenuInternal(string id, DropdownMenuConfig config)
         {
-            var menuStyle = styleManager?.GetDropdownMenuStyle(config.Variant, config.Size) ?? GUI.skin.box;
-            var itemStyle = styleManager?.GetDropdownMenuItemStyle() ?? GUI.skin.button;
-            var separatorStyle = styleManager?.GetSeparatorStyle(SeparatorOrientation.Horizontal, ControlVariant.Default, config.Size) ?? GUI.skin.box;
-            var headerStyle = styleManager?.GetLabelStyle(ControlVariant.Muted, config.Size) ?? GUI.skin.label;
+            var menuStyle = styleManager?.GetDropdownMenuStyle(config.Variant, config.Size, config.Appearance) ?? GUI.skin.box;
+            var itemStyle = styleManager?.GetDropdownMenuItemStyle(ControlVariant.Default, config.Size, config.Appearance) ?? GUI.skin.button;
+            var separatorStyle = styleManager?.GetSeparatorStyle(SeparatorOrientation.Horizontal, ControlVariant.Default, config.Size, config.Appearance) ?? GUI.skin.box;
+            var headerStyle = styleManager?.GetLabelStyle(ControlVariant.Muted, config.Size, config.Appearance) ?? GUI.skin.label;
 
             float width = GetMenuWidth(config, GetAnchorRect(id));
             float height = GetMenuHeight(config);
@@ -115,10 +115,10 @@ namespace shadcnui.GUIComponents.Controls
 
         private void DrawInline(string id, DropdownMenuConfig config)
         {
-            var menuStyle = styleManager?.GetDropdownMenuStyle(config.Variant, config.Size) ?? GUI.skin.box;
-            var itemStyle = styleManager?.GetDropdownMenuItemStyle() ?? GUI.skin.button;
-            var separatorStyle = styleManager?.GetSeparatorStyle(SeparatorOrientation.Horizontal, ControlVariant.Default, config.Size) ?? GUI.skin.box;
-            var headerStyle = styleManager?.GetLabelStyle(ControlVariant.Muted, config.Size) ?? GUI.skin.label;
+            var menuStyle = styleManager?.GetDropdownMenuStyle(config.Variant, config.Size, config.Appearance) ?? GUI.skin.box;
+            var itemStyle = styleManager?.GetDropdownMenuItemStyle(ControlVariant.Default, config.Size, config.Appearance) ?? GUI.skin.button;
+            var separatorStyle = styleManager?.GetSeparatorStyle(SeparatorOrientation.Horizontal, ControlVariant.Default, config.Size, config.Appearance) ?? GUI.skin.box;
+            var headerStyle = styleManager?.GetLabelStyle(ControlVariant.Muted, config.Size, config.Appearance) ?? GUI.skin.label;
 
             float width = GetMenuWidth(config, GetAnchorRect(id));
             float height = GetMenuHeight(config);

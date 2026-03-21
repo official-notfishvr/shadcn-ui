@@ -62,6 +62,25 @@ namespace shadcnui.GUIComponents.Core.Base
             return Self;
         }
 
+        public TBuilder Style(string styleId)
+        {
+            if (Config is ComponentConfigBase componentConfig)
+            {
+                componentConfig.Appearance ??= new ComponentAppearance();
+                componentConfig.Appearance.StyleId = styleId;
+            }
+
+            return Self;
+        }
+
+        public TBuilder Appearance(ComponentAppearance appearance)
+        {
+            if (Config is ComponentConfigBase componentConfig)
+                componentConfig.Appearance = appearance;
+
+            return Self;
+        }
+
         public TBuilder Width(float width)
         {
             Options.Add(GUILayout.Width(width));

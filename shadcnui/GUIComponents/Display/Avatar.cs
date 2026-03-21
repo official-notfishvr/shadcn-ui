@@ -16,7 +16,7 @@ namespace shadcnui.GUIComponents.Display
             if (config == null)
                 return;
 
-            GUIStyle style = styleManager?.GetAvatarStyle(config.Size, config.Shape, config.Variant) ?? GUI.skin.box;
+            GUIStyle style = styleManager?.GetAvatarStyle(config.Size, config.Shape, config.Variant, config.Appearance) ?? GUI.skin.box;
 
             if (config.Rect.HasValue)
             {
@@ -32,7 +32,7 @@ namespace shadcnui.GUIComponents.Display
             if (config.ShowNameBelow && !string.IsNullOrEmpty(config.Name))
             {
                 layoutComponents.AddSpace(DesignTokens.Spacing.XS);
-                UnityHelpers.Label(config.Name, styleManager?.GetLabelStyle(ControlVariant.Default, config.Size) ?? GUI.skin.label);
+                UnityHelpers.Label(config.Name, styleManager?.GetLabelStyle(ControlVariant.Default, config.Size, config.Appearance) ?? GUI.skin.label);
             }
 
             layoutComponents.EndVerticalGroup();
@@ -118,7 +118,7 @@ namespace shadcnui.GUIComponents.Display
         private void DrawFallback(Rect rect, AvatarConfig config)
         {
             string text = !string.IsNullOrEmpty(config.FallbackText) ? config.FallbackText : "?";
-            var labelStyle = new UnityHelpers.GUIStyle(styleManager?.GetLabelStyle(ControlVariant.Default, config.Size) ?? GUI.skin.label) { alignment = TextAnchor.MiddleCenter };
+            var labelStyle = new UnityHelpers.GUIStyle(styleManager?.GetLabelStyle(ControlVariant.Default, config.Size, config.Appearance) ?? GUI.skin.label) { alignment = TextAnchor.MiddleCenter };
             GUI.Label(rect, text, labelStyle);
         }
 

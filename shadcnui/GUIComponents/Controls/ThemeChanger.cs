@@ -25,7 +25,7 @@ namespace shadcnui.GUIComponents.Controls
             var themeManager = ThemeManager.Instance;
             var currentTheme = themeManager.CurrentTheme;
 
-            GUIStyle buttonStyle = styleManager?.GetButtonStyle(ControlVariant.Outline, ControlSize.Default) ?? GUI.skin.button;
+            GUIStyle buttonStyle = styleManager?.GetButtonStyle(ControlVariant.Outline, ControlSize.Default, config.Appearance) ?? GUI.skin.button;
             string buttonText = currentTheme?.Name ?? "Select Theme";
             string dropdownIcon = LayerManager.Instance.IsOpen(id) ? " ^" : " v";
 
@@ -79,8 +79,8 @@ namespace shadcnui.GUIComponents.Controls
             var themes = themeManager.Themes.Values.ToList();
             var currentTheme = themeManager.CurrentTheme;
 
-            GUIStyle boxStyle = styleManager?.GetSelectStyle(ControlVariant.Default, ControlSize.Default) ?? GUI.skin.box;
-            GUIStyle itemStyle = styleManager?.GetSelectItemStyle() ?? GUI.skin.button;
+            GUIStyle boxStyle = styleManager?.GetSelectStyle(ControlVariant.Default, ControlSize.Default, config.Appearance) ?? GUI.skin.box;
+            GUIStyle itemStyle = styleManager?.GetSelectItemStyle(ControlVariant.Default, ControlSize.Default, config.Appearance) ?? GUI.skin.button;
 
             GUILayout.BeginVertical(boxStyle);
             _scrollPosition = GUILayout.BeginScrollView(_scrollPosition, GUILayout.Width(config.Width - 10), GUILayout.Height(config.DropdownHeight - 20));

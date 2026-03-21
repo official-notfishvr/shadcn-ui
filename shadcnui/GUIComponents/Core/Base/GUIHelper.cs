@@ -172,6 +172,21 @@ namespace shadcnui.GUIComponents.Core.Base
             _styleManager.MarkStylesCorruption();
         }
 
+        public void RegisterStyle(StyleComponentType type, string styleId, RegisteredStyleProfile profile)
+        {
+            _styleManager.RegisterStyle(type, styleId, profile);
+        }
+
+        public void RegisterStyle(StyleComponentType type, string styleId, StatefulStyleModifier modifier)
+        {
+            _styleManager.RegisterStyle(type, styleId, modifier);
+        }
+
+        public bool UnregisterStyle(StyleComponentType type, string styleId)
+        {
+            return _styleManager.UnregisterStyle(type, styleId);
+        }
+
         public void SetUiScale(float scale)
         {
             var n = Mathf.Max(0.5f, scale);
@@ -336,7 +351,7 @@ namespace shadcnui.GUIComponents.Core.Base
         // Button
         public bool Button(ButtonConfig cfg) => Execute(() => _button.Draw(cfg), false, nameof(Button));
 
-        public bool Button(string text, ControlVariant v, ControlSize sz = ControlSize.Default, Action onClick = null, bool disabled = false, float opacity = 1f, params GUILayoutOption[] opts) =>
+        public bool Button(string text, ControlVariant v, ControlSize sz = ControlSize.Default, Action onClick = null, bool disabled = false, float opacity = 1f, ComponentAppearance appearance = null, params GUILayoutOption[] opts) =>
             Button(
                 new ButtonConfig
                 {
@@ -345,6 +360,7 @@ namespace shadcnui.GUIComponents.Core.Base
                     Size = sz,
                     IsDisabled = disabled,
                     Opacity = opacity,
+                    Appearance = appearance,
                     OnClick = onClick,
                     LayoutOptions = opts ?? Array.Empty<GUILayoutOption>(),
                 }
@@ -514,7 +530,7 @@ namespace shadcnui.GUIComponents.Core.Base
             );
         }
 
-        public bool Toggle(string label, bool value, Action<bool> onToggle = null, ControlVariant v = ControlVariant.Default, ControlSize sz = ControlSize.Default, bool disabled = false, params GUILayoutOption[] opts) =>
+        public bool Toggle(string label, bool value, Action<bool> onToggle = null, ControlVariant v = ControlVariant.Default, ControlSize sz = ControlSize.Default, bool disabled = false, ComponentAppearance appearance = null, params GUILayoutOption[] opts) =>
             Toggle(
                 new ToggleConfig
                 {
@@ -523,12 +539,13 @@ namespace shadcnui.GUIComponents.Core.Base
                     Variant = v,
                     Size = sz,
                     IsDisabled = disabled,
+                    Appearance = appearance,
                     OnValueChanged = onToggle,
                     LayoutOptions = opts ?? Array.Empty<GUILayoutOption>(),
                 }
             );
 
-        public bool Toggle(string label, bool value, ControlVariant v, ControlSize sz = ControlSize.Default, Action<bool> onToggle = null, bool disabled = false, params GUILayoutOption[] opts) =>
+        public bool Toggle(string label, bool value, ControlVariant v, ControlSize sz = ControlSize.Default, Action<bool> onToggle = null, bool disabled = false, ComponentAppearance appearance = null, params GUILayoutOption[] opts) =>
             Toggle(
                 new ToggleConfig
                 {
@@ -537,12 +554,13 @@ namespace shadcnui.GUIComponents.Core.Base
                     Variant = v,
                     Size = sz,
                     IsDisabled = disabled,
+                    Appearance = appearance,
                     OnValueChanged = onToggle,
                     LayoutOptions = opts ?? Array.Empty<GUILayoutOption>(),
                 }
             );
 
-        public bool Toggle(string label, IconConfig icon, bool value, Action<bool> onToggle = null, ControlVariant v = ControlVariant.Default, ControlSize sz = ControlSize.Default, bool disabled = false, params GUILayoutOption[] opts) =>
+        public bool Toggle(string label, IconConfig icon, bool value, Action<bool> onToggle = null, ControlVariant v = ControlVariant.Default, ControlSize sz = ControlSize.Default, bool disabled = false, ComponentAppearance appearance = null, params GUILayoutOption[] opts) =>
             Toggle(
                 new ToggleConfig
                 {
@@ -552,13 +570,14 @@ namespace shadcnui.GUIComponents.Core.Base
                     Variant = v,
                     Size = sz,
                     IsDisabled = disabled,
+                    Appearance = appearance,
                     OnValueChanged = onToggle,
                     LayoutOptions = opts ?? Array.Empty<GUILayoutOption>(),
                 }
             );
 
-        public bool Toggle(string label, Texture2D icon, bool value, Action<bool> onToggle = null, ControlVariant v = ControlVariant.Default, ControlSize sz = ControlSize.Default, bool disabled = false, params GUILayoutOption[] opts) =>
-            Toggle(label, icon != null ? new IconConfig(icon) : null, value, onToggle, v, sz, disabled, opts);
+        public bool Toggle(string label, Texture2D icon, bool value, Action<bool> onToggle = null, ControlVariant v = ControlVariant.Default, ControlSize sz = ControlSize.Default, bool disabled = false, ComponentAppearance appearance = null, params GUILayoutOption[] opts) =>
+            Toggle(label, icon != null ? new IconConfig(icon) : null, value, onToggle, v, sz, disabled, appearance, opts);
 
         // Checkbox
         public bool Checkbox(CheckboxConfig cfg)
@@ -975,7 +994,7 @@ namespace shadcnui.GUIComponents.Core.Base
         public void InputLabel(string text, float width = -1f)
         {
             if (width > 0f)
-                Label(text, ControlVariant.Default, false, GUILayout.Width(width * uiScale));
+                Label(text, ControlVariant.Default, false, null, GUILayout.Width(width * uiScale));
             else
                 Label(text, ControlVariant.Default);
         }
@@ -983,7 +1002,7 @@ namespace shadcnui.GUIComponents.Core.Base
         // Label
         public void Label(LabelConfig cfg) => Execute(() => _label.DrawLabel(cfg), nameof(Label));
 
-        public void Label(string text, ControlVariant v = ControlVariant.Default, bool disabled = false, params GUILayoutOption[] opts) => Execute(() => _label.DrawLabel(text, v, disabled, opts), nameof(Label));
+        public void Label(string text, ControlVariant v = ControlVariant.Default, bool disabled = false, ComponentAppearance appearance = null, params GUILayoutOption[] opts) => Execute(() => _label.DrawLabel(text, v, disabled, appearance, opts), nameof(Label));
 
         public void Label(Rect rect, string text, ControlVariant v = ControlVariant.Default, bool disabled = false) => Execute(() => _label.DrawLabel(rect, text, v, disabled), nameof(Label));
 
@@ -999,22 +1018,22 @@ namespace shadcnui.GUIComponents.Core.Base
                 }
             );
 
-        public void MutedLabel(string text, params GUILayoutOption[] opts) => Label(text, ControlVariant.Muted, false, opts);
+        public void MutedLabel(string text, params GUILayoutOption[] opts) => Label(text, ControlVariant.Muted, false, null, opts);
 
-        public void SecondaryLabel(string text, params GUILayoutOption[] opts) => Label(text, ControlVariant.Secondary, false, opts);
+        public void SecondaryLabel(string text, params GUILayoutOption[] opts) => Label(text, ControlVariant.Secondary, false, null, opts);
 
-        public void DestructiveLabel(string text, params GUILayoutOption[] opts) => Label(text, ControlVariant.Destructive, false, opts);
+        public void DestructiveLabel(string text, params GUILayoutOption[] opts) => Label(text, ControlVariant.Destructive, false, null, opts);
 
-        public void Heading(string text, params GUILayoutOption[] opts) => Label(text, ControlVariant.Default, false, opts);
+        public void Heading(string text, params GUILayoutOption[] opts) => Label(text, ControlVariant.Default, false, null, opts);
 
         public void Caption(string text, params GUILayoutOption[] opts) => MutedLabel(text, opts);
 
-        public void CodeLabel(string text, params GUILayoutOption[] opts) => Label(text, ControlVariant.Secondary, false, opts);
+        public void CodeLabel(string text, params GUILayoutOption[] opts) => Label(text, ControlVariant.Secondary, false, null, opts);
 
         // Badge
         public void Badge(BadgeConfig cfg) => Execute(() => _badge.DrawBadge(cfg), nameof(Badge));
 
-        public void Badge(string text, ControlVariant v = ControlVariant.Default, ControlSize sz = ControlSize.Default, params GUILayoutOption[] opts) => Execute(() => _badge.DrawBadge(text, v, sz, opts), nameof(Badge));
+        public void Badge(string text, ControlVariant v = ControlVariant.Default, ControlSize sz = ControlSize.Default, ComponentAppearance appearance = null, params GUILayoutOption[] opts) => Execute(() => _badge.DrawBadge(text, v, sz, appearance, opts), nameof(Badge));
 
         public void Badge(string text, IconConfig icon, ControlVariant v = ControlVariant.Default, ControlSize sz = ControlSize.Default, params GUILayoutOption[] opts) =>
             Badge(
@@ -1038,14 +1057,14 @@ namespace shadcnui.GUIComponents.Core.Base
 
         public void RoundedBadge(string text, ControlVariant v = ControlVariant.Default, ControlSize sz = ControlSize.Default, float cornerRadius = DesignTokens.Radius.XL, params GUILayoutOption[] opts) => Execute(() => _badge.RoundedBadge(text, v, sz, cornerRadius, opts), nameof(RoundedBadge));
 
-        public void AnimatedBadge(string text, string animId = null, ControlVariant v = ControlVariant.Default, ControlSize sz = ControlSize.Default, params GUILayoutOption[] opts) =>
+        public void AnimatedBadge(string text, string animId = null, ControlVariant v = ControlVariant.Default, ControlSize sz = ControlSize.Default, ComponentAppearance appearance = null, params GUILayoutOption[] opts) =>
             Execute(
                 () =>
                 {
                     if (string.IsNullOrEmpty(animId))
-                        _badge.AnimatedBadge(text, v, sz, opts);
+                        _badge.AnimatedBadge(text, v, sz, appearance, opts);
                     else
-                        _badge.AnimatedBadge(text, animId, v, sz, opts);
+                        _badge.AnimatedBadge(text, animId, v, sz, appearance, opts);
                 },
                 nameof(AnimatedBadge)
             );
@@ -1077,17 +1096,17 @@ namespace shadcnui.GUIComponents.Core.Base
         // Progress
         public void Progress(ProgressConfig cfg) => Execute(() => _progress.DrawProgress(cfg), nameof(Progress));
 
-        public void Progress(float val, float width = -1, float height = -1, params GUILayoutOption[] opts) => Execute(() => _progress.DrawProgress(val, width, height, opts), nameof(Progress));
+        public void Progress(float val, float width = -1, float height = -1, ComponentAppearance appearance = null, params GUILayoutOption[] opts) => Execute(() => _progress.DrawProgress(val, width, height, appearance, opts), nameof(Progress));
 
-        public void Progress(Rect rect, float val) => Execute(() => _progress.DrawProgress(rect, val), nameof(Progress));
+        public void Progress(Rect rect, float val, ComponentAppearance appearance = null) => Execute(() => _progress.DrawProgress(rect, val, appearance), nameof(Progress));
 
-        public void LabeledProgress(string label, float val, float width = -1, float height = -1, bool showPercentage = true, params GUILayoutOption[] opts) => Execute(() => _progress.LabeledProgress(label, val, width, height, showPercentage, opts), nameof(LabeledProgress));
+        public void LabeledProgress(string label, float val, float width = -1, float height = -1, bool showPercentage = true, ComponentAppearance appearance = null, params GUILayoutOption[] opts) => Execute(() => _progress.LabeledProgress(label, val, width, height, showPercentage, appearance, opts), nameof(LabeledProgress));
 
-        public void CircularProgress(float val, float size = DesignTokens.Height.Small, params GUILayoutOption[] opts) => Execute(() => _progress.CircularProgress(val, size, opts), nameof(CircularProgress));
+        public void CircularProgress(float val, float size = DesignTokens.Height.Small, ComponentAppearance appearance = null, params GUILayoutOption[] opts) => Execute(() => _progress.CircularProgress(val, size, appearance, opts), nameof(CircularProgress));
 
-        public void AnimatedProgress(string id, float val, float width = -1, float height = -1, params GUILayoutOption[] opts) => Execute(() => _progress.AnimatedProgress(id, val, width, height, opts), nameof(AnimatedProgress));
+        public void AnimatedProgress(string id, float val, float width = -1, float height = -1, ComponentAppearance appearance = null, params GUILayoutOption[] opts) => Execute(() => _progress.AnimatedProgress(id, val, width, height, appearance, opts), nameof(AnimatedProgress));
 
-        public void IndeterminateProgress(string id, float width = -1, float height = -1, params GUILayoutOption[] opts) => AnimatedProgress(id, Mathf.PingPong(Time.realtimeSinceStartup * 0.5f, 1f), width, height, opts);
+        public void IndeterminateProgress(string id, float width = -1, float height = -1, ComponentAppearance appearance = null, params GUILayoutOption[] opts) => AnimatedProgress(id, Mathf.PingPong(Time.realtimeSinceStartup * 0.5f, 1f), width, height, appearance, opts);
 
         // Chart
         public void Chart(ChartConfig cfg) => Execute(() => _chart.DrawChart(cfg), nameof(Chart));
@@ -1166,11 +1185,13 @@ namespace shadcnui.GUIComponents.Core.Base
 
         public void BeginCard(float width = -1, float height = -1) => Execute(() => _card.BeginCard(width, height), nameof(BeginCard));
 
+        public void BeginCard(float width, float height, ControlVariant variant, ControlSize size, ComponentAppearance appearance = null) => Execute(() => _card.BeginCard(width, height, variant, size, appearance), nameof(BeginCard));
+
         public void EndCard() => Execute(_card.EndCard, nameof(EndCard));
 
         public void CardHeader(Action content) => Execute(() => _card.CardHeader(content), nameof(CardHeader));
 
-        public void CardTitle(string title) => Execute(() => _card.CardTitle(title), nameof(CardTitle));
+        public void CardTitle(string title, ComponentAppearance appearance = null) => Execute(() => _card.CardTitle(title, appearance), nameof(CardTitle));
 
         public void CardDescription(string d) => Execute(() => _card.CardDescription(d), nameof(CardDescription));
 
@@ -1194,11 +1215,11 @@ namespace shadcnui.GUIComponents.Core.Base
         // Separator
         public void Separator(SeparatorConfig cfg) => Execute(() => _separator.DrawSeparator(cfg), nameof(Separator));
 
-        public void Separator(SeparatorOrientation o = SeparatorOrientation.Horizontal, bool decorative = true, params GUILayoutOption[] opts) => Execute(() => _separator.DrawSeparator(o, decorative, opts), nameof(Separator));
+        public void Separator(SeparatorOrientation o = SeparatorOrientation.Horizontal, bool decorative = true, ComponentAppearance appearance = null, params GUILayoutOption[] opts) => Execute(() => _separator.DrawSeparator(o, decorative, appearance, opts), nameof(Separator));
 
-        public void HorizontalSeparator(params GUILayoutOption[] opts) => Separator(SeparatorOrientation.Horizontal, true, opts);
+        public void HorizontalSeparator(params GUILayoutOption[] opts) => Separator(SeparatorOrientation.Horizontal, true, null, opts);
 
-        public void VerticalSeparator(params GUILayoutOption[] opts) => Separator(SeparatorOrientation.Vertical, true, opts);
+        public void VerticalSeparator(params GUILayoutOption[] opts) => Separator(SeparatorOrientation.Vertical, true, null, opts);
 
         public void LabeledSeparator(string text, params GUILayoutOption[] opts) => Separator(new SeparatorConfig { Text = text, LayoutOptions = opts ?? Array.Empty<GUILayoutOption>() });
 
@@ -1239,7 +1260,7 @@ namespace shadcnui.GUIComponents.Core.Base
             return idx;
         }
 
-        public int Tabs(string[] tabNames, int idx, Action content = null, Action<int> onTabChange = null, int maxLines = 1, TabPosition position = TabPosition.Top, IndicatorStyle indicatorStyle = IndicatorStyle.Underline, bool overflowScroll = false) =>
+        public int Tabs(string[] tabNames, int idx, Action content = null, Action<int> onTabChange = null, int maxLines = 1, TabPosition position = TabPosition.Top, IndicatorStyle indicatorStyle = IndicatorStyle.Underline, bool overflowScroll = false, ComponentAppearance appearance = null) =>
             Tabs(
                 new TabsConfig(tabNames, idx)
                 {
@@ -1249,12 +1270,13 @@ namespace shadcnui.GUIComponents.Core.Base
                     Position = position,
                     IndicatorStyle = indicatorStyle,
                     EnableOverflowScroll = overflowScroll,
+                    Appearance = appearance,
                 }
             );
 
-        public int Tabs(string[] tabNames, ref int idx, Action content = null, Action<int> onTabChange = null, int maxLines = 1, TabPosition position = TabPosition.Top, IndicatorStyle indicatorStyle = IndicatorStyle.Underline, bool overflowScroll = false)
+        public int Tabs(string[] tabNames, ref int idx, Action content = null, Action<int> onTabChange = null, int maxLines = 1, TabPosition position = TabPosition.Top, IndicatorStyle indicatorStyle = IndicatorStyle.Underline, bool overflowScroll = false, ComponentAppearance appearance = null)
         {
-            idx = Tabs(tabNames, idx, content, onTabChange, maxLines, position, indicatorStyle, overflowScroll);
+            idx = Tabs(tabNames, idx, content, onTabChange, maxLines, position, indicatorStyle, overflowScroll, appearance);
             return idx;
         }
 
@@ -1552,7 +1574,10 @@ namespace shadcnui.GUIComponents.Core.Base
 
         // DataTable
         public void DataTable(string id, List<DataTableColumn> cols, List<DataTableRow> data, bool showPagination = true, bool showSearch = true, bool showSelection = true, bool showColToggle = false, params GUILayoutOption[] opts) =>
-            Execute(() => _dataTable.DrawDataTable(id, cols, data, showPagination, showSearch, showSelection, showColToggle, opts), nameof(DataTable));
+            Execute(() => _dataTable.DrawDataTable(id, cols, data, showPagination, showSearch, showSelection, showColToggle, null, opts), nameof(DataTable));
+
+        public void DataTable(string id, List<DataTableColumn> cols, List<DataTableRow> data, ComponentAppearance appearance, bool showPagination = true, bool showSearch = true, bool showSelection = true, bool showColToggle = false, params GUILayoutOption[] opts) =>
+            Execute(() => _dataTable.DrawDataTable(id, cols, data, showPagination, showSearch, showSelection, showColToggle, appearance, opts), nameof(DataTable));
 
         public DataTableState GetDataTableState(string id) => Execute(() => _dataTable.GetTableState(id), null, nameof(GetDataTableState));
 

@@ -16,7 +16,7 @@ namespace shadcnui.GUIComponents.Data
         public DataTable(GUIHelper helper)
             : base(helper) { }
 
-        public void DrawDataTable(string id, List<DataTableColumn> columns, List<DataTableRow> data, bool showPagination = true, bool showSearch = true, bool showSelection = true, bool showColumnToggle = false, params GUILayoutOption[] options)
+        public void DrawDataTable(string id, List<DataTableColumn> columns, List<DataTableRow> data, bool showPagination = true, bool showSearch = true, bool showSelection = true, bool showColumnToggle = false, ComponentAppearance appearance = null, params GUILayoutOption[] options)
         {
             if (string.IsNullOrEmpty(id) || columns == null)
                 return;
@@ -25,26 +25,26 @@ namespace shadcnui.GUIComponents.Data
             var state = GetOrCreateState(id, columns);
             state.ShowColumnToggle = showColumnToggle;
 
-            GUIStyle tableStyle = styleManager?.GetTableStyle(ControlVariant.Default, ControlSize.Small) ?? GUI.skin.box;
+            GUIStyle tableStyle = styleManager?.GetTableStyle(ControlVariant.Default, ControlSize.Small, appearance) ?? GUI.skin.box;
             layoutComponents.BeginVerticalGroup(tableStyle, options ?? Array.Empty<GUILayoutOption>());
 
-            DrawToolbar(id, state, columns, showSearch, showColumnToggle);
+            DrawToolbar(id, state, columns, showSearch, showColumnToggle, appearance);
 
             var visibleColumns = columns.Where(c => state.ColumnVisibility.TryGetValue(c.Id, out bool visible) ? visible : c.IsVisible).ToList();
             var filtered = FilterData(data, state.FilterText, columns);
             var sorted = SortData(filtered, state.SortColumn, state.SortAscending, columns);
             var paginated = showPagination ? Paginate(sorted, state.CurrentPage, state.PageSize) : sorted;
 
-            DrawHeader(id, visibleColumns, state, showSelection, sorted);
-            DrawRows(id, visibleColumns, paginated, state, showSelection);
+            DrawHeader(id, visibleColumns, state, showSelection, sorted, appearance);
+            DrawRows(id, visibleColumns, paginated, state, showSelection, appearance);
 
             if (showPagination && sorted.Count > state.PageSize)
-                DrawPagination(state, sorted.Count);
+                DrawPagination(state, sorted.Count, appearance);
 
             layoutComponents.EndVerticalGroup();
 
             if (showColumnToggle)
-                DrawColumnMenuOverlay(id, state, columns);
+                DrawColumnMenuOverlay(id, state, columns, appearance);
         }
 
         public DataTableState GetTableState(string id) => _states.TryGetValue(id, out var state) ? state : null;
@@ -80,7 +80,7 @@ namespace shadcnui.GUIComponents.Data
             return state;
         }
 
-        private void DrawToolbar(string id, DataTableState state, List<DataTableColumn> columns, bool showSearch, bool showColumnToggle)
+        private void DrawToolbar(string id, DataTableState state, List<DataTableColumn> columns, bool showSearch, bool showColumnToggle, ComponentAppearance appearance)
         {
             if (!showSearch && !showColumnToggle)
                 return;
@@ -89,7 +89,7 @@ namespace shadcnui.GUIComponents.Data
 
             if (showSearch)
             {
-                UnityHelpers.Label("Search:", styleManager?.GetLabelStyle(ControlVariant.Muted, ControlSize.Small) ?? GUI.skin.label, GUILayout.Width(60f * guiHelper.uiScale));
+                UnityHelpers.Label("Search:", styleManager?.GetLabelStyle(ControlVariant.Muted, ControlSize.Small, appearance) ?? GUI.skin.label, GUILayout.Width(60f * guiHelper.uiScale));
 
                 var inputCfg = new InputConfig
                 {
@@ -100,6 +100,7 @@ namespace shadcnui.GUIComponents.Data
                     Size = ControlSize.Small,
                     Width = 200,
                     Height = 32f,
+                    Appearance = appearance,
                     OnValueChanged = v =>
                     {
                         state.FilterText = v;
@@ -114,8 +115,8 @@ namespace shadcnui.GUIComponents.Data
 
             if (showColumnToggle)
             {
-                if (guiHelper.Button("Columns", ControlVariant.Outline, ControlSize.Small))
-                    ToggleColumnMenu(id, columns);
+                if (guiHelper.Button(new ButtonConfig { Text = "Columns", Variant = ControlVariant.Outline, Size = ControlSize.Small, Appearance = appearance }))
+                    ToggleColumnMenu(id, columns, appearance);
 
                 if (Event.current.type == EventType.Repaint)
                     _columnMenuAnchors[id] = GUILayoutUtility.GetLastRect();
@@ -125,9 +126,9 @@ namespace shadcnui.GUIComponents.Data
             layoutComponents.AddSpace(DesignTokens.Spacing.SM);
         }
 
-        private void DrawHeader(string id, List<DataTableColumn> columns, DataTableState state, bool showSelection, List<DataTableRow> allData)
+        private void DrawHeader(string id, List<DataTableColumn> columns, DataTableState state, bool showSelection, List<DataTableRow> allData, ComponentAppearance appearance)
         {
-            var headerStyle = styleManager?.GetTableHeaderStyle(ControlVariant.Default, ControlSize.Small) ?? GUI.skin.label;
+            var headerStyle = styleManager?.GetTableHeaderStyle(ControlVariant.Default, ControlSize.Small, appearance) ?? GUI.skin.label;
             layoutComponents.BeginHorizontalGroup();
 
             if (showSelection)
@@ -174,15 +175,15 @@ namespace shadcnui.GUIComponents.Data
             layoutComponents.EndHorizontalGroup();
         }
 
-        private void DrawRows(string id, List<DataTableColumn> columns, List<DataTableRow> data, DataTableState state, bool showSelection)
+        private void DrawRows(string id, List<DataTableColumn> columns, List<DataTableRow> data, DataTableState state, bool showSelection, ComponentAppearance appearance)
         {
             if (data.Count == 0)
             {
-                DrawEmptyState();
+                DrawEmptyState(appearance);
                 return;
             }
 
-            var rowStyle = styleManager?.GetTableRowStyle(ControlVariant.Default, ControlSize.Small) ?? GUI.skin.box;
+            var rowStyle = styleManager?.GetTableRowStyle(ControlVariant.Default, ControlSize.Small, appearance) ?? GUI.skin.box;
 
             foreach (var row in data)
             {
@@ -216,6 +217,8 @@ namespace shadcnui.GUIComponents.Data
                     }
 
                     var cellStyle = styleManager?.GetTableCellStyle(ControlVariant.Default, ControlSize.Small, column.Alignment) ?? GUI.skin.label;
+                    if (appearance?.ForegroundColor != null)
+                        cellStyle.normal.textColor = appearance.ForegroundColor.Value;
                     UnityHelpers.Label(cellText ?? string.Empty, cellStyle, GUILayout.Width(column.Width * guiHelper.uiScale));
                 }
 
@@ -223,33 +226,33 @@ namespace shadcnui.GUIComponents.Data
             }
         }
 
-        private void DrawPagination(DataTableState state, int totalItems)
+        private void DrawPagination(DataTableState state, int totalItems, ComponentAppearance appearance)
         {
             int totalPages = Mathf.CeilToInt((float)totalItems / state.PageSize);
 
             layoutComponents.AddSpace(DesignTokens.Spacing.SM);
             layoutComponents.BeginHorizontalGroup();
 
-            if (guiHelper.Button("← Previous", ControlVariant.Outline, ControlSize.Small, null, false, 1f, GUILayout.Width(90f * guiHelper.uiScale)))
+            if (guiHelper.Button(new ButtonConfig { Text = "← Previous", Variant = ControlVariant.Outline, Size = ControlSize.Small, Appearance = appearance, LayoutOptions = new[] { GUILayout.Width(90f * guiHelper.uiScale) } }))
                 state.CurrentPage = Mathf.Max(0, state.CurrentPage - 1);
 
             GUILayout.FlexibleSpace();
 
-            UnityHelpers.Label($"Page {state.CurrentPage + 1} of {totalPages}", styleManager?.GetLabelStyle(ControlVariant.Muted, ControlSize.Small) ?? GUI.skin.label);
+            UnityHelpers.Label($"Page {state.CurrentPage + 1} of {totalPages}", styleManager?.GetLabelStyle(ControlVariant.Muted, ControlSize.Small, appearance) ?? GUI.skin.label);
 
             GUILayout.FlexibleSpace();
 
-            if (guiHelper.Button("Next →", ControlVariant.Outline, ControlSize.Small, null, false, 1f, GUILayout.Width(90f * guiHelper.uiScale)))
+            if (guiHelper.Button(new ButtonConfig { Text = "Next →", Variant = ControlVariant.Outline, Size = ControlSize.Small, Appearance = appearance, LayoutOptions = new[] { GUILayout.Width(90f * guiHelper.uiScale) } }))
                 state.CurrentPage = Mathf.Min(totalPages - 1, state.CurrentPage + 1);
 
             layoutComponents.EndHorizontalGroup();
         }
 
-        private void DrawEmptyState()
+        private void DrawEmptyState(ComponentAppearance appearance)
         {
             layoutComponents.BeginHorizontalGroup();
             GUILayout.FlexibleSpace();
-            UnityHelpers.Label("No results.", styleManager?.GetLabelStyle(ControlVariant.Muted, ControlSize.Small) ?? GUI.skin.label);
+            UnityHelpers.Label("No results.", styleManager?.GetLabelStyle(ControlVariant.Muted, ControlSize.Small, appearance) ?? GUI.skin.label);
             GUILayout.FlexibleSpace();
             layoutComponents.EndHorizontalGroup();
         }
@@ -291,7 +294,7 @@ namespace shadcnui.GUIComponents.Data
             return data.Skip(p * size).Take(size).ToList();
         }
 
-        private void ToggleColumnMenu(string id, List<DataTableColumn> columns)
+        private void ToggleColumnMenu(string id, List<DataTableColumn> columns, ComponentAppearance appearance)
         {
             string menuId = $"datatable_cols_{id}";
 
@@ -313,19 +316,19 @@ namespace shadcnui.GUIComponents.Data
                     Height = 240f * guiHelper.uiScale,
                     CloseOnClickOutside = true,
                     ZIndex = DesignTokens.ZIndex.Dropdown,
-                    Content = () => DrawColumnMenu(id, columns),
+                    Content = () => DrawColumnMenu(id, columns, appearance),
                 }
             );
         }
 
-        private void DrawColumnMenuOverlay(string id, DataTableState state, List<DataTableColumn> columns)
+        private void DrawColumnMenuOverlay(string id, DataTableState state, List<DataTableColumn> columns, ComponentAppearance appearance)
         {
         }
 
-        private void DrawColumnMenu(string tableId, List<DataTableColumn> columns)
+        private void DrawColumnMenu(string tableId, List<DataTableColumn> columns, ComponentAppearance appearance)
         {
-            var menuStyle = styleManager?.GetDropdownMenuStyle(ControlVariant.Default, ControlSize.Default) ?? GUI.skin.box;
-            var itemStyle = styleManager?.GetLabelStyle(ControlVariant.Default, ControlSize.Default) ?? GUI.skin.label;
+            var menuStyle = styleManager?.GetDropdownMenuStyle(ControlVariant.Default, ControlSize.Default, appearance) ?? GUI.skin.box;
+            var itemStyle = styleManager?.GetLabelStyle(ControlVariant.Default, ControlSize.Default, appearance) ?? GUI.skin.label;
 
             layoutComponents.BeginVerticalGroup(menuStyle, GUILayout.ExpandWidth(true));
             if (columns.Count == 0)

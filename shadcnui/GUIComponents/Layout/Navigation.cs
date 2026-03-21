@@ -23,7 +23,7 @@ namespace shadcnui.GUIComponents.Layout
             var selectedIndex = Mathf.Clamp(config.SelectedIndex, 0, config.Items.Length - 1);
             var newSelectedIndex = selectedIndex;
 
-            var navStyle = styleManager?.GetNavigationStyle(config.Variant, config.Size) ?? GUI.skin.box;
+            var navStyle = styleManager?.GetNavigationStyle(config.Variant, config.Size, config.Appearance) ?? GUI.skin.box;
             GUILayout.BeginVertical(navStyle, GUILayout.Width(config.Width * guiHelper.uiScale), GUILayout.ExpandHeight(true));
 
             DrawLogo(config);

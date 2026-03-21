@@ -16,7 +16,7 @@ namespace shadcnui.GUIComponents.Layout
             if (config == null)
                 return;
 
-            BeginCard(config.Width, config.Height, config.Variant, config.Size);
+            BeginCard(config.Width, config.Height, config.Variant, config.Size, config.Appearance);
 
             if (config.Image != null)
             {
@@ -103,11 +103,11 @@ namespace shadcnui.GUIComponents.Layout
             );
         }
 
-        public void BeginCard(float width = -1f, float height = -1f) => BeginCard(width, height, ControlVariant.Default, ControlSize.Default);
+        public void BeginCard(float width = -1f, float height = -1f) => BeginCard(width, height, ControlVariant.Default, ControlSize.Default, null);
 
-        public void BeginCard(float width, float height, ControlVariant variant, ControlSize size)
+        public void BeginCard(float width, float height, ControlVariant variant, ControlSize size, ComponentAppearance appearance = null)
         {
-            var style = styleManager?.GetCardStyle(variant, size) ?? GUI.skin.box;
+            var style = styleManager?.GetCardStyle(variant, size, appearance) ?? GUI.skin.box;
             var options = BuildSizeOptions(width, height);
             layoutComponents.BeginVerticalGroup(style, options);
         }
@@ -122,11 +122,11 @@ namespace shadcnui.GUIComponents.Layout
             layoutComponents.EndVerticalGroup();
         }
 
-        public void CardTitle(string title)
+        public void CardTitle(string title, ComponentAppearance appearance = null)
         {
             if (string.IsNullOrEmpty(title))
                 return;
-            var titleStyle = styleManager?.GetCardTitleStyle() ?? GUI.skin.label;
+            var titleStyle = styleManager?.GetCardTitleStyle(appearance) ?? GUI.skin.label;
             UnityHelpers.Label(title, titleStyle);
         }
 

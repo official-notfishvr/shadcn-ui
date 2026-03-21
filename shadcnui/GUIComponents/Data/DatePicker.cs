@@ -33,7 +33,7 @@ namespace shadcnui.GUIComponents.Data
             }
 
             string buttonText = config.SelectedDate?.ToString("MMM dd, yyyy") ?? config.Placeholder ?? "Select date";
-            bool clicked = UnityHelpers.Button(buttonText, styleManager?.GetButtonStyle(config.Variant, config.Size) ?? GUI.skin.button, config.LayoutOptions);
+            bool clicked = UnityHelpers.Button(buttonText, styleManager?.GetButtonStyle(config.Variant, config.Size, config.Appearance) ?? GUI.skin.button, config.LayoutOptions);
 
             if (Event.current.type == EventType.Repaint)
                 _anchorRects[id] = GUILayoutUtility.GetLastRect();
@@ -64,7 +64,7 @@ namespace shadcnui.GUIComponents.Data
 
             string buttonText = config.StartDate.HasValue && config.EndDate.HasValue ? $"{config.StartDate.Value:MMM dd} - {config.EndDate.Value:MMM dd, yyyy}" : config.Placeholder ?? "Select range";
 
-            bool clicked = UnityHelpers.Button(buttonText, styleManager?.GetButtonStyle(config.Variant, config.Size) ?? GUI.skin.button, config.LayoutOptions);
+            bool clicked = UnityHelpers.Button(buttonText, styleManager?.GetButtonStyle(config.Variant, config.Size, config.Appearance) ?? GUI.skin.button, config.LayoutOptions);
 
             if (Event.current.type == EventType.Repaint)
                 _anchorRects[id] = GUILayoutUtility.GetLastRect();

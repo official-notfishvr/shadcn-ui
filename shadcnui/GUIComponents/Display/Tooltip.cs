@@ -142,7 +142,7 @@ namespace shadcnui.GUIComponents.Display
 
         private Vector2 MeasureTooltip(string text, TooltipConfig config)
         {
-            GUIStyle style = styleManager?.GetTooltipStyle() ?? GUI.skin.box;
+            GUIStyle style = styleManager?.GetTooltipStyle(config.Variant, config.Size, config.Appearance) ?? GUI.skin.box;
             GUIContent content = new GUIContent(text);
             float padH = DesignTokens.Spacing.MD * guiHelper.uiScale;
             float padV = DesignTokens.Spacing.SM * guiHelper.uiScale;
@@ -180,7 +180,7 @@ namespace shadcnui.GUIComponents.Display
 
         private void DrawTooltipBox(Rect rect, string text, TooltipConfig config)
         {
-            GUIStyle style = styleManager?.GetTooltipStyle() ?? GUI.skin.box;
+            GUIStyle style = styleManager?.GetTooltipStyle(config.Variant, config.Size, config.Appearance) ?? GUI.skin.box;
             GUIContent content = new GUIContent(text);
             GUI.Box(rect, content, style);
         }

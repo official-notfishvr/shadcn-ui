@@ -152,8 +152,8 @@ namespace shadcnui.GUIComponents.Display
             float width = Mathf.Clamp(cfg.Width * guiHelper.uiScale, cfg.MinWidth * guiHelper.uiScale, cfg.MaxWidth * guiHelper.uiScale);
             float height = cfg.MinHeight * guiHelper.uiScale;
 
-            var titleStyle = styleManager?.GetLabelStyle(ControlVariant.Default, ControlSize.Default) ?? GUI.skin.label;
-            var descStyle = styleManager?.GetLabelStyle(ControlVariant.Muted, ControlSize.Default) ?? GUI.skin.label;
+            var titleStyle = styleManager?.GetLabelStyle(ControlVariant.Default, ControlSize.Default, cfg.Appearance) ?? GUI.skin.label;
+            var descStyle = styleManager?.GetLabelStyle(ControlVariant.Muted, ControlSize.Default, cfg.Appearance) ?? GUI.skin.label;
 
             float padding = cfg.Padding * guiHelper.uiScale;
             float contentWidth = width - padding * 2;
@@ -192,8 +192,8 @@ namespace shadcnui.GUIComponents.Display
             float padding = cfg.Padding * guiHelper.uiScale;
             Rect content = new Rect(rect.x + padding, rect.y + padding, rect.width - padding * 2, rect.height - padding * 2);
 
-            var titleStyle = new UnityHelpers.GUIStyle(styleManager?.GetLabelStyle(ControlVariant.Default, ControlSize.Default) ?? GUI.skin.label) { normal = { textColor = textColor } };
-            var descStyle = new UnityHelpers.GUIStyle(styleManager?.GetLabelStyle(ControlVariant.Muted, ControlSize.Default) ?? GUI.skin.label) { normal = { textColor = textColor }, wordWrap = true };
+            var titleStyle = new UnityHelpers.GUIStyle(styleManager?.GetLabelStyle(ControlVariant.Default, ControlSize.Default, cfg.Appearance) ?? GUI.skin.label) { normal = { textColor = textColor } };
+            var descStyle = new UnityHelpers.GUIStyle(styleManager?.GetLabelStyle(ControlVariant.Muted, ControlSize.Default, cfg.Appearance) ?? GUI.skin.label) { normal = { textColor = textColor }, wordWrap = true };
 
             float y = content.y;
             if (!string.IsNullOrEmpty(cfg.Title))

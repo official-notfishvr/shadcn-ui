@@ -22,7 +22,7 @@ namespace shadcnui.GUIComponents.Data
 
             if (!string.IsNullOrEmpty(config.Label))
             {
-                UnityHelpers.Label(config.Label, styleManager?.GetLabelStyle(ControlVariant.Default, ControlSize.Default) ?? GUI.skin.label);
+                UnityHelpers.Label(config.Label, styleManager?.GetLabelStyle(ControlVariant.Default, ControlSize.Default, config.Appearance) ?? GUI.skin.label);
                 layoutComponents.AddSpace(DesignTokens.Spacing.XS);
             }
 
@@ -127,7 +127,7 @@ namespace shadcnui.GUIComponents.Data
         {
             string controlName = "textarea_" + config.Id;
             bool focused = GUI.GetNameOfFocusedControl() == controlName;
-            var style = styleManager?.GetTextAreaStyle(config.Variant, config.Size, focused) ?? GUI.skin.textArea;
+            var style = styleManager?.GetTextAreaStyle(config.Variant, config.Size, focused, config.Appearance) ?? GUI.skin.textArea;
 
             var options = new List<GUILayoutOption> { GUILayout.MinHeight(config.MinHeight * guiHelper.uiScale), GUILayout.MaxHeight(config.MaxHeight * guiHelper.uiScale), GUILayout.ExpandWidth(true) };
 
@@ -151,7 +151,7 @@ namespace shadcnui.GUIComponents.Data
         {
             string controlName = "textarea_rect_" + config.Id;
             bool focused = GUI.GetNameOfFocusedControl() == controlName;
-            var style = styleManager?.GetTextAreaStyle(config.Variant, config.Size, focused) ?? GUI.skin.textArea;
+            var style = styleManager?.GetTextAreaStyle(config.Variant, config.Size, focused, config.Appearance) ?? GUI.skin.textArea;
 
             Rect rect = config.Rect ?? new Rect(0, 0, 200, 80);
             Rect scaled = new Rect(rect.x * guiHelper.uiScale, rect.y * guiHelper.uiScale, rect.width * guiHelper.uiScale, rect.height * guiHelper.uiScale);
@@ -194,7 +194,7 @@ namespace shadcnui.GUIComponents.Data
 
             string count = config.MaxLength > 0 ? $"{value.Length}/{config.MaxLength}" : $"{value.Length} characters";
             bool nearLimit = config.MaxLength > 0 && value.Length >= config.MaxLength * 0.9f;
-            var style = new UnityHelpers.GUIStyle(styleManager?.GetLabelStyle(ControlVariant.Muted, ControlSize.Default) ?? GUI.skin.label);
+            var style = new UnityHelpers.GUIStyle(styleManager?.GetLabelStyle(ControlVariant.Muted, ControlSize.Default, config.Appearance) ?? GUI.skin.label);
             if (nearLimit)
                 style.normal.textColor = new Color(0.9f, 0.3f, 0.3f);
 

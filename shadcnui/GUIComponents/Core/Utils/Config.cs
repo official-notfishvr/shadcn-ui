@@ -24,6 +24,7 @@ namespace shadcnui.GUIComponents.Core.Utils
         public ControlVariant Variant { get; set; } = ControlVariant.Default;
         public ControlSize Size { get; set; } = ControlSize.Default;
         public bool IsDisabled { get; set; }
+        public ComponentAppearance Appearance { get; set; }
     }
 
     public abstract class RectConfigBase : ComponentConfigBase // not being used that might maybe fully move off?
@@ -420,6 +421,7 @@ namespace shadcnui.GUIComponents.Core.Utils
         public float Height { get; set; } = 300f;
         public bool CloseOnOverlayClick { get; set; }
         public int ZIndex { get; set; } = DesignTokens.ZIndex.Modal;
+        public Rect? ParentWindowRect { get; set; }
 
         public DialogConfig()
         {

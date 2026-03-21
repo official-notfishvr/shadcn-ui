@@ -17,7 +17,7 @@ namespace shadcnui.GUIComponents.Controls
             if (config == null)
                 return false;
 
-            GUIStyle buttonStyle = styleManager?.GetButtonStyle(config.Variant, config.Size) ?? GUI.skin.button;
+            GUIStyle buttonStyle = styleManager?.GetButtonStyle(config.Variant, config.Size, config.Appearance) ?? GUI.skin.button;
             var options = BuildLayoutOptions(config, buttonStyle);
 
             bool prevEnabled = GUI.enabled;

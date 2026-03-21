@@ -116,9 +116,9 @@ namespace shadcnui.GUIComponents.Controls
             float trackY = sliderRect.y + (totalHeight - trackHeight) / 2f;
             Rect trackRect = new Rect(sliderRect.x + thumbSize / 2f, trackY, sliderRect.width - thumbSize, trackHeight);
 
-            Color trackColor = styleManager.GetSliderTrackColor(config.Variant, config.IsDisabled);
-            Color fillColor = styleManager.GetSliderFillColor(config.Variant, config.IsDisabled);
-            Color thumbColor = styleManager.GetSliderThumbColor(config.Variant, config.IsDisabled);
+            Color trackColor = styleManager.GetSliderTrackColor(config.Variant, config.IsDisabled, config.Appearance);
+            Color fillColor = styleManager.GetSliderFillColor(config.Variant, config.IsDisabled, config.Appearance);
+            Color thumbColor = styleManager.GetSliderThumbColor(config.Variant, config.IsDisabled, config.Appearance);
 
             float normalizedValue = ValueToNormalized(config.Value, config.MinValue, config.MaxValue);
             float fillWidth = trackRect.width * normalizedValue;

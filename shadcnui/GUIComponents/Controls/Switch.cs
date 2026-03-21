@@ -20,7 +20,7 @@ namespace shadcnui.GUIComponents.Controls
             if (config == null)
                 return false;
 
-            GUIStyle switchStyle = styleManager?.GetSwitchStyle(config.Variant, config.Size) ?? GUI.skin.toggle;
+            GUIStyle switchStyle = styleManager?.GetSwitchStyle(config.Variant, config.Size, config.Appearance) ?? GUI.skin.toggle;
 
             bool prevEnabled = GUI.enabled;
             if (config.IsDisabled)

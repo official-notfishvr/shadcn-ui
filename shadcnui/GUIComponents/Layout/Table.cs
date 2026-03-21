@@ -233,10 +233,10 @@ namespace shadcnui.GUIComponents.Layout
             if (colCount == 0)
                 return;
 
-            var tableStyle = styleManager?.GetTableStyle(config.Variant, config.Size) ?? GUI.skin.box;
-            var headerStyle = styleManager?.GetTableHeaderStyle(config.Variant, config.Size) ?? GUI.skin.label;
+            var tableStyle = styleManager?.GetTableStyle(config.Variant, config.Size, config.Appearance) ?? GUI.skin.box;
+            var headerStyle = styleManager?.GetTableHeaderStyle(config.Variant, config.Size, config.Appearance) ?? GUI.skin.label;
             var cellStyle = styleManager?.GetTableCellStyle(config.Variant, config.Size) ?? GUI.skin.label;
-            UnityHelpers.GUIStyle rowStyle = styleManager?.GetTableRowStyle(config.Variant, config.Size) ?? GUIStyle.none;
+            UnityHelpers.GUIStyle rowStyle = styleManager?.GetTableRowStyle(config.Variant, config.Size, config.Appearance) ?? GUIStyle.none;
             var altRowStyle = new UnityHelpers.GUIStyle(rowStyle);
 
             if (styleManager?.Textures?.TableRowAlternate != null)
@@ -271,10 +271,10 @@ namespace shadcnui.GUIComponents.Layout
         private void DrawSearchBar(TableConfig config)
         {
             layoutComponents.BeginHorizontalGroup();
-            var labelStyle = styleManager?.GetLabelStyle(ControlVariant.Muted, ControlSize.Small) ?? GUI.skin.label;
+            var labelStyle = styleManager?.GetLabelStyle(ControlVariant.Muted, ControlSize.Small, config.Appearance) ?? GUI.skin.label;
             UnityHelpers.Label("Search", labelStyle);
 
-            var inputStyle = styleManager?.GetInputStyle(ControlVariant.Outline, ControlSize.Small) ?? GUI.skin.textField;
+            var inputStyle = styleManager?.GetInputStyle(ControlVariant.Outline, ControlSize.Small, false, false, config.Appearance) ?? GUI.skin.textField;
             var query = config.SearchText ?? string.Empty;
             var newQuery = UnityHelpers.TextField(query, inputStyle, GUILayout.Width(200f * guiHelper.uiScale));
 
@@ -304,11 +304,11 @@ namespace shadcnui.GUIComponents.Layout
                 var options = new[] { GUILayout.Width(width), GUILayout.Height(RowHeight * guiHelper.uiScale) };
                 var content = new GUIContent(GetSortedHeaderLabel(config, col, header, sortable));
 
-                Rect rect = GUILayoutUtility.GetRect(content, styleManager?.GetTableHeaderStyle(config.Variant, config.Size) ?? GUI.skin.label, options);
-                var clicked = sortable && GUI.Button(rect, content, styleManager?.GetTableHeaderStyle(config.Variant, config.Size) ?? GUI.skin.label);
+                Rect rect = GUILayoutUtility.GetRect(content, styleManager?.GetTableHeaderStyle(config.Variant, config.Size, config.Appearance) ?? GUI.skin.label, options);
+                var clicked = sortable && GUI.Button(rect, content, styleManager?.GetTableHeaderStyle(config.Variant, config.Size, config.Appearance) ?? GUI.skin.label);
 
                 if (!sortable)
-                    GUI.Label(rect, content, styleManager?.GetTableHeaderStyle(config.Variant, config.Size) ?? GUI.skin.label);
+                    GUI.Label(rect, content, styleManager?.GetTableHeaderStyle(config.Variant, config.Size, config.Appearance) ?? GUI.skin.label);
 
                 if (clicked)
                     ToggleSort(config, col);
@@ -362,7 +362,7 @@ namespace shadcnui.GUIComponents.Layout
 
             config.SelectedRowFlags = flags;
 
-            var checkboxStyle = styleManager?.GetCheckboxStyle(ControlVariant.Default, ControlSize.Small) ?? GUI.skin.toggle;
+            var checkboxStyle = styleManager?.GetCheckboxStyle(ControlVariant.Default, ControlSize.Small, config.Appearance) ?? GUI.skin.toggle;
             var rect = GUILayoutUtility.GetRect(CheckboxWidth * guiHelper.uiScale, RowHeight * guiHelper.uiScale, GUILayout.Width(CheckboxWidth * guiHelper.uiScale), GUILayout.Height(RowHeight * guiHelper.uiScale));
             var current = rowIndex < flags.Length && flags[rowIndex];
             var next = GUI.Toggle(rect, current, GUIContent.none, checkboxStyle);
@@ -385,7 +385,7 @@ namespace shadcnui.GUIComponents.Layout
                 if (widths[col] <= 0f)
                 {
                     var header = col < headers.Length ? headers[col] : $"Col {col + 1}";
-                    var width = MeasureTextWidth(header, styleManager?.GetTableHeaderStyle(config.Variant, config.Size) ?? GUI.skin.label);
+                    var width = MeasureTextWidth(header, styleManager?.GetTableHeaderStyle(config.Variant, config.Size, config.Appearance) ?? GUI.skin.label);
                     int rowCount = rows?.GetLength(0) ?? objRows?.GetLength(0) ?? 0;
                     for (int row = 0; row < Mathf.Min(rowCount, 25); row++)
                     {
@@ -481,11 +481,11 @@ namespace shadcnui.GUIComponents.Layout
             layoutComponents.AddSpace(DesignTokens.Spacing.SM);
             layoutComponents.BeginHorizontalGroup();
 
-            var buttonStyle = styleManager?.GetButtonStyle(ControlVariant.Secondary, ControlSize.Small) ?? GUI.skin.button;
+            var buttonStyle = styleManager?.GetButtonStyle(ControlVariant.Secondary, ControlSize.Small, config.Appearance) ?? GUI.skin.button;
             var prev = UnityHelpers.Button("Prev", buttonStyle, GUILayout.ExpandWidth(false));
             var next = UnityHelpers.Button("Next", buttonStyle, GUILayout.ExpandWidth(false));
 
-            var labelStyle = styleManager?.GetLabelStyle(ControlVariant.Muted, ControlSize.Small) ?? GUI.skin.label;
+            var labelStyle = styleManager?.GetLabelStyle(ControlVariant.Muted, ControlSize.Small, config.Appearance) ?? GUI.skin.label;
             GUILayout.FlexibleSpace();
             UnityHelpers.Label($"Page {config.CurrentPage + 1}/{Mathf.Max(1, totalPages)}", labelStyle);
             GUILayout.FlexibleSpace();

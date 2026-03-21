@@ -14,6 +14,9 @@ namespace shadcnui.GUIComponents.Layout
         private readonly Stack<MenuData> _menuStack = new Stack<MenuData>();
         private Rect _menuBarRect;
         private string _menuId;
+        private ControlVariant _currentVariant = ControlVariant.Default;
+        private ControlSize _currentSize = ControlSize.Default;
+        private ComponentAppearance _currentAppearance;
         private const float AnimationDuration = DesignTokens.Animation.DurationFast;
 
         public MenuBar(GUIHelper helper)
@@ -59,6 +62,9 @@ namespace shadcnui.GUIComponents.Layout
         {
             public List<MenuItem> Items { get; set; }
             public GUILayoutOption[] Options { get; set; }
+            public ControlVariant Variant { get; set; } = ControlVariant.Default;
+            public ControlSize Size { get; set; } = ControlSize.Default;
+            public ComponentAppearance Appearance { get; set; }
 
             public MenuBarConfig(List<MenuItem> items)
             {
@@ -70,19 +76,27 @@ namespace shadcnui.GUIComponents.Layout
         #region Config-based API
         public void Draw(MenuBarConfig config)
         {
-            Draw(config.Items, config.Options);
+            Draw(config.Items, config.Variant, config.Size, config.Appearance, config.Options);
         }
         #endregion
 
         #region API
         public void Draw(List<MenuItem> items, params GUILayoutOption[] options)
         {
+            Draw(items, ControlVariant.Default, ControlSize.Default, null, options);
+        }
+
+        public void Draw(List<MenuItem> items, ControlVariant variant, ControlSize size, ComponentAppearance appearance = null, params GUILayoutOption[] options)
+        {
             if (items == null || items.Count == 0)
                 return;
 
             var styleManager = guiHelper.GetStyleManager();
+            _currentVariant = variant;
+            _currentSize = size;
+            _currentAppearance = appearance;
 
-            layoutComponents.BeginHorizontalGroup(styleManager.GetMenuBarStyle(), options);
+            layoutComponents.BeginHorizontalGroup(styleManager.GetMenuBarStyle(variant, size, appearance), options);
 
             for (var i = 0; i < items.Count; i++)
             {
@@ -90,7 +104,7 @@ namespace shadcnui.GUIComponents.Layout
                 if (item.IsSeparator || item.IsHeader)
                     continue;
 
-                DrawMenuBarItem(item, i, styleManager);
+                DrawMenuBarItem(item, i, styleManager, variant, size, appearance);
             }
 
             layoutComponents.EndHorizontalGroup();
@@ -118,9 +132,9 @@ namespace shadcnui.GUIComponents.Layout
         #endregion
 
         #region Private Methods
-        private void DrawMenuBarItem(MenuItem item, int index, StyleManager styleManager)
+        private void DrawMenuBarItem(MenuItem item, int index, StyleManager styleManager, ControlVariant variant, ControlSize size, ComponentAppearance appearance)
         {
-            var itemStyle = styleManager.GetMenuBarItemStyle(ControlVariant.Default, ControlSize.Default, active: _isDropdownOpen && _activeMenuIndex == index);
+            var itemStyle = styleManager.GetMenuBarItemStyle(variant, size, active: _isDropdownOpen && _activeMenuIndex == index, appearance: appearance);
 
             var wasEnabled = GUI.enabled;
             if (item.Disabled)
@@ -186,11 +200,11 @@ namespace shadcnui.GUIComponents.Layout
 
         private void DrawMenuContent(MenuData currentMenu, StyleManager styleManager)
         {
-            layoutComponents.BeginVerticalGroup(styleManager.GetMenuDropdownStyle(), GUILayout.Width(220 * guiHelper.uiScale));
+            layoutComponents.BeginVerticalGroup(styleManager.GetMenuDropdownStyle(_currentVariant, _currentSize, _currentAppearance), GUILayout.Width(220 * guiHelper.uiScale));
 
             if (_menuStack.Count > 1)
             {
-                if (UnityHelpers.Button("<- Back", styleManager.GetMenuBarItemStyle(ControlVariant.Default, ControlSize.Default)))
+                if (UnityHelpers.Button("<- Back", styleManager.GetMenuBarItemStyle(_currentVariant, _currentSize, appearance: _currentAppearance)))
                 {
                     _menuStack.Pop();
                     if (_menuStack.Count == 1)
@@ -201,7 +215,7 @@ namespace shadcnui.GUIComponents.Layout
                     return;
                 }
 
-                var separatorStyle = styleManager.GetSeparatorStyle(SeparatorOrientation.Horizontal);
+                var separatorStyle = styleManager.GetSeparatorStyle(SeparatorOrientation.Horizontal, _currentVariant, _currentSize, _currentAppearance);
                 GUILayout.Box("", separatorStyle, GUILayout.Height(1 * guiHelper.uiScale), GUILayout.ExpandWidth(true));
             }
 
@@ -215,13 +229,13 @@ namespace shadcnui.GUIComponents.Layout
         {
             if (item.IsHeader)
             {
-                UnityHelpers.Label(item.Text, styleManager.GetButtonStyle(ControlVariant.Ghost, ControlSize.Default));
+                UnityHelpers.Label(item.Text, styleManager.GetLabelStyle(ControlVariant.Muted, _currentSize, _currentAppearance));
                 return;
             }
 
             if (item.IsSeparator)
             {
-                var separatorStyle = styleManager.GetSeparatorStyle(SeparatorOrientation.Horizontal);
+                var separatorStyle = styleManager.GetSeparatorStyle(SeparatorOrientation.Horizontal, _currentVariant, _currentSize, _currentAppearance);
                 GUILayout.Box("", separatorStyle, GUILayout.Height(1 * guiHelper.uiScale), GUILayout.ExpandWidth(true));
                 return;
             }
@@ -232,7 +246,7 @@ namespace shadcnui.GUIComponents.Layout
 
             if (item.SubItems.Count > 0)
             {
-                if (GUILayout.Button(item.Text, styleManager.GetMenuBarItemStyle(ControlVariant.Default, ControlSize.Default), GUILayout.ExpandWidth(true)))
+                if (GUILayout.Button(item.Text, styleManager.GetMenuBarItemStyle(_currentVariant, _currentSize, appearance: _currentAppearance), GUILayout.ExpandWidth(true)))
                     _menuStack.Push(new MenuData(item.SubItems, _activeMenuIndex));
             }
             else
@@ -245,8 +259,8 @@ namespace shadcnui.GUIComponents.Layout
 
         private void DrawMenuItemButton(MenuItem item, StyleManager styleManager)
         {
-            var buttonStyle = styleManager.GetMenuBarItemStyle(ControlVariant.Default, ControlSize.Default);
-            var textStyle = styleManager.GetMenuBarItemStyle();
+            var buttonStyle = styleManager.GetMenuBarItemStyle(_currentVariant, _currentSize, appearance: _currentAppearance);
+            var textStyle = styleManager.GetMenuBarItemStyle(_currentVariant, _currentSize, appearance: _currentAppearance);
 
             Rect rect = GUILayoutUtility.GetRect(GUIContent.none, buttonStyle, GUILayout.ExpandWidth(true));
 
@@ -260,7 +274,7 @@ namespace shadcnui.GUIComponents.Layout
 
             if (!string.IsNullOrEmpty(item.Shortcut))
             {
-                var shortcutStyle = styleManager.GetMenuBarItemStyle(ControlVariant.Default, ControlSize.Default, true);
+                var shortcutStyle = styleManager.GetMenuBarItemStyle(_currentVariant, _currentSize, isShortcut: true, appearance: _currentAppearance);
                 GUI.Label(rect, item.Shortcut, shortcutStyle);
             }
         }

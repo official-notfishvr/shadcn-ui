@@ -220,7 +220,7 @@ namespace shadcnui.GUIComponents.Layout
             {
                 if (isVertical)
                 {
-                    layoutComponents.BeginVerticalGroup(localStyleManager.GetTabsListStyle(), GUILayout.Width(config.TabWidth * guiHelper.uiScale));
+                    layoutComponents.BeginVerticalGroup(localStyleManager.GetTabsListStyle(config.Variant, config.Size, config.Appearance), GUILayout.Width(config.TabWidth * guiHelper.uiScale));
 
                     for (var i = 0; i < config.TabLabels.Length; i++)
                     {
@@ -234,7 +234,7 @@ namespace shadcnui.GUIComponents.Layout
                 }
                 else
                 {
-                    layoutComponents.BeginHorizontalGroup(localStyleManager.GetTabsListStyle());
+                    layoutComponents.BeginHorizontalGroup(localStyleManager.GetTabsListStyle(config.Variant, config.Size, config.Appearance));
 
                     for (var i = 0; i < config.TabLabels.Length; i++)
                     {
@@ -280,7 +280,7 @@ namespace shadcnui.GUIComponents.Layout
 
             try
             {
-                layoutComponents.BeginVerticalGroup(localStyleManager.GetTabsListStyle());
+                layoutComponents.BeginVerticalGroup(localStyleManager.GetTabsListStyle(config.Variant, config.Size, config.Appearance));
 
                 for (var line = 0; line < totalLines; line++)
                 {
@@ -330,7 +330,7 @@ namespace shadcnui.GUIComponents.Layout
 
             try
             {
-                layoutComponents.BeginHorizontalGroup(localStyleManager.GetTabsListStyle());
+                layoutComponents.BeginHorizontalGroup(localStyleManager.GetTabsListStyle(config.Variant, config.Size, config.Appearance));
 
                 for (var col = 0; col < totalColumns; col++)
                 {
@@ -374,7 +374,7 @@ namespace shadcnui.GUIComponents.Layout
             var hasIcon = config.TabIcons != null && index < config.TabIcons.Length && config.TabIcons[index] != null;
             var isClosable = config.ClosableTabs != null && index < config.ClosableTabs.Length && config.ClosableTabs[index];
 
-            var triggerStyle = localStyleManager.GetTabsTriggerStyle(isActive);
+            var triggerStyle = localStyleManager.GetTabsTriggerStyle(isActive, config.Variant, config.Size, config.Appearance);
             var tabLabel = config.TabLabels[index] ?? $"Tab {index + 1}";
 
             GUILayoutOption[] layoutOptions;
@@ -560,7 +560,7 @@ namespace shadcnui.GUIComponents.Layout
         private void RenderTabContent(TabsConfig config, int selectedIndex)
         {
             var styleManager = guiHelper.GetStyleManager();
-            var contentStyle = styleManager?.GetTabsContentStyle() ?? GUIStyle.none;
+            var contentStyle = styleManager?.GetTabsContentStyle(config.Variant, config.Size, config.Appearance) ?? GUIStyle.none;
 
             layoutComponents.BeginVerticalGroup(contentStyle, GUILayout.ExpandWidth(true), GUILayout.ExpandHeight(true));
             try

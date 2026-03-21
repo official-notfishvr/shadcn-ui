@@ -41,7 +41,7 @@ namespace shadcnui.GUIComponents.Display
                 GUI.matrix = Matrix4x4.Translate(new Vector3(slide.x, slide.y, 0f)) * GUI.matrix;
             }
 
-            layoutComponents.BeginVerticalGroup(styleManager?.GetPopoverContentStyle() ?? GUI.skin.box, GUILayout.MaxWidth(320), GUILayout.MaxHeight(220));
+            layoutComponents.BeginVerticalGroup(styleManager?.GetPopoverContentStyle(config.Variant, config.Size, config.Appearance) ?? GUI.skin.box, GUILayout.MaxWidth(320), GUILayout.MaxHeight(220));
             config.Content?.Invoke();
             layoutComponents.EndVerticalGroup();
 

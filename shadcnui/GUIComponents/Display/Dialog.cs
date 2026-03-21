@@ -159,15 +159,18 @@ namespace shadcnui.GUIComponents.Display
             if (animProgress < 1f)
                 overlayColor.a *= animProgress;
             GUI.color = overlayColor;
-            Rect overlayRect = new Rect(0, 0, Screen.width, Screen.height);
+
+            Rect overlayRect = config.ParentWindowRect.HasValue
+                ? new Rect(0, 0, config.ParentWindowRect.Value.width, config.ParentWindowRect.Value.height)
+                : new Rect(0, 0, Screen.width, Screen.height);
             GUI.DrawTexture(overlayRect, Texture2D.whiteTexture);
             GUI.color = prev;
 
             if (config.CloseOnOverlayClick && Event.current.type == EventType.MouseDown)
             {
                 Vector2 mousePos = Event.current.mousePosition;
-                float dialogX = (Screen.width - config.Width) / 2f;
-                float dialogY = (Screen.height - config.Height) / 2f;
+                float dialogX, dialogY;
+                GetDialogPosition(config, out dialogX, out dialogY);
                 Rect dialogRect = new Rect(dialogX, dialogY, config.Width, config.Height);
 
                 if (!dialogRect.Contains(mousePos))
@@ -180,17 +183,32 @@ namespace shadcnui.GUIComponents.Display
             return false;
         }
 
+        private void GetDialogPosition(DialogConfig config, out float x, out float y)
+        {
+            if (config.ParentWindowRect.HasValue)
+            {
+                var parent = config.ParentWindowRect.Value;
+                x = (parent.width - config.Width) / 2f;
+                y = (parent.height - config.Height) / 2f;
+            }
+            else
+            {
+                x = (Screen.width - config.Width) / 2f;
+                y = (Screen.height - config.Height) / 2f;
+            }
+        }
+
         private void DrawDialogWindow(DialogConfig config, StyleManager styleManager, AnimationManager animManager, float animProgress)
         {
-            float dialogX = (Screen.width - config.Width) / 2f;
-            float dialogY = (Screen.height - config.Height) / 2f;
+            float dialogX, dialogY;
+            GetDialogPosition(config, out dialogX, out dialogY);
 
             Color prevColor = GUI.color;
             Matrix4x4 prevMatrix = GUI.matrix;
 
             ApplyDialogAnimation(animManager, config, animProgress, dialogX, dialogY, ref prevColor);
 
-            layoutComponents.BeginVerticalGroup(styleManager.GetDialogContentStyle(), GUILayout.Width(config.Width), GUILayout.Height(config.Height));
+            layoutComponents.BeginVerticalGroup(styleManager.GetDialogContentStyle(config.Variant, config.Size, config.Appearance), GUILayout.Width(config.Width), GUILayout.Height(config.Height));
 
             DrawDialogHeader(config, styleManager);
             GUILayout.Space(DesignTokens.Spacing.LG);
@@ -228,15 +246,15 @@ namespace shadcnui.GUIComponents.Display
             layoutComponents.BeginVerticalGroup();
 
             if (!string.IsNullOrEmpty(config.Title))
-                UnityHelpers.Label(config.Title, styleManager.GetLabelStyle(ControlVariant.Default, ControlSize.Large));
+                UnityHelpers.Label(config.Title, styleManager.GetLabelStyle(ControlVariant.Default, ControlSize.Large, config.Appearance));
 
             if (!string.IsNullOrEmpty(config.Description))
-                UnityHelpers.Label(config.Description, styleManager.GetLabelStyle(ControlVariant.Muted, ControlSize.Default));
+                UnityHelpers.Label(config.Description, styleManager.GetLabelStyle(ControlVariant.Muted, ControlSize.Default, config.Appearance));
 
             layoutComponents.EndVerticalGroup();
             GUILayout.FlexibleSpace();
 
-            if (UnityHelpers.Button("×", styleManager.GetButtonStyle(ControlVariant.Ghost, ControlSize.Default), GUILayout.Width(DesignTokens.Icon.Large), GUILayout.Height(DesignTokens.Icon.Large)))
+            if (UnityHelpers.Button("×", styleManager.GetButtonStyle(ControlVariant.Ghost, ControlSize.Default, config.Appearance), GUILayout.Width(DesignTokens.Icon.Large), GUILayout.Height(DesignTokens.Icon.Large)))
                 Close();
 
             layoutComponents.EndHorizontalGroup();

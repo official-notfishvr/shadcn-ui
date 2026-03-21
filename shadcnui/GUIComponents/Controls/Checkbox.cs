@@ -20,7 +20,7 @@ namespace shadcnui.GUIComponents.Controls
             if (config == null)
                 return false;
 
-            GUIStyle checkboxStyle = config.ShowCheckmark ? (styleManager?.GetCheckboxStyle(config.Variant, config.Size) ?? GUI.skin.toggle) : (styleManager?.GetCheckboxSolidStyle(config.Variant, config.Size) ?? GUI.skin.toggle);
+            GUIStyle checkboxStyle = config.ShowCheckmark ? (styleManager?.GetCheckboxStyle(config.Variant, config.Size, config.Appearance) ?? GUI.skin.toggle) : (styleManager?.GetCheckboxSolidStyle(config.Variant, config.Size, config.Appearance) ?? GUI.skin.toggle);
 
             bool prevEnabled = GUI.enabled;
             if (config.IsDisabled)

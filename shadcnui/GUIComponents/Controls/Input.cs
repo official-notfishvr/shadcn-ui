@@ -39,7 +39,7 @@ namespace shadcnui.GUIComponents.Controls
                 focused = true;
             }
 
-            GUIStyle inputStyle = styleManager?.GetInputStyle(config.Variant, config.Size, focused, config.IsDisabled) ?? GUI.skin.textField;
+            GUIStyle inputStyle = styleManager?.GetInputStyle(config.Variant, config.Size, focused, config.IsDisabled, config.Appearance) ?? GUI.skin.textField;
 
             bool prevEnabled = GUI.enabled;
             if (config.IsDisabled)
@@ -151,7 +151,7 @@ namespace shadcnui.GUIComponents.Controls
 
         private void DrawLabel(InputConfig config)
         {
-            GUIStyle labelStyle = styleManager?.GetLabelStyle(config.LabelVariant, config.Size) ?? GUI.skin.label;
+            GUIStyle labelStyle = styleManager?.GetLabelStyle(config.LabelVariant, config.Size, config.Appearance) ?? GUI.skin.label;
             UnityHelpers.Label(config.Label ?? string.Empty, labelStyle);
         }
 

@@ -53,6 +53,13 @@ namespace shadcnui_Demo.Menu
 
                 GUILayout.Space(10);
 
+                if (guiHelper.Button("Appearance Showcase", ControlVariant.Secondary, ControlSize.Default))
+                {
+                    LoadDemo<AppearanceShowcase>();
+                }
+
+                GUILayout.Space(10);
+
                 if (guiHelper.Button("Full Demo OLD", ControlVariant.Secondary, ControlSize.Default))
                 {
                     LoadDemo<FullDemo_old>();

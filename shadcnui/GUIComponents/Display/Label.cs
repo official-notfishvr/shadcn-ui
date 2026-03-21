@@ -19,7 +19,7 @@ namespace shadcnui.GUIComponents.Display
             if (config == null)
                 return;
 
-            GUIStyle style = styleManager?.GetLabelStyle(config.Variant, config.Size) ?? GUI.skin.label;
+            GUIStyle style = styleManager?.GetLabelStyle(config.Variant, config.Size, config.Appearance) ?? GUI.skin.label;
             bool prevEnabled = GUI.enabled;
             if (config.IsDisabled)
                 GUI.enabled = false;
@@ -37,7 +37,7 @@ namespace shadcnui.GUIComponents.Display
             GUI.enabled = prevEnabled;
         }
 
-        public void DrawLabel(string text, ControlVariant variant = ControlVariant.Default, bool disabled = false, params GUILayoutOption[] options)
+        public void DrawLabel(string text, ControlVariant variant = ControlVariant.Default, bool disabled = false, ComponentAppearance appearance = null, params GUILayoutOption[] options)
         {
             DrawLabel(
                 new LabelConfig
@@ -45,6 +45,7 @@ namespace shadcnui.GUIComponents.Display
                     Text = text,
                     Variant = variant,
                     IsDisabled = disabled,
+                    Appearance = appearance,
                     LayoutOptions = options ?? Array.Empty<GUILayoutOption>(),
                 }
             );

@@ -110,18 +110,24 @@ namespace shadcnui.GUIComponents.Core.Styling
         public readonly ControlVariant Variant;
         public readonly ControlSize Size;
         public readonly int State;
+        public readonly string StyleId;
 
-        public StyleKey(StyleComponentType type, ControlVariant variant, ControlSize size, int state)
+        public StyleKey(StyleComponentType type, ControlVariant variant, ControlSize size, int state, string styleId = null)
         {
             Type = type;
             Variant = variant;
             Size = size;
             State = state;
+            StyleId = styleId;
         }
 
         public bool Equals(StyleKey other)
         {
-            return Type == other.Type && Variant == other.Variant && Size == other.Size && State == other.State;
+            return Type == other.Type
+                && Variant == other.Variant
+                && Size == other.Size
+                && State == other.State
+                && string.Equals(StyleId, other.StyleId, StringComparison.Ordinal);
         }
 
         public override bool Equals(object obj) => obj is StyleKey other && Equals(other);
@@ -134,6 +140,7 @@ namespace shadcnui.GUIComponents.Core.Styling
                 hash = (hash * 397) ^ (int)Variant;
                 hash = (hash * 397) ^ (int)Size;
                 hash = (hash * 397) ^ State;
+                hash = (hash * 397) ^ (StyleId != null ? StringComparer.Ordinal.GetHashCode(StyleId) : 0);
                 return hash;
             }
         }
@@ -213,7 +220,6 @@ namespace shadcnui.GUIComponents.Core.Styling
             _lastThemeName = _theme?.Name;
             _lastScale = _guiHelper.uiScale;
             _styleCache.Clear();
-            Registry.Clear();
             Textures.CreateAllTextures();
             CreateBaseStyles();
             _initialized = true;
@@ -251,13 +257,7 @@ namespace shadcnui.GUIComponents.Core.Styling
 
         public Texture2D CreateBorderTexture(int width, int height, int radius, Color fillColor, Color borderColor, float borderThickness = 1f) => Textures.GenerateShape(width, height, radius, fillColor, fillColor, borderColor, borderThickness, 0f, 0);
 
-        public Texture2D CreateBorderTexture(Color borderColor, int thickness) => Textures.GenerateShape(Mathf.Max(4, thickness * 4), Mathf.Max(4, thickness * 4), 0, Color.clear, Color.clear, borderColor, thickness, 0f, 0);
-
-        public Texture2D CreateOutlineTexture(int width, int height, int radius, Color borderColor, float thickness = 1f) => Textures.GenerateShape(width, height, radius, Color.clear, Color.clear, borderColor, thickness, 0f, 0);
-
         public Texture2D CreateAvatarTexture(int size, int radius, Color backgroundColor, Color borderColor, float borderThickness, bool withShadow = true) => Textures.GenerateAvatarTexture(size, radius, backgroundColor, borderColor, borderThickness, withShadow);
-
-        public Texture2D CreateStatusIndicator(int size, bool isOnline) => Textures.GenerateStatusIndicator(size, isOnline);
 
         public void Cleanup()
         {
@@ -267,6 +267,26 @@ namespace shadcnui.GUIComponents.Core.Styling
         }
 
         public void MarkStylesCorruption() => _dirty = true;
+
+        public void RegisterStyle(StyleComponentType type, string styleId, RegisteredStyleProfile profile)
+        {
+            Registry.RegisterStyle(type, styleId, profile);
+            MarkStylesCorruption();
+        }
+
+        public void RegisterStyle(StyleComponentType type, string styleId, StatefulStyleModifier modifier)
+        {
+            Registry.RegisterStyle(type, styleId, modifier);
+            MarkStylesCorruption();
+        }
+
+        public bool UnregisterStyle(StyleComponentType type, string styleId)
+        {
+            var removed = Registry.UnregisterStyle(type, styleId);
+            if (removed)
+                MarkStylesCorruption();
+            return removed;
+        }
 
         public void RefreshStylesIfCorruption()
         {

@@ -233,27 +233,6 @@ namespace shadcnui.GUIComponents.Core.Styling
             return GenerateShape(size, size, radius, backgroundColor, backgroundColor, borderColor, borderThickness, withShadow ? 0.08f : 0f, withShadow ? 4 : 0);
         }
 
-        public Texture2D GenerateStatusIndicator(int size, bool isOnline)
-        {
-            var fill = isOnline ? new Color(0.22f, 0.78f, 0.40f, 1f) : new Color(0.53f, 0.57f, 0.63f, 1f);
-            return GenerateShape(size, size, size / 2, fill, fill, Color.white, 1f, 0f, 0);
-        }
-
-        public Texture2D GenerateTableHeaderTexture(int width, int height, int radius, Color topColor, Color bottomColor, Color borderColor, float borderThickness = 1f)
-        {
-            return GenerateShape(width, height, radius, topColor, bottomColor, borderColor, borderThickness, 0f, 0);
-        }
-
-        public Texture2D GenerateTableRowTexture(int width, int height, Color topColor, Color bottomColor, Color borderColor, float borderThickness = 1f)
-        {
-            return GenerateShape(width, height, 0, topColor, bottomColor, borderColor, borderThickness, 0f, 0);
-        }
-
-        public Texture2D GenerateTableCellTexture(Color cellColor)
-        {
-            return GenerateSolid(cellColor);
-        }
-
         public void DestroyAllTextures()
         {
             foreach (var texture in _ownedTextures)

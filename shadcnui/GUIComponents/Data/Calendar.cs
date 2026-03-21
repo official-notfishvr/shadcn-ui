@@ -30,7 +30,7 @@ namespace shadcnui.GUIComponents.Data
             if (!_displayMonths.ContainsKey(id))
                 _displayMonths[id] = config.SelectedDate ?? DateTime.Today;
 
-            var style = styleManager?.GetCalendarStyle(config.Variant, config.Size) ?? GUI.skin.box;
+            var style = styleManager?.GetCalendarStyle(config.Variant, config.Size, config.Appearance) ?? GUI.skin.box;
             layoutComponents.BeginVerticalGroup(style, config.LayoutOptions ?? Array.Empty<GUILayoutOption>());
 
             DrawHeader(id, config);
@@ -43,7 +43,7 @@ namespace shadcnui.GUIComponents.Data
 
         private void DrawHeader(string id, CalendarConfig config)
         {
-            var buttonStyle = styleManager?.GetButtonStyle(ControlVariant.Ghost, ControlSize.Default) ?? GUI.skin.button;
+            var buttonStyle = styleManager?.GetButtonStyle(ControlVariant.Ghost, ControlSize.Default, config.Appearance) ?? GUI.skin.button;
 
             layoutComponents.BeginHorizontalGroup();
 
@@ -52,7 +52,7 @@ namespace shadcnui.GUIComponents.Data
 
             GUILayout.FlexibleSpace();
 
-            UnityHelpers.Label(_displayMonths[id].ToString("MMMM yyyy"), styleManager?.GetLabelStyle(ControlVariant.Default, ControlSize.Default) ?? GUI.skin.label);
+            UnityHelpers.Label(_displayMonths[id].ToString("MMMM yyyy"), styleManager?.GetLabelStyle(ControlVariant.Default, ControlSize.Default, config.Appearance) ?? GUI.skin.label);
 
             GUILayout.FlexibleSpace();
 
@@ -64,7 +64,7 @@ namespace shadcnui.GUIComponents.Data
 
         private void DrawWeekdays(CalendarConfig config)
         {
-            var weekdayStyle = styleManager?.GetCalendarWeekdayStyle() ?? GUI.skin.label;
+            var weekdayStyle = styleManager?.GetCalendarWeekdayStyle(config.Appearance) ?? GUI.skin.label;
             var labels = WeekdaysSunday;
 
             layoutComponents.BeginHorizontalGroup();
@@ -90,7 +90,7 @@ namespace shadcnui.GUIComponents.Data
                 {
                     if ((row == 0 && col < firstDayIndex) || dayCounter > daysInMonth)
                     {
-                        UnityHelpers.Label(string.Empty, styleManager?.GetCalendarDayOutsideMonthStyle() ?? GUI.skin.label, GUILayout.Width(36f * guiHelper.uiScale));
+                        UnityHelpers.Label(string.Empty, styleManager?.GetCalendarDayOutsideMonthStyle(config.Appearance) ?? GUI.skin.label, GUILayout.Width(36f * guiHelper.uiScale));
                         continue;
                     }
 
@@ -100,15 +100,15 @@ namespace shadcnui.GUIComponents.Data
                     bool isToday = currentDay.Date == DateTime.Today;
                     bool inRange = config.Ranges?.Any(r => currentDay.Date >= r.Start.Date && currentDay.Date <= r.End.Date) == true;
 
-                    GUIStyle dayStyle = styleManager?.GetCalendarDayStyle() ?? GUI.skin.button;
+                    GUIStyle dayStyle = styleManager?.GetCalendarDayStyle(config.Appearance) ?? GUI.skin.button;
                     if (isDisabled)
-                        dayStyle = styleManager?.GetCalendarDayStyle() ?? GUI.skin.button;
+                        dayStyle = styleManager?.GetCalendarDayStyle(config.Appearance) ?? GUI.skin.button;
                     else if (isSelected)
-                        dayStyle = styleManager?.GetCalendarDaySelectedStyle() ?? GUI.skin.button;
+                        dayStyle = styleManager?.GetCalendarDaySelectedStyle(config.Appearance) ?? GUI.skin.button;
                     else if (inRange)
-                        dayStyle = styleManager?.GetCalendarDayInRangeStyle() ?? GUI.skin.button;
+                        dayStyle = styleManager?.GetCalendarDayInRangeStyle(config.Appearance) ?? GUI.skin.button;
                     else if (isToday)
-                        dayStyle = styleManager?.GetCalendarDayTodayStyle() ?? GUI.skin.button;
+                        dayStyle = styleManager?.GetCalendarDayTodayStyle(config.Appearance) ?? GUI.skin.button;
 
                     bool wasEnabled = GUI.enabled;
                     if (isDisabled)

@@ -25,14 +25,14 @@ namespace shadcnui.GUIComponents.Display
                 size = new Vector2(320f, 220f);
 
             var controlSize = ((ComponentConfigBase)config).Size;
-            GUIStyle style = styleManager?.GetChartStyle(config.Variant, controlSize) ?? GUI.skin.box;
+            GUIStyle style = styleManager?.GetChartStyle(config.Variant, controlSize, config.Appearance) ?? GUI.skin.box;
 
             Rect rect = GUILayoutUtility.GetRect(size.x * guiHelper.uiScale, size.y * guiHelper.uiScale, config.LayoutOptions);
             GUI.Box(rect, GUIContent.none, style);
 
             if (config.Series == null || config.Series.Count == 0)
             {
-                DrawEmpty(rect);
+                DrawEmpty(rect, config.Appearance);
                 return;
             }
 
@@ -47,7 +47,7 @@ namespace shadcnui.GUIComponents.Display
                     DrawLineChart(rect, config.Series);
                     break;
                 case ChartType.Pie:
-                    DrawPieLegend(rect, config.Series);
+                    DrawPieLegend(rect, config.Series, config.Appearance);
                     break;
             }
         }
@@ -57,7 +57,7 @@ namespace shadcnui.GUIComponents.Display
             var data = series.SelectMany(s => s.Data).ToList();
             if (data.Count == 0)
             {
-                DrawEmpty(rect);
+                DrawEmpty(rect, null);
                 return;
             }
 
@@ -93,7 +93,7 @@ namespace shadcnui.GUIComponents.Display
             var data = series.SelectMany(s => s.Data).ToList();
             if (data.Count == 0)
             {
-                DrawEmpty(rect);
+                DrawEmpty(rect, null);
                 return;
             }
 
@@ -120,12 +120,12 @@ namespace shadcnui.GUIComponents.Display
             }
         }
 
-        private void DrawPieLegend(Rect rect, List<ChartSeries> series)
+        private void DrawPieLegend(Rect rect, List<ChartSeries> series, ComponentAppearance appearance)
         {
             float padding = 12f * guiHelper.uiScale;
             Rect legend = new Rect(rect.x + padding, rect.y + padding, rect.width - padding * 2, rect.height - padding * 2);
 
-            var labelStyle = styleManager?.GetLabelStyle(ControlVariant.Default, ControlSize.Default) ?? GUI.skin.label;
+            var labelStyle = styleManager?.GetLabelStyle(ControlVariant.Default, ControlSize.Default, appearance) ?? GUI.skin.label;
             float y = legend.y;
             foreach (var ser in series)
             {
@@ -136,9 +136,9 @@ namespace shadcnui.GUIComponents.Display
             }
         }
 
-        private void DrawEmpty(Rect rect)
+        private void DrawEmpty(Rect rect, ComponentAppearance appearance)
         {
-            var style = styleManager?.GetLabelStyle(ControlVariant.Muted, ControlSize.Default) ?? GUI.skin.label;
+            var style = styleManager?.GetLabelStyle(ControlVariant.Muted, ControlSize.Default, appearance) ?? GUI.skin.label;
             var centered = new UnityHelpers.GUIStyle(style) { alignment = TextAnchor.MiddleCenter };
             GUI.Label(rect, "No data", centered);
         }

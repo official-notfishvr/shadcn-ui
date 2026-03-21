@@ -17,7 +17,7 @@ namespace shadcnui.GUIComponents.Display
                 return;
 
             string text = ResolveText(config);
-            GUIStyle badgeStyle = styleManager?.GetBadgeStyle(config.Variant, config.Size) ?? GUI.skin.label;
+            GUIStyle badgeStyle = styleManager?.GetBadgeStyle(config.Variant, config.Size, config.Appearance) ?? GUI.skin.label;
 
             layoutComponents.BeginHorizontalGroup(badgeStyle, config.LayoutOptions ?? Array.Empty<GUILayoutOption>());
 
@@ -30,13 +30,13 @@ namespace shadcnui.GUIComponents.Display
                 layoutComponents.AddSpace(Mathf.Max(2f, config.Icon.Spacing) * guiHelper.uiScale);
             }
 
-            var labelStyle = styleManager?.GetLabelStyle(ControlVariant.Default, config.Size) ?? GUI.skin.label;
+            var labelStyle = styleManager?.GetLabelStyle(ControlVariant.Default, config.Size, config.Appearance) ?? GUI.skin.label;
             UnityHelpers.Label(text, labelStyle);
 
             layoutComponents.EndHorizontalGroup();
         }
 
-        public void DrawBadge(string text, ControlVariant variant = ControlVariant.Default, ControlSize size = ControlSize.Default, params GUILayoutOption[] options)
+        public void DrawBadge(string text, ControlVariant variant = ControlVariant.Default, ControlSize size = ControlSize.Default, ComponentAppearance appearance = null, params GUILayoutOption[] options)
         {
             DrawBadge(
                 new BadgeConfig
@@ -44,6 +44,7 @@ namespace shadcnui.GUIComponents.Display
                     Text = text,
                     Variant = variant,
                     Size = size,
+                    Appearance = appearance,
                     LayoutOptions = options ?? Array.Empty<GUILayoutOption>(),
                 }
             );
@@ -66,7 +67,7 @@ namespace shadcnui.GUIComponents.Display
         public void CountBadge(int count, ControlVariant variant = ControlVariant.Default, ControlSize size = ControlSize.Default, int maxCount = 99, params GUILayoutOption[] options)
         {
             string text = count > maxCount ? $"{maxCount}+" : count.ToString();
-            DrawBadge(text, variant, size, options);
+            DrawBadge(text, variant, size, null, options);
         }
 
         public void StatusBadge(string text, bool isActive, ControlVariant variant = ControlVariant.Default, ControlSize size = ControlSize.Default, params GUILayoutOption[] options)
@@ -87,17 +88,17 @@ namespace shadcnui.GUIComponents.Display
         public void ProgressBadge(string text, float progress, ControlVariant variant = ControlVariant.Default, ControlSize size = ControlSize.Default, params GUILayoutOption[] options)
         {
             string value = $"{text} {(progress * 100f):0}%";
-            DrawBadge(value, variant, size, options);
+            DrawBadge(value, variant, size, null, options);
         }
 
         public void RoundedBadge(string text, ControlVariant variant = ControlVariant.Default, ControlSize size = ControlSize.Default, float cornerRadius = DesignTokens.Radius.XL, params GUILayoutOption[] options)
         {
-            DrawBadge(text, variant, size, options);
+            DrawBadge(text, variant, size, null, options);
         }
 
-        public void AnimatedBadge(string text, ControlVariant variant = ControlVariant.Default, ControlSize size = ControlSize.Default, params GUILayoutOption[] options) => AnimatedBadge(text, $"badge_{text}", variant, size, options);
+        public void AnimatedBadge(string text, ControlVariant variant = ControlVariant.Default, ControlSize size = ControlSize.Default, ComponentAppearance appearance = null, params GUILayoutOption[] options) => AnimatedBadge(text, $"badge_{text}", variant, size, appearance, options);
 
-        public void AnimatedBadge(string text, string animId, ControlVariant variant = ControlVariant.Default, ControlSize size = ControlSize.Default, params GUILayoutOption[] options)
+        public void AnimatedBadge(string text, string animId, ControlVariant variant = ControlVariant.Default, ControlSize size = ControlSize.Default, ComponentAppearance appearance = null, params GUILayoutOption[] options)
         {
             var animManager = guiHelper.GetAnimationManager();
             if (!animManager.Exists(animId))
@@ -106,7 +107,7 @@ namespace shadcnui.GUIComponents.Display
             float alpha = animManager.GetFloat(animId, 1f);
             Color prev = GUI.color;
             GUI.color = new Color(prev.r, prev.g, prev.b, prev.a * alpha);
-            DrawBadge(text, variant, size, options);
+            DrawBadge(text, variant, size, appearance, options);
             GUI.color = prev;
         }
 

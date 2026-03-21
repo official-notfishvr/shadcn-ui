@@ -31,13 +31,14 @@ namespace shadcnui.GUIComponents.Layout
                 layoutComponents.AddSpace(config.SpacingAfter);
         }
 
-        public void DrawSeparator(SeparatorOrientation orientation = SeparatorOrientation.Horizontal, bool decorative = true, params GUILayoutOption[] opts)
+        public void DrawSeparator(SeparatorOrientation orientation = SeparatorOrientation.Horizontal, bool decorative = true, ComponentAppearance appearance = null, params GUILayoutOption[] opts)
         {
             DrawSeparator(
                 new SeparatorConfig
                 {
                     Orientation = orientation,
                     IsDecorative = decorative,
+                    Appearance = appearance,
                     LayoutOptions = opts ?? Array.Empty<GUILayoutOption>(),
                 }
             );
@@ -45,7 +46,7 @@ namespace shadcnui.GUIComponents.Layout
 
         private void DrawLine(SeparatorConfig config)
         {
-            var style = styleManager?.GetSeparatorStyle(config.Orientation, config.Variant, config.Size) ?? GUIStyle.none;
+            var style = styleManager?.GetSeparatorStyle(config.Orientation, config.Variant, config.Size, config.Appearance) ?? GUIStyle.none;
 
             if (config.Orientation == SeparatorOrientation.Horizontal)
             {
@@ -59,8 +60,8 @@ namespace shadcnui.GUIComponents.Layout
 
         private void DrawLabeledLine(SeparatorConfig config)
         {
-            var lineStyle = styleManager?.GetSeparatorStyle(SeparatorOrientation.Horizontal, config.Variant, config.Size) ?? GUIStyle.none;
-            var labelStyle = styleManager?.GetLabelStyle(ControlVariant.Muted, ControlSize.Small) ?? GUI.skin.label;
+            var lineStyle = styleManager?.GetSeparatorStyle(SeparatorOrientation.Horizontal, config.Variant, config.Size, config.Appearance) ?? GUIStyle.none;
+            var labelStyle = styleManager?.GetLabelStyle(ControlVariant.Muted, ControlSize.Small, config.Appearance) ?? GUI.skin.label;
             var spacing = DesignTokens.Spacing.SM * guiHelper.uiScale;
 
             layoutComponents.BeginHorizontalGroup();
