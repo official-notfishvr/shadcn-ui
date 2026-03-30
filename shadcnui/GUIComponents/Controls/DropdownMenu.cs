@@ -57,8 +57,8 @@ namespace shadcnui.GUIComponents.Controls
             if (config.AnchorRect.HasValue)
                 _anchorRects[id] = config.AnchorRect.Value;
 
-            if (IsOpen(id))
-                UpdatePosition(id);
+            if (IsOpen(id) && Event.current.type == EventType.Repaint)
+                UpdatePosition(id, config);
         }
 
         public void Open(DropdownMenuConfig config, Rect anchorRect)
@@ -70,14 +70,16 @@ namespace shadcnui.GUIComponents.Controls
             _anchorRects[id] = anchorRect;
             _menuStacks[id] = BuildStack(config.Items);
 
-            Vector2 screenPos = GUIUtility.GUIToScreenPoint(new Vector2(anchorRect.x, anchorRect.yMax + 4));
+            float width = GetMenuWidth(config, anchorRect);
+            float height = GetMenuHeight(config);
+            Vector2 screenPos = GetMenuScreenPosition(anchorRect, width, height);
             LayerManager.Instance.Open(
                 new LayerConfig
                 {
                     Id = id,
                     OpenPosition = screenPos,
-                    Width = GetMenuWidth(config, anchorRect),
-                    Height = GetMenuHeight(config),
+                    Width = width,
+                    Height = height,
                     CloseOnClickOutside = config.CloseOnClickOutside,
                     ZIndex = config.ZIndex,
                     Content = () => DrawMenuInternal(id, config),
@@ -232,11 +234,41 @@ namespace shadcnui.GUIComponents.Controls
             return Mathf.Max(120f * guiHelper.uiScale, config.MaxHeight * guiHelper.uiScale);
         }
 
-        private void UpdatePosition(string id)
+        private void UpdatePosition(string id, DropdownMenuConfig config)
         {
             Rect anchor = GetAnchorRect(id);
-            Vector2 screenPos = GUIUtility.GUIToScreenPoint(new Vector2(anchor.x, anchor.yMax + 4));
+            float width = GetMenuWidth(config, anchor);
+            float height = GetMenuHeight(config);
+            Vector2 screenPos = GetMenuScreenPosition(anchor, width, height);
             LayerManager.Instance.SetPosition(id, screenPos);
+        }
+
+        private Vector2 GetMenuScreenPosition(Rect anchorRect, float menuWidth, float menuHeight)
+        {
+            const float gap = 4f;
+
+            Vector2 anchorTopLeft = GUIUtility.GUIToScreenPoint(new Vector2(anchorRect.xMin, anchorRect.yMin));
+            Vector2 anchorBottomLeft = GUIUtility.GUIToScreenPoint(new Vector2(anchorRect.xMin, anchorRect.yMax));
+            Rect rootRect = guiHelper.GetRootGuiScreenRect();
+
+            float x = anchorBottomLeft.x;
+            float y = anchorBottomLeft.y + gap;
+
+            if (y + menuHeight > rootRect.yMax)
+            {
+                float aboveY = anchorTopLeft.y - gap - menuHeight;
+                if (aboveY >= rootRect.yMin)
+                    y = aboveY;
+                else
+                    y = Mathf.Max(rootRect.yMin, rootRect.yMax - menuHeight);
+            }
+
+            if (x + menuWidth > rootRect.xMax)
+                x = Mathf.Max(rootRect.xMin, rootRect.xMax - menuWidth);
+            else if (x < rootRect.xMin)
+                x = rootRect.xMin;
+
+            return new Vector2(x, y);
         }
 
         private string ResolveId(string id, string fallback)
