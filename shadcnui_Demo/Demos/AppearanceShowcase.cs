@@ -85,7 +85,7 @@ namespace shadcnui_Demo.Menu
                 return;
             }
 
-            windowRect = GUI.Window(404, windowRect, DrawWindow, "", GUIStyle.none);
+            windowRect = GUI.Window(404, windowRect, (GUI.WindowFunction)DrawWindow, "", GUIStyle.none);
             guiHelper.DrawOverlays();
         }
 
