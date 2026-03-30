@@ -160,16 +160,15 @@ namespace shadcnui.GUIComponents.Display
                 overlayColor.a *= animProgress;
             GUI.color = overlayColor;
 
-            Rect overlayRect = config.ParentWindowRect.HasValue
-                ? new Rect(0, 0, config.ParentWindowRect.Value.width, config.ParentWindowRect.Value.height)
-                : new Rect(0, 0, Screen.width, Screen.height);
+            Rect overlayRect = config.ParentWindowRect.HasValue ? new Rect(0, 0, config.ParentWindowRect.Value.width, config.ParentWindowRect.Value.height) : new Rect(0, 0, Screen.width, Screen.height);
             GUI.DrawTexture(overlayRect, Texture2D.whiteTexture);
             GUI.color = prev;
 
             if (config.CloseOnOverlayClick && Event.current.type == EventType.MouseDown)
             {
                 Vector2 mousePos = Event.current.mousePosition;
-                float dialogX, dialogY;
+                float dialogX,
+                    dialogY;
                 GetDialogPosition(config, out dialogX, out dialogY);
                 Rect dialogRect = new Rect(dialogX, dialogY, config.Width, config.Height);
 
@@ -200,7 +199,8 @@ namespace shadcnui.GUIComponents.Display
 
         private void DrawDialogWindow(DialogConfig config, StyleManager styleManager, AnimationManager animManager, float animProgress)
         {
-            float dialogX, dialogY;
+            float dialogX,
+                dialogY;
             GetDialogPosition(config, out dialogX, out dialogY);
 
             Color prevColor = GUI.color;

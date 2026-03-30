@@ -1100,7 +1100,8 @@ namespace shadcnui.GUIComponents.Core.Base
 
         public void Progress(Rect rect, float val, ComponentAppearance appearance = null) => Execute(() => _progress.DrawProgress(rect, val, appearance), nameof(Progress));
 
-        public void LabeledProgress(string label, float val, float width = -1, float height = -1, bool showPercentage = true, ComponentAppearance appearance = null, params GUILayoutOption[] opts) => Execute(() => _progress.LabeledProgress(label, val, width, height, showPercentage, appearance, opts), nameof(LabeledProgress));
+        public void LabeledProgress(string label, float val, float width = -1, float height = -1, bool showPercentage = true, ComponentAppearance appearance = null, params GUILayoutOption[] opts) =>
+            Execute(() => _progress.LabeledProgress(label, val, width, height, showPercentage, appearance, opts), nameof(LabeledProgress));
 
         public void CircularProgress(float val, float size = DesignTokens.Height.Small, ComponentAppearance appearance = null, params GUILayoutOption[] opts) => Execute(() => _progress.CircularProgress(val, size, appearance, opts), nameof(CircularProgress));
 

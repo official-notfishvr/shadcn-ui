@@ -46,7 +46,7 @@ namespace shadcnui_Demo.Menu
                 ForegroundColor = new Color(0.95f, 0.97f, 0.98f, 1f),
                 AccentColor = new Color(0.40f, 0.75f, 0.90f, 1f),
                 BorderRadius = 10f,
-                BorderThickness = 1f
+                BorderThickness = 1f,
             };
 
             sunsetTheme = new ComponentAppearance
@@ -56,7 +56,7 @@ namespace shadcnui_Demo.Menu
                 ForegroundColor = new Color(1f, 0.96f, 0.94f, 1f),
                 AccentColor = new Color(1f, 0.60f, 0.45f, 1f),
                 BorderRadius = 10f,
-                BorderThickness = 1f
+                BorderThickness = 1f,
             };
 
             forestTheme = new ComponentAppearance
@@ -66,7 +66,7 @@ namespace shadcnui_Demo.Menu
                 ForegroundColor = new Color(0.95f, 0.97f, 0.95f, 1f),
                 AccentColor = new Color(0.55f, 0.85f, 0.55f, 1f),
                 BorderRadius = 10f,
-                BorderThickness = 1f
+                BorderThickness = 1f,
             };
         }
 
@@ -142,17 +142,14 @@ namespace shadcnui_Demo.Menu
             {
                 guiHelper.BeginHorizontalGroup();
                 guiHelper.Label("Theme:", ControlVariant.Default, appearance: currentAppearance);
-                selectedTheme = guiHelper.Select(new SelectConfig
-                {
-                    Options = new[]
+                selectedTheme = guiHelper.Select(
+                    new SelectConfig
                     {
-                        new SelectOption("Ocean", "ocean"),
-                        new SelectOption("Sunset", "sunset"),
-                        new SelectOption("Forest", "forest")
-                    },
-                    SelectedIndex = selectedTheme,
-                    Appearance = currentAppearance
-                });
+                        Options = new[] { new SelectOption("Ocean", "ocean"), new SelectOption("Sunset", "sunset"), new SelectOption("Forest", "forest") },
+                        SelectedIndex = selectedTheme,
+                        Appearance = currentAppearance,
+                    }
+                );
                 guiHelper.EndHorizontalGroup();
             });
             guiHelper.EndCard();
@@ -165,9 +162,15 @@ namespace shadcnui_Demo.Menu
         {
             switch (themeIndex)
             {
-                case 0: currentAppearance = oceanTheme; break;
-                case 1: currentAppearance = sunsetTheme; break;
-                case 2: currentAppearance = forestTheme; break;
+                case 0:
+                    currentAppearance = oceanTheme;
+                    break;
+                case 1:
+                    currentAppearance = sunsetTheme;
+                    break;
+                case 2:
+                    currentAppearance = forestTheme;
+                    break;
             }
         }
 
@@ -176,12 +179,7 @@ namespace shadcnui_Demo.Menu
             guiHelper.BeginVerticalGroup();
             guiHelper.AddSpace(12f);
 
-            activeTab = guiHelper.Tabs(
-                new[] { "Overview", "Inputs", "Display", "Charts" },
-                activeTab,
-                DrawTabContent,
-                appearance: currentAppearance
-            );
+            activeTab = guiHelper.Tabs(new[] { "Overview", "Inputs", "Display", "Charts" }, activeTab, DrawTabContent, appearance: currentAppearance);
 
             guiHelper.AddSpace(8f);
             guiHelper.EndVerticalGroup();
@@ -199,10 +197,18 @@ namespace shadcnui_Demo.Menu
 
                 switch (activeTab)
                 {
-                    case 0: DrawOverviewTab(); break;
-                    case 1: DrawInputsTab(); break;
-                    case 2: DrawDisplayTab(); break;
-                    case 3: DrawChartsTab(); break;
+                    case 0:
+                        DrawOverviewTab();
+                        break;
+                    case 1:
+                        DrawInputsTab();
+                        break;
+                    case 2:
+                        DrawDisplayTab();
+                        break;
+                    case 3:
+                        DrawChartsTab();
+                        break;
                 }
 
                 guiHelper.AddSpace(12f);
@@ -215,185 +221,227 @@ namespace shadcnui_Demo.Menu
 
         private void DrawOverviewTab()
         {
-            DrawSection("Button Variants", () =>
-            {
-                guiHelper.BeginHorizontalGroup();
-                guiHelper.Button("Default", ControlVariant.Default, appearance: currentAppearance);
-                guiHelper.Button("Secondary", ControlVariant.Secondary, appearance: currentAppearance);
-                guiHelper.Button("Outline", ControlVariant.Outline, appearance: currentAppearance);
-                guiHelper.Button("Ghost", ControlVariant.Ghost, appearance: currentAppearance);
-                guiHelper.EndHorizontalGroup();
+            DrawSection(
+                "Button Variants",
+                () =>
+                {
+                    guiHelper.BeginHorizontalGroup();
+                    guiHelper.Button("Default", ControlVariant.Default, appearance: currentAppearance);
+                    guiHelper.Button("Secondary", ControlVariant.Secondary, appearance: currentAppearance);
+                    guiHelper.Button("Outline", ControlVariant.Outline, appearance: currentAppearance);
+                    guiHelper.Button("Ghost", ControlVariant.Ghost, appearance: currentAppearance);
+                    guiHelper.EndHorizontalGroup();
 
-                guiHelper.AddSpace(8f);
-                guiHelper.Button("Destructive", ControlVariant.Destructive, appearance: currentAppearance);
-            });
+                    guiHelper.AddSpace(8f);
+                    guiHelper.Button("Destructive", ControlVariant.Destructive, appearance: currentAppearance);
+                }
+            );
 
-            DrawSection("Button Sizes", () =>
-            {
-                guiHelper.BeginHorizontalGroup();
-                guiHelper.Button("Small", ControlVariant.Default, ControlSize.Small, appearance: currentAppearance);
-                guiHelper.Button("Default", ControlVariant.Default, ControlSize.Default, appearance: currentAppearance);
-                guiHelper.Button("Large", ControlVariant.Default, ControlSize.Large, appearance: currentAppearance);
-                guiHelper.EndHorizontalGroup();
-            });
+            DrawSection(
+                "Button Sizes",
+                () =>
+                {
+                    guiHelper.BeginHorizontalGroup();
+                    guiHelper.Button("Small", ControlVariant.Default, ControlSize.Small, appearance: currentAppearance);
+                    guiHelper.Button("Default", ControlVariant.Default, ControlSize.Default, appearance: currentAppearance);
+                    guiHelper.Button("Large", ControlVariant.Default, ControlSize.Large, appearance: currentAppearance);
+                    guiHelper.EndHorizontalGroup();
+                }
+            );
 
-            DrawSection("Themed Buttons", () =>
-            {
-                guiHelper.BeginHorizontalGroup();
-                guiHelper.Button(new ButtonConfig { Text = "Ocean", Appearance = oceanTheme });
-                guiHelper.Button(new ButtonConfig { Text = "Sunset", Appearance = sunsetTheme });
-                guiHelper.Button(new ButtonConfig { Text = "Forest", Appearance = forestTheme });
-                guiHelper.EndHorizontalGroup();
-            });
+            DrawSection(
+                "Themed Buttons",
+                () =>
+                {
+                    guiHelper.BeginHorizontalGroup();
+                    guiHelper.Button(new ButtonConfig { Text = "Ocean", Appearance = oceanTheme });
+                    guiHelper.Button(new ButtonConfig { Text = "Sunset", Appearance = sunsetTheme });
+                    guiHelper.Button(new ButtonConfig { Text = "Forest", Appearance = forestTheme });
+                    guiHelper.EndHorizontalGroup();
+                }
+            );
 
-            DrawSection("Themed Badges", () =>
-            {
-                guiHelper.BeginHorizontalGroup();
-                guiHelper.Badge(new BadgeConfig { Text = "Ocean", Appearance = oceanTheme });
-                guiHelper.Badge(new BadgeConfig { Text = "Sunset", Appearance = sunsetTheme });
-                guiHelper.Badge(new BadgeConfig { Text = "Forest", Appearance = forestTheme });
-                guiHelper.EndHorizontalGroup();
-            });
+            DrawSection(
+                "Themed Badges",
+                () =>
+                {
+                    guiHelper.BeginHorizontalGroup();
+                    guiHelper.Badge(new BadgeConfig { Text = "Ocean", Appearance = oceanTheme });
+                    guiHelper.Badge(new BadgeConfig { Text = "Sunset", Appearance = sunsetTheme });
+                    guiHelper.Badge(new BadgeConfig { Text = "Forest", Appearance = forestTheme });
+                    guiHelper.EndHorizontalGroup();
+                }
+            );
         }
 
         private void DrawInputsTab()
         {
-            DrawSection("Text Input", () =>
-            {
-                searchText = guiHelper.Input(new InputConfig
+            DrawSection(
+                "Text Input",
+                () =>
                 {
-                    Label = "Search",
-                    Value = searchText,
-                    Placeholder = "Search...",
-                    Appearance = currentAppearance
-                });
-            });
+                    searchText = guiHelper.Input(
+                        new InputConfig
+                        {
+                            Label = "Search",
+                            Value = searchText,
+                            Placeholder = "Search...",
+                            Appearance = currentAppearance,
+                        }
+                    );
+                }
+            );
 
-            DrawSection("Text Area", () =>
-            {
-                noteText = guiHelper.TextArea(new TextAreaConfig
+            DrawSection(
+                "Text Area",
+                () =>
                 {
-                    Label = "Description",
-                    Value = noteText,
-                    MinHeight = 60f,
-                    Appearance = currentAppearance
-                });
-            });
+                    noteText = guiHelper.TextArea(
+                        new TextAreaConfig
+                        {
+                            Label = "Description",
+                            Value = noteText,
+                            MinHeight = 60f,
+                            Appearance = currentAppearance,
+                        }
+                    );
+                }
+            );
 
-            DrawSection("Slider", () =>
-            {
-                sliderValue = guiHelper.Slider(new SliderConfig
+            DrawSection(
+                "Slider",
+                () =>
                 {
-                    Label = "Progress",
-                    Value = sliderValue,
-                    MinValue = 0f,
-                    MaxValue = 100f,
-                    Appearance = currentAppearance
-                });
-            });
+                    sliderValue = guiHelper.Slider(
+                        new SliderConfig
+                        {
+                            Label = "Progress",
+                            Value = sliderValue,
+                            MinValue = 0f,
+                            MaxValue = 100f,
+                            Appearance = currentAppearance,
+                        }
+                    );
+                }
+            );
 
-            DrawSection("Toggle", () =>
-            {
-                toggleValue = guiHelper.Toggle("Enable feature", toggleValue, appearance: currentAppearance);
-            });
+            DrawSection(
+                "Toggle",
+                () =>
+                {
+                    toggleValue = guiHelper.Toggle("Enable feature", toggleValue, appearance: currentAppearance);
+                }
+            );
         }
 
         private void DrawDisplayTab()
         {
-            DrawSection("Progress Indicators", () =>
-            {
-                if (animateElements)
+            DrawSection(
+                "Progress Indicators",
+                () =>
                 {
-                    float animated = Mathf.PingPong(Time.time * 0.3f, 1f);
-                    guiHelper.AnimatedProgress("prog1", animated, appearance: currentAppearance);
-                }
-                else
-                {
-                    guiHelper.Progress(0.6f, appearance: currentAppearance);
-                }
+                    if (animateElements)
+                    {
+                        float animated = Mathf.PingPong(Time.time * 0.3f, 1f);
+                        guiHelper.AnimatedProgress("prog1", animated, appearance: currentAppearance);
+                    }
+                    else
+                    {
+                        guiHelper.Progress(0.6f, appearance: currentAppearance);
+                    }
 
-                guiHelper.AddSpace(12f);
-                guiHelper.LabeledProgress("Upload", 0.75f, showPercentage: true, appearance: currentAppearance);
-            });
-
-            DrawSection("Animated Badges", () =>
-            {
-                guiHelper.BeginHorizontalGroup();
-                if (animateElements)
-                {
-                    guiHelper.AnimatedBadge("Live", "pulse1", ControlVariant.Destructive, appearance: currentAppearance);
-                    guiHelper.AnimatedBadge("Sync", "pulse2", ControlVariant.Default, appearance: currentAppearance);
+                    guiHelper.AddSpace(12f);
+                    guiHelper.LabeledProgress("Upload", 0.75f, showPercentage: true, appearance: currentAppearance);
                 }
-                else
-                {
-                    guiHelper.Badge("Live", ControlVariant.Destructive, appearance: currentAppearance);
-                    guiHelper.Badge("Sync", ControlVariant.Default, appearance: currentAppearance);
-                }
-                guiHelper.EndHorizontalGroup();
-            });
+            );
 
-            DrawSection("Separators", () =>
-            {
-                guiHelper.Separator(SeparatorOrientation.Horizontal, appearance: currentAppearance);
-                guiHelper.AddSpace(8f);
-                guiHelper.Label("Content between lines", ControlVariant.Muted, appearance: currentAppearance);
-                guiHelper.AddSpace(8f);
-                guiHelper.Separator(SeparatorOrientation.Horizontal, true, appearance: currentAppearance);
-            });
+            DrawSection(
+                "Animated Badges",
+                () =>
+                {
+                    guiHelper.BeginHorizontalGroup();
+                    if (animateElements)
+                    {
+                        guiHelper.AnimatedBadge("Live", "pulse1", ControlVariant.Destructive, appearance: currentAppearance);
+                        guiHelper.AnimatedBadge("Sync", "pulse2", ControlVariant.Default, appearance: currentAppearance);
+                    }
+                    else
+                    {
+                        guiHelper.Badge("Live", ControlVariant.Destructive, appearance: currentAppearance);
+                        guiHelper.Badge("Sync", ControlVariant.Default, appearance: currentAppearance);
+                    }
+                    guiHelper.EndHorizontalGroup();
+                }
+            );
+
+            DrawSection(
+                "Separators",
+                () =>
+                {
+                    guiHelper.Separator(SeparatorOrientation.Horizontal, appearance: currentAppearance);
+                    guiHelper.AddSpace(8f);
+                    guiHelper.Label("Content between lines", ControlVariant.Muted, appearance: currentAppearance);
+                    guiHelper.AddSpace(8f);
+                    guiHelper.Separator(SeparatorOrientation.Horizontal, true, appearance: currentAppearance);
+                }
+            );
         }
 
         private void DrawChartsTab()
         {
             var theme = guiHelper.CurrentTheme;
 
-            DrawSection("Line Chart", () =>
-            {
-                guiHelper.Chart(new ChartConfig(
-                    new List<ChartSeries>
-                    {
-                        new ChartSeries("data", "Revenue", theme.Accent)
-                        {
-                            Data = new List<ChartDataPoint>
-                            {
-                                new("Jan", 42), new("Feb", 51), new("Mar", 48),
-                                new("Apr", 62), new("May", 58), new("Jun", 71)
-                            }
-                        }
-                    },
-                    ChartType.Line)
+            DrawSection(
+                "Line Chart",
+                () =>
                 {
-                    Size = new Vector2(480f, 180f),
-                    Appearance = currentAppearance
-                });
-            });
-
-            DrawSection("Pie Chart", () =>
-            {
-                guiHelper.BeginHorizontalGroup();
-                GUILayout.FlexibleSpace();
-
-                guiHelper.Chart(new ChartConfig(
-                    new List<ChartSeries>
-                    {
-                        new ChartSeries("pie", "Data")
-                        {
-                            Data = new List<ChartDataPoint>
+                    guiHelper.Chart(
+                        new ChartConfig(
+                            new List<ChartSeries>
                             {
-                                new("A", 40, theme.Accent),
-                                new("B", 35, theme.Secondary),
-                                new("C", 25, theme.Muted)
-                            }
+                                new ChartSeries("data", "Revenue", theme.Accent)
+                                {
+                                    Data = new List<ChartDataPoint> { new("Jan", 42), new("Feb", 51), new("Mar", 48), new("Apr", 62), new("May", 58), new("Jun", 71) },
+                                },
+                            },
+                            ChartType.Line
+                        )
+                        {
+                            Size = new Vector2(480f, 180f),
+                            Appearance = currentAppearance,
                         }
-                    },
-                    ChartType.Pie)
-                {
-                    Size = new Vector2(180f, 180f),
-                    Appearance = currentAppearance
-                });
+                    );
+                }
+            );
 
-                GUILayout.FlexibleSpace();
-                guiHelper.EndHorizontalGroup();
-            });
+            DrawSection(
+                "Pie Chart",
+                () =>
+                {
+                    guiHelper.BeginHorizontalGroup();
+                    GUILayout.FlexibleSpace();
+
+                    guiHelper.Chart(
+                        new ChartConfig(
+                            new List<ChartSeries>
+                            {
+                                new ChartSeries("pie", "Data")
+                                {
+                                    Data = new List<ChartDataPoint> { new("A", 40, theme.Accent), new("B", 35, theme.Secondary), new("C", 25, theme.Muted) },
+                                },
+                            },
+                            ChartType.Pie
+                        )
+                        {
+                            Size = new Vector2(180f, 180f),
+                            Appearance = currentAppearance,
+                        }
+                    );
+
+                    GUILayout.FlexibleSpace();
+                    guiHelper.EndHorizontalGroup();
+                }
+            );
         }
 
         private void DrawSection(string title, Action content)

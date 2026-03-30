@@ -115,7 +115,17 @@ namespace shadcnui.GUIComponents.Data
 
             if (showColumnToggle)
             {
-                if (guiHelper.Button(new ButtonConfig { Text = "Columns", Variant = ControlVariant.Outline, Size = ControlSize.Small, Appearance = appearance }))
+                if (
+                    guiHelper.Button(
+                        new ButtonConfig
+                        {
+                            Text = "Columns",
+                            Variant = ControlVariant.Outline,
+                            Size = ControlSize.Small,
+                            Appearance = appearance,
+                        }
+                    )
+                )
                     ToggleColumnMenu(id, columns, appearance);
 
                 if (Event.current.type == EventType.Repaint)
@@ -233,7 +243,18 @@ namespace shadcnui.GUIComponents.Data
             layoutComponents.AddSpace(DesignTokens.Spacing.SM);
             layoutComponents.BeginHorizontalGroup();
 
-            if (guiHelper.Button(new ButtonConfig { Text = "← Previous", Variant = ControlVariant.Outline, Size = ControlSize.Small, Appearance = appearance, LayoutOptions = new[] { GUILayout.Width(90f * guiHelper.uiScale) } }))
+            if (
+                guiHelper.Button(
+                    new ButtonConfig
+                    {
+                        Text = "← Previous",
+                        Variant = ControlVariant.Outline,
+                        Size = ControlSize.Small,
+                        Appearance = appearance,
+                        LayoutOptions = new[] { GUILayout.Width(90f * guiHelper.uiScale) },
+                    }
+                )
+            )
                 state.CurrentPage = Mathf.Max(0, state.CurrentPage - 1);
 
             GUILayout.FlexibleSpace();
@@ -242,7 +263,18 @@ namespace shadcnui.GUIComponents.Data
 
             GUILayout.FlexibleSpace();
 
-            if (guiHelper.Button(new ButtonConfig { Text = "Next →", Variant = ControlVariant.Outline, Size = ControlSize.Small, Appearance = appearance, LayoutOptions = new[] { GUILayout.Width(90f * guiHelper.uiScale) } }))
+            if (
+                guiHelper.Button(
+                    new ButtonConfig
+                    {
+                        Text = "Next →",
+                        Variant = ControlVariant.Outline,
+                        Size = ControlSize.Small,
+                        Appearance = appearance,
+                        LayoutOptions = new[] { GUILayout.Width(90f * guiHelper.uiScale) },
+                    }
+                )
+            )
                 state.CurrentPage = Mathf.Min(totalPages - 1, state.CurrentPage + 1);
 
             layoutComponents.EndHorizontalGroup();
@@ -321,9 +353,7 @@ namespace shadcnui.GUIComponents.Data
             );
         }
 
-        private void DrawColumnMenuOverlay(string id, DataTableState state, List<DataTableColumn> columns, ComponentAppearance appearance)
-        {
-        }
+        private void DrawColumnMenuOverlay(string id, DataTableState state, List<DataTableColumn> columns, ComponentAppearance appearance) { }
 
         private void DrawColumnMenu(string tableId, List<DataTableColumn> columns, ComponentAppearance appearance)
         {

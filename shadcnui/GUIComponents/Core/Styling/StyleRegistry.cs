@@ -36,14 +36,7 @@ namespace shadcnui.GUIComponents.Core.Styling
             if (modifier == null)
                 return;
 
-            RegisterStyle(
-                type,
-                styleId,
-                new RegisteredStyleProfile
-                {
-                    Modifier = modifier,
-                }
-            );
+            RegisterStyle(type, styleId, new RegisteredStyleProfile { Modifier = modifier });
         }
 
         public bool UnregisterStyle(StyleComponentType type, string styleId)

@@ -123,11 +123,7 @@ namespace shadcnui.GUIComponents.Core.Styling
 
         public bool Equals(StyleKey other)
         {
-            return Type == other.Type
-                && Variant == other.Variant
-                && Size == other.Size
-                && State == other.State
-                && string.Equals(StyleId, other.StyleId, StringComparison.Ordinal);
+            return Type == other.Type && Variant == other.Variant && Size == other.Size && State == other.State && string.Equals(StyleId, other.StyleId, StringComparison.Ordinal);
         }
 
         public override bool Equals(object obj) => obj is StyleKey other && Equals(other);

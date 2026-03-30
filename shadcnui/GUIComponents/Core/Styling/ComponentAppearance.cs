@@ -21,16 +21,7 @@ namespace shadcnui.GUIComponents.Core.Styling
         public float? BorderThickness { get; set; }
         public StatefulStyleModifier Modifier { get; set; }
 
-        internal bool IsInlineOverride =>
-            TemplateStyle != null
-            || ReplaceBaseStyle
-            || BackgroundColor.HasValue
-            || ForegroundColor.HasValue
-            || BorderColor.HasValue
-            || AccentColor.HasValue
-            || BorderRadius.HasValue
-            || BorderThickness.HasValue
-            || Modifier != null;
+        internal bool IsInlineOverride => TemplateStyle != null || ReplaceBaseStyle || BackgroundColor.HasValue || ForegroundColor.HasValue || BorderColor.HasValue || AccentColor.HasValue || BorderRadius.HasValue || BorderThickness.HasValue || Modifier != null;
     }
 
     public sealed class RegisteredStyleProfile

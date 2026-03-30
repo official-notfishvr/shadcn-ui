@@ -125,7 +125,7 @@ namespace shadcnui.GUIComponents.Core.Styling
                 var height = Mathf.Max(8, Mathf.RoundToInt(style.fixedHeight > 0 ? style.fixedHeight : GetScaledHeight(DesignTokens.Height.Default)));
                 var styleWidth = style.fixedWidth > 0 ? style.fixedWidth : 512f;
                 var textureWidth = Mathf.Min(1024, Mathf.Max(128, Mathf.RoundToInt(styleWidth)));
-                
+
                 Texture2D background = CreateTexture(textureWidth, height, radius, fill);
 
                 style.normal.background = background;
@@ -430,17 +430,29 @@ namespace shadcnui.GUIComponents.Core.Styling
         }
 
         public GUIStyle GetButtonStyle(ControlVariant variant, ControlSize size, ComponentAppearance appearance = null) => ResolveStyle(StyleComponentType.Button, variant, size, _baseButtonStyle, appearance);
+
         public GUIStyle GetToggleStyle(ControlVariant variant, ControlSize size, ComponentAppearance appearance = null) => ResolveStyle(StyleComponentType.Toggle, variant, size, _baseToggleStyle, appearance);
+
         public GUIStyle GetLabelStyle(ControlVariant variant, ControlSize size = ControlSize.Default, ComponentAppearance appearance = null) => ResolveStyle(StyleComponentType.Label, variant, size, _baseLabelStyle, appearance);
+
         public GUIStyle GetProgressBarStyle(ControlVariant variant = ControlVariant.Default, ControlSize size = ControlSize.Default, ComponentAppearance appearance = null) => ResolveStyle(StyleComponentType.ProgressBar, variant, size, _progressBarStyle, appearance);
+
         public GUIStyle GetBadgeStyle(ControlVariant variant, ControlSize size, ComponentAppearance appearance = null) => ResolveStyle(StyleComponentType.Badge, variant, size, _baseBadgeStyle, appearance);
+
         public GUIStyle GetCardStyle(ControlVariant variant = ControlVariant.Default, ControlSize size = ControlSize.Default, ComponentAppearance appearance = null) => ResolveStyle(StyleComponentType.Card, variant, size, _cardStyle, appearance);
+
         public GUIStyle GetDialogContentStyle(ControlVariant variant = ControlVariant.Default, ControlSize size = ControlSize.Default, ComponentAppearance appearance = null) => ResolveStyle(StyleComponentType.Dialog, variant, size, _dialogContentStyle, appearance);
+
         public GUIStyle GetChartStyle(ControlVariant variant, ControlSize size, ComponentAppearance appearance = null) => ResolveStyle(StyleComponentType.Chart, variant, size, _chartContainerStyle, appearance);
+
         public GUIStyle GetAnimatedBoxStyle(ControlVariant variant = ControlVariant.Default, ControlSize size = ControlSize.Large, ComponentAppearance appearance = null) => ResolveStyle(StyleComponentType.AnimatedBox, variant, size, AnimatedBoxStyle, appearance);
+
         public GUIStyle GetMenuBarStyle(ControlVariant variant = ControlVariant.Default, ControlSize size = ControlSize.Default, ComponentAppearance appearance = null) => ResolveStyle(StyleComponentType.MenuBar, variant, size, _menuBarStyle, appearance);
+
         public GUIStyle GetTabsListStyle(ControlVariant variant = ControlVariant.Default, ControlSize size = ControlSize.Default, ComponentAppearance appearance = null) => ResolveStyle(StyleComponentType.TabsList, variant, size, _tabsListStyle, appearance);
+
         public GUIStyle GetSelectStyle(ControlVariant variant, ControlSize size, ComponentAppearance appearance = null) => ResolveStyle(StyleComponentType.SelectContent, variant, size, _dropdownContentStyle, appearance);
+
         public GUIStyle GetDropdownMenuStyle(ControlVariant variant, ControlSize size, ComponentAppearance appearance = null) => ResolveStyle(StyleComponentType.DropdownMenu, variant, size, _dropdownContentStyle, appearance);
 
         public GUIStyle GetInputStyle(ControlVariant variant, ControlSize size = ControlSize.Default, bool focused = false, bool disabled = false, ComponentAppearance appearance = null)
@@ -557,9 +569,13 @@ namespace shadcnui.GUIComponents.Core.Styling
             );
         }
 
-        public GUIStyle GetTabsContentStyle(ControlVariant variant = ControlVariant.Default, ControlSize size = ControlSize.Default, ComponentAppearance appearance = null) => ResolveStyle(StyleComponentType.TabsContent, variant, size, GUIStyle.none, appearance, 0, style => style.padding = GetSpacingOffset(DesignTokens.Spacing.LG, DesignTokens.Spacing.LG));
+        public GUIStyle GetTabsContentStyle(ControlVariant variant = ControlVariant.Default, ControlSize size = ControlSize.Default, ComponentAppearance appearance = null) =>
+            ResolveStyle(StyleComponentType.TabsContent, variant, size, GUIStyle.none, appearance, 0, style => style.padding = GetSpacingOffset(DesignTokens.Spacing.LG, DesignTokens.Spacing.LG));
+
         public GUIStyle GetCheckboxStyle(ControlVariant variant, ControlSize size, ComponentAppearance appearance = null) => ResolveStyle(StyleComponentType.Checkbox, variant, size, _checkboxStyle, appearance);
+
         public GUIStyle GetCheckboxSolidStyle(ControlVariant variant, ControlSize size, ComponentAppearance appearance = null) => ResolveStyle(StyleComponentType.CheckboxSolid, variant, size, _checkboxSolidStyle, appearance);
+
         public GUIStyle GetSwitchStyle(ControlVariant variant, ControlSize size, ComponentAppearance appearance = null) => ResolveStyle(StyleComponentType.Switch, variant, size, _baseSwitchStyle, appearance);
 
         public GUIStyle GetAvatarStyle(ControlSize size, AvatarShape shape, ControlVariant variant = ControlVariant.Default, ComponentAppearance appearance = null)
@@ -606,10 +622,16 @@ namespace shadcnui.GUIComponents.Core.Styling
             };
 
         public GUIStyle GetTableStyle(ControlVariant variant, ControlSize size, ComponentAppearance appearance = null) => ResolveStyle(StyleComponentType.Table, variant, size, _baseTableStyle, appearance);
+
         public GUIStyle GetTableRowStyle(ControlVariant variant = ControlVariant.Default, ControlSize size = ControlSize.Default, ComponentAppearance appearance = null) => ResolveStyle(StyleComponentType.TableRow, variant, size, _tableRowStyle, appearance);
+
         public GUIStyle GetTableHeaderStyle(ControlVariant variant = ControlVariant.Default, ControlSize size = ControlSize.Default, ComponentAppearance appearance = null) => ResolveStyle(StyleComponentType.TableHeader, variant, size, _tableHeaderStyle, appearance);
-        public UnityHelpers.GUIStyle GetTableCellStyle(ControlVariant variant = ControlVariant.Default, ControlSize size = ControlSize.Default, TextAnchor alignment = TextAnchor.MiddleLeft) => ResolveStyle(StyleComponentType.TableCell, variant, size, _tableCellStyle, null, (int)alignment, style => style.alignment = alignment);
+
+        public UnityHelpers.GUIStyle GetTableCellStyle(ControlVariant variant = ControlVariant.Default, ControlSize size = ControlSize.Default, TextAnchor alignment = TextAnchor.MiddleLeft) =>
+            ResolveStyle(StyleComponentType.TableCell, variant, size, _tableCellStyle, null, (int)alignment, style => style.alignment = alignment);
+
         public GUIStyle GetDropdownMenuItemStyle(ControlVariant variant = ControlVariant.Default, ControlSize size = ControlSize.Default, ComponentAppearance appearance = null) => ResolveStyle(StyleComponentType.DropdownMenuItem, variant, size, _dropdownItemStyle, appearance);
+
         public GUIStyle GetSelectItemStyle(ControlVariant variant = ControlVariant.Default, ControlSize size = ControlSize.Default, ComponentAppearance appearance = null) => ResolveStyle(StyleComponentType.SelectItem, variant, size, _dropdownItemStyle, appearance);
 
         public GUIStyle GetMenuBarItemStyle(ControlVariant variant = ControlVariant.Default, ControlSize size = ControlSize.Default, bool isShortcut = false, bool active = false, ComponentAppearance appearance = null)
@@ -632,7 +654,9 @@ namespace shadcnui.GUIComponents.Core.Styling
         }
 
         public GUIStyle GetMenuDropdownStyle(ControlVariant variant = ControlVariant.Default, ControlSize size = ControlSize.Default, ComponentAppearance appearance = null) => ResolveStyle(StyleComponentType.MenuDropdown, variant, size, _dropdownContentStyle, appearance);
+
         public GUIStyle GetNavigationStyle(ControlVariant variant = ControlVariant.Default, ControlSize size = ControlSize.Default, ComponentAppearance appearance = null) => ResolveStyle(StyleComponentType.Navigation, variant, size, _navigationStyle, appearance);
+
         public GUIStyle GetPopoverContentStyle(ControlVariant variant = ControlVariant.Default, ControlSize size = ControlSize.Default, ComponentAppearance appearance = null) => ResolveStyle(StyleComponentType.Popover, variant, size, _dropdownContentStyle, appearance);
 
         public GUIStyle GetChartAxisStyle(ControlVariant variant = ControlVariant.Default, ControlSize size = ControlSize.Default, ComponentAppearance appearance = null) =>
@@ -682,9 +706,14 @@ namespace shadcnui.GUIComponents.Core.Styling
                 }
             );
 
-        public GUIStyle GetCardHeaderStyle(ControlVariant variant = ControlVariant.Default, ControlSize size = ControlSize.Default, ComponentAppearance appearance = null) => ResolveStyle(StyleComponentType.CardHeader, variant, size, GUIStyle.none, appearance, 0, style => style.padding = GetSpacingOffset(DesignTokens.Spacing.LG, DesignTokens.Spacing.MD));
-        public GUIStyle GetCardContentStyle(ControlVariant variant = ControlVariant.Default, ControlSize size = ControlSize.Default, ComponentAppearance appearance = null) => ResolveStyle(StyleComponentType.CardContent, variant, size, GUIStyle.none, appearance, 0, style => style.padding = GetSpacingOffset(DesignTokens.Spacing.LG, DesignTokens.Spacing.SM));
-        public GUIStyle GetCardFooterStyle(ControlVariant variant = ControlVariant.Default, ControlSize size = ControlSize.Default, ComponentAppearance appearance = null) => ResolveStyle(StyleComponentType.CardFooter, variant, size, GUIStyle.none, appearance, 0, style => style.padding = GetSpacingOffset(DesignTokens.Spacing.LG, DesignTokens.Spacing.MD));
+        public GUIStyle GetCardHeaderStyle(ControlVariant variant = ControlVariant.Default, ControlSize size = ControlSize.Default, ComponentAppearance appearance = null) =>
+            ResolveStyle(StyleComponentType.CardHeader, variant, size, GUIStyle.none, appearance, 0, style => style.padding = GetSpacingOffset(DesignTokens.Spacing.LG, DesignTokens.Spacing.MD));
+
+        public GUIStyle GetCardContentStyle(ControlVariant variant = ControlVariant.Default, ControlSize size = ControlSize.Default, ComponentAppearance appearance = null) =>
+            ResolveStyle(StyleComponentType.CardContent, variant, size, GUIStyle.none, appearance, 0, style => style.padding = GetSpacingOffset(DesignTokens.Spacing.LG, DesignTokens.Spacing.SM));
+
+        public GUIStyle GetCardFooterStyle(ControlVariant variant = ControlVariant.Default, ControlSize size = ControlSize.Default, ComponentAppearance appearance = null) =>
+            ResolveStyle(StyleComponentType.CardFooter, variant, size, GUIStyle.none, appearance, 0, style => style.padding = GetSpacingOffset(DesignTokens.Spacing.LG, DesignTokens.Spacing.MD));
 
         public GUIStyle GetCardTitleStyle(ComponentAppearance appearance = null) => GetCardTitleStyle(ControlVariant.Default, ControlSize.Default, appearance);
 
@@ -745,7 +774,8 @@ namespace shadcnui.GUIComponents.Core.Styling
 
         public Color GetSliderFillColor(ControlVariant variant, bool disabled, ComponentAppearance appearance = null)
         {
-            var color = appearance?.AccentColor
+            var color =
+                appearance?.AccentColor
                 ?? variant switch
                 {
                     ControlVariant.Destructive => GetTheme().Destructive,
@@ -786,18 +816,29 @@ namespace shadcnui.GUIComponents.Core.Styling
         public Color GetToastTextColor(ToastVariant variant) => DesignTokens.ToastColors.Text;
 
         public GUIStyle GetCalendarStyle(ControlVariant variant = ControlVariant.Default, ControlSize size = ControlSize.Default, ComponentAppearance appearance = null) => ResolveStyle(StyleComponentType.Calendar, variant, size, _calendarStyle, appearance);
+
         public GUIStyle GetCalendarWeekdayStyle(ComponentAppearance appearance = null) => ResolveStyle(StyleComponentType.CalendarWeekday, ControlVariant.Default, ControlSize.Default, _calendarWeekdayStyle, appearance);
+
         public GUIStyle GetCalendarDayStyle(ComponentAppearance appearance = null) => ResolveStyle(StyleComponentType.CalendarDay, ControlVariant.Default, ControlSize.Default, _calendarDayStyle, appearance);
+
         public GUIStyle GetCalendarDaySelectedStyle(ComponentAppearance appearance = null) => ResolveStyle(StyleComponentType.CalendarDaySelected, ControlVariant.Default, ControlSize.Default, _calendarDaySelectedStyle, appearance);
+
         public GUIStyle GetCalendarDayInRangeStyle(ComponentAppearance appearance = null) => ResolveStyle(StyleComponentType.CalendarDayInRange, ControlVariant.Default, ControlSize.Default, _calendarDayInRangeStyle, appearance);
+
         public GUIStyle GetCalendarDayTodayStyle(ComponentAppearance appearance = null) => ResolveStyle(StyleComponentType.CalendarDayToday, ControlVariant.Default, ControlSize.Default, _calendarDayTodayStyle, appearance);
+
         public GUIStyle GetCalendarDayOutsideMonthStyle(ComponentAppearance appearance = null) => ResolveStyle(StyleComponentType.CalendarDayOutsideMonth, ControlVariant.Default, ControlSize.Default, _calendarDayOutsideMonthStyle, appearance);
+
         public GUIStyle GetDatePickerStyle(ControlVariant variant = ControlVariant.Default, ControlSize size = ControlSize.Default, ComponentAppearance appearance = null) => ResolveStyle(StyleComponentType.DatePicker, variant, size, _datePickerStyle, appearance);
+
         public GUIStyle GetDatePickerWeekdayStyle(ComponentAppearance appearance = null) => ResolveStyle(StyleComponentType.DatePickerWeekday, ControlVariant.Default, ControlSize.Default, _datePickerWeekdayStyle, appearance);
+
         public GUIStyle GetDatePickerDayStyle(ComponentAppearance appearance = null) => ResolveStyle(StyleComponentType.DatePickerDay, ControlVariant.Default, ControlSize.Default, _datePickerDayStyle, appearance);
+
         public GUIStyle GetDatePickerDaySelectedStyle(ComponentAppearance appearance = null) => ResolveStyle(StyleComponentType.DatePickerDaySelected, ControlVariant.Default, ControlSize.Default, _datePickerDaySelectedStyle, appearance);
+
         public GUIStyle GetDatePickerDayTodayStyle(ComponentAppearance appearance = null) => ResolveStyle(StyleComponentType.DatePickerDayToday, ControlVariant.Default, ControlSize.Default, _datePickerDayTodayStyle, appearance);
+
         public GUIStyle GetDatePickerDayOutsideMonthStyle(ComponentAppearance appearance = null) => ResolveStyle(StyleComponentType.DatePickerDayOutsideMonth, ControlVariant.Default, ControlSize.Default, _datePickerDayOutsideMonthStyle, appearance);
     }
-
 }

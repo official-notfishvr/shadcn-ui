@@ -2,102 +2,154 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
-using System.Linq;
 using System.Reflection;
+using System.Text;
 using shadcnui.GUIComponents.Core.Base;
 using shadcnui.GUIComponents.Core.Styling;
-using shadcnui.GUIComponents.Core.Theming;
-using shadcnui.GUIComponents.Layout;
 using UnityEngine;
 
 namespace shadcnui_Demo.Menu
 {
     public class ScreenshotUtility : MonoBehaviour
     {
+        private static readonly string[] FullDemoTabs = { "Overview", "Controls", "Inputs", "Display", "Layout", "Data", "Overlay" };
+        private static readonly string[] FullDemoOldTabs =
+        {
+            "Button",
+            "Badge",
+            "Input",
+            "Toggle",
+            "Checkbox",
+            "Switch",
+            "TextArea",
+            "Avatar",
+            "Card",
+            "Progress",
+            "Separator",
+            "Label",
+            "Dialog",
+            "Select",
+            "DropdownMenu",
+            "Popover",
+            "Tabs",
+            "MenuBar",
+            "Chart",
+            "Table",
+            "Toast",
+            "Tooltip",
+            "Slider",
+            "Layout",
+        };
+
         private GUIHelper _gui;
-        private Rect _windowRect = new Rect(20, 20, 400, 600);
-        private Vector2 _scrollPos;
+        private FullDemo _fullDemo;
+        private FullDemo_old _fullDemoOld;
+        private string[] _tabNames = FullDemoTabs;
+
+        private Rect _windowRect = new(20f, 20f, 420f, 560f);
+        private Vector2 _scroll;
 
         private bool _showWindow = true;
         private bool _hideWhileCapturing = false;
-        private bool _openOverlaysBeforeCapture = false;
+        private bool _appendTimestamp = false;
+        private bool _keepGifFrames = false;
 
-        private string _outputFolder = "Screenshots";
-        private bool _useTimestamp = false;
-        private int _padding = 4;
-        private float _tabDelay = 0.4f;
-        private float _overlayDelay = 0.3f;
+        private string _outputFolder = "Screenshots\\FullDemo";
+        private string _ffmpegPath = "ffmpeg";
+        private int _padding = 8;
+        private int _showcaseMargin = 24;
+        private int _gifFps = 12;
+        private int _holdFrames = 4;
+        private float _settleDelay = 0.08f;
+        private float _scrollDuration = 1.15f;
 
-        private bool _isCapturing = false;
-        private int _currentTab = 0;
-        private int _currentTheme = 0;
-        private int _capturedCount = 0;
-        private int _totalCaptures = 0;
+        private bool _isCapturing;
+        private bool _cancelRequested;
+        private int _progressTotal;
+        private int _progressCurrent;
+        private int _savedCount;
+        private string _activeJobLabel = string.Empty;
         private string _status = "Ready";
-        private float _nextActionTime = 0f;
+        private Coroutine _captureRoutine;
 
-        private List<DemoInfo> _detectedDemos = new List<DemoInfo>();
-        private DemoInfo _activeDemo;
-        private List<string> _themes = new List<string>();
-        private string _originalTheme;
-        private bool _captureAllThemes = false;
+        private const string ActiveTabField = "_activeTab";
+        private const string WindowRectField = "_windowRect";
+        private const string GuiField = "_gui";
+        private const string ShowDialogField = "_showDialog";
+        private const string ConfirmDeployField = "_confirmDeploy";
+        private const string OldActiveTabField = "currentDemoTab";
+        private const string OldWindowRectField = "windowRect";
+        private const string OldShowWindowField = "showDemoWindow";
+        private const string OldScrollField = "scrollPosition";
+        private const string OldGuiField = "guiHelper";
+        private const string OldDropdownOpenField = "dropdownOpen";
 
-        private CaptureMode _captureMode = CaptureMode.WindowOnly;
+        private const string LegacySelectId = "select";
+        private const string LocationSelectId = "location_select";
+        private const string DropdownId = "full_demo_dropdown";
+        private const string MeetingPickerId = "meeting_picker";
+        private const string ShipPickerId = "ship_picker";
+        private const string RangePickerId = "maintenance_range";
 
-        private enum CaptureMode
+        private sealed class CaptureJob
         {
-            WindowOnly,
-            FullScreen,
-        }
+            public int TabIndex;
+            public bool Animated;
 
-        private class DemoInfo
-        {
-            public MonoBehaviour Instance;
-            public string Name;
-            public string[] TabNames;
-            public string TabField;
-            public string IndexField;
-            public string WindowRectField;
-            public string WindowVisibleField;
-
-            public DemoInfo(MonoBehaviour instance, string name, string[] tabs, string tabField, string indexField, string windowRectField, string windowVisibleField = null)
+            public CaptureJob(int tabIndex, bool animated)
             {
-                Instance = instance;
-                Name = name;
-                TabNames = tabs;
-                TabField = tabField;
-                IndexField = indexField;
-                WindowRectField = windowRectField;
-                WindowVisibleField = windowVisibleField;
+                TabIndex = tabIndex;
+                Animated = animated;
             }
         }
 
-        void Start()
+        private sealed class CapturePlan
+        {
+            public float HeroScrollY;
+            public string HeroPreviewState;
+            public float ScrollTargetY;
+            public bool UseMeasuredMaxScroll;
+            public string[] PreviewStates;
+
+            public CapturePlan(float heroScrollY, string heroPreviewState, float scrollTargetY, bool useMeasuredMaxScroll, params string[] previewStates)
+            {
+                HeroScrollY = heroScrollY;
+                HeroPreviewState = heroPreviewState ?? string.Empty;
+                ScrollTargetY = scrollTargetY;
+                UseMeasuredMaxScroll = useMeasuredMaxScroll;
+                PreviewStates = previewStates ?? Array.Empty<string>();
+            }
+        }
+
+        private sealed class FrameCounter
+        {
+            public int Value;
+        }
+
+        private void Start()
         {
             _gui = new GUIHelper();
             EnsureOutputFolder();
-            DetectDemos();
+            RefreshFullDemo();
         }
 
-        void Update()
+        private void Update()
         {
-            if (!_isCapturing && Time.frameCount % 120 == 0)
-                DetectDemos();
+            if (((_fullDemo == null || !_fullDemo) && (_fullDemoOld == null || !_fullDemoOld)) && Time.frameCount % 120 == 0)
+                RefreshFullDemo();
         }
 
-        void OnGUI()
+        private void OnGUI()
         {
             if (!_showWindow || (_hideWhileCapturing && _isCapturing))
                 return;
 
-            _windowRect = GUI.Window(9999, _windowRect, DrawWindow, "Screenshot Utility");
-
-            if (_isCapturing && Time.time >= _nextActionTime)
-                ProcessCaptureQueue();
+            _windowRect = GUI.Window(9999, _windowRect, DrawWindow, "Demo Capture");
         }
 
-        void DrawWindow(int id)
+        private void DrawWindow(int id)
         {
             _gui.UpdateGUI(_showWindow);
             if (!_gui.BeginGUI())
@@ -106,17 +158,17 @@ namespace shadcnui_Demo.Menu
                 return;
             }
 
-            _scrollPos = _gui.ScrollView(
-                _scrollPos,
+            _scroll = _gui.ScrollView(
+                _scroll,
                 () =>
                 {
-                    DrawDemoSelector();
+                    DrawTargetSection();
                     _gui.HorizontalSeparator();
-                    DrawSettings();
+                    DrawSettingsSection();
                     _gui.HorizontalSeparator();
-                    DrawStatus();
+                    DrawStatusSection();
                     _gui.HorizontalSeparator();
-                    DrawActions();
+                    DrawActionsSection();
                 },
                 GUILayout.ExpandHeight(true)
             );
@@ -125,106 +177,71 @@ namespace shadcnui_Demo.Menu
             GUI.DragWindow();
         }
 
-        void DrawDemoSelector()
+        private void DrawTargetSection()
         {
-            _gui.Label("Target Demo", ControlVariant.Default);
+            _gui.Label("Target", ControlVariant.Default);
 
-            if (_detectedDemos.Count == 0)
+            if ((_fullDemo == null || !_fullDemo) && (_fullDemoOld == null || !_fullDemoOld))
             {
-                _gui.Label("No demos detected", ControlVariant.Destructive);
-                if (_gui.Button("Scan Again", ControlVariant.Outline, ControlSize.Small))
-                    DetectDemos();
+                _gui.Label("No demo found", ControlVariant.Destructive);
+                if (_gui.Button("Refresh", ControlVariant.Outline, ControlSize.Small))
+                    RefreshFullDemo();
                 return;
             }
 
-            for (int i = 0; i < _detectedDemos.Count; i++)
+            _gui.Label(_fullDemo != null && _fullDemo ? "Attached to FullDemo" : "Attached to FullDemo_old", ControlVariant.Default);
+            _gui.MutedLabel($"{GetCurrentTabName()} tab active");
+
+            _gui.BeginHorizontalGroup();
+            for (int i = 0; i < Mathf.Min(_tabNames.Length, 8); i++)
             {
-                var demo = _detectedDemos[i];
-                bool isActive = _activeDemo == demo;
-
-                _gui.BeginHorizontalGroup();
-                if (_gui.Button(demo.Name, isActive ? ControlVariant.Default : ControlVariant.Ghost, ControlSize.Small))
-                    _activeDemo = demo;
-
-                _gui.Label($"{demo.TabNames?.Length ?? 0} tabs", ControlVariant.Muted);
-                _gui.EndHorizontalGroup();
+                if (_gui.Button(_tabNames[i], GetCurrentTabIndex() == i ? ControlVariant.Default : ControlVariant.Ghost, ControlSize.Small))
+                    JumpToTab(i);
             }
+            _gui.EndHorizontalGroup();
 
-            if (_activeDemo != null)
-            {
-                _gui.MutedLabel($"Selected: {_activeDemo.Name}");
-                if (_activeDemo.TabNames != null && _activeDemo.TabNames.Length > 0)
-                {
-                    _gui.BeginHorizontalGroup();
-                    for (int i = 0; i < Math.Min(_activeDemo.TabNames.Length, 6); i++)
-                    {
-                        _gui.Badge(_activeDemo.TabNames[i], ControlVariant.Outline, ControlSize.Small);
-                    }
-                    if (_activeDemo.TabNames.Length > 6)
-                        _gui.Label($"+{_activeDemo.TabNames.Length - 6} more", ControlVariant.Muted);
-                    _gui.EndHorizontalGroup();
-                }
-            }
+            if (_tabNames.Length > 8)
+                _gui.MutedLabel($"{_tabNames.Length} tabs available");
+
+            if (_gui.Button("Refresh", ControlVariant.Outline, ControlSize.Small))
+                RefreshFullDemo();
         }
 
-        void DrawSettings()
+        private void DrawSettingsSection()
         {
             _gui.Label("Settings", ControlVariant.Default);
 
             _gui.BeginHorizontalGroup();
             _gui.Label("Folder:", ControlVariant.Muted);
-            _outputFolder = GUILayout.TextField(_outputFolder, GUILayout.Width(180));
+            _outputFolder = GUILayout.TextField(_outputFolder, GUILayout.Width(220));
             _gui.EndHorizontalGroup();
 
             _gui.BeginHorizontalGroup();
-            _gui.Label("Mode:", ControlVariant.Muted);
-            if (_gui.Button("Window", _captureMode == CaptureMode.WindowOnly ? ControlVariant.Default : ControlVariant.Ghost, ControlSize.Small))
-                _captureMode = CaptureMode.WindowOnly;
-            if (_gui.Button("Screen", _captureMode == CaptureMode.FullScreen ? ControlVariant.Default : ControlVariant.Ghost, ControlSize.Small))
-                _captureMode = CaptureMode.FullScreen;
+            _gui.Label("ffmpeg:", ControlVariant.Muted);
+            _ffmpegPath = GUILayout.TextField(_ffmpegPath, GUILayout.Width(220));
             _gui.EndHorizontalGroup();
 
-            if (_captureMode == CaptureMode.WindowOnly)
-            {
-                _gui.BeginHorizontalGroup();
-                _gui.Label($"Padding: {_padding}px", ControlVariant.Muted);
-                GUILayout.FlexibleSpace();
-                _gui.EndHorizontalGroup();
-                _padding = Mathf.RoundToInt(GUILayout.HorizontalSlider(_padding, 0, 50, GUILayout.Width(200)));
-            }
-
-            _gui.BeginHorizontalGroup();
-            _gui.Label($"Tab Delay: {_tabDelay:F1}s", ControlVariant.Muted);
-            GUILayout.FlexibleSpace();
-            _gui.EndHorizontalGroup();
-            _tabDelay = GUILayout.HorizontalSlider(_tabDelay, 0.1f, 1.0f, GUILayout.Width(200));
-
-            _gui.BeginHorizontalGroup();
-            _gui.Label($"Overlay Delay: {_overlayDelay:F1}s", ControlVariant.Muted);
-            GUILayout.FlexibleSpace();
-            _gui.EndHorizontalGroup();
-            _overlayDelay = GUILayout.HorizontalSlider(_overlayDelay, 0.1f, 1.0f, GUILayout.Width(200));
+            DrawSlider("Padding", ref _padding, 0, 24, "px");
+            DrawSlider("Showcase Margin", ref _showcaseMargin, 0, 80, "px");
+            DrawSlider("GIF FPS", ref _gifFps, 6, 24, string.Empty);
+            DrawSlider("Hold Frames", ref _holdFrames, 2, 12, string.Empty);
+            DrawSlider("Settle Delay", ref _settleDelay, 0.02f, 0.25f, "s");
+            DrawSlider("Scroll Duration", ref _scrollDuration, 0.35f, 2.25f, "s");
 
             _hideWhileCapturing = _gui.Checkbox("Hide utility while capturing", _hideWhileCapturing);
-            _openOverlaysBeforeCapture = _gui.Checkbox("Open dialogs/dropdowns before capture", _openOverlaysBeforeCapture);
-            _useTimestamp = _gui.Checkbox("Add timestamp to filenames", _useTimestamp);
+            _appendTimestamp = _gui.Checkbox("Append timestamp to filenames", _appendTimestamp);
+            _keepGifFrames = _gui.Checkbox("Keep GIF frame folders", _keepGifFrames);
         }
 
-        void DrawStatus()
+        private void DrawStatusSection()
         {
             _gui.Label("Status", ControlVariant.Default);
 
             if (_isCapturing)
             {
-                string themeInfo = _captureAllThemes ? $" (Theme {_currentTheme + 1}/{_themes.Count})" : "";
-                _gui.Label($"Progress: {_capturedCount}/{_totalCaptures}{themeInfo}", ControlVariant.Default);
-                _gui.Progress((float)_capturedCount / Mathf.Max(1, _totalCaptures), 360);
-
-                if (_activeDemo != null && _currentTab < (_activeDemo.TabNames?.Length ?? 0))
-                {
-                    string themeName = _captureAllThemes && _currentTheme < _themes.Count ? _themes[_currentTheme] : ThemeManager.Instance.CurrentTheme?.Name ?? "Default";
-                    _gui.MutedLabel($"Capturing: {_activeDemo.TabNames[_currentTab]} ({themeName})");
-                }
+                _gui.Label($"{_progressCurrent}/{Mathf.Max(1, _progressTotal)} completed", ControlVariant.Default);
+                _gui.Progress(_progressCurrent / (float)Mathf.Max(1, _progressTotal), 360f);
+                _gui.MutedLabel(string.IsNullOrWhiteSpace(_activeJobLabel) ? "Running capture..." : _activeJobLabel);
             }
             else
             {
@@ -232,37 +249,42 @@ namespace shadcnui_Demo.Menu
             }
         }
 
-        void DrawActions()
+        private void DrawActionsSection()
         {
-            bool canCapture = !_isCapturing && _activeDemo != null && (_activeDemo.TabNames?.Length ?? 0) > 0;
+            bool hasDemo = (_fullDemo != null && _fullDemo) || (_fullDemoOld != null && _fullDemoOld);
+            bool canRun = hasDemo && !_isCapturing;
 
             if (_isCapturing)
             {
-                if (_gui.Button("Stop Capture", ControlVariant.Destructive, ControlSize.Default))
+                if (_gui.Button("Stop", ControlVariant.Destructive, ControlSize.Default))
                     StopCapture();
             }
             else
             {
-                GUI.enabled = canCapture;
+                GUI.enabled = canRun;
 
-                if (_gui.Button("Capture Current Tab", ControlVariant.Secondary, ControlSize.Default))
-                    CaptureSingle();
+                if (_gui.Button("Current PNG", ControlVariant.Secondary, ControlSize.Default))
+                    StartJobs(new List<CaptureJob> { new CaptureJob(GetCurrentTabIndex(), false) });
 
-                GUILayout.Space(5);
+                GUILayout.Space(5f);
 
-                if (_gui.Button("Capture All Tabs", ControlVariant.Default, ControlSize.Default))
-                    StartCapture(false);
+                if (_gui.Button("All PNGs", ControlVariant.Default, ControlSize.Default))
+                    StartJobs(BuildJobs(false));
 
-                GUILayout.Space(5);
+                GUILayout.Space(5f);
 
-                int themeCount = ThemeManager.Instance.Themes?.Count ?? 0;
-                if (_gui.Button($"All Tabs & Themes ({themeCount})", ControlVariant.Default, ControlSize.Default))
-                    StartCapture(true);
+                if (_gui.Button("Current GIF", ControlVariant.Outline, ControlSize.Default))
+                    StartJobs(new List<CaptureJob> { new CaptureJob(GetCurrentTabIndex(), true) });
+
+                GUILayout.Space(5f);
+
+                if (_gui.Button("All GIFs", ControlVariant.Outline, ControlSize.Default))
+                    StartJobs(BuildJobs(true));
 
                 GUI.enabled = true;
             }
 
-            GUILayout.Space(5);
+            GUILayout.Space(6f);
 
             _gui.BeginHorizontalGroup();
             if (_gui.Button("Open Folder", ControlVariant.Outline, ControlSize.Small))
@@ -273,445 +295,710 @@ namespace shadcnui_Demo.Menu
             _gui.EndHorizontalGroup();
         }
 
-        void DetectDemos()
+        private void DrawSlider(string label, ref int value, int min, int max, string suffix)
         {
-            _detectedDemos.Clear();
-
-            DetectDemo<FullDemo>("FullDemo", "_tabs", "_activeTab", "_windowRect");
-            DetectDemo<FullDemo_old>("FullDemo_old", "demoTabs", "currentDemoTab", "windowRect", "showDemoWindow");
-
-            if (_activeDemo == null || (_activeDemo.Instance == null && _detectedDemos.Count > 0))
-                _activeDemo = _detectedDemos.FirstOrDefault();
-
-            _status = _detectedDemos.Count > 0 ? $"Found {_detectedDemos.Count} demo(s)" : "No demos detected";
+            _gui.BeginHorizontalGroup();
+            _gui.Label($"{label}: {value}{suffix}", ControlVariant.Muted);
+            GUILayout.FlexibleSpace();
+            _gui.EndHorizontalGroup();
+            value = Mathf.RoundToInt(GUILayout.HorizontalSlider(value, min, max, GUILayout.Width(220)));
         }
 
-        void DetectDemo<T>(string name, string tabField, string indexField, string windowRectField, string windowVisibleField = null)
-            where T : MonoBehaviour
+        private void DrawSlider(string label, ref float value, float min, float max, string suffix)
         {
-            var instance = FindFirstObjectByType<T>();
-            if (instance == null)
+            _gui.BeginHorizontalGroup();
+            _gui.Label($"{label}: {value:F2}{suffix}", ControlVariant.Muted);
+            GUILayout.FlexibleSpace();
+            _gui.EndHorizontalGroup();
+            value = GUILayout.HorizontalSlider(value, min, max, GUILayout.Width(220));
+        }
+
+        private void RefreshFullDemo()
+        {
+            _fullDemo = UnityEngine.Object.FindFirstObjectByType<FullDemo>();
+            _fullDemoOld = _fullDemo == null ? UnityEngine.Object.FindFirstObjectByType<FullDemo_old>() : null;
+            _tabNames = _fullDemo != null ? FullDemoTabs : (_fullDemoOld != null ? FullDemoOldTabs : FullDemoTabs);
+            _status = _fullDemo != null ? "FullDemo detected" : (_fullDemoOld != null ? "FullDemo_old detected" : "No demo found");
+        }
+
+        private void JumpToTab(int tabIndex)
+        {
+            if (!EnsureFullDemo())
                 return;
 
-            string[] tabNames = ExtractTabNames(instance, tabField);
-            var demo = new DemoInfo(instance, name, tabNames, tabField, indexField, windowRectField, windowVisibleField);
-            _detectedDemos.Add(demo);
+            PrepareDemoForTab(tabIndex);
+            _status = $"Showing {GetTabName(tabIndex)}";
         }
 
-        string[] ExtractTabNames(MonoBehaviour instance, string tabFieldName)
+        private void StartJobs(List<CaptureJob> jobs)
         {
-            if (instance == null)
-                return Array.Empty<string>();
-
-            FieldInfo field = instance.GetType().GetField(tabFieldName, BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Instance);
-            if (field == null)
-                return Array.Empty<string>();
-
-            object value = field.GetValue(instance);
-
-            if (value is string[] strArray)
-                return strArray;
-
-            if (value is Array array)
-            {
-                var names = new List<string>();
-                for (int i = 0; i < array.Length; i++)
-                {
-                    object item = array.GetValue(i);
-                    if (item == null)
-                        continue;
-
-                    PropertyInfo nameProp = item.GetType().GetProperty("Name");
-                    if (nameProp != null)
-                    {
-                        object nameValue = nameProp.GetValue(item);
-                        if (nameValue != null)
-                            names.Add(nameValue.ToString());
-                    }
-                    else
-                    {
-                        FieldInfo nameField = item.GetType().GetField("Name");
-                        if (nameField != null)
-                        {
-                            object nameValue = nameField.GetValue(item);
-                            if (nameValue != null)
-                                names.Add(nameValue.ToString());
-                        }
-                    }
-                }
-                return names.ToArray();
-            }
-
-            return Array.Empty<string>();
-        }
-
-        void StartCapture(bool allThemes)
-        {
-            if (_activeDemo == null || (_activeDemo.TabNames?.Length ?? 0) == 0)
-            {
-                _status = "No demo or tabs to capture";
+            if (_isCapturing)
                 return;
-            }
+
+            if (!EnsureFullDemo())
+                return;
 
             EnsureOutputFolder();
+            _cancelRequested = false;
+            _progressCurrent = 0;
+            _progressTotal = jobs.Count;
+            _savedCount = 0;
+            _activeJobLabel = string.Empty;
+            _status = jobs.Count == 1 ? "Starting capture..." : $"Starting {jobs.Count} captures...";
+            _captureRoutine = StartCoroutine(RunJobs(jobs));
+        }
 
-            _captureAllThemes = allThemes;
-            _currentTab = 0;
-            _currentTheme = 0;
-            _capturedCount = 0;
+        private IEnumerator RunJobs(List<CaptureJob> jobs)
+        {
             _isCapturing = true;
+            bool originalWindowVisible = _showWindow;
 
-            if (allThemes)
-            {
-                _themes = ThemeManager.Instance.Themes?.Keys?.ToList() ?? new List<string>();
-                _totalCaptures = (_activeDemo.TabNames?.Length ?? 0) * _themes.Count;
-                _originalTheme = ThemeManager.Instance.CurrentTheme?.Name ?? "Dark";
-                if (_themes.Count > 0)
-                    ThemeManager.Instance.SetTheme(_themes[0]);
-            }
-            else
-            {
-                _themes.Clear();
-                _totalCaptures = _activeDemo.TabNames?.Length ?? 0;
-            }
-
-            _nextActionTime = Time.time + _tabDelay;
-            _status = "Starting capture...";
-
-            EnsureDemoWindowVisible();
-        }
-
-        void StopCapture()
-        {
-            _isCapturing = false;
-            _status = $"Stopped. Captured {_capturedCount}/{_totalCaptures}";
-
-            if (_captureAllThemes && !string.IsNullOrEmpty(_originalTheme))
-                ThemeManager.Instance.SetTheme(_originalTheme);
-        }
-
-        void ProcessCaptureQueue()
-        {
-            if (_activeDemo == null || _activeDemo.Instance == null)
-            {
-                StopCapture();
-                return;
-            }
-
-            int tabCount = _activeDemo.TabNames?.Length ?? 0;
-
-            if (_currentTab >= tabCount)
-            {
-                if (_captureAllThemes && _currentTheme + 1 < _themes.Count)
-                {
-                    _currentTheme++;
-                    _currentTab = 0;
-                    ThemeManager.Instance.SetTheme(_themes[_currentTheme]);
-                    _nextActionTime = Time.time + _tabDelay;
-                    return;
-                }
-
-                _isCapturing = false;
-                _status = $"Complete! {_capturedCount} screenshots saved";
-
-                if (_captureAllThemes && !string.IsNullOrEmpty(_originalTheme))
-                    ThemeManager.Instance.SetTheme(_originalTheme);
-
-                return;
-            }
-
-            SetTabIndex(_currentTab);
-            StartCoroutine(CaptureWithDelay());
-            _nextActionTime = Time.time + _tabDelay + _overlayDelay + 0.3f;
-        }
-
-        void SetTabIndex(int index)
-        {
-            if (_activeDemo?.Instance == null)
-                return;
-
-            FieldInfo field = _activeDemo.Instance.GetType().GetField(_activeDemo.IndexField, BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Instance);
-            field?.SetValue(_activeDemo.Instance, index);
-        }
-
-        void EnsureDemoWindowVisible()
-        {
-            if (_activeDemo?.Instance == null || string.IsNullOrEmpty(_activeDemo.WindowVisibleField))
-                return;
-
-            FieldInfo field = _activeDemo.Instance.GetType().GetField(_activeDemo.WindowVisibleField, BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Instance);
-            if (field?.FieldType == typeof(bool))
-                field.SetValue(_activeDemo.Instance, true);
-        }
-
-        void OpenOverlays()
-        {
-            if (_activeDemo?.Instance == null || !_openOverlaysBeforeCapture)
-                return;
-
-            SetFieldValue(_activeDemo.Instance, "dropdownOpen", true);
-            SetFieldValue(_activeDemo.Instance, "_showDropdown", true);
-            SetFieldValue(_activeDemo.Instance, "_showDialog", true);
-            SetFieldValue(_activeDemo.Instance, "_showSelect", true);
-
-            InvokeMethod(_activeDemo.Instance, "OpenSelect");
-            InvokeMethod(_activeDemo.Instance, "OpenPopover");
-            InvokeMethod(_activeDemo.Instance, "OpenDialog", "std_dlg");
-
-            FieldInfo helperField = _activeDemo.Instance.GetType().GetField("guiHelper", BindingFlags.NonPublic | BindingFlags.Instance);
-            object helper = helperField?.GetValue(_activeDemo.Instance);
-
-            helperField = _activeDemo.Instance.GetType().GetField("_gui", BindingFlags.NonPublic | BindingFlags.Instance);
-            helper = helper ?? helperField?.GetValue(_activeDemo.Instance);
-
-            if (helper != null)
-            {
-                InvokeMethod(helper, "OpenSelect");
-                InvokeMethod(helper, "OpenPopover");
-                InvokeMethod(helper, "OpenDialog", "std_dlg");
-            }
-        }
-
-        void SetFieldValue(object obj, string fieldName, object value)
-        {
-            if (obj == null)
-                return;
-            FieldInfo field = obj.GetType().GetField(fieldName, BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Instance);
-            field?.SetValue(obj, value);
-        }
-
-        void InvokeMethod(object obj, string methodName, params object[] args)
-        {
-            if (obj == null)
-                return;
-            MethodInfo method = obj.GetType().GetMethod(methodName, BindingFlags.Public | BindingFlags.Instance | BindingFlags.NonPublic);
-            method?.Invoke(obj, args.Length > 0 ? args : null);
-        }
-
-        IEnumerator CaptureWithDelay()
-        {
-            yield return new WaitForEndOfFrame();
-            yield return new WaitForSeconds(0.1f);
-
-            OpenOverlays();
-
-            yield return new WaitForSeconds(_overlayDelay);
-            yield return new WaitForEndOfFrame();
-            yield return new WaitForSeconds(0.05f);
-
-            string tabName = _currentTab < (_activeDemo.TabNames?.Length ?? 0) ? _activeDemo.TabNames[_currentTab] : "Unknown";
-            string themeName = _captureAllThemes && _currentTheme < _themes.Count ? _themes[_currentTheme] : ThemeManager.Instance.CurrentTheme?.Name ?? "Default";
-
-            string fileName = BuildFileName(tabName, themeName, _currentTab + 1);
-            string filePath = BuildFilePath(fileName, themeName);
-
-            EnsureDirectory(Path.GetDirectoryName(filePath));
-
-            Rect captureRect = GetCaptureRect();
-            if (captureRect.width > 0 && captureRect.height > 0)
-            {
-                CaptureRegion(captureRect, filePath);
-                _capturedCount++;
-                _status = $"Captured: {tabName}";
-            }
-            else
-            {
-                _status = $"Bad rect for {tabName}: {captureRect}";
-            }
-
-            _currentTab++;
-            yield break;
-        }
-
-        void CaptureSingle()
-        {
-            if (_activeDemo == null)
-            {
-                _status = "ERROR: _activeDemo is null";
-                return;
-            }
-            if (_activeDemo.Instance == null)
-            {
-                _status = "ERROR: _activeDemo.Instance is null";
-                return;
-            }
-            if (_activeDemo.TabNames == null || _activeDemo.TabNames.Length == 0)
-            {
-                _status = "ERROR: No tabs detected";
-                return;
-            }
-
-            _status = "Starting capture coroutine...";
-            StartCoroutine(CaptureSingleCoroutine());
-        }
-
-        IEnumerator CaptureSingleCoroutine()
-        {
-            EnsureOutputFolder();
-            EnsureDemoWindowVisible();
-
-            int currentIndex = GetTabIndex();
-            string tabName = currentIndex >= 0 && currentIndex < (_activeDemo.TabNames?.Length ?? 0) ? _activeDemo.TabNames[currentIndex] : "Unknown";
-            string themeName = ThemeManager.Instance.CurrentTheme?.Name ?? "Default";
-
-            _status = $"Capturing {tabName}...";
-
-            bool wasVisible = _showWindow;
             if (_hideWhileCapturing)
                 _showWindow = false;
 
-            yield return new WaitForEndOfFrame();
-            yield return new WaitForSeconds(0.1f);
+            try
+            {
+                for (int i = 0; i < jobs.Count; i++)
+                {
+                    if (_cancelRequested)
+                        break;
 
-            OpenOverlays();
+                    if (!EnsureFullDemo())
+                        break;
 
-            yield return new WaitForSeconds(_overlayDelay);
-            yield return new WaitForEndOfFrame();
-            yield return new WaitForSeconds(0.05f);
+                    CaptureJob job = jobs[i];
+                    _activeJobLabel = $"{(job.Animated ? "GIF" : "PNG")} - {GetTabName(job.TabIndex)}";
 
-            string fileName = BuildFileName(tabName, themeName, currentIndex + 1);
-            string filePath = BuildFilePath(fileName, themeName);
+                    if (job.Animated)
+                        yield return CaptureGif(job.TabIndex);
+                    else
+                        yield return CaptureStill(job.TabIndex);
 
-            EnsureDirectory(Path.GetDirectoryName(filePath));
+                    _progressCurrent = i + 1;
+                }
+            }
+            finally
+            {
+                CleanupDemoState();
+                _captureRoutine = null;
+                _isCapturing = false;
+                _activeJobLabel = string.Empty;
 
+                if (_hideWhileCapturing)
+                    _showWindow = originalWindowVisible;
+            }
+
+            if (_cancelRequested)
+                _status = $"Stopped after {_savedCount}/{_progressTotal}";
+            else if (_savedCount > 0)
+                _status = $"Saved {_savedCount}/{_progressTotal}";
+            else if (string.IsNullOrWhiteSpace(_status))
+                _status = "Nothing captured";
+        }
+
+        private IEnumerator CaptureStill(int tabIndex)
+        {
+            PrepareDemoForTab(tabIndex);
+            yield return ApplyPreviewState(tabIndex, 0f, string.Empty);
+
+            CapturePlan plan = ResolvePlan(GetPlan(tabIndex));
+
+            yield return ApplyPreviewState(tabIndex, plan.HeroScrollY, plan.HeroPreviewState);
+
+            string filePath = BuildOutputPath(tabIndex, false);
             Rect captureRect = GetCaptureRect();
+            CaptureRegion(captureRect, filePath);
 
-            if (captureRect.width > 0 && captureRect.height > 0)
+            if (File.Exists(filePath))
             {
-                CaptureRegion(captureRect, filePath);
-                _status = $"Saved: {fileName}";
+                _savedCount++;
+                _status = $"Saved {Path.GetFileName(filePath)}";
             }
             else
             {
-                _status = $"Bad capture rect: {captureRect}";
+                _status = $"Failed to save {Path.GetFileName(filePath)}";
+            }
+        }
+
+        private IEnumerator CaptureGif(int tabIndex)
+        {
+            PrepareDemoForTab(tabIndex);
+            yield return ApplyPreviewState(tabIndex, 0f, string.Empty);
+
+            string gifPath = BuildOutputPath(tabIndex, true);
+            string framesDir = BuildFrameDirectory(tabIndex);
+            Rect captureRect = GetCaptureRect();
+            CapturePlan plan = ResolvePlan(GetPlan(tabIndex));
+            var frameCounter = new FrameCounter();
+
+            RecreateDirectory(framesDir);
+
+            yield return CaptureHoldFrames(tabIndex, captureRect, framesDir, frameCounter, 0f, string.Empty, _holdFrames);
+
+            if (plan.ScrollTargetY > 0f)
+                yield return CaptureScrollFrames(tabIndex, captureRect, framesDir, frameCounter, 0f, plan.ScrollTargetY);
+
+            yield return CaptureHoldFrames(tabIndex, captureRect, framesDir, frameCounter, plan.HeroScrollY, plan.HeroPreviewState, _holdFrames);
+
+            for (int i = 0; i < plan.PreviewStates.Length; i++)
+            {
+                if (_cancelRequested)
+                    yield break;
+
+                string previewState = plan.PreviewStates[i];
+                if (string.Equals(previewState, plan.HeroPreviewState, StringComparison.Ordinal))
+                    continue;
+
+                yield return CaptureHoldFrames(tabIndex, captureRect, framesDir, frameCounter, plan.HeroScrollY, previewState, _holdFrames + 2);
             }
 
-            if (_hideWhileCapturing)
-                _showWindow = wasVisible;
+            if (_cancelRequested)
+                yield break;
 
-            yield break;
-        }
+            string finalPreviewState = plan.PreviewStates.Length > 0 ? plan.PreviewStates[plan.PreviewStates.Length - 1] : plan.HeroPreviewState;
+            int finalHoldFrames = Mathf.Max(_holdFrames * 3, _gifFps);
+            yield return CaptureHoldFrames(tabIndex, captureRect, framesDir, frameCounter, plan.HeroScrollY, finalPreviewState, finalHoldFrames);
 
-        int GetTabIndex()
-        {
-            if (_activeDemo?.Instance == null)
-                return 0;
-
-            FieldInfo field = _activeDemo.Instance.GetType().GetField(_activeDemo.IndexField, BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Instance);
-            if (field == null)
-                return 0;
-
-            object value = field.GetValue(_activeDemo.Instance);
-            return value is int i ? i : 0;
-        }
-
-        string BuildFileName(string tabName, string themeName, int index)
-        {
-            string sanitizedTab = SanitizeFileName(tabName);
-            string timestamp = _useTimestamp ? $"_{DateTime.Now:yyyyMMdd_HHmmss}" : "";
-
-            if (_captureAllThemes)
-                return $"{_activeDemo.Name}_{themeName}_{index:D2}_{sanitizedTab}{timestamp}.png";
+            bool gifCreated = TryCreateGif(framesDir, gifPath);
+            if (gifCreated)
+            {
+                _savedCount++;
+                _status = $"Saved {Path.GetFileName(gifPath)}";
+                if (!_keepGifFrames)
+                    DeleteDirectory(framesDir);
+            }
             else
-                return $"{_activeDemo.Name}_{index:D2}_{sanitizedTab}{timestamp}.png";
+            {
+                _status = $"Frames saved in {Path.GetFileName(framesDir)}";
+            }
         }
 
-        string BuildFilePath(string fileName, string themeName)
+        private IEnumerator CaptureScrollFrames(int tabIndex, Rect captureRect, string framesDir, FrameCounter frameCounter, float fromY, float toY)
         {
-            string basePath = Path.Combine(Application.dataPath, "..", _outputFolder);
-            return Path.Combine(basePath, fileName);
+            int scrollFrames = Mathf.Max(8, Mathf.RoundToInt(_gifFps * Mathf.Max(0.35f, _scrollDuration)));
+            for (int i = 0; i < scrollFrames; i++)
+            {
+                if (_cancelRequested)
+                    yield break;
+
+                float t = scrollFrames <= 1 ? 1f : i / (float)(scrollFrames - 1);
+                float scrollY = Mathf.Lerp(fromY, toY, t);
+                yield return CaptureFrame(tabIndex, captureRect, framesDir, frameCounter, scrollY, string.Empty);
+            }
         }
 
-        Rect GetCaptureRect()
+        private IEnumerator CaptureHoldFrames(int tabIndex, Rect captureRect, string framesDir, FrameCounter frameCounter, float scrollY, string previewState, int frameCount)
         {
-            if (_captureMode == CaptureMode.FullScreen)
-                return new Rect(0, 0, Screen.width, Screen.height);
-
-            if (_activeDemo?.Instance == null)
+            for (int i = 0; i < frameCount; i++)
             {
-                _status = "ERROR: No demo instance for capture rect";
-                return new Rect(0, 0, Screen.width, Screen.height);
+                if (_cancelRequested)
+                    yield break;
+
+                yield return CaptureFrame(tabIndex, captureRect, framesDir, frameCounter, scrollY, previewState);
+            }
+        }
+
+        private IEnumerator CaptureFrame(int tabIndex, Rect captureRect, string framesDir, FrameCounter frameCounter, float scrollY, string previewState)
+        {
+            yield return ApplyPreviewState(tabIndex, scrollY, previewState);
+            string framePath = Path.Combine(framesDir, $"frame_{frameCounter.Value:D4}.png");
+            CaptureRegion(captureRect, framePath);
+            frameCounter.Value++;
+        }
+
+        private IEnumerator ApplyPreviewState(int tabIndex, float scrollY, string previewState)
+        {
+            SetActiveTab(tabIndex);
+            ResizeDemoWindow();
+            CloseTransientUi();
+            if (_fullDemo != null && _fullDemo)
+                _fullDemo.SetScreenshotPreview(scrollY, previewState);
+            else if (_fullDemoOld != null && _fullDemoOld)
+                SetFieldValue(_fullDemoOld, OldScrollField, new Vector2(0f, Mathf.Max(0f, scrollY)));
+
+            yield return new WaitForEndOfFrame();
+            yield return new WaitForSeconds(_settleDelay);
+            yield return new WaitForEndOfFrame();
+        }
+
+        private void PrepareDemoForTab(int tabIndex)
+        {
+            SetActiveTab(tabIndex);
+            ResizeDemoWindow();
+            CleanupDemoState();
+            if (_fullDemo != null && _fullDemo)
+                _fullDemo.SetScreenshotPreview(0f, string.Empty);
+            else if (_fullDemoOld != null && _fullDemoOld)
+                SetFieldValue(_fullDemoOld, OldScrollField, Vector2.zero);
+        }
+
+        private void CleanupDemoState()
+        {
+            if ((_fullDemo == null || !_fullDemo) && (_fullDemoOld == null || !_fullDemoOld))
+                return;
+
+            CloseTransientUi();
+            if (_fullDemo != null && _fullDemo)
+                _fullDemo.ClearScreenshotPreview();
+        }
+
+        private void CloseTransientUi()
+        {
+            if ((_fullDemo == null || !_fullDemo) && (_fullDemoOld == null || !_fullDemoOld))
+                return;
+
+            if (_fullDemo != null && _fullDemo)
+            {
+                _fullDemo.ClearScreenshotPreview();
+                SetFieldValue(_fullDemo, ShowDialogField, false);
+                SetFieldValue(_fullDemo, ConfirmDeployField, false);
+            }
+            else
+            {
+                SetFieldValue(_fullDemoOld, OldDropdownOpenField, false);
+                SetFieldValue(_fullDemoOld, OldScrollField, Vector2.zero);
+                SetFieldValue(_fullDemoOld, OldShowWindowField, true);
             }
 
-            FieldInfo field = _activeDemo.Instance.GetType().GetField(_activeDemo.WindowRectField, BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Instance);
-            if (field == null)
+            GUIHelper helper = GetFullDemoHelper();
+            if (helper == null)
+                return;
+
+            InvokeHelper(helper, "CloseDialog");
+            InvokeHelper(helper, "ClosePopover");
+            InvokeHelper(helper, "DismissAllToasts", false);
+            InvokeHelper(helper, "CloseSelect");
+            InvokeHelper(helper, "CloseSelect", LegacySelectId);
+            InvokeHelper(helper, "CloseSelect", LocationSelectId);
+            InvokeHelper(helper, "CloseDropdownMenu", DropdownId);
+            InvokeHelper(helper, "CloseDatePicker", MeetingPickerId);
+            InvokeHelper(helper, "CloseDatePicker", ShipPickerId);
+            InvokeHelper(helper, "CloseDatePicker", RangePickerId);
+        }
+
+        private bool EnsureFullDemo()
+        {
+            if ((_fullDemo != null && _fullDemo) || (_fullDemoOld != null && _fullDemoOld))
+                return true;
+
+            RefreshFullDemo();
+            if ((_fullDemo == null || !_fullDemo) && (_fullDemoOld == null || !_fullDemoOld))
             {
-                _status = $"ERROR: Field '{_activeDemo.WindowRectField}' not found on {_activeDemo.Name}";
-                return new Rect(0, 0, Screen.width, Screen.height);
+                _status = "No demo found";
+                return false;
             }
 
-            if (field.FieldType != typeof(Rect))
+            return true;
+        }
+
+        private bool EnsureFullDemoSilently()
+        {
+            if ((_fullDemo != null && _fullDemo) || (_fullDemoOld != null && _fullDemoOld))
+                return true;
+
+            _fullDemo = UnityEngine.Object.FindFirstObjectByType<FullDemo>();
+            _fullDemoOld = _fullDemo == null ? UnityEngine.Object.FindFirstObjectByType<FullDemo_old>() : null;
+            _tabNames = _fullDemo != null ? FullDemoTabs : (_fullDemoOld != null ? FullDemoOldTabs : FullDemoTabs);
+            return _fullDemo != null || _fullDemoOld != null;
+        }
+
+        private void StopCapture()
+        {
+            _cancelRequested = true;
+            _status = "Stopping...";
+        }
+
+        private List<CaptureJob> BuildJobs(bool animated)
+        {
+            var jobs = new List<CaptureJob>(_tabNames.Length);
+            for (int i = 0; i < _tabNames.Length; i++)
+                jobs.Add(new CaptureJob(i, animated));
+            return jobs;
+        }
+
+        private CapturePlan ResolvePlan(CapturePlan plan)
+        {
+            if (plan == null)
+                return new CapturePlan(0f, string.Empty, 0f, false);
+
+            if (!plan.UseMeasuredMaxScroll)
+                return plan;
+
+            float measuredMaxScroll = _fullDemo != null && _fullDemo ? Mathf.Max(0f, _fullDemo.GetScreenshotMaxScroll()) : (_fullDemoOld != null && _fullDemoOld ? Mathf.Max(0f, _fullDemoOld.GetScreenshotMaxScroll()) : 0f);
+            float resolvedScroll = measuredMaxScroll > 0f ? measuredMaxScroll : Mathf.Max(plan.HeroScrollY, plan.ScrollTargetY);
+
+            return new CapturePlan(resolvedScroll, plan.HeroPreviewState, resolvedScroll, true, plan.PreviewStates);
+        }
+
+        private CapturePlan GetPlan(int tabIndex)
+        {
+            if (_fullDemoOld != null && _fullDemoOld)
             {
-                _status = $"ERROR: Field '{_activeDemo.WindowRectField}' is not a Rect";
-                return new Rect(0, 0, Screen.width, Screen.height);
+                return tabIndex switch
+                {
+                    2 => new CapturePlan(220f, string.Empty, 220f, true),
+                    6 => new CapturePlan(320f, string.Empty, 320f, true),
+                    12 => new CapturePlan(520f, string.Empty, 520f, true),
+                    13 => new CapturePlan(220f, string.Empty, 220f, true),
+                    14 => new CapturePlan(220f, string.Empty, 220f, true),
+                    15 => new CapturePlan(220f, string.Empty, 220f, true),
+                    18 => new CapturePlan(260f, string.Empty, 260f, true),
+                    19 => new CapturePlan(420f, string.Empty, 420f, true),
+                    20 => new CapturePlan(220f, string.Empty, 220f, true),
+                    22 => new CapturePlan(340f, string.Empty, 340f, true),
+                    23 => new CapturePlan(420f, string.Empty, 420f, true),
+                    _ => new CapturePlan(0f, string.Empty, 0f, false),
+                };
             }
 
-            Rect rect = (Rect)field.GetValue(_activeDemo.Instance);
-
-            if (_padding > 0)
+            return tabIndex switch
             {
-                rect.x -= _padding;
-                rect.y -= _padding;
-                rect.width += _padding * 2;
-                rect.height += _padding * 2;
-            }
+                0 => new CapturePlan(112f, string.Empty, 160f, false),
+                1 => new CapturePlan(148f, string.Empty, 220f, false),
+                2 => new CapturePlan(360f, "inputs_select", 360f, true, "inputs_select", "inputs_dropdown"),
+                3 => new CapturePlan(140f, string.Empty, 220f, false),
+                4 => new CapturePlan(520f, string.Empty, 520f, true),
+                5 => new CapturePlan(720f, string.Empty, 720f, true),
+                6 => new CapturePlan(240f, "overlay_dialog", 240f, true, "overlay_dialog", "overlay_popover", "overlay_toasts"),
+                _ => new CapturePlan(0f, string.Empty, 0f, false),
+            };
+        }
 
+        private string GetCurrentTabName() => GetTabName(GetCurrentTabIndex());
+
+        private string GetTabName(int tabIndex)
+        {
+            if (tabIndex < 0 || tabIndex >= _tabNames.Length)
+                return "Unknown";
+
+            return _tabNames[tabIndex];
+        }
+
+        private int GetCurrentTabIndex()
+        {
+            if (!EnsureFullDemoSilently())
+                return 0;
+
+            object value = _fullDemo != null && _fullDemo ? GetFieldValue(_fullDemo, ActiveTabField) : GetFieldValue(_fullDemoOld, OldActiveTabField);
+            return value is int tabIndex ? Mathf.Clamp(tabIndex, 0, _tabNames.Length - 1) : 0;
+        }
+
+        private void SetActiveTab(int tabIndex)
+        {
+            if (_fullDemo != null && _fullDemo)
+                SetFieldValue(_fullDemo, ActiveTabField, Mathf.Clamp(tabIndex, 0, _tabNames.Length - 1));
+            else if (_fullDemoOld != null && _fullDemoOld)
+            {
+                SetFieldValue(_fullDemoOld, OldActiveTabField, Mathf.Clamp(tabIndex, 0, _tabNames.Length - 1));
+                SetFieldValue(_fullDemoOld, OldShowWindowField, true);
+            }
+        }
+
+        private void ResizeDemoWindow()
+        {
+            if (_fullDemo != null && _fullDemo)
+                SetFieldValue(_fullDemo, WindowRectField, GetShowcaseRect());
+            else if (_fullDemoOld != null && _fullDemoOld)
+            {
+                SetFieldValue(_fullDemoOld, OldWindowRectField, GetShowcaseRect());
+                SetFieldValue(_fullDemoOld, OldShowWindowField, true);
+            }
+        }
+
+        private Rect GetShowcaseRect()
+        {
+            float margin = Mathf.Max(0f, _showcaseMargin);
+            float width = Mathf.Max(960f, Screen.width - (margin * 2f));
+            float height = Mathf.Max(720f, Screen.height - (margin * 2f));
+            float x = Mathf.Max(0f, (Screen.width - width) * 0.5f);
+            float y = Mathf.Max(0f, (Screen.height - height) * 0.5f);
+            return new Rect(x, y, width, height);
+        }
+
+        private Rect GetCaptureRect()
+        {
+            object value = _fullDemo != null && _fullDemo ? GetFieldValue(_fullDemo, WindowRectField) : GetFieldValue(_fullDemoOld, OldWindowRectField);
+            Rect rect = value is Rect currentRect ? currentRect : GetShowcaseRect();
+
+            if (_padding <= 0)
+                return rect;
+
+            rect.x -= _padding;
+            rect.y -= _padding;
+            rect.width += _padding * 2f;
+            rect.height += _padding * 2f;
             return rect;
         }
 
-        void CaptureRegion(Rect rect, string filePath)
+        private GUIHelper GetFullDemoHelper()
         {
-            int x = Mathf.FloorToInt(Mathf.Max(0, rect.x));
-            int y = Mathf.FloorToInt(Mathf.Max(0, Screen.height - rect.y - rect.height));
+            object value = _fullDemo != null && _fullDemo ? GetFieldValue(_fullDemo, GuiField) : GetFieldValue(_fullDemoOld, OldGuiField);
+            return value as GUIHelper;
+        }
+
+        private object GetFieldValue(object instance, string fieldName)
+        {
+            if (instance == null || string.IsNullOrWhiteSpace(fieldName))
+                return null;
+
+            FieldInfo field = instance.GetType().GetField(fieldName, BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public);
+            return field?.GetValue(instance);
+        }
+
+        private void SetFieldValue(object instance, string fieldName, object value)
+        {
+            if (instance == null || string.IsNullOrWhiteSpace(fieldName))
+                return;
+
+            FieldInfo field = instance.GetType().GetField(fieldName, BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public);
+            field?.SetValue(instance, value);
+        }
+
+        private void InvokeHelper(object instance, string methodName, params object[] args)
+        {
+            if (instance == null || string.IsNullOrWhiteSpace(methodName))
+                return;
+
+            object[] provided = args ?? Array.Empty<object>();
+            MethodInfo[] methods = instance.GetType().GetMethods(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
+
+            for (int i = 0; i < methods.Length; i++)
+            {
+                MethodInfo method = methods[i];
+                if (!string.Equals(method.Name, methodName, StringComparison.Ordinal))
+                    continue;
+
+                ParameterInfo[] parameters = method.GetParameters();
+                if (parameters.Length < provided.Length)
+                    continue;
+
+                bool compatible = true;
+                for (int j = 0; j < provided.Length; j++)
+                {
+                    object arg = provided[j];
+                    if (arg == null)
+                        continue;
+
+                    Type expectedType = parameters[j].ParameterType;
+                    if (expectedType.IsInstanceOfType(arg))
+                        continue;
+
+                    if (expectedType.IsEnum && arg is int)
+                        continue;
+
+                    compatible = false;
+                    break;
+                }
+
+                if (!compatible)
+                    continue;
+
+                for (int j = provided.Length; j < parameters.Length; j++)
+                {
+                    if (!parameters[j].IsOptional)
+                    {
+                        compatible = false;
+                        break;
+                    }
+                }
+
+                if (!compatible)
+                    continue;
+
+                object[] invokeArgs = new object[parameters.Length];
+                for (int j = 0; j < provided.Length; j++)
+                    invokeArgs[j] = provided[j];
+                for (int j = provided.Length; j < parameters.Length; j++)
+                    invokeArgs[j] = Type.Missing;
+
+                method.Invoke(instance, invokeArgs);
+                return;
+            }
+        }
+
+        private string BuildOutputPath(int tabIndex, bool animated)
+        {
+            string suffix = animated ? ".gif" : ".png";
+            string timestamp = _appendTimestamp ? $"_{DateTime.Now:yyyyMMdd_HHmmss}" : string.Empty;
+            string prefix = _fullDemo != null && _fullDemo ? "FullDemo" : "FullDemo_old";
+            string fileName = $"{prefix}_{tabIndex + 1:D2}_{SanitizeFileName(GetTabName(tabIndex))}{timestamp}{suffix}";
+            return Path.Combine(GetOutputFolderPath(), fileName);
+        }
+
+        private string BuildFrameDirectory(int tabIndex)
+        {
+            string timestamp = _appendTimestamp ? $"_{DateTime.Now:yyyyMMdd_HHmmss}" : string.Empty;
+            string prefix = _fullDemo != null && _fullDemo ? "FullDemo" : "FullDemo_old";
+            string folderName = $"{prefix}_{tabIndex + 1:D2}_{SanitizeFileName(GetTabName(tabIndex))}{timestamp}_frames";
+            return Path.Combine(GetOutputFolderPath(), folderName);
+        }
+
+        private string GetOutputFolderPath() => Path.Combine(Application.dataPath, "..", _outputFolder);
+
+        private bool TryCreateGif(string framesDir, string gifPath)
+        {
+            string ffmpegExe = ResolveFfmpegPath();
+            if (string.IsNullOrWhiteSpace(ffmpegExe))
+            {
+                _status = "ffmpeg path is invalid";
+                return false;
+            }
+
+            string palettePath = Path.Combine(framesDir, "palette.png");
+            string inputPattern = Path.Combine(framesDir, "frame_%04d.png");
+
+            bool paletteCreated = RunProcess(ffmpegExe, $"-y -framerate {_gifFps} -i \"{inputPattern}\" -vf \"palettegen=reserve_transparent=0\" \"{palettePath}\"");
+            if (!paletteCreated || !File.Exists(palettePath))
+                return false;
+
+            bool gifCreated = RunProcess(ffmpegExe, $"-y -framerate {_gifFps} -i \"{inputPattern}\" -i \"{palettePath}\" -lavfi \"paletteuse=dither=bayer:bayer_scale=5\" -loop 0 \"{gifPath}\"");
+            return gifCreated && File.Exists(gifPath);
+        }
+
+        private string ResolveFfmpegPath()
+        {
+            if (string.IsNullOrWhiteSpace(_ffmpegPath))
+                return null;
+
+            if (File.Exists(_ffmpegPath))
+                return _ffmpegPath;
+
+            return string.Equals(_ffmpegPath, "ffmpeg", StringComparison.OrdinalIgnoreCase) ? _ffmpegPath : null;
+        }
+
+        private bool RunProcess(string exePath, string arguments)
+        {
+            try
+            {
+                var errorOutput = new StringBuilder();
+
+                using var process = new Process();
+                process.StartInfo = new ProcessStartInfo
+                {
+                    FileName = exePath,
+                    Arguments = arguments,
+                    UseShellExecute = false,
+                    CreateNoWindow = true,
+                    RedirectStandardError = true,
+                };
+                process.ErrorDataReceived += (_, e) =>
+                {
+                    if (!string.IsNullOrWhiteSpace(e.Data))
+                        errorOutput.AppendLine(e.Data);
+                };
+
+                process.Start();
+                process.BeginErrorReadLine();
+
+                if (!process.WaitForExit(120000))
+                {
+                    _status = "ffmpeg timed out";
+                    try
+                    {
+                        process.Kill();
+                    }
+                    catch { }
+
+                    UnityEngine.Debug.LogError($"ffmpeg timed out: {exePath} {arguments}");
+                    return false;
+                }
+
+                process.WaitForExit();
+                if (process.ExitCode != 0)
+                {
+                    _status = $"ffmpeg failed ({process.ExitCode})";
+                    if (errorOutput.Length > 0)
+                        UnityEngine.Debug.LogError(errorOutput.ToString());
+                }
+
+                return process.ExitCode == 0;
+            }
+            catch (Exception ex)
+            {
+                _status = $"Process failed: {ex.GetType().Name}";
+                UnityEngine.Debug.LogException(ex);
+                return false;
+            }
+        }
+
+        private void CaptureRegion(Rect rect, string filePath)
+        {
+            int x = Mathf.FloorToInt(Mathf.Max(0f, rect.x));
+            int y = Mathf.FloorToInt(Mathf.Max(0f, Screen.height - rect.y - rect.height));
             int width = Mathf.FloorToInt(Mathf.Min(rect.width, Screen.width - x));
             int height = Mathf.FloorToInt(Mathf.Min(rect.height, Screen.height - y));
 
             if (width <= 0 || height <= 0)
                 return;
 
-            Texture2D screenshot = new Texture2D(width, height, TextureFormat.RGB24, false);
-            screenshot.ReadPixels(new Rect(x, y, width, height), 0, 0);
-            screenshot.Apply();
+            Texture2D fullTexture = ScreenCapture.CaptureScreenshotAsTexture();
+            if (fullTexture == null)
+            {
+                _status = "Failed to capture screenshot";
+                return;
+            }
 
-            byte[] bytes = screenshot.EncodeToPNG();
-            File.WriteAllBytes(filePath, bytes);
-            Destroy(screenshot);
+            width = Mathf.Min(width, fullTexture.width - x);
+            height = Mathf.Min(height, fullTexture.height - y);
+            if (width <= 0 || height <= 0)
+            {
+                Destroy(fullTexture);
+                return;
+            }
+
+            Texture2D cropped = new Texture2D(width, height, TextureFormat.RGB24, false);
+            cropped.SetPixels(fullTexture.GetPixels(x, y, width, height));
+            cropped.Apply();
+
+            File.WriteAllBytes(filePath, cropped.EncodeToPNG());
+
+            Destroy(fullTexture);
+            Destroy(cropped);
         }
 
-        void EnsureOutputFolder()
-        {
-            string path = Path.Combine(Application.dataPath, "..", _outputFolder);
-            EnsureDirectory(path);
-        }
+        private void EnsureOutputFolder() => EnsureDirectory(GetOutputFolderPath());
 
-        void EnsureDirectory(string path)
+        private void EnsureDirectory(string path)
         {
-            if (!string.IsNullOrEmpty(path) && !Directory.Exists(path))
+            if (!string.IsNullOrWhiteSpace(path) && !Directory.Exists(path))
                 Directory.CreateDirectory(path);
         }
 
-        string SanitizeFileName(string name)
+        private void RecreateDirectory(string path)
         {
-            if (string.IsNullOrEmpty(name))
+            DeleteDirectory(path);
+            Directory.CreateDirectory(path);
+        }
+
+        private void DeleteDirectory(string path)
+        {
+            try
+            {
+                if (Directory.Exists(path))
+                    Directory.Delete(path, true);
+            }
+            catch (Exception ex)
+            {
+                UnityEngine.Debug.LogException(ex);
+            }
+        }
+
+        private string SanitizeFileName(string value)
+        {
+            if (string.IsNullOrWhiteSpace(value))
                 return "unnamed";
-            foreach (char c in Path.GetInvalidFileNameChars())
-                name = name.Replace(c, '_');
-            return name.Replace(' ', '_');
+
+            foreach (char invalid in Path.GetInvalidFileNameChars())
+                value = value.Replace(invalid, '_');
+
+            return value.Replace(' ', '_');
         }
 
-        void OpenOutputFolder()
+        private void OpenOutputFolder()
         {
-            string path = Path.Combine(Application.dataPath, "..", _outputFolder);
-            if (Directory.Exists(path))
-                System.Diagnostics.Process.Start(path);
-            else
-                _status = "Folder doesn't exist yet";
-        }
-
-        new T FindFirstObjectByType<T>()
-            where T : MonoBehaviour
-        {
-            return UnityEngine.Object.FindFirstObjectByType<T>();
+            string folder = GetOutputFolderPath();
+            EnsureDirectory(folder);
+            Process.Start(new ProcessStartInfo { FileName = folder, UseShellExecute = true });
         }
     }
 }

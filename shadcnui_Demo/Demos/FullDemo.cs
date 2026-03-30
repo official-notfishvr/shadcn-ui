@@ -30,6 +30,8 @@ namespace shadcnui_Demo.Menu
         private GUIHelper _gui;
         private Rect _windowRect = new(24f, 24f, 1460f, 900f);
         private Vector2 _scroll;
+        private float _lastScrollViewportHeight;
+        private float _lastScrollContentHeight;
         private int _activeTab;
 
         private readonly List<Texture2D> _generatedTextures = new();
@@ -63,6 +65,8 @@ namespace shadcnui_Demo.Menu
         private float _steppedValue = 40f;
         private float _smallSlider = 0.28f;
         private float _largeSlider = 0.84f;
+        private string _screenshotPreview = string.Empty;
+        private bool _previewToastsPrimed;
 
         private int _priorityIndex = 1;
         private int _locationIndex = 2;
@@ -128,7 +132,7 @@ namespace shadcnui_Demo.Menu
 
         private void OnGUI()
         {
-            _windowRect = GUI.Window(104, _windowRect, DrawWindow, string.Empty);
+            _windowRect = GUI.Window(104, _windowRect, (GUI.WindowFunction)DrawWindow, string.Empty);
             _gui.DrawOverlays();
         }
 
@@ -155,15 +159,7 @@ namespace shadcnui_Demo.Menu
             DrawHeader();
             _gui.HorizontalSeparator();
 
-            _activeTab = _gui.Tabs(
-                _tabs,
-                _activeTab,
-                DrawBody,
-                maxLines: 1,
-                position: TabPosition.Top,
-                indicatorStyle: IndicatorStyle.Background,
-                overflowScroll: true
-            );
+            _activeTab = _gui.Tabs(_tabs, _activeTab, DrawBody, maxLines: 1, position: TabPosition.Top, indicatorStyle: IndicatorStyle.Background, overflowScroll: true);
 
             _gui.EndGUI();
             GUI.DragWindow();
@@ -266,10 +262,22 @@ namespace shadcnui_Demo.Menu
 
                     _gui.AddSpace(28f);
                     _gui.EndVerticalGroup();
+
+                    if (Event.current.type == EventType.Repaint)
+                    {
+                        Rect contentRect = GUILayoutUtility.GetLastRect();
+                        _lastScrollContentHeight = Mathf.Max(0f, contentRect.height);
+                    }
                 },
                 GUILayout.ExpandHeight(true),
                 GUILayout.ExpandWidth(true)
             );
+
+            if (Event.current.type == EventType.Repaint)
+            {
+                Rect viewportRect = GUILayoutUtility.GetLastRect();
+                _lastScrollViewportHeight = Mathf.Max(0f, viewportRect.height);
+            }
         }
 
         private void DrawOverviewTab()
@@ -305,19 +313,17 @@ namespace shadcnui_Demo.Menu
                 "Shortcut buttons, tooltips, and summary helpers that make the rest of the demo feel like an app instead of a test harness.",
                 () =>
                 {
-                    _gui.ButtonGroup(
-                        () =>
-                        {
-                            if (_gui.Button("Save Preset", ControlVariant.Secondary))
-                                _gui.ShowSuccessToast("Preset Saved", "Window state committed");
-                            if (_gui.Button("Broadcast", new IconConfig(_sampleTexture), ControlVariant.Default))
-                                _gui.ShowInfoToast("Broadcast", "Sent current status to squad");
-                            if (_gui.WithTooltip("Show a warning toast", new TooltipConfig { HoverDelaySeconds = 0.15f }, () => _gui.Button("Alert", ControlVariant.Outline)))
-                                _gui.ShowWarningToast("Signal Weak", "Relay jitter crossed threshold");
-                            if (_gui.Button("Dismiss Toasts", ControlVariant.Ghost))
-                                _gui.DismissAllToasts();
-                        }
-                    );
+                    _gui.ButtonGroup(() =>
+                    {
+                        if (_gui.Button("Save Preset", ControlVariant.Secondary))
+                            _gui.ShowSuccessToast("Preset Saved", "Window state committed");
+                        if (_gui.Button("Broadcast", new IconConfig(_sampleTexture), ControlVariant.Default))
+                            _gui.ShowInfoToast("Broadcast", "Sent current status to squad");
+                        if (_gui.WithTooltip("Show a warning toast", new TooltipConfig { HoverDelaySeconds = 0.15f }, () => _gui.Button("Alert", ControlVariant.Outline)))
+                            _gui.ShowWarningToast("Signal Weak", "Relay jitter crossed threshold");
+                        if (_gui.Button("Dismiss Toasts", ControlVariant.Ghost))
+                            _gui.DismissAllToasts();
+                    });
 
                     _gui.AddSpace(10f);
                     _gui.KeyValueRow("Current Theme", _gui.CurrentTheme.Name);
@@ -431,8 +437,26 @@ namespace shadcnui_Demo.Menu
                     );
 
                     _gui.AddSpace(8f);
-                    _smallSlider = _gui.Slider(new SliderConfig { Value = _smallSlider, MinValue = 0f, MaxValue = 1f, Size = ControlSize.Small, Label = "Small" });
-                    _largeSlider = _gui.Slider(new SliderConfig { Value = _largeSlider, MinValue = 0f, MaxValue = 1f, Size = ControlSize.Large, Label = "Large" });
+                    _smallSlider = _gui.Slider(
+                        new SliderConfig
+                        {
+                            Value = _smallSlider,
+                            MinValue = 0f,
+                            MaxValue = 1f,
+                            Size = ControlSize.Small,
+                            Label = "Small",
+                        }
+                    );
+                    _largeSlider = _gui.Slider(
+                        new SliderConfig
+                        {
+                            Value = _largeSlider,
+                            MinValue = 0f,
+                            MaxValue = 1f,
+                            Size = ControlSize.Large,
+                            Label = "Large",
+                        }
+                    );
                     _gui.DisabledSlider(0.35f, 0f, 1f);
                 }
             );
@@ -498,28 +522,26 @@ namespace shadcnui_Demo.Menu
                 () =>
                 {
                     _priorityIndex = _gui.Select("Priority", _priorityItems, _priorityIndex);
-                    _locationIndex = _gui.Select(
-                        new SelectConfig
-                        {
-                            Id = LocationSelectId,
-                            Label = "Location",
-                            SelectedIndex = _locationIndex,
-                            Width = 280f,
-                            Options = Array.ConvertAll(_locationItems, item => new SelectOption(item.ToLowerInvariant(), item)),
-                        }
-                    );
+                    var locationConfig = new SelectConfig
+                    {
+                        Id = LocationSelectId,
+                        Label = "Location",
+                        SelectedIndex = _locationIndex,
+                        Width = 280f,
+                        Options = Array.ConvertAll(_locationItems, item => new SelectOption(item.ToLowerInvariant(), item)),
+                    };
+                    _locationIndex = _gui.Select(locationConfig);
+                    if (_screenshotPreview == "inputs_select" && Event.current.type == EventType.Repaint && !_gui.IsSelectOpen(LocationSelectId))
+                        _gui.OpenSelect(locationConfig, GUILayoutUtility.GetLastRect());
 
                     _gui.AddSpace(6f);
                     _gui.MutedLabel(_gui.IsSelectOpen(LocationSelectId) ? "Location select is open." : "Location select is closed.");
 
                     _gui.AddSpace(10f);
-                    _gui.DropdownMenu(
-                        new DropdownMenuConfig(_dropdownItems)
-                        {
-                            Id = "full_demo_dropdown",
-                            Trigger = () => _gui.Button("Open Dropdown", ControlVariant.Outline),
-                        }
-                    );
+                    var dropdownConfig = new DropdownMenuConfig(_dropdownItems) { Id = "full_demo_dropdown", Trigger = () => _gui.Button("Open Dropdown", ControlVariant.Outline) };
+                    _gui.DropdownMenu(dropdownConfig);
+                    if (_screenshotPreview == "inputs_dropdown" && Event.current.type == EventType.Repaint && !_gui.IsDropdownMenuOpen("full_demo_dropdown"))
+                        _gui.OpenDropdownMenu(dropdownConfig, GUILayoutUtility.GetLastRect());
 
                     _gui.AddSpace(12f);
                     _gui.BeginHorizontalGroup();
@@ -627,58 +649,29 @@ namespace shadcnui_Demo.Menu
                 () =>
                 {
                     _gui.BeginHorizontalGroup();
-                    _gui.Card(
-                        "Mission Brief",
-                        "Convenience card",
-                        "Use the one-call helper when you want a title, copy, and compact footer action.",
-                        () => _gui.Button("Acknowledge", ControlVariant.Secondary, ControlSize.Small),
-                        260f,
-                        210f
-                    );
-                    _gui.CardWithImage(
-                        _coverTexture,
-                        "Image Card",
-                        "Reusable content block",
-                        "Cards with images are useful for dashboards, launchers, and detail previews.",
-                        () => _gui.Button("Inspect", ControlVariant.Outline, ControlSize.Small),
-                        260f,
-                        210f
-                    );
-                    _gui.CardWithAvatar(
-                        _sampleTexture,
-                        "Squad Lead",
-                        "Rhea Vale",
-                        "Avatar cards keep title, subtitle, and body aligned to the shared token system.",
-                        () => _gui.Button("Message", ControlVariant.Ghost, ControlSize.Small),
-                        260f,
-                        210f
-                    );
+                    _gui.Card("Mission Brief", "Convenience card", "Use the one-call helper when you want a title, copy, and compact footer action.", () => _gui.Button("Acknowledge", ControlVariant.Secondary, ControlSize.Small), 260f, 210f);
+                    _gui.CardWithImage(_coverTexture, "Image Card", "Reusable content block", "Cards with images are useful for dashboards, launchers, and detail previews.", () => _gui.Button("Inspect", ControlVariant.Outline, ControlSize.Small), 260f, 210f);
+                    _gui.CardWithAvatar(_sampleTexture, "Squad Lead", "Rhea Vale", "Avatar cards keep title, subtitle, and body aligned to the shared token system.", () => _gui.Button("Message", ControlVariant.Ghost, ControlSize.Small), 260f, 210f);
                     _gui.EndHorizontalGroup();
 
                     _gui.AddSpace(10f);
                     _gui.BeginHorizontalGroup();
                     _gui.BeginCard(320f, 190f);
-                    _gui.CardHeader(
-                        () =>
+                    _gui.CardHeader(() =>
+                    {
+                        _gui.CardTitle("Manual Composition");
+                        _gui.CardDescription("Use the lower-level card helpers when you need tighter control.");
+                    });
+                    _gui.CardContent(() =>
+                    {
+                        _gui.Label("Cards can nest separators, button groups, and helper text.");
+                        _gui.LabeledSeparator("Actions");
+                        _gui.ButtonGroup(() =>
                         {
-                            _gui.CardTitle("Manual Composition");
-                            _gui.CardDescription("Use the lower-level card helpers when you need tighter control.");
-                        }
-                    );
-                    _gui.CardContent(
-                        () =>
-                        {
-                            _gui.Label("Cards can nest separators, button groups, and helper text.");
-                            _gui.LabeledSeparator("Actions");
-                            _gui.ButtonGroup(
-                                () =>
-                                {
-                                    _gui.Button("Save", ControlVariant.Secondary, ControlSize.Small);
-                                    _gui.Button("Publish", ControlVariant.Default, ControlSize.Small);
-                                }
-                            );
-                        }
-                    );
+                            _gui.Button("Save", ControlVariant.Secondary, ControlSize.Small);
+                            _gui.Button("Publish", ControlVariant.Default, ControlSize.Small);
+                        });
+                    });
                     _gui.CardFooter(() => _gui.Caption("Footer content uses the same spacing system."));
                     _gui.EndCard();
 
@@ -708,23 +701,9 @@ namespace shadcnui_Demo.Menu
                     _gui.EndHorizontalGroup();
 
                     _gui.AddSpace(12f);
-                    _nestedTabIndex = _gui.Tabs(
-                        new[] { "Overview", "Loadout", "Intel" },
-                        _nestedTabIndex,
-                        () => _gui.SimpleCard($"Nested tab: {_nestedTabIndex}", 260f, 90f),
-                        maxLines: 1,
-                        position: TabPosition.Top,
-                        indicatorStyle: IndicatorStyle.Underline
-                    );
+                    _nestedTabIndex = _gui.Tabs(new[] { "Overview", "Loadout", "Intel" }, _nestedTabIndex, () => _gui.SimpleCard($"Nested tab: {_nestedTabIndex}", 260f, 90f), maxLines: 1, position: TabPosition.Top, indicatorStyle: IndicatorStyle.Underline);
 
-                    _verticalTabIndex = _gui.VerticalTabs(
-                        new[] { "Status", "Map", "Logs" },
-                        _verticalTabIndex,
-                        () => _gui.SimpleCard($"Vertical tab: {_verticalTabIndex}", 240f, 90f),
-                        tabWidth: 120f,
-                        side: TabSide.Left,
-                        style: IndicatorStyle.Background
-                    );
+                    _verticalTabIndex = _gui.VerticalTabs(new[] { "Status", "Map", "Logs" }, _verticalTabIndex, () => _gui.SimpleCard($"Vertical tab: {_verticalTabIndex}", 240f, 90f), tabWidth: 120f, side: TabSide.Left, style: IndicatorStyle.Background);
 
                     _gui.AddSpace(10f);
                     if (_closableTabs.Length == 0)
@@ -738,12 +717,7 @@ namespace shadcnui_Demo.Menu
                     else
                     {
                         var closableIndex = Mathf.Clamp(_nestedTabIndex, 0, Mathf.Max(_closableTabs.Length - 1, 0));
-                        closableIndex = _gui.ClosableTabs(
-                            ref _closableTabs,
-                            ref _closableFlags,
-                            closableIndex,
-                            () => _gui.SimpleCard($"Closable tab count: {_closableTabs.Length}", 260f, 90f)
-                        );
+                        closableIndex = _gui.ClosableTabs(ref _closableTabs, ref _closableFlags, closableIndex, () => _gui.SimpleCard($"Closable tab count: {_closableTabs.Length}", 260f, 90f));
                         _nestedTabIndex = Mathf.Clamp(closableIndex, 0, Mathf.Max(_closableTabs.Length - 1, 0));
                     }
                 }
@@ -797,23 +771,8 @@ namespace shadcnui_Demo.Menu
                                     new MenuBar.MenuItem("Close", () => _gui.ShowWarningToast("Closed", "Session closed")),
                                 }
                             ),
-                            new MenuBar.MenuItem(
-                                "Edit",
-                                subItems: new List<MenuBar.MenuItem>
-                                {
-                                    new MenuBar.MenuItem("Duplicate", () => _gui.ShowInfoToast("Duplicate", "Copied selection")),
-                                    new MenuBar.MenuItem("Delete", () => _gui.ShowErrorToast("Delete", "Removed selection")),
-                                }
-                            ),
-                            new MenuBar.MenuItem(
-                                "View",
-                                subItems: new List<MenuBar.MenuItem>
-                                {
-                                    new MenuBar.MenuItem("Dark Theme", () => _gui.SetTheme("Dark")),
-                                    new MenuBar.MenuItem("Light Theme", () => _gui.SetTheme("Light")),
-                                    new MenuBar.MenuItem("Cyan Theme", () => _gui.SetTheme("Cyan")),
-                                }
-                            ),
+                            new MenuBar.MenuItem("Edit", subItems: new List<MenuBar.MenuItem> { new MenuBar.MenuItem("Duplicate", () => _gui.ShowInfoToast("Duplicate", "Copied selection")), new MenuBar.MenuItem("Delete", () => _gui.ShowErrorToast("Delete", "Removed selection")) }),
+                            new MenuBar.MenuItem("View", subItems: new List<MenuBar.MenuItem> { new MenuBar.MenuItem("Dark Theme", () => _gui.SetTheme("Dark")), new MenuBar.MenuItem("Light Theme", () => _gui.SetTheme("Light")), new MenuBar.MenuItem("Cyan Theme", () => _gui.SetTheme("Cyan")) }),
                         }
                     );
                 }
@@ -909,6 +868,9 @@ namespace shadcnui_Demo.Menu
 
         private void DrawOverlayTab()
         {
+            if (_screenshotPreview == "overlay_dialog")
+                _showDialog = true;
+
             DrawSection(
                 "Dialog and Popover",
                 "Modal overlays and lightweight supporting surfaces.",
@@ -928,6 +890,9 @@ namespace shadcnui_Demo.Menu
 
                     if (_showDialog)
                     {
+                        if (Event.current.type == EventType.Repaint)
+                            _gui.OpenDialog(MissionDialogId);
+
                         _gui.Dialog(
                             new DialogConfig
                             {
@@ -964,17 +929,19 @@ namespace shadcnui_Demo.Menu
 
                     if (_gui.IsPopoverOpen())
                     {
-                        _gui.Popover(
-                            () =>
-                            {
-                                _gui.Label("Status Popover");
-                                _gui.MutedLabel("Use this for supporting context without taking over the flow.");
-                                _gui.KeyValueRow("Priority", _priorityItems[_priorityIndex]);
-                                _gui.KeyValueRow("Location", _locationItems[_locationIndex]);
-                                if (_gui.Button("Close", ControlVariant.Ghost, ControlSize.Small))
-                                    _gui.ClosePopover();
-                            }
-                        );
+                        _gui.Popover(() =>
+                        {
+                            _gui.Label("Status Popover");
+                            _gui.MutedLabel("Use this for supporting context without taking over the flow.");
+                            _gui.KeyValueRow("Priority", _priorityItems[_priorityIndex]);
+                            _gui.KeyValueRow("Location", _locationItems[_locationIndex]);
+                            if (_gui.Button("Close", ControlVariant.Ghost, ControlSize.Small))
+                                _gui.ClosePopover();
+                        });
+                    }
+                    else if (_screenshotPreview == "overlay_popover" && Event.current.type == EventType.Repaint)
+                    {
+                        _gui.OpenPopover(StatusPopoverId);
                     }
                 }
             );
@@ -984,6 +951,14 @@ namespace shadcnui_Demo.Menu
                 "Tooltip wrappers and a broader set of toast behaviors.",
                 () =>
                 {
+                    if (_screenshotPreview == "overlay_toasts" && !_previewToastsPrimed)
+                    {
+                        _previewToastsPrimed = true;
+                        _gui.ShowSuccessToast("Saved", "Preset updated", 12000f);
+                        _gui.ShowWarningToast("Signal Weak", "Relay strength dropped below threshold", 12000f);
+                        _gui.ShowInfoToast("Build Info", "The demo is using the rebuilt showcase", 12000f);
+                    }
+
                     _gui.BeginHorizontalGroup();
                     _gui.WithTooltip("Primary action", () => _gui.Button("Primary"));
                     _gui.WithTooltip("Secondary action", () => _gui.Button("Secondary", ControlVariant.Secondary));
@@ -1074,13 +1049,11 @@ namespace shadcnui_Demo.Menu
         private void DrawSection(string title, string summary, Action draw)
         {
             _gui.BeginCard(-1f, -1f);
-            _gui.CardHeader(
-                () =>
-                {
-                    _gui.CardTitle(title);
-                    _gui.CardDescription(summary);
-                }
-            );
+            _gui.CardHeader(() =>
+            {
+                _gui.CardTitle(title);
+                _gui.CardDescription(summary);
+            });
             _gui.CardContent(draw);
             _gui.EndCard();
             _gui.AddSpace(12f);
@@ -1145,13 +1118,83 @@ namespace shadcnui_Demo.Menu
 
             _dataRows = new List<DataTableRow>
             {
-                new("1", new Dictionary<string, object> { ["squad"] = "Alpha", ["lead"] = "Rhea", ["status"] = "Ready", ["power"] = 93, ["region"] = "NA" }),
-                new("2", new Dictionary<string, object> { ["squad"] = "Bravo", ["lead"] = "Noah", ["status"] = "Queued", ["power"] = 71, ["region"] = "EU" }),
-                new("3", new Dictionary<string, object> { ["squad"] = "Charlie", ["lead"] = "Yara", ["status"] = "Offline", ["power"] = 14, ["region"] = "APAC" }),
-                new("4", new Dictionary<string, object> { ["squad"] = "Delta", ["lead"] = "Mina", ["status"] = "Ready", ["power"] = 88, ["region"] = "NA" }),
-                new("5", new Dictionary<string, object> { ["squad"] = "Echo", ["lead"] = "Kai", ["status"] = "Ready", ["power"] = 64, ["region"] = "LATAM" }),
-                new("6", new Dictionary<string, object> { ["squad"] = "Foxtrot", ["lead"] = "Iris", ["status"] = "Queued", ["power"] = 52, ["region"] = "EU" }),
-                new("7", new Dictionary<string, object> { ["squad"] = "Gamma", ["lead"] = "Juno", ["status"] = "Ready", ["power"] = 81, ["region"] = "APAC" }),
+                new(
+                    "1",
+                    new Dictionary<string, object>
+                    {
+                        ["squad"] = "Alpha",
+                        ["lead"] = "Rhea",
+                        ["status"] = "Ready",
+                        ["power"] = 93,
+                        ["region"] = "NA",
+                    }
+                ),
+                new(
+                    "2",
+                    new Dictionary<string, object>
+                    {
+                        ["squad"] = "Bravo",
+                        ["lead"] = "Noah",
+                        ["status"] = "Queued",
+                        ["power"] = 71,
+                        ["region"] = "EU",
+                    }
+                ),
+                new(
+                    "3",
+                    new Dictionary<string, object>
+                    {
+                        ["squad"] = "Charlie",
+                        ["lead"] = "Yara",
+                        ["status"] = "Offline",
+                        ["power"] = 14,
+                        ["region"] = "APAC",
+                    }
+                ),
+                new(
+                    "4",
+                    new Dictionary<string, object>
+                    {
+                        ["squad"] = "Delta",
+                        ["lead"] = "Mina",
+                        ["status"] = "Ready",
+                        ["power"] = 88,
+                        ["region"] = "NA",
+                    }
+                ),
+                new(
+                    "5",
+                    new Dictionary<string, object>
+                    {
+                        ["squad"] = "Echo",
+                        ["lead"] = "Kai",
+                        ["status"] = "Ready",
+                        ["power"] = 64,
+                        ["region"] = "LATAM",
+                    }
+                ),
+                new(
+                    "6",
+                    new Dictionary<string, object>
+                    {
+                        ["squad"] = "Foxtrot",
+                        ["lead"] = "Iris",
+                        ["status"] = "Queued",
+                        ["power"] = 52,
+                        ["region"] = "EU",
+                    }
+                ),
+                new(
+                    "7",
+                    new Dictionary<string, object>
+                    {
+                        ["squad"] = "Gamma",
+                        ["lead"] = "Juno",
+                        ["status"] = "Ready",
+                        ["power"] = 81,
+                        ["region"] = "APAC",
+                    }
+                ),
             };
         }
 
@@ -1185,13 +1228,7 @@ namespace shadcnui_Demo.Menu
             {
                 new ChartSeries("regions", "Regions")
                 {
-                    Data = new List<ChartDataPoint>
-                    {
-                        new("NA", 42, Theme.Hex("#38bdf8")),
-                        new("EU", 31, Theme.Hex("#22c55e")),
-                        new("APAC", 19, Theme.Hex("#f59e0b")),
-                        new("LATAM", 8, Theme.Hex("#ef4444")),
-                    },
+                    Data = new List<ChartDataPoint> { new("NA", 42, Theme.Hex("#38bdf8")), new("EU", 31, Theme.Hex("#22c55e")), new("APAC", 19, Theme.Hex("#f59e0b")), new("LATAM", 8, Theme.Hex("#ef4444")) },
                 },
             };
         }
@@ -1266,6 +1303,28 @@ namespace shadcnui_Demo.Menu
             texture.Apply();
             _generatedTextures.Add(texture);
             return texture;
+        }
+
+        public void SetScreenshotPreview(float scrollY, string previewState)
+        {
+            _scroll = new Vector2(0f, Mathf.Max(0f, scrollY));
+
+            string nextPreview = previewState ?? string.Empty;
+            if (!string.Equals(_screenshotPreview, nextPreview, StringComparison.Ordinal))
+                _previewToastsPrimed = false;
+
+            _screenshotPreview = nextPreview;
+        }
+
+        public void ClearScreenshotPreview()
+        {
+            _screenshotPreview = string.Empty;
+            _previewToastsPrimed = false;
+        }
+
+        public float GetScreenshotMaxScroll()
+        {
+            return Mathf.Max(0f, _lastScrollContentHeight - _lastScrollViewportHeight);
         }
     }
 }

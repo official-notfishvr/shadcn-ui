@@ -107,13 +107,13 @@ Check out what's possible with shadcnui:
 
 <div align="center">
 
-<img src="Screenshots/FullDemo_01_Button.png" alt="Button" width="45%">
-<img src="Screenshots/FullDemo_04_Toggle.png" alt="Toggle" width="45%">
+<img src="Screenshots/FullDemo_Old/FullDemo_old_01_Button.gif" alt="Button" width="45%">
+<img src="Screenshots/FullDemo_Old/FullDemo_old_04_Toggle.gif" alt="Toggle" width="45%">
 
-<img src="Screenshots/FullDemo_09_Card.png" alt="Card" width="45%">
-<img src="Screenshots/FullDemo_12_Label.png" alt="Label" width="45%">
+<img src="Screenshots/FullDemo_Old/FullDemo_old_09_Card.gif" alt="Card" width="45%">
+<img src="Screenshots/FullDemo_Old/FullDemo_old_12_Label.gif" alt="Label" width="45%">
 
-<img src="Screenshots/FullDemo_05_Checkbox.png" alt="Checkbox" width="45%">
+<img src="Screenshots/FullDemo_Old/FullDemo_old_05_Checkbox.gif" alt="Checkbox" width="45%">
 
 </div>
 

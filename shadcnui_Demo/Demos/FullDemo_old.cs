@@ -21,6 +21,8 @@ namespace shadcnui_Demo.Menu
         private bool showDemoWindow = false;
         private bool useVerticalTabs = false;
         private Vector2 scrollPosition;
+        private float lastScrollViewportHeight;
+        private float lastScrollContentHeight;
 
         // Demo State Variables
         private int currentDemoTab = 0;
@@ -204,9 +206,21 @@ namespace shadcnui_Demo.Menu
                         demoTabs[currentDemoTab].Content?.Invoke();
                     }
                     guiHelper.EndVerticalGroup();
+
+                    if (Event.current.type == EventType.Repaint)
+                    {
+                        Rect contentRect = GUILayoutUtility.GetLastRect();
+                        lastScrollContentHeight = Mathf.Max(0f, contentRect.height);
+                    }
                 },
                 GUILayout.ExpandHeight(true)
             );
+
+            if (Event.current.type == EventType.Repaint)
+            {
+                Rect viewportRect = GUILayoutUtility.GetLastRect();
+                lastScrollViewportHeight = Mathf.Max(0f, viewportRect.height);
+            }
         }
 
         #region Helper Methods
@@ -1658,5 +1672,10 @@ namespace shadcnui_Demo.Menu
             );
         }
         #endregion
+
+        public float GetScreenshotMaxScroll()
+        {
+            return Mathf.Max(0f, lastScrollContentHeight - lastScrollViewportHeight);
+        }
     }
 }
