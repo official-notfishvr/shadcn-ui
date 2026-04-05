@@ -10,20 +10,19 @@ namespace shadcnui_Demo.Menu
     public class AppearanceShowcase : MonoBehaviour
     {
         private GUIHelper guiHelper;
-        private Rect windowRect = new Rect(50, 50, 1100, 750);
+        private Rect windowRect = new Rect(100, 80, 960, 680);
         private bool showWindow = true;
         private Vector2 scrollPosition;
         private int activeTab;
-        private bool settingsOpen;
         private int selectedTheme = 0;
 
         private string searchText = "";
         private string noteText = "";
         private float sliderValue = 65f;
         private bool toggleValue = true;
+        private bool toggleValue2 = false;
         private int selectedOption = 0;
-        private float pulseTime;
-        private bool animateElements = true;
+        private float progressValue = 0.72f;
 
         private ComponentAppearance oceanTheme;
         private ComponentAppearance sunsetTheme;
@@ -41,46 +40,40 @@ namespace shadcnui_Demo.Menu
         {
             oceanTheme = new ComponentAppearance
             {
-                BackgroundColor = new Color(0.10f, 0.18f, 0.25f, 0.95f),
-                BorderColor = new Color(0.30f, 0.65f, 0.80f, 0.60f),
-                ForegroundColor = new Color(0.95f, 0.97f, 0.98f, 1f),
-                AccentColor = new Color(0.40f, 0.75f, 0.90f, 1f),
-                BorderRadius = 10f,
+                BackgroundColor = new Color(0.08f, 0.12f, 0.18f, 1f),
+                BorderColor = new Color(0.25f, 0.45f, 0.65f, 0.40f),
+                ForegroundColor = new Color(0.90f, 0.95f, 1f, 1f),
+                AccentColor = new Color(0.35f, 0.70f, 0.95f, 1f),
+                BorderRadius = 8f,
                 BorderThickness = 1f,
             };
 
             sunsetTheme = new ComponentAppearance
             {
-                BackgroundColor = new Color(0.22f, 0.12f, 0.15f, 0.96f),
-                BorderColor = new Color(0.90f, 0.50f, 0.40f, 0.55f),
-                ForegroundColor = new Color(1f, 0.96f, 0.94f, 1f),
-                AccentColor = new Color(1f, 0.60f, 0.45f, 1f),
-                BorderRadius = 10f,
+                BackgroundColor = new Color(0.18f, 0.10f, 0.12f, 1f),
+                BorderColor = new Color(0.75f, 0.35f, 0.30f, 0.40f),
+                ForegroundColor = new Color(1f, 0.92f, 0.90f, 1f),
+                AccentColor = new Color(0.95f, 0.45f, 0.35f, 1f),
+                BorderRadius = 8f,
                 BorderThickness = 1f,
             };
 
             forestTheme = new ComponentAppearance
             {
-                BackgroundColor = new Color(0.12f, 0.20f, 0.14f, 0.95f),
-                BorderColor = new Color(0.40f, 0.70f, 0.45f, 0.55f),
-                ForegroundColor = new Color(0.95f, 0.97f, 0.95f, 1f),
-                AccentColor = new Color(0.55f, 0.85f, 0.55f, 1f),
-                BorderRadius = 10f,
+                BackgroundColor = new Color(0.08f, 0.15f, 0.10f, 1f),
+                BorderColor = new Color(0.30f, 0.60f, 0.35f, 0.40f),
+                ForegroundColor = new Color(0.90f, 0.97f, 0.92f, 1f),
+                AccentColor = new Color(0.45f, 0.85f, 0.45f, 1f),
+                BorderRadius = 8f,
                 BorderThickness = 1f,
             };
-        }
-
-        void Update()
-        {
-            if (animateElements)
-                pulseTime += Time.deltaTime * 2f;
         }
 
         void OnGUI()
         {
             if (!showWindow)
             {
-                if (GUI.Button(new Rect(20, 20, 160, 32), "Open Showcase"))
+                if (GUI.Button(new Rect(20, 20, 140, 32), "Open Showcase"))
                     showWindow = true;
                 return;
             }
@@ -95,189 +88,228 @@ namespace shadcnui_Demo.Menu
             if (!guiHelper.BeginGUI())
                 return;
 
-            DrawTitleBar();
-            DrawContent();
+            DrawHeader();
+            DrawLayout();
 
             guiHelper.EndGUI();
-
-            GUI.DragWindow(new Rect(0, 0, windowRect.width, 44));
+            GUI.DragWindow(new Rect(0, 0, windowRect.width, 48));
         }
 
-        private void DrawTitleBar()
+        private void DrawHeader()
         {
             var theme = guiHelper.CurrentTheme;
-            GUI.color = theme.Elevated;
-            GUI.DrawTexture(new Rect(0, 0, windowRect.width, 44), Texture2D.whiteTexture);
+            GUI.color = new Color(0.06f, 0.06f, 0.08f, 0.98f);
+            GUI.DrawTexture(new Rect(0, 0, windowRect.width, 48), Texture2D.whiteTexture);
             GUI.color = Color.white;
 
-            guiHelper.BeginHorizontalGroup(GUILayout.Height(44));
-            guiHelper.AddSpace(16f);
+            guiHelper.BeginHorizontalGroup(GUILayout.Height(48));
+            guiHelper.AddSpace(20f);
 
-            guiHelper.Label("shadcn/ui", ControlVariant.Default, appearance: currentAppearance);
+            var titleStyle = guiHelper.GetStyleManager().GetLabelStyle(ControlVariant.Default);
+            titleStyle.fontStyle = FontStyle.Bold;
+            titleStyle.fontSize = guiHelper.GetStyleManager().GetScaledFontSize(1.1f);
+            UnityHelpers.Label("Appearance", titleStyle);
 
             GUILayout.FlexibleSpace();
 
-            guiHelper.BeginHorizontalGroup();
-            guiHelper.Button("Settings", ControlVariant.Ghost, ControlSize.Small, appearance: currentAppearance, onClick: () => settingsOpen = !settingsOpen);
-            guiHelper.AddSpace(12f);
-            animateElements = guiHelper.Toggle("Animate", animateElements, appearance: currentAppearance);
-            guiHelper.AddSpace(12f);
-            guiHelper.Button("X", ControlVariant.Ghost, ControlSize.Small, appearance: currentAppearance, onClick: () => showWindow = false);
-            guiHelper.EndHorizontalGroup();
+            DrawThemeSelector();
 
             guiHelper.AddSpace(16f);
+            guiHelper.Button("\u2715", ControlVariant.Ghost, ControlSize.Small, appearance: currentAppearance, onClick: () => showWindow = false);
+            guiHelper.AddSpace(16f);
             guiHelper.EndHorizontalGroup();
-
-            if (settingsOpen)
-                DrawSettingsPanel();
         }
 
-        private void DrawSettingsPanel()
+        private void DrawThemeSelector()
         {
-            int previousTheme = selectedTheme;
+            guiHelper.BeginHorizontalGroup();
+            guiHelper.Label("Theme:", ControlVariant.Muted, appearance: currentAppearance);
+            guiHelper.AddSpace(8f);
 
-            guiHelper.BeginCard(-1f, 140f, ControlVariant.Default, ControlSize.Default, currentAppearance);
-            guiHelper.CardHeader(() => guiHelper.CardTitle("Appearance Settings", appearance: currentAppearance));
-            guiHelper.CardContent(() =>
+            string[] themes = { "Ocean", "Sunset", "Forest" };
+            for (int i = 0; i < themes.Length; i++)
             {
-                guiHelper.BeginHorizontalGroup();
-                guiHelper.Label("Theme:", ControlVariant.Default, appearance: currentAppearance);
-                selectedTheme = guiHelper.Select(
-                    new SelectConfig
+                bool isActive = selectedTheme == i;
+                var variant = isActive ? ControlVariant.Default : ControlVariant.Ghost;
+                guiHelper.Button(
+                    themes[i],
+                    variant,
+                    ControlSize.Small,
+                    appearance: currentAppearance,
+                    onClick: () =>
                     {
-                        Options = new[] { new SelectOption("Ocean", "ocean"), new SelectOption("Sunset", "sunset"), new SelectOption("Forest", "forest") },
-                        SelectedIndex = selectedTheme,
-                        Appearance = currentAppearance,
+                        selectedTheme = i;
+                        ApplyTheme(i);
                     }
                 );
-                guiHelper.EndHorizontalGroup();
-            });
-            guiHelper.EndCard();
-
-            if (selectedTheme != previousTheme)
-                ApplyTheme(selectedTheme);
-        }
-
-        private void ApplyTheme(int themeIndex)
-        {
-            switch (themeIndex)
-            {
-                case 0:
-                    currentAppearance = oceanTheme;
-                    break;
-                case 1:
-                    currentAppearance = sunsetTheme;
-                    break;
-                case 2:
-                    currentAppearance = forestTheme;
-                    break;
+                guiHelper.AddSpace(4f);
             }
+
+            guiHelper.EndHorizontalGroup();
         }
 
-        private void DrawContent()
+        private void ApplyTheme(int index)
         {
-            guiHelper.BeginVerticalGroup();
+            currentAppearance = index switch
+            {
+                0 => oceanTheme,
+                1 => sunsetTheme,
+                2 => forestTheme,
+                _ => oceanTheme,
+            };
+        }
+
+        private void DrawLayout()
+        {
+            guiHelper.BeginHorizontalGroup(GUILayout.ExpandHeight(true));
+
+            DrawSidebar();
+            DrawMainContent();
+
+            guiHelper.EndHorizontalGroup();
+        }
+
+        private void DrawSidebar()
+        {
+            var sidebarBg = new Color(0.05f, 0.05f, 0.06f, 0.6f);
+            float sidebarWidth = 180f;
+
+            GUI.color = sidebarBg;
+            GUI.DrawTexture(new Rect(0, 48, sidebarWidth, windowRect.height - 48), Texture2D.whiteTexture);
+            GUI.color = Color.white;
+
+            guiHelper.BeginVerticalGroup(GUILayout.Width(sidebarWidth), GUILayout.ExpandHeight(true));
+            guiHelper.AddSpace(16f);
+
+            string[] tabs = { "Overview", "Controls", "Feedback", "Data" };
+            for (int i = 0; i < tabs.Length; i++)
+            {
+                bool isActive = activeTab == i;
+                var variant = isActive ? ControlVariant.Default : ControlVariant.Ghost;
+                guiHelper.Button(tabs[i], variant, ControlSize.Default, appearance: currentAppearance, onClick: () => activeTab = i);
+                guiHelper.AddSpace(10f);
+            }
+
+            GUILayout.FlexibleSpace();
+
+            guiHelper.Separator(SeparatorOrientation.Horizontal, appearance: currentAppearance);
+            guiHelper.AddSpace(8f);
+            guiHelper.Label("v1.0.0", ControlVariant.Muted, appearance: currentAppearance);
             guiHelper.AddSpace(12f);
 
-            activeTab = guiHelper.Tabs(new[] { "Overview", "Inputs", "Display", "Charts" }, activeTab, DrawTabContent, appearance: currentAppearance);
-
-            guiHelper.AddSpace(8f);
             guiHelper.EndVerticalGroup();
         }
 
-        private void DrawTabContent()
+        private void DrawMainContent()
         {
-            guiHelper.BeginCard(-1f, -1f, ControlVariant.Default, ControlSize.Default, currentAppearance);
-            guiHelper.CardContent(() =>
+            guiHelper.BeginVerticalGroup(GUILayout.ExpandWidth(true), GUILayout.ExpandHeight(true));
+            guiHelper.AddSpace(20f);
+
+            scrollPosition = GUILayout.BeginScrollView(scrollPosition, GUIStyle.none, GUI.skin.verticalScrollbar);
+
+            guiHelper.BeginVerticalGroup();
+            guiHelper.AddSpace(8f);
+
+            switch (activeTab)
             {
-                scrollPosition = GUILayout.BeginScrollView(scrollPosition, GUIStyle.none, GUI.skin.verticalScrollbar);
+                case 0:
+                    DrawOverviewTab();
+                    break;
+                case 1:
+                    DrawControlsTab();
+                    break;
+                case 2:
+                    DrawFeedbackTab();
+                    break;
+                case 3:
+                    DrawDataTab();
+                    break;
+            }
 
-                guiHelper.BeginVerticalGroup();
-                guiHelper.AddSpace(12f);
+            guiHelper.AddSpace(24f);
+            guiHelper.EndVerticalGroup();
 
-                switch (activeTab)
-                {
-                    case 0:
-                        DrawOverviewTab();
-                        break;
-                    case 1:
-                        DrawInputsTab();
-                        break;
-                    case 2:
-                        DrawDisplayTab();
-                        break;
-                    case 3:
-                        DrawChartsTab();
-                        break;
-                }
-
-                guiHelper.AddSpace(12f);
-                guiHelper.EndVerticalGroup();
-
-                GUILayout.EndScrollView();
-            });
-            guiHelper.EndCard();
+            GUILayout.EndScrollView();
+            guiHelper.EndVerticalGroup();
         }
 
         private void DrawOverviewTab()
         {
             DrawSection(
-                "Button Variants",
+                "Colors",
+                () =>
+                {
+                    guiHelper.BeginHorizontalGroup();
+                    DrawColorSwatch("Background", currentAppearance.BackgroundColor ?? Color.gray);
+                    guiHelper.AddSpace(12f);
+                    DrawColorSwatch("Border", currentAppearance.BorderColor ?? Color.gray);
+                    guiHelper.AddSpace(12f);
+                    DrawColorSwatch("Text", currentAppearance.ForegroundColor ?? Color.gray);
+                    guiHelper.AddSpace(12f);
+                    DrawColorSwatch("Accent", currentAppearance.AccentColor ?? Color.gray);
+                    guiHelper.EndHorizontalGroup();
+                }
+            );
+
+            DrawSection(
+                "Buttons",
                 () =>
                 {
                     guiHelper.BeginHorizontalGroup();
                     guiHelper.Button("Default", ControlVariant.Default, appearance: currentAppearance);
                     guiHelper.Button("Secondary", ControlVariant.Secondary, appearance: currentAppearance);
-                    guiHelper.Button("Outline", ControlVariant.Outline, appearance: currentAppearance);
-                    guiHelper.Button("Ghost", ControlVariant.Ghost, appearance: currentAppearance);
+                    guiHelper.Button("Destructive", ControlVariant.Destructive, appearance: currentAppearance);
                     guiHelper.EndHorizontalGroup();
 
                     guiHelper.AddSpace(8f);
-                    guiHelper.Button("Destructive", ControlVariant.Destructive, appearance: currentAppearance);
+                    guiHelper.BeginHorizontalGroup();
+                    guiHelper.Button("Outline", ControlVariant.Outline, appearance: currentAppearance);
+                    guiHelper.Button("Ghost", ControlVariant.Ghost, appearance: currentAppearance);
+                    guiHelper.EndHorizontalGroup();
                 }
             );
 
             DrawSection(
-                "Button Sizes",
+                "Sizes",
                 () =>
                 {
                     guiHelper.BeginHorizontalGroup();
                     guiHelper.Button("Small", ControlVariant.Default, ControlSize.Small, appearance: currentAppearance);
-                    guiHelper.Button("Default", ControlVariant.Default, ControlSize.Default, appearance: currentAppearance);
+                    guiHelper.Button("Default", ControlVariant.Default, appearance: currentAppearance);
                     guiHelper.Button("Large", ControlVariant.Default, ControlSize.Large, appearance: currentAppearance);
                     guiHelper.EndHorizontalGroup();
                 }
             );
 
             DrawSection(
-                "Themed Buttons",
+                "Badges",
                 () =>
                 {
                     guiHelper.BeginHorizontalGroup();
-                    guiHelper.Button(new ButtonConfig { Text = "Ocean", Appearance = oceanTheme });
-                    guiHelper.Button(new ButtonConfig { Text = "Sunset", Appearance = sunsetTheme });
-                    guiHelper.Button(new ButtonConfig { Text = "Forest", Appearance = forestTheme });
-                    guiHelper.EndHorizontalGroup();
-                }
-            );
-
-            DrawSection(
-                "Themed Badges",
-                () =>
-                {
-                    guiHelper.BeginHorizontalGroup();
-                    guiHelper.Badge(new BadgeConfig { Text = "Ocean", Appearance = oceanTheme });
-                    guiHelper.Badge(new BadgeConfig { Text = "Sunset", Appearance = sunsetTheme });
-                    guiHelper.Badge(new BadgeConfig { Text = "Forest", Appearance = forestTheme });
+                    guiHelper.Badge("Default", appearance: currentAppearance);
+                    guiHelper.Badge("Secondary", ControlVariant.Secondary, appearance: currentAppearance);
+                    guiHelper.Badge("Destructive", ControlVariant.Destructive, appearance: currentAppearance);
+                    guiHelper.Badge("Outline", ControlVariant.Outline, appearance: currentAppearance);
                     guiHelper.EndHorizontalGroup();
                 }
             );
         }
 
-        private void DrawInputsTab()
+        private void DrawColorSwatch(string label, Color color)
+        {
+            guiHelper.BeginVerticalGroup();
+            var rect = GUILayoutUtility.GetRect(48f, 48f);
+            GUI.color = color;
+            GUI.DrawTexture(rect, Texture2D.whiteTexture);
+            GUI.color = Color.white;
+            guiHelper.Label(label, ControlVariant.Muted, appearance: currentAppearance);
+            guiHelper.EndVerticalGroup();
+        }
+
+        private void DrawControlsTab()
         {
             DrawSection(
-                "Text Input",
+                "Input",
                 () =>
                 {
                     searchText = guiHelper.Input(
@@ -285,7 +317,7 @@ namespace shadcnui_Demo.Menu
                         {
                             Label = "Search",
                             Value = searchText,
-                            Placeholder = "Search...",
+                            Placeholder = "Type to search...",
                             Appearance = currentAppearance,
                         }
                     );
@@ -299,26 +331,10 @@ namespace shadcnui_Demo.Menu
                     noteText = guiHelper.TextArea(
                         new TextAreaConfig
                         {
-                            Label = "Description",
+                            Label = "Notes",
                             Value = noteText,
-                            MinHeight = 60f,
-                            Appearance = currentAppearance,
-                        }
-                    );
-                }
-            );
-
-            DrawSection(
-                "Slider",
-                () =>
-                {
-                    sliderValue = guiHelper.Slider(
-                        new SliderConfig
-                        {
-                            Label = "Progress",
-                            Value = sliderValue,
-                            MinValue = 0f,
-                            MaxValue = 100f,
+                            Placeholder = "Write something...",
+                            MinHeight = 80f,
                             Appearance = currentAppearance,
                         }
                     );
@@ -329,47 +345,63 @@ namespace shadcnui_Demo.Menu
                 "Toggle",
                 () =>
                 {
-                    toggleValue = guiHelper.Toggle("Enable feature", toggleValue, appearance: currentAppearance);
+                    guiHelper.BeginVerticalGroup();
+                    toggleValue = guiHelper.Toggle("Enable notifications", toggleValue, appearance: currentAppearance);
+                    guiHelper.AddSpace(8f);
+                    toggleValue2 = guiHelper.Toggle("Dark mode", toggleValue2, appearance: currentAppearance);
+                    guiHelper.EndVerticalGroup();
+                }
+            );
+
+            DrawSection(
+                "Slider",
+                () =>
+                {
+                    sliderValue = guiHelper.Slider(
+                        new SliderConfig
+                        {
+                            Label = "Volume",
+                            Value = sliderValue,
+                            MinValue = 0f,
+                            MaxValue = 100f,
+                            Appearance = currentAppearance,
+                        }
+                    );
                 }
             );
         }
 
-        private void DrawDisplayTab()
+        private void DrawFeedbackTab()
         {
             DrawSection(
-                "Progress Indicators",
+                "Progress",
                 () =>
                 {
-                    if (animateElements)
-                    {
-                        float animated = Mathf.PingPong(Time.time * 0.3f, 1f);
-                        guiHelper.AnimatedProgress("prog1", animated, appearance: currentAppearance);
-                    }
-                    else
-                    {
-                        guiHelper.Progress(0.6f, appearance: currentAppearance);
-                    }
-
+                    guiHelper.LabeledProgress("Upload progress", progressValue, appearance: currentAppearance);
                     guiHelper.AddSpace(12f);
-                    guiHelper.LabeledProgress("Upload", 0.75f, showPercentage: true, appearance: currentAppearance);
+                    guiHelper.Progress(0.45f, appearance: currentAppearance);
                 }
             );
 
             DrawSection(
-                "Animated Badges",
+                "Animated Progress",
+                () =>
+                {
+                    float animated = Mathf.PingPong(Time.time * 0.4f, 1f);
+                    guiHelper.AnimatedProgress("anim1", animated, appearance: currentAppearance);
+                }
+            );
+
+            DrawSection(
+                "Badges",
                 () =>
                 {
                     guiHelper.BeginHorizontalGroup();
-                    if (animateElements)
-                    {
-                        guiHelper.AnimatedBadge("Live", "pulse1", ControlVariant.Destructive, appearance: currentAppearance);
-                        guiHelper.AnimatedBadge("Sync", "pulse2", ControlVariant.Default, appearance: currentAppearance);
-                    }
-                    else
-                    {
-                        guiHelper.Badge("Live", ControlVariant.Destructive, appearance: currentAppearance);
-                        guiHelper.Badge("Sync", ControlVariant.Default, appearance: currentAppearance);
-                    }
+                    guiHelper.AnimatedBadge("Live", "live1", ControlVariant.Destructive, appearance: currentAppearance);
+                    guiHelper.AddSpace(8f);
+                    guiHelper.AnimatedBadge("Syncing", "sync1", appearance: currentAppearance);
+                    guiHelper.AddSpace(8f);
+                    guiHelper.Badge("Stable", ControlVariant.Default, appearance: currentAppearance);
                     guiHelper.EndHorizontalGroup();
                 }
             );
@@ -378,16 +410,16 @@ namespace shadcnui_Demo.Menu
                 "Separators",
                 () =>
                 {
+                    guiHelper.Label("Section A", ControlVariant.Default, appearance: currentAppearance);
+                    guiHelper.AddSpace(8f);
                     guiHelper.Separator(SeparatorOrientation.Horizontal, appearance: currentAppearance);
                     guiHelper.AddSpace(8f);
-                    guiHelper.Label("Content between lines", ControlVariant.Muted, appearance: currentAppearance);
-                    guiHelper.AddSpace(8f);
-                    guiHelper.Separator(SeparatorOrientation.Horizontal, true, appearance: currentAppearance);
+                    guiHelper.Label("Section B", ControlVariant.Default, appearance: currentAppearance);
                 }
             );
         }
 
-        private void DrawChartsTab()
+        private void DrawDataTab()
         {
             var theme = guiHelper.CurrentTheme;
 
@@ -399,7 +431,7 @@ namespace shadcnui_Demo.Menu
                         new ChartConfig(
                             new List<ChartSeries>
                             {
-                                new ChartSeries("data", "Revenue", theme.Accent)
+                                new ChartSeries("revenue", "Revenue", theme.Accent)
                                 {
                                     Data = new List<ChartDataPoint> { new("Jan", 42), new("Feb", 51), new("Mar", 48), new("Apr", 62), new("May", 58), new("Jun", 71) },
                                 },
@@ -407,7 +439,7 @@ namespace shadcnui_Demo.Menu
                             ChartType.Line
                         )
                         {
-                            Size = new Vector2(480f, 180f),
+                            Size = new Vector2(520f, 200f),
                             Appearance = currentAppearance,
                         }
                     );
@@ -425,7 +457,7 @@ namespace shadcnui_Demo.Menu
                         new ChartConfig(
                             new List<ChartSeries>
                             {
-                                new ChartSeries("pie", "Data")
+                                new ChartSeries("pie", "Distribution")
                                 {
                                     Data = new List<ChartDataPoint> { new("A", 40, theme.Accent), new("B", 35, theme.Secondary), new("C", 25, theme.Muted) },
                                 },
@@ -433,7 +465,7 @@ namespace shadcnui_Demo.Menu
                             ChartType.Pie
                         )
                         {
-                            Size = new Vector2(180f, 180f),
+                            Size = new Vector2(200f, 200f),
                             Appearance = currentAppearance,
                         }
                     );
@@ -448,9 +480,9 @@ namespace shadcnui_Demo.Menu
         {
             guiHelper.BeginVerticalGroup();
             guiHelper.Label(title, ControlVariant.Default, appearance: currentAppearance);
-            guiHelper.AddSpace(8f);
+            guiHelper.AddSpace(10f);
             content();
-            guiHelper.AddSpace(20f);
+            guiHelper.AddSpace(24f);
             guiHelper.EndVerticalGroup();
         }
 

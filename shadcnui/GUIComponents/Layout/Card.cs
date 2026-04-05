@@ -162,21 +162,23 @@ namespace shadcnui.GUIComponents.Layout
                 DrawAvatar(config.Avatar);
                 layoutComponents.AddSpace(DesignTokens.Spacing.SM);
                 layoutComponents.BeginVerticalGroup();
+            }
+
+            if (!string.IsNullOrEmpty(config.Title))
                 CardTitle(config.Title);
-                if (!string.IsNullOrEmpty(config.Subtitle))
-                    CardDescription(config.Subtitle);
-                if (!string.IsNullOrEmpty(config.Description))
-                    CardDescription(config.Description);
+
+            if (!string.IsNullOrEmpty(config.Subtitle))
+                CardDescription(config.Subtitle);
+            else if (!string.IsNullOrEmpty(config.Description))
+                CardDescription(config.Description);
+
+            if (config.Avatar != null)
+            {
                 layoutComponents.EndVerticalGroup();
                 layoutComponents.EndHorizontalGroup();
                 return;
             }
 
-            CardTitle(config.Title);
-            if (!string.IsNullOrEmpty(config.Subtitle))
-                CardDescription(config.Subtitle);
-            if (!string.IsNullOrEmpty(config.Description))
-                CardDescription(config.Description);
             config.HeaderContent?.Invoke();
         }
 

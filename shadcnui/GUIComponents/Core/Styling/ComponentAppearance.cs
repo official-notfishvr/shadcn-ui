@@ -23,33 +23,4 @@ namespace shadcnui.GUIComponents.Core.Styling
 
         internal bool IsInlineOverride => TemplateStyle != null || ReplaceBaseStyle || BackgroundColor.HasValue || ForegroundColor.HasValue || BorderColor.HasValue || AccentColor.HasValue || BorderRadius.HasValue || BorderThickness.HasValue || Modifier != null;
     }
-
-    public sealed class RegisteredStyleProfile
-    {
-        public UnityHelpers.GUIStyle TemplateStyle { get; set; }
-        public bool ReplaceBaseStyle { get; set; }
-        public Color? BackgroundColor { get; set; }
-        public Color? ForegroundColor { get; set; }
-        public Color? BorderColor { get; set; }
-        public Color? AccentColor { get; set; }
-        public float? BorderRadius { get; set; }
-        public float? BorderThickness { get; set; }
-        public StatefulStyleModifier Modifier { get; set; }
-
-        internal ComponentAppearance ToAppearance()
-        {
-            return new ComponentAppearance
-            {
-                TemplateStyle = TemplateStyle,
-                ReplaceBaseStyle = ReplaceBaseStyle,
-                BackgroundColor = BackgroundColor,
-                ForegroundColor = ForegroundColor,
-                BorderColor = BorderColor,
-                AccentColor = AccentColor,
-                BorderRadius = BorderRadius,
-                BorderThickness = BorderThickness,
-                Modifier = Modifier,
-            };
-        }
-    }
 }

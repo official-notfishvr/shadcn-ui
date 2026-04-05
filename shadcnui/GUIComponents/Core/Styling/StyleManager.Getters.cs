@@ -90,10 +90,10 @@ namespace shadcnui.GUIComponents.Core.Styling
             if (string.IsNullOrWhiteSpace(styleId))
                 return;
 
-            if (Registry.GetStyle(type, styleId) is not { } profile)
+            if (Registry.GetStyle(type, styleId) is not { } appearance)
                 return;
 
-            ApplyAppearance(style, profile.ToAppearance(), state);
+            ApplyAppearance(style, appearance, state);
         }
 
         private void ApplyAppearance(GUIStyle style, ComponentAppearance appearance, int state)
@@ -117,25 +117,40 @@ namespace shadcnui.GUIComponents.Core.Styling
         {
             bool hasFill = appearance.BackgroundColor.HasValue;
             bool hasText = appearance.ForegroundColor.HasValue;
+            bool hasBorder = appearance.BorderColor.HasValue;
+            bool hasRadius = appearance.BorderRadius.HasValue;
+            float borderThickness = appearance.BorderThickness ?? 1f;
 
-            if (hasFill)
+            if (!hasFill && !hasBorder && !hasText)
+                return;
+
+            if (hasFill || hasBorder)
             {
-                var fill = appearance.BackgroundColor.Value;
-                var radius = GetScaledBorderRadius(appearance.BorderRadius ?? DesignTokens.Radius.MD);
-                var height = Mathf.Max(8, Mathf.RoundToInt(style.fixedHeight > 0 ? style.fixedHeight : GetScaledHeight(DesignTokens.Height.Default)));
-                var styleWidth = style.fixedWidth > 0 ? style.fixedWidth : 512f;
-                var textureWidth = Mathf.Min(1024, Mathf.Max(128, Mathf.RoundToInt(styleWidth)));
+                var fill = appearance.BackgroundColor ?? GetTheme().Base;
+                var borderColor = hasBorder ? appearance.BorderColor.Value : Color.clear;
+                var effectiveThickness = hasBorder ? borderThickness : 0f;
 
-                Texture2D background = CreateTexture(textureWidth, height, radius, fill);
+                var baseRadius = GetScaledBorderRadius(DesignTokens.Radius.MD);
+                var radius = hasRadius ? GetScaledBorderRadius(appearance.BorderRadius.Value) : baseRadius;
+                var textureSize = 256;
 
-                style.normal.background = background;
-                style.hover.background = background;
-                style.active.background = background;
-                style.focused.background = background;
-                style.onNormal.background = background;
-                style.onHover.background = background;
-                style.onActive.background = background;
-                style.onFocused.background = background;
+                var normalBg = effectiveThickness > 0f ? CreateBorderTexture(textureSize, textureSize, radius, fill, borderColor, effectiveThickness) : CreateTexture(textureSize, textureSize, radius, fill);
+
+                var hoverBg = effectiveThickness > 0f ? CreateBorderTexture(textureSize, textureSize, radius, Lift(fill, 0.06f), Lift(borderColor, 0.06f), effectiveThickness) : CreateTexture(textureSize, textureSize, radius, Lift(fill, 0.06f));
+
+                var activeBg = effectiveThickness > 0f ? CreateBorderTexture(textureSize, textureSize, radius, Lower(fill, 0.08f), Lower(borderColor, 0.08f), effectiveThickness) : CreateTexture(textureSize, textureSize, radius, Lower(fill, 0.08f));
+
+                style.normal.background = normalBg;
+                style.hover.background = hoverBg;
+                style.active.background = activeBg;
+                style.focused.background = hoverBg;
+                style.onNormal.background = normalBg;
+                style.onHover.background = hoverBg;
+                style.onActive.background = activeBg;
+                style.onFocused.background = hoverBg;
+
+                var borderSize = Mathf.Max(1, Mathf.RoundToInt(effectiveThickness > 0f ? effectiveThickness : 1f));
+                style.border = new UnityHelpers.RectOffset(borderSize, borderSize, borderSize, borderSize);
             }
 
             if (hasText)
@@ -234,6 +249,13 @@ namespace shadcnui.GUIComponents.Core.Styling
                 target.background = source.background;
             if (source.textColor != default)
                 target.textColor = source.textColor;
+        }
+
+        private Texture2D CreateFocusedBorderTexture(GUIStyle style, float fallbackHeight = -1f)
+        {
+            var radius = GetScaledBorderRadius(DesignTokens.Radius.MD);
+            var height = Mathf.Max(28, Mathf.RoundToInt(style.fixedHeight > 0 ? style.fixedHeight : (fallbackHeight > 0 ? fallbackHeight : GetScaledHeight(DesignTokens.Height.Default))));
+            return CreateBorderTexture(128, height, radius, GetTheme().Base, Color.clear, 0f);
         }
 
         private void ApplySize(GUIStyle style, StyleComponentType type, ControlSize size)
@@ -467,7 +489,7 @@ namespace shadcnui.GUIComponents.Core.Styling
                 style =>
                 {
                     if (focused)
-                        style.focused.background = CreateBorderTexture(128, Mathf.Max(28, Mathf.RoundToInt(style.fixedHeight > 0 ? style.fixedHeight : GetScaledHeight(DesignTokens.Height.Default))), GetScaledBorderRadius(DesignTokens.Radius.MD), GetTheme().Base, Color.clear, 0f);
+                        style.focused.background = CreateFocusedBorderTexture(style);
 
                     if (disabled)
                     {
@@ -475,26 +497,6 @@ namespace shadcnui.GUIComponents.Core.Styling
                         style.hover.textColor = GetTheme().Muted;
                         style.active.textColor = GetTheme().Muted;
                     }
-                }
-            );
-        }
-
-        public GUIStyle GetPasswordFieldStyle(ControlVariant variant = ControlVariant.Default, ControlSize size = ControlSize.Default, bool focused = false, bool disabled = false, ComponentAppearance appearance = null)
-        {
-            return ResolveStyle(
-                StyleComponentType.PasswordField,
-                variant,
-                size,
-                _baseInputStyle,
-                appearance,
-                (focused ? 1 : 0) | (disabled ? 2 : 0),
-                style =>
-                {
-                    style.fontSize = GetScaledFontSize(DesignTokens.FontScale.SM);
-                    if (focused)
-                        style.focused.background = CreateBorderTexture(128, Mathf.Max(28, Mathf.RoundToInt(style.fixedHeight > 0 ? style.fixedHeight : GetScaledHeight(DesignTokens.Height.Default))), GetScaledBorderRadius(DesignTokens.Radius.MD), GetTheme().Base, Color.clear, 0f);
-                    if (disabled)
-                        style.normal.textColor = GetTheme().Muted;
                 }
             );
         }
@@ -514,7 +516,7 @@ namespace shadcnui.GUIComponents.Core.Styling
                     style.stretchHeight = true;
                     style.fixedHeight = 0f;
                     if (focused)
-                        style.focused.background = CreateBorderTexture(128, 96, GetScaledBorderRadius(DesignTokens.Radius.MD), GetTheme().Base, Color.clear, 0f);
+                        style.focused.background = CreateFocusedBorderTexture(style, 96);
                 }
             );
         }
@@ -658,22 +660,6 @@ namespace shadcnui.GUIComponents.Core.Styling
         public GUIStyle GetNavigationStyle(ControlVariant variant = ControlVariant.Default, ControlSize size = ControlSize.Default, ComponentAppearance appearance = null) => ResolveStyle(StyleComponentType.Navigation, variant, size, _navigationStyle, appearance);
 
         public GUIStyle GetPopoverContentStyle(ControlVariant variant = ControlVariant.Default, ControlSize size = ControlSize.Default, ComponentAppearance appearance = null) => ResolveStyle(StyleComponentType.Popover, variant, size, _dropdownContentStyle, appearance);
-
-        public GUIStyle GetChartAxisStyle(ControlVariant variant = ControlVariant.Default, ControlSize size = ControlSize.Default, ComponentAppearance appearance = null) =>
-            ResolveStyle(
-                StyleComponentType.ChartAxis,
-                variant,
-                size,
-                _baseLabelStyle,
-                appearance,
-                0,
-                style =>
-                {
-                    style.alignment = TextAnchor.MiddleCenter;
-                    style.normal.textColor = GetTheme().Muted;
-                    style.fontSize = GetScaledFontSize(DesignTokens.Chart.AxisFontScale);
-                }
-            );
 
         public GUIStyle GetTooltipStyle(ControlVariant variant = ControlVariant.Default, ControlSize size = ControlSize.Default, ComponentAppearance appearance = null) =>
             ResolveStyle(

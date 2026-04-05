@@ -11,7 +11,7 @@ namespace shadcnui.GUIComponents.Core.Styling
     {
         private readonly Dictionary<(StyleComponentType Type, ControlVariant Variant), StyleModifier> _variantModifiers = new();
         private readonly Dictionary<(StyleComponentType Type, ControlSize Size), StyleModifier> _sizeModifiers = new();
-        private readonly Dictionary<(StyleComponentType Type, string StyleId), RegisteredStyleProfile> _styles = new();
+        private readonly Dictionary<(StyleComponentType Type, string StyleId), ComponentAppearance> _styles = new();
 
         public StyleModifier GetVariantModifier(StyleComponentType type, ControlVariant variant)
         {
@@ -23,7 +23,7 @@ namespace shadcnui.GUIComponents.Core.Styling
             return _sizeModifiers.TryGetValue((type, size), out var modifier) ? modifier : null;
         }
 
-        public void RegisterStyle(StyleComponentType type, string styleId, RegisteredStyleProfile profile)
+        public void RegisterStyle(StyleComponentType type, string styleId, ComponentAppearance profile)
         {
             if (string.IsNullOrWhiteSpace(styleId) || profile == null)
                 return;
@@ -36,7 +36,7 @@ namespace shadcnui.GUIComponents.Core.Styling
             if (modifier == null)
                 return;
 
-            RegisterStyle(type, styleId, new RegisteredStyleProfile { Modifier = modifier });
+            RegisterStyle(type, styleId, new ComponentAppearance { Modifier = modifier });
         }
 
         public bool UnregisterStyle(StyleComponentType type, string styleId)
@@ -44,7 +44,7 @@ namespace shadcnui.GUIComponents.Core.Styling
             return !string.IsNullOrWhiteSpace(styleId) && _styles.Remove((type, styleId));
         }
 
-        public RegisteredStyleProfile GetStyle(StyleComponentType type, string styleId)
+        public ComponentAppearance GetStyle(StyleComponentType type, string styleId)
         {
             return !string.IsNullOrWhiteSpace(styleId) && _styles.TryGetValue((type, styleId), out var profile) ? profile : null;
         }

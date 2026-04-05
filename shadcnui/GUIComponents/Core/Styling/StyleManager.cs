@@ -264,7 +264,7 @@ namespace shadcnui.GUIComponents.Core.Styling
 
         public void MarkStylesCorruption() => _dirty = true;
 
-        public void RegisterStyle(StyleComponentType type, string styleId, RegisteredStyleProfile profile)
+        public void RegisterStyle(StyleComponentType type, string styleId, ComponentAppearance profile)
         {
             Registry.RegisterStyle(type, styleId, profile);
             MarkStylesCorruption();

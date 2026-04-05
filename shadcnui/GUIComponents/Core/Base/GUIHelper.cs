@@ -172,7 +172,7 @@ namespace shadcnui.GUIComponents.Core.Base
             _styleManager.MarkStylesCorruption();
         }
 
-        public void RegisterStyle(StyleComponentType type, string styleId, RegisteredStyleProfile profile)
+        public void RegisterStyle(StyleComponentType type, string styleId, ComponentAppearance profile)
         {
             _styleManager.RegisterStyle(type, styleId, profile);
         }

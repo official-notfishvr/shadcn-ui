@@ -84,7 +84,7 @@ namespace shadcnui.GUIComponents.Core.Styling
             style.onNormal.textColor = style.onHover.textColor = style.onActive.textColor = style.onFocused.textColor = text;
             style.padding = GetSpacingOffset(paddingH, paddingV);
             style.margin = new UnityHelpers.RectOffset(0, 0, 0, 0);
-            style.border = hasBorder ? new UnityHelpers.RectOffset(1, 1, 1, 1) : new UnityHelpers.RectOffset(0, 0, 0, 0);
+            style.border = new UnityHelpers.RectOffset(1, 1, 1, 1);
             style.alignment = TextAnchor.MiddleCenter;
             style.fontSize = GetScaledFontSize(DesignTokens.FontScale.SM);
             style.fontStyle = fontStyle;
@@ -133,7 +133,7 @@ namespace shadcnui.GUIComponents.Core.Styling
             style.normal.background = CreateBorderTexture(256, 256, r, fill, border, hasBorder ? 1f : 0f);
             style.padding = GetSpacingOffset(paddingH, paddingV);
             style.margin = new UnityHelpers.RectOffset(0, 0, 0, 0);
-            style.border = hasBorder ? new UnityHelpers.RectOffset(1, 1, 1, 1) : new UnityHelpers.RectOffset(0, 0, 0, 0);
+            style.border = new UnityHelpers.RectOffset(1, 1, 1, 1);
             style.normal.textColor = GetTheme().Text;
             return style;
         }
@@ -151,7 +151,7 @@ namespace shadcnui.GUIComponents.Core.Styling
             style.onActive.background = CreateBorderTexture(128, height, radius, activeFill, hasBorder ? Lower(border, 0.06f) : activeFill, hasBorder ? 1f : 0f);
             style.onFocused.background = style.onHover.background;
             style.onNormal.textColor = style.onHover.textColor = style.onActive.textColor = style.onFocused.textColor = text;
-            style.border = hasBorder ? new UnityHelpers.RectOffset(1, 1, 1, 1) : new UnityHelpers.RectOffset(0, 0, 0, 0);
+            style.border = new UnityHelpers.RectOffset(radius, radius, radius, radius);
         }
 
         private GUIStyle MakeChipStyle(Color fill, Color text)
