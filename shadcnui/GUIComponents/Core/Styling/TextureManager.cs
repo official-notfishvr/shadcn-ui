@@ -40,8 +40,9 @@ namespace shadcnui.GUIComponents.Core.Styling
             public readonly float BorderThickness;
             public readonly float ShadowAlpha;
             public readonly int ShadowBlur;
+            public readonly Color ShadowColor;
 
-            public TextureKey(int width, int height, int radius, Color fillA, Color fillB, Color border, float borderThickness, float shadowAlpha, int shadowBlur)
+            public TextureKey(int width, int height, int radius, Color fillA, Color fillB, Color border, float borderThickness, float shadowAlpha, int shadowBlur, Color shadowColor)
             {
                 Width = width;
                 Height = height;
@@ -52,6 +53,7 @@ namespace shadcnui.GUIComponents.Core.Styling
                 BorderThickness = borderThickness;
                 ShadowAlpha = shadowAlpha;
                 ShadowBlur = shadowBlur;
+                ShadowColor = shadowColor;
             }
 
             public bool Equals(TextureKey other)
@@ -64,7 +66,8 @@ namespace shadcnui.GUIComponents.Core.Styling
                     && Border.Equals(other.Border)
                     && BorderThickness.Equals(other.BorderThickness)
                     && ShadowAlpha.Equals(other.ShadowAlpha)
-                    && ShadowBlur == other.ShadowBlur;
+                    && ShadowBlur == other.ShadowBlur
+                    && ShadowColor.Equals(other.ShadowColor);
             }
 
             public override int GetHashCode()
@@ -80,6 +83,7 @@ namespace shadcnui.GUIComponents.Core.Styling
                     hash = (hash * 397) ^ BorderThickness.GetHashCode();
                     hash = (hash * 397) ^ ShadowAlpha.GetHashCode();
                     hash = (hash * 397) ^ ShadowBlur;
+                    hash = (hash * 397) ^ ShadowColor.GetHashCode();
                     return hash;
                 }
             }
@@ -95,37 +99,49 @@ namespace shadcnui.GUIComponents.Core.Styling
             DestroyAllTextures();
 
             var theme = ThemeManager.Instance.CurrentTheme;
+            var mdRadius = Mathf.Max(0, Mathf.RoundToInt(DesignTokens.Radius.MD * _helper.uiScale));
+            var lgRadius = Mathf.Max(0, Mathf.RoundToInt(DesignTokens.Radius.LG * _helper.uiScale));
+            var xlRadius = Mathf.Max(0, Mathf.RoundToInt(DesignTokens.Radius.XL * _helper.uiScale));
+            var focusHeight = Mathf.Max(1, Mathf.RoundToInt(DesignTokens.Height.Default * _helper.uiScale));
+            var tabsHeight = Mathf.Max(1, Mathf.RoundToInt(DesignTokens.Height.Small * _helper.uiScale));
+            var badgeHeight = Mathf.Max(1, Mathf.RoundToInt(DesignTokens.Badge.Height * _helper.uiScale));
+            var shadowBlurMd = Mathf.Max(0, Mathf.RoundToInt(DesignTokens.Effects.ShadowBlurMD * _helper.uiScale));
+            var shadowBlurLg = Mathf.Max(0, Mathf.RoundToInt(DesignTokens.Effects.ShadowBlurLG * _helper.uiScale));
+            var focusBlur = Mathf.Max(0, Mathf.RoundToInt(DesignTokens.Effects.FocusRingBlur * _helper.uiScale));
+            var focusShadow = new Color(theme.Accent.r, theme.Accent.g, theme.Accent.b, 0.9f);
+
             Gradient = GenerateVerticalGradient(1, 32, theme.Base, theme.Secondary);
-            Glow = GenerateGlow(32, theme.Accent);
+            Glow = GenerateGlow(64, new Color(theme.Accent.r, theme.Accent.g, theme.Accent.b, 0.18f));
             Particle = GenerateSolid(theme.Accent);
             Transparent = GenerateSolid(Color.clear);
             Separator = GenerateSolid(theme.Border);
-            InputFocused = GenerateShape(128, Mathf.RoundToInt(DesignTokens.Height.Default), 2, Color.clear, Color.clear, theme.Accent, 1f, 0f, 0);
+            InputFocused = GenerateShape(128, focusHeight, mdRadius, theme.Base, theme.Base, theme.Accent, DesignTokens.Effects.FocusRingThickness, DesignTokens.Effects.FocusRingAlpha, focusBlur, focusShadow);
             ProgressBarBackground = GenerateShape(128, DesignTokens.ProgressBar.TextureHeight, 999, theme.Secondary, theme.Secondary, Color.clear, 0f, 0f, 0);
-            TabsActive = GenerateShape(128, 36, 2, theme.TabsTriggerActiveBg, theme.TabsTriggerActiveBg, theme.Border, 1f, 0f, 0);
-            Badge = GenerateShape(96, 24, 999, theme.ButtonPrimaryBg, theme.ButtonPrimaryBg, Color.clear, 0f, 0f, 0);
+            TabsActive = GenerateShape(128, tabsHeight, mdRadius, theme.Elevated, theme.Elevated, theme.Border, 1f, DesignTokens.Effects.ShadowLight, shadowBlurMd, theme.Shadow);
+            Badge = GenerateShape(96, badgeHeight, mdRadius, theme.ButtonPrimaryBg, theme.ButtonPrimaryBg, Color.clear, 0f, 0f, 0);
             TableCell = GenerateSolid(theme.Base);
-            TableHeader = GenerateShape(128, 36, 0, theme.Secondary, theme.Secondary, theme.Border, 1f, 0f, 0);
-            TableRow = GenerateShape(128, 36, 0, theme.Base, theme.Base, theme.Border, 1f, 0f, 0);
-            TableRowAlternate = GenerateShape(128, 36, 0, theme.Elevated, theme.Elevated, theme.Border, 1f, 0f, 0);
-            DropdownMenuContent = GenerateShape(192, 192, 2, theme.Elevated, theme.Elevated, theme.Border, 1f, 0.08f, 4);
-            ChartContainer = GenerateShape(256, 256, 2, theme.Elevated, theme.Elevated, theme.Border, 1f, 0f, 0);
-            CardBackground = GenerateShape(256, 256, 2, theme.Elevated, theme.Elevated, theme.Border, 1f, 0.04f, 4);
+            TableHeader = GenerateShape(128, focusHeight, 0, theme.Secondary, theme.Secondary, theme.Border, 1f, 0f, 0);
+            TableRow = GenerateSolid(theme.Base);
+            TableRowAlternate = GenerateSolid(Color.Lerp(theme.Base, theme.Secondary, 0.45f));
+            DropdownMenuContent = GenerateShape(192, 192, lgRadius, theme.Elevated, theme.Elevated, theme.Border, 1f, DesignTokens.Effects.ShadowMedium, shadowBlurMd, theme.Shadow);
+            ChartContainer = GenerateShape(256, 256, xlRadius, theme.Elevated, theme.Elevated, theme.Border, 1f, 0f, 0);
+            CardBackground = GenerateShape(256, 256, xlRadius, theme.Elevated, theme.Elevated, theme.Border, 1f, DesignTokens.Effects.ShadowLight, shadowBlurLg, theme.Shadow);
         }
 
-        public Texture2D GenerateShape(int width, int height, int radius, Color topColor, Color bottomColor, Color borderColor, float borderPx, float shadowAlpha = 0f, int shadowBlur = 0)
+        public Texture2D GenerateShape(int width, int height, int radius, Color topColor, Color bottomColor, Color borderColor, float borderPx, float shadowAlpha = 0f, int shadowBlur = 0, Color shadowColor = default)
         {
             width = Mathf.Max(1, width);
             height = Mathf.Max(1, height);
-            radius = Mathf.Max(0, radius);
+            radius = Mathf.Clamp(radius, 0, Mathf.Min(width, height) / 2);
             shadowBlur = Mathf.Max(0, shadowBlur);
 
-            var key = new TextureKey(width, height, radius, topColor, bottomColor, borderColor, borderPx, shadowAlpha, shadowBlur);
+            var effectiveShadowColor = shadowColor.a > 0f ? shadowColor : ThemeManager.Instance.CurrentTheme?.Shadow ?? new Color(0f, 0f, 0f, 0.18f);
+
+            var key = new TextureKey(width, height, radius, topColor, bottomColor, borderColor, borderPx, shadowAlpha, shadowBlur, effectiveShadowColor);
             if (_cache.TryGetValue(key, out var cached) && cached != null)
                 return cached;
 
-            var tex = new Texture2D(width, height, TextureFormat.RGBA32, false) { filterMode = FilterMode.Point, wrapMode = TextureWrapMode.Clamp };
-
+            var tex = CreateTexture2D(width, height);
             var pixels = new Color[width * height];
             var borderThickness = Mathf.Max(0f, borderPx);
 
@@ -138,13 +154,15 @@ namespace shadcnui.GUIComponents.Core.Styling
                 {
                     var index = y * width + x;
                     var distance = DistanceToRoundedRectEdge(x + 0.5f, y + 0.5f, width, height, radius);
+                    var coverage = Coverage(distance);
 
-                    if (distance > 0f)
+                    if (coverage <= 0f)
                     {
-                        if (shadowBlur > 0 && distance <= shadowBlur)
+                        if (shadowBlur > 0 && shadowAlpha > 0f && distance <= shadowBlur)
                         {
                             var shadowT = 1f - distance / shadowBlur;
-                            pixels[index] = new Color(0f, 0f, 0f, shadowAlpha * shadowT * shadowT);
+                            var alpha = effectiveShadowColor.a * shadowAlpha * shadowT * shadowT;
+                            pixels[index] = new Color(effectiveShadowColor.r, effectiveShadowColor.g, effectiveShadowColor.b, alpha);
                         }
                         else
                         {
@@ -155,9 +173,13 @@ namespace shadcnui.GUIComponents.Core.Styling
                     }
 
                     var color = fillColor;
-                    if (borderThickness > 0f && distance >= -borderThickness)
-                        color = borderColor;
+                    if (borderThickness > 0f && borderColor.a > 0f)
+                    {
+                        var innerCoverage = Coverage(distance + borderThickness);
+                        color = Color.Lerp(borderColor, fillColor, innerCoverage);
+                    }
 
+                    color.a *= coverage;
                     pixels[index] = color;
                 }
             }
@@ -170,11 +192,11 @@ namespace shadcnui.GUIComponents.Core.Styling
 
         public Texture2D GenerateSolid(Color color)
         {
-            var key = new TextureKey(1, 1, 0, color, color, Color.clear, 0f, 0f, 0);
+            var key = new TextureKey(1, 1, 0, color, color, Color.clear, 0f, 0f, 0, Color.clear);
             if (_cache.TryGetValue(key, out var cached) && cached != null)
                 return cached;
 
-            var texture = new Texture2D(1, 1, TextureFormat.RGBA32, false) { filterMode = FilterMode.Point, wrapMode = TextureWrapMode.Clamp };
+            var texture = CreateTexture2D(1, 1);
             texture.SetPixel(0, 0, color);
             texture.Apply();
             Track(key, texture);
@@ -183,11 +205,11 @@ namespace shadcnui.GUIComponents.Core.Styling
 
         public Texture2D GenerateVerticalGradient(int width, int height, Color top, Color bottom)
         {
-            var key = new TextureKey(width, height, 0, top, bottom, Color.clear, 0f, 0f, 0);
+            var key = new TextureKey(width, height, 0, top, bottom, Color.clear, 0f, 0f, 0, Color.clear);
             if (_cache.TryGetValue(key, out var cached) && cached != null)
                 return cached;
 
-            var texture = new Texture2D(width, height, TextureFormat.RGBA32, false) { filterMode = FilterMode.Point, wrapMode = TextureWrapMode.Clamp };
+            var texture = CreateTexture2D(width, height);
 
             for (int y = 0; y < height; y++)
             {
@@ -204,12 +226,11 @@ namespace shadcnui.GUIComponents.Core.Styling
 
         public Texture2D GenerateGlow(int size, Color color)
         {
-            var key = new TextureKey(size, size, 0, color, color, Color.clear, -1f, 0f, 0);
+            var key = new TextureKey(size, size, 0, color, color, Color.clear, -1f, 0f, 0, Color.clear);
             if (_cache.TryGetValue(key, out var cached) && cached != null)
                 return cached;
 
-            var texture = new Texture2D(size, size, TextureFormat.RGBA32, false) { filterMode = FilterMode.Point, wrapMode = TextureWrapMode.Clamp };
-
+            var texture = CreateTexture2D(size, size);
             var center = size * 0.5f;
             var maxDistance = center;
 
@@ -230,7 +251,7 @@ namespace shadcnui.GUIComponents.Core.Styling
 
         public Texture2D GenerateAvatarTexture(int size, int radius, Color backgroundColor, Color borderColor, float borderThickness, bool withShadow = true)
         {
-            return GenerateShape(size, size, radius, backgroundColor, backgroundColor, borderColor, borderThickness, withShadow ? 0.08f : 0f, withShadow ? 4 : 0);
+            return GenerateShape(size, size, radius, backgroundColor, backgroundColor, borderColor, borderThickness, withShadow ? DesignTokens.Effects.ShadowLight : 0f, withShadow ? Mathf.RoundToInt(DesignTokens.Effects.ShadowBlurSM * _helper.uiScale) : 0);
         }
 
         public void DestroyAllTextures()
@@ -312,11 +333,23 @@ namespace shadcnui.GUIComponents.Core.Styling
             GUI.color = previous;
         }
 
+        private static Texture2D CreateTexture2D(int width, int height)
+        {
+            return new Texture2D(width, height, TextureFormat.RGBA32, false)
+            {
+                filterMode = FilterMode.Bilinear,
+                wrapMode = TextureWrapMode.Clamp,
+                anisoLevel = 1,
+            };
+        }
+
         private void Track(TextureKey key, Texture2D texture)
         {
             _cache[key] = texture;
             _ownedTextures.Add(texture);
         }
+
+        private static float Coverage(float signedDistance) => Mathf.Clamp01(0.5f - signedDistance);
 
         private static float DistanceToRoundedRectEdge(float x, float y, float width, float height, float radius)
         {

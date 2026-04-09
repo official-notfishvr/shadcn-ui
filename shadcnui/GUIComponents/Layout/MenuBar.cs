@@ -9,15 +9,18 @@ namespace shadcnui.GUIComponents.Layout
 {
     public class MenuBar : BaseComponent
     {
+        private const float DropdownWidth = 220f;
+        private const float MenuItemHeight = 32f;
+        private const float HeaderHeight = 24f;
+        private const float MenuPadding = 8f;
+        private readonly string _layerId = $"menubar_layer_{Guid.NewGuid():N}";
         private int _activeMenuIndex = -1;
         private bool _isDropdownOpen = false;
         private readonly Stack<MenuData> _menuStack = new Stack<MenuData>();
-        private Rect _menuBarRect;
-        private string _menuId;
+        private readonly Dictionary<int, Rect> _menuItemRects = new Dictionary<int, Rect>();
         private ControlVariant _currentVariant = ControlVariant.Default;
         private ControlSize _currentSize = ControlSize.Default;
         private ComponentAppearance _currentAppearance;
-        private const float AnimationDuration = DesignTokens.Animation.DurationFast;
 
         public MenuBar(GUIHelper helper)
             : base(helper) { }
@@ -95,6 +98,8 @@ namespace shadcnui.GUIComponents.Layout
             _currentVariant = variant;
             _currentSize = size;
             _currentAppearance = appearance;
+            if (Event.current.type == EventType.Repaint)
+                _menuItemRects.Clear();
 
             layoutComponents.BeginHorizontalGroup(styleManager.GetMenuBarStyle(variant, size, appearance), options);
 
@@ -108,26 +113,23 @@ namespace shadcnui.GUIComponents.Layout
             }
 
             layoutComponents.EndHorizontalGroup();
-            _menuBarRect = GUILayoutUtility.GetLastRect();
-
             if (_isDropdownOpen && _menuStack.Count > 0)
-                DrawDropdownMenu();
-
-            HandleClickOutside();
+                RefreshDropdownLayer();
+            else
+                CloseDropdownLayer();
         }
 
         public void CloseDropdown()
         {
-            if (_menuId != null)
-            {
-                var animManager = guiHelper.GetAnimationManager();
-                animManager.FadeOut($"menubar_alpha_{_menuId}", AnimationDuration * 0.8f, EasingFunctions.EaseInCubic);
-                animManager.ScaleOut($"menubar_scale_{_menuId}", AnimationDuration * 0.8f, 0.92f, EasingFunctions.EaseInCubic);
-            }
+            ResetDropdownState();
+            CloseDropdownLayer();
+        }
+
+        private void ResetDropdownState()
+        {
             _activeMenuIndex = -1;
             _isDropdownOpen = false;
             _menuStack.Clear();
-            _menuId = null;
         }
         #endregion
 
@@ -141,6 +143,8 @@ namespace shadcnui.GUIComponents.Layout
                 GUI.enabled = false;
 
             var clicked = UnityHelpers.Button(item.Text, itemStyle, GUILayout.ExpandWidth(false));
+            if (Event.current.type == EventType.Repaint)
+                _menuItemRects[index] = ToScreenRect(GUILayoutUtility.GetLastRect());
 
             GUI.enabled = wasEnabled;
 
@@ -152,16 +156,17 @@ namespace shadcnui.GUIComponents.Layout
         {
             if (item.SubItems.Count > 0)
             {
+                if (_isDropdownOpen && _activeMenuIndex == index)
+                {
+                    CloseDropdown();
+                    return;
+                }
+
                 _activeMenuIndex = index;
-                _menuId = $"menu_{index}";
                 _menuStack.Clear();
                 _menuStack.Push(new MenuData(item.SubItems, index));
                 _isDropdownOpen = true;
-
-                var animManager = guiHelper.GetAnimationManager();
-                animManager.FadeIn($"menubar_alpha_{_menuId}", AnimationDuration, EasingFunctions.EaseOutCubic);
-                animManager.ScaleIn($"menubar_scale_{_menuId}", AnimationDuration, 0.92f, EasingFunctions.EaseOutCubic);
-                animManager.SlideIn($"menubar_slide_{_menuId}", Vector2.zero, new Vector2(0, -DesignTokens.Spacing.MD), AnimationDuration, EasingFunctions.EaseOutCubic);
+                RefreshDropdownLayer();
             }
             else
             {
@@ -170,48 +175,27 @@ namespace shadcnui.GUIComponents.Layout
             }
         }
 
-        private void DrawDropdownMenu()
+        private void DrawDropdownMenu(float width, float height)
         {
-            var styleManager = guiHelper.GetStyleManager();
-            var animManager = guiHelper.GetAnimationManager();
-            var currentMenu = _menuStack.Peek();
-
-            float alpha = animManager.GetFloat($"menubar_alpha_{_menuId}", 1f);
-            float scale = animManager.GetFloat($"menubar_scale_{_menuId}", 1f);
-            Vector2 slideOffset = animManager.GetVector2($"menubar_slide_{_menuId}", Vector2.zero);
-
-            ApplyMenuAnimation(alpha, scale, slideOffset);
-            DrawMenuContent(currentMenu, styleManager);
-            RestoreGraphicsState();
-        }
-
-        private void ApplyMenuAnimation(float alpha, float scale, Vector2 slideOffset)
-        {
-            Color prevColor = GUI.color;
-            if (alpha < 1f)
-                GUI.color = new Color(prevColor.r, prevColor.g, prevColor.b, prevColor.a * alpha);
-
-            if (scale < 1f || slideOffset != Vector2.zero)
+            if (!_isDropdownOpen || _menuStack.Count == 0)
             {
-                GUIUtility.ScaleAroundPivot(new Vector3(scale, scale, 1f), Vector2.zero);
-                GUI.matrix = Matrix4x4.Translate(new Vector3(slideOffset.x, slideOffset.y, 0f)) * GUI.matrix;
+                CloseDropdownLayer();
+                return;
             }
-        }
 
-        private void DrawMenuContent(MenuData currentMenu, StyleManager styleManager)
-        {
-            layoutComponents.BeginVerticalGroup(styleManager.GetMenuDropdownStyle(_currentVariant, _currentSize, _currentAppearance), GUILayout.Width(220 * guiHelper.uiScale));
+            var styleManager = guiHelper.GetStyleManager();
+            var currentMenu = _menuStack.Peek();
+            layoutComponents.BeginVerticalGroup(styleManager.GetMenuDropdownStyle(_currentVariant, _currentSize, _currentAppearance), GUILayout.Width(width), GUILayout.Height(height));
 
             if (_menuStack.Count > 1)
             {
-                if (UnityHelpers.Button("<- Back", styleManager.GetMenuBarItemStyle(_currentVariant, _currentSize, appearance: _currentAppearance)))
+                if (UnityHelpers.Button("<- Back", styleManager.GetMenuBarItemStyle(_currentVariant, _currentSize, appearance: _currentAppearance), GUILayout.Height(MenuItemHeight * guiHelper.uiScale)))
                 {
                     _menuStack.Pop();
                     if (_menuStack.Count == 1)
                         _activeMenuIndex = _menuStack.Peek().ParentIndex;
                     layoutComponents.EndVerticalGroup();
-                    GUI.matrix = Matrix4x4.identity;
-                    GUI.color = Color.white;
+                    RefreshDropdownLayer();
                     return;
                 }
 
@@ -246,8 +230,11 @@ namespace shadcnui.GUIComponents.Layout
 
             if (item.SubItems.Count > 0)
             {
-                if (GUILayout.Button(item.Text, styleManager.GetMenuBarItemStyle(_currentVariant, _currentSize, appearance: _currentAppearance), GUILayout.ExpandWidth(true)))
+                if (GUILayout.Button(item.Text, styleManager.GetMenuBarItemStyle(_currentVariant, _currentSize, appearance: _currentAppearance), GUILayout.ExpandWidth(true), GUILayout.Height(MenuItemHeight * guiHelper.uiScale)))
+                {
                     _menuStack.Push(new MenuData(item.SubItems, _activeMenuIndex));
+                    RefreshDropdownLayer();
+                }
             }
             else
             {
@@ -262,7 +249,7 @@ namespace shadcnui.GUIComponents.Layout
             var buttonStyle = styleManager.GetMenuBarItemStyle(_currentVariant, _currentSize, appearance: _currentAppearance);
             var textStyle = styleManager.GetMenuBarItemStyle(_currentVariant, _currentSize, appearance: _currentAppearance);
 
-            Rect rect = GUILayoutUtility.GetRect(GUIContent.none, buttonStyle, GUILayout.ExpandWidth(true));
+            Rect rect = GUILayoutUtility.GetRect(GUIContent.none, buttonStyle, GUILayout.ExpandWidth(true), GUILayout.Height(MenuItemHeight * guiHelper.uiScale));
 
             if (GUI.Button(rect, "", buttonStyle))
             {
@@ -279,23 +266,76 @@ namespace shadcnui.GUIComponents.Layout
             }
         }
 
-        private void HandleClickOutside()
+        private void RefreshDropdownLayer()
         {
-            if (Event.current.type == EventType.MouseDown && _isDropdownOpen)
+            if (!_isDropdownOpen || _menuStack.Count == 0 || !_menuItemRects.TryGetValue(_activeMenuIndex, out var anchorRect))
             {
-                var mousePos = Event.current.mousePosition;
-                if (!_menuBarRect.Contains(mousePos))
-                {
-                    CloseDropdown();
-                    Event.current.Use();
-                }
+                CloseDropdownLayer();
+                return;
             }
+
+            var rootRect = guiHelper.GetRootGuiScreenRect();
+            var anchorScreen = new Vector2(anchorRect.x, anchorRect.yMax + DesignTokens.Spacing.XS * guiHelper.uiScale);
+            var width = GetDropdownWidth();
+            var height = GetDropdownHeight(_menuStack.Peek());
+            var position = new Vector2(anchorScreen.x, anchorScreen.y);
+
+            if (position.x + width > rootRect.xMax)
+                position.x = Mathf.Max(rootRect.xMin, rootRect.xMax - width);
+            if (position.y + height > rootRect.yMax)
+                position.y = Mathf.Max(rootRect.yMin, anchorScreen.y - height - anchorRect.height);
+
+            LayerManager.Instance.Open(
+                new Core.Utils.LayerConfig
+                {
+                    Id = GetLayerId(),
+                    OpenPosition = position,
+                    Width = width,
+                    Height = height,
+                    ZIndex = DesignTokens.ZIndex.Dropdown,
+                    CloseOnClickOutside = true,
+                    DrawChrome = false,
+                    Content = () => DrawDropdownMenu(width, height),
+                    OnClose = ResetDropdownState,
+                }
+            );
         }
 
-        private void RestoreGraphicsState()
+        private void CloseDropdownLayer()
         {
-            GUI.matrix = Matrix4x4.identity;
-            GUI.color = Color.white;
+            if (LayerManager.Instance.IsOpen(_layerId))
+                LayerManager.Instance.Close(_layerId);
+        }
+
+        private string GetLayerId() => _layerId;
+
+        private float GetDropdownWidth() => DropdownWidth * guiHelper.uiScale;
+
+        private Rect ToScreenRect(Rect rect)
+        {
+            var topLeft = GUIUtility.GUIToScreenPoint(new Vector2(rect.xMin, rect.yMin));
+            var bottomRight = GUIUtility.GUIToScreenPoint(new Vector2(rect.xMax, rect.yMax));
+            return Rect.MinMaxRect(topLeft.x, topLeft.y, bottomRight.x, bottomRight.y);
+        }
+
+        private float GetDropdownHeight(MenuData menu)
+        {
+            float height = MenuPadding * 2f * guiHelper.uiScale;
+
+            if (_menuStack.Count > 1)
+                height += MenuItemHeight * guiHelper.uiScale + 1f * guiHelper.uiScale + DesignTokens.Spacing.XS * guiHelper.uiScale;
+
+            foreach (var item in menu.Items)
+            {
+                if (item.IsSeparator)
+                    height += 1f * guiHelper.uiScale + DesignTokens.Spacing.XS * guiHelper.uiScale;
+                else if (item.IsHeader)
+                    height += HeaderHeight * guiHelper.uiScale;
+                else
+                    height += MenuItemHeight * guiHelper.uiScale;
+            }
+
+            return Mathf.Max(MenuItemHeight * guiHelper.uiScale, height);
         }
 
         private struct MenuData

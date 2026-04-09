@@ -129,28 +129,16 @@ namespace shadcnui.GUIComponents.Core.Styling
                 var fill = appearance.BackgroundColor ?? GetTheme().Base;
                 var borderColor = hasBorder ? appearance.BorderColor.Value : Color.clear;
                 var effectiveThickness = hasBorder ? borderThickness : 0f;
+                var radius = hasRadius ? appearance.BorderRadius.Value : DesignTokens.Radius.MD;
+                var textureWidth = GetTextureWidth(style, DesignTokens.TextureSize.Large);
+                var textureHeight = GetTextureHeight(style, style.fixedHeight > 0f ? style.fixedHeight / Mathf.Max(0.0001f, _guiHelper.uiScale) : DesignTokens.TextureSize.Large);
 
-                var baseRadius = GetScaledBorderRadius(DesignTokens.Radius.MD);
-                var radius = hasRadius ? GetScaledBorderRadius(appearance.BorderRadius.Value) : baseRadius;
-                var textureSize = 256;
+                var normalBg = CreateSurfaceTexture(textureWidth, textureHeight, radius, fill, borderColor, effectiveThickness);
+                var hoverBg = CreateSurfaceTexture(textureWidth, textureHeight, radius, HoverSurface(fill), borderColor.a > 0f ? HoverSurface(borderColor, 0.025f) : borderColor, effectiveThickness);
+                var activeBg = CreateSurfaceTexture(textureWidth, textureHeight, radius, ActiveSurface(fill), borderColor.a > 0f ? ActiveSurface(borderColor, 0.04f) : borderColor, effectiveThickness);
 
-                var normalBg = effectiveThickness > 0f ? CreateBorderTexture(textureSize, textureSize, radius, fill, borderColor, effectiveThickness) : CreateTexture(textureSize, textureSize, radius, fill);
-
-                var hoverBg = effectiveThickness > 0f ? CreateBorderTexture(textureSize, textureSize, radius, Lift(fill, 0.06f), Lift(borderColor, 0.06f), effectiveThickness) : CreateTexture(textureSize, textureSize, radius, Lift(fill, 0.06f));
-
-                var activeBg = effectiveThickness > 0f ? CreateBorderTexture(textureSize, textureSize, radius, Lower(fill, 0.08f), Lower(borderColor, 0.08f), effectiveThickness) : CreateTexture(textureSize, textureSize, radius, Lower(fill, 0.08f));
-
-                style.normal.background = normalBg;
-                style.hover.background = hoverBg;
-                style.active.background = activeBg;
-                style.focused.background = hoverBg;
-                style.onNormal.background = normalBg;
-                style.onHover.background = hoverBg;
-                style.onActive.background = activeBg;
-                style.onFocused.background = hoverBg;
-
-                var borderSize = Mathf.Max(1, Mathf.RoundToInt(effectiveThickness > 0f ? effectiveThickness : 1f));
-                style.border = new UnityHelpers.RectOffset(borderSize, borderSize, borderSize, borderSize);
+                SetBackgroundStates(style, normalBg, hoverBg, activeBg, hoverBg);
+                style.border = CreateBorderSlice(GetScaledBorderRadius(radius), textureWidth, textureHeight);
             }
 
             if (hasText)
@@ -253,9 +241,8 @@ namespace shadcnui.GUIComponents.Core.Styling
 
         private Texture2D CreateFocusedBorderTexture(GUIStyle style, float fallbackHeight = -1f)
         {
-            var radius = GetScaledBorderRadius(DesignTokens.Radius.MD);
             var height = Mathf.Max(28, Mathf.RoundToInt(style.fixedHeight > 0 ? style.fixedHeight : (fallbackHeight > 0 ? fallbackHeight : GetScaledHeight(DesignTokens.Height.Default))));
-            return CreateBorderTexture(128, height, radius, GetTheme().Base, Color.clear, 0f);
+            return CreateFocusTexture(128, height, DesignTokens.Radius.MD, GetTheme().Base);
         }
 
         private void ApplySize(GUIStyle style, StyleComponentType type, ControlSize size)
@@ -266,7 +253,14 @@ namespace shadcnui.GUIComponents.Core.Styling
                 case StyleComponentType.Toggle:
                 case StyleComponentType.Input:
                 case StyleComponentType.PasswordField:
+                case StyleComponentType.TextArea:
                 case StyleComponentType.Switch:
+                case StyleComponentType.Checkbox:
+                case StyleComponentType.CheckboxSolid:
+                case StyleComponentType.TabsTrigger:
+                case StyleComponentType.DropdownMenuItem:
+                case StyleComponentType.SelectItem:
+                case StyleComponentType.MenuBarItem:
                     ApplyControlSize(style, size);
                     return;
                 case StyleComponentType.Badge:
@@ -289,6 +283,8 @@ namespace shadcnui.GUIComponents.Core.Styling
 
         private void ApplyControlSize(GUIStyle style, ControlSize size)
         {
+            style.fixedWidth = 0f;
+
             switch (size)
             {
                 case ControlSize.Mini:
@@ -297,7 +293,7 @@ namespace shadcnui.GUIComponents.Core.Styling
                     style.fixedHeight = GetMinimumControlHeight(DesignTokens.Height.Mini, style.fontSize, DesignTokens.Padding.Button.MiniV);
                     break;
                 case ControlSize.Small:
-                    style.fontSize = GetScaledFontSize(DesignTokens.FontScale.XS);
+                    style.fontSize = GetScaledFontSize(DesignTokens.FontScale.SM);
                     style.padding = GetSpacingOffset(DesignTokens.Padding.Button.SmallH, DesignTokens.Padding.Button.SmallV);
                     style.fixedHeight = GetMinimumControlHeight(DesignTokens.Height.Small, style.fontSize, DesignTokens.Padding.Button.SmallV);
                     break;
@@ -313,7 +309,7 @@ namespace shadcnui.GUIComponents.Core.Styling
                     style.padding = new RectOffset();
                     break;
                 default:
-                    style.fontSize = GetScaledFontSize(DesignTokens.FontScale.SM);
+                    style.fontSize = GetScaledFontSize(DesignTokens.FontScale.MD);
                     style.padding = GetSpacingOffset(DesignTokens.Padding.Button.DefaultH, DesignTokens.Padding.Button.DefaultV);
                     style.fixedHeight = GetMinimumControlHeight(DesignTokens.Height.Default, style.fontSize, DesignTokens.Padding.Button.DefaultV);
                     break;
@@ -333,19 +329,23 @@ namespace shadcnui.GUIComponents.Core.Styling
             {
                 case ControlSize.Mini:
                     style.fontSize = GetScaledFontSize(DesignTokens.FontScale.XS);
-                    style.padding = GetSpacingOffset(DesignTokens.Spacing.SM, DesignTokens.Spacing.XXS);
+                    style.padding = GetSpacingOffset(DesignTokens.Spacing.MD, DesignTokens.Spacing.XXS);
+                    style.fixedHeight = GetScaledHeight(DesignTokens.Badge.Height - 2f);
                     break;
                 case ControlSize.Small:
                     style.fontSize = GetScaledFontSize(DesignTokens.FontScale.XS);
-                    style.padding = GetSpacingOffset(DesignTokens.Spacing.SM, DesignTokens.Spacing.XS);
+                    style.padding = GetSpacingOffset(DesignTokens.Spacing.MD, DesignTokens.Spacing.XS);
+                    style.fixedHeight = GetScaledHeight(DesignTokens.Badge.Height);
                     break;
                 case ControlSize.Large:
-                    style.fontSize = GetScaledFontSize(DesignTokens.FontScale.MD);
-                    style.padding = GetSpacingOffset(DesignTokens.Spacing.MD, DesignTokens.Spacing.SM);
+                    style.fontSize = GetScaledFontSize(DesignTokens.FontScale.SM);
+                    style.padding = GetSpacingOffset(DesignTokens.Spacing.LG, DesignTokens.Spacing.XS);
+                    style.fixedHeight = GetScaledHeight(DesignTokens.Badge.Height + 4f);
                     break;
                 default:
-                    style.fontSize = GetScaledFontSize(DesignTokens.FontScale.SM);
+                    style.fontSize = GetScaledFontSize(DesignTokens.FontScale.XS);
                     style.padding = GetSpacingOffset(DesignTokens.Padding.Badge.Horizontal, DesignTokens.Padding.Badge.Vertical);
+                    style.fixedHeight = GetScaledHeight(DesignTokens.Badge.Height);
                     break;
             }
         }
@@ -355,9 +355,9 @@ namespace shadcnui.GUIComponents.Core.Styling
             style.fontSize = size switch
             {
                 ControlSize.Mini => GetScaledFontSize(DesignTokens.FontScale.XS),
-                ControlSize.Small => GetScaledFontSize(DesignTokens.FontScale.XS),
+                ControlSize.Small => GetScaledFontSize(DesignTokens.FontScale.SM),
                 ControlSize.Large => GetScaledFontSize(DesignTokens.FontScale.LG),
-                _ => GetScaledFontSize(DesignTokens.FontScale.SM),
+                _ => GetScaledFontSize(DesignTokens.FontScale.MD),
             };
         }
 
@@ -370,32 +370,45 @@ namespace shadcnui.GUIComponents.Core.Styling
 
             if (type == StyleComponentType.Label || type == StyleComponentType.SectionHeader || type == StyleComponentType.ChartAxis || type == StyleComponentType.CardTitle || type == StyleComponentType.CardDescription)
             {
-                style.normal.textColor = variant switch
+                var labelColor = variant switch
                 {
                     ControlVariant.Destructive => theme.Destructive,
                     ControlVariant.Link => theme.ButtonLinkColor,
                     ControlVariant.Muted => theme.Muted,
                     _ => style.normal.textColor,
                 };
+                SetTextStates(style, labelColor);
                 return;
             }
 
             if (type == StyleComponentType.Input || type == StyleComponentType.PasswordField || type == StyleComponentType.TextArea)
             {
-                var radius = GetScaledBorderRadius(DesignTokens.Radius.MD);
+                var height = GetTextureHeight(style, DesignTokens.Height.Default);
+                var width = GetTextureWidth(style, DesignTokens.TextureSize.Default);
                 switch (variant)
                 {
                     case ControlVariant.Outline:
-                        style.normal.background = CreateBorderTexture(128, GetScaledHeight(DesignTokens.Height.Default), radius, theme.Base, Color.clear, 0f);
                         break;
                     case ControlVariant.Ghost:
-                        style.normal.background = CreateTexture(128, GetScaledHeight(DesignTokens.Height.Default), radius, Color.clear);
+                        SetBackgroundStates(
+                            style,
+                            CreateSurfaceTexture(width, height, DesignTokens.Radius.MD, Color.clear, theme.Border, 1f),
+                            CreateSurfaceTexture(width, height, DesignTokens.Radius.MD, GetGhostFill(0.05f), HoverSurface(theme.Border, 0.025f), 1f),
+                            CreateFocusTexture(width, height, DesignTokens.Radius.MD, GetGhostFill(0.05f)),
+                            CreateFocusTexture(width, height, DesignTokens.Radius.MD, GetGhostFill(0.05f))
+                        );
                         break;
                     case ControlVariant.Secondary:
-                        style.normal.background = CreateBorderTexture(128, GetScaledHeight(DesignTokens.Height.Default), radius, theme.Secondary, Color.clear, 0f);
+                        SetBackgroundStates(
+                            style,
+                            CreateSurfaceTexture(width, height, DesignTokens.Radius.MD, theme.Secondary, Color.clear, 0f),
+                            CreateSurfaceTexture(width, height, DesignTokens.Radius.MD, HoverSurface(theme.Secondary), Color.clear, 0f),
+                            CreateFocusTexture(width, height, DesignTokens.Radius.MD, theme.Secondary),
+                            CreateFocusTexture(width, height, DesignTokens.Radius.MD, theme.Secondary)
+                        );
                         break;
                     case ControlVariant.Muted:
-                        style.normal.textColor = theme.Muted;
+                        SetTextStates(style, theme.Muted);
                         break;
                 }
                 return;
@@ -408,47 +421,69 @@ namespace shadcnui.GUIComponents.Core.Styling
         {
             var theme = GetTheme();
             var fill = theme.ButtonPrimaryBg;
+            var hoverFill = HoverSurface(fill);
+            var activeFill = ActiveSurface(fill);
             var text = theme.ButtonPrimaryFg;
+            var hoverText = text;
+            var activeText = text;
             var border = Color.clear;
+            var hoverBorder = Color.clear;
+            var activeBorder = Color.clear;
+            var borderThickness = 0f;
 
             switch (variant)
             {
                 case ControlVariant.Secondary:
                     fill = theme.ButtonSecondaryBg;
+                    hoverFill = HoverSurface(fill);
+                    activeFill = ActiveSurface(fill);
                     text = theme.ButtonSecondaryFg;
                     break;
                 case ControlVariant.Destructive:
                     fill = theme.ButtonDestructiveBg;
+                    hoverFill = HoverSurface(fill);
+                    activeFill = ActiveSurface(fill);
                     text = theme.ButtonDestructiveFg;
                     break;
                 case ControlVariant.Outline:
-                    fill = Color.clear;
+                    fill = theme.Base;
+                    hoverFill = theme.Secondary;
+                    activeFill = HoverSurface(theme.Secondary);
                     text = theme.ButtonOutlineFg;
                     border = theme.Border;
+                    hoverBorder = HoverSurface(theme.Border, 0.025f);
+                    activeBorder = ActiveSurface(theme.Border, 0.04f);
+                    borderThickness = 1f;
                     break;
                 case ControlVariant.Ghost:
                     fill = Color.clear;
+                    hoverFill = GetGhostFill(0.075f);
+                    activeFill = GetGhostFill(0.11f);
                     text = theme.ButtonGhostFg;
-                    border = Color.clear;
                     break;
                 case ControlVariant.Link:
                     fill = Color.clear;
+                    hoverFill = Color.clear;
+                    activeFill = Color.clear;
                     text = theme.ButtonLinkColor;
-                    border = Color.clear;
                     break;
                 case ControlVariant.Muted:
-                    fill = theme.Muted;
-                    text = theme.Base;
+                    fill = theme.Secondary;
+                    hoverFill = HoverSurface(theme.Secondary);
+                    activeFill = ActiveSurface(theme.Secondary);
+                    text = theme.Muted;
                     break;
             }
 
-            var radius = style.border.left > 0 ? style.border.left : GetScaledBorderRadius(DesignTokens.Radius.SM);
-            var height = Mathf.Max(8, Mathf.RoundToInt(style.fixedHeight > 0 ? style.fixedHeight : GetScaledHeight(DesignTokens.Height.Default)));
-            style.normal.background = border == Color.clear ? CreateTexture(128, height, radius, fill) : CreateBorderTexture(128, height, radius, fill == Color.clear ? Color.clear : fill, border, 1f);
-            style.hover.background = style.normal.background;
-            style.active.background = style.normal.background;
-            style.focused.background = style.normal.background;
-            style.normal.textColor = style.hover.textColor = style.active.textColor = style.focused.textColor = text;
+            var radius = GetRadiusFromStyle(style, DesignTokens.Radius.MD);
+            var height = GetTextureHeight(style, DesignTokens.Height.Default);
+            var width = GetTextureWidth(style, DesignTokens.TextureSize.Default);
+            var normal = CreateSurfaceTexture(width, height, radius, fill, border, borderThickness);
+            var hover = CreateSurfaceTexture(width, height, radius, hoverFill, hoverBorder, borderThickness);
+            var active = CreateSurfaceTexture(width, height, radius, activeFill, activeBorder, borderThickness);
+
+            SetOffBackgroundStates(style, normal, hover, active, hover);
+            SetOffTextStates(style, text, hoverText, activeText, hoverText);
         }
 
         public GUIStyle GetButtonStyle(ControlVariant variant, ControlSize size, ComponentAppearance appearance = null) => ResolveStyle(StyleComponentType.Button, variant, size, _baseButtonStyle, appearance);
@@ -457,7 +492,25 @@ namespace shadcnui.GUIComponents.Core.Styling
 
         public GUIStyle GetLabelStyle(ControlVariant variant, ControlSize size = ControlSize.Default, ComponentAppearance appearance = null) => ResolveStyle(StyleComponentType.Label, variant, size, _baseLabelStyle, appearance);
 
-        public GUIStyle GetProgressBarStyle(ControlVariant variant = ControlVariant.Default, ControlSize size = ControlSize.Default, ComponentAppearance appearance = null) => ResolveStyle(StyleComponentType.ProgressBar, variant, size, _progressBarStyle, appearance);
+        public GUIStyle GetProgressBarStyle(ControlVariant variant = ControlVariant.Default, ControlSize size = ControlSize.Default, ComponentAppearance appearance = null) =>
+            ResolveStyle(
+                StyleComponentType.ProgressBar,
+                variant,
+                size,
+                _progressBarStyle,
+                appearance,
+                0,
+                style =>
+                {
+                    var height = Mathf.Max(1, Mathf.RoundToInt(DesignTokens.ProgressBar.TextureHeight * _guiHelper.uiScale));
+                    style.fixedHeight = height;
+                    style.padding = new UnityHelpers.RectOffset(0, 0, 0, 0);
+                    style.margin = new UnityHelpers.RectOffset(0, 0, 0, 0);
+                    style.border = CreateBorderSlice(height / 2, DesignTokens.TextureSize.Default, height);
+                    style.stretchHeight = false;
+                    style.stretchWidth = true;
+                }
+            );
 
         public GUIStyle GetBadgeStyle(ControlVariant variant, ControlSize size, ComponentAppearance appearance = null) => ResolveStyle(StyleComponentType.Badge, variant, size, _baseBadgeStyle, appearance);
 
@@ -471,7 +524,21 @@ namespace shadcnui.GUIComponents.Core.Styling
 
         public GUIStyle GetMenuBarStyle(ControlVariant variant = ControlVariant.Default, ControlSize size = ControlSize.Default, ComponentAppearance appearance = null) => ResolveStyle(StyleComponentType.MenuBar, variant, size, _menuBarStyle, appearance);
 
-        public GUIStyle GetTabsListStyle(ControlVariant variant = ControlVariant.Default, ControlSize size = ControlSize.Default, ComponentAppearance appearance = null) => ResolveStyle(StyleComponentType.TabsList, variant, size, _tabsListStyle, appearance);
+        public GUIStyle GetTabsListStyle(ControlVariant variant = ControlVariant.Default, ControlSize size = ControlSize.Default, ComponentAppearance appearance = null) =>
+            ResolveStyle(
+                StyleComponentType.TabsList,
+                variant,
+                size,
+                _tabsListStyle,
+                appearance,
+                0,
+                style =>
+                {
+                    style.stretchWidth = true;
+                    style.stretchHeight = false;
+                    style.fixedHeight = 0f;
+                }
+            );
 
         public GUIStyle GetSelectStyle(ControlVariant variant, ControlSize size, ComponentAppearance appearance = null) => ResolveStyle(StyleComponentType.SelectContent, variant, size, _dropdownContentStyle, appearance);
 
@@ -493,9 +560,7 @@ namespace shadcnui.GUIComponents.Core.Styling
 
                     if (disabled)
                     {
-                        style.normal.textColor = GetTheme().Muted;
-                        style.hover.textColor = GetTheme().Muted;
-                        style.active.textColor = GetTheme().Muted;
+                        SetTextStates(style, GetTheme().Muted);
                     }
                 }
             );
@@ -623,14 +688,71 @@ namespace shadcnui.GUIComponents.Core.Styling
                 _ => DesignTokens.StatusIndicator.Default * _guiHelper.uiScale,
             };
 
-        public GUIStyle GetTableStyle(ControlVariant variant, ControlSize size, ComponentAppearance appearance = null) => ResolveStyle(StyleComponentType.Table, variant, size, _baseTableStyle, appearance);
+        public GUIStyle GetTableStyle(ControlVariant variant, ControlSize size, ComponentAppearance appearance = null) =>
+            ResolveStyle(
+                StyleComponentType.Table,
+                variant,
+                size,
+                _baseTableStyle,
+                appearance,
+                0,
+                style =>
+                {
+                    style.padding = new UnityHelpers.RectOffset(0, 0, 0, 0);
+                    style.margin = new UnityHelpers.RectOffset(0, 0, 0, 0);
+                    style.stretchWidth = true;
+                }
+            );
 
-        public GUIStyle GetTableRowStyle(ControlVariant variant = ControlVariant.Default, ControlSize size = ControlSize.Default, ComponentAppearance appearance = null) => ResolveStyle(StyleComponentType.TableRow, variant, size, _tableRowStyle, appearance);
+        public GUIStyle GetTableRowStyle(ControlVariant variant = ControlVariant.Default, ControlSize size = ControlSize.Default, ComponentAppearance appearance = null) =>
+            ResolveStyle(
+                StyleComponentType.TableRow,
+                variant,
+                size,
+                _tableRowStyle,
+                appearance,
+                0,
+                style =>
+                {
+                    style.padding = new UnityHelpers.RectOffset(0, 0, 0, 0);
+                    style.margin = new UnityHelpers.RectOffset(0, 0, 0, 0);
+                    style.border = new UnityHelpers.RectOffset(0, 0, 0, 0);
+                    style.stretchWidth = true;
+                }
+            );
 
-        public GUIStyle GetTableHeaderStyle(ControlVariant variant = ControlVariant.Default, ControlSize size = ControlSize.Default, ComponentAppearance appearance = null) => ResolveStyle(StyleComponentType.TableHeader, variant, size, _tableHeaderStyle, appearance);
+        public GUIStyle GetTableHeaderStyle(ControlVariant variant = ControlVariant.Default, ControlSize size = ControlSize.Default, ComponentAppearance appearance = null) =>
+            ResolveStyle(
+                StyleComponentType.TableHeader,
+                variant,
+                size,
+                _tableHeaderStyle,
+                appearance,
+                0,
+                style =>
+                {
+                    style.alignment = TextAnchor.MiddleLeft;
+                    style.padding = GetSpacingOffset(DesignTokens.Padding.Table.CellH, DesignTokens.Padding.Table.CellV);
+                    style.wordWrap = false;
+                    style.clipping = TextClipping.Clip;
+                }
+            );
 
         public UnityHelpers.GUIStyle GetTableCellStyle(ControlVariant variant = ControlVariant.Default, ControlSize size = ControlSize.Default, TextAnchor alignment = TextAnchor.MiddleLeft) =>
-            ResolveStyle(StyleComponentType.TableCell, variant, size, _tableCellStyle, null, (int)alignment, style => style.alignment = alignment);
+            ResolveStyle(
+                StyleComponentType.TableCell,
+                variant,
+                size,
+                _tableCellStyle,
+                null,
+                (int)alignment,
+                style =>
+                {
+                    style.alignment = alignment;
+                    style.wordWrap = false;
+                    style.clipping = TextClipping.Clip;
+                }
+            );
 
         public GUIStyle GetDropdownMenuItemStyle(ControlVariant variant = ControlVariant.Default, ControlSize size = ControlSize.Default, ComponentAppearance appearance = null) => ResolveStyle(StyleComponentType.DropdownMenuItem, variant, size, _dropdownItemStyle, appearance);
 
@@ -648,9 +770,12 @@ namespace shadcnui.GUIComponents.Core.Styling
                 style =>
                 {
                     style.alignment = isShortcut ? TextAnchor.MiddleRight : TextAnchor.MiddleLeft;
-                    style.normal.textColor = isShortcut ? Lift(GetTheme().Muted, 0.2f) : GetTheme().Text;
+                    SetOffTextStates(style, isShortcut ? Lift(GetTheme().Muted, 0.2f) : GetTheme().Text);
                     if (active)
-                        style.normal.background = CreateTexture(128, 32, GetScaledBorderRadius(DesignTokens.Radius.SM), Tint(GetTheme().Accent, 0.14f));
+                    {
+                        var background = CreateSurfaceTexture(128, GetScaledHeight(DesignTokens.Height.Small), DesignTokens.Radius.SM, GetGhostFill(0.09f), Color.clear, 0f);
+                        SetOffBackgroundStates(style, background, background, background, background);
+                    }
                 }
             );
         }
@@ -764,10 +889,10 @@ namespace shadcnui.GUIComponents.Core.Styling
                 appearance?.AccentColor
                 ?? variant switch
                 {
-                    ControlVariant.Destructive => GetTheme().Destructive,
+                    ControlVariant.Destructive => GetTheme().ButtonDestructiveBg,
                     ControlVariant.Secondary => GetTheme().ButtonSecondaryBg,
                     ControlVariant.Muted => GetTheme().Muted,
-                    _ => GetTheme().Accent,
+                    _ => GetTheme().ButtonPrimaryBg,
                 };
 
             return disabled ? Color.Lerp(color, GetTheme().Muted, 0.5f) : color;

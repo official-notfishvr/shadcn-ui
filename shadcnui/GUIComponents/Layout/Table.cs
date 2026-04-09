@@ -234,13 +234,14 @@ namespace shadcnui.GUIComponents.Layout
                 return;
 
             var tableStyle = styleManager?.GetTableStyle(config.Variant, config.Size, config.Appearance) ?? GUI.skin.box;
-            var headerStyle = styleManager?.GetTableHeaderStyle(config.Variant, config.Size, config.Appearance) ?? GUI.skin.label;
             var cellStyle = styleManager?.GetTableCellStyle(config.Variant, config.Size) ?? GUI.skin.label;
             UnityHelpers.GUIStyle rowStyle = styleManager?.GetTableRowStyle(config.Variant, config.Size, config.Appearance) ?? GUIStyle.none;
             var altRowStyle = new UnityHelpers.GUIStyle(rowStyle);
 
-            if (styleManager?.Textures?.TableRowAlternate != null)
+            if (config.Variant == ControlVariant.Secondary && styleManager?.Textures?.TableRowAlternate != null)
                 altRowStyle.normal.background = styleManager.Textures.TableRowAlternate;
+            else
+                altRowStyle.normal.background = rowStyle.normal.background;
 
             if (searchable)
                 DrawSearchBar(config);
@@ -254,12 +255,16 @@ namespace shadcnui.GUIComponents.Layout
 
             layoutComponents.BeginVerticalGroup(tableStyle, config.LayoutOptions);
             DrawHeaderRow(config, headers, colCount, widths, sortable, selectable, resizable);
+            if (paged.Count > 0)
+                DrawDivider(config);
 
             for (int displayRow = 0; displayRow < paged.Count; displayRow++)
             {
                 int rowIndex = paged[displayRow];
                 var style = displayRow % 2 == 0 ? rowStyle : altRowStyle;
                 DrawRow(config, style, cellStyle, rowIndex, colCount, widths, selectable, useObjects);
+                if (displayRow < paged.Count - 1)
+                    DrawDivider(config);
             }
 
             layoutComponents.EndVerticalGroup();
@@ -290,25 +295,28 @@ namespace shadcnui.GUIComponents.Layout
 
         private void DrawHeaderRow(TableConfig config, string[] headers, int colCount, float[] widths, bool sortable, bool selectable, bool resizable)
         {
-            layoutComponents.BeginHorizontalGroup();
+            var headerHeight = RowHeight * guiHelper.uiScale;
+            var headerRowStyle = CreateHeaderRowStyle();
+            var headerCellStyle = CreateHeaderCellStyle(config);
+            layoutComponents.BeginHorizontalGroup(headerRowStyle, GUILayout.Height(headerHeight), GUILayout.ExpandWidth(true));
 
             if (selectable)
             {
-                GUILayoutUtility.GetRect(CheckboxWidth * guiHelper.uiScale, RowHeight * guiHelper.uiScale, GUILayout.Width(CheckboxWidth * guiHelper.uiScale), GUILayout.Height(RowHeight * guiHelper.uiScale));
+                GUILayoutUtility.GetRect(CheckboxWidth * guiHelper.uiScale, headerHeight, GUILayout.Width(CheckboxWidth * guiHelper.uiScale), GUILayout.Height(headerHeight));
             }
 
             for (int col = 0; col < colCount; col++)
             {
                 var header = col < headers.Length ? headers[col] : $"Col {col + 1}";
                 var width = widths[col] * guiHelper.uiScale;
-                var options = new[] { GUILayout.Width(width), GUILayout.Height(RowHeight * guiHelper.uiScale) };
+                var options = new[] { GUILayout.Width(width), GUILayout.Height(headerHeight) };
                 var content = new GUIContent(GetSortedHeaderLabel(config, col, header, sortable));
 
-                Rect rect = GUILayoutUtility.GetRect(content, styleManager?.GetTableHeaderStyle(config.Variant, config.Size, config.Appearance) ?? GUI.skin.label, options);
-                var clicked = sortable && GUI.Button(rect, content, styleManager?.GetTableHeaderStyle(config.Variant, config.Size, config.Appearance) ?? GUI.skin.label);
+                Rect rect = GUILayoutUtility.GetRect(content, headerCellStyle, options);
+                var clicked = sortable && GUI.Button(rect, content, headerCellStyle);
 
                 if (!sortable)
-                    GUI.Label(rect, content, styleManager?.GetTableHeaderStyle(config.Variant, config.Size, config.Appearance) ?? GUI.skin.label);
+                    GUI.Label(rect, content, headerCellStyle);
 
                 if (clicked)
                     ToggleSort(config, col);
@@ -322,7 +330,8 @@ namespace shadcnui.GUIComponents.Layout
 
         private void DrawRow(TableConfig config, UnityHelpers.GUIStyle rowStyle, UnityHelpers.GUIStyle cellStyle, int rowIndex, int colCount, float[] widths, bool selectable, bool useObjects)
         {
-            layoutComponents.BeginHorizontalGroup(rowStyle);
+            var rowHeight = RowHeight * guiHelper.uiScale;
+            layoutComponents.BeginHorizontalGroup(rowStyle, GUILayout.Height(rowHeight), GUILayout.ExpandWidth(true));
 
             if (selectable)
                 DrawSelectionCell(config, rowIndex, rowStyle);
@@ -330,27 +339,59 @@ namespace shadcnui.GUIComponents.Layout
             for (int col = 0; col < colCount; col++)
             {
                 var width = widths[col] * guiHelper.uiScale;
-                layoutComponents.BeginVerticalGroup(GUILayout.Width(width));
-
                 if (config.CellRenderer != null)
                 {
+                    layoutComponents.BeginVerticalGroup(GUILayout.Width(width), GUILayout.Height(rowHeight));
                     object value = null;
                     if (config.ObjectRows != null && rowIndex < config.ObjectRows.GetLength(0) && col < config.ObjectRows.GetLength(1))
                         value = config.ObjectRows[rowIndex, col];
                     else if (config.Rows != null && rowIndex < config.Rows.GetLength(0) && col < config.Rows.GetLength(1))
                         value = config.Rows[rowIndex, col];
                     config.CellRenderer.Invoke(value, rowIndex, col);
+                    layoutComponents.EndVerticalGroup();
                 }
                 else
                 {
                     var text = ResolveCellText(config, rowIndex, col);
-                    UnityHelpers.Label(text, cellStyle);
+                    UnityHelpers.Label(text, cellStyle, GUILayout.Width(width), GUILayout.Height(rowHeight));
                 }
-
-                layoutComponents.EndVerticalGroup();
             }
 
             layoutComponents.EndHorizontalGroup();
+        }
+
+        private GUIStyle CreateHeaderRowStyle()
+        {
+            var style = new UnityHelpers.GUIStyle(GUIStyle.none)
+            {
+                padding = new UnityHelpers.RectOffset(0, 0, 0, 0),
+                margin = new UnityHelpers.RectOffset(0, 0, 0, 0),
+                border = new UnityHelpers.RectOffset(0, 0, 0, 0),
+                stretchWidth = true,
+            };
+
+            if (styleManager?.Textures?.TableHeader != null)
+                style.normal.background = styleManager.Textures.TableHeader;
+
+            return style;
+        }
+
+        private GUIStyle CreateHeaderCellStyle(TableConfig config)
+        {
+            var style = new UnityHelpers.GUIStyle(styleManager?.GetTableHeaderStyle(config.Variant, config.Size, config.Appearance) ?? GUI.skin.label);
+            style.normal.background = null;
+            style.hover.background = null;
+            style.active.background = null;
+            style.focused.background = null;
+            style.border = new UnityHelpers.RectOffset(0, 0, 0, 0);
+            style.margin = new UnityHelpers.RectOffset(0, 0, 0, 0);
+            return style;
+        }
+
+        private void DrawDivider(TableConfig config)
+        {
+            var dividerStyle = styleManager?.GetSeparatorStyle(SeparatorOrientation.Horizontal, config.Variant, config.Size, config.Appearance) ?? GUIStyle.none;
+            UnityHelpers.Box(string.Empty, dividerStyle, GUILayout.Height(Mathf.Max(1f, guiHelper.uiScale)), GUILayout.ExpandWidth(true));
         }
 
         private void DrawSelectionCell(TableConfig config, int rowIndex, GUIStyle rowStyle)

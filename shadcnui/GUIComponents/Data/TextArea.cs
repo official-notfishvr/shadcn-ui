@@ -143,7 +143,7 @@ namespace shadcnui.GUIComponents.Data
 
             GUI.enabled = wasEnabled;
 
-            DrawPlaceholderIfNeeded(config, style, focused);
+            DrawPlaceholderIfNeeded(config, style, focused, value);
             return value;
         }
 
@@ -165,25 +165,31 @@ namespace shadcnui.GUIComponents.Data
 
             GUI.enabled = wasEnabled;
 
-            DrawPlaceholderIfNeeded(config, style, focused, scaled);
+            DrawPlaceholderIfNeeded(config, style, focused, value, scaled);
             return value;
         }
 
-        private void DrawPlaceholderIfNeeded(TextAreaConfig config, GUIStyle style, bool focused, Rect? rectOverride = null)
+        private void DrawPlaceholderIfNeeded(TextAreaConfig config, GUIStyle inputStyle, bool focused, string value, Rect? fieldRectOverride = null)
         {
-            if (focused || string.IsNullOrEmpty(config.Placeholder))
+            if (focused || !string.IsNullOrEmpty(value) || string.IsNullOrEmpty(config.Placeholder))
                 return;
 
-            string value = config.Value ?? string.Empty;
-            if (!string.IsNullOrEmpty(value))
+            if (Event.current.type != EventType.Repaint)
                 return;
 
-            Rect rect = rectOverride ?? GUILayoutUtility.GetLastRect();
-            var placeholder = new UnityHelpers.GUIStyle(style) { normal = { textColor = styleManager?.GetTheme().Muted ?? new Color(0.64f, 0.64f, 0.71f, 1f) } };
+            Rect fieldRect = fieldRectOverride ?? GUILayoutUtility.GetLastRect();
 
-            Rect textRect = new Rect(rect.x + style.padding.left, rect.y + style.padding.top, rect.width - style.padding.horizontal, rect.height - style.padding.vertical);
+            var placeholderStyle = new UnityHelpers.GUIStyle(GUI.skin.label);
+            placeholderStyle.font = inputStyle.font;
+            placeholderStyle.fontSize = inputStyle.fontSize;
+            placeholderStyle.fontStyle = inputStyle.fontStyle;
+            placeholderStyle.alignment = inputStyle.alignment;
+            placeholderStyle.normal.background = null;
+            placeholderStyle.normal.textColor = styleManager?.GetTheme().Muted ?? new Color(0.55f, 0.55f, 0.60f, 1f);
 
-            GUI.Label(textRect, config.Placeholder, placeholder);
+            Rect textRect = new Rect(fieldRect.x + inputStyle.padding.left, fieldRect.y + inputStyle.padding.top, fieldRect.width - inputStyle.padding.horizontal, fieldRect.height - inputStyle.padding.vertical);
+
+            GUI.Label(textRect, config.Placeholder, placeholderStyle);
         }
 
         private void DrawCharacterCount(TextAreaConfig config, string value)

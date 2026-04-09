@@ -81,13 +81,7 @@ namespace shadcnui.GUIComponents.Core.Styling
         CardDescription,
         CardContent,
         CardFooter,
-        Toast,
-        ToastTitle,
-        ToastDescription,
         Tooltip,
-        SliderTrack,
-        SliderThumb,
-        SliderFill,
         Navigation,
         Calendar,
         CalendarWeekday,
@@ -241,17 +235,12 @@ namespace shadcnui.GUIComponents.Core.Styling
             return new UnityHelpers.RectOffset(h, h, v, v);
         }
 
-        public Texture2D CreateSolidTexture(Color color) => Textures.GenerateSolid(color);
-
         public Texture2D CreateTexture(int width, int height, int radius, Color color) => Textures.GenerateShape(width, height, radius, color, color, Color.clear, 0f, 0f, 0);
 
-        public Texture2D CreateTexture(int width, int height, int radius, Color color, Color color2) => Textures.GenerateShape(width, height, radius, color, color2, Color.clear, 0f, 0f, 0);
+        public Texture2D CreateTexture(int width, int height, int radius, Color color, float shadowIntensity, int shadowBlur, Color shadowColor = default) => Textures.GenerateShape(width, height, radius, color, color, Color.clear, 0f, shadowIntensity, shadowBlur, shadowColor);
 
-        public Texture2D CreateTexture(int width, int height, int radius, Color ringColor, float thickness = 1f) => Textures.GenerateShape(width, height, radius, Color.clear, Color.clear, ringColor, thickness, 0f, 0);
-
-        public Texture2D CreateTexture(int width, int height, int radius, Color topColor, Color bottomColor, float shadowIntensity = 0f, int shadowBlur = 0) => Textures.GenerateShape(width, height, radius, topColor, bottomColor, Color.clear, 0f, shadowIntensity, shadowBlur);
-
-        public Texture2D CreateBorderTexture(int width, int height, int radius, Color fillColor, Color borderColor, float borderThickness = 1f) => Textures.GenerateShape(width, height, radius, fillColor, fillColor, borderColor, borderThickness, 0f, 0);
+        public Texture2D CreateBorderTexture(int width, int height, int radius, Color fillColor, Color borderColor, float borderThickness = 1f, float shadowIntensity = 0f, int shadowBlur = 0, Color shadowColor = default) =>
+            Textures.GenerateShape(width, height, radius, fillColor, fillColor, borderColor, borderThickness, shadowIntensity, shadowBlur, shadowColor);
 
         public Texture2D CreateAvatarTexture(int size, int radius, Color backgroundColor, Color borderColor, float borderThickness, bool withShadow = true) => Textures.GenerateAvatarTexture(size, radius, backgroundColor, borderColor, borderThickness, withShadow);
 

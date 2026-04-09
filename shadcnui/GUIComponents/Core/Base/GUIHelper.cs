@@ -69,6 +69,7 @@ namespace shadcnui.GUIComponents.Core.Base
         private readonly Dictionary<int, DateTime?> _dateState = new(),
             _dateInput = new();
         private readonly Dictionary<string, bool> _legacySelectOpen = new();
+        private readonly Stack<string> _stateScopes = new();
         private const string LegacySelectId = "legacy_select";
 
         internal int fontSize = 14;
@@ -303,7 +304,21 @@ namespace shadcnui.GUIComponents.Core.Base
         public void Dispose() => Cleanup();
 
         // Layout helpers
-        public Vector2 ScrollView(Vector2 pos, Action draw, params GUILayoutOption[] opts) => ExecStatefulV2(nameof(ScrollView), s => _layout.DrawScrollView(s, draw, opts), pos);
+        public Vector2 ScrollView(Vector2 pos, Action draw, params GUILayoutOption[] opts)
+        {
+            string scopedKey = GetScopedStateKey(nameof(ScrollView));
+            if (!string.IsNullOrEmpty(scopedKey))
+            {
+                int id = GetStateId(nameof(ScrollView), scopedKey);
+                Vector2 seed = _v2State.TryGetValue(id, out var existing) ? existing : Vector2.zero;
+                Vector2 result = Execute(() => _layout.DrawScrollView(seed, draw, opts), seed, nameof(ScrollView));
+                SetV2State(id, result);
+                _v2Input[id] = result;
+                return result;
+            }
+
+            return ExecStatefulV2(nameof(ScrollView), s => _layout.DrawScrollView(s, draw, opts), pos);
+        }
 
         public Vector2 ScrollView(ref Vector2 pos, Action draw, params GUILayoutOption[] opts)
         {
@@ -1624,6 +1639,29 @@ namespace shadcnui.GUIComponents.Core.Base
         {
             string k = string.IsNullOrEmpty(key) ? prefix : $"{prefix}:{key}";
             return GUIUtility.GetControlID(new GUIContent(k), FocusType.Passive);
+        }
+
+        internal void PushStateScope(string scope)
+        {
+            if (!string.IsNullOrWhiteSpace(scope))
+                _stateScopes.Push(scope);
+        }
+
+        internal void PopStateScope()
+        {
+            if (_stateScopes.Count > 0)
+                _stateScopes.Pop();
+        }
+
+        private string GetScopedStateKey(string leaf = null)
+        {
+            if (_stateScopes.Count == 0)
+                return leaf;
+
+            var scopes = _stateScopes.ToArray();
+            Array.Reverse(scopes);
+            string prefix = string.Join("/", scopes);
+            return string.IsNullOrEmpty(leaf) ? prefix : $"{prefix}:{leaf}";
         }
 
         private float GetFloatState(int id, float v)

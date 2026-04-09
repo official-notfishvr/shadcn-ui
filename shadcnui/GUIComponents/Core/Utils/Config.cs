@@ -392,7 +392,7 @@ namespace shadcnui.GUIComponents.Core.Utils
         public string Label { get; set; }
         public float Width { get; set; } = -1f;
         public float Height { get; set; } = -1f;
-        public float Size { get; set; } = 32f;
+        public new float Size { get; set; } = 32f;
         public bool ShowPercentage { get; set; } = true;
     }
 
@@ -400,7 +400,7 @@ namespace shadcnui.GUIComponents.Core.Utils
     {
         public List<ChartSeries> Series { get; set; }
         public ChartType ChartType { get; set; }
-        public Vector2 Size { get; set; } = new(400f, 300f);
+        public new Vector2 Size { get; set; } = new(400f, 300f);
 
         public ChartConfig() { }
 

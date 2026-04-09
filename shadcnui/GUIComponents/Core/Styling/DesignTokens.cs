@@ -9,105 +9,110 @@ namespace shadcnui.GUIComponents.Core.Styling
             public const float None = 0f;
             public const float XXS = 2f;
             public const float XS = 4f;
-            public const float SM = 8f;
-            public const float MD = 12f;
-            public const float LG = 16f;
-            public const float XL = 24f;
-            public const float XXL = 32f;
+            public const float SM = 6f;
+            public const float MD = 8f;
+            public const float LG = 12f;
+            public const float XL = 16f;
+            public const float XXL = 24f;
         }
 
         public static class Radius
         {
             public const float None = 0f;
-            public const float SM = 1f;
-            public const float MD = 2f;
-            public const float LG = 4f;
-            public const float XL = 6f;
+            public const float SM = 4f;
+            public const float MD = 8f;
+            public const float LG = 10f;
+            public const float XL = 12f;
             public const float Full = 9999f;
         }
 
         public static class FontScale
         {
-            public const float XS = 0.75f;
-            public const float SM = 0.875f;
+            public const float XS = 0.7857f;
+            public const float SM = 0.8571f;
             public const float MD = 1f;
-            public const float LG = 1.125f;
-            public const float XL = 1.25f;
-            public const float XXL = 1.5f;
+            public const float LG = 1.1429f;
+            public const float XL = 1.2857f;
+            public const float XXL = 1.7143f;
         }
 
         public static class Height
         {
-            public const float Mini = 22f;
-            public const float Small = 28f;
-            public const float Default = 34f;
-            public const float Large = 42f;
-            public const float XL = 52f;
+            public const float Mini = 28f;
+            public const float Small = 32f;
+            public const float Default = 36f;
+            public const float Large = 40f;
+            public const float XL = 44f;
         }
 
         public static class Padding
         {
             public static class Button
             {
-                public const float MiniH = 8f;
+                public const float MiniH = 10f;
                 public const float MiniV = 4f;
-                public const float SmallH = 10f;
+                public const float SmallH = 12f;
                 public const float SmallV = 6f;
-                public const float DefaultH = 12f;
+                public const float DefaultH = 16f;
                 public const float DefaultV = 8f;
-                public const float LargeH = 16f;
-                public const float LargeV = 10f;
+                public const float LargeH = 24f;
+                public const float LargeV = 8f;
             }
 
             public static class Input
-            {
-                public const float Horizontal = 10f;
-                public const float Vertical = 8f;
-            }
-
-            public static class Card
-            {
-                public const float Horizontal = 16f;
-                public const float Vertical = 16f;
-            }
-
-            public static class Badge
-            {
-                public const float Horizontal = 8f;
-                public const float Vertical = 3f;
-            }
-
-            public static class Tab
             {
                 public const float Horizontal = 12f;
                 public const float Vertical = 8f;
             }
 
+            public static class Card
+            {
+                public const float Horizontal = 24f;
+                public const float Vertical = 24f;
+            }
+
+            public static class Badge
+            {
+                public const float Horizontal = 10f;
+                public const float Vertical = 4f;
+            }
+
+            public static class Tab
+            {
+                public const float Horizontal = 12f;
+                public const float Vertical = 6f;
+            }
+
             public static class Table
             {
-                public const float CellH = 12f;
-                public const float CellV = 8f;
+                public const float CellH = 16f;
+                public const float CellV = 12f;
             }
 
             public static class Dropdown
             {
-                public const float ItemH = 10f;
-                public const float ItemV = 8f;
+                public const float ItemH = 8f;
+                public const float ItemV = 6f;
             }
         }
 
         public static class Effects
         {
-            public const float ShadowLight = 0.04f;
-            public const float ShadowMedium = 0.08f;
-            public const float ShadowHeavy = 0.12f;
-            public const float ShadowElevation = 0.14f;
+            public const float ShadowLight = 0.06f;
+            public const float ShadowMedium = 0.10f;
+            public const float ShadowHeavy = 0.16f;
+            public const float ShadowElevation = 0.22f;
             public const float ShadowBlurSM = 4f;
-            public const float ShadowBlurMD = 8f;
+            public const float ShadowBlurMD = 10f;
+            public const float ShadowBlurLG = 18f;
             public const float FocusRingThickness = 1f;
-            public const float FocusRingAlpha = 0.55f;
-            public const float SurfaceHighlightTop = 0.01f;
-            public const float SurfaceDepthBottom = 0.02f;
+            public const float FocusRingAlpha = 0.24f;
+            public const float FocusRingBlur = 6f;
+            public const float HoverShift = 0.045f;
+            public const float ActiveShift = 0.08f;
+            public const float DisabledAlpha = 0.5f;
+            public const float SurfaceHighlightTop = 0f;
+            public const float SurfaceDepthBottom = 0f;
         }
 
         public static class TextureSize
@@ -129,12 +134,12 @@ namespace shadcnui.GUIComponents.Core.Styling
         public static class Slider
         {
             public const float TrackMini = 4f;
-            public const float TrackSmall = 5f;
-            public const float TrackDefault = 6f;
-            public const float TrackLarge = 8f;
-            public const float ThumbMini = 10f;
-            public const float ThumbSmall = 12f;
-            public const float ThumbDefault = 14f;
+            public const float TrackSmall = 4f;
+            public const float TrackDefault = 5f;
+            public const float TrackLarge = 6f;
+            public const float ThumbMini = 12f;
+            public const float ThumbSmall = 14f;
+            public const float ThumbDefault = 16f;
             public const float ThumbLarge = 18f;
         }
 
@@ -169,14 +174,14 @@ namespace shadcnui.GUIComponents.Core.Styling
 
         public static class Switch
         {
-            public const float Width = 38f;
+            public const float Width = 36f;
             public const float Height = 20f;
-            public const float Radius = 10f;
+            public const float Radius = 999f;
         }
 
         public static class Layout
         {
-            public const float ControlTextSlack = 4f;
+            public const float ControlTextSlack = 2f;
         }
 
         public static class Avatar
@@ -192,10 +197,10 @@ namespace shadcnui.GUIComponents.Core.Styling
 
         public static class Chart
         {
-            public const float ContainerPaddingH = 12f;
-            public const float ContainerPaddingV = 12f;
-            public const float AxisFontScale = 0.8f;
-            public const float Radius = 2f;
+            public const float ContainerPaddingH = 24f;
+            public const float ContainerPaddingV = 24f;
+            public const float AxisFontScale = 0.8571f;
+            public const float Radius = 12f;
         }
 
         public static class Separator
@@ -206,7 +211,7 @@ namespace shadcnui.GUIComponents.Core.Styling
 
         public static class Badge
         {
-            public const float Height = 24f;
+            public const float Height = 20f;
         }
 
         public static class ToastColors
