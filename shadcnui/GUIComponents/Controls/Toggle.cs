@@ -20,7 +20,7 @@ namespace shadcnui.GUIComponents.Controls
             if (config == null)
                 return false;
 
-            GUIStyle toggleStyle = styleManager?.GetToggleStyle(config.Variant, config.Size, config.Appearance) ?? GUI.skin.toggle;
+            GUIStyle toggleStyle = styleManager?.GetToggleStyle(config.Variant, config.Size, config.Appearance) ?? GUI.skin.button;
 
             bool prevEnabled = GUI.enabled;
             if (config.IsDisabled)
@@ -39,29 +39,16 @@ namespace shadcnui.GUIComponents.Controls
         private bool DrawLayout(BoolControlConfigBase config, GUIStyle style)
         {
             var options = BuildLayoutOptions(config);
-            string label = config.Label ?? string.Empty;
-
-            if (config.Icon?.Image != null)
-            {
-                layoutComponents.BeginHorizontalGroup();
-                RenderIcon(config.Icon);
-                layoutComponents.AddSpace(config.Icon.Spacing * guiHelper.uiScale);
-                bool value = DrawToggleRect(config.Value, label, style, options.ToArray(), config.IsDisabled);
-                layoutComponents.EndHorizontalGroup();
-                return value;
-            }
-
-            return DrawToggleRect(config.Value, label, style, options.ToArray(), config.IsDisabled);
+            var content = new UnityHelpers.GUIContent(config.Label ?? string.Empty);
+            var rect = GUILayoutUtility.GetRect(content, style, options.ToArray());
+            return DrawToggleButton(rect, config, style);
         }
 
         private bool DrawRect(BoolControlConfigBase config, GUIStyle style)
         {
             Rect r = config.Rect.Value;
             Rect scaledRect = new Rect(r.x * guiHelper.uiScale, r.y * guiHelper.uiScale, r.width * guiHelper.uiScale, r.height * guiHelper.uiScale);
-            bool hovered = scaledRect.Contains(Event.current.mousePosition);
-            float offset = hovered && !config.IsDisabled ? DesignTokens.Spacing.XXS * guiHelper.uiScale : 0f;
-            var rect = offset > 0f ? new Rect(scaledRect.x, scaledRect.y - offset, scaledRect.width, scaledRect.height) : scaledRect;
-            return UnityHelpers.Toggle(rect, config.Value, config.Label ?? string.Empty, style);
+            return DrawToggleButton(scaledRect, config, style);
         }
 
         private List<GUILayoutOption> BuildLayoutOptions(BoolControlConfigBase config)
@@ -72,23 +59,33 @@ namespace shadcnui.GUIComponents.Controls
             return options;
         }
 
-        private void RenderIcon(IconConfig iconConfig)
+        private bool DrawToggleButton(Rect rect, BoolControlConfigBase config, GUIStyle style)
         {
-            if (iconConfig?.Image == null)
-                return;
-
-            float scaledSize = iconConfig.Size * guiHelper.uiScale;
-            UnityHelpers.Label(iconConfig.Image, GUILayout.Width(scaledSize), GUILayout.Height(scaledSize));
+            bool next = GUI.Toggle(rect, config.Value, GUIContent.none, style);
+            DrawToggleContent(rect, config, style);
+            return next;
         }
 
-        private bool DrawToggleRect(bool value, string label, GUIStyle style, GUILayoutOption[] options, bool disabled)
+        private void DrawToggleContent(Rect rect, BoolControlConfigBase config, GUIStyle style)
         {
-            var content = new UnityHelpers.GUIContent(label ?? string.Empty);
-            var rect = GUILayoutUtility.GetRect(content, style, options);
-            bool hovered = rect.Contains(Event.current.mousePosition) && !disabled;
-            float offset = hovered ? DesignTokens.Spacing.XXS * guiHelper.uiScale : 0f;
-            var drawRect = offset > 0f ? new Rect(rect.x, rect.y - offset, rect.width, rect.height) : rect;
-            return UnityHelpers.Toggle(drawRect, value, content, style);
+            float spacing = DesignTokens.Spacing.XS * guiHelper.uiScale;
+            float iconSize = config.Icon?.Image != null ? config.Icon.Size * guiHelper.uiScale : 0f;
+            var labelStyle = new UnityHelpers.GUIStyle(style) { normal = { background = null }, alignment = TextAnchor.MiddleCenter };
+
+            var labelContent = new UnityHelpers.GUIContent(config.Label ?? string.Empty);
+            Vector2 labelSize = labelStyle.CalcSize(labelContent);
+            float totalWidth = labelSize.x + (iconSize > 0f ? iconSize + spacing : 0f);
+            float startX = rect.x + (rect.width - totalWidth) * 0.5f;
+
+            if (iconSize > 0f && config.Icon?.Image != null)
+            {
+                var iconRect = new Rect(startX, rect.y + (rect.height - iconSize) * 0.5f, iconSize, iconSize);
+                GUI.DrawTexture(iconRect, config.Icon.Image, ScaleMode.ScaleToFit);
+                startX += iconSize + spacing;
+            }
+
+            var textRect = new Rect(startX, rect.y, labelSize.x, rect.height);
+            GUI.Label(textRect, labelContent, labelStyle);
         }
     }
 }

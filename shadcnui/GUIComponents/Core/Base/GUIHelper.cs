@@ -830,8 +830,7 @@ namespace shadcnui.GUIComponents.Core.Base
         public int Select(string[] items, int selectedIndex, Action<int> onChange = null, ControlVariant v = ControlVariant.Default, ControlSize sz = ControlSize.Default, bool disabled = false, params GUILayoutOption[] opts)
         {
             var options = items == null ? Array.Empty<SelectOption>() : Array.ConvertAll(items, t => new SelectOption(t, t));
-            int result = selectedIndex;
-            var cfg = new SelectConfig
+            var config = new SelectConfig
             {
                 Id = LegacySelectId,
                 Options = options,
@@ -839,22 +838,16 @@ namespace shadcnui.GUIComponents.Core.Base
                 Variant = v,
                 Size = sz,
                 IsDisabled = disabled,
-                OnSelectionChanged = i =>
-                {
-                    result = i;
-                    onChange?.Invoke(i);
-                },
+                OnSelectionChanged = onChange,
                 LayoutOptions = opts ?? Array.Empty<GUILayoutOption>(),
             };
 
-            bool wasEnabled = GUI.enabled;
-            if (disabled)
-                GUI.enabled = false;
-            Execute(() => _select.DrawMenu(cfg), nameof(SelectMenu));
-            GUI.enabled = wasEnabled;
-
-            if (result != selectedIndex)
+            int result = Select(config);
+            if (_legacySelectOpen.TryGetValue(LegacySelectId, out bool shouldOpen) && shouldOpen && Event.current.type == EventType.Repaint && !_select.IsOpen(LegacySelectId))
+            {
+                _select.Open(config, GUILayoutUtility.GetLastRect());
                 _legacySelectOpen[LegacySelectId] = false;
+            }
 
             return result;
         }

@@ -4,9 +4,6 @@ using shadcnui.GUIComponents.Core.Base;
 using shadcnui.GUIComponents.Core.Styling;
 using shadcnui.GUIComponents.Core.Utils;
 using UnityEngine;
-#if IL2CPP_MELONLOADER_PRE57
-using UnhollowerBaseLib;
-#endif
 
 namespace shadcnui.GUIComponents.Data
 {
@@ -22,7 +19,7 @@ namespace shadcnui.GUIComponents.Data
 
             if (!string.IsNullOrEmpty(config.Label))
             {
-                UnityHelpers.Label(config.Label, styleManager?.GetLabelStyle(ControlVariant.Default, ControlSize.Default, config.Appearance) ?? GUI.skin.label);
+                UnityHelpers.Label(config.Label, styleManager?.GetLabelStyle(ControlVariant.Default, config.Size, config.Appearance) ?? GUI.skin.label);
                 layoutComponents.AddSpace(DesignTokens.Spacing.XS);
             }
 
@@ -94,7 +91,6 @@ namespace shadcnui.GUIComponents.Data
         public string ResizableTextArea(string text, ref float height, ControlVariant variant = ControlVariant.Default, string placeholder = "", bool disabled = false, float minHeight = 60f, float maxHeight = 300f, int maxLength = -1, params GUILayoutOption[] options)
         {
             height = Mathf.Clamp(height, minHeight, maxHeight);
-
             var layoutOptions = new List<GUILayoutOption> { GUILayout.Height(height * guiHelper.uiScale), GUILayout.ExpandWidth(true) };
             if (options != null && options.Length > 0)
                 layoutOptions.AddRange(options);
@@ -115,8 +111,7 @@ namespace shadcnui.GUIComponents.Data
 
             layoutComponents.BeginHorizontalGroup();
             GUILayout.FlexibleSpace();
-            var gripStyle = styleManager?.GetLabelStyle(ControlVariant.Muted, ControlSize.Default) ?? GUI.skin.label;
-            if (UnityHelpers.Button("⋮⋮⋮", gripStyle, GUILayout.Width(20f * guiHelper.uiScale), GUILayout.Height(10f * guiHelper.uiScale)))
+            if (UnityHelpers.Button("⋮⋮⋮", styleManager?.GetLabelStyle(ControlVariant.Muted, ControlSize.Default) ?? GUI.skin.label, GUILayout.Width(20f * guiHelper.uiScale), GUILayout.Height(10f * guiHelper.uiScale)))
                 height = height >= maxHeight ? minHeight : height + 20f;
             layoutComponents.EndHorizontalGroup();
 
@@ -130,7 +125,6 @@ namespace shadcnui.GUIComponents.Data
             var style = styleManager?.GetTextAreaStyle(config.Variant, config.Size, focused, config.Appearance) ?? GUI.skin.textArea;
 
             var options = new List<GUILayoutOption> { GUILayout.MinHeight(config.MinHeight * guiHelper.uiScale), GUILayout.MaxHeight(config.MaxHeight * guiHelper.uiScale), GUILayout.ExpandWidth(true) };
-
             if (config.LayoutOptions != null && config.LayoutOptions.Length > 0)
                 options.AddRange(config.LayoutOptions);
 
@@ -140,7 +134,6 @@ namespace shadcnui.GUIComponents.Data
 
             GUI.SetNextControlName(controlName);
             string value = UnityHelpers.TextArea(config.Value ?? string.Empty, style, options.ToArray());
-
             GUI.enabled = wasEnabled;
 
             DrawPlaceholderIfNeeded(config, style, focused, value);
@@ -162,7 +155,6 @@ namespace shadcnui.GUIComponents.Data
 
             GUI.SetNextControlName(controlName);
             string value = GUI.TextArea(scaled, config.Value ?? string.Empty, style);
-
             GUI.enabled = wasEnabled;
 
             DrawPlaceholderIfNeeded(config, style, focused, value, scaled);
@@ -171,24 +163,21 @@ namespace shadcnui.GUIComponents.Data
 
         private void DrawPlaceholderIfNeeded(TextAreaConfig config, GUIStyle inputStyle, bool focused, string value, Rect? fieldRectOverride = null)
         {
-            if (focused || !string.IsNullOrEmpty(value) || string.IsNullOrEmpty(config.Placeholder))
-                return;
-
-            if (Event.current.type != EventType.Repaint)
+            if (focused || !string.IsNullOrEmpty(value) || string.IsNullOrEmpty(config.Placeholder) || Event.current.type != EventType.Repaint)
                 return;
 
             Rect fieldRect = fieldRectOverride ?? GUILayoutUtility.GetLastRect();
-
-            var placeholderStyle = new UnityHelpers.GUIStyle(GUI.skin.label);
-            placeholderStyle.font = inputStyle.font;
-            placeholderStyle.fontSize = inputStyle.fontSize;
-            placeholderStyle.fontStyle = inputStyle.fontStyle;
-            placeholderStyle.alignment = inputStyle.alignment;
+            var placeholderStyle = new UnityHelpers.GUIStyle(GUI.skin.label)
+            {
+                font = inputStyle.font,
+                fontSize = inputStyle.fontSize,
+                fontStyle = inputStyle.fontStyle,
+                alignment = inputStyle.alignment,
+            };
             placeholderStyle.normal.background = null;
             placeholderStyle.normal.textColor = styleManager?.GetTheme().Muted ?? new Color(0.55f, 0.55f, 0.60f, 1f);
 
             Rect textRect = new Rect(fieldRect.x + inputStyle.padding.left, fieldRect.y + inputStyle.padding.top, fieldRect.width - inputStyle.padding.horizontal, fieldRect.height - inputStyle.padding.vertical);
-
             GUI.Label(textRect, config.Placeholder, placeholderStyle);
         }
 
@@ -199,11 +188,7 @@ namespace shadcnui.GUIComponents.Data
             GUILayout.FlexibleSpace();
 
             string count = config.MaxLength > 0 ? $"{value.Length}/{config.MaxLength}" : $"{value.Length} characters";
-            bool nearLimit = config.MaxLength > 0 && value.Length >= config.MaxLength * 0.9f;
             var style = new UnityHelpers.GUIStyle(styleManager?.GetLabelStyle(ControlVariant.Muted, ControlSize.Default, config.Appearance) ?? GUI.skin.label);
-            if (nearLimit)
-                style.normal.textColor = new Color(0.9f, 0.3f, 0.3f);
-
             UnityHelpers.Label(count, style);
             layoutComponents.EndHorizontalGroup();
         }

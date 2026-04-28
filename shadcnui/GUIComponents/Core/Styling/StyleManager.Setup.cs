@@ -11,14 +11,14 @@ namespace shadcnui.GUIComponents.Core.Styling
             var theme = GetTheme();
 
             _baseButtonStyle = MakeControlStyle(theme.ButtonPrimaryBg, theme.ButtonPrimaryFg, DesignTokens.Padding.Button.DefaultH, DesignTokens.Padding.Button.DefaultV, DesignTokens.Radius.MD, Color.clear, FontStyle.Normal);
-            _baseToggleStyle = MakeControlStyle(theme.Secondary, theme.Text, DesignTokens.Padding.Button.DefaultH, DesignTokens.Padding.Button.DefaultV, DesignTokens.Radius.MD, theme.Border, FontStyle.Normal);
+            _baseToggleStyle = MakeControlStyle(theme.Secondary, theme.Text, DesignTokens.Padding.Button.DefaultH, DesignTokens.Padding.Button.DefaultV, DesignTokens.Radius.MD, Color.clear, FontStyle.Normal);
             _baseInputStyle = MakeInputStyle(theme.Base, theme.Text, theme.Border);
             _baseLabelStyle = MakeLabelStyle(theme.Text);
             _baseBadgeStyle = MakeChipStyle(theme.ButtonPrimaryBg, theme.ButtonPrimaryFg);
-            _baseTableStyle = MakePanelStyle(theme.Base, theme.Border, DesignTokens.Radius.XL, 0f, 0f);
-            _checkboxStyle = MakeControlStyle(theme.Base, theme.Text, DesignTokens.Spacing.MD, DesignTokens.Spacing.XS, DesignTokens.Radius.SM, theme.Border, FontStyle.Normal);
+            _baseTableStyle = MakePanelStyle(theme.Elevated, theme.Border, DesignTokens.Radius.LG, 0f, 0f);
+            _checkboxStyle = MakeControlStyle(theme.Base, theme.Text, DesignTokens.Spacing.SM, DesignTokens.Spacing.XS, DesignTokens.Radius.SM, theme.Border, FontStyle.Normal);
             _checkboxSolidStyle = MakeControlStyle(theme.ButtonPrimaryBg, theme.ButtonPrimaryFg, DesignTokens.Spacing.MD, DesignTokens.Spacing.XS, DesignTokens.Radius.SM, Color.clear, FontStyle.Normal);
-            _baseSwitchStyle = MakeControlStyle(theme.Secondary, theme.Text, DesignTokens.Spacing.MD, DesignTokens.Spacing.XS, DesignTokens.Switch.Radius, theme.Border, FontStyle.Normal);
+            _baseSwitchStyle = MakeControlStyle(theme.Secondary, theme.Text, DesignTokens.Spacing.SM, DesignTokens.Spacing.XS, DesignTokens.Switch.Radius, Color.clear, FontStyle.Normal);
             ApplyCheckedState(_baseToggleStyle, theme.ButtonPrimaryBg, theme.ButtonPrimaryFg, Color.clear);
             ApplyCheckedState(_checkboxStyle, theme.ButtonPrimaryBg, theme.ButtonPrimaryFg, Color.clear);
             ApplyCheckedState(_checkboxSolidStyle, theme.ButtonPrimaryBg, theme.ButtonPrimaryFg, Color.clear);
@@ -41,8 +41,8 @@ namespace shadcnui.GUIComponents.Core.Styling
                 padding = new RectOffset(),
                 border = new RectOffset(),
             };
-            _tabsListStyle = MakePanelStyle(theme.TabsBg, theme.Border, DesignTokens.Radius.MD, DesignTokens.Spacing.XS, DesignTokens.Spacing.XS);
-            _tabsTriggerStyle = MakeControlStyle(Color.clear, theme.TabsTriggerFg, DesignTokens.Padding.Tab.Horizontal, DesignTokens.Padding.Tab.Vertical, DesignTokens.Radius.SM, Color.clear, FontStyle.Bold);
+            _tabsListStyle = MakePanelStyle(theme.TabsBg, Color.clear, DesignTokens.Radius.MD, DesignTokens.Spacing.XS, DesignTokens.Spacing.XS);
+            _tabsTriggerStyle = MakeControlStyle(Color.clear, theme.TabsTriggerFg, DesignTokens.Padding.Tab.Horizontal, DesignTokens.Padding.Tab.Vertical, DesignTokens.Radius.MD, Color.clear, FontStyle.Normal);
             _tableHeaderStyle = MakeLabelStyle(theme.Muted, FontStyle.Bold);
             _tableHeaderStyle.normal.background = Textures.TableHeader;
             _tableHeaderStyle.padding = GetSpacingOffset(DesignTokens.Padding.Table.CellH, DesignTokens.Padding.Table.CellV);
@@ -55,15 +55,15 @@ namespace shadcnui.GUIComponents.Core.Styling
             _tableRowStyle.stretchWidth = true;
             _tableCellStyle = MakeLabelStyle(theme.Text);
             _tableCellStyle.padding = GetSpacingOffset(DesignTokens.Padding.Table.CellH, DesignTokens.Padding.Table.CellV);
-            _dialogContentStyle = MakePanelStyle(theme.Elevated, theme.Border, DesignTokens.Radius.XL, DesignTokens.Padding.Card.Horizontal, DesignTokens.Padding.Card.Vertical, DesignTokens.Effects.ShadowHeavy, GetScaledBlur(DesignTokens.Effects.ShadowBlurLG));
-            _cardStyle = MakePanelStyle(theme.Elevated, theme.Border, DesignTokens.Radius.XL, DesignTokens.Padding.Card.Horizontal, DesignTokens.Padding.Card.Vertical);
-            _dropdownContentStyle = MakePanelStyle(theme.Elevated, theme.Border, DesignTokens.Radius.LG, DesignTokens.Spacing.XS, DesignTokens.Spacing.XS, DesignTokens.Effects.ShadowMedium, GetScaledBlur(DesignTokens.Effects.ShadowBlurMD));
+            _dialogContentStyle = MakePanelStyle(theme.Elevated, theme.Border, DesignTokens.Radius.LG, DesignTokens.Padding.Card.Horizontal, DesignTokens.Padding.Card.Vertical, DesignTokens.Effects.ShadowMedium, GetScaledBlur(DesignTokens.Effects.ShadowBlurLG));
+            _cardStyle = MakePanelStyle(theme.Elevated, theme.Border, DesignTokens.Radius.LG, DesignTokens.Padding.Card.Horizontal, DesignTokens.Padding.Card.Vertical);
+            _dropdownContentStyle = MakePanelStyle(theme.Elevated, theme.Border, DesignTokens.Radius.MD, DesignTokens.Spacing.XS, DesignTokens.Spacing.XS, DesignTokens.Effects.ShadowMedium, GetScaledBlur(DesignTokens.Effects.ShadowBlurMD));
             _dropdownItemStyle = MakeControlStyle(Color.clear, theme.Text, DesignTokens.Padding.Dropdown.ItemH, DesignTokens.Padding.Dropdown.ItemV, DesignTokens.Radius.SM, Color.clear, FontStyle.Normal);
-            _menuBarStyle = MakePanelStyle(theme.Elevated, theme.Border, DesignTokens.Radius.LG, DesignTokens.Spacing.XS, DesignTokens.Spacing.XS);
+            _menuBarStyle = MakePanelStyle(theme.Elevated, theme.Border, DesignTokens.Radius.MD, DesignTokens.Spacing.XS, DesignTokens.Spacing.XS);
             _chartContainerStyle = MakePanelStyle(theme.Elevated, theme.Border, DesignTokens.Chart.Radius, DesignTokens.Chart.ContainerPaddingH, DesignTokens.Chart.ContainerPaddingV);
             _avatarStyle = MakeAvatarStyle(theme);
-            _navigationStyle = MakePanelStyle(theme.Elevated, theme.Border, DesignTokens.Radius.LG, DesignTokens.Spacing.MD, DesignTokens.Spacing.MD);
-            _calendarStyle = MakePanelStyle(theme.Elevated, theme.Border, DesignTokens.Radius.XL, DesignTokens.Padding.Card.Horizontal, DesignTokens.Padding.Card.Vertical, DesignTokens.Effects.ShadowMedium, GetScaledBlur(DesignTokens.Effects.ShadowBlurMD));
+            _navigationStyle = MakePanelStyle(theme.Secondary, Color.clear, DesignTokens.Radius.MD, DesignTokens.Spacing.MD, DesignTokens.Spacing.MD);
+            _calendarStyle = MakePanelStyle(theme.Elevated, theme.Border, DesignTokens.Radius.LG, DesignTokens.Padding.Card.Horizontal, DesignTokens.Padding.Card.Vertical, DesignTokens.Effects.ShadowMedium, GetScaledBlur(DesignTokens.Effects.ShadowBlurMD));
             _calendarWeekdayStyle = MakeLabelStyle(theme.Muted, FontStyle.Bold);
             _calendarWeekdayStyle.alignment = TextAnchor.MiddleCenter;
             _calendarWeekdayStyle.fontSize = GetScaledFontSize(DesignTokens.FontScale.XS);
@@ -72,7 +72,7 @@ namespace shadcnui.GUIComponents.Core.Styling
             _calendarDayInRangeStyle = MakeCalendarDayStyle(Tint(theme.ButtonPrimaryBg, 0.18f), theme.Text, Color.clear);
             _calendarDayTodayStyle = MakeCalendarDayStyle(theme.Secondary, theme.Text, theme.Border);
             _calendarDayOutsideMonthStyle = MakeCalendarDayStyle(Color.clear, theme.Muted, Color.clear);
-            _datePickerStyle = MakePanelStyle(theme.Elevated, theme.Border, DesignTokens.Radius.XL, DesignTokens.Padding.Card.Horizontal, DesignTokens.Padding.Card.Vertical, DesignTokens.Effects.ShadowMedium, GetScaledBlur(DesignTokens.Effects.ShadowBlurMD));
+            _datePickerStyle = MakePanelStyle(theme.Elevated, theme.Border, DesignTokens.Radius.LG, DesignTokens.Padding.Card.Horizontal, DesignTokens.Padding.Card.Vertical, DesignTokens.Effects.ShadowMedium, GetScaledBlur(DesignTokens.Effects.ShadowBlurMD));
             _datePickerWeekdayStyle = MakeLabelStyle(theme.Muted, FontStyle.Bold);
             _datePickerWeekdayStyle.alignment = TextAnchor.MiddleCenter;
             _datePickerWeekdayStyle.fontSize = GetScaledFontSize(DesignTokens.FontScale.XS);
@@ -156,7 +156,7 @@ namespace shadcnui.GUIComponents.Core.Styling
             style.normal.textColor = color;
             style.hover.textColor = color;
             style.active.textColor = color;
-            style.fontSize = GetScaledFontSize(DesignTokens.FontScale.SM);
+            style.fontSize = GetScaledFontSize(DesignTokens.FontScale.MD);
             style.fontStyle = fontStyle;
             style.wordWrap = true;
             style.margin = new UnityHelpers.RectOffset(0, 0, 0, 0);
@@ -338,26 +338,21 @@ namespace shadcnui.GUIComponents.Core.Styling
             style.focused.textColor = focusedText;
         }
 
-        private Color HoverSurface(Color color, float amount = DesignTokens.Effects.HoverShift)
+        private Color HoverSurface(Color color, float amount = 0.08f)
         {
-            return Color.Lerp(color, IsDarkSurface(GetTheme().Base) ? Color.white : Color.black, amount);
+            return Color.Lerp(color, GetTheme().Base, Mathf.Clamp01(amount));
         }
 
-        private Color ActiveSurface(Color color, float amount = DesignTokens.Effects.ActiveShift)
+        private Color ActiveSurface(Color color, float amount = 0.16f)
         {
-            return Color.Lerp(color, IsDarkSurface(GetTheme().Base) ? Color.white : Color.black, amount);
+            return Color.Lerp(color, GetTheme().Base, Mathf.Clamp01(amount));
         }
 
         private Color GetGhostFill(float alpha)
         {
             var theme = GetTheme();
-            return new Color(theme.Text.r, theme.Text.g, theme.Text.b, alpha);
-        }
-
-        private bool IsDarkSurface(Color color)
-        {
-            var luminance = color.r * 0.2126f + color.g * 0.7152f + color.b * 0.0722f;
-            return luminance < 0.5f;
+            var mix = Mathf.Clamp01(alpha / 0.11f);
+            return Color.Lerp(theme.Base, theme.Secondary, mix);
         }
 
         private Color Lift(Color color, float amount) => Color.Lerp(color, Color.white, amount);

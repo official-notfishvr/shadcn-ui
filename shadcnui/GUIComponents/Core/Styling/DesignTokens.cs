@@ -19,10 +19,10 @@ namespace shadcnui.GUIComponents.Core.Styling
         public static class Radius
         {
             public const float None = 0f;
-            public const float SM = 4f;
-            public const float MD = 8f;
-            public const float LG = 10f;
-            public const float XL = 12f;
+            public const float SM = 3f;
+            public const float MD = 6f;
+            public const float LG = 8f;
+            public const float XL = 10f;
             public const float Full = 9999f;
         }
 
@@ -30,10 +30,10 @@ namespace shadcnui.GUIComponents.Core.Styling
         {
             public const float XS = 0.7857f;
             public const float SM = 0.8571f;
-            public const float MD = 1f;
-            public const float LG = 1.1429f;
-            public const float XL = 1.2857f;
-            public const float XXL = 1.7143f;
+            public const float MD = 0.9286f;
+            public const float LG = 1f;
+            public const float XL = 1.1429f;
+            public const float XXL = 1.5714f;
         }
 
         public static class Height
@@ -49,20 +49,20 @@ namespace shadcnui.GUIComponents.Core.Styling
         {
             public static class Button
             {
-                public const float MiniH = 10f;
+                public const float MiniH = 8f;
                 public const float MiniV = 4f;
                 public const float SmallH = 12f;
-                public const float SmallV = 6f;
+                public const float SmallV = 5f;
                 public const float DefaultH = 16f;
                 public const float DefaultV = 8f;
-                public const float LargeH = 24f;
+                public const float LargeH = 20f;
                 public const float LargeV = 8f;
             }
 
             public static class Input
             {
                 public const float Horizontal = 12f;
-                public const float Vertical = 8f;
+                public const float Vertical = 7f;
             }
 
             public static class Card
@@ -92,22 +92,22 @@ namespace shadcnui.GUIComponents.Core.Styling
             public static class Dropdown
             {
                 public const float ItemH = 8f;
-                public const float ItemV = 6f;
+                public const float ItemV = 5f;
             }
         }
 
         public static class Effects
         {
-            public const float ShadowLight = 0.06f;
-            public const float ShadowMedium = 0.10f;
-            public const float ShadowHeavy = 0.16f;
-            public const float ShadowElevation = 0.22f;
-            public const float ShadowBlurSM = 4f;
-            public const float ShadowBlurMD = 10f;
-            public const float ShadowBlurLG = 18f;
+            public const float ShadowLight = 0.025f;
+            public const float ShadowMedium = 0.05f;
+            public const float ShadowHeavy = 0.08f;
+            public const float ShadowElevation = 0.12f;
+            public const float ShadowBlurSM = 2f;
+            public const float ShadowBlurMD = 6f;
+            public const float ShadowBlurLG = 12f;
             public const float FocusRingThickness = 1f;
-            public const float FocusRingAlpha = 0.24f;
-            public const float FocusRingBlur = 6f;
+            public const float FocusRingAlpha = 0.16f;
+            public const float FocusRingBlur = 3f;
             public const float HoverShift = 0.045f;
             public const float ActiveShift = 0.08f;
             public const float DisabledAlpha = 0.5f;
@@ -154,8 +154,8 @@ namespace shadcnui.GUIComponents.Core.Styling
         public static class Icon
         {
             public const float Small = 14f;
-            public const float Default = 18f;
-            public const float Large = 22f;
+            public const float Default = 16f;
+            public const float Large = 18f;
         }
 
         public static class ZIndex
@@ -169,7 +169,7 @@ namespace shadcnui.GUIComponents.Core.Styling
 
         public static class Checkbox
         {
-            public const float Size = 18f;
+            public const float Size = 16f;
         }
 
         public static class Switch
@@ -181,7 +181,7 @@ namespace shadcnui.GUIComponents.Core.Styling
 
         public static class Layout
         {
-            public const float ControlTextSlack = 2f;
+            public const float ControlTextSlack = 0f;
         }
 
         public static class Avatar

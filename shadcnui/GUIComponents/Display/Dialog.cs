@@ -16,14 +16,6 @@ namespace shadcnui.GUIComponents.Display
         private bool _isOpen = false;
         private string _dialogId;
         private const float AnimationDuration = DesignTokens.Animation.DurationNormal;
-        private static List<DialogState> _openDialogs = new List<DialogState>();
-
-        private class DialogState
-        {
-            public string Id;
-            public int ZIndex;
-            public DialogConfig Config;
-        }
 
         public Dialog(GUIHelper helper)
             : base(helper) { }
@@ -36,7 +28,6 @@ namespace shadcnui.GUIComponents.Display
             if (!_isOpen || _dialogId != config.Id)
                 return;
 
-            RegisterDialog(config);
             var styleManager = guiHelper.GetStyleManager();
             var animManager = guiHelper.GetAnimationManager();
 
@@ -67,7 +58,6 @@ namespace shadcnui.GUIComponents.Display
         {
             if (_dialogId != null)
             {
-                _openDialogs.RemoveAll(d => d.Id == _dialogId);
                 var animManager = guiHelper.GetAnimationManager();
                 animManager.Remove($"dialog_alpha_{_dialogId}");
                 animManager.Remove($"dialog_scale_{_dialogId}");
@@ -115,9 +105,9 @@ namespace shadcnui.GUIComponents.Display
             var styleManager = guiHelper.GetStyleManager();
             layoutComponents.BeginVerticalGroup();
             if (!string.IsNullOrEmpty(title))
-                UnityHelpers.Label(title, styleManager.GetLabelStyle(ControlVariant.Default, ControlSize.Large));
+                UnityHelpers.Label(title, styleManager.GetCardTitleStyle(ControlVariant.Default, ControlSize.Default, null));
             if (!string.IsNullOrEmpty(description))
-                UnityHelpers.Label(description, styleManager.GetLabelStyle(ControlVariant.Muted, ControlSize.Default));
+                UnityHelpers.Label(description, styleManager.GetCardDescriptionStyle(ControlVariant.Default, ControlSize.Default, null));
             layoutComponents.EndVerticalGroup();
         }
 
@@ -138,20 +128,6 @@ namespace shadcnui.GUIComponents.Display
         #endregion
 
         #region Private Methods
-        private void RegisterDialog(DialogConfig config)
-        {
-            _openDialogs.RemoveAll(d => d.Id == config.Id);
-            _openDialogs.Add(
-                new DialogState
-                {
-                    Id = config.Id,
-                    ZIndex = config.ZIndex,
-                    Config = config,
-                }
-            );
-            _openDialogs.Sort((a, b) => a.ZIndex.CompareTo(b.ZIndex));
-        }
-
         private bool DrawOverlay(DialogConfig config, float animProgress)
         {
             Color prev = GUI.color;
@@ -246,15 +222,15 @@ namespace shadcnui.GUIComponents.Display
             layoutComponents.BeginVerticalGroup();
 
             if (!string.IsNullOrEmpty(config.Title))
-                UnityHelpers.Label(config.Title, styleManager.GetLabelStyle(ControlVariant.Default, ControlSize.Large, config.Appearance));
+                UnityHelpers.Label(config.Title, styleManager.GetCardTitleStyle(ControlVariant.Default, ControlSize.Default, config.Appearance));
 
             if (!string.IsNullOrEmpty(config.Description))
-                UnityHelpers.Label(config.Description, styleManager.GetLabelStyle(ControlVariant.Muted, ControlSize.Default, config.Appearance));
+                UnityHelpers.Label(config.Description, styleManager.GetCardDescriptionStyle(ControlVariant.Default, ControlSize.Default, config.Appearance));
 
             layoutComponents.EndVerticalGroup();
             GUILayout.FlexibleSpace();
 
-            if (UnityHelpers.Button("×", styleManager.GetButtonStyle(ControlVariant.Ghost, ControlSize.Default, config.Appearance), GUILayout.Width(DesignTokens.Icon.Large), GUILayout.Height(DesignTokens.Icon.Large)))
+            if (UnityHelpers.Button("×", styleManager.GetButtonStyle(ControlVariant.Ghost, ControlSize.Icon, config.Appearance), GUILayout.Width(DesignTokens.Height.Default * guiHelper.uiScale), GUILayout.Height(DesignTokens.Height.Default * guiHelper.uiScale)))
                 Close();
 
             layoutComponents.EndHorizontalGroup();

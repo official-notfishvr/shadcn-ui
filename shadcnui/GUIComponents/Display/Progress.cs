@@ -1,4 +1,3 @@
-using System;
 using shadcnui.GUIComponents.Core.Base;
 using shadcnui.GUIComponents.Core.Styling;
 using shadcnui.GUIComponents.Core.Utils;
@@ -17,26 +16,20 @@ namespace shadcnui.GUIComponents.Display
                 return;
 
             if (!string.IsNullOrEmpty(config.Label))
-                UnityHelpers.Label(config.Label, styleManager?.GetLabelStyle(ControlVariant.Default, ControlSize.Default, config.Appearance) ?? GUI.skin.label);
-
-            if (config.Rect.HasValue)
-            {
-                DrawProgressRect(config.Rect.Value, config.Value, config);
-                return;
-            }
-
-            float width = config.Width > 0 ? config.Width * guiHelper.uiScale : 240f * guiHelper.uiScale;
-            float height = config.Height > 0 ? config.Height * guiHelper.uiScale : 10f * guiHelper.uiScale;
-            Rect rect = GUILayoutUtility.GetRect(width, height, (config.LayoutOptions != null && config.LayoutOptions.Length > 0) ? config.LayoutOptions : new[] { GUILayout.Width(width), GUILayout.Height(height) });
-            DrawProgressRect(rect, config.Value, config);
-
-            if (config.ShowPercentage)
             {
                 layoutComponents.BeginHorizontalGroup();
-                GUILayout.FlexibleSpace();
-                UnityHelpers.Label($"{Mathf.Clamp01(config.Value) * 100f:0}%", styleManager?.GetLabelStyle(ControlVariant.Muted, ControlSize.Default, config.Appearance) ?? GUI.skin.label);
+                UnityHelpers.Label(config.Label, styleManager.GetLabelStyle(ControlVariant.Default, ControlSize.Default, config.Appearance));
+                if (config.ShowPercentage)
+                {
+                    GUILayout.FlexibleSpace();
+                    UnityHelpers.Label($"{Mathf.Clamp01(config.Value) * 100f:0}%", styleManager.GetLabelStyle(ControlVariant.Muted, ControlSize.Default, config.Appearance));
+                }
                 layoutComponents.EndHorizontalGroup();
+                layoutComponents.AddSpace(DesignTokens.Spacing.XS);
             }
+
+            Rect rect = config.Rect.HasValue ? ScaleRect(config.Rect.Value) : GetRect(config.Width, config.Height, config.LayoutOptions);
+            DrawProgressBar(rect, config.Value, config.Variant, config.Appearance);
         }
 
         public void DrawProgress(float value, float width = -1f, float height = -1f, ComponentAppearance appearance = null, params GUILayoutOption[] options)
@@ -48,14 +41,21 @@ namespace shadcnui.GUIComponents.Display
                     Width = width,
                     Height = height,
                     Appearance = appearance,
-                    LayoutOptions = options ?? Array.Empty<GUILayoutOption>(),
+                    LayoutOptions = options,
                 }
             );
         }
 
         public void DrawProgress(Rect rect, float value, ComponentAppearance appearance = null)
         {
-            DrawProgressRect(rect, value, new ProgressConfig { Appearance = appearance });
+            DrawProgress(
+                new ProgressConfig
+                {
+                    Value = value,
+                    Rect = rect,
+                    Appearance = appearance,
+                }
+            );
         }
 
         public void LabeledProgress(string label, float value, float width = -1f, float height = -1f, bool showPercentage = true, ComponentAppearance appearance = null, params GUILayoutOption[] options)
@@ -69,56 +69,64 @@ namespace shadcnui.GUIComponents.Display
                     Height = height,
                     ShowPercentage = showPercentage,
                     Appearance = appearance,
-                    LayoutOptions = options ?? Array.Empty<GUILayoutOption>(),
+                    LayoutOptions = options,
                 }
             );
         }
 
-        public void CircularProgress(float value, float size = DesignTokens.Height.Small, ComponentAppearance appearance = null, params GUILayoutOption[] options)
+        public void CircularProgress(float value, float size = 32f, ComponentAppearance appearance = null, params GUILayoutOption[] options)
         {
-            float px = size * guiHelper.uiScale;
-            Rect rect = GUILayoutUtility.GetRect(px, px, GUILayout.Width(px), GUILayout.Height(px));
-            GUIStyle style = styleManager?.GetProgressBarStyle(ControlVariant.Default, ControlSize.Default, appearance) ?? GUI.skin.box;
-            GUI.Box(rect, GUIContent.none, style);
-
-            string text = $"{Mathf.Clamp01(value) * 100f:0}%";
-            var labelStyle = new UnityHelpers.GUIStyle(styleManager?.GetLabelStyle(ControlVariant.Default, ControlSize.Default, appearance) ?? GUI.skin.label) { alignment = TextAnchor.MiddleCenter };
-            GUI.Label(rect, text, labelStyle);
+            float scaled = size * guiHelper.uiScale;
+            Rect rect = GUILayoutUtility.GetRect(scaled, scaled, GUILayout.Width(scaled), GUILayout.Height(scaled));
+            DrawProgressBar(new Rect(rect.x, rect.y + rect.height * 0.45f, rect.width, Mathf.Max(4f, rect.height * 0.12f)), value, ControlVariant.Default, appearance);
+            GUI.Label(rect, $"{Mathf.Clamp01(value) * 100f:0}%", styleManager.GetLabelStyle(ControlVariant.Muted, ControlSize.Small, appearance));
         }
 
         public void AnimatedProgress(string id, float value, float width = -1f, float height = -1f, ComponentAppearance appearance = null, params GUILayoutOption[] options)
         {
-            var anim = guiHelper.GetAnimationManager();
-            if (!anim.Exists(id))
-                anim.StartFloat(id, value, value, 0f);
-
-            float current = anim.GetFloat(id, value);
+            var animation = guiHelper.GetAnimationManager();
+            float current = animation.GetFloat(id, value);
             if (Mathf.Abs(current - value) > 0.001f)
-                anim.StartFloat(id, current, value, DesignTokens.Animation.DurationFast, EasingFunctions.EaseOutCubic);
+                animation.StartFloat(id, current, value, DesignTokens.Animation.DurationNormal, EasingFunctions.EaseOutCubic);
 
-            DrawProgress(current, width, height, appearance, options);
+            DrawProgress(
+                new ProgressConfig
+                {
+                    Value = animation.GetFloat(id, value),
+                    Width = width,
+                    Height = height,
+                    Appearance = appearance,
+                    LayoutOptions = options,
+                }
+            );
         }
 
-        private void DrawProgressRect(Rect rect, float value, ProgressConfig config)
+        private Rect GetRect(float width, float height, GUILayoutOption[] options)
         {
-            Rect scaled = config.Rect.HasValue ? ScaleRect(rect) : rect;
-            float clamped = Mathf.Clamp01(value);
+            float resolvedHeight = height > 0 ? height * guiHelper.uiScale : styleManager.GetProgressBarStyle().fixedHeight;
+            if (options != null && options.Length > 0)
+                return GUILayoutUtility.GetRect(0f, resolvedHeight, options);
 
-            GUIStyle trackStyle = styleManager?.GetProgressBarStyle(config.Variant, ControlSize.Default, config.Appearance) ?? GUI.skin.box;
-            GUI.Box(scaled, GUIContent.none, trackStyle);
+            if (width > 0)
+                return GUILayoutUtility.GetRect(width * guiHelper.uiScale, resolvedHeight, GUILayout.Width(width * guiHelper.uiScale), GUILayout.Height(resolvedHeight));
 
-            var fillColor = config.Appearance?.AccentColor ?? styleManager?.GetTheme()?.Accent ?? new Color(0.2f, 0.6f, 1f);
-            Rect fill = new Rect(scaled.x, scaled.y, scaled.width * clamped, scaled.height);
-
-            Color prev = GUI.color;
-            GUI.color = fillColor;
-            GUI.DrawTexture(fill, Texture2D.whiteTexture);
-            GUI.color = prev;
+            return GUILayoutUtility.GetRect(0f, resolvedHeight, GUILayout.ExpandWidth(true), GUILayout.Height(resolvedHeight));
         }
 
-        private Rect ScaleRect(Rect rect)
+        private void DrawProgressBar(Rect rect, float value, ControlVariant variant, ComponentAppearance appearance)
         {
-            return new Rect(rect.x * guiHelper.uiScale, rect.y * guiHelper.uiScale, rect.width * guiHelper.uiScale, rect.height * guiHelper.uiScale);
+            value = Mathf.Clamp01(value);
+            GUI.Box(rect, GUIContent.none, styleManager.GetProgressBarStyle(variant, ControlSize.Default, appearance));
+
+            if (rect.width <= 0f || value <= 0f)
+                return;
+
+            float fillWidth = Mathf.Max(rect.height, rect.width * value);
+            Rect fillRect = new Rect(rect.x, rect.y, Mathf.Min(rect.width, fillWidth), rect.height);
+            var fillColor = styleManager.GetSliderFillColor(variant, false, appearance);
+            GUI.DrawTexture(fillRect, styleManager.CreateTexture(Mathf.Max(1, Mathf.RoundToInt(fillRect.width)), Mathf.Max(1, Mathf.RoundToInt(fillRect.height)), Mathf.RoundToInt(fillRect.height / 2f), fillColor), ScaleMode.StretchToFill);
         }
+
+        private Rect ScaleRect(Rect rect) => new(rect.x * guiHelper.uiScale, rect.y * guiHelper.uiScale, rect.width * guiHelper.uiScale, rect.height * guiHelper.uiScale);
     }
 }

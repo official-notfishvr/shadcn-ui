@@ -4,9 +4,6 @@ using shadcnui.GUIComponents.Core.Base;
 using shadcnui.GUIComponents.Core.Styling;
 using shadcnui.GUIComponents.Core.Utils;
 using UnityEngine;
-#if IL2CPP_MELONLOADER_PRE57
-using UnhollowerBaseLib;
-#endif
 
 namespace shadcnui.GUIComponents.Controls
 {
@@ -32,7 +29,6 @@ namespace shadcnui.GUIComponents.Controls
             }
 
             bool focused = GUI.GetNameOfFocusedControl() == controlName;
-
             if (config.AutoFocus && !_autoFocused.Contains(id))
             {
                 GUI.FocusControl(controlName);
@@ -47,9 +43,7 @@ namespace shadcnui.GUIComponents.Controls
                 GUI.enabled = false;
 
             GUI.SetNextControlName(controlName);
-
-            string value = DrawInputField(config, inputStyle, controlName, out GUIStyle renderedStyle);
-
+            string value = DrawInputField(config, inputStyle, out GUIStyle renderedStyle);
             GUI.enabled = prevEnabled;
 
             DrawPlaceholderIfNeeded(config, renderedStyle, focused, value);
@@ -61,51 +55,19 @@ namespace shadcnui.GUIComponents.Controls
             return config.IsDisabled ? (config.Value ?? string.Empty) : value;
         }
 
-        private string DrawInputField(InputConfig config, GUIStyle inputStyle, string controlName, out GUIStyle renderedStyle)
+        private string DrawInputField(InputConfig config, GUIStyle inputStyle, out GUIStyle renderedStyle)
         {
             bool hasIcon = config.Icon?.Image != null;
+            renderedStyle = hasIcon ? BuildStyleWithIconPadding(inputStyle, config.Icon) : new UnityHelpers.GUIStyle(inputStyle);
 
-            if (hasIcon && IsVerticalIconPosition(config.Icon.Position))
-            {
-                renderedStyle = inputStyle;
-                return DrawWithVerticalIcon(config, inputStyle, controlName);
-            }
-
-            GUIStyle paddedStyle = hasIcon ? BuildStyleWithIconPadding(inputStyle, config.Icon) : new UnityHelpers.GUIStyle(inputStyle);
-
-            renderedStyle = paddedStyle;
-
-            string value = DrawField(config, paddedStyle, controlName);
-
+            string value = DrawField(config, renderedStyle);
             if (hasIcon && Event.current.type == EventType.Repaint)
                 DrawIconOverlay(config.Icon, GUILayoutUtility.GetLastRect());
 
             return value;
         }
 
-        private string DrawWithVerticalIcon(InputConfig config, GUIStyle style, string controlName)
-        {
-            layoutComponents.BeginVerticalGroup();
-
-            if (config.Icon.Position == IconPosition.Above)
-            {
-                RenderIconInline(config.Icon);
-                layoutComponents.AddSpace(config.Icon.Spacing * guiHelper.uiScale);
-            }
-
-            string value = DrawField(config, style, controlName);
-
-            if (config.Icon.Position == IconPosition.Below)
-            {
-                layoutComponents.AddSpace(config.Icon.Spacing * guiHelper.uiScale);
-                RenderIconInline(config.Icon);
-            }
-
-            layoutComponents.EndVerticalGroup();
-            return value;
-        }
-
-        private string DrawField(InputConfig config, GUIStyle style, string controlName)
+        private string DrawField(InputConfig config, GUIStyle style)
         {
             var options = BuildLayoutOptions(config);
             string current = config.Value ?? string.Empty;
@@ -121,24 +83,21 @@ namespace shadcnui.GUIComponents.Controls
 
         private void DrawPlaceholderIfNeeded(InputConfig config, GUIStyle inputStyle, bool focused, string value)
         {
-            if (focused || !string.IsNullOrEmpty(value) || string.IsNullOrEmpty(config.Placeholder))
-                return;
-
-            if (Event.current.type != EventType.Repaint)
+            if (focused || !string.IsNullOrEmpty(value) || string.IsNullOrEmpty(config.Placeholder) || Event.current.type != EventType.Repaint)
                 return;
 
             Rect fieldRect = GUILayoutUtility.GetLastRect();
-
-            var placeholderStyle = new UnityHelpers.GUIStyle(GUI.skin.label);
-            placeholderStyle.font = inputStyle.font;
-            placeholderStyle.fontSize = inputStyle.fontSize;
-            placeholderStyle.fontStyle = inputStyle.fontStyle;
-            placeholderStyle.alignment = inputStyle.alignment;
+            var placeholderStyle = new UnityHelpers.GUIStyle(GUI.skin.label)
+            {
+                font = inputStyle.font,
+                fontSize = inputStyle.fontSize,
+                fontStyle = inputStyle.fontStyle,
+                alignment = inputStyle.alignment,
+            };
             placeholderStyle.normal.background = null;
             placeholderStyle.normal.textColor = styleManager?.GetTheme().Muted ?? new Color(0.55f, 0.55f, 0.60f, 1f);
 
             Rect textRect = new Rect(fieldRect.x + inputStyle.padding.left, fieldRect.y + inputStyle.padding.top, fieldRect.width - inputStyle.padding.horizontal, fieldRect.height - inputStyle.padding.vertical);
-
             GUI.Label(textRect, config.Placeholder, placeholderStyle);
         }
 
@@ -158,20 +117,10 @@ namespace shadcnui.GUIComponents.Controls
         private void DrawIconOverlay(IconConfig icon, Rect fieldRect)
         {
             float size = icon.Size * guiHelper.uiScale;
-            float y = fieldRect.y + (fieldRect.height - size) / 2f;
-            float xPad = DesignTokens.Spacing.XS * guiHelper.uiScale;
-
+            float y = fieldRect.y + (fieldRect.height - size) * 0.5f;
+            float xPad = DesignTokens.Spacing.SM * guiHelper.uiScale;
             Rect iconRect = icon.Position == IconPosition.Left ? new Rect(fieldRect.x + xPad, y, size, size) : new Rect(fieldRect.xMax - size - xPad, y, size, size);
-
             GUI.DrawTexture(iconRect, icon.Image, ScaleMode.ScaleToFit);
-        }
-
-        private void RenderIconInline(IconConfig icon)
-        {
-            if (icon?.Image == null)
-                return;
-            float size = icon.Size * guiHelper.uiScale;
-            UnityHelpers.Label(icon.Image, GUILayout.Width(size), GUILayout.Height(size));
         }
 
         private void DrawLabel(InputConfig config)
@@ -185,25 +134,20 @@ namespace shadcnui.GUIComponents.Controls
             if (!string.IsNullOrEmpty(config.ErrorText))
             {
                 layoutComponents.AddSpace(DesignTokens.Spacing.XXS);
-                GUIStyle errorStyle = styleManager?.GetLabelStyle(ControlVariant.Destructive, config.Size) ?? GUI.skin.label;
-                UnityHelpers.Label(config.ErrorText, errorStyle);
+                UnityHelpers.Label(config.ErrorText, styleManager?.GetLabelStyle(ControlVariant.Destructive, config.Size, config.Appearance) ?? GUI.skin.label);
                 return;
             }
 
             if (!string.IsNullOrEmpty(config.HelperText))
             {
                 layoutComponents.AddSpace(DesignTokens.Spacing.XXS);
-                GUIStyle helperStyle = styleManager?.GetLabelStyle(ControlVariant.Muted, config.Size) ?? GUI.skin.label;
-                UnityHelpers.Label(config.HelperText, helperStyle);
+                UnityHelpers.Label(config.HelperText, styleManager?.GetLabelStyle(ControlVariant.Muted, config.Size, config.Appearance) ?? GUI.skin.label);
             }
         }
 
         private List<GUILayoutOption> BuildLayoutOptions(InputConfig config)
         {
-            var options = new List<GUILayoutOption>(config.LayoutOptions ?? Array.Empty<GUILayoutOption>());
-
-            float height = config.Height > 0 ? config.Height : DesignTokens.Height.Default;
-            options.Add(GUILayout.Height(height * guiHelper.uiScale));
+            var options = new List<GUILayoutOption>(config.LayoutOptions ?? Array.Empty<GUILayoutOption>()) { GUILayout.Height((config.Height > 0 ? config.Height : DesignTokens.Height.Default) * guiHelper.uiScale) };
 
             if (config.Width > 0)
                 options.Add(GUILayout.Width(config.Width * guiHelper.uiScale));
@@ -223,7 +167,5 @@ namespace shadcnui.GUIComponents.Controls
                 return placeholder;
             return Guid.NewGuid().ToString("N");
         }
-
-        private static bool IsVerticalIconPosition(IconPosition pos) => pos == IconPosition.Above || pos == IconPosition.Below;
     }
 }

@@ -141,12 +141,12 @@ namespace shadcnui.GUIComponents.Controls
 
             if (stack.Count > 1)
             {
-                if (UnityHelpers.Button("<- Back", itemStyle))
+                if (DrawMenuRow(new DropdownMenuItem(DropdownMenuItemType.Item, "Back"), itemStyle, true))
                 {
                     stack.Pop();
                     return;
                 }
-                UnityHelpers.Box(string.Empty, separatorStyle);
+                UnityHelpers.Box(string.Empty, separatorStyle, GUILayout.Height(1f * guiHelper.uiScale), GUILayout.ExpandWidth(true));
             }
 
             var items = stack.Peek();
@@ -158,7 +158,7 @@ namespace shadcnui.GUIComponents.Controls
                         UnityHelpers.Label(item.Text ?? string.Empty, headerStyle);
                         break;
                     case DropdownMenuItemType.Separator:
-                        UnityHelpers.Box(string.Empty, separatorStyle);
+                        UnityHelpers.Box(string.Empty, separatorStyle, GUILayout.Height(1f * guiHelper.uiScale), GUILayout.ExpandWidth(true));
                         break;
                     case DropdownMenuItemType.Item:
                         DrawMenuItem(id, config, item, itemStyle, stack);
@@ -174,11 +174,7 @@ namespace shadcnui.GUIComponents.Controls
                 GUI.enabled = false;
 
             bool hasChildren = item.SubItems != null && item.SubItems.Count > 0;
-            string label = item.Text ?? string.Empty;
-            if (hasChildren)
-                label += " >";
-
-            if (UnityHelpers.Button(label, itemStyle))
+            if (DrawMenuRow(item, itemStyle, false, hasChildren))
             {
                 if (hasChildren)
                 {
@@ -193,6 +189,34 @@ namespace shadcnui.GUIComponents.Controls
             }
 
             GUI.enabled = prevEnabled;
+        }
+
+        private bool DrawMenuRow(DropdownMenuItem item, GUIStyle itemStyle, bool isBack = false, bool hasChildren = false)
+        {
+            string text = item?.Text ?? string.Empty;
+            Rect rect = GUILayoutUtility.GetRect(new GUIContent(text), itemStyle, GUILayout.ExpandWidth(true), GUILayout.Height(DesignTokens.Height.Default * guiHelper.uiScale));
+            bool clicked = GUI.Button(rect, string.Empty, itemStyle);
+
+            float contentX = rect.x + itemStyle.padding.left;
+            if (item?.Icon != null)
+            {
+                float iconSize = 14f * guiHelper.uiScale;
+                var iconRect = new Rect(contentX, rect.y + (rect.height - iconSize) * 0.5f, iconSize, iconSize);
+                GUI.DrawTexture(iconRect, item.Icon, ScaleMode.ScaleToFit);
+                contentX += iconSize + DesignTokens.Spacing.SM * guiHelper.uiScale;
+            }
+
+            string indicator =
+                isBack ? "‹"
+                : hasChildren ? "›"
+                : string.Empty;
+            var textStyle = new UnityHelpers.GUIStyle(itemStyle) { normal = { background = null, textColor = styleManager.GetTheme().Text }, alignment = TextAnchor.MiddleLeft };
+            GUI.Label(new Rect(contentX, rect.y, rect.width - (contentX - rect.x) - 18f * guiHelper.uiScale, rect.height), text, textStyle);
+
+            if (!string.IsNullOrEmpty(indicator))
+                GUI.Label(new Rect(rect.xMax - 16f * guiHelper.uiScale, rect.y, 12f * guiHelper.uiScale, rect.height), indicator, styleManager.GetLabelStyle(ControlVariant.Muted, ControlSize.Small));
+
+            return clicked;
         }
 
         private Stack<List<DropdownMenuItem>> BuildStack(List<DropdownMenuItem> root)

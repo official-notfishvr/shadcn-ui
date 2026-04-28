@@ -393,7 +393,7 @@ namespace shadcnui.GUIComponents.Core.Styling
                         SetBackgroundStates(
                             style,
                             CreateSurfaceTexture(width, height, DesignTokens.Radius.MD, Color.clear, theme.Border, 1f),
-                            CreateSurfaceTexture(width, height, DesignTokens.Radius.MD, GetGhostFill(0.05f), HoverSurface(theme.Border, 0.025f), 1f),
+                            CreateSurfaceTexture(width, height, DesignTokens.Radius.MD, GetGhostFill(0.05f), theme.Border, 1f),
                             CreateFocusTexture(width, height, DesignTokens.Radius.MD, GetGhostFill(0.05f)),
                             CreateFocusTexture(width, height, DesignTokens.Radius.MD, GetGhostFill(0.05f))
                         );
@@ -448,17 +448,17 @@ namespace shadcnui.GUIComponents.Core.Styling
                 case ControlVariant.Outline:
                     fill = theme.Base;
                     hoverFill = theme.Secondary;
-                    activeFill = HoverSurface(theme.Secondary);
+                    activeFill = ActiveSurface(theme.Secondary);
                     text = theme.ButtonOutlineFg;
                     border = theme.Border;
-                    hoverBorder = HoverSurface(theme.Border, 0.025f);
-                    activeBorder = ActiveSurface(theme.Border, 0.04f);
+                    hoverBorder = theme.Border;
+                    activeBorder = theme.Border;
                     borderThickness = 1f;
                     break;
                 case ControlVariant.Ghost:
                     fill = Color.clear;
-                    hoverFill = GetGhostFill(0.075f);
-                    activeFill = GetGhostFill(0.11f);
+                    hoverFill = theme.Secondary;
+                    activeFill = ActiveSurface(theme.Secondary);
                     text = theme.ButtonGhostFg;
                     break;
                 case ControlVariant.Link:
@@ -629,8 +629,12 @@ namespace shadcnui.GUIComponents.Core.Styling
                     style.alignment = TextAnchor.MiddleCenter;
                     if (active)
                     {
-                        style.normal.background = Textures.TabsActive;
-                        style.normal.textColor = GetTheme().TabsTriggerActiveFg;
+                        SetOffBackgroundStates(style, Textures.TabsActive, Textures.TabsActive, Textures.TabsActive, Textures.TabsActive);
+                        SetOffTextStates(style, GetTheme().TabsTriggerActiveFg);
+                    }
+                    else
+                    {
+                        SetOffTextStates(style, GetTheme().TabsTriggerFg);
                     }
                 }
             );
@@ -773,7 +777,7 @@ namespace shadcnui.GUIComponents.Core.Styling
                     SetOffTextStates(style, isShortcut ? Lift(GetTheme().Muted, 0.2f) : GetTheme().Text);
                     if (active)
                     {
-                        var background = CreateSurfaceTexture(128, GetScaledHeight(DesignTokens.Height.Small), DesignTokens.Radius.SM, GetGhostFill(0.09f), Color.clear, 0f);
+                        var background = CreateSurfaceTexture(128, GetScaledHeight(DesignTokens.Height.Small), DesignTokens.Radius.SM, GetTheme().Secondary, Color.clear, 0f);
                         SetOffBackgroundStates(style, background, background, background, background);
                     }
                 }
@@ -818,13 +822,37 @@ namespace shadcnui.GUIComponents.Core.Styling
             );
 
         public GUIStyle GetCardHeaderStyle(ControlVariant variant = ControlVariant.Default, ControlSize size = ControlSize.Default, ComponentAppearance appearance = null) =>
-            ResolveStyle(StyleComponentType.CardHeader, variant, size, GUIStyle.none, appearance, 0, style => style.padding = GetSpacingOffset(DesignTokens.Spacing.LG, DesignTokens.Spacing.MD));
+            ResolveStyle(
+                StyleComponentType.CardHeader,
+                variant,
+                size,
+                GUIStyle.none,
+                appearance,
+                0,
+                style => style.padding = new UnityHelpers.RectOffset(GetScaledSpacing(DesignTokens.Padding.Card.Horizontal), GetScaledSpacing(DesignTokens.Padding.Card.Horizontal), GetScaledSpacing(DesignTokens.Padding.Card.Vertical), GetScaledSpacing(DesignTokens.Spacing.LG))
+            );
 
         public GUIStyle GetCardContentStyle(ControlVariant variant = ControlVariant.Default, ControlSize size = ControlSize.Default, ComponentAppearance appearance = null) =>
-            ResolveStyle(StyleComponentType.CardContent, variant, size, GUIStyle.none, appearance, 0, style => style.padding = GetSpacingOffset(DesignTokens.Spacing.LG, DesignTokens.Spacing.SM));
+            ResolveStyle(
+                StyleComponentType.CardContent,
+                variant,
+                size,
+                GUIStyle.none,
+                appearance,
+                0,
+                style => style.padding = new UnityHelpers.RectOffset(GetScaledSpacing(DesignTokens.Padding.Card.Horizontal), GetScaledSpacing(DesignTokens.Padding.Card.Horizontal), 0, GetScaledSpacing(DesignTokens.Padding.Card.Vertical))
+            );
 
         public GUIStyle GetCardFooterStyle(ControlVariant variant = ControlVariant.Default, ControlSize size = ControlSize.Default, ComponentAppearance appearance = null) =>
-            ResolveStyle(StyleComponentType.CardFooter, variant, size, GUIStyle.none, appearance, 0, style => style.padding = GetSpacingOffset(DesignTokens.Spacing.LG, DesignTokens.Spacing.MD));
+            ResolveStyle(
+                StyleComponentType.CardFooter,
+                variant,
+                size,
+                GUIStyle.none,
+                appearance,
+                0,
+                style => style.padding = new UnityHelpers.RectOffset(GetScaledSpacing(DesignTokens.Padding.Card.Horizontal), GetScaledSpacing(DesignTokens.Padding.Card.Horizontal), GetScaledSpacing(DesignTokens.Spacing.SM), GetScaledSpacing(DesignTokens.Padding.Card.Vertical))
+            );
 
         public GUIStyle GetCardTitleStyle(ComponentAppearance appearance = null) => GetCardTitleStyle(ControlVariant.Default, ControlSize.Default, appearance);
 
@@ -839,7 +867,7 @@ namespace shadcnui.GUIComponents.Core.Styling
                 style =>
                 {
                     style.fontStyle = FontStyle.Bold;
-                    style.fontSize = GetScaledFontSize(DesignTokens.FontScale.XL);
+                    style.fontSize = GetScaledFontSize(DesignTokens.FontScale.XXL);
                     style.normal.textColor = GetTheme().Text;
                 }
             );
@@ -854,7 +882,7 @@ namespace shadcnui.GUIComponents.Core.Styling
                 0,
                 style =>
                 {
-                    style.fontSize = GetScaledFontSize(DesignTokens.FontScale.SM);
+                    style.fontSize = GetScaledFontSize(DesignTokens.FontScale.MD);
                     style.normal.textColor = GetTheme().Muted;
                 }
             );

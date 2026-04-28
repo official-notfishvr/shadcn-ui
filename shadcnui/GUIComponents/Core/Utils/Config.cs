@@ -27,7 +27,7 @@ namespace shadcnui.GUIComponents.Core.Utils
         public ComponentAppearance Appearance { get; set; }
     }
 
-    public abstract class RectConfigBase : ComponentConfigBase // not being used that might maybe fully move off?
+    public abstract class RectConfigBase : ComponentConfigBase
     {
         public Rect? Rect { get; set; }
     }
@@ -157,7 +157,7 @@ namespace shadcnui.GUIComponents.Core.Utils
         public string Placeholder { get; set; }
         public IconConfig Icon { get; set; }
         public int Width { get; set; } = -1;
-        public float Height { get; set; } = 60f;
+        public float Height { get; set; } = DesignTokens.Height.Default;
         public char MaskCharacter { get; set; } = '*';
         public int MaxLength { get; set; } = 1000;
         public bool AutoFocus { get; set; }
@@ -202,7 +202,7 @@ namespace shadcnui.GUIComponents.Core.Utils
         public string Value { get; set; }
         public string Placeholder { get; set; }
         public string Label { get; set; }
-        public float MinHeight { get; set; } = 60f;
+        public float MinHeight { get; set; } = 80f;
         public float MaxHeight { get; set; } = 300f;
         public int MaxLength { get; set; } = -1;
         public bool ShowCharCount { get; set; } = true;
@@ -274,7 +274,7 @@ namespace shadcnui.GUIComponents.Core.Utils
         public TabPosition Position { get; set; } = TabPosition.Top;
         public TabSide Side { get; set; } = TabSide.Left;
         public IndicatorStyle IndicatorStyle { get; set; } = IndicatorStyle.Underline;
-        public bool ShowIndicator { get; set; } = true;
+        public bool ShowIndicator { get; set; }
         public bool EnableOverflowScroll { get; set; }
         public bool[] DisabledTabs { get; set; } = Array.Empty<bool>();
         public bool[] ClosableTabs { get; set; }

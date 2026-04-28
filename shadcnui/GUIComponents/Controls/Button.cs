@@ -45,9 +45,6 @@ namespace shadcnui.GUIComponents.Controls
         {
             var options = new List<GUILayoutOption>(config.LayoutOptions ?? Array.Empty<GUILayoutOption>());
 
-            if (config.Size != ControlSize.Icon && config.Icon?.Image == null)
-                options.Add(GUILayout.ExpandWidth(true));
-
             if (style.fixedWidth > 0)
                 options.Add(GUILayout.Width(style.fixedWidth));
             if (style.fixedHeight > 0)
@@ -67,75 +64,93 @@ namespace shadcnui.GUIComponents.Controls
         private bool DrawWithIcon(ButtonConfig config, GUIStyle style, List<GUILayoutOption> options)
         {
             var icon = config.Icon;
-            bool horizontal = icon.Position == IconPosition.Left || icon.Position == IconPosition.Right;
-
-            if (horizontal)
-                layoutComponents.BeginHorizontalGroup();
-            else
-                layoutComponents.BeginVerticalGroup();
-
-            if (icon.Position == IconPosition.Above)
-            {
-                RenderIcon(icon, false);
-                layoutComponents.AddSpace(icon.Spacing * guiHelper.uiScale);
-            }
-
-            if (icon.Position == IconPosition.Left)
-            {
-                RenderIcon(icon, false);
-                layoutComponents.AddSpace(icon.Spacing * guiHelper.uiScale);
-            }
-
             var content = new UnityHelpers.GUIContent(config.Text ?? string.Empty);
             var rect = GUILayoutUtility.GetRect(content, style, options.ToArray());
-            bool hovered = rect.Contains(Event.current.mousePosition);
-            bool clicked = DrawButtonRect(rect, content, style, hovered && !config.IsDisabled);
-
-            if (icon.Position == IconPosition.Right)
-            {
-                layoutComponents.AddSpace(icon.Spacing * guiHelper.uiScale);
-                RenderIcon(icon, hovered && !config.IsDisabled);
-            }
-
-            if (icon.Position == IconPosition.Below)
-            {
-                layoutComponents.AddSpace(icon.Spacing * guiHelper.uiScale);
-                RenderIcon(icon, hovered && !config.IsDisabled);
-            }
-
-            if (horizontal)
-                layoutComponents.EndHorizontalGroup();
-            else
-                layoutComponents.EndVerticalGroup();
-
+            bool hovered = rect.Contains(Event.current.mousePosition) && !config.IsDisabled;
+            bool clicked = DrawButtonRect(rect, UnityHelpers.GUIContent.none, style, hovered);
+            DrawButtonIconContent(rect, style, config.Text ?? string.Empty, icon);
             return clicked;
         }
 
         private bool DrawButtonRect(Rect rect, UnityHelpers.GUIContent content, GUIStyle style, bool hovered)
         {
-            if (hovered)
-            {
-                float offset = DesignTokens.Spacing.XXS * guiHelper.uiScale;
-                var lifted = new Rect(rect.x, rect.y - offset, rect.width, rect.height);
-                return UnityHelpers.Button(lifted, content, style);
-            }
-
             return UnityHelpers.Button(rect, content, style);
         }
 
-        private void RenderIcon(IconConfig iconConfig, bool hovered)
+        private void DrawButtonIconContent(Rect rect, GUIStyle style, string text, IconConfig iconConfig)
         {
             if (iconConfig?.Image == null)
                 return;
 
             float scaledSize = iconConfig.Size * guiHelper.uiScale;
-            var rect = GUILayoutUtility.GetRect(scaledSize, scaledSize, GUILayout.Width(scaledSize), GUILayout.Height(scaledSize));
-            if (hovered)
+            float spacing = iconConfig.Spacing * guiHelper.uiScale;
+            var labelStyle = new UnityHelpers.GUIStyle(style)
             {
-                float offset = DesignTokens.Spacing.XXS * guiHelper.uiScale;
-                rect = new Rect(rect.x, rect.y - offset, rect.width, rect.height);
+                normal = { background = null },
+                hover = { background = null },
+                active = { background = null },
+                focused = { background = null },
+                onNormal = { background = null },
+                onHover = { background = null },
+                onActive = { background = null },
+                onFocused = { background = null },
+                alignment = TextAnchor.MiddleLeft,
+                clipping = TextClipping.Clip,
+            };
+
+            bool hasText = !string.IsNullOrEmpty(text);
+            Vector2 textSize = hasText ? labelStyle.CalcSize(new UnityHelpers.GUIContent(text)) : Vector2.zero;
+
+            Rect iconRect;
+            Rect textRect;
+
+            if (!hasText)
+            {
+                iconRect = new Rect(rect.x + (rect.width - scaledSize) * 0.5f, rect.y + (rect.height - scaledSize) * 0.5f, scaledSize, scaledSize);
+                GUI.DrawTexture(iconRect, iconConfig.Image, ScaleMode.ScaleToFit);
+                return;
             }
-            GUI.DrawTexture(rect, iconConfig.Image, ScaleMode.ScaleToFit);
+
+            switch (iconConfig.Position)
+            {
+                case IconPosition.Right:
+                {
+                    float totalWidth = textSize.x + spacing + scaledSize;
+                    float startX = rect.x + (rect.width - totalWidth) * 0.5f;
+                    textRect = new Rect(startX, rect.y, textSize.x, rect.height);
+                    iconRect = new Rect(startX + textSize.x + spacing, rect.y + (rect.height - scaledSize) * 0.5f, scaledSize, scaledSize);
+                    break;
+                }
+                case IconPosition.Above:
+                {
+                    float totalHeight = scaledSize + spacing + textSize.y;
+                    float startY = rect.y + (rect.height - totalHeight) * 0.5f;
+                    iconRect = new Rect(rect.x + (rect.width - scaledSize) * 0.5f, startY, scaledSize, scaledSize);
+                    textRect = new Rect(rect.x, startY + scaledSize + spacing, rect.width, textSize.y);
+                    labelStyle.alignment = TextAnchor.UpperCenter;
+                    break;
+                }
+                case IconPosition.Below:
+                {
+                    float totalHeight = textSize.y + spacing + scaledSize;
+                    float startY = rect.y + (rect.height - totalHeight) * 0.5f;
+                    textRect = new Rect(rect.x, startY, rect.width, textSize.y);
+                    iconRect = new Rect(rect.x + (rect.width - scaledSize) * 0.5f, startY + textSize.y + spacing, scaledSize, scaledSize);
+                    labelStyle.alignment = TextAnchor.UpperCenter;
+                    break;
+                }
+                default:
+                {
+                    float totalWidth = scaledSize + spacing + textSize.x;
+                    float startX = rect.x + (rect.width - totalWidth) * 0.5f;
+                    iconRect = new Rect(startX, rect.y + (rect.height - scaledSize) * 0.5f, scaledSize, scaledSize);
+                    textRect = new Rect(startX + scaledSize + spacing, rect.y, textSize.x, rect.height);
+                    break;
+                }
+            }
+
+            GUI.DrawTexture(iconRect, iconConfig.Image, ScaleMode.ScaleToFit);
+            GUI.Label(textRect, text, labelStyle);
         }
     }
 }

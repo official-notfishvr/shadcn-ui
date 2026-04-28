@@ -389,8 +389,7 @@ namespace shadcnui.GUIComponents.Layout
 
             GUI.enabled = !isDisabled;
 
-            var displayLabel = isClosable ? tabLabel + "  ×" : tabLabel;
-            var tabRect = GUILayoutUtility.GetRect(new GUIContent(displayLabel), triggerStyle, layoutOptions);
+            var tabRect = GUILayoutUtility.GetRect(new GUIContent(tabLabel), triggerStyle, layoutOptions);
 
             var closeClicked = false;
             if (isClosable)
