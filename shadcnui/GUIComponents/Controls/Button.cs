@@ -47,6 +47,9 @@ namespace shadcnui.GUIComponents.Controls
 
             if (style.fixedWidth > 0)
                 options.Add(GUILayout.Width(style.fixedWidth));
+            else
+                options.Add(GUILayout.ExpandWidth(true));
+
             if (style.fixedHeight > 0)
                 options.Add(GUILayout.Height(style.fixedHeight));
 
