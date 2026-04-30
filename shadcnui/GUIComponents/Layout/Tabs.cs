@@ -389,7 +389,7 @@ namespace shadcnui.GUIComponents.Layout
 
             GUI.enabled = !isDisabled;
 
-            var tabRect = GUILayoutUtility.GetRect(new GUIContent(tabLabel), triggerStyle, layoutOptions);
+            var tabRect = ControlLayoutUtility.ReserveRect(new UnityHelpers.GUIContent(tabLabel), triggerStyle, layoutOptions);
 
             var closeClicked = false;
             if (isClosable)
@@ -424,31 +424,22 @@ namespace shadcnui.GUIComponents.Layout
 
         private void DrawTabContent(Rect tabRect, string label, GUIStyle triggerStyle, Texture2D icon, bool isClosable, bool isVertical)
         {
-            var labelStyle = new UnityHelpers.GUIStyle(triggerStyle);
-
             if (icon != null)
             {
-                var iconSize = DesignTokens.Icon.Small * guiHelper.uiScale;
-                var labelContent = new GUIContent(label);
-                var labelWidth = triggerStyle.CalcSize(labelContent).x;
-                var totalContentWidth = iconSize + DesignTokens.Spacing.XS * guiHelper.uiScale + labelWidth;
-                var contentStartX = tabRect.x + (tabRect.width - totalContentWidth) / 2;
-
-                if (isClosable)
-                    contentStartX -= DesignTokens.Spacing.MD * guiHelper.uiScale;
-
-                var iconY = tabRect.y + (tabRect.height - iconSize) / 2;
-                var iconRect = new Rect(contentStartX, iconY, iconSize, iconSize);
-                GUI.DrawTexture(iconRect, icon, ScaleMode.ScaleToFit);
-
-                labelStyle.alignment = isVertical ? TextAnchor.MiddleLeft : TextAnchor.MiddleCenter;
-                var labelRect = new Rect(contentStartX + iconSize + DesignTokens.Spacing.XS * guiHelper.uiScale, tabRect.y, labelWidth, tabRect.height);
-                GUI.Label(labelRect, label, labelStyle);
+                ContentRenderUtility.DrawLeadingIconAndText(
+                    isClosable ? ControlLayoutUtility.Inset(tabRect, right: CLOSE_BUTTON_HIT_AREA * guiHelper.uiScale) : tabRect,
+                    triggerStyle,
+                    label,
+                    icon,
+                    DesignTokens.Icon.Small * guiHelper.uiScale,
+                    DesignTokens.Spacing.XS * guiHelper.uiScale,
+                    alignment: isVertical ? TextAnchor.MiddleLeft : TextAnchor.MiddleCenter
+                );
             }
             else
             {
-                labelStyle.alignment = isVertical ? TextAnchor.MiddleLeft : TextAnchor.MiddleCenter;
-                var labelRect = isClosable ? new Rect(tabRect.x, tabRect.y, tabRect.width - CLOSE_BUTTON_HIT_AREA * guiHelper.uiScale, tabRect.height) : tabRect;
+                var labelStyle = ContentRenderUtility.CreateOverlayLabelStyle(triggerStyle, isVertical ? TextAnchor.MiddleLeft : TextAnchor.MiddleCenter);
+                var labelRect = isClosable ? ControlLayoutUtility.Inset(tabRect, right: CLOSE_BUTTON_HIT_AREA * guiHelper.uiScale) : tabRect;
                 GUI.Label(labelRect, label, labelStyle);
             }
         }
@@ -456,7 +447,7 @@ namespace shadcnui.GUIComponents.Layout
         private bool HandleCloseButton(Rect tabRect, int index, TabsConfig config)
         {
             var closeButtonSize = CLOSE_BUTTON_HIT_AREA * guiHelper.uiScale;
-            var closeButtonRect = new Rect(tabRect.x + tabRect.width - closeButtonSize - DesignTokens.Spacing.XS * guiHelper.uiScale, tabRect.y + (tabRect.height - closeButtonSize) / 2, closeButtonSize, closeButtonSize);
+            var closeButtonRect = ControlLayoutUtility.Centered(ControlLayoutUtility.RightAligned(tabRect, closeButtonSize, DesignTokens.Spacing.XS * guiHelper.uiScale), closeButtonSize, closeButtonSize);
 
             if (Event.current.type == EventType.MouseDown && Event.current.button == 0 && closeButtonRect.Contains(Event.current.mousePosition))
             {

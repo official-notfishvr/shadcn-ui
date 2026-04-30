@@ -26,7 +26,7 @@ namespace shadcnui.GUIComponents.Display
 
             if (config.Rect.HasValue)
             {
-                Rect rect = ScaleRect(config.Rect.Value);
+                Rect rect = ControlLayoutUtility.ScaleRect(config.Rect.Value, guiHelper.uiScale);
                 DrawLabelContent(rect, config, style);
             }
             else
@@ -146,11 +146,6 @@ namespace shadcnui.GUIComponents.Display
 
             float size = icon.Size * guiHelper.uiScale;
             UnityHelpers.Label(icon.Image, GUILayout.Width(size), GUILayout.Height(size));
-        }
-
-        private Rect ScaleRect(Rect rect)
-        {
-            return new Rect(rect.x * guiHelper.uiScale, rect.y * guiHelper.uiScale, rect.width * guiHelper.uiScale, rect.height * guiHelper.uiScale);
         }
     }
 }

@@ -43,23 +43,13 @@ namespace shadcnui.GUIComponents.Controls
 
         private List<GUILayoutOption> BuildLayoutOptions(ButtonConfig config, GUIStyle style)
         {
-            var options = new List<GUILayoutOption>(config.LayoutOptions ?? Array.Empty<GUILayoutOption>());
-
-            if (style.fixedWidth > 0)
-                options.Add(GUILayout.Width(style.fixedWidth));
-            else
-                options.Add(GUILayout.ExpandWidth(true));
-
-            if (style.fixedHeight > 0)
-                options.Add(GUILayout.Height(style.fixedHeight));
-
-            return options;
+            return ControlLayoutUtility.BuildLayoutOptions(config.LayoutOptions, style.fixedWidth, style.fixedHeight, expandWidth: style.fixedWidth <= 0f);
         }
 
         private bool DrawBasic(ButtonConfig config, GUIStyle style, List<GUILayoutOption> options)
         {
             var content = new UnityHelpers.GUIContent(config.Text ?? string.Empty);
-            var rect = GUILayoutUtility.GetRect(content, style, options.ToArray());
+            var rect = config.Rect.HasValue ? ControlLayoutUtility.ScaleRect(config.Rect.Value, guiHelper.uiScale) : ControlLayoutUtility.ReserveRect(content, style, options);
             bool hovered = rect.Contains(Event.current.mousePosition);
             return DrawButtonRect(rect, content, style, hovered && !config.IsDisabled);
         }
@@ -68,7 +58,7 @@ namespace shadcnui.GUIComponents.Controls
         {
             var icon = config.Icon;
             var content = new UnityHelpers.GUIContent(config.Text ?? string.Empty);
-            var rect = GUILayoutUtility.GetRect(content, style, options.ToArray());
+            var rect = config.Rect.HasValue ? ControlLayoutUtility.ScaleRect(config.Rect.Value, guiHelper.uiScale) : ControlLayoutUtility.ReserveRect(content, style, options);
             bool hovered = rect.Contains(Event.current.mousePosition) && !config.IsDisabled;
             bool clicked = DrawButtonRect(rect, UnityHelpers.GUIContent.none, style, hovered);
             DrawButtonIconContent(rect, style, config.Text ?? string.Empty, icon);
@@ -84,76 +74,7 @@ namespace shadcnui.GUIComponents.Controls
         {
             if (iconConfig?.Image == null)
                 return;
-
-            float scaledSize = iconConfig.Size * guiHelper.uiScale;
-            float spacing = iconConfig.Spacing * guiHelper.uiScale;
-            var labelStyle = new UnityHelpers.GUIStyle(style)
-            {
-                normal = { background = null },
-                hover = { background = null },
-                active = { background = null },
-                focused = { background = null },
-                onNormal = { background = null },
-                onHover = { background = null },
-                onActive = { background = null },
-                onFocused = { background = null },
-                alignment = TextAnchor.MiddleLeft,
-                clipping = TextClipping.Clip,
-            };
-
-            bool hasText = !string.IsNullOrEmpty(text);
-            Vector2 textSize = hasText ? labelStyle.CalcSize(new UnityHelpers.GUIContent(text)) : Vector2.zero;
-
-            Rect iconRect;
-            Rect textRect;
-
-            if (!hasText)
-            {
-                iconRect = new Rect(rect.x + (rect.width - scaledSize) * 0.5f, rect.y + (rect.height - scaledSize) * 0.5f, scaledSize, scaledSize);
-                GUI.DrawTexture(iconRect, iconConfig.Image, ScaleMode.ScaleToFit);
-                return;
-            }
-
-            switch (iconConfig.Position)
-            {
-                case IconPosition.Right:
-                {
-                    float totalWidth = textSize.x + spacing + scaledSize;
-                    float startX = rect.x + (rect.width - totalWidth) * 0.5f;
-                    textRect = new Rect(startX, rect.y, textSize.x, rect.height);
-                    iconRect = new Rect(startX + textSize.x + spacing, rect.y + (rect.height - scaledSize) * 0.5f, scaledSize, scaledSize);
-                    break;
-                }
-                case IconPosition.Above:
-                {
-                    float totalHeight = scaledSize + spacing + textSize.y;
-                    float startY = rect.y + (rect.height - totalHeight) * 0.5f;
-                    iconRect = new Rect(rect.x + (rect.width - scaledSize) * 0.5f, startY, scaledSize, scaledSize);
-                    textRect = new Rect(rect.x, startY + scaledSize + spacing, rect.width, textSize.y);
-                    labelStyle.alignment = TextAnchor.UpperCenter;
-                    break;
-                }
-                case IconPosition.Below:
-                {
-                    float totalHeight = textSize.y + spacing + scaledSize;
-                    float startY = rect.y + (rect.height - totalHeight) * 0.5f;
-                    textRect = new Rect(rect.x, startY, rect.width, textSize.y);
-                    iconRect = new Rect(rect.x + (rect.width - scaledSize) * 0.5f, startY + textSize.y + spacing, scaledSize, scaledSize);
-                    labelStyle.alignment = TextAnchor.UpperCenter;
-                    break;
-                }
-                default:
-                {
-                    float totalWidth = scaledSize + spacing + textSize.x;
-                    float startX = rect.x + (rect.width - totalWidth) * 0.5f;
-                    iconRect = new Rect(startX, rect.y + (rect.height - scaledSize) * 0.5f, scaledSize, scaledSize);
-                    textRect = new Rect(startX + scaledSize + spacing, rect.y, textSize.x, rect.height);
-                    break;
-                }
-            }
-
-            GUI.DrawTexture(iconRect, iconConfig.Image, ScaleMode.ScaleToFit);
-            GUI.Label(textRect, text, labelStyle);
+            ContentRenderUtility.DrawCenteredContent(rect, style, text, iconConfig.Image, iconConfig.Position, iconConfig.Size * guiHelper.uiScale, iconConfig.Spacing * guiHelper.uiScale);
         }
     }
 }

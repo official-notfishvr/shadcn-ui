@@ -152,17 +152,24 @@ namespace shadcnui.GUIComponents.Display
             float width = Mathf.Clamp(cfg.Width * guiHelper.uiScale, cfg.MinWidth * guiHelper.uiScale, cfg.MaxWidth * guiHelper.uiScale);
             float height = cfg.MinHeight * guiHelper.uiScale;
 
-            var titleStyle = styleManager?.GetLabelStyle(ControlVariant.Default, ControlSize.Default, cfg.Appearance) ?? GUI.skin.label;
-            var descStyle = styleManager?.GetLabelStyle(ControlVariant.Muted, ControlSize.Default, cfg.Appearance) ?? GUI.skin.label;
+            var titleStyle = styleManager?.GetCardTitleStyle(ControlVariant.Default, ControlSize.Default, cfg.Appearance) ?? GUI.skin.label;
+            var descStyle = styleManager?.GetCardDescriptionStyle(ControlVariant.Default, ControlSize.Default, cfg.Appearance) ?? GUI.skin.label;
 
             float padding = cfg.Padding * guiHelper.uiScale;
-            float contentWidth = width - padding * 2;
+            float accentWidth = cfg.ShowAccentBar ? 5f * guiHelper.uiScale : 0f;
+            float closeAllowance = cfg.IsDismissible ? 30f * guiHelper.uiScale : 0f;
+            float contentWidth = width - padding * 2 - accentWidth - closeAllowance;
 
             float titleHeight = string.IsNullOrEmpty(cfg.Title) ? 0f : titleStyle.CalcHeight(new GUIContent(cfg.Title), contentWidth);
             float descHeight = string.IsNullOrEmpty(cfg.Description) ? 0f : descStyle.CalcHeight(new GUIContent(cfg.Description), contentWidth);
+            float actionHeight = !string.IsNullOrEmpty(cfg.ActionLabel) && cfg.OnAction != null ? 32f * guiHelper.uiScale : 0f;
+            float eyebrowHeight = 16f * guiHelper.uiScale;
+            float gapAfterEyebrow = (titleHeight > 0f || descHeight > 0f) ? 8f * guiHelper.uiScale : 0f;
+            float titleGap = titleHeight > 0f && descHeight > 0f ? 6f * guiHelper.uiScale : 0f;
+            float actionGap = actionHeight > 0f && (titleHeight > 0f || descHeight > 0f) ? 10f * guiHelper.uiScale : 0f;
 
-            float total = padding * 2 + titleHeight + descHeight;
-            height = Mathf.Max(height, total + (string.IsNullOrEmpty(cfg.Description) ? 0f : 6f * guiHelper.uiScale));
+            float total = padding * 2 + eyebrowHeight + gapAfterEyebrow + titleHeight + titleGap + descHeight + actionGap + actionHeight;
+            height = Mathf.Max(height, total);
 
             return new Vector2(width, height);
         }
@@ -174,61 +181,111 @@ namespace shadcnui.GUIComponents.Display
             Color bg = styleManager?.GetToastBackgroundColor(cfg.Variant) ?? (theme?.Elevated ?? Color.black);
             Color accent = styleManager?.GetToastAccentColor(cfg.Variant) ?? (theme?.Accent ?? Color.white);
             Color textColor = styleManager?.GetToastTextColor(cfg.Variant) ?? Color.white;
+            Color border = theme != null ? Color.Lerp(theme.Border, accent, 0.22f) : accent;
+            Color muted = theme != null ? Color.Lerp(theme.Muted, textColor, 0.18f) : textColor;
 
             bool hovered = rect.Contains(Event.current.mousePosition);
             HandleHover(toast, hovered, now);
 
-            Color prev = GUI.color;
-            GUI.color = bg;
-            GUI.DrawTexture(rect, Texture2D.whiteTexture);
-            GUI.color = prev;
+            SurfaceDrawUtility.DrawRoundedBorder(
+                styleManager,
+                rect,
+                styleManager.GetScaledBorderRadius(cfg.BorderRadius),
+                bg,
+                border,
+                1f,
+                hovered ? DesignTokens.Effects.ShadowMedium : DesignTokens.Effects.ShadowLight,
+                hovered ? styleManager.GetScaledSpacing(DesignTokens.Effects.ShadowBlurLG) : styleManager.GetScaledSpacing(DesignTokens.Effects.ShadowBlurMD),
+                theme?.Shadow ?? new Color(0f, 0f, 0f, 0.28f)
+            );
 
             if (cfg.ShowAccentBar)
             {
-                Rect accentRect = new Rect(rect.x, rect.y, 4f * guiHelper.uiScale, rect.height);
-                DrawSolid(accentRect, accent);
+                Rect accentRect = new Rect(rect.x + 1f, rect.y + 1f, 5f * guiHelper.uiScale, rect.height - 2f);
+                SurfaceDrawUtility.DrawRoundedFill(styleManager, accentRect, accent, styleManager.GetScaledBorderRadius(cfg.BorderRadius));
             }
 
             float padding = cfg.Padding * guiHelper.uiScale;
-            Rect content = new Rect(rect.x + padding, rect.y + padding, rect.width - padding * 2, rect.height - padding * 2);
+            float accentInset = cfg.ShowAccentBar ? 8f * guiHelper.uiScale : 0f;
+            float closeAllowance = cfg.IsDismissible ? 30f * guiHelper.uiScale : 0f;
+            Rect content = new Rect(rect.x + padding + accentInset, rect.y + padding, rect.width - padding * 2 - accentInset - closeAllowance, rect.height - padding * 2);
 
-            var titleStyle = new UnityHelpers.GUIStyle(styleManager?.GetLabelStyle(ControlVariant.Default, ControlSize.Default, cfg.Appearance) ?? GUI.skin.label) { normal = { textColor = textColor } };
-            var descStyle = new UnityHelpers.GUIStyle(styleManager?.GetLabelStyle(ControlVariant.Muted, ControlSize.Default, cfg.Appearance) ?? GUI.skin.label) { normal = { textColor = textColor }, wordWrap = true };
+            var eyebrowStyle = new UnityHelpers.GUIStyle(styleManager?.GetLabelStyle(ControlVariant.Muted, ControlSize.Small, cfg.Appearance) ?? GUI.skin.label)
+            {
+                alignment = TextAnchor.MiddleLeft,
+                fontStyle = FontStyle.Bold,
+                clipping = TextClipping.Clip,
+            };
+            eyebrowStyle.normal.textColor = accent;
+
+            var titleStyle = new UnityHelpers.GUIStyle(styleManager?.GetCardTitleStyle(ControlVariant.Default, ControlSize.Default, cfg.Appearance) ?? GUI.skin.label) { wordWrap = true, clipping = TextClipping.Clip };
+            titleStyle.normal.textColor = textColor;
+
+            var descStyle = new UnityHelpers.GUIStyle(styleManager?.GetCardDescriptionStyle(ControlVariant.Default, ControlSize.Default, cfg.Appearance) ?? GUI.skin.label) { wordWrap = true, clipping = TextClipping.Clip };
+            descStyle.normal.textColor = muted;
 
             float y = content.y;
+            string eyebrow = GetToastEyebrow(cfg.Variant);
+            GUI.Label(new Rect(content.x, y, content.width, 16f * guiHelper.uiScale), eyebrow, eyebrowStyle);
+            y += 16f * guiHelper.uiScale;
+
+            if (!string.IsNullOrEmpty(cfg.Title) || !string.IsNullOrEmpty(cfg.Description))
+                y += 8f * guiHelper.uiScale;
+
             if (!string.IsNullOrEmpty(cfg.Title))
             {
                 float h = titleStyle.CalcHeight(new UnityHelpers.GUIContent(cfg.Title), content.width);
                 GUI.Label(new Rect(content.x, y, content.width, h), cfg.Title, titleStyle);
-                y += h + 4f * guiHelper.uiScale;
+                y += h + (!string.IsNullOrEmpty(cfg.Description) ? 6f * guiHelper.uiScale : 0f);
             }
 
             if (!string.IsNullOrEmpty(cfg.Description))
             {
                 float h = descStyle.CalcHeight(new UnityHelpers.GUIContent(cfg.Description), content.width);
                 GUI.Label(new Rect(content.x, y, content.width, h), cfg.Description, descStyle);
-                y += h + 6f * guiHelper.uiScale;
+                y += h;
             }
 
             if (!string.IsNullOrEmpty(cfg.ActionLabel) && cfg.OnAction != null)
             {
-                if (GUI.Button(new Rect(content.x, y, 90f * guiHelper.uiScale, 26f * guiHelper.uiScale), cfg.ActionLabel))
-                    cfg.OnAction?.Invoke();
+                y += 10f * guiHelper.uiScale;
+                var actionWidth = Mathf.Min(content.width, Mathf.Max(96f * guiHelper.uiScale, (styleManager?.GetButtonStyle(ControlVariant.Secondary, ControlSize.Small, cfg.Appearance) ?? GUI.skin.button).CalcSize(new GUIContent(cfg.ActionLabel)).x + 28f * guiHelper.uiScale));
+                var actionButton = new Controls.Button(guiHelper);
+                actionButton.Draw(
+                    new ButtonConfig
+                    {
+                        Rect = new Rect(content.x, y, actionWidth / guiHelper.uiScale, 32f),
+                        Text = cfg.ActionLabel,
+                        Variant = ControlVariant.Secondary,
+                        Size = ControlSize.Small,
+                        Appearance = cfg.Appearance,
+                        OnClick = cfg.OnAction,
+                    }
+                );
             }
 
             if (cfg.IsDismissible)
             {
-                Rect closeRect = new Rect(rect.xMax - 22f * guiHelper.uiScale, rect.y + 6f * guiHelper.uiScale, 16f * guiHelper.uiScale, 16f * guiHelper.uiScale);
-                if (GUI.Button(closeRect, "×"))
-                    Dismiss(cfg.Id);
+                var closeButton = new Controls.Button(guiHelper);
+                closeButton.Draw(
+                    new ButtonConfig
+                    {
+                        Rect = new Rect((rect.xMax - padding - 22f * guiHelper.uiScale) / guiHelper.uiScale, (rect.y + padding - 2f * guiHelper.uiScale) / guiHelper.uiScale, 22f, 22f),
+                        Text = "×",
+                        Variant = ControlVariant.Ghost,
+                        Size = ControlSize.Icon,
+                        Appearance = cfg.Appearance,
+                        OnClick = () => Dismiss(cfg.Id),
+                    }
+                );
             }
 
             if (cfg.ShowProgressBar && cfg.DurationMs > 0)
             {
                 float elapsed = GetElapsedSeconds(toast, now);
                 float t = Mathf.Clamp01(elapsed / (cfg.DurationMs / 1000f));
-                Rect bar = new Rect(rect.x, rect.yMax - 3f * guiHelper.uiScale, rect.width * (1f - t), 3f * guiHelper.uiScale);
-                DrawSolid(bar, accent);
+                Rect bar = ControlLayoutUtility.BottomAligned(new Rect(rect.x, rect.y, rect.width * (1f - t), rect.height), 3f * guiHelper.uiScale);
+                SurfaceDrawUtility.DrawSolid(bar, accent);
             }
 
             if (cfg.EnableClickToDismiss && Event.current.type == EventType.MouseDown && rect.Contains(Event.current.mousePosition))
@@ -238,12 +295,16 @@ namespace shadcnui.GUIComponents.Display
             }
         }
 
-        private void DrawSolid(Rect rect, Color color)
+        private string GetToastEyebrow(ToastVariant variant)
         {
-            Color prev = GUI.color;
-            GUI.color = color;
-            GUI.DrawTexture(rect, Texture2D.whiteTexture);
-            GUI.color = prev;
+            return variant switch
+            {
+                ToastVariant.Success => "SUCCESS",
+                ToastVariant.Error => "ERROR",
+                ToastVariant.Warning => "WARNING",
+                ToastVariant.Info => "INFO",
+                _ => "NOTICE",
+            };
         }
 
         private void HandleHover(ToastItem toast, bool hovered, float now)

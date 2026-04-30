@@ -69,7 +69,7 @@ namespace shadcnui.GUIComponents.Display
 
         private void DrawAvatarCore(Texture2D image, string fallback, float dimension, GUIStyle avatarStyle, Color borderColor, bool online)
         {
-            Rect rect = GUILayoutUtility.GetRect(dimension, dimension, GUILayout.Width(dimension), GUILayout.Height(dimension));
+            Rect rect = SurfaceDrawUtility.ReserveSquare(dimension);
             GUI.Box(rect, GUIContent.none, avatarStyle);
 
             if (image != null)
@@ -84,7 +84,7 @@ namespace shadcnui.GUIComponents.Display
 
             if (borderColor.a > 0f)
             {
-                GUI.DrawTexture(rect, styleManager.CreateBorderTexture(Mathf.RoundToInt(rect.width), Mathf.RoundToInt(rect.height), Mathf.RoundToInt(rect.height / 2f), Color.clear, borderColor, 1f), ScaleMode.StretchToFill);
+                SurfaceDrawUtility.DrawRoundedBorder(styleManager, rect, Mathf.RoundToInt(rect.height / 2f), Color.clear, borderColor, 1f);
             }
 
             if (!online)
@@ -92,7 +92,7 @@ namespace shadcnui.GUIComponents.Display
 
             float indicatorSize = styleManager.GetStatusIndicatorSize(size: ControlSize.Default);
             Rect indicatorRect = new Rect(rect.xMax - indicatorSize, rect.yMax - indicatorSize, indicatorSize, indicatorSize);
-            GUI.DrawTexture(indicatorRect, styleManager.CreateBorderTexture(Mathf.RoundToInt(indicatorRect.width), Mathf.RoundToInt(indicatorRect.height), Mathf.RoundToInt(indicatorRect.width / 2f), new Color(0.13f, 0.78f, 0.39f, 1f), styleManager.GetTheme().Base, 2f), ScaleMode.StretchToFill);
+            SurfaceDrawUtility.DrawRoundedBorder(styleManager, indicatorRect, Mathf.RoundToInt(indicatorRect.width / 2f), new Color(0.13f, 0.78f, 0.39f, 1f), styleManager.GetTheme().Base, 2f);
         }
     }
 }

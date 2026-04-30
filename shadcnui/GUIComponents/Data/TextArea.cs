@@ -91,7 +91,7 @@ namespace shadcnui.GUIComponents.Data
         public string ResizableTextArea(string text, ref float height, ControlVariant variant = ControlVariant.Default, string placeholder = "", bool disabled = false, float minHeight = 60f, float maxHeight = 300f, int maxLength = -1, params GUILayoutOption[] options)
         {
             height = Mathf.Clamp(height, minHeight, maxHeight);
-            var layoutOptions = new List<GUILayoutOption> { GUILayout.Height(height * guiHelper.uiScale), GUILayout.ExpandWidth(true) };
+            var layoutOptions = ControlLayoutUtility.BuildLayoutOptions(null, fixedHeight: height * guiHelper.uiScale, expandWidth: true);
             if (options != null && options.Length > 0)
                 layoutOptions.AddRange(options);
 
@@ -147,7 +147,7 @@ namespace shadcnui.GUIComponents.Data
             var style = styleManager?.GetTextAreaStyle(config.Variant, config.Size, focused, config.Appearance) ?? GUI.skin.textArea;
 
             Rect rect = config.Rect ?? new Rect(0, 0, 200, 80);
-            Rect scaled = new Rect(rect.x * guiHelper.uiScale, rect.y * guiHelper.uiScale, rect.width * guiHelper.uiScale, rect.height * guiHelper.uiScale);
+            Rect scaled = ControlLayoutUtility.ScaleRect(rect, guiHelper.uiScale);
 
             bool wasEnabled = GUI.enabled;
             if (config.IsDisabled)

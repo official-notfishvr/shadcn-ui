@@ -108,7 +108,7 @@ namespace shadcnui.GUIComponents.Controls
         {
             if (config.LayoutOptions != null && config.LayoutOptions.Length > 0)
                 return GUILayoutUtility.GetRect(100f * guiHelper.uiScale, totalHeight, config.LayoutOptions);
-            return GUILayoutUtility.GetRect(GUIContent.none, GUI.skin.horizontalSlider, GUILayout.Height(totalHeight), GUILayout.ExpandWidth(true));
+            return ControlLayoutUtility.ReserveRect(UnityHelpers.GUIContent.none, GUI.skin.horizontalSlider, ControlLayoutUtility.BuildLayoutOptions(null, fixedHeight: totalHeight, expandWidth: true));
         }
 
         private float DrawSliderRepaint(Rect sliderRect, SliderConfig config, float trackHeight, float thumbSize, float totalHeight)
@@ -210,8 +210,7 @@ namespace shadcnui.GUIComponents.Controls
             int width = Mathf.Max(8, Mathf.RoundToInt(rect.width));
             int height = Mathf.Max(8, Mathf.RoundToInt(rect.height));
 
-            var texture = styleManager.CreateTexture(width, height, radius, color);
-            GUI.DrawTexture(rect, texture, ScaleMode.StretchToFill);
+            SurfaceDrawUtility.DrawRoundedFill(styleManager, rect, color, radius);
         }
 
         private void DrawCachedThumb(Rect rect, Color color, bool disabled)
@@ -230,16 +229,14 @@ namespace shadcnui.GUIComponents.Controls
         {
             int radius = size / 2;
             var shadowColor = new Color(0, 0, 0, 0.2f);
-            var shadowTex = styleManager.CreateTexture(size, size, radius, shadowColor);
             Rect shadowRect = new Rect(rect.x + 1, rect.y + 2, rect.width, rect.height);
-            GUI.DrawTexture(shadowRect, shadowTex, ScaleMode.StretchToFill);
+            SurfaceDrawUtility.DrawRoundedFill(styleManager, shadowRect, shadowColor, radius);
         }
 
         private void DrawThumbTexture(Rect rect, int size, Color color, Color borderColor)
         {
             int radius = size / 2;
-            var thumbTex = styleManager.CreateBorderTexture(size, size, radius, color, borderColor, 1f);
-            GUI.DrawTexture(rect, thumbTex, ScaleMode.StretchToFill);
+            SurfaceDrawUtility.DrawRoundedBorder(styleManager, rect, radius, color, borderColor, 1f);
         }
     }
 }

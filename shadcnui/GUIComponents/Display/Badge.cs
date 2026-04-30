@@ -137,11 +137,8 @@ namespace shadcnui.GUIComponents.Display
             var theme = styleManager?.GetTheme();
             Color dot = isActive ? (theme?.Accent ?? Color.green) : (theme?.Muted ?? Color.gray);
 
-            Rect rect = GUILayoutUtility.GetRect(size, size, GUILayout.Width(size), GUILayout.Height(size));
-            Color prev = GUI.color;
-            GUI.color = dot;
-            GUI.DrawTexture(rect, Texture2D.whiteTexture);
-            GUI.color = prev;
+            Rect rect = SurfaceDrawUtility.ReserveSquare(size);
+            SurfaceDrawUtility.DrawSolid(rect, dot);
 
             layoutComponents.AddSpace(DesignTokens.Spacing.XXS);
         }

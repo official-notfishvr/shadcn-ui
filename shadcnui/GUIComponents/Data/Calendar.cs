@@ -24,54 +24,18 @@ namespace shadcnui.GUIComponents.Data
 
             var style = styleManager.GetCalendarStyle(config.Variant, config.Size, config.Appearance);
             layoutComponents.BeginVerticalGroup(style);
-            DrawHeader(id);
-            DrawWeekdays(styleManager.GetCalendarWeekdayStyle(config.Appearance));
-            DrawMonthGrid(config, id);
+            CalendarRenderUtility.DrawMonthHeader(
+                layoutComponents,
+                styleManager.GetButtonStyle(ControlVariant.Ghost, ControlSize.Icon),
+                styleManager.GetCardTitleStyle(ControlVariant.Default, ControlSize.Default, null),
+                _visibleMonths[id],
+                () => _visibleMonths[id] = _visibleMonths[id].AddMonths(-1),
+                () => _visibleMonths[id] = _visibleMonths[id].AddMonths(1),
+                DesignTokens.Spacing.SM
+            );
+            CalendarRenderUtility.DrawWeekdays(layoutComponents, styleManager.GetCalendarWeekdayStyle(config.Appearance), 36f * guiHelper.uiScale, DesignTokens.Spacing.XS);
+            CalendarRenderUtility.DrawMonthGrid(layoutComponents, _visibleMonths[id], (current, activeMonth) => DrawDay(config, current, activeMonth), DesignTokens.Spacing.XXS);
             layoutComponents.EndVerticalGroup();
-        }
-
-        private void DrawHeader(string id)
-        {
-            layoutComponents.BeginHorizontalGroup();
-            if (GUILayout.Button("‹", styleManager.GetButtonStyle(ControlVariant.Ghost, ControlSize.Icon)))
-                _visibleMonths[id] = _visibleMonths[id].AddMonths(-1);
-            GUILayout.FlexibleSpace();
-            GUILayout.Label(_visibleMonths[id].ToString("MMMM yyyy"), styleManager.GetCardTitleStyle(ControlVariant.Default, ControlSize.Default, null));
-            GUILayout.FlexibleSpace();
-            if (GUILayout.Button("›", styleManager.GetButtonStyle(ControlVariant.Ghost, ControlSize.Icon)))
-                _visibleMonths[id] = _visibleMonths[id].AddMonths(1);
-            layoutComponents.EndHorizontalGroup();
-            layoutComponents.AddSpace(DesignTokens.Spacing.SM);
-        }
-
-        private void DrawWeekdays(GUIStyle weekdayStyle)
-        {
-            layoutComponents.BeginHorizontalGroup();
-            foreach (var day in new[] { "Su", "Mo", "Tu", "We", "Th", "Fr", "Sa" })
-                GUILayout.Label(day, weekdayStyle, GUILayout.Width(36f * guiHelper.uiScale));
-            layoutComponents.EndHorizontalGroup();
-            layoutComponents.AddSpace(DesignTokens.Spacing.XS);
-        }
-
-        private void DrawMonthGrid(CalendarConfig config, string id)
-        {
-            DateTime month = _visibleMonths[id];
-            DateTime first = new DateTime(month.Year, month.Month, 1);
-            int startOffset = (int)first.DayOfWeek;
-            DateTime gridStart = first.AddDays(-startOffset);
-
-            for (int week = 0; week < 6; week++)
-            {
-                layoutComponents.BeginHorizontalGroup();
-                for (int day = 0; day < 7; day++)
-                {
-                    DateTime current = gridStart.AddDays(week * 7 + day);
-                    DrawDay(config, current, month.Month);
-                }
-                layoutComponents.EndHorizontalGroup();
-                if (week < 5)
-                    layoutComponents.AddSpace(DesignTokens.Spacing.XXS);
-            }
         }
 
         private void DrawDay(CalendarConfig config, DateTime date, int activeMonth)

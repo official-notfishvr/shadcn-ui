@@ -28,7 +28,7 @@ namespace shadcnui.GUIComponents.Display
                 layoutComponents.AddSpace(DesignTokens.Spacing.XS);
             }
 
-            Rect rect = config.Rect.HasValue ? ScaleRect(config.Rect.Value) : GetRect(config.Width, config.Height, config.LayoutOptions);
+            Rect rect = config.Rect.HasValue ? ControlLayoutUtility.ScaleRect(config.Rect.Value, guiHelper.uiScale) : GetRect(config.Width, config.Height, config.LayoutOptions);
             DrawProgressBar(rect, config.Value, config.Variant, config.Appearance);
         }
 
@@ -77,7 +77,7 @@ namespace shadcnui.GUIComponents.Display
         public void CircularProgress(float value, float size = 32f, ComponentAppearance appearance = null, params GUILayoutOption[] options)
         {
             float scaled = size * guiHelper.uiScale;
-            Rect rect = GUILayoutUtility.GetRect(scaled, scaled, GUILayout.Width(scaled), GUILayout.Height(scaled));
+            Rect rect = SurfaceDrawUtility.ReserveSquare(scaled);
             DrawProgressBar(new Rect(rect.x, rect.y + rect.height * 0.45f, rect.width, Mathf.Max(4f, rect.height * 0.12f)), value, ControlVariant.Default, appearance);
             GUI.Label(rect, $"{Mathf.Clamp01(value) * 100f:0}%", styleManager.GetLabelStyle(ControlVariant.Muted, ControlSize.Small, appearance));
         }
@@ -110,7 +110,7 @@ namespace shadcnui.GUIComponents.Display
             if (width > 0)
                 return GUILayoutUtility.GetRect(width * guiHelper.uiScale, resolvedHeight, GUILayout.Width(width * guiHelper.uiScale), GUILayout.Height(resolvedHeight));
 
-            return GUILayoutUtility.GetRect(0f, resolvedHeight, GUILayout.ExpandWidth(true), GUILayout.Height(resolvedHeight));
+            return ControlLayoutUtility.ReserveRect(UnityHelpers.GUIContent.none, GUIStyle.none, ControlLayoutUtility.BuildLayoutOptions(null, fixedHeight: resolvedHeight, expandWidth: true));
         }
 
         private void DrawProgressBar(Rect rect, float value, ControlVariant variant, ComponentAppearance appearance)
@@ -124,9 +124,7 @@ namespace shadcnui.GUIComponents.Display
             float fillWidth = Mathf.Max(rect.height, rect.width * value);
             Rect fillRect = new Rect(rect.x, rect.y, Mathf.Min(rect.width, fillWidth), rect.height);
             var fillColor = styleManager.GetSliderFillColor(variant, false, appearance);
-            GUI.DrawTexture(fillRect, styleManager.CreateTexture(Mathf.Max(1, Mathf.RoundToInt(fillRect.width)), Mathf.Max(1, Mathf.RoundToInt(fillRect.height)), Mathf.RoundToInt(fillRect.height / 2f), fillColor), ScaleMode.StretchToFill);
+            SurfaceDrawUtility.DrawRoundedFill(styleManager, fillRect, fillColor, Mathf.RoundToInt(fillRect.height / 2f));
         }
-
-        private Rect ScaleRect(Rect rect) => new(rect.x * guiHelper.uiScale, rect.y * guiHelper.uiScale, rect.width * guiHelper.uiScale, rect.height * guiHelper.uiScale);
     }
 }

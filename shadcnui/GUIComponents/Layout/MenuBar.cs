@@ -144,7 +144,7 @@ namespace shadcnui.GUIComponents.Layout
 
             var clicked = UnityHelpers.Button(item.Text, itemStyle, GUILayout.ExpandWidth(false));
             if (Event.current.type == EventType.Repaint)
-                _menuItemRects[index] = ToScreenRect(GUILayoutUtility.GetLastRect());
+                _menuItemRects[index] = PopupLayoutUtility.ToScreenRect(GUILayoutUtility.GetLastRect());
 
             GUI.enabled = wasEnabled;
 
@@ -249,7 +249,7 @@ namespace shadcnui.GUIComponents.Layout
             var buttonStyle = styleManager.GetMenuBarItemStyle(_currentVariant, _currentSize, appearance: _currentAppearance);
             var textStyle = styleManager.GetMenuBarItemStyle(_currentVariant, _currentSize, appearance: _currentAppearance);
 
-            Rect rect = GUILayoutUtility.GetRect(GUIContent.none, buttonStyle, GUILayout.ExpandWidth(true), GUILayout.Height(MenuItemHeight * guiHelper.uiScale));
+            Rect rect = ControlLayoutUtility.ReserveRect(UnityHelpers.GUIContent.none, buttonStyle, ControlLayoutUtility.BuildLayoutOptions(null, fixedHeight: MenuItemHeight * guiHelper.uiScale, expandWidth: true));
 
             if (GUI.Button(rect, "", buttonStyle))
             {
@@ -310,13 +310,6 @@ namespace shadcnui.GUIComponents.Layout
         private string GetLayerId() => _layerId;
 
         private float GetDropdownWidth() => DropdownWidth * guiHelper.uiScale;
-
-        private Rect ToScreenRect(Rect rect)
-        {
-            var topLeft = GUIUtility.GUIToScreenPoint(new Vector2(rect.xMin, rect.yMin));
-            var bottomRight = GUIUtility.GUIToScreenPoint(new Vector2(rect.xMax, rect.yMax));
-            return Rect.MinMaxRect(topLeft.x, topLeft.y, bottomRight.x, bottomRight.y);
-        }
 
         private float GetDropdownHeight(MenuData menu)
         {

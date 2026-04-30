@@ -31,8 +31,7 @@ namespace shadcnui.GUIComponents.Display
             if (!rect.Contains(mouse))
                 return;
 
-            Vector2 screenMin = GUIUtility.GUIToScreenPoint(rect.position);
-            Rect screenRect = new Rect(screenMin.x, screenMin.y, rect.width, rect.height);
+            Rect screenRect = PopupLayoutUtility.ToScreenRect(rect);
 
             bool isNew = !_hoverRect.HasValue || _hoverText != text;
             if (isNew)

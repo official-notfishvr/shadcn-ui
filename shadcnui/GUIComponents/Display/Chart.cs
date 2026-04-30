@@ -21,7 +21,7 @@ namespace shadcnui.GUIComponents.Display
             var style = styleManager.GetChartStyle(config.Variant, ControlSize.Default, config.Appearance);
 
             layoutComponents.BeginVerticalGroup(style, GUILayout.Width(width), GUILayout.Height(height));
-            Rect rect = GUILayoutUtility.GetRect(width - style.padding.horizontal, height - style.padding.vertical - 24f * guiHelper.uiScale, GUILayout.ExpandWidth(true), GUILayout.ExpandHeight(true));
+            Rect rect = ControlLayoutUtility.ReserveRect(UnityHelpers.GUIContent.none, GUIStyle.none, new[] { GUILayout.ExpandWidth(true), GUILayout.ExpandHeight(true) }, height - style.padding.vertical - 24f * guiHelper.uiScale);
             DrawPlot(rect, config);
             DrawLegend(config);
             layoutComponents.EndVerticalGroup();
@@ -63,7 +63,7 @@ namespace shadcnui.GUIComponents.Display
                     float h = rect.height * normalized;
                     Rect barRect = new Rect(rect.x + i * groupWidth + s * barWidth, rect.yMax - h, barWidth - 2f, h);
                     Color color = ResolveSeriesColor(series[s], i);
-                    GUI.DrawTexture(barRect, styleManager.CreateTexture(Mathf.Max(1, Mathf.RoundToInt(barRect.width)), Mathf.Max(1, Mathf.RoundToInt(barRect.height)), styleManager.GetScaledBorderRadius(DesignTokens.Radius.SM), color), ScaleMode.StretchToFill);
+                    SurfaceDrawUtility.DrawRoundedFill(styleManager, barRect, color, styleManager.GetScaledBorderRadius(DesignTokens.Radius.SM));
                 }
             }
         }
@@ -107,8 +107,8 @@ namespace shadcnui.GUIComponents.Display
             layoutComponents.BeginHorizontalGroup();
             foreach (var series in config.Series.Where(s => s != null && s.Visible))
             {
-                Rect dot = GUILayoutUtility.GetRect(8f * guiHelper.uiScale, 8f * guiHelper.uiScale, GUILayout.Width(8f * guiHelper.uiScale), GUILayout.Height(8f * guiHelper.uiScale));
-                GUI.DrawTexture(dot, styleManager.CreateTexture(Mathf.RoundToInt(dot.width), Mathf.RoundToInt(dot.height), Mathf.RoundToInt(dot.width / 2f), ResolveSeriesColor(series, 0)), ScaleMode.StretchToFill);
+                Rect dot = SurfaceDrawUtility.ReserveSquare(8f * guiHelper.uiScale);
+                SurfaceDrawUtility.DrawRoundedFill(styleManager, dot, ResolveSeriesColor(series, 0), Mathf.RoundToInt(dot.width / 2f));
                 layoutComponents.AddSpace(DesignTokens.Spacing.XS);
                 UnityHelpers.Label(series.Label ?? series.Key ?? "Series", styleManager.GetLabelStyle(ControlVariant.Muted, ControlSize.Small, config.Appearance));
                 layoutComponents.AddSpace(DesignTokens.Spacing.MD);

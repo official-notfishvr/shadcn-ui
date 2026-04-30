@@ -136,7 +136,7 @@ namespace shadcnui.GUIComponents.Core.Utils
         public Action<bool> OnValueChanged { get; set; }
     }
 
-    public class ButtonConfig : ComponentConfigBase
+    public class ButtonConfig : RectConfigBase
     {
         public string Text { get; set; }
         public IconConfig Icon { get; set; }

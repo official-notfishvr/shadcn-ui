@@ -73,7 +73,7 @@ namespace shadcnui.GUIComponents.Controls
 
             float width = GetMenuWidth(config, anchorRect);
             float height = GetMenuHeight(config);
-            Vector2 screenPos = GetMenuScreenPosition(anchorRect, width, height);
+            Vector2 screenPos = PopupLayoutUtility.GetAnchoredScreenPosition(anchorRect, width, height, guiHelper.GetRootGuiScreenRect());
             LayerManager.Instance.Open(
                 new LayerConfig
                 {
@@ -152,12 +152,8 @@ namespace shadcnui.GUIComponents.Controls
 
         private List<GUILayoutOption> BuildTriggerOptions(SelectConfig config)
         {
-            var options = new List<GUILayoutOption>(config.LayoutOptions ?? Array.Empty<GUILayoutOption>());
-            if (config.Width > 0)
-                options.Add(GUILayout.Width(config.Width * guiHelper.uiScale));
-            else
-                options.Add(GUILayout.ExpandWidth(true));
-            return options;
+            float width = config.Width > 0 ? config.Width * guiHelper.uiScale : 0f;
+            return ControlLayoutUtility.BuildLayoutOptions(config.LayoutOptions, width, expandWidth: width <= 0f);
         }
 
         private Rect GetAnchorRect(string id)
@@ -182,36 +178,8 @@ namespace shadcnui.GUIComponents.Controls
             Rect anchor = GetAnchorRect(id);
             float width = GetMenuWidth(config, anchor);
             float height = GetMenuHeight(config);
-            Vector2 screenPos = GetMenuScreenPosition(anchor, width, height);
+            Vector2 screenPos = PopupLayoutUtility.GetAnchoredScreenPosition(anchor, width, height, guiHelper.GetRootGuiScreenRect());
             LayerManager.Instance.SetPosition(id, screenPos);
-        }
-
-        private Vector2 GetMenuScreenPosition(Rect anchorRect, float menuWidth, float menuHeight)
-        {
-            const float gap = 4f;
-
-            Vector2 anchorTopLeft = GUIUtility.GUIToScreenPoint(new Vector2(anchorRect.xMin, anchorRect.yMin));
-            Vector2 anchorBottomLeft = GUIUtility.GUIToScreenPoint(new Vector2(anchorRect.xMin, anchorRect.yMax));
-            Rect rootRect = guiHelper.GetRootGuiScreenRect();
-
-            float x = anchorBottomLeft.x;
-            float y = anchorBottomLeft.y + gap;
-
-            if (y + menuHeight > rootRect.yMax)
-            {
-                float aboveY = anchorTopLeft.y - gap - menuHeight;
-                if (aboveY >= rootRect.yMin)
-                    y = aboveY;
-                else
-                    y = Mathf.Max(rootRect.yMin, rootRect.yMax - menuHeight);
-            }
-
-            if (x + menuWidth > rootRect.xMax)
-                x = Mathf.Max(rootRect.xMin, rootRect.xMax - menuWidth);
-            else if (x < rootRect.xMin)
-                x = rootRect.xMin;
-
-            return new Vector2(x, y);
         }
 
         private string GetSelectedLabel(SelectConfig config)

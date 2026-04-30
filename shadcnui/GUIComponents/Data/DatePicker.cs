@@ -26,7 +26,7 @@ namespace shadcnui.GUIComponents.Data
 
             string label = config.SelectedDate?.ToString("MMM d, yyyy") ?? config.Placeholder ?? "Select date";
             GUIStyle triggerStyle = styleManager.GetInputStyle(ControlVariant.Outline, config.Size, false, config.IsDisabled, config.Appearance);
-            Rect rect = GUILayoutUtility.GetRect(new GUIContent(label), triggerStyle, config.LayoutOptions ?? Array.Empty<GUILayoutOption>());
+            Rect rect = ControlLayoutUtility.ReserveRect(new UnityHelpers.GUIContent(label), triggerStyle, config.LayoutOptions);
             if (GUI.Button(rect, string.Empty, triggerStyle))
             {
                 if (LayerManager.Instance.IsOpen(id))
@@ -35,11 +35,17 @@ namespace shadcnui.GUIComponents.Data
                     Open(id, rect, config);
             }
 
-            var textStyle = new UnityHelpers.GUIStyle(triggerStyle) { alignment = TextAnchor.MiddleLeft };
-            textStyle.normal.background = null;
+            var textStyle = ContentRenderUtility.CreateOverlayLabelStyle(triggerStyle, TextAnchor.MiddleLeft);
             textStyle.normal.textColor = config.SelectedDate.HasValue ? styleManager.GetTheme().Text : styleManager.GetTheme().Muted;
-            GUI.Label(new Rect(rect.x + triggerStyle.padding.left, rect.y, rect.width - triggerStyle.padding.horizontal - 18f * guiHelper.uiScale, rect.height), label, textStyle);
-            GUI.Label(new Rect(rect.xMax - 18f * guiHelper.uiScale, rect.y, 14f * guiHelper.uiScale, rect.height), "˅", styleManager.GetLabelStyle(ControlVariant.Muted, ControlSize.Small, config.Appearance));
+            ContentRenderUtility.DrawTextWithTrailing(
+                ControlLayoutUtility.Inset(rect, triggerStyle.padding.left, triggerStyle.padding.right),
+                label,
+                textStyle,
+                "˅",
+                styleManager.GetLabelStyle(ControlVariant.Muted, ControlSize.Small, config.Appearance),
+                14f * guiHelper.uiScale,
+                18f * guiHelper.uiScale
+            );
 
             if (Event.current.type == EventType.Repaint)
                 _anchorRects[id] = rect;
@@ -99,7 +105,7 @@ namespace shadcnui.GUIComponents.Data
         private void Open(string id, Rect anchor, DatePickerConfig config)
         {
             _anchorRects[id] = anchor;
-            Vector2 pos = GUIUtility.GUIToScreenPoint(new Vector2(anchor.xMin, anchor.yMax + 4f));
+            Vector2 pos = PopupLayoutUtility.GetAnchoredScreenPosition(anchor, 280f * guiHelper.uiScale, 320f * guiHelper.uiScale, guiHelper.GetRootGuiScreenRect());
             LayerManager.Instance.Open(
                 new LayerConfig
                 {
@@ -118,53 +124,18 @@ namespace shadcnui.GUIComponents.Data
         {
             var style = styleManager.GetDatePickerStyle(config.Variant, config.Size, config.Appearance);
             layoutComponents.BeginVerticalGroup(style, GUILayout.Width(280f * guiHelper.uiScale));
-            DrawCalendarHeader(id);
-            DrawWeekdays(config);
-            DrawGrid(id, config);
+            CalendarRenderUtility.DrawMonthHeader(
+                layoutComponents,
+                styleManager.GetButtonStyle(ControlVariant.Ghost, ControlSize.Icon),
+                styleManager.GetCardTitleStyle(ControlVariant.Default, ControlSize.Default, null),
+                _visibleMonths[id],
+                () => _visibleMonths[id] = _visibleMonths[id].AddMonths(-1),
+                () => _visibleMonths[id] = _visibleMonths[id].AddMonths(1),
+                DesignTokens.Spacing.SM
+            );
+            CalendarRenderUtility.DrawWeekdays(layoutComponents, styleManager.GetDatePickerWeekdayStyle(config.Appearance), 36f * guiHelper.uiScale, DesignTokens.Spacing.XS);
+            CalendarRenderUtility.DrawMonthGrid(layoutComponents, _visibleMonths[id], (current, activeMonth) => DrawDateButton(id, config, current, activeMonth), DesignTokens.Spacing.XXS);
             layoutComponents.EndVerticalGroup();
-        }
-
-        private void DrawCalendarHeader(string id)
-        {
-            layoutComponents.BeginHorizontalGroup();
-            if (GUILayout.Button("‹", styleManager.GetButtonStyle(ControlVariant.Ghost, ControlSize.Icon)))
-                _visibleMonths[id] = _visibleMonths[id].AddMonths(-1);
-            GUILayout.FlexibleSpace();
-            GUILayout.Label(_visibleMonths[id].ToString("MMMM yyyy"), styleManager.GetCardTitleStyle(ControlVariant.Default, ControlSize.Default, null));
-            GUILayout.FlexibleSpace();
-            if (GUILayout.Button("›", styleManager.GetButtonStyle(ControlVariant.Ghost, ControlSize.Icon)))
-                _visibleMonths[id] = _visibleMonths[id].AddMonths(1);
-            layoutComponents.EndHorizontalGroup();
-            layoutComponents.AddSpace(DesignTokens.Spacing.SM);
-        }
-
-        private void DrawWeekdays(DatePickerConfig config)
-        {
-            layoutComponents.BeginHorizontalGroup();
-            foreach (var day in new[] { "Su", "Mo", "Tu", "We", "Th", "Fr", "Sa" })
-                GUILayout.Label(day, styleManager.GetDatePickerWeekdayStyle(config.Appearance), GUILayout.Width(36f * guiHelper.uiScale));
-            layoutComponents.EndHorizontalGroup();
-            layoutComponents.AddSpace(DesignTokens.Spacing.XS);
-        }
-
-        private void DrawGrid(string id, DatePickerConfig config)
-        {
-            DateTime month = _visibleMonths[id];
-            DateTime first = new DateTime(month.Year, month.Month, 1);
-            DateTime cursor = first.AddDays(-(int)first.DayOfWeek);
-
-            for (int week = 0; week < 6; week++)
-            {
-                layoutComponents.BeginHorizontalGroup();
-                for (int day = 0; day < 7; day++)
-                {
-                    DateTime current = cursor.AddDays(week * 7 + day);
-                    DrawDateButton(id, config, current, month.Month);
-                }
-                layoutComponents.EndHorizontalGroup();
-                if (week < 5)
-                    layoutComponents.AddSpace(DesignTokens.Spacing.XXS);
-            }
         }
 
         private void DrawDateButton(string id, DatePickerConfig config, DateTime date, int activeMonth)

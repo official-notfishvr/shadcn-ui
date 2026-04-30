@@ -188,7 +188,7 @@ namespace shadcnui.GUIComponents.Layout
                 return;
 
             var height = 140f * guiHelper.uiScale;
-            var rect = GUILayoutUtility.GetRect(0f, height, GUILayout.ExpandWidth(true));
+            var rect = ControlLayoutUtility.ReserveRect(UnityHelpers.GUIContent.none, GUIStyle.none, ControlLayoutUtility.BuildLayoutOptions(null, fixedHeight: height, expandWidth: true));
             GUI.DrawTexture(rect, image, ScaleMode.ScaleToFit);
         }
 
@@ -198,18 +198,13 @@ namespace shadcnui.GUIComponents.Layout
                 return;
 
             var size = DesignTokens.Height.Small * guiHelper.uiScale;
-            var rect = GUILayoutUtility.GetRect(size, size, GUILayout.Width(size), GUILayout.Height(size));
+            var rect = SurfaceDrawUtility.ReserveSquare(size);
             GUI.DrawTexture(rect, image, ScaleMode.ScaleToFit);
         }
 
         private GUILayoutOption[] BuildSizeOptions(float width, float height)
         {
-            var options = new System.Collections.Generic.List<GUILayoutOption>();
-            if (width > 0f)
-                options.Add(GUILayout.Width(width * guiHelper.uiScale));
-            if (height > 0f)
-                options.Add(GUILayout.Height(height * guiHelper.uiScale));
-            return options.ToArray();
+            return ControlLayoutUtility.BuildLayoutOptions(null, width > 0f ? width * guiHelper.uiScale : 0f, height > 0f ? height * guiHelper.uiScale : 0f).ToArray();
         }
     }
 }

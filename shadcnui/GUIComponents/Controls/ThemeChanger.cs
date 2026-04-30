@@ -13,6 +13,8 @@ namespace shadcnui.GUIComponents.Controls
     {
         private Vector2 _scrollPosition;
         private Rect _triggerRect;
+        private float _dropdownWidth;
+        private float _dropdownHeight;
 
         public ThemeChanger(GUIHelper helper)
             : base(helper) { }
@@ -21,6 +23,8 @@ namespace shadcnui.GUIComponents.Controls
         {
             config ??= new ThemeChangerConfig();
             string id = ResolveId(config.Id, "theme_changer");
+            _dropdownWidth = config.Width;
+            _dropdownHeight = config.DropdownHeight;
 
             var themeManager = ThemeManager.Instance;
             var currentTheme = themeManager.CurrentTheme;
@@ -49,7 +53,7 @@ namespace shadcnui.GUIComponents.Controls
                 return;
             }
 
-            Vector2 screenPos = GUIUtility.GUIToScreenPoint(new Vector2(_triggerRect.x, _triggerRect.yMax + 4));
+            Vector2 screenPos = PopupLayoutUtility.GetAnchoredScreenPosition(_triggerRect, config.Width, config.DropdownHeight, guiHelper.GetRootGuiScreenRect());
             LayerManager.Instance.Open(
                 new LayerConfig
                 {
@@ -69,7 +73,7 @@ namespace shadcnui.GUIComponents.Controls
             if (!LayerManager.Instance.IsOpen(id))
                 return;
 
-            Vector2 screenPos = GUIUtility.GUIToScreenPoint(new Vector2(_triggerRect.x, _triggerRect.yMax + 4));
+            Vector2 screenPos = PopupLayoutUtility.GetAnchoredScreenPosition(_triggerRect, _dropdownWidth, _dropdownHeight, guiHelper.GetRootGuiScreenRect());
             LayerManager.Instance.SetPosition(id, screenPos);
         }
 
@@ -120,7 +124,7 @@ namespace shadcnui.GUIComponents.Controls
 
         private void DrawThemePreview(Theme theme, float size)
         {
-            Rect previewRect = GUILayoutUtility.GetRect(size, size);
+            Rect previewRect = SurfaceDrawUtility.ReserveSquare(size);
 
             float halfSize = size / 2f;
             Rect topLeft = new Rect(previewRect.x, previewRect.y, halfSize, halfSize);
@@ -130,17 +134,10 @@ namespace shadcnui.GUIComponents.Controls
 
             Color prevColor = GUI.color;
 
-            GUI.color = theme.Base;
-            GUI.DrawTexture(topLeft, Texture2D.whiteTexture);
-
-            GUI.color = theme.Accent;
-            GUI.DrawTexture(topRight, Texture2D.whiteTexture);
-
-            GUI.color = theme.Secondary;
-            GUI.DrawTexture(bottomLeft, Texture2D.whiteTexture);
-
-            GUI.color = theme.Text;
-            GUI.DrawTexture(bottomRight, Texture2D.whiteTexture);
+            SurfaceDrawUtility.DrawSolid(topLeft, theme.Base);
+            SurfaceDrawUtility.DrawSolid(topRight, theme.Accent);
+            SurfaceDrawUtility.DrawSolid(bottomLeft, theme.Secondary);
+            SurfaceDrawUtility.DrawSolid(bottomRight, theme.Text);
 
             GUI.color = theme.Border;
             DrawRectOutline(previewRect, 1f);
@@ -150,10 +147,10 @@ namespace shadcnui.GUIComponents.Controls
 
         private void DrawRectOutline(Rect rect, float thickness)
         {
-            GUI.DrawTexture(new Rect(rect.x, rect.y, rect.width, thickness), Texture2D.whiteTexture);
-            GUI.DrawTexture(new Rect(rect.x, rect.yMax - thickness, rect.width, thickness), Texture2D.whiteTexture);
-            GUI.DrawTexture(new Rect(rect.x, rect.y, thickness, rect.height), Texture2D.whiteTexture);
-            GUI.DrawTexture(new Rect(rect.xMax - thickness, rect.y, thickness, rect.height), Texture2D.whiteTexture);
+            SurfaceDrawUtility.DrawSolid(new Rect(rect.x, rect.y, rect.width, thickness), GUI.color);
+            SurfaceDrawUtility.DrawSolid(new Rect(rect.x, rect.yMax - thickness, rect.width, thickness), GUI.color);
+            SurfaceDrawUtility.DrawSolid(new Rect(rect.x, rect.y, thickness, rect.height), GUI.color);
+            SurfaceDrawUtility.DrawSolid(new Rect(rect.xMax - thickness, rect.y, thickness, rect.height), GUI.color);
         }
 
         private string ResolveId(string id, string fallback)

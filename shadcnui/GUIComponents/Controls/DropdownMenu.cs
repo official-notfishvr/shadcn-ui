@@ -72,7 +72,7 @@ namespace shadcnui.GUIComponents.Controls
 
             float width = GetMenuWidth(config, anchorRect);
             float height = GetMenuHeight(config);
-            Vector2 screenPos = GetMenuScreenPosition(anchorRect, width, height);
+            Vector2 screenPos = PopupLayoutUtility.GetAnchoredScreenPosition(anchorRect, width, height, guiHelper.GetRootGuiScreenRect());
             LayerManager.Instance.Open(
                 new LayerConfig
                 {
@@ -194,7 +194,7 @@ namespace shadcnui.GUIComponents.Controls
         private bool DrawMenuRow(DropdownMenuItem item, GUIStyle itemStyle, bool isBack = false, bool hasChildren = false)
         {
             string text = item?.Text ?? string.Empty;
-            Rect rect = GUILayoutUtility.GetRect(new GUIContent(text), itemStyle, GUILayout.ExpandWidth(true), GUILayout.Height(DesignTokens.Height.Default * guiHelper.uiScale));
+            Rect rect = ControlLayoutUtility.ReserveRect(new UnityHelpers.GUIContent(text), itemStyle, ControlLayoutUtility.BuildLayoutOptions(null, fixedHeight: DesignTokens.Height.Default * guiHelper.uiScale, expandWidth: true));
             bool clicked = GUI.Button(rect, string.Empty, itemStyle);
 
             float contentX = rect.x + itemStyle.padding.left;
@@ -210,11 +210,9 @@ namespace shadcnui.GUIComponents.Controls
                 isBack ? "‹"
                 : hasChildren ? "›"
                 : string.Empty;
-            var textStyle = new UnityHelpers.GUIStyle(itemStyle) { normal = { background = null, textColor = styleManager.GetTheme().Text }, alignment = TextAnchor.MiddleLeft };
-            GUI.Label(new Rect(contentX, rect.y, rect.width - (contentX - rect.x) - 18f * guiHelper.uiScale, rect.height), text, textStyle);
-
-            if (!string.IsNullOrEmpty(indicator))
-                GUI.Label(new Rect(rect.xMax - 16f * guiHelper.uiScale, rect.y, 12f * guiHelper.uiScale, rect.height), indicator, styleManager.GetLabelStyle(ControlVariant.Muted, ControlSize.Small));
+            var textStyle = ContentRenderUtility.CreateOverlayLabelStyle(itemStyle, TextAnchor.MiddleLeft);
+            textStyle.normal.textColor = styleManager.GetTheme().Text;
+            ContentRenderUtility.DrawTextWithTrailing(new Rect(contentX, rect.y, Mathf.Max(0f, rect.width - (contentX - rect.x)), rect.height), text, textStyle, indicator, styleManager.GetLabelStyle(ControlVariant.Muted, ControlSize.Small), 12f * guiHelper.uiScale, 16f * guiHelper.uiScale);
 
             return clicked;
         }
@@ -263,36 +261,8 @@ namespace shadcnui.GUIComponents.Controls
             Rect anchor = GetAnchorRect(id);
             float width = GetMenuWidth(config, anchor);
             float height = GetMenuHeight(config);
-            Vector2 screenPos = GetMenuScreenPosition(anchor, width, height);
+            Vector2 screenPos = PopupLayoutUtility.GetAnchoredScreenPosition(anchor, width, height, guiHelper.GetRootGuiScreenRect());
             LayerManager.Instance.SetPosition(id, screenPos);
-        }
-
-        private Vector2 GetMenuScreenPosition(Rect anchorRect, float menuWidth, float menuHeight)
-        {
-            const float gap = 4f;
-
-            Vector2 anchorTopLeft = GUIUtility.GUIToScreenPoint(new Vector2(anchorRect.xMin, anchorRect.yMin));
-            Vector2 anchorBottomLeft = GUIUtility.GUIToScreenPoint(new Vector2(anchorRect.xMin, anchorRect.yMax));
-            Rect rootRect = guiHelper.GetRootGuiScreenRect();
-
-            float x = anchorBottomLeft.x;
-            float y = anchorBottomLeft.y + gap;
-
-            if (y + menuHeight > rootRect.yMax)
-            {
-                float aboveY = anchorTopLeft.y - gap - menuHeight;
-                if (aboveY >= rootRect.yMin)
-                    y = aboveY;
-                else
-                    y = Mathf.Max(rootRect.yMin, rootRect.yMax - menuHeight);
-            }
-
-            if (x + menuWidth > rootRect.xMax)
-                x = Mathf.Max(rootRect.xMin, rootRect.xMax - menuWidth);
-            else if (x < rootRect.xMin)
-                x = rootRect.xMin;
-
-            return new Vector2(x, y);
         }
 
         private string ResolveId(string id, string fallback)

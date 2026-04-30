@@ -147,14 +147,9 @@ namespace shadcnui.GUIComponents.Controls
 
         private List<GUILayoutOption> BuildLayoutOptions(InputConfig config)
         {
-            var options = new List<GUILayoutOption>(config.LayoutOptions ?? Array.Empty<GUILayoutOption>()) { GUILayout.Height((config.Height > 0 ? config.Height : DesignTokens.Height.Default) * guiHelper.uiScale) };
-
-            if (config.Width > 0)
-                options.Add(GUILayout.Width(config.Width * guiHelper.uiScale));
-            else
-                options.Add(GUILayout.ExpandWidth(true));
-
-            return options;
+            float width = config.Width > 0 ? config.Width * guiHelper.uiScale : 0f;
+            float height = (config.Height > 0 ? config.Height : DesignTokens.Height.Default) * guiHelper.uiScale;
+            return ControlLayoutUtility.BuildLayoutOptions(config.LayoutOptions, width, height, expandWidth: width <= 0f);
         }
 
         private static string ResolveId(string id, string label, string placeholder)
