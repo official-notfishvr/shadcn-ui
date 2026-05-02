@@ -116,8 +116,18 @@ namespace shadcnui.GUIComponents.Data
                     CloseOnClickOutside = true,
                     ZIndex = DesignTokens.ZIndex.Popover,
                     Content = () => DrawCalendarPopup(id, config),
+                    OnClose = () => ClearState(id),
                 }
             );
+        }
+
+        protected override void OnBeforeDispose()
+        {
+            foreach (var id in _anchorRects.Keys)
+                LayerManager.Instance.Close(id);
+
+            _anchorRects.Clear();
+            _visibleMonths.Clear();
         }
 
         private void DrawCalendarPopup(string id, DatePickerConfig config)
@@ -158,6 +168,12 @@ namespace shadcnui.GUIComponents.Data
                 CloseDatePicker(id);
             }
             GUI.enabled = prev;
+        }
+
+        private void ClearState(string id)
+        {
+            _anchorRects.Remove(id);
+            _visibleMonths.Remove(id);
         }
     }
 }

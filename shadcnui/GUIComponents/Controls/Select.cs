@@ -84,13 +84,31 @@ namespace shadcnui.GUIComponents.Controls
                     CloseOnClickOutside = true,
                     ZIndex = DesignTokens.ZIndex.Dropdown,
                     Content = () => DrawMenuInternal(id, config),
+                    OnClose = () => ClearState(id),
                 }
             );
         }
 
-        public void Close(string id) => LayerManager.Instance.Close(id);
+        public void Close(string id)
+        {
+            if (string.IsNullOrWhiteSpace(id))
+                return;
+
+            LayerManager.Instance.Close(id);
+            ClearState(id);
+        }
 
         public bool IsOpen(string id) => LayerManager.Instance.IsOpen(id);
+
+        protected override void OnBeforeDispose()
+        {
+            foreach (var id in _anchorRects.Keys)
+                LayerManager.Instance.Close(id);
+
+            _scrollPositions.Clear();
+            _anchorRects.Clear();
+            _pendingSelection.Clear();
+        }
 
         private int DrawMenuInternal(string id, SelectConfig config)
         {
@@ -200,6 +218,13 @@ namespace shadcnui.GUIComponents.Controls
             if (!string.IsNullOrEmpty(label))
                 return label;
             return fallback;
+        }
+
+        private void ClearState(string id)
+        {
+            _scrollPositions.Remove(id);
+            _anchorRects.Remove(id);
+            _pendingSelection.Remove(id);
         }
     }
 }

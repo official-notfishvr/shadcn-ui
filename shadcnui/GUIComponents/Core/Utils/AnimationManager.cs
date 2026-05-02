@@ -81,9 +81,13 @@ namespace shadcnui.GUIComponents.Core.Utils
 
         public void StartFloat(string id, float from, float to, float duration, Func<float, float> easing = null, Action onComplete = null)
         {
+            if (string.IsNullOrWhiteSpace(id))
+                return;
+
             var state = GetOrCreate(id, AnimationType.Float);
-            state.StartFloat = state.Completed ? from : state.CurrentFloat;
-            state.CurrentFloat = from;
+            var start = ShouldRetarget(state, AnimationType.Float) ? state.CurrentFloat : from;
+            state.StartFloat = start;
+            state.CurrentFloat = start;
             state.TargetFloat = to;
             Prepare(state, duration, easing, onComplete);
 
@@ -101,9 +105,13 @@ namespace shadcnui.GUIComponents.Core.Utils
 
         public void StartColor(string id, Color from, Color to, float duration, Func<float, float> easing = null, Action onComplete = null)
         {
+            if (string.IsNullOrWhiteSpace(id))
+                return;
+
             var state = GetOrCreate(id, AnimationType.Color);
-            state.StartColor = from;
-            state.CurrentColor = from;
+            var start = ShouldRetarget(state, AnimationType.Color) ? state.CurrentColor : from;
+            state.StartColor = start;
+            state.CurrentColor = start;
             state.TargetColor = to;
             Prepare(state, duration, easing, onComplete);
 
@@ -121,9 +129,13 @@ namespace shadcnui.GUIComponents.Core.Utils
 
         public void StartVector2(string id, Vector2 from, Vector2 to, float duration, Func<float, float> easing = null, Action onComplete = null)
         {
+            if (string.IsNullOrWhiteSpace(id))
+                return;
+
             var state = GetOrCreate(id, AnimationType.Vector2);
-            state.StartVector = from;
-            state.CurrentVector = from;
+            var start = ShouldRetarget(state, AnimationType.Vector2) ? state.CurrentVector : from;
+            state.StartVector = start;
+            state.CurrentVector = start;
             state.TargetVector = to;
             Prepare(state, duration, easing, onComplete);
 
@@ -291,6 +303,11 @@ namespace shadcnui.GUIComponents.Core.Utils
 
             state.Type = type;
             return state;
+        }
+
+        private static bool ShouldRetarget(AnimationState state, AnimationType type)
+        {
+            return state != null && state.Type == type && !state.Completed;
         }
 
         private void Prepare(AnimationState state, float duration, Func<float, float> easing, Action onComplete)

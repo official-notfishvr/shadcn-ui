@@ -25,10 +25,10 @@
         <ErrorReport>prompt</ErrorReport>
         <WarningLevel>4</WarningLevel>
     </PropertyGroup>
-    <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'IL2CPP_BepInEx|AnyCPU' ">
+    <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'IL2CPP_BEPINEX|AnyCPU' ">
         <DebugType>pdbonly</DebugType>
         <Optimize>true</Optimize>
-        <OutputPath>bin\IL2CPP_BepInEx\</OutputPath>
+        <OutputPath>bin\IL2CPP_BEPINEX\</OutputPath>
         <DefineConstants>TRACE;IL2CPP_BEPINEX</DefineConstants>
         <ErrorReport>prompt</ErrorReport>
         <WarningLevel>4</WarningLevel>

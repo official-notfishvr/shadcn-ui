@@ -50,6 +50,8 @@ namespace shadcnui_Demo.Menu
 
         private Rect _windowRect = new(20f, 20f, 420f, 560f);
         private Vector2 _scroll;
+        private const float DragHandleHeight = 28f;
+        private const float WindowChromePadding = 24f;
 
         private bool _showWindow = true;
         private bool _hideWhileCapturing = false;
@@ -77,6 +79,9 @@ namespace shadcnui_Demo.Menu
         private const string ActiveTabField = "_activeTab";
         private const string WindowRectField = "_windowRect";
         private const string GuiField = "_gui";
+        private const string ScrollField = "_scroll";
+        private const string LastScrollViewportHeightField = "_lastScrollViewportHeight";
+        private const string LastScrollContentHeightField = "_lastScrollContentHeight";
         private const string ShowDialogField = "_showDialog";
         private const string ConfirmDeployField = "_confirmDeploy";
         private const string OldActiveTabField = "currentDemoTab";
@@ -85,6 +90,7 @@ namespace shadcnui_Demo.Menu
         private const string OldScrollField = "scrollPosition";
         private const string OldGuiField = "guiHelper";
         private const string OldDropdownOpenField = "dropdownOpen";
+        private const bool EnableCaptureLogging = true;
 
         private const string LegacySelectId = "select";
         private const string LocationSelectId = "location_select";
@@ -170,11 +176,17 @@ namespace shadcnui_Demo.Menu
                     _gui.HorizontalSeparator();
                     DrawActionsSection();
                 },
-                GUILayout.ExpandHeight(true)
+                GUILayout.Height(GetScrollViewportHeight()),
+                GUILayout.ExpandWidth(true)
             );
 
             _gui.EndGUI();
-            GUI.DragWindow();
+            GUI.DragWindow(new Rect(0f, 0f, _windowRect.width, DragHandleHeight));
+        }
+
+        private float GetScrollViewportHeight()
+        {
+            return Mathf.Max(160f, _windowRect.height - DragHandleHeight - WindowChromePadding);
         }
 
         private void DrawTargetSection()
@@ -345,6 +357,7 @@ namespace shadcnui_Demo.Menu
             _savedCount = 0;
             _activeJobLabel = string.Empty;
             _status = jobs.Count == 1 ? "Starting capture..." : $"Starting {jobs.Count} captures...";
+            LogCapture($"StartJobs count={jobs.Count} currentTab={GetCurrentTabIndex()} currentTabName={GetCurrentTabName()}");
             _captureRoutine = StartCoroutine(RunJobs(jobs));
         }
 
@@ -511,6 +524,7 @@ namespace shadcnui_Demo.Menu
             SetActiveTab(tabIndex);
             ResizeDemoWindow();
             CloseTransientUi();
+            LogCapture($"ApplyPreviewState tab={tabIndex} name={GetTabName(tabIndex)} requestedScroll={scrollY:F2} preview='{previewState ?? string.Empty}' before={DescribeCurrentScrollState()}");
             if (_fullDemo != null && _fullDemo)
                 _fullDemo.SetScreenshotPreview(scrollY, previewState);
             else if (_fullDemoOld != null && _fullDemoOld)
@@ -519,6 +533,7 @@ namespace shadcnui_Demo.Menu
             yield return new WaitForEndOfFrame();
             yield return new WaitForSeconds(_settleDelay);
             yield return new WaitForEndOfFrame();
+            LogCapture($"ApplyPreviewState settled tab={tabIndex} after={DescribeCurrentScrollState()}");
         }
 
         private void PrepareDemoForTab(int tabIndex)
@@ -618,16 +633,34 @@ namespace shadcnui_Demo.Menu
 
         private CapturePlan ResolvePlan(CapturePlan plan)
         {
+            float measuredMaxScroll = _fullDemo != null && _fullDemo ? Mathf.Max(0f, _fullDemo.GetScreenshotMaxScroll()) : (_fullDemoOld != null && _fullDemoOld ? Mathf.Max(0f, _fullDemoOld.GetScreenshotMaxScroll()) : 0f);
+            LogCapture($"ResolvePlan tab={GetCurrentTabIndex()} name={GetCurrentTabName()} measuredMaxScroll={measuredMaxScroll:F2} rawPlan={(plan == null ? "<null>" : $"hero={plan.HeroScrollY:F2},target={plan.ScrollTargetY:F2},useMeasured={plan.UseMeasuredMaxScroll},states={plan.PreviewStates.Length}")}");
+
             if (plan == null)
-                return new CapturePlan(0f, string.Empty, 0f, false);
+            {
+                CapturePlan fallbackPlan = measuredMaxScroll > 0f ? new CapturePlan(measuredMaxScroll, string.Empty, measuredMaxScroll, true) : new CapturePlan(0f, string.Empty, 0f, false);
+                LogResolvedPlan("null-plan fallback", measuredMaxScroll, fallbackPlan);
+                return fallbackPlan;
+            }
 
             if (!plan.UseMeasuredMaxScroll)
-                return plan;
+            {
+                bool needsAutomaticScroll = plan.HeroScrollY <= 0f && plan.ScrollTargetY <= 0f && measuredMaxScroll > 0f;
+                if (!needsAutomaticScroll)
+                {
+                    LogResolvedPlan("explicit plan", measuredMaxScroll, plan);
+                    return plan;
+                }
 
-            float measuredMaxScroll = _fullDemo != null && _fullDemo ? Mathf.Max(0f, _fullDemo.GetScreenshotMaxScroll()) : (_fullDemoOld != null && _fullDemoOld ? Mathf.Max(0f, _fullDemoOld.GetScreenshotMaxScroll()) : 0f);
+                CapturePlan autoPlan = new CapturePlan(measuredMaxScroll, plan.HeroPreviewState, measuredMaxScroll, true, plan.PreviewStates);
+                LogResolvedPlan("auto-measured fallback", measuredMaxScroll, autoPlan);
+                return autoPlan;
+            }
+
             float resolvedScroll = measuredMaxScroll > 0f ? measuredMaxScroll : Mathf.Max(plan.HeroScrollY, plan.ScrollTargetY);
-
-            return new CapturePlan(resolvedScroll, plan.HeroPreviewState, resolvedScroll, true, plan.PreviewStates);
+            CapturePlan resolvedPlan = new CapturePlan(resolvedScroll, plan.HeroPreviewState, resolvedScroll, true, plan.PreviewStates);
+            LogResolvedPlan("measured plan", measuredMaxScroll, resolvedPlan);
+            return resolvedPlan;
         }
 
         private CapturePlan GetPlan(int tabIndex)
@@ -999,6 +1032,40 @@ namespace shadcnui_Demo.Menu
             string folder = GetOutputFolderPath();
             EnsureDirectory(folder);
             Process.Start(new ProcessStartInfo { FileName = folder, UseShellExecute = true });
+        }
+
+        private void LogResolvedPlan(string reason, float measuredMaxScroll, CapturePlan plan)
+        {
+            LogCapture($"ResolvedPlan reason={reason} measuredMaxScroll={measuredMaxScroll:F2} hero={plan.HeroScrollY:F2} target={plan.ScrollTargetY:F2} useMeasured={plan.UseMeasuredMaxScroll} states={plan.PreviewStates.Length}");
+        }
+
+        private void LogCapture(string message)
+        {
+            if (!EnableCaptureLogging)
+                return;
+
+            UnityEngine.Debug.Log($"[ScreenshotUtility] {message}");
+        }
+
+        private string DescribeCurrentScrollState()
+        {
+            if (_fullDemo != null && _fullDemo)
+            {
+                Vector2 currentScroll = GetFieldValue(_fullDemo, ScrollField) is Vector2 scroll ? scroll : Vector2.zero;
+                float contentHeight = GetFieldValue(_fullDemo, LastScrollContentHeightField) is float content ? content : -1f;
+                float viewportHeight = GetFieldValue(_fullDemo, LastScrollViewportHeightField) is float viewport ? viewport : -1f;
+                float maxScroll = _fullDemo.GetScreenshotMaxScroll();
+                return $"FullDemo scroll=({currentScroll.x:F2},{currentScroll.y:F2}) content={contentHeight:F2} viewport={viewportHeight:F2} max={maxScroll:F2}";
+            }
+
+            if (_fullDemoOld != null && _fullDemoOld)
+            {
+                Vector2 currentScroll = GetFieldValue(_fullDemoOld, OldScrollField) is Vector2 scroll ? scroll : Vector2.zero;
+                float maxScroll = _fullDemoOld.GetScreenshotMaxScroll();
+                return $"FullDemo_old scroll=({currentScroll.x:F2},{currentScroll.y:F2}) max={maxScroll:F2}";
+            }
+
+            return "No demo attached";
         }
     }
 }

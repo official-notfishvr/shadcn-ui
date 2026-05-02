@@ -66,6 +66,8 @@ namespace shadcnui_Demo.Menu
         private float _smallSlider = 0.28f;
         private float _largeSlider = 0.84f;
         private string _screenshotPreview = string.Empty;
+        private bool _screenshotScrollOverrideActive;
+        private float _screenshotScrollOverrideY;
         private bool _previewToastsPrimed;
 
         private int _priorityIndex = 1;
@@ -237,54 +239,65 @@ namespace shadcnui_Demo.Menu
 
         private void DrawBody()
         {
-            _scroll = _gui.ScrollView(
-                _scroll,
-                () =>
-                {
-                    _gui.BeginVerticalGroup();
-
-                    switch (_activeTab)
-                    {
-                        case 0:
-                            DrawOverviewTab();
-                            break;
-                        case 1:
-                            DrawControlsTab();
-                            break;
-                        case 2:
-                            DrawInputsTab();
-                            break;
-                        case 3:
-                            DrawDisplayTab();
-                            break;
-                        case 4:
-                            DrawLayoutTab();
-                            break;
-                        case 5:
-                            DrawDataTab();
-                            break;
-                        default:
-                            DrawOverlayTab();
-                            break;
-                    }
-
-                    _gui.AddSpace(28f);
-                    _gui.EndVerticalGroup();
-
-                    if (Event.current.type == EventType.Repaint)
-                    {
-                        Rect contentRect = GUILayoutUtility.GetLastRect();
-                        _lastScrollContentHeight = Mathf.Max(0f, contentRect.height);
-                    }
-                },
-                GUILayout.ExpandHeight(true),
-                GUILayout.ExpandWidth(true)
-            );
+            if (_screenshotScrollOverrideActive)
+            {
+                _scroll = GUILayout.BeginScrollView(new Vector2(_scroll.x, Mathf.Max(0f, _screenshotScrollOverrideY)), GUILayout.ExpandHeight(true), GUILayout.ExpandWidth(true));
+                DrawBodyContent();
+                GUILayout.EndScrollView();
+            }
+            else
+            {
+                _scroll = _gui.ScrollView(
+                    _scroll,
+                    DrawBodyContent,
+                    GUILayout.ExpandHeight(true),
+                    GUILayout.ExpandWidth(true)
+                );
+            }
 
             if (Event.current.type == EventType.Repaint)
             {
                 Rect viewportRect = GUILayoutUtility.GetLastRect();
                 _lastScrollViewportHeight = Mathf.Max(0f, viewportRect.height);
+            }
+        }
+
+        private void DrawBodyContent()
+        {
+            _gui.BeginVerticalGroup();
+
+            switch (_activeTab)
+            {
+                case 0:
+                    DrawOverviewTab();
+                    break;
+                case 1:
+                    DrawControlsTab();
+                    break;
+                case 2:
+                    DrawInputsTab();
+                    break;
+                case 3:
+                    DrawDisplayTab();
+                    break;
+                case 4:
+                    DrawLayoutTab();
+                    break;
+                case 5:
+                    DrawDataTab();
+                    break;
+                default:
+                    DrawOverlayTab();
+                    break;
+            }
+
+            _gui.AddSpace(28f);
+            _gui.EndVerticalGroup();
+
+            if (Event.current.type == EventType.Repaint)
+            {
+                Rect contentRect = GUILayoutUtility.GetLastRect();
+                _lastScrollContentHeight = Mathf.Max(0f, contentRect.height);
             }
         }
 
@@ -1316,6 +1329,8 @@ namespace shadcnui_Demo.Menu
         public void SetScreenshotPreview(float scrollY, string previewState)
         {
             _scroll = new Vector2(0f, Mathf.Max(0f, scrollY));
+            _screenshotScrollOverrideActive = true;
+            _screenshotScrollOverrideY = Mathf.Max(0f, scrollY);
 
             string nextPreview = previewState ?? string.Empty;
             if (!string.Equals(_screenshotPreview, nextPreview, StringComparison.Ordinal))
@@ -1327,6 +1342,8 @@ namespace shadcnui_Demo.Menu
         public void ClearScreenshotPreview()
         {
             _screenshotPreview = string.Empty;
+            _screenshotScrollOverrideActive = false;
+            _screenshotScrollOverrideY = 0f;
             _previewToastsPrimed = false;
         }
 
