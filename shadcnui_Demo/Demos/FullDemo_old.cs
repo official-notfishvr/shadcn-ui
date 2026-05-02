@@ -183,6 +183,8 @@ namespace shadcnui_Demo.Menu
             GUILayout.FlexibleSpace();
             guiHelper.ThemeChangerWithPreview("header_theme_changer", 180f);
             GUILayout.Space(10);
+            guiHelper.FontChangerWithPreview("header_font_changer", 220f);
+            GUILayout.Space(10);
             useVerticalTabs = guiHelper.Toggle("Vertical Tabs", useVerticalTabs);
             GUILayout.Space(10);
             if (useVerticalTabs)

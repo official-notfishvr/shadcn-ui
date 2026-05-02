@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using shadcnui.GUIComponents.Controls;
 using shadcnui.GUIComponents.Core.Styling;
 using shadcnui.GUIComponents.Core.Theming;
@@ -31,6 +32,7 @@ namespace shadcnui.GUIComponents.Core.Base
         private readonly Select _select;
         private readonly DropdownMenu _dropdownMenu;
         private readonly ThemeChanger _themeChanger;
+        private readonly FontChanger _fontChanger;
         private readonly TextArea _textArea;
         private readonly Calendar _calendar;
         private readonly DatePicker _datePicker;
@@ -74,6 +76,9 @@ namespace shadcnui.GUIComponents.Core.Base
 
         internal int fontSize = 14;
         public float uiScale = 1f;
+        public const string DefaultFontName = "Segoe UI";
+        private string _currentFontName = DefaultFontName;
+        private HashSet<string> _availableFonts;
 
         private bool _scrollbarsInitialized;
         private int _lastCheckFrame = -10;
@@ -95,6 +100,7 @@ namespace shadcnui.GUIComponents.Core.Base
             _select = new Select(this);
             _dropdownMenu = new DropdownMenu(this);
             _themeChanger = new ThemeChanger(this);
+            _fontChanger = new FontChanger(this);
             _textArea = new TextArea(this);
             _calendar = new Calendar(this);
             _datePicker = new DatePicker(this);
@@ -126,6 +132,7 @@ namespace shadcnui.GUIComponents.Core.Base
                 _select,
                 _dropdownMenu,
                 _themeChanger,
+                _fontChanger,
                 _textArea,
                 _calendar,
                 _datePicker,
@@ -146,6 +153,8 @@ namespace shadcnui.GUIComponents.Core.Base
                 _table,
                 _navigation,
             };
+
+            ApplyDefaultFont();
         }
 
         // Theme & style
@@ -156,6 +165,8 @@ namespace shadcnui.GUIComponents.Core.Base
         public ThemeManager GetThemeManager() => ThemeManager.Instance;
 
         public Theme CurrentTheme => ThemeManager.Instance.CurrentTheme;
+
+        public string CurrentFontName => _currentFontName;
 
         public Chart GetChartComponent() => _chart;
 
@@ -215,6 +226,34 @@ namespace shadcnui.GUIComponents.Core.Base
                 _styleManager.CustomFont = font;
                 _styleManager.MarkStylesCorruption();
             }
+        }
+
+        public void SetFont(string fontName)
+        {
+            if (string.IsNullOrWhiteSpace(fontName))
+                return;
+
+            fontName = NormalizeFontName(fontName);
+            if (!TryCreateOsFont(fontName, out var font))
+                return;
+
+            _currentFontName = fontName;
+            SetCustomFont(font);
+        }
+
+        public void SetFont(UnityEngine.Font font, string displayName = null)
+        {
+            if (font == null)
+                return;
+
+            _currentFontName = string.IsNullOrWhiteSpace(displayName) ? font.name : displayName;
+            SetCustomFont(font);
+        }
+
+        public string[] GetAvailableFonts()
+        {
+            AvailableFontsLoaded();
+            return _availableFonts?.Select(NormalizeFontName).Where(name => !string.IsNullOrWhiteSpace(name)).Distinct(StringComparer.OrdinalIgnoreCase).OrderBy(name => name, StringComparer.OrdinalIgnoreCase).ToArray() ?? Array.Empty<string>();
         }
 
         public void UpdateGUI(bool isOpen) { }
@@ -905,6 +944,18 @@ namespace shadcnui.GUIComponents.Core.Base
         public void ThemeChangerWithPreview(string id = "theme_changer", float width = 200f) =>
             ThemeChanger(
                 new ThemeChangerConfig
+                {
+                    Id = id,
+                    Width = width,
+                    ShowPreview = true,
+                }
+            );
+
+        public void FontChanger(FontChangerConfig cfg) => Execute(() => _fontChanger.Draw(cfg), nameof(FontChanger));
+
+        public void FontChangerWithPreview(string id = "font_changer", float width = 240f) =>
+            FontChanger(
+                new FontChangerConfig
                 {
                     Id = id,
                     Width = width,
@@ -1873,12 +1924,91 @@ namespace shadcnui.GUIComponents.Core.Base
                         return rect;
                 }
             }
-            catch
-            {
-                // ignored
-            }
+            catch { }
 
             return new Rect(0f, 0f, Screen.width, Screen.height);
+        }
+
+        private void ApplyDefaultFont()
+        {
+            string[] preferredFonts = { DefaultFontName, "Arial" };
+            foreach (var fontName in preferredFonts)
+            {
+                if (!TryCreateOsFont(fontName, out var font))
+                    continue;
+
+                _currentFontName = fontName;
+                _styleManager.CustomFont = font;
+                _styleManager.MarkStylesCorruption();
+                return;
+            }
+        }
+
+        private bool TryCreateOsFont(string fontName, out UnityEngine.Font font)
+        {
+            font = null;
+            fontName = NormalizeFontName(fontName);
+            if (string.IsNullOrWhiteSpace(fontName) || !IsFontAvailable(fontName))
+                return false;
+
+            try
+            {
+                font = UnityEngine.Font.CreateDynamicFontFromOSFont(fontName, Mathf.Max(8, fontSize));
+                return font != null;
+            }
+            catch
+            {
+                font = null;
+                return false;
+            }
+        }
+
+        private bool IsFontAvailable(string fontName)
+        {
+            AvailableFontsLoaded();
+            fontName = NormalizeFontName(fontName);
+            return _availableFonts != null && _availableFonts.Contains(fontName);
+        }
+
+        private void AvailableFontsLoaded()
+        {
+            if (_availableFonts != null)
+                return;
+
+            try
+            {
+                _availableFonts = new HashSet<string>(UnityEngine.Font.GetOSInstalledFontNames() ?? Array.Empty<string>(), StringComparer.OrdinalIgnoreCase);
+            }
+            catch
+            {
+                _availableFonts = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+            }
+        }
+
+        private static string NormalizeFontName(string fontName)
+        {
+            if (string.IsNullOrWhiteSpace(fontName))
+                return string.Empty;
+
+            string normalized = fontName.Trim();
+            string[] suffixes = { " Bold Italic", " Bold Oblique", " SemiBold Italic", " Semibold Italic", " ExtraBold Italic", " Light Italic", " Italic", " Oblique", " SemiBold", " Semibold", " ExtraBold", " Bold", " Regular" };
+
+            bool changed;
+            do
+            {
+                changed = false;
+                foreach (var suffix in suffixes)
+                {
+                    if (!normalized.EndsWith(suffix, StringComparison.OrdinalIgnoreCase))
+                        continue;
+
+                    normalized = normalized[..^suffix.Length].TrimEnd();
+                    changed = true;
+                    break;
+                }
+            } while (changed && !string.IsNullOrWhiteSpace(normalized));
+
+            return normalized;
         }
     }
 }

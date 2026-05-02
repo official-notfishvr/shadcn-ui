@@ -661,5 +661,19 @@ namespace shadcnui.GUIComponents.Core.Utils
             Id = "theme_changer";
         }
     }
+
+    public class FontChangerConfig : ComponentConfigBase
+    {
+        public float Width { get; set; } = 240f;
+        public float DropdownHeight { get; set; } = 320f;
+        public bool ShowPreview { get; set; } = true;
+        public string PreviewText { get; set; } = "Aa";
+        public Action<string> OnFontChanged { get; set; }
+
+        public FontChangerConfig()
+        {
+            Id = "font_changer";
+        }
+    }
     #endregion
 }

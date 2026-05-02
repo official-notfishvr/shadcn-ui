@@ -199,6 +199,14 @@ namespace shadcnui_Demo.Menu
                     ShowPreview = true,
                 }
             );
+            _gui.FontChanger(
+                new FontChangerConfig
+                {
+                    Id = "full_demo_font",
+                    Width = 240f,
+                    ShowPreview = true,
+                }
+            );
             _uiScale = _gui.Slider(
                 new SliderConfig
                 {
