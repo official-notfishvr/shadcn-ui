@@ -641,7 +641,7 @@ namespace shadcnui.GUIComponents.Core.Styling
         }
 
         public GUIStyle GetTabsContentStyle(ControlVariant variant = ControlVariant.Default, ControlSize size = ControlSize.Default, ComponentAppearance appearance = null) =>
-            ResolveStyle(StyleComponentType.TabsContent, variant, size, GUIStyle.none, appearance, 0, style => style.padding = GetSpacingOffset(DesignTokens.Spacing.LG, DesignTokens.Spacing.LG));
+            ResolveStyle(StyleComponentType.TabsContent, variant, size, GUIStyle.none, appearance, 0, style => style.padding = GetSpacingOffset(DesignTokens.Spacing.XL, DesignTokens.Spacing.LG));
 
         public GUIStyle GetCheckboxStyle(ControlVariant variant, ControlSize size, ComponentAppearance appearance = null) => ResolveStyle(StyleComponentType.Checkbox, variant, size, _checkboxStyle, appearance);
 
@@ -829,7 +829,7 @@ namespace shadcnui.GUIComponents.Core.Styling
                 GUIStyle.none,
                 appearance,
                 0,
-                style => style.padding = new UnityHelpers.RectOffset(GetScaledSpacing(DesignTokens.Padding.Card.Horizontal), GetScaledSpacing(DesignTokens.Padding.Card.Horizontal), GetScaledSpacing(DesignTokens.Padding.Card.Vertical), GetScaledSpacing(DesignTokens.Spacing.LG))
+                style => style.padding = new UnityHelpers.RectOffset(GetScaledSpacing(DesignTokens.Padding.Card.Horizontal), GetScaledSpacing(DesignTokens.Padding.Card.Horizontal), GetScaledSpacing(DesignTokens.Padding.Card.Vertical), GetScaledSpacing(DesignTokens.Spacing.SM))
             );
 
         public GUIStyle GetCardContentStyle(ControlVariant variant = ControlVariant.Default, ControlSize size = ControlSize.Default, ComponentAppearance appearance = null) =>
@@ -867,7 +867,7 @@ namespace shadcnui.GUIComponents.Core.Styling
                 style =>
                 {
                     style.fontStyle = FontStyle.Bold;
-                    style.fontSize = GetScaledFontSize(DesignTokens.FontScale.XXL);
+                    style.fontSize = GetScaledFontSize(DesignTokens.FontScale.XL);
                     style.normal.textColor = GetTheme().Text;
                 }
             );

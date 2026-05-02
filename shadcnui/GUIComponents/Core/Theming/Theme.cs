@@ -133,9 +133,9 @@ namespace shadcnui.GUIComponents.Core.Theming
             };
         }
 
-        public static Theme Dark => Create("Dark", "#101214", "#171a1f", "#14181c", "#f3f5f7", "#9099a4", "#242a31", "#5aa2ff", "#d94b4b", "#2fbf71", "#e0a43b", "#5aa2ff", "#99000000", "#55000000", "#1b2026", "#f3f5f7", "#171c22", "#f3f5f7", "#e8edf3", "#7bb6ff", "#14181c", "#20262d", "#f3f5f7");
+        public static Theme Dark => Create("Dark", "#09090b", "#18181b", "#111114", "#fafafa", "#a1a1aa", "#27272a", "#fafafa", "#ef4444", "#22c55e", "#f59e0b", "#60a5fa", "#a6000000", "#73000000", "#27272a", "#fafafa", "#18181b", "#fafafa", "#fafafa", "#d4d4d8", "#18181b", "#09090b", "#fafafa");
 
-        public static Theme Light => Create("Light", "#f7f7f8", "#eceef0", "#ffffff", "#15181c", "#66707c", "#d9dde2", "#0f6bff", "#d44242", "#1ea85d", "#d48b19", "#2e7df6", "#66000000", "#15000000", "#15181c", "#ffffff", "#eceef0", "#15181c", "#15181c", "#0f6bff", "#eceef0", "#ffffff", "#15181c");
+        public static Theme Light => Create("Light", "#ffffff", "#f4f4f5", "#ffffff", "#09090b", "#71717a", "#e4e4e7", "#18181b", "#dc2626", "#16a34a", "#d97706", "#2563eb", "#52000000", "#14000000", "#09090b", "#fafafa", "#f4f4f5", "#09090b", "#09090b", "#18181b", "#f4f4f5", "#ffffff", "#09090b");
 
         public static Theme Slate => Create("Slate", "#111827", "#162033", "#131c2b", "#eff4ff", "#94a3b8", "#25324a", "#4da3ff", "#ef4444", "#22c55e", "#f59e0b", "#38bdf8", "#a0000000", "#66000000", "#1b283d", "#eff4ff", "#1a2435", "#eff4ff", "#eff4ff", "#4da3ff", "#131c2b", "#1b283d", "#eff4ff");
 

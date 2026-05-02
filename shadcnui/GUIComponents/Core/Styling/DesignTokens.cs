@@ -10,19 +10,19 @@ namespace shadcnui.GUIComponents.Core.Styling
             public const float XXS = 2f;
             public const float XS = 4f;
             public const float SM = 6f;
-            public const float MD = 8f;
-            public const float LG = 12f;
-            public const float XL = 16f;
+            public const float MD = 10f;
+            public const float LG = 14f;
+            public const float XL = 20f;
             public const float XXL = 24f;
         }
 
         public static class Radius
         {
             public const float None = 0f;
-            public const float SM = 3f;
+            public const float SM = 4f;
             public const float MD = 6f;
             public const float LG = 8f;
-            public const float XL = 10f;
+            public const float XL = 12f;
             public const float Full = 9999f;
         }
 
@@ -32,13 +32,13 @@ namespace shadcnui.GUIComponents.Core.Styling
             public const float SM = 0.8571f;
             public const float MD = 0.9286f;
             public const float LG = 1f;
-            public const float XL = 1.1429f;
-            public const float XXL = 1.5714f;
+            public const float XL = 1.0714f;
+            public const float XXL = 1.2857f;
         }
 
         public static class Height
         {
-            public const float Mini = 28f;
+            public const float Mini = 26f;
             public const float Small = 32f;
             public const float Default = 36f;
             public const float Large = 40f;
@@ -49,13 +49,13 @@ namespace shadcnui.GUIComponents.Core.Styling
         {
             public static class Button
             {
-                public const float MiniH = 8f;
+                public const float MiniH = 10f;
                 public const float MiniV = 4f;
                 public const float SmallH = 12f;
                 public const float SmallV = 5f;
-                public const float DefaultH = 16f;
-                public const float DefaultV = 8f;
-                public const float LargeH = 20f;
+                public const float DefaultH = 14f;
+                public const float DefaultV = 7f;
+                public const float LargeH = 18f;
                 public const float LargeV = 8f;
             }
 
@@ -68,7 +68,7 @@ namespace shadcnui.GUIComponents.Core.Styling
             public static class Card
             {
                 public const float Horizontal = 24f;
-                public const float Vertical = 24f;
+                public const float Vertical = 20f;
             }
 
             public static class Badge
@@ -98,18 +98,18 @@ namespace shadcnui.GUIComponents.Core.Styling
 
         public static class Effects
         {
-            public const float ShadowLight = 0.025f;
-            public const float ShadowMedium = 0.05f;
-            public const float ShadowHeavy = 0.08f;
+            public const float ShadowLight = 0.035f;
+            public const float ShadowMedium = 0.06f;
+            public const float ShadowHeavy = 0.085f;
             public const float ShadowElevation = 0.12f;
             public const float ShadowBlurSM = 2f;
-            public const float ShadowBlurMD = 6f;
-            public const float ShadowBlurLG = 12f;
+            public const float ShadowBlurMD = 8f;
+            public const float ShadowBlurLG = 16f;
             public const float FocusRingThickness = 1f;
-            public const float FocusRingAlpha = 0.16f;
-            public const float FocusRingBlur = 3f;
-            public const float HoverShift = 0.045f;
-            public const float ActiveShift = 0.08f;
+            public const float FocusRingAlpha = 0.22f;
+            public const float FocusRingBlur = 4f;
+            public const float HoverShift = 0.035f;
+            public const float ActiveShift = 0.07f;
             public const float DisabledAlpha = 0.5f;
             public const float SurfaceHighlightTop = 0f;
             public const float SurfaceDepthBottom = 0f;
@@ -198,8 +198,8 @@ namespace shadcnui.GUIComponents.Core.Styling
         public static class Chart
         {
             public const float ContainerPaddingH = 24f;
-            public const float ContainerPaddingV = 24f;
-            public const float AxisFontScale = 0.8571f;
+            public const float ContainerPaddingV = 20f;
+            public const float AxisFontScale = 0.7857f;
             public const float Radius = 12f;
         }
 

@@ -117,12 +117,12 @@ namespace shadcnui.GUIComponents.Core.Styling
             Separator = GenerateSolid(theme.Border);
             InputFocused = GenerateShape(128, focusHeight, mdRadius, theme.Base, theme.Base, theme.Accent, DesignTokens.Effects.FocusRingThickness, DesignTokens.Effects.FocusRingAlpha, focusBlur, focusShadow);
             ProgressBarBackground = GenerateShape(128, DesignTokens.ProgressBar.TextureHeight, 999, theme.Secondary, theme.Secondary, Color.clear, 0f, 0f, 0);
-            TabsActive = GenerateShape(128, tabsHeight, mdRadius, theme.Elevated, theme.Elevated, theme.Border, 1f, DesignTokens.Effects.ShadowLight, shadowBlurMd, theme.Shadow);
+            TabsActive = GenerateShape(128, tabsHeight, mdRadius, theme.Base, theme.Base, theme.Border, 1f, DesignTokens.Effects.ShadowLight, shadowBlurMd, theme.Shadow);
             Badge = GenerateShape(96, badgeHeight, mdRadius, theme.ButtonPrimaryBg, theme.ButtonPrimaryBg, Color.clear, 0f, 0f, 0);
             TableCell = GenerateSolid(theme.Base);
             TableHeader = GenerateShape(128, focusHeight, 0, theme.Secondary, theme.Secondary, theme.Border, 1f, 0f, 0);
             TableRow = GenerateSolid(theme.Base);
-            TableRowAlternate = GenerateSolid(Color.Lerp(theme.Base, theme.Secondary, 0.45f));
+            TableRowAlternate = GenerateSolid(Color.Lerp(theme.Base, theme.Secondary, 0.6f));
             DropdownMenuContent = GenerateShape(192, 192, lgRadius, theme.Elevated, theme.Elevated, theme.Border, 1f, DesignTokens.Effects.ShadowMedium, shadowBlurMd, theme.Shadow);
             ChartContainer = GenerateShape(256, 256, xlRadius, theme.Elevated, theme.Elevated, theme.Border, 1f, 0f, 0);
             CardBackground = GenerateShape(256, 256, xlRadius, theme.Elevated, theme.Elevated, theme.Border, 1f, DesignTokens.Effects.ShadowLight, shadowBlurLg, theme.Shadow);

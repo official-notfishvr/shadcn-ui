@@ -12,7 +12,7 @@ namespace shadcnui.GUIComponents.Core.Styling
 
             _baseButtonStyle = MakeControlStyle(theme.ButtonPrimaryBg, theme.ButtonPrimaryFg, DesignTokens.Padding.Button.DefaultH, DesignTokens.Padding.Button.DefaultV, DesignTokens.Radius.MD, Color.clear, FontStyle.Normal);
             _baseToggleStyle = MakeControlStyle(theme.Secondary, theme.Text, DesignTokens.Padding.Button.DefaultH, DesignTokens.Padding.Button.DefaultV, DesignTokens.Radius.MD, Color.clear, FontStyle.Normal);
-            _baseInputStyle = MakeInputStyle(theme.Base, theme.Text, theme.Border);
+            _baseInputStyle = MakeInputStyle(theme.Elevated, theme.Text, theme.Border);
             _baseLabelStyle = MakeLabelStyle(theme.Text);
             _baseBadgeStyle = MakeChipStyle(theme.ButtonPrimaryBg, theme.ButtonPrimaryFg);
             _baseTableStyle = MakePanelStyle(theme.Elevated, theme.Border, DesignTokens.Radius.LG, 0f, 0f);
@@ -56,13 +56,13 @@ namespace shadcnui.GUIComponents.Core.Styling
             _tableCellStyle = MakeLabelStyle(theme.Text);
             _tableCellStyle.padding = GetSpacingOffset(DesignTokens.Padding.Table.CellH, DesignTokens.Padding.Table.CellV);
             _dialogContentStyle = MakePanelStyle(theme.Elevated, theme.Border, DesignTokens.Radius.LG, DesignTokens.Padding.Card.Horizontal, DesignTokens.Padding.Card.Vertical, DesignTokens.Effects.ShadowMedium, GetScaledBlur(DesignTokens.Effects.ShadowBlurLG));
-            _cardStyle = MakePanelStyle(theme.Elevated, theme.Border, DesignTokens.Radius.LG, DesignTokens.Padding.Card.Horizontal, DesignTokens.Padding.Card.Vertical);
+            _cardStyle = MakePanelStyle(theme.Elevated, theme.Border, DesignTokens.Radius.LG, 0f, 0f, DesignTokens.Effects.ShadowLight, GetScaledBlur(DesignTokens.Effects.ShadowBlurMD));
             _dropdownContentStyle = MakePanelStyle(theme.Elevated, theme.Border, DesignTokens.Radius.MD, DesignTokens.Spacing.XS, DesignTokens.Spacing.XS, DesignTokens.Effects.ShadowMedium, GetScaledBlur(DesignTokens.Effects.ShadowBlurMD));
             _dropdownItemStyle = MakeControlStyle(Color.clear, theme.Text, DesignTokens.Padding.Dropdown.ItemH, DesignTokens.Padding.Dropdown.ItemV, DesignTokens.Radius.SM, Color.clear, FontStyle.Normal);
             _menuBarStyle = MakePanelStyle(theme.Elevated, theme.Border, DesignTokens.Radius.MD, DesignTokens.Spacing.XS, DesignTokens.Spacing.XS);
             _chartContainerStyle = MakePanelStyle(theme.Elevated, theme.Border, DesignTokens.Chart.Radius, DesignTokens.Chart.ContainerPaddingH, DesignTokens.Chart.ContainerPaddingV);
             _avatarStyle = MakeAvatarStyle(theme);
-            _navigationStyle = MakePanelStyle(theme.Secondary, Color.clear, DesignTokens.Radius.MD, DesignTokens.Spacing.MD, DesignTokens.Spacing.MD);
+            _navigationStyle = MakePanelStyle(theme.Secondary, theme.Border, DesignTokens.Radius.LG, DesignTokens.Spacing.MD, DesignTokens.Spacing.MD);
             _calendarStyle = MakePanelStyle(theme.Elevated, theme.Border, DesignTokens.Radius.LG, DesignTokens.Padding.Card.Horizontal, DesignTokens.Padding.Card.Vertical, DesignTokens.Effects.ShadowMedium, GetScaledBlur(DesignTokens.Effects.ShadowBlurMD));
             _calendarWeekdayStyle = MakeLabelStyle(theme.Muted, FontStyle.Bold);
             _calendarWeekdayStyle.alignment = TextAnchor.MiddleCenter;
@@ -94,8 +94,8 @@ namespace shadcnui.GUIComponents.Core.Styling
             var width = DesignTokens.TextureSize.Default;
             var borderThickness = border.a > 0f ? 1f : 0f;
             var normalFill = background.a > 0f ? background : Color.clear;
-            var hoverFill = background.a > 0f ? HoverSurface(background) : GetGhostFill(0.075f);
-            var activeFill = background.a > 0f ? ActiveSurface(background) : GetGhostFill(0.11f);
+            var hoverFill = background.a > 0f ? HoverSurface(background) : GetGhostFill(0.06f);
+            var activeFill = background.a > 0f ? ActiveSurface(background) : GetGhostFill(0.1f);
             var hoverBorder = border.a > 0f ? HoverSurface(border, 0.025f) : Color.clear;
             var activeBorder = border.a > 0f ? ActiveSurface(border, 0.04f) : Color.clear;
 
@@ -351,7 +351,7 @@ namespace shadcnui.GUIComponents.Core.Styling
         private Color GetGhostFill(float alpha)
         {
             var theme = GetTheme();
-            var mix = Mathf.Clamp01(alpha / 0.11f);
+            var mix = Mathf.Clamp01(alpha / 0.1f);
             return Color.Lerp(theme.Base, theme.Secondary, mix);
         }
 
