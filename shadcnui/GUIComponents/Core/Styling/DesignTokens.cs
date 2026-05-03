@@ -74,7 +74,7 @@ namespace shadcnui.GUIComponents.Core.Styling
             public static class Badge
             {
                 public const float Horizontal = 10f;
-                public const float Vertical = 4f;
+                public const float Vertical = 6f;
             }
 
             public static class Tab
@@ -211,7 +211,7 @@ namespace shadcnui.GUIComponents.Core.Styling
 
         public static class Badge
         {
-            public const float Height = 20f;
+            public const float Height = 22f;
         }
 
         public static class ToastColors

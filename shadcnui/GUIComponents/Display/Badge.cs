@@ -31,7 +31,11 @@ namespace shadcnui.GUIComponents.Display
             }
 
             var labelStyle = styleManager?.GetLabelStyle(ControlVariant.Default, config.Size, config.Appearance) ?? GUI.skin.label;
-            UnityHelpers.Label(text, labelStyle);
+            var centeredLabelStyle = new UnityHelpers.GUIStyle(labelStyle)
+            {
+                alignment = TextAnchor.MiddleCenter,
+            };
+            UnityHelpers.Label(text, centeredLabelStyle, GUILayout.ExpandHeight(true));
 
             layoutComponents.EndHorizontalGroup();
         }

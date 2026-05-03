@@ -10,7 +10,7 @@ namespace shadcnui_Demo.Menu
     {
         private GUIHelper guiHelper;
         private Rect windowRect = new Rect(20, 20, 1600, 750);
-        private bool showDemoWindow = false;
+        private bool showDemoWindow = true;
         private Vector2 scrollPosition;
 
         private int currentDemoTab = 0;
@@ -56,10 +56,10 @@ namespace shadcnui_Demo.Menu
 
         void OnGUI()
         {
-            if (GUI.Button(new Rect(10, 10, 150, 30), "Open Demo Window"))
-            {
-                showDemoWindow = !showDemoWindow;
-            }
+            //if (GUI.Button(new Rect(10, 10, 150, 30), "Open Demo Window"))
+            //{
+            //    showDemoWindow = !showDemoWindow;
+            //}
 
             if (showDemoWindow)
             {

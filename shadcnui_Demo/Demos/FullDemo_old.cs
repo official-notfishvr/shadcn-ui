@@ -18,7 +18,7 @@ namespace shadcnui_Demo.Menu
     {
         private GUIHelper guiHelper;
         private Rect windowRect = new Rect(20, 20, 1450, 800);
-        private bool showDemoWindow = false;
+        private bool showDemoWindow = true;
         private bool useVerticalTabs = false;
         private Vector2 scrollPosition;
         private float lastScrollViewportHeight;
@@ -135,15 +135,15 @@ namespace shadcnui_Demo.Menu
             GUI.skin.horizontalScrollbar = GUIStyle.none;
             GUI.skin.verticalScrollbar = GUIStyle.none;
 
-            GUILayout.BeginArea(new Rect(10, 10, 400, 60));
-            GUILayout.BeginHorizontal();
-            if (GUILayout.Button("Open Demo Window", GUILayout.Width(150), GUILayout.Height(30)))
-            {
-                showDemoWindow = !showDemoWindow;
-            }
-            GUILayout.Label($"Components: {componentCount}", GUILayout.Width(200));
-            GUILayout.EndHorizontal();
-            GUILayout.EndArea();
+           // GUILayout.BeginArea(new Rect(10, 10, 400, 60));
+           // GUILayout.BeginHorizontal();
+            //if (GUILayout.Button("Open Demo Window", GUILayout.Width(150), GUILayout.Height(30)))
+           // {
+           //     showDemoWindow = !showDemoWindow;
+           // }
+            //GUILayout.Label($"Components: {componentCount}", GUILayout.Width(200));
+           // GUILayout.EndHorizontal();
+            //GUILayout.EndArea();
 
             if (showDemoWindow)
             {
