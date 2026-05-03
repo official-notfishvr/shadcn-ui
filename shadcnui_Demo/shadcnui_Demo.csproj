@@ -27,105 +27,6 @@
         </ItemGroup>
     </Target>
     <ItemGroup>
-        <Reference Include="Unity.Addressables">
-            <HintPath>$(ReferencePath)Unity.Addressables.dll</HintPath>
-        </Reference>
-        <Reference Include="Unity.AI.Navigation">
-            <HintPath>$(ReferencePath)Unity.AI.Navigation.dll</HintPath>
-        </Reference>
-        <Reference Include="Unity.Animation.Rigging">
-            <HintPath>$(ReferencePath)Unity.Animation.Rigging.dll</HintPath>
-        </Reference>
-        <Reference Include="Unity.Animation.Rigging.DocCodeExamples">
-            <HintPath>$(ReferencePath)Unity.Animation.Rigging.DocCodeExamples.dll</HintPath>
-        </Reference>
-        <Reference Include="Unity.Burst">
-            <HintPath>$(ReferencePath)Unity.Burst.dll</HintPath>
-        </Reference>
-        <Reference Include="Unity.Burst.Unsafe">
-            <HintPath>$(ReferencePath)Unity.Burst.Unsafe.dll</HintPath>
-        </Reference>
-        <Reference Include="Unity.Collections">
-            <HintPath>$(ReferencePath)Unity.Collections.dll</HintPath>
-        </Reference>
-        <Reference Include="Unity.Collections.LowLevel.ILSupport">
-            <HintPath>$(ReferencePath)Unity.Collections.LowLevel.ILSupport.dll</HintPath>
-        </Reference>
-        <Reference Include="Unity.Formats.Fbx.Runtime">
-            <HintPath>$(ReferencePath)Unity.Formats.Fbx.Runtime.dll</HintPath>
-        </Reference>
-        <Reference Include="Unity.InputSystem">
-            <HintPath>$(ReferencePath)Unity.InputSystem.dll</HintPath>
-        </Reference>
-        <Reference Include="Unity.InputSystem.ForUI">
-            <HintPath>$(ReferencePath)Unity.InputSystem.ForUI.dll</HintPath>
-        </Reference>
-        <Reference Include="Unity.Mathematics">
-            <HintPath>$(ReferencePath)Unity.Mathematics.dll</HintPath>
-        </Reference>
-        <Reference Include="Unity.ProBuilder">
-            <HintPath>$(ReferencePath)Unity.ProBuilder.dll</HintPath>
-        </Reference>
-        <Reference Include="Unity.ProBuilder.Csg">
-            <HintPath>$(ReferencePath)Unity.ProBuilder.Csg.dll</HintPath>
-        </Reference>
-        <Reference Include="Unity.ProBuilder.KdTree">
-            <HintPath>$(ReferencePath)Unity.ProBuilder.KdTree.dll</HintPath>
-        </Reference>
-        <Reference Include="Unity.ProBuilder.Poly2Tri">
-            <HintPath>$(ReferencePath)Unity.ProBuilder.Poly2Tri.dll</HintPath>
-        </Reference>
-        <Reference Include="Unity.ProBuilder.Stl">
-            <HintPath>$(ReferencePath)Unity.ProBuilder.Stl.dll</HintPath>
-        </Reference>
-        <Reference Include="Unity.Profiling.Core">
-            <HintPath>$(ReferencePath)Unity.Profiling.Core.dll</HintPath>
-        </Reference>
-        <Reference Include="Unity.RenderPipeline.Universal.ShaderLibrary">
-            <HintPath>$(ReferencePath)Unity.RenderPipeline.Universal.ShaderLibrary.dll</HintPath>
-        </Reference>
-        <Reference Include="Unity.RenderPipelines.Core.Runtime">
-            <HintPath>$(ReferencePath)Unity.RenderPipelines.Core.Runtime.dll</HintPath>
-        </Reference>
-        <Reference Include="Unity.RenderPipelines.Core.ShaderLibrary">
-            <HintPath>$(ReferencePath)Unity.RenderPipelines.Core.ShaderLibrary.dll</HintPath>
-        </Reference>
-        <Reference Include="Unity.RenderPipelines.ShaderGraph.ShaderGraphLibrary">
-            <HintPath>$(ReferencePath)Unity.RenderPipelines.ShaderGraph.ShaderGraphLibrary.dll</HintPath>
-        </Reference>
-        <Reference Include="Unity.RenderPipelines.Universal.Runtime">
-            <HintPath>$(ReferencePath)Unity.RenderPipelines.Universal.Runtime.dll</HintPath>
-        </Reference>
-        <Reference Include="Unity.RenderPipelines.Universal.Shaders">
-            <HintPath>$(ReferencePath)Unity.RenderPipelines.Universal.Shaders.dll</HintPath>
-        </Reference>
-        <Reference Include="Unity.ResourceManager">
-            <HintPath>$(ReferencePath)Unity.ResourceManager.dll</HintPath>
-        </Reference>
-        <Reference Include="Unity.ScriptableBuildPipeline">
-            <HintPath>$(ReferencePath)Unity.ScriptableBuildPipeline.dll</HintPath>
-        </Reference>
-        <Reference Include="Unity.Splines">
-            <HintPath>$(ReferencePath)Unity.Splines.dll</HintPath>
-        </Reference>
-        <Reference Include="Unity.TextMeshPro">
-            <HintPath>$(ReferencePath)Unity.TextMeshPro.dll</HintPath>
-        </Reference>
-        <Reference Include="Unity.Timeline">
-            <HintPath>$(ReferencePath)Unity.Timeline.dll</HintPath>
-        </Reference>
-        <Reference Include="Unity.XR.CoreUtils">
-            <HintPath>$(ReferencePath)Unity.XR.CoreUtils.dll</HintPath>
-        </Reference>
-        <Reference Include="Unity.XR.Interaction.Toolkit">
-            <HintPath>$(ReferencePath)Unity.XR.Interaction.Toolkit.dll</HintPath>
-        </Reference>
-        <Reference Include="Unity.XR.Management">
-            <HintPath>$(ReferencePath)Unity.XR.Management.dll</HintPath>
-        </Reference>
-        <Reference Include="Unity.XR.OpenVR">
-            <HintPath>$(ReferencePath)Unity.XR.OpenVR.dll</HintPath>
-        </Reference>
         <Reference Include="UnityEngine">
             <HintPath>$(ReferencePath)UnityEngine.dll</HintPath>
         </Reference>
@@ -141,9 +42,6 @@
         <Reference Include="UnityEngine.AnimationModule">
             <HintPath>$(ReferencePath)UnityEngine.AnimationModule.dll</HintPath>
         </Reference>
-        <Reference Include="UnityEngine.ARModule">
-            <HintPath>$(ReferencePath)UnityEngine.ARModule.dll</HintPath>
-        </Reference>
         <Reference Include="UnityEngine.AssetBundleModule">
             <HintPath>$(ReferencePath)UnityEngine.AssetBundleModule.dll</HintPath>
         </Reference>
@@ -152,12 +50,6 @@
         </Reference>
         <Reference Include="UnityEngine.ClothModule">
             <HintPath>$(ReferencePath)UnityEngine.ClothModule.dll</HintPath>
-        </Reference>
-        <Reference Include="UnityEngine.ClusterInputModule">
-            <HintPath>$(ReferencePath)UnityEngine.ClusterInputModule.dll</HintPath>
-        </Reference>
-        <Reference Include="UnityEngine.ClusterRendererModule">
-            <HintPath>$(ReferencePath)UnityEngine.ClusterRendererModule.dll</HintPath>
         </Reference>
         <Reference Include="UnityEngine.ContentLoadModule">
             <HintPath>$(ReferencePath)UnityEngine.ContentLoadModule.dll</HintPath>
@@ -204,9 +96,6 @@
         <Reference Include="UnityEngine.LocalizationModule">
             <HintPath>$(ReferencePath)UnityEngine.LocalizationModule.dll</HintPath>
         </Reference>
-        <Reference Include="UnityEngine.NVIDIAModule">
-            <HintPath>$(ReferencePath)UnityEngine.NVIDIAModule.dll</HintPath>
-        </Reference>
         <Reference Include="UnityEngine.ParticleSystemModule">
             <HintPath>$(ReferencePath)UnityEngine.ParticleSystemModule.dll</HintPath>
         </Reference>
@@ -230,9 +119,6 @@
         </Reference>
         <Reference Include="UnityEngine.SharedInternalsModule">
             <HintPath>$(ReferencePath)UnityEngine.SharedInternalsModule.dll</HintPath>
-        </Reference>
-        <Reference Include="UnityEngine.SpatialTracking">
-            <HintPath>$(ReferencePath)UnityEngine.SpatialTracking.dll</HintPath>
         </Reference>
         <Reference Include="UnityEngine.SpriteMaskModule">
             <HintPath>$(ReferencePath)UnityEngine.SpriteMaskModule.dll</HintPath>
@@ -321,17 +207,11 @@
         <Reference Include="UnityEngine.VideoModule">
             <HintPath>$(ReferencePath)UnityEngine.VideoModule.dll</HintPath>
         </Reference>
-        <Reference Include="UnityEngine.VirtualTexturingModule">
-            <HintPath>$(ReferencePath)UnityEngine.VirtualTexturingModule.dll</HintPath>
-        </Reference>
         <Reference Include="UnityEngine.VRModule">
             <HintPath>$(ReferencePath)UnityEngine.VRModule.dll</HintPath>
         </Reference>
         <Reference Include="UnityEngine.WindModule">
             <HintPath>$(ReferencePath)UnityEngine.WindModule.dll</HintPath>
-        </Reference>
-        <Reference Include="UnityEngine.XR.LegacyInputHelpers">
-            <HintPath>$(ReferencePath)UnityEngine.XR.LegacyInputHelpers.dll</HintPath>
         </Reference>
         <Reference Include="UnityEngine.XRModule">
             <HintPath>$(ReferencePath)UnityEngine.XRModule.dll</HintPath>

@@ -163,7 +163,7 @@ namespace shadcnui.GUIComponents.Controls
             if (string.IsNullOrEmpty(config.Label))
                 return;
 
-            GUIStyle labelStyle = styleManager?.GetLabelStyle(config.LabelVariant, config.Size, config.Appearance) ?? GUI.skin.label;
+            GUIStyle labelStyle = styleManager?.GetLabelStyle(config.LabelVariant, config.Size, GetTextOnlyAppearance(config.Appearance)) ?? GUI.skin.label;
             UnityHelpers.Label(config.Label, labelStyle);
             layoutComponents.AddSpace(DesignTokens.Spacing.XS);
         }
@@ -225,6 +225,14 @@ namespace shadcnui.GUIComponents.Controls
             _scrollPositions.Remove(id);
             _anchorRects.Remove(id);
             _pendingSelection.Remove(id);
+        }
+
+        private static ComponentAppearance GetTextOnlyAppearance(ComponentAppearance appearance)
+        {
+            if (appearance?.ForegroundColor == null)
+                return null;
+
+            return new ComponentAppearance { ForegroundColor = appearance.ForegroundColor };
         }
     }
 }

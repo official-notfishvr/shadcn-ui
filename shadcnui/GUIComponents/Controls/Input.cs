@@ -59,6 +59,8 @@ namespace shadcnui.GUIComponents.Controls
         {
             bool hasIcon = config.Icon?.Image != null;
             renderedStyle = hasIcon ? BuildStyleWithIconPadding(inputStyle, config.Icon) : new UnityHelpers.GUIStyle(inputStyle);
+            renderedStyle.fixedHeight = ResolveHeight(config) * guiHelper.uiScale;
+            renderedStyle.stretchHeight = false;
 
             string value = DrawField(config, renderedStyle);
             if (hasIcon && Event.current.type == EventType.Repaint)
@@ -125,7 +127,7 @@ namespace shadcnui.GUIComponents.Controls
 
         private void DrawLabel(InputConfig config)
         {
-            GUIStyle labelStyle = styleManager?.GetLabelStyle(config.LabelVariant, config.Size, config.Appearance) ?? GUI.skin.label;
+            GUIStyle labelStyle = styleManager?.GetLabelStyle(config.LabelVariant, config.Size, GetTextOnlyAppearance(config.Appearance)) ?? GUI.skin.label;
             UnityHelpers.Label(config.Label ?? string.Empty, labelStyle);
         }
 
@@ -134,22 +136,44 @@ namespace shadcnui.GUIComponents.Controls
             if (!string.IsNullOrEmpty(config.ErrorText))
             {
                 layoutComponents.AddSpace(DesignTokens.Spacing.XXS);
-                UnityHelpers.Label(config.ErrorText, styleManager?.GetLabelStyle(ControlVariant.Destructive, config.Size, config.Appearance) ?? GUI.skin.label);
+                UnityHelpers.Label(config.ErrorText, styleManager?.GetLabelStyle(ControlVariant.Destructive, config.Size, GetTextOnlyAppearance(config.Appearance)) ?? GUI.skin.label);
                 return;
             }
 
             if (!string.IsNullOrEmpty(config.HelperText))
             {
                 layoutComponents.AddSpace(DesignTokens.Spacing.XXS);
-                UnityHelpers.Label(config.HelperText, styleManager?.GetLabelStyle(ControlVariant.Muted, config.Size, config.Appearance) ?? GUI.skin.label);
+                UnityHelpers.Label(config.HelperText, styleManager?.GetLabelStyle(ControlVariant.Muted, config.Size, GetTextOnlyAppearance(config.Appearance)) ?? GUI.skin.label);
             }
         }
 
         private List<GUILayoutOption> BuildLayoutOptions(InputConfig config)
         {
             float width = config.Width > 0 ? config.Width * guiHelper.uiScale : 0f;
-            float height = (config.Height > 0 ? config.Height : DesignTokens.Height.Default) * guiHelper.uiScale;
+            float height = ResolveHeight(config) * guiHelper.uiScale;
             return ControlLayoutUtility.BuildLayoutOptions(config.LayoutOptions, width, height, expandWidth: width <= 0f);
+        }
+
+        private float ResolveHeight(InputConfig config)
+        {
+            if (config.Height > 0f && (config.Size == ControlSize.Default || !Mathf.Approximately(config.Height, DesignTokens.Height.Default)))
+                return config.Height;
+
+            return config.Size switch
+            {
+                ControlSize.Mini => DesignTokens.Height.Mini,
+                ControlSize.Small => DesignTokens.Height.Small,
+                ControlSize.Large => DesignTokens.Height.Large,
+                _ => DesignTokens.Height.Default,
+            };
+        }
+
+        private static ComponentAppearance GetTextOnlyAppearance(ComponentAppearance appearance)
+        {
+            if (appearance?.ForegroundColor == null)
+                return null;
+
+            return new ComponentAppearance { ForegroundColor = appearance.ForegroundColor };
         }
 
         private static string ResolveId(string id, string label, string placeholder)

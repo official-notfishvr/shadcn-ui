@@ -634,7 +634,9 @@ namespace shadcnui_Demo.Menu
         private CapturePlan ResolvePlan(CapturePlan plan)
         {
             float measuredMaxScroll = _fullDemo != null && _fullDemo ? Mathf.Max(0f, _fullDemo.GetScreenshotMaxScroll()) : (_fullDemoOld != null && _fullDemoOld ? Mathf.Max(0f, _fullDemoOld.GetScreenshotMaxScroll()) : 0f);
-            LogCapture($"ResolvePlan tab={GetCurrentTabIndex()} name={GetCurrentTabName()} measuredMaxScroll={measuredMaxScroll:F2} rawPlan={(plan == null ? "<null>" : $"hero={plan.HeroScrollY:F2},target={plan.ScrollTargetY:F2},useMeasured={plan.UseMeasuredMaxScroll},states={plan.PreviewStates.Length}")}");
+            LogCapture(
+                $"ResolvePlan tab={GetCurrentTabIndex()} name={GetCurrentTabName()} measuredMaxScroll={measuredMaxScroll:F2} rawPlan={(plan == null ? "<null>" : $"hero={plan.HeroScrollY:F2},target={plan.ScrollTargetY:F2},useMeasured={plan.UseMeasuredMaxScroll},states={plan.PreviewStates.Length}")}"
+            );
 
             if (plan == null)
             {

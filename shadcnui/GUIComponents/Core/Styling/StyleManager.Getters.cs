@@ -251,9 +251,6 @@ namespace shadcnui.GUIComponents.Core.Styling
             {
                 case StyleComponentType.Button:
                 case StyleComponentType.Toggle:
-                case StyleComponentType.Input:
-                case StyleComponentType.PasswordField:
-                case StyleComponentType.TextArea:
                 case StyleComponentType.Switch:
                 case StyleComponentType.Checkbox:
                 case StyleComponentType.CheckboxSolid:
@@ -262,6 +259,11 @@ namespace shadcnui.GUIComponents.Core.Styling
                 case StyleComponentType.SelectItem:
                 case StyleComponentType.MenuBarItem:
                     ApplyControlSize(style, size);
+                    return;
+                case StyleComponentType.Input:
+                case StyleComponentType.PasswordField:
+                case StyleComponentType.TextArea:
+                    ApplyInputSize(style, size);
                     return;
                 case StyleComponentType.Badge:
                     ApplyChipSize(style, size);
@@ -321,6 +323,36 @@ namespace shadcnui.GUIComponents.Core.Styling
             int minHeight = GetScaledHeight(baseHeight);
             int contentHeight = fontSize + GetScaledSpacing(verticalPadding * 2f) + GetScaledSpacing(DesignTokens.Layout.ControlTextSlack);
             return Mathf.Max(minHeight, contentHeight);
+        }
+
+        private void ApplyInputSize(GUIStyle style, ControlSize size)
+        {
+            style.fixedWidth = 0f;
+            style.wordWrap = false;
+
+            switch (size)
+            {
+                case ControlSize.Mini:
+                    style.fontSize = GetScaledFontSize(DesignTokens.FontScale.XS);
+                    style.padding = GetSpacingOffset(10f, 4f);
+                    style.fixedHeight = GetScaledHeight(28f);
+                    break;
+                case ControlSize.Small:
+                    style.fontSize = GetScaledFontSize(DesignTokens.FontScale.SM);
+                    style.padding = GetSpacingOffset(11f, 5f);
+                    style.fixedHeight = GetScaledHeight(32f);
+                    break;
+                case ControlSize.Large:
+                    style.fontSize = GetScaledFontSize(DesignTokens.FontScale.MD);
+                    style.padding = GetSpacingOffset(DesignTokens.Padding.Input.Horizontal + 2f, DesignTokens.Padding.Input.Vertical + 1f);
+                    style.fixedHeight = GetScaledHeight(DesignTokens.Height.Large);
+                    break;
+                default:
+                    style.fontSize = GetScaledFontSize(DesignTokens.FontScale.MD);
+                    style.padding = GetSpacingOffset(DesignTokens.Padding.Input.Horizontal, DesignTokens.Padding.Input.Vertical);
+                    style.fixedHeight = GetScaledHeight(DesignTokens.Height.Default);
+                    break;
+            }
         }
 
         private void ApplyChipSize(GUIStyle style, ControlSize size)
@@ -392,10 +424,10 @@ namespace shadcnui.GUIComponents.Core.Styling
                     case ControlVariant.Ghost:
                         SetBackgroundStates(
                             style,
-                            CreateSurfaceTexture(width, height, DesignTokens.Radius.MD, Color.clear, theme.Border, 1f),
-                            CreateSurfaceTexture(width, height, DesignTokens.Radius.MD, GetGhostFill(0.05f), theme.Border, 1f),
-                            CreateFocusTexture(width, height, DesignTokens.Radius.MD, GetGhostFill(0.05f)),
-                            CreateFocusTexture(width, height, DesignTokens.Radius.MD, GetGhostFill(0.05f))
+                            CreateSurfaceTexture(width, height, DesignTokens.Radius.MD, Color.clear, Color.clear, 0f),
+                            CreateSurfaceTexture(width, height, DesignTokens.Radius.MD, GetGhostFill(0.035f), Color.clear, 0f),
+                            CreateSurfaceTexture(width, height, DesignTokens.Radius.MD, GetGhostFill(0.055f), Color.clear, 0f),
+                            CreateSurfaceTexture(width, height, DesignTokens.Radius.MD, GetGhostFill(0.035f), Color.clear, 0f)
                         );
                         break;
                     case ControlVariant.Secondary:
@@ -869,6 +901,7 @@ namespace shadcnui.GUIComponents.Core.Styling
                     style.fontStyle = FontStyle.Bold;
                     style.fontSize = GetScaledFontSize(DesignTokens.FontScale.XL);
                     style.normal.textColor = GetTheme().Text;
+                    style.wordWrap = true;
                 }
             );
 
@@ -884,6 +917,7 @@ namespace shadcnui.GUIComponents.Core.Styling
                 {
                     style.fontSize = GetScaledFontSize(DesignTokens.FontScale.MD);
                     style.normal.textColor = GetTheme().Muted;
+                    style.wordWrap = true;
                 }
             );
 

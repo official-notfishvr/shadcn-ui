@@ -51,12 +51,7 @@ namespace shadcnui_Demo.Menu
             DrawSearchBar();
             guiHelper.AddSpace(8f);
 
-            scrollPosition = guiHelper.ScrollView(
-                scrollPosition,
-                DrawDemoGrid,
-                GUILayout.Height(selectorRect.height - 150f),
-                GUILayout.ExpandWidth(true)
-            );
+            scrollPosition = guiHelper.ScrollView(scrollPosition, DrawDemoGrid, GUILayout.Height(selectorRect.height - 150f), GUILayout.ExpandWidth(true));
 
             guiHelper.AddSpace(10f);
             guiHelper.HorizontalSeparator();
@@ -210,6 +205,15 @@ namespace shadcnui_Demo.Menu
                     Description = "Older all-in-one showcase.",
                     Accent = ControlVariant.Ghost,
                     Load = () => LoadDemo<FullDemo_old>("Full Demo OLD"),
+                },
+                new DemoEntry
+                {
+                    Id = nameof(ShadcnDocsHomeDemo),
+                    Title = "ShadcnDocsHomeDemo",
+                    Category = "New",
+                    Description = "",
+                    Accent = ControlVariant.Ghost,
+                    Load = () => LoadDemo<ShadcnDocsHomeDemo>("ShadcnDocsHomeDemo"),
                 },
             };
 

@@ -195,6 +195,29 @@ namespace shadcnui.GUIComponents.Core.Utils
         }
     }
 
+    public class RangeSliderConfig : ComponentConfigBase
+    {
+        public string Label { get; set; }
+        public float LowerValue { get; set; }
+        public float UpperValue { get; set; } = 1f;
+        public float MinValue { get; set; }
+        public float MaxValue { get; set; } = 1f;
+        public float Step { get; set; }
+        public string ValueFormat { get; set; } = "F0";
+        public bool ShowValue { get; set; } = true;
+        public Action<float, float> OnValueChanged { get; set; }
+
+        public RangeSliderConfig() { }
+
+        public RangeSliderConfig(float lowerValue, float upperValue, float min = 0f, float max = 1f)
+        {
+            LowerValue = lowerValue;
+            UpperValue = upperValue;
+            MinValue = min;
+            MaxValue = max;
+        }
+    }
+
     public class TextAreaConfig : RectConfigBase
     {
         private static int _counter;
@@ -485,6 +508,7 @@ namespace shadcnui.GUIComponents.Core.Utils
 
         public string Label { get; set; }
         public string Placeholder { get; set; } = "Select date";
+        public string DisplayFormat { get; set; } = "MMM d, yyyy";
         public DateTime? SelectedDate { get; set; }
         public DateTime? StartDate { get; set; }
         public DateTime? EndDate { get; set; }

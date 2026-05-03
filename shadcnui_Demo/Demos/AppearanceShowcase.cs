@@ -21,7 +21,6 @@ namespace shadcnui_Demo.Menu
         private float sliderValue = 65f;
         private bool toggleValue = true;
         private bool toggleValue2 = false;
-        private int selectedOption = 0;
         private float progressValue = 0.72f;
 
         private ComponentAppearance oceanTheme;

@@ -12,7 +12,7 @@ namespace shadcnui.GUIComponents.Core.Styling
 
             _baseButtonStyle = MakeControlStyle(theme.ButtonPrimaryBg, theme.ButtonPrimaryFg, DesignTokens.Padding.Button.DefaultH, DesignTokens.Padding.Button.DefaultV, DesignTokens.Radius.MD, Color.clear, FontStyle.Normal);
             _baseToggleStyle = MakeControlStyle(theme.Secondary, theme.Text, DesignTokens.Padding.Button.DefaultH, DesignTokens.Padding.Button.DefaultV, DesignTokens.Radius.MD, Color.clear, FontStyle.Normal);
-            _baseInputStyle = MakeInputStyle(theme.Elevated, theme.Text, theme.Border);
+            _baseInputStyle = MakeInputStyle(theme.Secondary, theme.Text, theme.Border);
             _baseLabelStyle = MakeLabelStyle(theme.Text);
             _baseBadgeStyle = MakeChipStyle(theme.ButtonPrimaryBg, theme.ButtonPrimaryFg);
             _baseTableStyle = MakePanelStyle(theme.Elevated, theme.Border, DesignTokens.Radius.LG, 0f, 0f);

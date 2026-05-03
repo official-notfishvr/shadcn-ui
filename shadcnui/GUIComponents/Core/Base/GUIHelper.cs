@@ -29,6 +29,7 @@ namespace shadcnui.GUIComponents.Core.Base
         private readonly Switch _switch;
         private readonly Toggle _toggle;
         private readonly Slider _slider;
+        private readonly RangeSlider _rangeSlider;
         private readonly Select _select;
         private readonly DropdownMenu _dropdownMenu;
         private readonly ThemeChanger _themeChanger;
@@ -97,6 +98,7 @@ namespace shadcnui.GUIComponents.Core.Base
             _switch = new Switch(this);
             _toggle = new Toggle(this);
             _slider = new Slider(this);
+            _rangeSlider = new RangeSlider(this);
             _select = new Select(this);
             _dropdownMenu = new DropdownMenu(this);
             _themeChanger = new ThemeChanger(this);
@@ -129,6 +131,7 @@ namespace shadcnui.GUIComponents.Core.Base
                 _switch,
                 _toggle,
                 _slider,
+                _rangeSlider,
                 _select,
                 _dropdownMenu,
                 _themeChanger,
@@ -830,6 +833,50 @@ namespace shadcnui.GUIComponents.Core.Base
                 }
             );
 
+        public Vector2 RangeSlider(RangeSliderConfig cfg)
+        {
+            if (cfg == null)
+                return Execute(() => _rangeSlider.Draw(cfg), Vector2.zero, nameof(RangeSlider));
+
+            return Execute(() => _rangeSlider.Draw(cfg), new Vector2(cfg.LowerValue, cfg.UpperValue), nameof(RangeSlider));
+        }
+
+        public Vector2 RangeSlider(
+            float lowerValue,
+            float upperValue,
+            float min,
+            float max,
+            float step = 0f,
+            string label = null,
+            Action<float, float> onChange = null,
+            ControlVariant v = ControlVariant.Default,
+            ControlSize sz = ControlSize.Default,
+            bool disabled = false,
+            bool showValue = true,
+            string format = "F0",
+            ComponentAppearance appearance = null,
+            params GUILayoutOption[] opts
+        ) =>
+            RangeSlider(
+                new RangeSliderConfig
+                {
+                    Label = label,
+                    LowerValue = lowerValue,
+                    UpperValue = upperValue,
+                    MinValue = min,
+                    MaxValue = max,
+                    Step = step,
+                    Variant = v,
+                    Size = sz,
+                    IsDisabled = disabled,
+                    ShowValue = showValue,
+                    ValueFormat = format,
+                    Appearance = appearance,
+                    OnValueChanged = onChange,
+                    LayoutOptions = opts ?? Array.Empty<GUILayoutOption>(),
+                }
+            );
+
         // Select
         public int Select(SelectConfig cfg)
         {
@@ -1083,9 +1130,25 @@ namespace shadcnui.GUIComponents.Core.Base
 
         public void DestructiveLabel(string text, params GUILayoutOption[] opts) => Label(text, ControlVariant.Destructive, false, null, opts);
 
-        public void Heading(string text, params GUILayoutOption[] opts) => Label(text, ControlVariant.Default, false, null, opts);
+        public void Heading(string text, params GUILayoutOption[] opts) =>
+            Execute(
+                () =>
+                {
+                    var style = _styleManager?.GetCardTitleStyle(ControlVariant.Default, ControlSize.Default, null) ?? GUI.skin.label;
+                    UnityHelpers.Label(text, style, opts ?? Array.Empty<GUILayoutOption>());
+                },
+                nameof(Heading)
+            );
 
-        public void Caption(string text, params GUILayoutOption[] opts) => MutedLabel(text, opts);
+        public void Caption(string text, params GUILayoutOption[] opts) =>
+            Execute(
+                () =>
+                {
+                    var style = _styleManager?.GetCardDescriptionStyle(ControlVariant.Default, ControlSize.Default, null) ?? GUI.skin.label;
+                    UnityHelpers.Label(text, style, opts ?? Array.Empty<GUILayoutOption>());
+                },
+                nameof(Caption)
+            );
 
         public void CodeLabel(string text, params GUILayoutOption[] opts) => Label(text, ControlVariant.Secondary, false, null, opts);
 

@@ -135,14 +135,14 @@ namespace shadcnui_Demo.Menu
             GUI.skin.horizontalScrollbar = GUIStyle.none;
             GUI.skin.verticalScrollbar = GUIStyle.none;
 
-           // GUILayout.BeginArea(new Rect(10, 10, 400, 60));
-           // GUILayout.BeginHorizontal();
+            // GUILayout.BeginArea(new Rect(10, 10, 400, 60));
+            // GUILayout.BeginHorizontal();
             //if (GUILayout.Button("Open Demo Window", GUILayout.Width(150), GUILayout.Height(30)))
-           // {
-           //     showDemoWindow = !showDemoWindow;
-           // }
+            // {
+            //     showDemoWindow = !showDemoWindow;
+            // }
             //GUILayout.Label($"Components: {componentCount}", GUILayout.Width(200));
-           // GUILayout.EndHorizontal();
+            // GUILayout.EndHorizontal();
             //GUILayout.EndArea();
 
             if (showDemoWindow)

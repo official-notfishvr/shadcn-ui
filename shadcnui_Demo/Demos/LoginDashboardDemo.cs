@@ -25,14 +25,7 @@ namespace shadcnui_Demo.Menu
         private float _automationCoverage = 0.73f;
 
         private readonly string[] _activityTimes = { "08:30", "09:10", "10:25", "11:05", "12:40" };
-        private readonly string[] _activityTitles =
-        {
-            "Docking lane recalibrated",
-            "Maintenance ticket approved",
-            "Relay cluster warmed up",
-            "Crew roster synced",
-            "Telemetry export completed",
-        };
+        private readonly string[] _activityTitles = { "Docking lane recalibrated", "Maintenance ticket approved", "Relay cluster warmed up", "Crew roster synced", "Telemetry export completed" };
         private readonly string[] _activityStates = { "Completed", "Pending", "Completed", "Completed", "Completed" };
 
         private void Start()
@@ -47,7 +40,7 @@ namespace shadcnui_Demo.Menu
 
         private void OnGUI()
         {
-            _windowRect = GUI.Window(205, _windowRect, DrawWindow, string.Empty);
+            _windowRect = GUI.Window(205, _windowRect, (GUI.WindowFunction)DrawWindow, string.Empty);
             _gui?.DrawOverlays();
         }
 

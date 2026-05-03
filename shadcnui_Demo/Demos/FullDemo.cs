@@ -247,12 +247,7 @@ namespace shadcnui_Demo.Menu
             }
             else
             {
-                _scroll = _gui.ScrollView(
-                    _scroll,
-                    DrawBodyContent,
-                    GUILayout.ExpandHeight(true),
-                    GUILayout.ExpandWidth(true)
-                );
+                _scroll = _gui.ScrollView(_scroll, DrawBodyContent, GUILayout.ExpandHeight(true), GUILayout.ExpandWidth(true));
             }
 
             if (Event.current.type == EventType.Repaint)

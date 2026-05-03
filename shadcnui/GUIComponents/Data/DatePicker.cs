@@ -24,8 +24,9 @@ namespace shadcnui.GUIComponents.Data
             if (!_visibleMonths.ContainsKey(id))
                 _visibleMonths[id] = new DateTime((config.SelectedDate ?? DateTime.Today).Year, (config.SelectedDate ?? DateTime.Today).Month, 1);
 
-            string label = config.SelectedDate?.ToString("MMM d, yyyy") ?? config.Placeholder ?? "Select date";
-            GUIStyle triggerStyle = styleManager.GetInputStyle(ControlVariant.Outline, config.Size, false, config.IsDisabled, config.Appearance);
+            string format = string.IsNullOrWhiteSpace(config.DisplayFormat) ? "MMM d, yyyy" : config.DisplayFormat;
+            string label = config.SelectedDate?.ToString(format) ?? config.Placeholder ?? "Select date";
+            GUIStyle triggerStyle = styleManager.GetInputStyle(config.Variant, config.Size, false, config.IsDisabled, config.Appearance);
             Rect rect = ControlLayoutUtility.ReserveRect(new UnityHelpers.GUIContent(label), triggerStyle, config.LayoutOptions);
             if (GUI.Button(rect, string.Empty, triggerStyle))
             {
@@ -59,7 +60,7 @@ namespace shadcnui.GUIComponents.Data
                 return null;
             if (!string.IsNullOrEmpty(config.Label))
             {
-                UnityHelpers.Label(config.Label, styleManager.GetLabelStyle(ControlVariant.Default, config.Size, config.Appearance));
+                UnityHelpers.Label(config.Label, styleManager.GetLabelStyle(ControlVariant.Default, config.Size, GetTextOnlyAppearance(config.Appearance)));
                 layoutComponents.AddSpace(DesignTokens.Spacing.XS);
             }
             return DrawDatePicker(config);
@@ -90,6 +91,7 @@ namespace shadcnui.GUIComponents.Data
                     SelectedDate = config.StartDate,
                     MinDate = config.MinDate,
                     MaxDate = config.MaxDate,
+                    DisplayFormat = config.DisplayFormat,
                     Variant = config.Variant,
                     Size = config.Size,
                     Appearance = config.Appearance,
@@ -174,6 +176,14 @@ namespace shadcnui.GUIComponents.Data
         {
             _anchorRects.Remove(id);
             _visibleMonths.Remove(id);
+        }
+
+        private static ComponentAppearance GetTextOnlyAppearance(ComponentAppearance appearance)
+        {
+            if (appearance?.ForegroundColor == null)
+                return null;
+
+            return new ComponentAppearance { ForegroundColor = appearance.ForegroundColor };
         }
     }
 }

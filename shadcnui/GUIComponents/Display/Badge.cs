@@ -30,11 +30,10 @@ namespace shadcnui.GUIComponents.Display
                 layoutComponents.AddSpace(Mathf.Max(2f, config.Icon.Spacing) * guiHelper.uiScale);
             }
 
-            var labelStyle = styleManager?.GetLabelStyle(ControlVariant.Default, config.Size, config.Appearance) ?? GUI.skin.label;
-            var centeredLabelStyle = new UnityHelpers.GUIStyle(labelStyle)
-            {
-                alignment = TextAnchor.MiddleCenter,
-            };
+            var labelStyle = styleManager?.GetLabelStyle(ControlVariant.Default, config.Size) ?? GUI.skin.label;
+            if (config.Appearance?.ForegroundColor is { } foreground)
+                labelStyle = new UnityHelpers.GUIStyle(labelStyle) { normal = { textColor = foreground } };
+            var centeredLabelStyle = new UnityHelpers.GUIStyle(labelStyle) { alignment = TextAnchor.MiddleCenter };
             UnityHelpers.Label(text, centeredLabelStyle, GUILayout.ExpandHeight(true));
 
             layoutComponents.EndHorizontalGroup();
