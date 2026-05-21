@@ -205,6 +205,9 @@ namespace shadcnui.GUIComponents.Core.Styling
 
         public Texture2D GenerateVerticalGradient(int width, int height, Color top, Color bottom)
         {
+            width = Mathf.Max(1, width);
+            height = Mathf.Max(1, height);
+
             var key = new TextureKey(width, height, 0, top, bottom, Color.clear, 0f, 0f, 0, Color.clear);
             if (_cache.TryGetValue(key, out var cached) && cached != null)
                 return cached;
@@ -226,6 +229,8 @@ namespace shadcnui.GUIComponents.Core.Styling
 
         public Texture2D GenerateGlow(int size, Color color)
         {
+            size = Mathf.Max(1, size);
+
             var key = new TextureKey(size, size, 0, color, color, Color.clear, -1f, 0f, 0, Color.clear);
             if (_cache.TryGetValue(key, out var cached) && cached != null)
                 return cached;

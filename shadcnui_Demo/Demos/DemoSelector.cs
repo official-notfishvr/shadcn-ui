@@ -172,6 +172,15 @@ namespace shadcnui_Demo.Menu
                 },
                 new DemoEntry
                 {
+                    Id = nameof(ShadcnDocsHomeDemo),
+                    Title = "Docs Home",
+                    Category = "Showcase",
+                    Description = "shadcn docs-inspired dashboard.",
+                    Accent = ControlVariant.Secondary,
+                    Load = () => LoadDemo<ShadcnDocsHomeDemo>("Docs Home"),
+                },
+                new DemoEntry
+                {
                     Id = nameof(FullDemo_old),
                     Title = "Full Demo OLD",
                     Category = "Legacy",

@@ -145,8 +145,20 @@ namespace shadcnui.GUIComponents.Core.Styling
         private bool _dirty = true;
         private float _lastScale = -1f;
         private string _lastThemeName;
+        private Font _customFont;
 
-        public Font CustomFont { get; set; }
+        public Font CustomFont
+        {
+            get => _customFont;
+            set
+            {
+                if (_customFont == value)
+                    return;
+
+                _customFont = value;
+                MarkStylesCorruption();
+            }
+        }
         public StyleRegistry Registry { get; }
         public TextureManager Textures { get; }
 
@@ -299,8 +311,8 @@ namespace shadcnui.GUIComponents.Core.Styling
         private GUIStyle CloneStyle(GUIStyle source)
         {
             var clone = source != null ? new UnityHelpers.GUIStyle(source) : new UnityHelpers.GUIStyle();
-            if (CustomFont != null)
-                clone.font = CustomFont;
+            if (_customFont != null)
+                clone.font = _customFont;
             return clone;
         }
     }

@@ -67,6 +67,7 @@ namespace shadcnui.GUIComponents.Core.Utils
         private readonly shadcnui.GUIComponents.Layout.Layout _layout;
         private readonly Dictionary<string, AnimationState> _animations = new();
         private readonly List<string> _toRemove = new();
+        private readonly List<Action> _completionCallbacks = new();
         private float _clock;
         private bool _rootGroupStarted;
 
@@ -256,6 +257,7 @@ namespace shadcnui.GUIComponents.Core.Utils
 
             _clock += deltaTime;
             _toRemove.Clear();
+            _completionCallbacks.Clear();
 
             foreach (var pair in _animations)
             {
@@ -280,7 +282,7 @@ namespace shadcnui.GUIComponents.Core.Utils
                 }
 
                 if (state.Progress >= 1f)
-                    Complete(state);
+                    CompleteDuringUpdate(state);
             }
 
             foreach (var pair in _animations)
@@ -291,6 +293,8 @@ namespace shadcnui.GUIComponents.Core.Utils
 
             foreach (var id in _toRemove)
                 _animations.Remove(id);
+
+            InvokeCompletionCallbacks();
         }
 
         private AnimationState GetOrCreate(string id, AnimationType type)
@@ -341,6 +345,36 @@ namespace shadcnui.GUIComponents.Core.Utils
             {
                 GUILogger.LogException(ex, nameof(Complete), nameof(AnimationManager));
             }
+        }
+
+        private void CompleteDuringUpdate(AnimationState state)
+        {
+            state.Completed = true;
+            state.Paused = false;
+            state.CompletedAt = _clock;
+
+            if (state.CompletionHandled || state.OnComplete == null)
+                return;
+
+            state.CompletionHandled = true;
+            _completionCallbacks.Add(state.OnComplete);
+        }
+
+        private void InvokeCompletionCallbacks()
+        {
+            foreach (var callback in _completionCallbacks)
+            {
+                try
+                {
+                    callback();
+                }
+                catch (Exception ex)
+                {
+                    GUILogger.LogException(ex, nameof(InvokeCompletionCallbacks), nameof(AnimationManager));
+                }
+            }
+
+            _completionCallbacks.Clear();
         }
 
         private void DrawBackground()

@@ -135,27 +135,32 @@ namespace shadcnui.GUIComponents.Core.Base
             _drawing = true;
             _pendingClose.Clear();
 
-            SortDrawOrder();
-            var order = new List<string>(_drawOrder);
-            var topWindowId = -1;
-
-            foreach (var id in order)
+            try
             {
-                if (!_layers.TryGetValue(id, out var layer))
-                    continue;
+                SortDrawOrder();
+                var order = new List<string>(_drawOrder);
+                var topWindowId = -1;
 
-                var rect = ClampToScreen(new Rect(layer.Position.x, layer.Position.y, layer.Width, layer.Height));
-                layer.Position = rect.position;
-                GUI.Window(layer.WindowId, rect, (GUI.WindowFunction)DrawWindowCallback, string.Empty, GUIStyle.none);
-                topWindowId = layer.WindowId;
+                foreach (var id in order)
+                {
+                    if (!_layers.TryGetValue(id, out var layer))
+                        continue;
+
+                    var rect = ClampToScreen(new Rect(layer.Position.x, layer.Position.y, layer.Width, layer.Height));
+                    layer.Position = rect.position;
+                    GUI.Window(layer.WindowId, rect, (GUI.WindowFunction)DrawWindowCallback, string.Empty, GUIStyle.none);
+                    topWindowId = layer.WindowId;
+                }
+
+                if (topWindowId >= 0)
+                    GUI.BringWindowToFront(topWindowId);
+
+                HandleOutsideClick(order);
             }
-
-            if (topWindowId >= 0)
-                GUI.BringWindowToFront(topWindowId);
-
-            HandleOutsideClick(order);
-
-            _drawing = false;
+            finally
+            {
+                _drawing = false;
+            }
 
             foreach (var id in _pendingClose)
                 CloseNow(id);
@@ -218,7 +223,8 @@ namespace shadcnui.GUIComponents.Core.Base
 
                 if (layer.CloseOnClickOutside)
                 {
-                    _pendingClose.Add(id);
+                    if (!_pendingClose.Contains(id))
+                        _pendingClose.Add(id);
                     Event.current.Use();
                     return;
                 }
