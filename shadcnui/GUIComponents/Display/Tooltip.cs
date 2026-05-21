@@ -47,6 +47,7 @@ namespace shadcnui.GUIComponents.Display
         public void WithTooltip(string text, Action draw)
         {
             draw?.Invoke();
+            guiHelper.FlushAutoRenderBuilder();
             if (Event.current.type == EventType.Repaint || Event.current.type == EventType.Layout)
                 RegisterHover(GUILayoutUtility.GetLastRect(), text);
         }
@@ -54,6 +55,7 @@ namespace shadcnui.GUIComponents.Display
         public void WithTooltip(string text, TooltipConfig config, Action draw)
         {
             draw?.Invoke();
+            guiHelper.FlushAutoRenderBuilder();
             if (Event.current.type == EventType.Repaint || Event.current.type == EventType.Layout)
                 RegisterHover(GUILayoutUtility.GetLastRect(), text, config);
         }
@@ -61,6 +63,7 @@ namespace shadcnui.GUIComponents.Display
         public T WithTooltip<T>(string text, Func<T> draw)
         {
             T result = draw != null ? draw() : default;
+            guiHelper.FlushAutoRenderBuilder();
             if (Event.current.type == EventType.Repaint || Event.current.type == EventType.Layout)
                 RegisterHover(GUILayoutUtility.GetLastRect(), text);
             return result;
@@ -69,6 +72,7 @@ namespace shadcnui.GUIComponents.Display
         public T WithTooltip<T>(string text, TooltipConfig config, Func<T> draw)
         {
             T result = draw != null ? draw() : default;
+            guiHelper.FlushAutoRenderBuilder();
             if (Event.current.type == EventType.Repaint || Event.current.type == EventType.Layout)
                 RegisterHover(GUILayoutUtility.GetLastRect(), text, config);
             return result;

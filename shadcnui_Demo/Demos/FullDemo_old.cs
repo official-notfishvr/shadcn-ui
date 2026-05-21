@@ -417,8 +417,7 @@ namespace shadcnui_Demo.Menu
                                 showDialog = false;
                                 guiHelper.Dialog(DialogId).Close();
                             }
-                        })
-                        ;
+                        });
 
                     if (showDialog)
                         guiHelper.Dialog(DialogId).Open();
@@ -465,8 +464,7 @@ namespace shadcnui_Demo.Menu
                         {
                             guiHelper.Label("Legacy popover");
                             guiHelper.Label("Current implementation").Muted();
-                        })
-                        ;
+                        });
 
                     if (showPopover)
                         guiHelper.Popover(PopoverId).Open();
@@ -546,8 +544,28 @@ namespace shadcnui_Demo.Menu
                 "Tooltip",
                 () =>
                 {
-                    guiHelper.Label("Tooltip-specific helper shortcuts were removed from this demo.");
-                    guiHelper.Label("This tab remains as a migration marker for the old showcase layout.").Muted();
+                    guiHelper.Label("Hover each control to preview tooltip placement and styling.").Muted();
+                    guiHelper.AddSpace(8f);
+
+                    guiHelper.BeginHorizontalGroup();
+                    guiHelper.WithTooltip("Primary actions can explain the effect before the user clicks.", () => guiHelper.Button("Hover Button", ControlVariant.Default, ControlSize.Small));
+                    guiHelper.WithTooltip("Badges work too, including fluent badge builders without calling Render.", () => guiHelper.Badge("Live").StatusDot());
+                    guiHelper.EndHorizontalGroup();
+
+                    guiHelper.AddSpace(10f);
+                    guiHelper.WithTooltip(
+                        "This tooltip uses a shorter delay and a wider wrapping area for longer explanatory copy.",
+                        new TooltipConfig
+                        {
+                            HoverDelaySeconds = 0.15f,
+                            MaxWidth = 360f,
+                            Variant = ControlVariant.Secondary,
+                        },
+                        () => guiHelper.Label("Fast secondary tooltip").Secondary()
+                    );
+
+                    guiHelper.AddSpace(10f);
+                    guiHelper.WithTooltip("Destructive affordances can warn users without taking over the layout.", new TooltipConfig { HoverDelaySeconds = 0.1f, Variant = ControlVariant.Destructive }, () => guiHelper.Button("Danger Hover", ControlVariant.Destructive, ControlSize.Small));
                 }
             );
         }

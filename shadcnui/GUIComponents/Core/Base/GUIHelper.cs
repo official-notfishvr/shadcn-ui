@@ -280,6 +280,14 @@ namespace shadcnui.GUIComponents.Core.Base
 
         public void DrawOverlay() => DrawOverlays();
 
+        public void WithTooltip(string text, Action draw) => Execute(() => _tooltip.WithTooltip(text, draw), nameof(WithTooltip));
+
+        public void WithTooltip(string text, TooltipConfig config, Action draw) => Execute(() => _tooltip.WithTooltip(text, config, draw), nameof(WithTooltip));
+
+        public T WithTooltip<T>(string text, Func<T> draw) => Execute(() => _tooltip.WithTooltip(text, draw), default, nameof(WithTooltip));
+
+        public T WithTooltip<T>(string text, TooltipConfig config, Func<T> draw) => Execute(() => _tooltip.WithTooltip(text, config, draw), default, nameof(WithTooltip));
+
         public void DrawOverlays() =>
             Execute(
                 () =>

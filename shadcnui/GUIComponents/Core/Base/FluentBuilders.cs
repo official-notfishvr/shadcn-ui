@@ -20,8 +20,7 @@ namespace shadcnui.GUIComponents.Core.Base
         void RenderIfPending();
     }
 
-    public abstract class ComponentBuilder<TBuilder, TConfig, TResult>
-        : IAutoRenderBuilder
+    public abstract class ComponentBuilder<TBuilder, TConfig, TResult> : IAutoRenderBuilder
         where TBuilder : ComponentBuilder<TBuilder, TConfig, TResult>
         where TConfig : ComponentConfigBase, new()
     {
@@ -203,13 +202,11 @@ namespace shadcnui.GUIComponents.Core.Base
         }
 
         public override bool Render() =>
-            RenderOnce(
-                () =>
-                {
-                    ApplyOptions();
-                    return Helper.Render(Config);
-                }
-            );
+            RenderOnce(() =>
+            {
+                ApplyOptions();
+                return Helper.Render(Config);
+            });
 
         public static implicit operator bool(ButtonBuilder builder) => builder?.Render() ?? false;
     }
@@ -379,13 +376,11 @@ namespace shadcnui.GUIComponents.Core.Base
         }
 
         public override bool Render() =>
-            RenderOnce(
-                () =>
-                {
-                    ApplyOptions();
-                    return Helper.Render(Config);
-                }
-            );
+            RenderOnce(() =>
+            {
+                ApplyOptions();
+                return Helper.Render(Config);
+            });
 
         public static implicit operator bool(CheckboxBuilder builder) => builder?.Render() ?? false;
     }
@@ -396,13 +391,11 @@ namespace shadcnui.GUIComponents.Core.Base
             : base(helper, label, value) { }
 
         public override bool Render() =>
-            RenderOnce(
-                () =>
-                {
-                    ApplyOptions();
-                    return Helper.Render(Config);
-                }
-            );
+            RenderOnce(() =>
+            {
+                ApplyOptions();
+                return Helper.Render(Config);
+            });
 
         public static implicit operator bool(SwitchBuilder builder) => builder?.Render() ?? false;
     }
@@ -413,13 +406,11 @@ namespace shadcnui.GUIComponents.Core.Base
             : base(helper, label, value) { }
 
         public override bool Render() =>
-            RenderOnce(
-                () =>
-                {
-                    ApplyOptions();
-                    return Helper.Render(Config);
-                }
-            );
+            RenderOnce(() =>
+            {
+                ApplyOptions();
+                return Helper.Render(Config);
+            });
 
         public static implicit operator bool(ToggleBuilder builder) => builder?.Render() ?? false;
     }
