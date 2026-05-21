@@ -14,7 +14,7 @@ namespace shadcnui.GUIComponents.Controls
         public Checkbox(GUIHelper helper)
             : base(helper) { }
 
-        public bool Draw(CheckboxConfig config)
+        public bool Render(CheckboxConfig config)
         {
             if (config == null)
                 return false;

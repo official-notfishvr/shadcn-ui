@@ -1,109 +1,113 @@
-// NOT BEING WORKED ON
 using System;
 using System.Collections.Generic;
 using shadcnui.GUIComponents.Core.Styling;
+using shadcnui.GUIComponents.Core.Theming;
 using shadcnui.GUIComponents.Core.Utils;
+using shadcnui.GUIComponents.Display;
 using shadcnui.GUIComponents.Layout;
 using UnityEngine;
+using static shadcnui.GUIComponents.Layout.MenuBar;
 
 namespace shadcnui.GUIComponents.Core.Base
 {
-    public abstract class FluentBuilder<TBuilder, TConfig>
-        where TBuilder : FluentBuilder<TBuilder, TConfig>
-        where TConfig : class
+    public readonly struct RenderResult
+    {
+        public static readonly RenderResult Value = new();
+    }
+
+    public abstract class ComponentBuilder<TBuilder, TConfig, TResult>
+        where TBuilder : ComponentBuilder<TBuilder, TConfig, TResult>
+        where TConfig : ComponentConfigBase, new()
     {
         protected readonly GUIHelper Helper;
         protected readonly TConfig Config;
+        private readonly List<GUILayoutOption> _options = new();
 
-        protected FluentBuilder(GUIHelper helper, TConfig config)
+        protected ComponentBuilder(GUIHelper helper, TConfig config = null)
         {
-            Helper = helper;
-            Config = config;
+            Helper = helper ?? throw new ArgumentNullException(nameof(helper));
+            Config = config ?? new TConfig();
         }
 
         protected TBuilder Self => (TBuilder)this;
 
-        public TConfig Build() => Config;
+        public TConfig Props() => Config;
 
         public TBuilder Configure(Action<TConfig> configure)
         {
             configure?.Invoke(Config);
             return Self;
         }
-    }
 
-    public abstract class SizedBuilder<TBuilder, TConfig> : FluentBuilder<TBuilder, TConfig>
-        where TBuilder : SizedBuilder<TBuilder, TConfig>
-        where TConfig : class
-    {
-        protected SizedBuilder(GUIHelper helper, TConfig config)
-            : base(helper, config) { }
-
-        protected readonly List<GUILayoutOption> Options = new();
-        protected ControlVariant VariantValue = ControlVariant.Default;
-        protected ControlSize SizeValue = ControlSize.Default;
-        protected bool DisabledValue;
+        public TBuilder Id(string id)
+        {
+            Config.Id = id;
+            return Self;
+        }
 
         public TBuilder Variant(ControlVariant variant)
         {
-            VariantValue = variant;
+            Config.Variant = variant;
             return Self;
         }
 
         public TBuilder Size(ControlSize size)
         {
-            SizeValue = size;
+            Config.Size = size;
             return Self;
         }
 
         public TBuilder Disabled(bool disabled = true)
         {
-            DisabledValue = disabled;
-            return Self;
-        }
-
-        public TBuilder Style(string styleId)
-        {
-            if (Config is ComponentConfigBase componentConfig)
-            {
-                componentConfig.Appearance ??= new ComponentAppearance();
-                componentConfig.Appearance.StyleId = styleId;
-            }
-
+            Config.IsDisabled = disabled;
             return Self;
         }
 
         public TBuilder Appearance(ComponentAppearance appearance)
         {
-            if (Config is ComponentConfigBase componentConfig)
-                componentConfig.Appearance = appearance;
+            Config.Appearance = appearance;
+            return Self;
+        }
 
+        public TBuilder Style(string styleId)
+        {
+            Config.Appearance ??= new ComponentAppearance();
+            Config.Appearance.StyleId = styleId;
+            return Self;
+        }
+
+        public TBuilder Options(params GUILayoutOption[] options)
+        {
+            if (options != null)
+                _options.AddRange(options);
             return Self;
         }
 
         public TBuilder Width(float width)
         {
-            Options.Add(GUILayout.Width(width));
+            _options.Add(GUILayout.Width(width));
             return Self;
         }
 
         public TBuilder Height(float height)
         {
-            Options.Add(GUILayout.Height(height));
+            _options.Add(GUILayout.Height(height));
             return Self;
         }
 
         public TBuilder ExpandWidth(bool expand = true)
         {
-            Options.Add(GUILayout.ExpandWidth(expand));
+            _options.Add(GUILayout.ExpandWidth(expand));
             return Self;
         }
 
         public TBuilder ExpandHeight(bool expand = true)
         {
-            Options.Add(GUILayout.ExpandHeight(expand));
+            _options.Add(GUILayout.ExpandHeight(expand));
             return Self;
         }
+
+        public TBuilder Default() => Variant(ControlVariant.Default);
 
         public TBuilder Secondary() => Variant(ControlVariant.Secondary);
 
@@ -111,7 +115,11 @@ namespace shadcnui.GUIComponents.Core.Base
 
         public TBuilder Ghost() => Variant(ControlVariant.Ghost);
 
+        public TBuilder Link() => Variant(ControlVariant.Link);
+
         public TBuilder Destructive() => Variant(ControlVariant.Destructive);
+
+        public TBuilder Muted() => Variant(ControlVariant.Muted);
 
         public TBuilder Small() => Size(ControlSize.Small);
 
@@ -119,17 +127,41 @@ namespace shadcnui.GUIComponents.Core.Base
 
         public TBuilder Mini() => Size(ControlSize.Mini);
 
-        protected GUILayoutOption[] GetOptions() => Options.Count == 0 ? Array.Empty<GUILayoutOption>() : Options.ToArray();
+        public TBuilder Icon() => Size(ControlSize.Icon);
+
+        protected void ApplyOptions() => Config.LayoutOptions = _options.Count == 0 ? Array.Empty<GUILayoutOption>() : _options.ToArray();
+
+        public abstract TResult Render();
     }
 
-    public sealed class ButtonBuilder : SizedBuilder<ButtonBuilder, ButtonConfig>
+    public abstract class RectComponentBuilder<TBuilder, TConfig, TResult> : ComponentBuilder<TBuilder, TConfig, TResult>
+        where TBuilder : RectComponentBuilder<TBuilder, TConfig, TResult>
+        where TConfig : RectConfigBase, new()
+    {
+        protected RectComponentBuilder(GUIHelper helper, TConfig config = null)
+            : base(helper, config) { }
+
+        public TBuilder Rect(Rect rect)
+        {
+            Config.Rect = rect;
+            return Self;
+        }
+    }
+
+    public sealed class ButtonBuilder : RectComponentBuilder<ButtonBuilder, ButtonConfig, bool>
     {
         public ButtonBuilder(GUIHelper helper, string text = "")
-            : base(helper, new ButtonConfig(text)) { }
+            : base(helper, new ButtonConfig { Text = text }) { }
 
         public ButtonBuilder Text(string text)
         {
             Config.Text = text;
+            return this;
+        }
+
+        public ButtonBuilder Icon(Texture2D image, IconPosition position = IconPosition.Left, float size = DesignTokens.Icon.Default, float spacing = DesignTokens.Spacing.XS)
+        {
+            Config.Icon = image == null ? null : new IconConfig(image, position) { Size = size, Spacing = spacing };
             return this;
         }
 
@@ -139,42 +171,27 @@ namespace shadcnui.GUIComponents.Core.Base
             return this;
         }
 
-        public ButtonBuilder Icon(Texture2D image, IconPosition position = IconPosition.Left, float size = DesignTokens.Icon.Default, float spacing = DesignTokens.Spacing.XS)
-        {
-            Config.Icon = new IconConfig(image, position) { Size = size, Spacing = spacing };
-            return this;
-        }
-
         public ButtonBuilder Opacity(float opacity)
         {
             Config.Opacity = opacity;
             return this;
         }
 
-        public bool Draw()
+        public override bool Render()
         {
-            Config.Variant = VariantValue;
-            Config.Size = SizeValue;
-            Config.IsDisabled = DisabledValue;
-            Config.LayoutOptions = GetOptions();
-            return Helper.Button(Config);
+            ApplyOptions();
+            return Helper.Render(Config);
         }
     }
 
-    public sealed class InputBuilder : SizedBuilder<InputBuilder, InputConfig>
+    public sealed class InputBuilder : RectComponentBuilder<InputBuilder, InputConfig, string>
     {
-        public InputBuilder(GUIHelper helper)
-            : base(helper, new InputConfig()) { }
+        public InputBuilder(GUIHelper helper, string value = "")
+            : base(helper, new InputConfig { Value = value }) { }
 
         public InputBuilder Value(string value)
         {
             Config.Value = value;
-            return this;
-        }
-
-        public InputBuilder Placeholder(string placeholder)
-        {
-            Config.Placeholder = placeholder;
             return this;
         }
 
@@ -184,17 +201,46 @@ namespace shadcnui.GUIComponents.Core.Base
             return this;
         }
 
-        public InputBuilder Password(char mask = '*')
+        public InputBuilder Placeholder(string placeholder)
         {
-            Config.MaskCharacter = mask;
-            Config.InputKind = InputKind.Password;
-            Config.Label ??= string.Empty;
+            Config.Placeholder = placeholder;
             return this;
         }
 
-        public InputBuilder Focused(bool focused = true)
+        public InputBuilder HelperText(string text)
         {
-            Config.AutoFocus = focused;
+            Config.HelperText = text;
+            return this;
+        }
+
+        public InputBuilder Error(string text)
+        {
+            Config.ErrorText = text;
+            return this;
+        }
+
+        public InputBuilder LabelVariant(ControlVariant variant)
+        {
+            Config.LabelVariant = variant;
+            return this;
+        }
+
+        public InputBuilder Icon(Texture2D image, IconPosition position = IconPosition.Left, float size = DesignTokens.Icon.Default, float spacing = DesignTokens.Spacing.XS)
+        {
+            Config.Icon = image == null ? null : new IconConfig(image, position) { Size = size, Spacing = spacing };
+            return this;
+        }
+
+        public InputBuilder Password(char maskCharacter = '*')
+        {
+            Config.InputKind = InputKind.Password;
+            Config.MaskCharacter = maskCharacter;
+            return this;
+        }
+
+        public InputBuilder MaxLength(int maxLength)
+        {
+            Config.MaxLength = maxLength;
             return this;
         }
 
@@ -204,409 +250,139 @@ namespace shadcnui.GUIComponents.Core.Base
             return this;
         }
 
-        public InputBuilder Icon(Texture2D image, IconPosition position = IconPosition.Left, float size = DesignTokens.Icon.Default, float spacing = DesignTokens.Spacing.XS)
+        public InputBuilder InputHeight(float height)
         {
-            Config.Icon = new IconConfig(image, position) { Size = size, Spacing = spacing };
-            return this;
-        }
-
-        public InputBuilder OnChange(Action<string> onChange)
-        {
-            Config.OnValueChanged = onChange;
-            return this;
-        }
-
-        public string Draw()
-        {
-            Config.Variant = VariantValue;
-            Config.IsDisabled = DisabledValue;
-            return Helper.Input(Config);
-        }
-    }
-
-    public sealed class ToggleBuilder : SizedBuilder<ToggleBuilder, ToggleConfig>
-    {
-        public ToggleBuilder(GUIHelper helper, string text, bool value)
-            : base(helper, new ToggleConfig { Label = text, Value = value }) { }
-
-        public ToggleBuilder Text(string text)
-        {
-            Config.Label = text;
-            return this;
-        }
-
-        public ToggleBuilder Value(bool value)
-        {
-            Config.Value = value;
-            return this;
-        }
-
-        public ToggleBuilder Icon(Texture2D image, IconPosition position = IconPosition.Left, float size = DesignTokens.Icon.Default, float spacing = DesignTokens.Spacing.XS)
-        {
-            Config.Icon = new IconConfig(image, position) { Size = size, Spacing = spacing };
-            return this;
-        }
-
-        public ToggleBuilder OnToggle(Action<bool> onToggle)
-        {
-            Config.OnValueChanged = onToggle;
-            return this;
-        }
-
-        public bool Draw()
-        {
-            Config.Variant = VariantValue;
-            Config.Size = SizeValue;
-            Config.IsDisabled = DisabledValue;
-            Config.LayoutOptions = GetOptions();
-            return Helper.Toggle(Config);
-        }
-    }
-
-    public sealed class CheckboxBuilder : SizedBuilder<CheckboxBuilder, CheckboxConfig>
-    {
-        public CheckboxBuilder(GUIHelper helper, string text, bool value)
-            : base(helper, new CheckboxConfig { Label = text, Value = value }) { }
-
-        public CheckboxBuilder Icon(Texture2D image, IconPosition position = IconPosition.Left, float size = DesignTokens.Icon.Default, float spacing = DesignTokens.Spacing.XS)
-        {
-            Config.Icon = new IconConfig(image, position) { Size = size, Spacing = spacing };
-            return this;
-        }
-
-        public CheckboxBuilder OnToggle(Action<bool> onToggle)
-        {
-            Config.OnValueChanged = onToggle;
-            return this;
-        }
-
-        public bool Draw()
-        {
-            Config.Variant = VariantValue;
-            Config.Size = SizeValue;
-            Config.IsDisabled = DisabledValue;
-            Config.LayoutOptions = GetOptions();
-            return Helper.Checkbox(Config);
-        }
-    }
-
-    public sealed class SwitchBuilder : SizedBuilder<SwitchBuilder, SwitchConfig>
-    {
-        public SwitchBuilder(GUIHelper helper, string text, bool value)
-            : base(helper, new SwitchConfig { Label = text, Value = value }) { }
-
-        public SwitchBuilder OnToggle(Action<bool> onToggle)
-        {
-            Config.OnValueChanged = onToggle;
-            return this;
-        }
-
-        public bool Draw()
-        {
-            Config.Variant = VariantValue;
-            Config.Size = SizeValue;
-            Config.IsDisabled = DisabledValue;
-            Config.LayoutOptions = GetOptions();
-            return Helper.Switch(Config);
-        }
-    }
-
-    public sealed class LabelBuilder : SizedBuilder<LabelBuilder, LabelConfig>
-    {
-        public LabelBuilder(GUIHelper helper, string text = "")
-            : base(helper, new LabelConfig { Text = text }) { }
-
-        public LabelBuilder Text(string text)
-        {
-            Config.Text = text;
-            return this;
-        }
-
-        public LabelBuilder Muted() => Variant(ControlVariant.Muted);
-
-        public LabelBuilder Icon(Texture2D image, IconPosition position = IconPosition.Left, float size = DesignTokens.Icon.Default, float spacing = DesignTokens.Spacing.XS)
-        {
-            Config.Icon = new IconConfig(image, position) { Size = size, Spacing = spacing };
-            return this;
-        }
-
-        public void Draw()
-        {
-            Config.Variant = VariantValue;
-            Config.IsDisabled = DisabledValue;
-            Config.LayoutOptions = GetOptions();
-            Helper.Label(Config);
-        }
-    }
-
-    public sealed class BadgeBuilder : SizedBuilder<BadgeBuilder, BadgeConfig>
-    {
-        public BadgeBuilder(GUIHelper helper, string text = "Badge")
-            : base(helper, new BadgeConfig { Text = text }) { }
-
-        public BadgeBuilder Text(string text)
-        {
-            Config.Text = text;
-            return this;
-        }
-
-        public BadgeBuilder Icon(Texture2D image, IconPosition position = IconPosition.Left, float size = DesignTokens.Icon.Small, float spacing = DesignTokens.Spacing.XS)
-        {
-            Config.Icon = new IconConfig(image, position) { Size = size, Spacing = spacing };
-            return this;
-        }
-
-        public BadgeBuilder Count(int count, int maxCount = 99)
-        {
-            Config.Count = count;
-            Config.MaxCount = maxCount;
-            Config.Text = count > maxCount ? $"{maxCount}+" : count.ToString();
-            return this;
-        }
-
-        public BadgeBuilder StatusDot(bool active = true)
-        {
-            Config.ShowStatusDot = true;
-            Config.IsActive = active;
-            return this;
-        }
-
-        public BadgeBuilder Progress(float progress)
-        {
-            Config.Progress = progress;
-            return this;
-        }
-
-        public BadgeBuilder CornerRadius(float radius)
-        {
-            Config.CornerRadius = radius;
-            return this;
-        }
-
-        public void Draw()
-        {
-            Config.Variant = VariantValue;
-            Config.Size = SizeValue;
-            Config.LayoutOptions = GetOptions();
-            Helper.Badge(Config);
-        }
-    }
-
-    public sealed class AvatarBuilder : SizedBuilder<AvatarBuilder, AvatarConfig>
-    {
-        public AvatarBuilder(GUIHelper helper, Texture2D image = null)
-            : base(helper, new AvatarConfig { Image = image }) { }
-
-        public AvatarBuilder Image(Texture2D image)
-        {
-            Config.Image = image;
-            return this;
-        }
-
-        public AvatarBuilder Fallback(string text)
-        {
-            Config.FallbackText = text;
-            return this;
-        }
-
-        public AvatarBuilder Circle()
-        {
-            Config.Shape = AvatarShape.Circle;
-            return this;
-        }
-
-        public AvatarBuilder Square()
-        {
-            Config.Shape = AvatarShape.Square;
-            return this;
-        }
-
-        public AvatarBuilder Rounded()
-        {
-            Config.Shape = AvatarShape.Rounded;
-            return this;
-        }
-
-        public AvatarBuilder Online(bool online = true)
-        {
-            Config.IsOnline = online;
-            return this;
-        }
-
-        public AvatarBuilder Border(Color color)
-        {
-            Config.BorderColor = color;
-            return this;
-        }
-
-        public AvatarBuilder NameBelow(string name)
-        {
-            Config.Name = name;
-            Config.ShowNameBelow = true;
-            return this;
-        }
-
-        public void Draw()
-        {
-            Config.Size = SizeValue;
-            Config.LayoutOptions = GetOptions();
-            Helper.Avatar(Config);
-        }
-    }
-
-    public sealed class CardBuilder : FluentBuilder<CardBuilder, CardConfig>
-    {
-        public CardBuilder(GUIHelper helper, string title = null)
-            : base(helper, new CardConfig { Title = title }) { }
-
-        public CardBuilder Title(string title)
-        {
-            Config.Title = title;
-            return this;
-        }
-
-        public CardBuilder Description(string description)
-        {
-            Config.Description = description;
-            return this;
-        }
-
-        public CardBuilder Subtitle(string subtitle)
-        {
-            Config.Subtitle = subtitle;
-            return this;
-        }
-
-        public CardBuilder Content(string content)
-        {
-            Config.Content = content;
-            return this;
-        }
-
-        public CardBuilder Footer(Action footer)
-        {
-            Config.FooterContent = footer;
-            return this;
-        }
-
-        public CardBuilder Header(Action header)
-        {
-            Config.HeaderContent = header;
-            return this;
-        }
-
-        public CardBuilder Image(Texture2D image)
-        {
-            Config.Image = image;
-            return this;
-        }
-
-        public CardBuilder Avatar(Texture2D avatar)
-        {
-            Config.Avatar = avatar;
-            return this;
-        }
-
-        public CardBuilder CardSize(float width, float height)
-        {
-            Config.Width = width;
             Config.Height = height;
             return this;
         }
 
-        public void Draw()
+        public InputBuilder AutoFocus(bool autoFocus = true)
         {
-            Helper.Card(Config);
-        }
-    }
-
-    public sealed class ProgressBuilder : FluentBuilder<ProgressBuilder, ProgressConfig>
-    {
-        public ProgressBuilder(GUIHelper helper, float value = 0f)
-            : base(helper, new ProgressConfig { Value = value }) { }
-
-        public ProgressBuilder Value(float value)
-        {
-            Config.Value = value;
+            Config.AutoFocus = autoFocus;
             return this;
         }
 
-        public ProgressBuilder ProgressLabel(string label)
+        public InputBuilder OnChange(Action<string> onValueChanged)
+        {
+            Config.OnValueChanged = onValueChanged;
+            return this;
+        }
+
+        public override string Render()
+        {
+            ApplyOptions();
+            return Helper.Render(Config);
+        }
+    }
+
+    public abstract class BooleanControlBuilder<TBuilder, TConfig> : RectComponentBuilder<TBuilder, TConfig, bool>
+        where TBuilder : BooleanControlBuilder<TBuilder, TConfig>
+        where TConfig : BoolControlConfigBase, new()
+    {
+        protected BooleanControlBuilder(GUIHelper helper, string label, bool value)
+            : base(helper, new TConfig { Label = label, Value = value }) { }
+
+        public TBuilder Label(string label)
+        {
+            Config.Label = label;
+            return Self;
+        }
+
+        public TBuilder Value(bool value)
+        {
+            Config.Value = value;
+            return Self;
+        }
+
+        public TBuilder HelperText(string text)
+        {
+            Config.HelperText = text;
+            return Self;
+        }
+
+        public TBuilder Error(string text)
+        {
+            Config.ErrorText = text;
+            return Self;
+        }
+
+        public TBuilder LabelVariant(ControlVariant variant)
+        {
+            Config.LabelVariant = variant;
+            return Self;
+        }
+
+        public TBuilder FullRowClick(bool enabled = true)
+        {
+            Config.FullRowClick = enabled;
+            return Self;
+        }
+
+        public TBuilder Icon(Texture2D image, IconPosition position = IconPosition.Left, float size = DesignTokens.Icon.Default, float spacing = DesignTokens.Spacing.XS)
+        {
+            Config.Icon = image == null ? null : new IconConfig(image, position) { Size = size, Spacing = spacing };
+            return Self;
+        }
+
+        public TBuilder OnChange(Action<bool> onValueChanged)
+        {
+            Config.OnValueChanged = onValueChanged;
+            return Self;
+        }
+    }
+
+    public sealed class CheckboxBuilder : BooleanControlBuilder<CheckboxBuilder, CheckboxConfig>
+    {
+        public CheckboxBuilder(GUIHelper helper, string label, bool value)
+            : base(helper, label, value) { }
+
+        public CheckboxBuilder ShowCheckmark(bool show = true)
+        {
+            Config.ShowCheckmark = show;
+            return this;
+        }
+
+        public override bool Render()
+        {
+            ApplyOptions();
+            return Helper.Render(Config);
+        }
+    }
+
+    public sealed class SwitchBuilder : BooleanControlBuilder<SwitchBuilder, SwitchConfig>
+    {
+        public SwitchBuilder(GUIHelper helper, string label, bool value)
+            : base(helper, label, value) { }
+
+        public override bool Render()
+        {
+            ApplyOptions();
+            return Helper.Render(Config);
+        }
+    }
+
+    public sealed class ToggleBuilder : BooleanControlBuilder<ToggleBuilder, ToggleConfig>
+    {
+        public ToggleBuilder(GUIHelper helper, string label, bool value)
+            : base(helper, label, value) { }
+
+        public override bool Render()
+        {
+            ApplyOptions();
+            return Helper.Render(Config);
+        }
+    }
+
+    public sealed class SliderBuilder : ComponentBuilder<SliderBuilder, SliderConfig, float>
+    {
+        public SliderBuilder(GUIHelper helper, float value = 0f)
+            : base(helper, new SliderConfig { Value = value }) { }
+
+        public SliderBuilder Label(string label)
         {
             Config.Label = label;
             return this;
         }
-
-        public ProgressBuilder ProgressWidth(float width)
-        {
-            Config.Width = width;
-            return this;
-        }
-
-        public ProgressBuilder ProgressHeight(float height)
-        {
-            Config.Height = height;
-            return this;
-        }
-
-        public ProgressBuilder Circular(float size = DesignTokens.Height.Small)
-        {
-            Config.Size = size;
-            return this;
-        }
-
-        public ProgressBuilder ShowPercentage(bool show = true)
-        {
-            Config.ShowPercentage = show;
-            return this;
-        }
-
-        public void Draw()
-        {
-            Helper.Progress(Config);
-        }
-    }
-
-    public sealed class SeparatorBuilder : FluentBuilder<SeparatorBuilder, SeparatorConfig>
-    {
-        public SeparatorBuilder(GUIHelper helper)
-            : base(helper, new SeparatorConfig()) { }
-
-        public SeparatorBuilder Horizontal()
-        {
-            Config.Orientation = SeparatorOrientation.Horizontal;
-            return this;
-        }
-
-        public SeparatorBuilder Vertical()
-        {
-            Config.Orientation = SeparatorOrientation.Vertical;
-            return this;
-        }
-
-        public SeparatorBuilder WithLabel(string text)
-        {
-            Config.Text = text;
-            return this;
-        }
-
-        public SeparatorBuilder Spacing(float before, float after)
-        {
-            Config.SpacingBefore = before;
-            Config.SpacingAfter = after;
-            return this;
-        }
-
-        public void Draw()
-        {
-            Helper.Separator(Config);
-        }
-    }
-
-    public sealed class SliderBuilder : SizedBuilder<SliderBuilder, SliderConfig>
-    {
-        public SliderBuilder(GUIHelper helper, float value = 0f)
-            : base(helper, new SliderConfig { Value = value }) { }
 
         public SliderBuilder Value(float value)
         {
@@ -627,9 +403,9 @@ namespace shadcnui.GUIComponents.Core.Base
             return this;
         }
 
-        public SliderBuilder SliderLabel(string label)
+        public SliderBuilder Format(string format)
         {
-            Config.Label = label;
+            Config.ValueFormat = format;
             return this;
         }
 
@@ -639,36 +415,302 @@ namespace shadcnui.GUIComponents.Core.Base
             return this;
         }
 
-        public SliderBuilder Format(string format)
+        public SliderBuilder OnChange(Action<float> onValueChanged)
+        {
+            Config.OnValueChanged = onValueChanged;
+            return this;
+        }
+
+        public override float Render()
+        {
+            ApplyOptions();
+            return Helper.Render(Config);
+        }
+    }
+
+    public sealed class RangeSliderBuilder : ComponentBuilder<RangeSliderBuilder, RangeSliderConfig, Vector2>
+    {
+        public RangeSliderBuilder(GUIHelper helper, float lowerValue = 0f, float upperValue = 1f)
+            : base(helper, new RangeSliderConfig { LowerValue = lowerValue, UpperValue = upperValue }) { }
+
+        public RangeSliderBuilder Label(string label)
+        {
+            Config.Label = label;
+            return this;
+        }
+
+        public RangeSliderBuilder Values(float lowerValue, float upperValue)
+        {
+            Config.LowerValue = lowerValue;
+            Config.UpperValue = upperValue;
+            return this;
+        }
+
+        public RangeSliderBuilder Range(float min, float max)
+        {
+            Config.MinValue = min;
+            Config.MaxValue = max;
+            return this;
+        }
+
+        public RangeSliderBuilder Step(float step)
+        {
+            Config.Step = step;
+            return this;
+        }
+
+        public RangeSliderBuilder Format(string format)
         {
             Config.ValueFormat = format;
             return this;
         }
 
-        public SliderBuilder OnChange(Action<float> onChange)
+        public RangeSliderBuilder ShowValue(bool show = true)
         {
-            Config.OnValueChanged = onChange;
+            Config.ShowValue = show;
             return this;
         }
 
-        public float Draw()
+        public RangeSliderBuilder OnChange(Action<float, float> onValueChanged)
         {
-            Config.Variant = VariantValue;
-            Config.Size = SizeValue;
-            Config.IsDisabled = DisabledValue;
-            Config.LayoutOptions = GetOptions();
-            return Helper.Slider(Config);
+            Config.OnValueChanged = onValueChanged;
+            return this;
+        }
+
+        public override Vector2 Render()
+        {
+            ApplyOptions();
+            return Helper.Render(Config);
         }
     }
 
-    public sealed class TextAreaBuilder : SizedBuilder<TextAreaBuilder, TextAreaConfig>
+    public sealed class SelectBuilder : ComponentBuilder<SelectBuilder, SelectConfig, int>
     {
-        public TextAreaBuilder(GUIHelper helper, string text = "")
-            : base(helper, new TextAreaConfig { Value = text }) { }
+        public SelectBuilder(GUIHelper helper)
+            : base(helper, new SelectConfig()) { }
 
-        public TextAreaBuilder Text(string text)
+        public SelectBuilder Label(string label)
         {
-            Config.Value = text;
+            Config.Label = label;
+            return this;
+        }
+
+        public SelectBuilder Placeholder(string placeholder)
+        {
+            Config.Placeholder = placeholder;
+            return this;
+        }
+
+        public new SelectBuilder Width(float width)
+        {
+            Config.Width = width;
+            return this;
+        }
+
+        public SelectBuilder MaxHeight(float maxHeight)
+        {
+            Config.MaxHeight = maxHeight;
+            return this;
+        }
+
+        public SelectBuilder Options(params SelectOption[] options)
+        {
+            Config.Options = options ?? Array.Empty<SelectOption>();
+            return this;
+        }
+
+        public SelectBuilder Items(params string[] items)
+        {
+            Config.Options = items == null ? Array.Empty<SelectOption>() : Array.ConvertAll(items, item => new SelectOption(item, item));
+            return this;
+        }
+
+        public SelectBuilder SelectedIndex(int selectedIndex)
+        {
+            Config.SelectedIndex = selectedIndex;
+            return this;
+        }
+
+        public SelectBuilder CloseOnSelect(bool closeOnSelect = true)
+        {
+            Config.CloseOnSelect = closeOnSelect;
+            return this;
+        }
+
+        public SelectBuilder OnChange(Action<int> onSelectionChanged)
+        {
+            Config.OnSelectionChanged = onSelectionChanged;
+            return this;
+        }
+
+        public override int Render()
+        {
+            ApplyOptions();
+            return Helper.Render(Config);
+        }
+    }
+
+    public sealed class DropdownMenuBuilder : ComponentBuilder<DropdownMenuBuilder, DropdownMenuConfig, RenderResult>
+    {
+        public DropdownMenuBuilder(GUIHelper helper)
+            : base(helper, new DropdownMenuConfig()) { }
+
+        public new DropdownMenuBuilder Width(float width)
+        {
+            Config.Width = width;
+            return this;
+        }
+
+        public DropdownMenuBuilder MaxHeight(float maxHeight)
+        {
+            Config.MaxHeight = maxHeight;
+            return this;
+        }
+
+        public DropdownMenuBuilder Trigger(Func<bool> trigger)
+        {
+            Config.Trigger = trigger;
+            return this;
+        }
+
+        public DropdownMenuBuilder Anchor(Rect anchorRect)
+        {
+            Config.AnchorRect = anchorRect;
+            return this;
+        }
+
+        public DropdownMenuBuilder CloseOnSelect(bool closeOnSelect = true)
+        {
+            Config.CloseOnSelect = closeOnSelect;
+            return this;
+        }
+
+        public DropdownMenuBuilder CloseOnClickOutside(bool closeOnClickOutside = true)
+        {
+            Config.CloseOnClickOutside = closeOnClickOutside;
+            return this;
+        }
+
+        public DropdownMenuBuilder Item(string text, Action onClick = null, Texture2D icon = null, bool disabled = false)
+        {
+            Config.Items.Add(new DropdownMenuItem(DropdownMenuItemType.Item, text, onClick, icon, disabled));
+            return this;
+        }
+
+        public DropdownMenuBuilder Header(string text)
+        {
+            Config.Items.Add(new DropdownMenuItem(DropdownMenuItemType.Header, text));
+            return this;
+        }
+
+        public DropdownMenuBuilder Separator()
+        {
+            Config.Items.Add(new DropdownMenuItem(DropdownMenuItemType.Separator));
+            return this;
+        }
+
+        public override RenderResult Render()
+        {
+            ApplyOptions();
+            Helper.Render(Config);
+            return RenderResult.Value;
+        }
+    }
+
+    public sealed class ThemeChangerBuilder : ComponentBuilder<ThemeChangerBuilder, ThemeChangerConfig, RenderResult>
+    {
+        public ThemeChangerBuilder(GUIHelper helper)
+            : base(helper, new ThemeChangerConfig()) { }
+
+        public new ThemeChangerBuilder Width(float width)
+        {
+            Config.Width = width;
+            return this;
+        }
+
+        public ThemeChangerBuilder DropdownHeight(float height)
+        {
+            Config.DropdownHeight = height;
+            return this;
+        }
+
+        public ThemeChangerBuilder ShowPreview(bool showPreview = true)
+        {
+            Config.ShowPreview = showPreview;
+            return this;
+        }
+
+        public ThemeChangerBuilder OnChange(Action<Theme> onThemeChanged)
+        {
+            Config.OnThemeChanged = onThemeChanged;
+            return this;
+        }
+
+        public override RenderResult Render()
+        {
+            ApplyOptions();
+            Helper.Render(Config);
+            return RenderResult.Value;
+        }
+    }
+
+    public sealed class FontChangerBuilder : ComponentBuilder<FontChangerBuilder, FontChangerConfig, RenderResult>
+    {
+        public FontChangerBuilder(GUIHelper helper)
+            : base(helper, new FontChangerConfig()) { }
+
+        public new FontChangerBuilder Width(float width)
+        {
+            Config.Width = width;
+            return this;
+        }
+
+        public FontChangerBuilder DropdownHeight(float height)
+        {
+            Config.DropdownHeight = height;
+            return this;
+        }
+
+        public FontChangerBuilder ShowPreview(bool showPreview = true)
+        {
+            Config.ShowPreview = showPreview;
+            return this;
+        }
+
+        public FontChangerBuilder PreviewText(string previewText)
+        {
+            Config.PreviewText = previewText;
+            return this;
+        }
+
+        public FontChangerBuilder OnChange(Action<string> onFontChanged)
+        {
+            Config.OnFontChanged = onFontChanged;
+            return this;
+        }
+
+        public override RenderResult Render()
+        {
+            ApplyOptions();
+            Helper.Render(Config);
+            return RenderResult.Value;
+        }
+    }
+
+    public sealed class TextAreaBuilder : RectComponentBuilder<TextAreaBuilder, TextAreaConfig, string>
+    {
+        public TextAreaBuilder(GUIHelper helper, string value = "")
+            : base(helper, new TextAreaConfig { Value = value }) { }
+
+        public TextAreaBuilder Value(string value)
+        {
+            Config.Value = value;
+            return this;
+        }
+
+        public TextAreaBuilder Label(string label)
+        {
+            Config.Label = label;
             return this;
         }
 
@@ -678,21 +720,15 @@ namespace shadcnui.GUIComponents.Core.Base
             return this;
         }
 
-        public TextAreaBuilder TextAreaLabel(string label)
+        public TextAreaBuilder MinHeight(float minHeight)
         {
-            Config.Label = label;
+            Config.MinHeight = minHeight;
             return this;
         }
 
-        public TextAreaBuilder TextAreaMinHeight(float height)
+        public TextAreaBuilder MaxHeight(float maxHeight)
         {
-            Config.MinHeight = height;
-            return this;
-        }
-
-        public TextAreaBuilder TextAreaMaxHeight(float height)
-        {
-            Config.MaxHeight = height;
+            Config.MaxHeight = maxHeight;
             return this;
         }
 
@@ -702,86 +738,367 @@ namespace shadcnui.GUIComponents.Core.Base
             return this;
         }
 
-        public TextAreaBuilder ShowCharCount(bool show = true)
+        public TextAreaBuilder ShowCharacterCount(bool showCharacterCount = true)
         {
-            Config.ShowCharCount = show;
+            Config.ShowCharCount = showCharacterCount;
             return this;
         }
 
-        public string Draw()
+        public override string Render()
         {
-            Config.Variant = VariantValue;
-            Config.IsDisabled = DisabledValue;
-            Config.LayoutOptions = GetOptions();
-            return Helper.TextArea(Config);
+            ApplyOptions();
+            return Helper.Render(Config);
         }
     }
 
-    public sealed class TableBuilder : FluentBuilder<TableBuilder, TableConfig>
+    public sealed class CalendarBuilder : ComponentBuilder<CalendarBuilder, CalendarConfig, DateTime?>
     {
-        public TableBuilder(GUIHelper helper, params string[] headers)
-            : base(helper, new TableConfig { ColumnHeaders = headers ?? Array.Empty<string>() }) { }
+        public CalendarBuilder(GUIHelper helper)
+            : base(helper, new CalendarConfig()) { }
 
-        public TableBuilder Headers(params string[] headers)
+        public CalendarBuilder Value(DateTime? selectedDate)
         {
-            Config.ColumnHeaders = headers;
+            Config.SelectedDate = selectedDate;
             return this;
         }
 
-        public TableBuilder Data(string[,] data)
+        public CalendarBuilder DisabledDates(params DateTime[] disabledDates)
         {
-            Config.Rows = data;
+            Config.DisabledDates = disabledDates == null ? new List<DateTime>() : new List<DateTime>(disabledDates);
             return this;
         }
 
-        public TableBuilder Variant(ControlVariant variant)
+        public CalendarBuilder Ranges(params (DateTime Start, DateTime End)[] ranges)
         {
-            Config.Variant = variant;
+            Config.Ranges = ranges == null ? new List<(DateTime Start, DateTime End)>() : new List<(DateTime Start, DateTime End)>(ranges);
             return this;
         }
 
-        public TableBuilder Size(ControlSize size)
+        public CalendarBuilder OnChange(Action<DateTime> onDateSelected)
+        {
+            Config.OnDateSelected = onDateSelected;
+            return this;
+        }
+
+        public override DateTime? Render()
+        {
+            ApplyOptions();
+            return Helper.Render(Config);
+        }
+    }
+
+    public sealed class DatePickerBuilder : ComponentBuilder<DatePickerBuilder, DatePickerConfig, DateTime?>
+    {
+        public DatePickerBuilder(GUIHelper helper)
+            : base(helper, new DatePickerConfig()) { }
+
+        public DatePickerBuilder Label(string label)
+        {
+            Config.Label = label;
+            return this;
+        }
+
+        public DatePickerBuilder Placeholder(string placeholder)
+        {
+            Config.Placeholder = placeholder;
+            return this;
+        }
+
+        public DatePickerBuilder DisplayFormat(string format)
+        {
+            Config.DisplayFormat = format;
+            return this;
+        }
+
+        public DatePickerBuilder Value(DateTime? selectedDate)
+        {
+            Config.SelectedDate = selectedDate;
+            return this;
+        }
+
+        public DatePickerBuilder Range(DateTime? minDate, DateTime? maxDate)
+        {
+            Config.MinDate = minDate;
+            Config.MaxDate = maxDate;
+            return this;
+        }
+
+        public DatePickerBuilder Start(DateTime? startDate)
+        {
+            Config.StartDate = startDate;
+            return this;
+        }
+
+        public DatePickerBuilder End(DateTime? endDate)
+        {
+            Config.EndDate = endDate;
+            return this;
+        }
+
+        public override DateTime? Render()
+        {
+            ApplyOptions();
+            return Helper.Render(Config);
+        }
+    }
+
+    public sealed class DataTableBuilder : ComponentBuilder<DataTableBuilder, DataTableConfig, RenderResult>
+    {
+        public DataTableBuilder(GUIHelper helper, string id)
+            : base(helper, new DataTableConfig { Id = id }) { }
+
+        public DataTableBuilder Columns(List<DataTableColumn> columns)
+        {
+            Config.Columns = columns ?? new List<DataTableColumn>();
+            return this;
+        }
+
+        public DataTableBuilder Rows(List<DataTableRow> rows)
+        {
+            Config.Rows = rows ?? new List<DataTableRow>();
+            return this;
+        }
+
+        public DataTableBuilder ShowPagination(bool show = true)
+        {
+            Config.ShowPagination = show;
+            return this;
+        }
+
+        public DataTableBuilder ShowSearch(bool show = true)
+        {
+            Config.ShowSearch = show;
+            return this;
+        }
+
+        public DataTableBuilder ShowSelection(bool show = true)
+        {
+            Config.ShowSelection = show;
+            return this;
+        }
+
+        public DataTableBuilder ShowColumnToggle(bool show = true)
+        {
+            Config.ShowColumnToggle = show;
+            return this;
+        }
+
+        public override RenderResult Render()
+        {
+            ApplyOptions();
+            Helper.Render(Config);
+            return RenderResult.Value;
+        }
+    }
+
+    public sealed class LabelBuilder : RectComponentBuilder<LabelBuilder, LabelConfig, RenderResult>
+    {
+        public LabelBuilder(GUIHelper helper, string text = "")
+            : base(helper, new LabelConfig { Text = text }) { }
+
+        public LabelBuilder Text(string text)
+        {
+            Config.Text = text;
+            return this;
+        }
+
+        public LabelBuilder Icon(Texture2D image, IconPosition position = IconPosition.Left, float size = DesignTokens.Icon.Default, float spacing = DesignTokens.Spacing.XS)
+        {
+            Config.Icon = image == null ? null : new IconConfig(image, position) { Size = size, Spacing = spacing };
+            return this;
+        }
+
+        public override RenderResult Render()
+        {
+            ApplyOptions();
+            Helper.Render(Config);
+            return RenderResult.Value;
+        }
+    }
+
+    public sealed class BadgeBuilder : RectComponentBuilder<BadgeBuilder, BadgeConfig, RenderResult>
+    {
+        public BadgeBuilder(GUIHelper helper, string text = "Badge")
+            : base(helper, new BadgeConfig { Text = text }) { }
+
+        public BadgeBuilder Text(string text)
+        {
+            Config.Text = text;
+            return this;
+        }
+
+        public BadgeBuilder Icon(Texture2D image, IconPosition position = IconPosition.Left, float size = DesignTokens.Icon.Small, float spacing = DesignTokens.Spacing.XS)
+        {
+            Config.Icon = image == null ? null : new IconConfig(image, position) { Size = size, Spacing = spacing };
+            return this;
+        }
+
+        public BadgeBuilder Count(int count, int maxCount = 99)
+        {
+            Config.Count = count;
+            Config.MaxCount = maxCount;
+            return this;
+        }
+
+        public BadgeBuilder Progress(float progress)
+        {
+            Config.Progress = progress;
+            return this;
+        }
+
+        public BadgeBuilder StatusDot(bool active = true)
+        {
+            Config.ShowStatusDot = true;
+            Config.IsActive = active;
+            return this;
+        }
+
+        public BadgeBuilder CornerRadius(float cornerRadius)
+        {
+            Config.CornerRadius = cornerRadius;
+            return this;
+        }
+
+        public override RenderResult Render()
+        {
+            ApplyOptions();
+            Helper.Render(Config);
+            return RenderResult.Value;
+        }
+    }
+
+    public sealed class AvatarBuilder : RectComponentBuilder<AvatarBuilder, AvatarConfig, RenderResult>
+    {
+        public AvatarBuilder(GUIHelper helper)
+            : base(helper, new AvatarConfig()) { }
+
+        public AvatarBuilder Image(Texture2D image)
+        {
+            Config.Image = image;
+            return this;
+        }
+
+        public AvatarBuilder Fallback(string fallbackText)
+        {
+            Config.FallbackText = fallbackText;
+            return this;
+        }
+
+        public AvatarBuilder Name(string name, bool showBelow = true)
+        {
+            Config.Name = name;
+            Config.ShowNameBelow = showBelow;
+            return this;
+        }
+
+        public AvatarBuilder Shape(AvatarShape shape)
+        {
+            Config.Shape = shape;
+            return this;
+        }
+
+        public AvatarBuilder Border(Color borderColor)
+        {
+            Config.BorderColor = borderColor;
+            return this;
+        }
+
+        public AvatarBuilder Online(bool online = true)
+        {
+            Config.IsOnline = online;
+            return this;
+        }
+
+        public override RenderResult Render()
+        {
+            ApplyOptions();
+            Helper.Render(Config);
+            return RenderResult.Value;
+        }
+    }
+
+    public sealed class ProgressBuilder : RectComponentBuilder<ProgressBuilder, ProgressConfig, RenderResult>
+    {
+        public ProgressBuilder(GUIHelper helper, float value = 0f)
+            : base(helper, new ProgressConfig { Value = value }) { }
+
+        public ProgressBuilder Value(float value)
+        {
+            Config.Value = value;
+            return this;
+        }
+
+        public ProgressBuilder Label(string label)
+        {
+            Config.Label = label;
+            return this;
+        }
+
+        public ProgressBuilder WidthValue(float width)
+        {
+            Config.Width = width;
+            return this;
+        }
+
+        public ProgressBuilder HeightValue(float height)
+        {
+            Config.Height = height;
+            return this;
+        }
+
+        public ProgressBuilder IndicatorSize(float size)
         {
             Config.Size = size;
             return this;
         }
 
-        public void Draw()
+        public ProgressBuilder ShowPercentage(bool show = true)
         {
-            Helper.Table(Config);
+            Config.ShowPercentage = show;
+            return this;
+        }
+
+        public override RenderResult Render()
+        {
+            ApplyOptions();
+            Helper.Render(Config);
+            return RenderResult.Value;
         }
     }
 
-    public sealed class ChartBuilder : FluentBuilder<ChartBuilder, ChartConfig>
+    public sealed class ChartBuilder : ComponentBuilder<ChartBuilder, ChartConfig, RenderResult>
     {
-        public ChartBuilder(GUIHelper helper, ChartType type = ChartType.Bar)
-            : base(helper, new ChartConfig { ChartType = type, Series = new List<ChartSeries>() }) { }
+        public ChartBuilder(GUIHelper helper)
+            : base(helper, new ChartConfig { Series = new List<ChartSeries>() }) { }
 
-        public ChartBuilder Type(ChartType type)
+        public ChartBuilder Type(ChartType chartType)
         {
-            Config.ChartType = type;
+            Config.ChartType = chartType;
             return this;
         }
 
         public ChartBuilder Series(params ChartSeries[] series)
         {
-            Config.Series.AddRange(series);
+            if (series != null)
+                Config.Series.AddRange(series);
             return this;
         }
 
-        public ChartBuilder ChartSize(float width, float height)
+        public ChartBuilder Size(float width, float height)
         {
             Config.Size = new Vector2(width, height);
             return this;
         }
 
-        public void Draw()
+        public override RenderResult Render()
         {
-            Helper.Chart(Config);
+            ApplyOptions();
+            Helper.Render(Config);
+            return RenderResult.Value;
         }
     }
 
-    public sealed class DialogBuilder : FluentBuilder<DialogBuilder, DialogConfig>
+    public sealed class DialogBuilder : ComponentBuilder<DialogBuilder, DialogConfig, RenderResult>
     {
         public DialogBuilder(GUIHelper helper, string id)
             : base(helper, new DialogConfig { Id = id }) { }
@@ -817,9 +1134,9 @@ namespace shadcnui.GUIComponents.Core.Base
             return this;
         }
 
-        public DialogBuilder CloseOnOverlayClick(bool close = true)
+        public DialogBuilder CloseOnOverlayClick(bool closeOnOverlayClick = true)
         {
-            Config.CloseOnOverlayClick = close;
+            Config.CloseOnOverlayClick = closeOnOverlayClick;
             return this;
         }
 
@@ -829,39 +1146,42 @@ namespace shadcnui.GUIComponents.Core.Base
             return this;
         }
 
-        public void Open()
+        public DialogBuilder ParentWindow(Rect parentWindowRect)
+        {
+            Config.ParentWindowRect = parentWindowRect;
+            return this;
+        }
+
+        public DialogBuilder Open()
         {
             Helper.OpenDialog(Config.Id);
+            return this;
         }
 
-        public void Close()
+        public DialogBuilder Close()
         {
             Helper.CloseDialog();
+            return this;
         }
 
-        public void Draw()
+        public override RenderResult Render()
         {
-            Helper.Dialog(Config);
+            ApplyOptions();
+            Helper.Render(Config);
+            return RenderResult.Value;
         }
     }
 
-    public sealed class PopoverBuilder : FluentBuilder<PopoverBuilder, PopoverConfig>
+    public sealed class PopoverBuilder : ComponentBuilder<PopoverBuilder, PopoverConfig, RenderResult>
     {
-        private string _id = "popover";
         private int _zIndex = -1;
 
-        public PopoverBuilder(GUIHelper helper, Action content = null)
-            : base(helper, new PopoverConfig { Content = content }) { }
+        public PopoverBuilder(GUIHelper helper, string id = "popover")
+            : base(helper, new PopoverConfig { Id = id }) { }
 
         public PopoverBuilder Content(Action content)
         {
             Config.Content = content;
-            return this;
-        }
-
-        public PopoverBuilder Id(string id)
-        {
-            _id = id;
             return this;
         }
 
@@ -871,93 +1191,32 @@ namespace shadcnui.GUIComponents.Core.Base
             return this;
         }
 
-        public void Open()
+        public PopoverBuilder Open()
         {
-            Helper.OpenPopover(_id, _zIndex);
+            Helper.OpenPopover(Config.Id, _zIndex);
+            return this;
         }
 
-        public void Close()
+        public PopoverBuilder Close()
         {
             Helper.ClosePopover();
+            return this;
         }
 
         public bool IsOpen() => Helper.IsPopoverOpen();
 
-        public void Draw()
+        public override RenderResult Render()
         {
-            Helper.Popover(Config);
+            ApplyOptions();
+            Helper.Render(Config);
+            return RenderResult.Value;
         }
     }
 
-    public sealed class SelectBuilder : FluentBuilder<SelectBuilder, SelectConfig>
+    public sealed class ToastBuilder : ComponentBuilder<ToastBuilder, ToastConfig, RenderResult>
     {
-        public SelectBuilder(GUIHelper helper, int selectedIndex = 0, params string[] items)
-            : base(helper, new SelectConfig { SelectedIndex = selectedIndex, Options = items == null ? Array.Empty<SelectOption>() : Array.ConvertAll(items, t => new SelectOption(t, t)) }) { }
-
-        public SelectBuilder Items(params string[] items)
-        {
-            Config.Options = items == null ? Array.Empty<SelectOption>() : Array.ConvertAll(items, t => new SelectOption(t, t));
-            return this;
-        }
-
-        public SelectBuilder SelectedIndex(int index)
-        {
-            Config.SelectedIndex = index;
-            return this;
-        }
-
-        public SelectBuilder OnChange(Action<int> onChange)
-        {
-            Config.OnSelectionChanged = onChange;
-            return this;
-        }
-
-        public void Open(Rect anchorRect)
-        {
-            Helper.OpenSelect(Config, anchorRect);
-        }
-
-        public bool IsOpen() => Helper.IsSelectOpen(Config.Id);
-
-        public int Draw()
-        {
-            return Helper.Select(Config);
-        }
-    }
-
-    public sealed class DropdownMenuBuilder : FluentBuilder<DropdownMenuBuilder, DropdownMenuConfig>
-    {
-        public DropdownMenuBuilder(GUIHelper helper)
-            : base(helper, new DropdownMenuConfig(new List<DropdownMenuItem>())) { }
-
-        public DropdownMenuBuilder Header(string text)
-        {
-            Config.Items.Add(new DropdownMenuItem(DropdownMenuItemType.Header, text));
-            return this;
-        }
-
-        public DropdownMenuBuilder Separator()
-        {
-            Config.Items.Add(new DropdownMenuItem(DropdownMenuItemType.Separator));
-            return this;
-        }
-
-        public DropdownMenuBuilder Item(string text, Action onClick = null, Texture2D icon = null)
-        {
-            Config.Items.Add(new DropdownMenuItem(DropdownMenuItemType.Item, text, onClick, icon));
-            return this;
-        }
-
-        public void Draw()
-        {
-            Helper.DropdownMenu(Config);
-        }
-    }
-
-    public sealed class ToastBuilder : FluentBuilder<ToastBuilder, ToastConfig>
-    {
-        public ToastBuilder(GUIHelper helper, string title = null, string description = null)
-            : base(helper, new ToastConfig { Title = title, Description = description }) { }
+        public ToastBuilder(GUIHelper helper)
+            : base(helper, new ToastConfig()) { }
 
         public ToastBuilder Title(string title)
         {
@@ -977,17 +1236,21 @@ namespace shadcnui.GUIComponents.Core.Base
             return this;
         }
 
-        public ToastBuilder Success() => Variant(ToastVariant.Success);
-
-        public ToastBuilder Error() => Variant(ToastVariant.Error);
-
-        public ToastBuilder Warning() => Variant(ToastVariant.Warning);
-
-        public ToastBuilder Info() => Variant(ToastVariant.Info);
-
-        public ToastBuilder Duration(float milliseconds)
+        public ToastBuilder Position(ToastPosition position)
         {
-            Config.DurationMs = milliseconds;
+            Config.Position = position;
+            return this;
+        }
+
+        public ToastBuilder Stack(ToastStackDirection stackDirection)
+        {
+            Config.StackDirection = stackDirection;
+            return this;
+        }
+
+        public ToastBuilder Duration(float durationMilliseconds)
+        {
+            Config.DurationMs = durationMilliseconds;
             return this;
         }
 
@@ -998,108 +1261,377 @@ namespace shadcnui.GUIComponents.Core.Base
             return this;
         }
 
-        public ToastBuilder Position(ToastPosition position)
+        public override RenderResult Render()
+        {
+            ApplyOptions();
+            Helper.ShowToast(Config);
+            return RenderResult.Value;
+        }
+    }
+
+    public sealed class CardBuilder : ComponentBuilder<CardBuilder, CardConfig, RenderResult>
+    {
+        public CardBuilder(GUIHelper helper)
+            : base(helper, new CardConfig()) { }
+
+        public CardBuilder Title(string title)
+        {
+            Config.Title = title;
+            return this;
+        }
+
+        public CardBuilder Subtitle(string subtitle)
+        {
+            Config.Subtitle = subtitle;
+            return this;
+        }
+
+        public CardBuilder Description(string description)
+        {
+            Config.Description = description;
+            return this;
+        }
+
+        public CardBuilder Content(string content)
+        {
+            Config.Content = content;
+            return this;
+        }
+
+        public CardBuilder Header(Action headerContent)
+        {
+            Config.HeaderContent = headerContent;
+            return this;
+        }
+
+        public CardBuilder Footer(Action footerContent)
+        {
+            Config.FooterContent = footerContent;
+            return this;
+        }
+
+        public CardBuilder Image(Texture2D image)
+        {
+            Config.Image = image;
+            return this;
+        }
+
+        public CardBuilder Avatar(Texture2D avatar)
+        {
+            Config.Avatar = avatar;
+            return this;
+        }
+
+        public CardBuilder Size(float width, float height = -1f)
+        {
+            Config.Width = width;
+            Config.Height = height;
+            return this;
+        }
+
+        public override RenderResult Render()
+        {
+            ApplyOptions();
+            Helper.Render(Config);
+            return RenderResult.Value;
+        }
+    }
+
+    public sealed class SeparatorBuilder : RectComponentBuilder<SeparatorBuilder, SeparatorConfig, RenderResult>
+    {
+        public SeparatorBuilder(GUIHelper helper)
+            : base(helper, new SeparatorConfig()) { }
+
+        public SeparatorBuilder Orientation(SeparatorOrientation orientation)
+        {
+            Config.Orientation = orientation;
+            return this;
+        }
+
+        public SeparatorBuilder Text(string text)
+        {
+            Config.Text = text;
+            return this;
+        }
+
+        public SeparatorBuilder Decorative(bool decorative = true)
+        {
+            Config.IsDecorative = decorative;
+            return this;
+        }
+
+        public SeparatorBuilder Spacing(float before, float after)
+        {
+            Config.SpacingBefore = before;
+            Config.SpacingAfter = after;
+            return this;
+        }
+
+        public override RenderResult Render()
+        {
+            ApplyOptions();
+            Helper.Render(Config);
+            return RenderResult.Value;
+        }
+    }
+
+    public sealed class TabsBuilder : ComponentBuilder<TabsBuilder, TabsConfig, int>
+    {
+        public TabsBuilder(GUIHelper helper)
+            : base(helper, new TabsConfig()) { }
+
+        public TabsBuilder Items(params string[] tabLabels)
+        {
+            Config.TabLabels = tabLabels ?? Array.Empty<string>();
+            if (Config.DisabledTabs == null || Config.DisabledTabs.Length != Config.TabLabels.Length)
+                Config.DisabledTabs = new bool[Config.TabLabels.Length];
+            return this;
+        }
+
+        public TabsBuilder SelectedIndex(int selectedIndex)
+        {
+            Config.SelectedIndex = selectedIndex;
+            return this;
+        }
+
+        public TabsBuilder Content(Action content)
+        {
+            Config.Content = content;
+            return this;
+        }
+
+        public TabsBuilder MaxLines(int maxLines)
+        {
+            Config.MaxLines = maxLines;
+            return this;
+        }
+
+        public TabsBuilder TabWidth(float tabWidth)
+        {
+            Config.TabWidth = tabWidth;
+            return this;
+        }
+
+        public TabsBuilder Position(TabPosition position)
         {
             Config.Position = position;
             return this;
         }
 
-        public ToastBuilder Stack(ToastStackDirection direction)
+        public TabsBuilder Side(TabSide side)
         {
-            Config.StackDirection = direction;
+            Config.Side = side;
             return this;
         }
 
-        public void Show()
+        public TabsBuilder Indicator(IndicatorStyle indicatorStyle, bool show = true)
         {
-            Helper.ShowToast(Config);
+            Config.IndicatorStyle = indicatorStyle;
+            Config.ShowIndicator = show;
+            return this;
+        }
+
+        public TabsBuilder Closable(params bool[] closableTabs)
+        {
+            Config.ClosableTabs = closableTabs;
+            return this;
+        }
+
+        public TabsBuilder DisabledTabs(params bool[] disabledTabs)
+        {
+            Config.DisabledTabs = disabledTabs ?? Array.Empty<bool>();
+            return this;
+        }
+
+        public TabsBuilder Icons(params Texture2D[] icons)
+        {
+            Config.TabIcons = icons;
+            return this;
+        }
+
+        public TabsBuilder OnChange(Action<int> onSelectionChanged)
+        {
+            Config.OnSelectionChanged = onSelectionChanged;
+            return this;
+        }
+
+        public TabsBuilder OnClose(Action<int> onTabClosed)
+        {
+            Config.OnTabClosed = onTabClosed;
+            return this;
+        }
+
+        public override int Render()
+        {
+            ApplyOptions();
+            return Helper.Render(Config);
+        }
+    }
+
+    public sealed class TableBuilder : RectComponentBuilder<TableBuilder, TableConfig, RenderResult>
+    {
+        public TableBuilder(GUIHelper helper)
+            : base(helper, new TableConfig()) { }
+
+        public TableBuilder Headers(params string[] headers)
+        {
+            Config.ColumnHeaders = headers;
+            return this;
+        }
+
+        public TableBuilder Rows(string[,] rows)
+        {
+            Config.Rows = rows;
+            return this;
+        }
+
+        public TableBuilder ObjectRows(object[,] rows)
+        {
+            Config.ObjectRows = rows;
+            return this;
+        }
+
+        public TableBuilder Search(string searchText)
+        {
+            Config.SearchText = searchText;
+            return this;
+        }
+
+        public TableBuilder Page(int currentPage, int pageSize)
+        {
+            Config.CurrentPage = currentPage;
+            Config.PageSize = pageSize;
+            return this;
+        }
+
+        public TableBuilder OnSort(Action<int, bool> onSortChanged)
+        {
+            Config.OnSortChanged = onSortChanged;
+            return this;
+        }
+
+        public TableBuilder OnSelection(Action<int, bool> onSelectionChanged)
+        {
+            Config.OnSelectionChanged = onSelectionChanged;
+            return this;
+        }
+
+        public TableBuilder OnPage(Action<int> onPageChanged)
+        {
+            Config.OnPageChanged = onPageChanged;
+            return this;
+        }
+
+        public TableBuilder OnSearch(Action<string> onSearchChanged)
+        {
+            Config.OnSearchChanged = onSearchChanged;
+            return this;
+        }
+
+        public override RenderResult Render()
+        {
+            ApplyOptions();
+            Helper.Render(Config);
+            return RenderResult.Value;
+        }
+    }
+
+    public sealed class NavigationBuilder : ComponentBuilder<NavigationBuilder, NavigationConfig, int>
+    {
+        public NavigationBuilder(GUIHelper helper)
+            : base(helper, new NavigationConfig()) { }
+
+        public NavigationBuilder Items(params NavigationItem[] items)
+        {
+            Config.Items = items ?? Array.Empty<NavigationItem>();
+            return this;
+        }
+
+        public NavigationBuilder SelectedIndex(int selectedIndex)
+        {
+            Config.SelectedIndex = selectedIndex;
+            return this;
+        }
+
+        public new NavigationBuilder Width(float width)
+        {
+            Config.Width = width;
+            return this;
+        }
+
+        public NavigationBuilder Logo(string logoText)
+        {
+            Config.LogoText = logoText;
+            return this;
+        }
+
+        public NavigationBuilder Indicator(IndicatorStyle indicatorStyle, bool show = true)
+        {
+            Config.IndicatorStyle = indicatorStyle;
+            Config.ShowIndicator = show;
+            return this;
+        }
+
+        public NavigationBuilder IndicatorColor(Color indicatorColor)
+        {
+            Config.IndicatorColor = indicatorColor;
+            return this;
+        }
+
+        public NavigationBuilder OnChange(Action<int> onSelectionChanged)
+        {
+            Config.OnSelectionChanged = onSelectionChanged;
+            return this;
+        }
+
+        public override int Render()
+        {
+            ApplyOptions();
+            return Helper.Render(Config);
         }
     }
 
     public sealed class MenuItemGroupBuilder
     {
-        internal readonly List<MenuBar.MenuItem> Items = new();
+        internal readonly List<MenuItem> Items = new();
 
         public MenuItemGroupBuilder Item(string text, Action onClick = null, bool disabled = false, string shortcut = "")
         {
-            Items.Add(new MenuBar.MenuItem(text, onClick, disabled, null, shortcut));
+            Items.Add(new MenuItem(text, onClick, disabled, null, shortcut));
             return this;
         }
 
         public MenuItemGroupBuilder Separator()
         {
-            Items.Add(MenuBar.MenuItem.Separator());
+            Items.Add(MenuItem.Separator());
             return this;
         }
 
         public MenuItemGroupBuilder Header(string text)
         {
-            Items.Add(MenuBar.MenuItem.Header(text));
+            Items.Add(MenuItem.Header(text));
             return this;
         }
     }
 
-    public sealed class MenuBarBuilder : FluentBuilder<MenuBarBuilder, MenuBar.MenuBarConfig>
+    public sealed class MenuBarBuilder : ComponentBuilder<MenuBarBuilder, MenuBarConfig, RenderResult>
     {
         public MenuBarBuilder(GUIHelper helper)
-            : base(helper, new MenuBar.MenuBarConfig(new List<MenuBar.MenuItem>())) { }
+            : base(helper, new MenuBarConfig(new List<MenuItem>())) { }
 
         public MenuBarBuilder Item(string text, Action<MenuItemGroupBuilder> children = null, Action onClick = null, bool disabled = false, string shortcut = "")
         {
-            var childBuilder = new MenuItemGroupBuilder();
-            children?.Invoke(childBuilder);
-            Config.Items.Add(new MenuBar.MenuItem(text, onClick, disabled, childBuilder.Items, shortcut));
+            var group = new MenuItemGroupBuilder();
+            children?.Invoke(group);
+            Config.Items.Add(new MenuItem(text, onClick, disabled, group.Items, shortcut));
             return this;
         }
 
-        public void Draw()
+        public override RenderResult Render()
         {
-            Helper.MenuBar(Config);
+            ApplyOptions();
+            Helper.Render(Config);
+            return RenderResult.Value;
         }
-    }
-
-    public partial class GUIHelper
-    {
-        public ButtonBuilder CreateButton(string text = "") => new(this, text);
-
-        public InputBuilder CreateInput() => new(this);
-
-        public ToggleBuilder CreateToggle(string text, bool value) => new(this, text, value);
-
-        public CheckboxBuilder CreateCheckbox(string text, bool value) => new(this, text, value);
-
-        public SwitchBuilder CreateSwitch(string text, bool value) => new(this, text, value);
-
-        public LabelBuilder CreateLabel(string text = "") => new(this, text);
-
-        public BadgeBuilder CreateBadge(string text = "Badge") => new(this, text);
-
-        public AvatarBuilder CreateAvatar(Texture2D image = null) => new(this, image);
-
-        public CardBuilder CreateCard(string title = null) => new(this, title);
-
-        public ProgressBuilder CreateProgress(float value = 0f) => new(this, value);
-
-        public SeparatorBuilder CreateSeparator() => new(this);
-
-        public SliderBuilder CreateSlider(float value = 0f) => new(this, value);
-
-        public TextAreaBuilder CreateTextArea(string text = "") => new(this, text);
-
-        public TableBuilder CreateTable(params string[] headers) => new(this, headers);
-
-        public ChartBuilder CreateChart(ChartType type = ChartType.Bar) => new(this, type);
-
-        public DialogBuilder CreateDialog(string id) => new(this, id);
-
-        public PopoverBuilder CreatePopover(Action content = null) => new(this, content);
-
-        public SelectBuilder CreateSelect(int selectedIndex = 0, params string[] items) => new(this, selectedIndex, items);
-
-        public DropdownMenuBuilder CreateDropdownMenu() => new(this);
-
-        public ToastBuilder CreateToast(string title = null, string description = null) => new(this, title, description);
-
-        public MenuBarBuilder CreateMenuBar() => new(this);
     }
 }

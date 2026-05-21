@@ -15,7 +15,7 @@ namespace shadcnui.GUIComponents.Data
         public DataTable(GUIHelper helper)
             : base(helper) { }
 
-        public void DrawDataTable(string id, List<DataTableColumn> columns, List<DataTableRow> data, bool showPagination = true, bool showSearch = true, bool showSelection = true, bool showColumnToggle = false, ComponentAppearance appearance = null, params GUILayoutOption[] options)
+        public void Render(string id, List<DataTableColumn> columns, List<DataTableRow> data, bool showPagination = true, bool showSearch = true, bool showSelection = true, bool showColumnToggle = false, ComponentAppearance appearance = null, params GUILayoutOption[] options)
         {
             if (string.IsNullOrEmpty(id))
                 id = "datatable";

@@ -17,7 +17,7 @@ namespace shadcnui.GUIComponents.Controls
         public FontChanger(GUIHelper helper)
             : base(helper) { }
 
-        public void Draw(FontChangerConfig config)
+        public void Render(FontChangerConfig config)
         {
             config ??= new FontChangerConfig();
             string id = ResolveId(config.Id, "font_changer");

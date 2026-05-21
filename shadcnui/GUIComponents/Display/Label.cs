@@ -14,7 +14,7 @@ namespace shadcnui.GUIComponents.Display
         public Label(GUIHelper helper)
             : base(helper) { }
 
-        public void DrawLabel(LabelConfig config)
+        public void Render(LabelConfig config)
         {
             if (config == null)
                 return;
@@ -37,9 +37,9 @@ namespace shadcnui.GUIComponents.Display
             GUI.enabled = prevEnabled;
         }
 
-        public void DrawLabel(string text, ControlVariant variant = ControlVariant.Default, bool disabled = false, ComponentAppearance appearance = null, params GUILayoutOption[] options)
+        internal void DrawLabel(string text, ControlVariant variant = ControlVariant.Default, bool disabled = false, ComponentAppearance appearance = null, params GUILayoutOption[] options)
         {
-            DrawLabel(
+            Render(
                 new LabelConfig
                 {
                     Text = text,
@@ -51,9 +51,9 @@ namespace shadcnui.GUIComponents.Display
             );
         }
 
-        public void DrawLabel(Rect rect, string text, ControlVariant variant = ControlVariant.Default, bool disabled = false)
+        internal void DrawLabel(Rect rect, string text, ControlVariant variant = ControlVariant.Default, bool disabled = false)
         {
-            DrawLabel(
+            Render(
                 new LabelConfig
                 {
                     Text = text,

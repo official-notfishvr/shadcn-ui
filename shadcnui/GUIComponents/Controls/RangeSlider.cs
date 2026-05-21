@@ -22,7 +22,7 @@ namespace shadcnui.GUIComponents.Controls
         public RangeSlider(GUIHelper helper)
             : base(helper) { }
 
-        public Vector2 Draw(RangeSliderConfig config)
+        public Vector2 Render(RangeSliderConfig config)
         {
             if (config == null)
                 return Vector2.zero;
@@ -45,7 +45,7 @@ namespace shadcnui.GUIComponents.Controls
             }
             catch (Exception ex)
             {
-                GUILogger.LogException(ex, nameof(Draw), nameof(RangeSlider));
+                GUILogger.LogException(ex, nameof(Render), nameof(RangeSlider));
                 return new Vector2(config.LowerValue, config.UpperValue);
             }
         }

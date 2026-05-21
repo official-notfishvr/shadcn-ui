@@ -50,7 +50,7 @@ namespace shadcnui.GUIComponents.Display
 
         public void Cleanup() => _toasts.Clear();
 
-        public void DrawToasts()
+        internal void DrawToasts()
         {
             if (_toasts.Count == 0)
                 return;
@@ -251,7 +251,7 @@ namespace shadcnui.GUIComponents.Display
                 y += 10f * guiHelper.uiScale;
                 var actionWidth = Mathf.Min(content.width, Mathf.Max(96f * guiHelper.uiScale, (styleManager?.GetButtonStyle(ControlVariant.Secondary, ControlSize.Small, cfg.Appearance) ?? GUI.skin.button).CalcSize(new GUIContent(cfg.ActionLabel)).x + 28f * guiHelper.uiScale));
                 var actionButton = new Controls.Button(guiHelper);
-                actionButton.Draw(
+                actionButton.Render(
                     new ButtonConfig
                     {
                         Rect = new Rect(content.x, y, actionWidth / guiHelper.uiScale, 32f),
@@ -267,7 +267,7 @@ namespace shadcnui.GUIComponents.Display
             if (cfg.IsDismissible)
             {
                 var closeButton = new Controls.Button(guiHelper);
-                closeButton.Draw(
+                closeButton.Render(
                     new ButtonConfig
                     {
                         Rect = new Rect((rect.xMax - padding - 22f * guiHelper.uiScale) / guiHelper.uiScale, (rect.y + padding - 2f * guiHelper.uiScale) / guiHelper.uiScale, 22f, 22f),

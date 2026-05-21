@@ -16,7 +16,7 @@ namespace shadcnui.GUIComponents.Controls
         public Select(GUIHelper helper)
             : base(helper) { }
 
-        public int Draw(SelectConfig config)
+        public int Render(SelectConfig config)
         {
             if (config == null)
                 return 0;
@@ -54,7 +54,7 @@ namespace shadcnui.GUIComponents.Controls
             return config.SelectedIndex;
         }
 
-        public int DrawMenu(SelectConfig config)
+        internal int DrawMenu(SelectConfig config)
         {
             if (config == null)
                 return 0;

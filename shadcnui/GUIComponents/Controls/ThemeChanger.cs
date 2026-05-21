@@ -19,7 +19,7 @@ namespace shadcnui.GUIComponents.Controls
         public ThemeChanger(GUIHelper helper)
             : base(helper) { }
 
-        public void Draw(ThemeChangerConfig config)
+        public void Render(ThemeChangerConfig config)
         {
             config ??= new ThemeChangerConfig();
             string id = ResolveId(config.Id, "theme_changer");

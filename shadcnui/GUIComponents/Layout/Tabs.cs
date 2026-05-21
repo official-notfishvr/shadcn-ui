@@ -91,7 +91,7 @@ namespace shadcnui.GUIComponents.Layout
             : base(helper) { }
 
         #region Public Drawing API
-        public int Draw(TabsConfig config)
+        public int Render(TabsConfig config)
         {
             if (config.TabLabels == null || config.TabLabels.Length == 0)
             {
@@ -103,7 +103,7 @@ namespace shadcnui.GUIComponents.Layout
             return DrawTabs(config);
         }
 
-        public int DrawWithAutoClose(ref string[] tabNames, ref bool[] closableTabs, int selectedIndex, Action content = null, Action<int> onTabChange = null)
+        internal int DrawWithAutoClose(ref string[] tabNames, ref bool[] closableTabs, int selectedIndex, Action content = null, Action<int> onTabChange = null)
         {
             if (tabNames == null || tabNames.Length == 0)
             {
@@ -532,7 +532,7 @@ namespace shadcnui.GUIComponents.Layout
                 }
             }
 
-            return Draw(config);
+            return Render(config);
         }
 
         private void ProcessPendingClose(TabsConfig config)

@@ -11,7 +11,7 @@ namespace shadcnui.GUIComponents.Layout
         public Separator(GUIHelper helper)
             : base(helper) { }
 
-        public void DrawSeparator(SeparatorConfig config)
+        public void Render(SeparatorConfig config)
         {
             config ??= new SeparatorConfig();
 
@@ -31,9 +31,9 @@ namespace shadcnui.GUIComponents.Layout
                 layoutComponents.AddSpace(config.SpacingAfter);
         }
 
-        public void DrawSeparator(SeparatorOrientation orientation = SeparatorOrientation.Horizontal, bool decorative = true, ComponentAppearance appearance = null, params GUILayoutOption[] opts)
+        internal void DrawSeparator(SeparatorOrientation orientation = SeparatorOrientation.Horizontal, bool decorative = true, ComponentAppearance appearance = null, params GUILayoutOption[] opts)
         {
-            DrawSeparator(
+            Render(
                 new SeparatorConfig
                 {
                     Orientation = orientation,

@@ -11,7 +11,7 @@ namespace shadcnui.GUIComponents.Display
         public Avatar(GUIHelper helper)
             : base(helper) { }
 
-        public void DrawAvatar(AvatarConfig config)
+        public void Render(AvatarConfig config)
         {
             if (config == null)
                 return;
@@ -19,22 +19,22 @@ namespace shadcnui.GUIComponents.Display
             DrawAvatarInternal(config.Image, config.FallbackText, config.Size, config.Shape, config.BorderColor, config.IsOnline, config.Name, config.ShowNameBelow, config.LayoutOptions ?? Array.Empty<GUILayoutOption>());
         }
 
-        public void DrawAvatar(Texture2D image, string fallback, ControlSize size = ControlSize.Default, AvatarShape shape = AvatarShape.Circle, params GUILayoutOption[] options)
+        internal void DrawAvatar(Texture2D image, string fallback, ControlSize size = ControlSize.Default, AvatarShape shape = AvatarShape.Circle, params GUILayoutOption[] options)
         {
             DrawAvatarInternal(image, fallback, size, shape, Color.clear, false, null, false, options ?? Array.Empty<GUILayoutOption>());
         }
 
-        public void AvatarWithStatus(Texture2D image, string fallback, bool online, ControlSize size = ControlSize.Default, AvatarShape shape = AvatarShape.Circle, params GUILayoutOption[] options)
+        internal void AvatarWithStatus(Texture2D image, string fallback, bool online, ControlSize size = ControlSize.Default, AvatarShape shape = AvatarShape.Circle, params GUILayoutOption[] options)
         {
             DrawAvatarInternal(image, fallback, size, shape, Color.clear, online, null, false, options ?? Array.Empty<GUILayoutOption>());
         }
 
-        public void AvatarWithName(Texture2D image, string fallback, string name, ControlSize size = ControlSize.Default, AvatarShape shape = AvatarShape.Circle, bool showNameBelow = false, params GUILayoutOption[] options)
+        internal void AvatarWithName(Texture2D image, string fallback, string name, ControlSize size = ControlSize.Default, AvatarShape shape = AvatarShape.Circle, bool showNameBelow = false, params GUILayoutOption[] options)
         {
             DrawAvatarInternal(image, fallback, size, shape, Color.clear, false, name, showNameBelow, options ?? Array.Empty<GUILayoutOption>());
         }
 
-        public void AvatarWithBorder(Texture2D image, string fallback, Color borderColor, ControlSize size = ControlSize.Default, AvatarShape shape = AvatarShape.Circle, params GUILayoutOption[] options)
+        internal void AvatarWithBorder(Texture2D image, string fallback, Color borderColor, ControlSize size = ControlSize.Default, AvatarShape shape = AvatarShape.Circle, params GUILayoutOption[] options)
         {
             DrawAvatarInternal(image, fallback, size, shape, borderColor, false, null, false, options ?? Array.Empty<GUILayoutOption>());
         }

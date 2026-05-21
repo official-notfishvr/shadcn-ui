@@ -14,7 +14,7 @@ namespace shadcnui.GUIComponents.Data
         public Calendar(GUIHelper helper)
             : base(helper) { }
 
-        public void DrawCalendar(CalendarConfig config = null)
+        public void Render(CalendarConfig config = null)
         {
             config ??= new CalendarConfig();
             string id = string.IsNullOrEmpty(config.Id) ? "calendar" : config.Id;

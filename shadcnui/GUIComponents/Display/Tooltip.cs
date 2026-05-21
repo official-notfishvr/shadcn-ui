@@ -74,7 +74,7 @@ namespace shadcnui.GUIComponents.Display
             return result;
         }
 
-        public void FlushAndDraw(Rect clipBounds)
+        internal void FlushAndDraw(Rect clipBounds)
         {
             if (Event.current.type != EventType.Repaint)
                 return;

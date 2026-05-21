@@ -11,13 +11,13 @@ namespace shadcnui.GUIComponents.Layout
         public Navigation(GUIHelper helper)
             : base(helper) { }
 
-        public int DrawSidebar(string[] labels, int selectedIndex, string[] icons = null, string logo = "U", Action<int> onChanged = null, float width = 70f)
+        internal int DrawSidebar(string[] labels, int selectedIndex, string[] icons = null, string logo = "U", Action<int> onChanged = null, float width = 70f)
         {
             var source = labels ?? Array.Empty<string>();
             var items = new NavigationItem[source.Length];
             for (int i = 0; i < source.Length; i++)
                 items[i] = new NavigationItem(i.ToString(), source[i], icons != null && i < icons.Length ? icons[i] : null);
-            return Draw(
+            return Render(
                 new NavigationConfig
                 {
                     Items = items,
@@ -29,7 +29,7 @@ namespace shadcnui.GUIComponents.Layout
             );
         }
 
-        public int Draw(NavigationConfig config)
+        public int Render(NavigationConfig config)
         {
             if (config == null || config.Items == null)
                 return 0;

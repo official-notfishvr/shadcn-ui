@@ -521,6 +521,16 @@ namespace shadcnui.GUIComponents.Core.Utils
         }
     }
 
+    public class DataTableConfig : ComponentConfigBase
+    {
+        public List<DataTableColumn> Columns { get; set; } = new();
+        public List<DataTableRow> Rows { get; set; } = new();
+        public bool ShowPagination { get; set; } = true;
+        public bool ShowSearch { get; set; } = true;
+        public bool ShowSelection { get; set; } = true;
+        public bool ShowColumnToggle { get; set; }
+    }
+
     public class DataTableColumn
     {
         public string Id { get; set; }

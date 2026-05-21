@@ -14,7 +14,7 @@ namespace shadcnui.GUIComponents.Controls
         public Input(GUIHelper helper)
             : base(helper) { }
 
-        public string Draw(InputConfig config)
+        public string Render(InputConfig config)
         {
             if (config == null)
                 return string.Empty;

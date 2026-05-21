@@ -61,35 +61,37 @@ namespace shadcnui.GUIComponents.Layout
             }
         }
 
-        public class MenuBarConfig
+        public class MenuBarConfig : Core.Utils.ComponentConfigBase
         {
             public List<MenuItem> Items { get; set; }
-            public GUILayoutOption[] Options { get; set; }
-            public ControlVariant Variant { get; set; } = ControlVariant.Default;
-            public ControlSize Size { get; set; } = ControlSize.Default;
-            public ComponentAppearance Appearance { get; set; }
+
+            public MenuBarConfig()
+            {
+                Items = new List<MenuItem>();
+                LayoutOptions = System.Array.Empty<GUILayoutOption>();
+            }
 
             public MenuBarConfig(List<MenuItem> items)
             {
                 Items = items;
-                Options = System.Array.Empty<GUILayoutOption>();
+                LayoutOptions = System.Array.Empty<GUILayoutOption>();
             }
         }
 
         #region Config-based API
-        public void Draw(MenuBarConfig config)
+        public void Render(MenuBarConfig config)
         {
-            Draw(config.Items, config.Variant, config.Size, config.Appearance, config.Options);
+            Draw(config.Items, config.Variant, config.Size, config.Appearance, config.LayoutOptions);
         }
         #endregion
 
         #region API
-        public void Draw(List<MenuItem> items, params GUILayoutOption[] options)
+        internal void Draw(List<MenuItem> items, params GUILayoutOption[] options)
         {
             Draw(items, ControlVariant.Default, ControlSize.Default, null, options);
         }
 
-        public void Draw(List<MenuItem> items, ControlVariant variant, ControlSize size, ComponentAppearance appearance = null, params GUILayoutOption[] options)
+        internal void Draw(List<MenuItem> items, ControlVariant variant, ControlSize size, ComponentAppearance appearance = null, params GUILayoutOption[] options)
         {
             if (items == null || items.Count == 0)
                 return;

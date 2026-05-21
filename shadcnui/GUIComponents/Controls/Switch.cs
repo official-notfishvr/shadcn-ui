@@ -14,7 +14,7 @@ namespace shadcnui.GUIComponents.Controls
         public Switch(GUIHelper helper)
             : base(helper) { }
 
-        public bool Draw(SwitchConfig config)
+        public bool Render(SwitchConfig config)
         {
             if (config == null)
                 return false;

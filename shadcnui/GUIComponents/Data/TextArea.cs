@@ -12,7 +12,7 @@ namespace shadcnui.GUIComponents.Data
         public TextArea(GUIHelper helper)
             : base(helper) { }
 
-        public string DrawTextArea(TextAreaConfig config)
+        public string Render(TextAreaConfig config)
         {
             if (config == null)
                 return string.Empty;
@@ -33,9 +33,9 @@ namespace shadcnui.GUIComponents.Data
             return value;
         }
 
-        public string DrawTextArea(string text, ControlVariant variant = ControlVariant.Default, string placeholder = "", bool disabled = false, float minHeight = 60f, int maxLength = -1, params GUILayoutOption[] options)
+        internal string DrawTextArea(string text, ControlVariant variant = ControlVariant.Default, string placeholder = "", bool disabled = false, float minHeight = 60f, int maxLength = -1, params GUILayoutOption[] options)
         {
-            return DrawTextArea(
+            return Render(
                 new TextAreaConfig
                 {
                     Value = text,
@@ -50,9 +50,9 @@ namespace shadcnui.GUIComponents.Data
             );
         }
 
-        public string DrawTextArea(Rect rect, string text, ControlVariant variant = ControlVariant.Default, string placeholder = "", bool disabled = false, int maxLength = -1)
+        internal string DrawTextArea(Rect rect, string text, ControlVariant variant = ControlVariant.Default, string placeholder = "", bool disabled = false, int maxLength = -1)
         {
-            return DrawTextArea(
+            return Render(
                 new TextAreaConfig
                 {
                     Value = text,
@@ -66,13 +66,13 @@ namespace shadcnui.GUIComponents.Data
             );
         }
 
-        public string OutlineTextArea(string text, string placeholder = "", bool disabled = false, float minHeight = 60f, int maxLength = -1, params GUILayoutOption[] options) => DrawTextArea(text, ControlVariant.Outline, placeholder, disabled, minHeight, maxLength, options);
+        internal string OutlineTextArea(string text, string placeholder = "", bool disabled = false, float minHeight = 60f, int maxLength = -1, params GUILayoutOption[] options) => DrawTextArea(text, ControlVariant.Outline, placeholder, disabled, minHeight, maxLength, options);
 
-        public string GhostTextArea(string text, string placeholder = "", bool disabled = false, float minHeight = 60f, int maxLength = -1, params GUILayoutOption[] options) => DrawTextArea(text, ControlVariant.Ghost, placeholder, disabled, minHeight, maxLength, options);
+        internal string GhostTextArea(string text, string placeholder = "", bool disabled = false, float minHeight = 60f, int maxLength = -1, params GUILayoutOption[] options) => DrawTextArea(text, ControlVariant.Ghost, placeholder, disabled, minHeight, maxLength, options);
 
-        public string LabeledTextArea(string label, string text, ControlVariant variant = ControlVariant.Default, string placeholder = "", bool disabled = false, float minHeight = 60f, int maxLength = -1, bool showCharCount = true, params GUILayoutOption[] options)
+        internal string LabeledTextArea(string label, string text, ControlVariant variant = ControlVariant.Default, string placeholder = "", bool disabled = false, float minHeight = 60f, int maxLength = -1, bool showCharCount = true, params GUILayoutOption[] options)
         {
-            return DrawTextArea(
+            return Render(
                 new TextAreaConfig
                 {
                     Value = text,
@@ -88,14 +88,14 @@ namespace shadcnui.GUIComponents.Data
             );
         }
 
-        public string ResizableTextArea(string text, ref float height, ControlVariant variant = ControlVariant.Default, string placeholder = "", bool disabled = false, float minHeight = 60f, float maxHeight = 300f, int maxLength = -1, params GUILayoutOption[] options)
+        internal string ResizableTextArea(string text, ref float height, ControlVariant variant = ControlVariant.Default, string placeholder = "", bool disabled = false, float minHeight = 60f, float maxHeight = 300f, int maxLength = -1, params GUILayoutOption[] options)
         {
             height = Mathf.Clamp(height, minHeight, maxHeight);
             var layoutOptions = ControlLayoutUtility.BuildLayoutOptions(null, fixedHeight: height * guiHelper.uiScale, expandWidth: true);
             if (options != null && options.Length > 0)
                 layoutOptions.AddRange(options);
 
-            string result = DrawTextArea(
+            string result = Render(
                 new TextAreaConfig
                 {
                     Value = text,

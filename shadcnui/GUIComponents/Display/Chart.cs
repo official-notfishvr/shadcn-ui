@@ -11,7 +11,7 @@ namespace shadcnui.GUIComponents.Display
         public Chart(GUIHelper helper)
             : base(helper) { }
 
-        public void DrawChart(ChartConfig config)
+        public void Render(ChartConfig config)
         {
             if (config?.Series == null || config.Series.Count == 0)
                 return;

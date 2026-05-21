@@ -13,7 +13,7 @@ namespace shadcnui.GUIComponents.Controls
         public Toggle(GUIHelper helper)
             : base(helper) { }
 
-        public bool Draw(ToggleConfig config)
+        public bool Render(ToggleConfig config)
         {
             if (config == null)
                 return false;

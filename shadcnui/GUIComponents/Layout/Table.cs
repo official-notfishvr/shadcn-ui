@@ -12,7 +12,7 @@ namespace shadcnui.GUIComponents.Layout
         public Table(GUIHelper helper)
             : base(helper) { }
 
-        public void DrawTable(TableConfig config)
+        public void Render(TableConfig config)
         {
             if (config == null)
                 return;
@@ -21,21 +21,21 @@ namespace shadcnui.GUIComponents.Layout
             DrawTableCore(config.ColumnHeaders, rows, config.ColumnWidths, config.Variant, config.Size, config.Appearance);
         }
 
-        public void DrawTable(string[] headers, string[,] data, ControlVariant variant = ControlVariant.Default, ControlSize size = ControlSize.Default, params GUILayoutOption[] options)
+        internal void DrawTable(string[] headers, string[,] data, ControlVariant variant = ControlVariant.Default, ControlSize size = ControlSize.Default, params GUILayoutOption[] options)
         {
             DrawTableCore(headers, data, null, variant, size, null, options);
         }
 
-        public void DrawTable(Rect rect, string[] headers, string[,] data, ControlVariant variant = ControlVariant.Default, ControlSize size = ControlSize.Default)
+        internal void DrawTable(Rect rect, string[] headers, string[,] data, ControlVariant variant = ControlVariant.Default, ControlSize size = ControlSize.Default)
         {
             GUILayout.BeginArea(ControlLayoutUtility.ScaleRect(rect, guiHelper.uiScale));
             DrawTableCore(headers, data, null, variant, size, null);
             GUILayout.EndArea();
         }
 
-        public void SortableTable(TableConfig config) => DrawTable(config);
+        internal void SortableTable(TableConfig config) => Render(config);
 
-        public void SortableTable(string[] headers, string[,] data, ref int[] sortCols, ref bool[] sortAsc, ControlVariant variant = ControlVariant.Default, ControlSize size = ControlSize.Default, Action<int, bool> onSort = null, params GUILayoutOption[] options)
+        internal void SortableTable(string[] headers, string[,] data, ref int[] sortCols, ref bool[] sortAsc, ControlVariant variant = ControlVariant.Default, ControlSize size = ControlSize.Default, Action<int, bool> onSort = null, params GUILayoutOption[] options)
         {
             sortCols ??= Array.Empty<int>();
             sortAsc ??= Array.Empty<bool>();
@@ -68,9 +68,9 @@ namespace shadcnui.GUIComponents.Layout
             sortAsc = nextSortAsc;
         }
 
-        public void SelectableTable(TableConfig config) => DrawTable(config);
+        internal void SelectableTable(TableConfig config) => Render(config);
 
-        public void SelectableTable(string[] headers, string[,] data, ref bool[] selected, ControlVariant variant = ControlVariant.Default, ControlSize size = ControlSize.Default, Action<int, bool> onSelectionChanged = null, params GUILayoutOption[] options)
+        internal void SelectableTable(string[] headers, string[,] data, ref bool[] selected, ControlVariant variant = ControlVariant.Default, ControlSize size = ControlSize.Default, Action<int, bool> onSelectionChanged = null, params GUILayoutOption[] options)
         {
             int rowCount = data?.GetLength(0) ?? 0;
             EnsureSelectionArray(ref selected, rowCount);
@@ -94,9 +94,9 @@ namespace shadcnui.GUIComponents.Layout
             selected = workingSelection;
         }
 
-        public void PaginatedTable(TableConfig config) => DrawTable(config);
+        internal void PaginatedTable(TableConfig config) => Render(config);
 
-        public void PaginatedTable(string[] headers, string[,] data, ref int page, int pageSize, ControlVariant variant = ControlVariant.Default, ControlSize size = ControlSize.Default, Action<int> onPageChange = null, params GUILayoutOption[] options)
+        internal void PaginatedTable(string[] headers, string[,] data, ref int page, int pageSize, ControlVariant variant = ControlVariant.Default, ControlSize size = ControlSize.Default, Action<int> onPageChange = null, params GUILayoutOption[] options)
         {
             int totalRows = data?.GetLength(0) ?? 0;
             int resolvedPageSize = Mathf.Max(1, pageSize);
@@ -122,27 +122,27 @@ namespace shadcnui.GUIComponents.Layout
             page = nextPageValue;
         }
 
-        public void SearchableTable(TableConfig config) => DrawTable(config);
+        internal void SearchableTable(TableConfig config) => Render(config);
 
-        public void SearchableTable(string[] headers, string[,] data, ref string query, ref string[,] filtered, ControlVariant variant = ControlVariant.Default, ControlSize size = ControlSize.Default, Action<string> onSearch = null, params GUILayoutOption[] options)
+        internal void SearchableTable(string[] headers, string[,] data, ref string query, ref string[,] filtered, ControlVariant variant = ControlVariant.Default, ControlSize size = ControlSize.Default, Action<string> onSearch = null, params GUILayoutOption[] options)
         {
             filtered = data;
             DrawTableCore(headers, filtered, null, variant, size, null, options);
         }
 
-        public void ResizableTable(TableConfig config) => DrawTable(config);
+        internal void ResizableTable(TableConfig config) => Render(config);
 
-        public void ResizableTable(string[] headers, string[,] data, ref float[] columnWidths, ControlVariant variant = ControlVariant.Default, ControlSize size = ControlSize.Default, params GUILayoutOption[] options)
+        internal void ResizableTable(string[] headers, string[,] data, ref float[] columnWidths, ControlVariant variant = ControlVariant.Default, ControlSize size = ControlSize.Default, params GUILayoutOption[] options)
         {
             DrawTableCore(headers, data, columnWidths, variant, size, null, options);
         }
 
-        public void CustomTable(TableConfig config)
+        internal void CustomTable(TableConfig config)
         {
-            DrawTable(config);
+            Render(config);
         }
 
-        public void CustomTable(string[] headers, object[,] data, Action<object, int, int> cellRenderer, ControlVariant variant = ControlVariant.Default, ControlSize size = ControlSize.Default, params GUILayoutOption[] options)
+        internal void CustomTable(string[] headers, object[,] data, Action<object, int, int> cellRenderer, ControlVariant variant = ControlVariant.Default, ControlSize size = ControlSize.Default, params GUILayoutOption[] options)
         {
             int rows = data?.GetLength(0) ?? 0;
             int cols = data?.GetLength(1) ?? 0;
@@ -201,7 +201,7 @@ namespace shadcnui.GUIComponents.Layout
                 if (selectable)
                 {
                     bool isSelected = selectedRows != null && r < selectedRows.Length && selectedRows[r];
-                    bool nextSelected = guiHelper.Toggle(string.Empty, isSelected, ControlVariant.Outline, size, value => onSelectionChanged?.Invoke(r, value), false, null, GUILayout.Width(28f * guiHelper.uiScale), GUILayout.Height(GetRowToggleHeight(size)));
+                    bool nextSelected = guiHelper.DrawToggle(string.Empty, isSelected, ControlVariant.Outline, size, value => onSelectionChanged?.Invoke(r, value), false, null, GUILayout.Width(28f * guiHelper.uiScale), GUILayout.Height(GetRowToggleHeight(size)));
                     if (selectedRows != null && r < selectedRows.Length && nextSelected != isSelected)
                         selectedRows[r] = nextSelected;
                 }
@@ -239,7 +239,7 @@ namespace shadcnui.GUIComponents.Layout
             if (selectable)
             {
                 bool allSelected = AreAllRowsSelected(rows, selectedRows);
-                bool nextAll = guiHelper.Toggle(
+                bool nextAll = guiHelper.DrawToggle(
                     string.Empty,
                     allSelected,
                     ControlVariant.Outline,
@@ -283,9 +283,9 @@ namespace shadcnui.GUIComponents.Layout
                         label = $"{label} {(activeSortAscending ? "↑" : "↓")}";
 
                     if (width > 0f)
-                        guiHelper.Button(label, () => onSort?.Invoke(i, nextAscending), ControlVariant.Ghost, ControlSize.Small, false, 1f, null, GUILayout.Width(width), GUILayout.Height(GetHeaderButtonHeight(size)));
+                        guiHelper.DrawButton(label, () => onSort?.Invoke(i, nextAscending), ControlVariant.Ghost, ControlSize.Small, false, 1f, null, GUILayout.Width(width), GUILayout.Height(GetHeaderButtonHeight(size)));
                     else
-                        guiHelper.Button(label, () => onSort?.Invoke(i, nextAscending), ControlVariant.Ghost, ControlSize.Small, false, 1f, null, GUILayout.ExpandWidth(true), GUILayout.Height(GetHeaderButtonHeight(size)));
+                        guiHelper.DrawButton(label, () => onSort?.Invoke(i, nextAscending), ControlVariant.Ghost, ControlSize.Small, false, 1f, null, GUILayout.ExpandWidth(true), GUILayout.Height(GetHeaderButtonHeight(size)));
                 }
                 else if (width > 0f)
                 {
@@ -301,11 +301,11 @@ namespace shadcnui.GUIComponents.Layout
         {
             layoutComponents.AddSpace(DesignTokens.Spacing.SM);
             layoutComponents.BeginHorizontalGroup();
-            guiHelper.Button("Prev", () => onPageChanged?.Invoke(Mathf.Max(0, currentPage - 1)), ControlVariant.Outline, ControlSize.Small, currentPage <= 0);
+            guiHelper.DrawButton("Prev", () => onPageChanged?.Invoke(Mathf.Max(0, currentPage - 1)), ControlVariant.Outline, ControlSize.Small, currentPage <= 0);
             GUILayout.FlexibleSpace();
             GUILayout.Label($"Page {currentPage + 1} of {totalPages}", styleManager.GetLabelStyle(ControlVariant.Muted, ControlSize.Small));
             GUILayout.FlexibleSpace();
-            guiHelper.Button("Next", () => onPageChanged?.Invoke(Mathf.Min(totalPages - 1, currentPage + 1)), ControlVariant.Outline, ControlSize.Small, currentPage >= totalPages - 1);
+            guiHelper.DrawButton("Next", () => onPageChanged?.Invoke(Mathf.Min(totalPages - 1, currentPage + 1)), ControlVariant.Outline, ControlSize.Small, currentPage >= totalPages - 1);
             layoutComponents.EndHorizontalGroup();
         }
 

@@ -15,7 +15,7 @@ namespace shadcnui.GUIComponents.Data
         public DatePicker(GUIHelper helper)
             : base(helper) { }
 
-        public DateTime? DrawDatePicker(DatePickerConfig config)
+        public DateTime? Render(DatePickerConfig config)
         {
             if (config == null)
                 return null;
@@ -54,7 +54,7 @@ namespace shadcnui.GUIComponents.Data
             return config.SelectedDate;
         }
 
-        public DateTime? DrawDatePickerWithLabel(DatePickerConfig config)
+        internal DateTime? DrawDatePickerWithLabel(DatePickerConfig config)
         {
             if (config == null)
                 return null;
@@ -63,10 +63,10 @@ namespace shadcnui.GUIComponents.Data
                 UnityHelpers.Label(config.Label, styleManager.GetLabelStyle(ControlVariant.Default, config.Size, GetTextOnlyAppearance(config.Appearance)));
                 layoutComponents.AddSpace(DesignTokens.Spacing.XS);
             }
-            return DrawDatePicker(config);
+            return Render(config);
         }
 
-        public DateTime? DrawDateRangePicker(string placeholder, DateTime? start, DateTime? end, string id, params GUILayoutOption[] options)
+        internal DateTime? DrawDateRangePicker(string placeholder, DateTime? start, DateTime? end, string id, params GUILayoutOption[] options)
         {
             return DrawDateRangePicker(
                 new DatePickerConfig
@@ -80,10 +80,10 @@ namespace shadcnui.GUIComponents.Data
             );
         }
 
-        public DateTime? DrawDateRangePicker(DatePickerConfig config)
+        internal DateTime? DrawDateRangePicker(DatePickerConfig config)
         {
             string text = config.StartDate.HasValue ? config.StartDate.Value.ToString("MMM d, yyyy") : (config.Placeholder ?? "Select date");
-            return DrawDatePicker(
+            return Render(
                 new DatePickerConfig
                 {
                     Id = config.Id,

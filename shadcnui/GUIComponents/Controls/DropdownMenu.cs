@@ -17,7 +17,7 @@ namespace shadcnui.GUIComponents.Controls
         public DropdownMenu(GUIHelper helper)
             : base(helper) { }
 
-        public void Draw(DropdownMenuConfig config)
+        public void Render(DropdownMenuConfig config)
         {
             if (config == null)
                 return;

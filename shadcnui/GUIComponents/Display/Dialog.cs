@@ -23,7 +23,7 @@ namespace shadcnui.GUIComponents.Display
         public bool IsOpen => _isOpen;
 
         #region Config-based API
-        public void DrawDialog(DialogConfig config)
+        public void Render(DialogConfig config)
         {
             if (!_isOpen || _dialogId != config.Id)
                 return;
@@ -66,9 +66,9 @@ namespace shadcnui.GUIComponents.Display
             _dialogId = null;
         }
 
-        public void DrawDialog(string dialogId, Action content, float width = 400, float height = 300)
+        internal void DrawDialog(string dialogId, Action content, float width = 400, float height = 300)
         {
-            DrawDialog(
+            Render(
                 new DialogConfig
                 {
                     Id = dialogId,
@@ -79,9 +79,9 @@ namespace shadcnui.GUIComponents.Display
             );
         }
 
-        public void DrawDialog(string dialogId, string title, string description, Action content, Action footer = null, float width = 400, float height = 300)
+        internal void DrawDialog(string dialogId, string title, string description, Action content, Action footer = null, float width = 400, float height = 300)
         {
-            DrawDialog(
+            Render(
                 new DialogConfig
                 {
                     Id = dialogId,
@@ -95,12 +95,12 @@ namespace shadcnui.GUIComponents.Display
             );
         }
 
-        public bool DrawDialogTrigger(string label, ControlVariant variant = ControlVariant.Default, ControlSize size = ControlSize.Default)
+        internal bool DrawDialogTrigger(string label, ControlVariant variant = ControlVariant.Default, ControlSize size = ControlSize.Default)
         {
             return guiHelper.Button(label, variant, size, null);
         }
 
-        public void DrawDialogHeader(string title, string description = null)
+        internal void DrawDialogHeader(string title, string description = null)
         {
             var styleManager = guiHelper.GetStyleManager();
             layoutComponents.BeginVerticalGroup();
@@ -111,14 +111,14 @@ namespace shadcnui.GUIComponents.Display
             layoutComponents.EndVerticalGroup();
         }
 
-        public void DrawDialogContent(Action content)
+        internal void DrawDialogContent(Action content)
         {
             layoutComponents.BeginVerticalGroup();
             content?.Invoke();
             layoutComponents.EndVerticalGroup();
         }
 
-        public void DrawDialogFooter(Action footer)
+        internal void DrawDialogFooter(Action footer)
         {
             layoutComponents.BeginHorizontalGroup();
             GUILayout.FlexibleSpace();

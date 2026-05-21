@@ -10,7 +10,7 @@ namespace shadcnui.GUIComponents.Display
         public Progress(GUIHelper helper)
             : base(helper) { }
 
-        public void DrawProgress(ProgressConfig config)
+        public void Render(ProgressConfig config)
         {
             if (config == null)
                 return;
@@ -32,9 +32,9 @@ namespace shadcnui.GUIComponents.Display
             DrawProgressBar(rect, config.Value, config.Variant, config.Appearance);
         }
 
-        public void DrawProgress(float value, float width = -1f, float height = -1f, ComponentAppearance appearance = null, params GUILayoutOption[] options)
+        internal void DrawProgress(float value, float width = -1f, float height = -1f, ComponentAppearance appearance = null, params GUILayoutOption[] options)
         {
-            DrawProgress(
+            Render(
                 new ProgressConfig
                 {
                     Value = value,
@@ -46,9 +46,9 @@ namespace shadcnui.GUIComponents.Display
             );
         }
 
-        public void DrawProgress(Rect rect, float value, ComponentAppearance appearance = null)
+        internal void DrawProgress(Rect rect, float value, ComponentAppearance appearance = null)
         {
-            DrawProgress(
+            Render(
                 new ProgressConfig
                 {
                     Value = value,
@@ -58,9 +58,9 @@ namespace shadcnui.GUIComponents.Display
             );
         }
 
-        public void LabeledProgress(string label, float value, float width = -1f, float height = -1f, bool showPercentage = true, ComponentAppearance appearance = null, params GUILayoutOption[] options)
+        internal void LabeledProgress(string label, float value, float width = -1f, float height = -1f, bool showPercentage = true, ComponentAppearance appearance = null, params GUILayoutOption[] options)
         {
-            DrawProgress(
+            Render(
                 new ProgressConfig
                 {
                     Label = label,
@@ -74,7 +74,7 @@ namespace shadcnui.GUIComponents.Display
             );
         }
 
-        public void CircularProgress(float value, float size = 32f, ComponentAppearance appearance = null, params GUILayoutOption[] options)
+        internal void CircularProgress(float value, float size = 32f, ComponentAppearance appearance = null, params GUILayoutOption[] options)
         {
             float scaled = size * guiHelper.uiScale;
             Rect rect = SurfaceDrawUtility.ReserveSquare(scaled);
@@ -82,14 +82,14 @@ namespace shadcnui.GUIComponents.Display
             GUI.Label(rect, $"{Mathf.Clamp01(value) * 100f:0}%", styleManager.GetLabelStyle(ControlVariant.Muted, ControlSize.Small, appearance));
         }
 
-        public void AnimatedProgress(string id, float value, float width = -1f, float height = -1f, ComponentAppearance appearance = null, params GUILayoutOption[] options)
+        internal void AnimatedProgress(string id, float value, float width = -1f, float height = -1f, ComponentAppearance appearance = null, params GUILayoutOption[] options)
         {
             var animation = guiHelper.GetAnimationManager();
             float current = animation.GetFloat(id, value);
             if (Mathf.Abs(current - value) > 0.001f)
                 animation.StartFloat(id, current, value, DesignTokens.Animation.DurationNormal, EasingFunctions.EaseOutCubic);
 
-            DrawProgress(
+            Render(
                 new ProgressConfig
                 {
                     Value = animation.GetFloat(id, value),

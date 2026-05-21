@@ -18,7 +18,7 @@ namespace shadcnui.GUIComponents.Display
 
         public bool IsOpen => _isOpen;
 
-        public void DrawPopover(PopoverConfig config)
+        public void Render(PopoverConfig config)
         {
             if (!_isOpen || config == null)
                 return;
@@ -49,9 +49,9 @@ namespace shadcnui.GUIComponents.Display
             GUI.color = prevColor;
         }
 
-        public void DrawPopover(Action content)
+        internal void DrawPopover(Action content)
         {
-            DrawPopover(new PopoverConfig { Content = content });
+            Render(new PopoverConfig { Content = content });
         }
 
         public void Open(string id = "popover", int zIndex = -1)

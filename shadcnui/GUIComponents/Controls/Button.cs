@@ -12,7 +12,7 @@ namespace shadcnui.GUIComponents.Controls
         public Button(GUIHelper helper)
             : base(helper) { }
 
-        public bool Draw(ButtonConfig config)
+        public bool Render(ButtonConfig config)
         {
             if (config == null)
                 return false;

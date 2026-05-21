@@ -15,7 +15,7 @@ namespace shadcnui.GUIComponents.Controls
         public Slider(GUIHelper helper)
             : base(helper) { }
 
-        public float Draw(SliderConfig config)
+        public float Render(SliderConfig config)
         {
             if (config == null)
                 return 0f;
@@ -40,7 +40,7 @@ namespace shadcnui.GUIComponents.Controls
             }
             catch (Exception ex)
             {
-                GUILogger.LogException(ex, nameof(Draw), nameof(Slider));
+                GUILogger.LogException(ex, nameof(Render), nameof(Slider));
                 return config.Value;
             }
         }
