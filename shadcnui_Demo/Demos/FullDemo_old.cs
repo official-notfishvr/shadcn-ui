@@ -82,7 +82,7 @@ namespace shadcnui_Demo.Menu
             GUI.skin.verticalScrollbar = GUIStyle.none;
 
             if (showDemoWindow)
-                windowRect = GUI.Window(101, windowRect, DrawDemoWindow, "shadcn/ui Demo - Legacy Tabs");
+                windowRect = GUI.Window(101, windowRect, (GUI.WindowFunction)DrawDemoWindow, "shadcn/ui Demo - Legacy Tabs");
 
             guiHelper.DrawOverlay();
         }
