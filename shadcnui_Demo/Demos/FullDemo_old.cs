@@ -97,11 +97,11 @@ namespace shadcnui_Demo.Menu
 
             if (useVerticalTabs)
             {
-                currentDemoTab = guiHelper.Tabs().Items(demoTabs).SelectedIndex(currentDemoTab).Side(verticalTabsOnRight ? TabSide.Right : TabSide.Left).Content(DrawScrollableContent).Render();
+                currentDemoTab = guiHelper.Tabs().Items(demoTabs).SelectedIndex(currentDemoTab).Side(verticalTabsOnRight ? TabSide.Right : TabSide.Left).Content(DrawScrollableContent);
             }
             else
             {
-                currentDemoTab = guiHelper.Tabs().Items(demoTabs).SelectedIndex(currentDemoTab).Position(tabsOnBottom ? TabPosition.Bottom : TabPosition.Top).MaxLines(2).Content(DrawScrollableContent).Render();
+                currentDemoTab = guiHelper.Tabs().Items(demoTabs).SelectedIndex(currentDemoTab).Position(tabsOnBottom ? TabPosition.Bottom : TabPosition.Top).MaxLines(2).Content(DrawScrollableContent);
             }
 
             guiHelper.EndGUI();
@@ -111,17 +111,16 @@ namespace shadcnui_Demo.Menu
         private void DrawHeader()
         {
             guiHelper.BeginHorizontalGroup();
-            guiHelper.Label("Legacy Tab Map").Large().Render();
             GUILayout.FlexibleSpace();
-            useVerticalTabs = guiHelper.Toggle("Vertical Tabs", useVerticalTabs).Render();
+            useVerticalTabs = guiHelper.Toggle("Vertical Tabs", useVerticalTabs);
             guiHelper.AddSpace(8f);
             if (useVerticalTabs)
-                verticalTabsOnRight = guiHelper.Toggle("Right Side", verticalTabsOnRight).Render();
+                verticalTabsOnRight = guiHelper.Toggle("Right Side", verticalTabsOnRight);
             else
-                tabsOnBottom = guiHelper.Toggle("Bottom Tabs", tabsOnBottom).Render();
+                tabsOnBottom = guiHelper.Toggle("Bottom Tabs", tabsOnBottom);
             guiHelper.EndHorizontalGroup();
 
-            guiHelper.Label("This file keeps the old tab layout, but each tab now demonstrates the current API surface.").Muted().Render();
+            guiHelper.Label("This file keeps the old tab layout, but each tab now demonstrates the current API surface.").Muted();
             guiHelper.HorizontalSeparator();
         }
 
@@ -230,8 +229,8 @@ namespace shadcnui_Demo.Menu
 
         private void DrawSection(string title, Action content)
         {
-            guiHelper.Label(title).Large().Render();
-            guiHelper.Label("Current API example").Muted().Render();
+            guiHelper.Label(title).Large();
+            guiHelper.Label("Current API example").Muted();
             guiHelper.AddSpace(8f);
             content?.Invoke();
             guiHelper.AddSpace(18f);
@@ -246,10 +245,10 @@ namespace shadcnui_Demo.Menu
                 () =>
                 {
                     guiHelper.BeginHorizontalGroup();
-                    guiHelper.Button("Primary").Render();
-                    guiHelper.Button("Secondary").Secondary().Render();
-                    guiHelper.Button("Outline").Outline().Render();
-                    guiHelper.Button("Danger").Destructive().Render();
+                    guiHelper.Button("Primary");
+                    guiHelper.Button("Secondary").Secondary();
+                    guiHelper.Button("Outline").Outline();
+                    guiHelper.Button("Danger").Destructive();
                     guiHelper.EndHorizontalGroup();
                 }
             );
@@ -262,10 +261,10 @@ namespace shadcnui_Demo.Menu
                 () =>
                 {
                     guiHelper.BeginHorizontalGroup();
-                    guiHelper.Badge("Default").Render();
-                    guiHelper.Badge("Queued").Secondary().Render();
-                    guiHelper.Badge("42").Count(42).Outline().Render();
-                    guiHelper.Badge("Online").StatusDot().Render();
+                    guiHelper.Badge("Default");
+                    guiHelper.Badge("Queued").Secondary();
+                    guiHelper.Badge("42").Count(42).Outline();
+                    guiHelper.Badge("Online").StatusDot();
                     guiHelper.EndHorizontalGroup();
                 }
             );
@@ -277,8 +276,8 @@ namespace shadcnui_Demo.Menu
                 "Input",
                 () =>
                 {
-                    passwordValue = guiHelper.Input(passwordValue).Label("Password").Password().Render();
-                    passwordValue = guiHelper.Input(passwordValue).Label("Email").Placeholder("pilot@relay.local").Render();
+                    passwordValue = guiHelper.Input(passwordValue).Label("Password").Password();
+                    passwordValue = guiHelper.Input(passwordValue).Label("Email").Placeholder("pilot@relay.local");
                 }
             );
         }
@@ -289,8 +288,8 @@ namespace shadcnui_Demo.Menu
                 "Toggle",
                 () =>
                 {
-                    toggleStates["toggle_default"] = guiHelper.Toggle("Feature Flag", GetToggle("toggle_default")).Render();
-                    toggleStates["toggle_outline"] = guiHelper.Toggle("Muted Routing", GetToggle("toggle_outline")).Outline().Render();
+                    toggleStates["toggle_default"] = guiHelper.Toggle("Feature Flag", GetToggle("toggle_default"));
+                    toggleStates["toggle_outline"] = guiHelper.Toggle("Muted Routing", GetToggle("toggle_outline")).Outline();
                 }
             );
         }
@@ -301,8 +300,8 @@ namespace shadcnui_Demo.Menu
                 "Checkbox",
                 () =>
                 {
-                    toggleStates["checkbox_1"] = guiHelper.Checkbox("Enable Alerts", GetToggle("checkbox_1")).Render();
-                    toggleStates["checkbox_2"] = guiHelper.Checkbox("Auto Assign", GetToggle("checkbox_2")).Secondary().Render();
+                    toggleStates["checkbox_1"] = guiHelper.Checkbox("Enable Alerts", GetToggle("checkbox_1"));
+                    toggleStates["checkbox_2"] = guiHelper.Checkbox("Auto Assign", GetToggle("checkbox_2")).Secondary();
                 }
             );
         }
@@ -313,8 +312,8 @@ namespace shadcnui_Demo.Menu
                 "Switch",
                 () =>
                 {
-                    toggleStates["switch_1"] = guiHelper.Switch("Maintenance Mode", GetToggle("switch_1")).Render();
-                    toggleStates["switch_2"] = guiHelper.Switch("Broadcast Changes", GetToggle("switch_2")).Small().Render();
+                    toggleStates["switch_1"] = guiHelper.Switch("Maintenance Mode", GetToggle("switch_1"));
+                    toggleStates["switch_2"] = guiHelper.Switch("Broadcast Changes", GetToggle("switch_2")).Small();
                 }
             );
         }
@@ -325,7 +324,7 @@ namespace shadcnui_Demo.Menu
                 "Text Area",
                 () =>
                 {
-                    textAreaValue = guiHelper.TextArea(textAreaValue).Label("Notes").MinHeight(110f).ShowCharacterCount().Render();
+                    textAreaValue = guiHelper.TextArea(textAreaValue).Label("Notes").MinHeight(110f).ShowCharacterCount();
                 }
             );
         }
@@ -337,9 +336,9 @@ namespace shadcnui_Demo.Menu
                 () =>
                 {
                     guiHelper.BeginHorizontalGroup();
-                    guiHelper.Avatar().Image(img).Fallback("AL").Name("Ava Lane").Online().Render();
-                    guiHelper.Avatar().Fallback("BR").Shape(AvatarShape.Rounded).Border(Theme.Hex("#22c55e")).Render();
-                    guiHelper.Avatar().Fallback("CY").Shape(AvatarShape.Square).Render();
+                    guiHelper.Avatar().Image(img).Fallback("AL").Name("Ava Lane").Online();
+                    guiHelper.Avatar().Fallback("BR").Shape(AvatarShape.Rounded).Border(Theme.Hex("#22c55e"));
+                    guiHelper.Avatar().Fallback("CY").Shape(AvatarShape.Square);
                     guiHelper.EndHorizontalGroup();
                 }
             );
@@ -352,8 +351,8 @@ namespace shadcnui_Demo.Menu
                 () =>
                 {
                     guiHelper.BeginHorizontalGroup();
-                    guiHelper.Card().Title("Relay Tower").Subtitle("North Wing").Content("Current builder API").Image(img).Size(220f, 200f).Render();
-                    guiHelper.Card().Title("Operator").Content("A compact example card.").Avatar(img).Size(220f, 170f).Render();
+                    guiHelper.Card().Title("Relay Tower").Subtitle("North Wing").Content("Current builder API").Image(img).Size(220f, 200f);
+                    guiHelper.Card().Title("Operator").Content("A compact example card.").Avatar(img).Size(220f, 170f);
                     guiHelper.EndHorizontalGroup();
                 }
             );
@@ -365,7 +364,7 @@ namespace shadcnui_Demo.Menu
                 "Progress",
                 () =>
                 {
-                    guiHelper.Progress(sliderValue).Label("Upload").WidthValue(420f).ShowPercentage().Render();
+                    guiHelper.Progress(sliderValue).Label("Upload").WidthValue(420f).ShowPercentage();
                 }
             );
         }
@@ -376,9 +375,9 @@ namespace shadcnui_Demo.Menu
                 "Separator",
                 () =>
                 {
-                    guiHelper.Label("Before").Render();
+                    guiHelper.Label("Before");
                     guiHelper.HorizontalSeparator();
-                    guiHelper.Label("After").Render();
+                    guiHelper.Label("After");
                 }
             );
         }
@@ -389,9 +388,9 @@ namespace shadcnui_Demo.Menu
                 "Label",
                 () =>
                 {
-                    guiHelper.Label("Default").Render();
-                    guiHelper.Label("Muted").Muted().Render();
-                    guiHelper.Label("Secondary").Secondary().Render();
+                    guiHelper.Label("Default");
+                    guiHelper.Label("Muted").Muted();
+                    guiHelper.Label("Secondary").Secondary();
                 }
             );
         }
@@ -410,7 +409,7 @@ namespace shadcnui_Demo.Menu
                         .ParentWindow(windowRect)
                         .Title("Legacy Tab")
                         .Description("Still using the new dialog builder.")
-                        .Content(() => guiHelper.Label("Dialog content").Muted().Render())
+                        .Content(() => guiHelper.Label("Dialog content").Muted())
                         .Footer(() =>
                         {
                             if (guiHelper.Button("Close", ControlVariant.Outline, ControlSize.Small))
@@ -419,7 +418,7 @@ namespace shadcnui_Demo.Menu
                                 guiHelper.Dialog(DialogId).Close();
                             }
                         })
-                        .Render();
+                        ;
 
                     if (showDialog)
                         guiHelper.Dialog(DialogId).Open();
@@ -433,8 +432,8 @@ namespace shadcnui_Demo.Menu
                 "Select",
                 () =>
                 {
-                    selectIndex = guiHelper.Select().Label("Squad").Items(selectItems).SelectedIndex(selectIndex).Width(240f).Render();
-                    guiHelper.Badge(selectItems[Mathf.Clamp(selectIndex, 0, selectItems.Length - 1)]).Outline().Render();
+                    selectIndex = guiHelper.Select().Label("Squad").Items(selectItems).SelectedIndex(selectIndex).Width(240f);
+                    guiHelper.Badge(selectItems[Mathf.Clamp(selectIndex, 0, selectItems.Length - 1)]).Outline();
                 }
             );
         }
@@ -445,8 +444,8 @@ namespace shadcnui_Demo.Menu
                 "Dropdown Menu",
                 () =>
                 {
-                    dropdownOpen = guiHelper.Toggle("Sticky Preview", dropdownOpen).Render();
-                    guiHelper.DropdownMenu().Trigger(() => dropdownOpen || guiHelper.Button("Open Menu", ControlVariant.Outline, ControlSize.Small)).Header("Actions").Item("Deploy").Item("Duplicate").Separator().Item("Archive").Render();
+                    dropdownOpen = guiHelper.Toggle("Sticky Preview", dropdownOpen);
+                    guiHelper.DropdownMenu().Trigger(() => dropdownOpen || guiHelper.Button("Open Menu", ControlVariant.Outline, ControlSize.Small)).Header("Actions").Item("Deploy").Item("Duplicate").Separator().Item("Archive");
                 }
             );
         }
@@ -464,10 +463,10 @@ namespace shadcnui_Demo.Menu
                         .Popover(PopoverId)
                         .Content(() =>
                         {
-                            guiHelper.Label("Legacy popover").Render();
-                            guiHelper.Label("Current implementation").Muted().Render();
+                            guiHelper.Label("Legacy popover");
+                            guiHelper.Label("Current implementation").Muted();
                         })
-                        .Render();
+                        ;
 
                     if (showPopover)
                         guiHelper.Popover(PopoverId).Open();
@@ -481,7 +480,7 @@ namespace shadcnui_Demo.Menu
                 "Tabs",
                 () =>
                 {
-                    nestedTabIndex = guiHelper.Tabs().Items("Overview", "Settings", "History").SelectedIndex(nestedTabIndex).Indicator(IndicatorStyle.Background).Content(() => guiHelper.Label($"Nested tab: {nestedTabIndex + 1}").Render()).Render();
+                    nestedTabIndex = guiHelper.Tabs().Items("Overview", "Settings", "History").SelectedIndex(nestedTabIndex).Indicator(IndicatorStyle.Background).Content(() => guiHelper.Label($"Nested tab: {nestedTabIndex + 1}"));
                 }
             );
         }
@@ -492,7 +491,7 @@ namespace shadcnui_Demo.Menu
                 "Menu Bar",
                 () =>
                 {
-                    guiHelper.MenuBar().Item("File", items => items.Item("New").Item("Save").Separator().Item("Close")).Item("View", items => items.Item("Compact").Item("Expanded")).Item("Help", items => items.Item("Migration").Item("API")).Render();
+                    guiHelper.MenuBar().Item("File", items => items.Item("New").Item("Save").Separator().Item("Close")).Item("View", items => items.Item("Compact").Item("Expanded")).Item("Help", items => items.Item("Migration").Item("API"));
                 }
             );
         }
@@ -503,9 +502,9 @@ namespace shadcnui_Demo.Menu
                 "Chart",
                 () =>
                 {
-                    guiHelper.Chart().Type(ChartType.Line).Series(chartSeries.ToArray()).Size(560f, 260f).Render();
+                    guiHelper.Chart().Type(ChartType.Line).Series(chartSeries.ToArray()).Size(560f, 260f);
                     guiHelper.AddSpace(12f);
-                    guiHelper.Chart().Type(ChartType.Pie).Series(chartPieSeries.ToArray()).Size(360f, 260f).Render();
+                    guiHelper.Chart().Type(ChartType.Pie).Series(chartPieSeries.ToArray()).Size(360f, 260f);
                 }
             );
         }
@@ -516,9 +515,9 @@ namespace shadcnui_Demo.Menu
                 "Table",
                 () =>
                 {
-                    guiHelper.Table().Headers(tableHeaders).Rows(tableRows).Page(0, 4).Render();
+                    guiHelper.Table().Headers(tableHeaders).Rows(tableRows).Page(0, 4);
                     guiHelper.AddSpace(12f);
-                    guiHelper.DataTable(DataTableId).Columns(dataColumns).Rows(dataRows).ShowPagination().ShowSearch().ShowSelection().Render();
+                    guiHelper.DataTable(DataTableId).Columns(dataColumns).Rows(dataRows).ShowPagination().ShowSearch().ShowSelection();
                 }
             );
         }
@@ -547,8 +546,8 @@ namespace shadcnui_Demo.Menu
                 "Tooltip",
                 () =>
                 {
-                    guiHelper.Label("Tooltip-specific helper shortcuts were removed from this demo.").Render();
-                    guiHelper.Label("This tab remains as a migration marker for the old showcase layout.").Muted().Render();
+                    guiHelper.Label("Tooltip-specific helper shortcuts were removed from this demo.");
+                    guiHelper.Label("This tab remains as a migration marker for the old showcase layout.").Muted();
                 }
             );
         }
@@ -559,9 +558,9 @@ namespace shadcnui_Demo.Menu
                 "Slider",
                 () =>
                 {
-                    sliderValue = guiHelper.Slider(sliderValue).Label("Volume").Range(0f, 1f).Step(0.05f).ShowValue().Render();
-                    sliderWithStepValue = guiHelper.Slider(sliderWithStepValue).Label("Percent").Range(0f, 100f).Step(10f).ShowValue().Format("F0").Render();
-                    rangeSliderValue = guiHelper.RangeSlider(rangeSliderValue.x, rangeSliderValue.y).Label("Window").Range(0f, 100f).Step(5f).ShowValue().Format("F0").Render();
+                    sliderValue = guiHelper.Slider(sliderValue).Label("Volume").Range(0f, 1f).Step(0.05f).ShowValue();
+                    sliderWithStepValue = guiHelper.Slider(sliderWithStepValue).Label("Percent").Range(0f, 100f).Step(10f).ShowValue().Format("F0");
+                    rangeSliderValue = guiHelper.RangeSlider(rangeSliderValue.x, rangeSliderValue.y).Label("Window").Range(0f, 100f).Step(5f).ShowValue().Format("F0");
                 }
             );
         }
@@ -572,13 +571,13 @@ namespace shadcnui_Demo.Menu
                 "Layout",
                 () =>
                 {
-                    navIndex = guiHelper.Navigation().Logo("L").Width(90f).Items(new NavigationItem("home", "Home"), new NavigationItem("queue", "Queue"), new NavigationItem("logs", "Logs")).SelectedIndex(navIndex).Render();
+                    navIndex = guiHelper.Navigation().Logo("L").Width(90f).Items(new NavigationItem("home", "Home"), new NavigationItem("queue", "Queue"), new NavigationItem("logs", "Logs")).SelectedIndex(navIndex);
 
                     guiHelper.AddSpace(12f);
                     guiHelper.BeginHorizontalGroup();
-                    guiHelper.Button("Left").Render();
+                    guiHelper.Button("Left");
                     GUILayout.FlexibleSpace();
-                    guiHelper.Button("Right").Render();
+                    guiHelper.Button("Right");
                     guiHelper.EndHorizontalGroup();
                 }
             );
@@ -597,7 +596,7 @@ namespace shadcnui_Demo.Menu
 
         private void ShowToast(string title, string description, ToastVariant variant)
         {
-            guiHelper.Toast().Title(title).Description(description).Variant(variant).Position(ToastPosition.BottomRight).Duration(3200f).Render();
+            guiHelper.Toast().Title(title).Description(description).Variant(variant).Position(ToastPosition.BottomRight).Duration(3200f);
         }
 
         private void BuildData()

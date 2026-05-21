@@ -114,16 +114,30 @@ namespace shadcnui.GUIComponents.Display
         internal void DrawDialogContent(Action content)
         {
             layoutComponents.BeginVerticalGroup();
-            content?.Invoke();
-            layoutComponents.EndVerticalGroup();
+            try
+            {
+                content?.Invoke();
+                guiHelper.FlushAutoRenderBuilder();
+            }
+            finally
+            {
+                layoutComponents.EndVerticalGroup();
+            }
         }
 
         internal void DrawDialogFooter(Action footer)
         {
             layoutComponents.BeginHorizontalGroup();
             GUILayout.FlexibleSpace();
-            footer?.Invoke();
-            layoutComponents.EndHorizontalGroup();
+            try
+            {
+                footer?.Invoke();
+                guiHelper.FlushAutoRenderBuilder();
+            }
+            finally
+            {
+                layoutComponents.EndHorizontalGroup();
+            }
         }
         #endregion
 
@@ -185,24 +199,35 @@ namespace shadcnui.GUIComponents.Display
             ApplyDialogAnimation(animManager, config, animProgress, dialogX, dialogY, ref prevColor);
 
             layoutComponents.BeginVerticalGroup(styleManager.GetDialogContentStyle(config.Variant, config.Size, config.Appearance), GUILayout.Width(config.Width), GUILayout.Height(config.Height));
-
-            DrawDialogHeader(config, styleManager);
-            GUILayout.Space(DesignTokens.Spacing.LG);
-            config.Content?.Invoke();
-
-            if (config.Footer != null)
+            try
             {
+                DrawDialogHeader(config, styleManager);
                 GUILayout.Space(DesignTokens.Spacing.LG);
-                layoutComponents.BeginHorizontalGroup();
-                GUILayout.FlexibleSpace();
-                config.Footer.Invoke();
-                layoutComponents.EndHorizontalGroup();
+                config.Content?.Invoke();
+                guiHelper.FlushAutoRenderBuilder();
+
+                if (config.Footer != null)
+                {
+                    GUILayout.Space(DesignTokens.Spacing.LG);
+                    layoutComponents.BeginHorizontalGroup();
+                    GUILayout.FlexibleSpace();
+                    try
+                    {
+                        config.Footer.Invoke();
+                        guiHelper.FlushAutoRenderBuilder();
+                    }
+                    finally
+                    {
+                        layoutComponents.EndHorizontalGroup();
+                    }
+                }
             }
-
-            GUILayout.EndVertical();
-
-            GUI.matrix = prevMatrix;
-            GUI.color = prevColor;
+            finally
+            {
+                GUILayout.EndVertical();
+                GUI.matrix = prevMatrix;
+                GUI.color = prevColor;
+            }
         }
 
         private void ApplyDialogAnimation(AnimationManager animManager, DialogConfig config, float animProgress, float dialogX, float dialogY, ref Color prevColor)

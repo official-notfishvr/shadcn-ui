@@ -96,6 +96,7 @@ namespace shadcnui.GUIComponents.Layout
             if (config.TabLabels == null || config.TabLabels.Length == 0)
             {
                 config.Content?.Invoke();
+                guiHelper.FlushAutoRenderBuilder();
                 return config.SelectedIndex;
             }
 
@@ -108,6 +109,7 @@ namespace shadcnui.GUIComponents.Layout
             if (tabNames == null || tabNames.Length == 0)
             {
                 content?.Invoke();
+                guiHelper.FlushAutoRenderBuilder();
                 return selectedIndex;
             }
 
@@ -556,6 +558,7 @@ namespace shadcnui.GUIComponents.Layout
             try
             {
                 config.Content?.Invoke();
+                guiHelper.FlushAutoRenderBuilder();
             }
             finally
             {
@@ -574,6 +577,7 @@ namespace shadcnui.GUIComponents.Layout
 
         public void EndTabContent()
         {
+            guiHelper.FlushAutoRenderBuilder();
             layoutComponents.EndVerticalGroup();
         }
         #endregion

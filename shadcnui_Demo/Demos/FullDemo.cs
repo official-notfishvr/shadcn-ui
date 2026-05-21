@@ -49,7 +49,6 @@ namespace shadcnui_Demo.Menu
 
         private bool _featureToggle = true;
         private bool _alertsEnabled = true;
-        private bool _compactMode;
         private bool _allowSpectators = true;
         private bool _showDialog;
         private bool _showPopover;

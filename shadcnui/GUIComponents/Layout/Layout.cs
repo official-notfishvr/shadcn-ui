@@ -27,8 +27,16 @@ namespace shadcnui.GUIComponents.Layout
 #else
             scrollPosition = GUILayout.BeginScrollView(scrollPosition, options);
 #endif
-            drawContent?.Invoke();
-            GUILayout.EndScrollView();
+            try
+            {
+                drawContent?.Invoke();
+                _guiHelper.FlushAutoRenderBuilder();
+            }
+            finally
+            {
+                GUILayout.EndScrollView();
+            }
+
             return scrollPosition;
         }
 

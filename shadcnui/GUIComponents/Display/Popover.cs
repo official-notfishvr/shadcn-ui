@@ -42,11 +42,17 @@ namespace shadcnui.GUIComponents.Display
             }
 
             layoutComponents.BeginVerticalGroup(styleManager?.GetPopoverContentStyle(config.Variant, config.Size, config.Appearance) ?? GUI.skin.box, GUILayout.MaxWidth(320), GUILayout.MaxHeight(220));
-            config.Content?.Invoke();
-            layoutComponents.EndVerticalGroup();
-
-            GUI.matrix = prevMatrix;
-            GUI.color = prevColor;
+            try
+            {
+                config.Content?.Invoke();
+                guiHelper.FlushAutoRenderBuilder();
+            }
+            finally
+            {
+                layoutComponents.EndVerticalGroup();
+                GUI.matrix = prevMatrix;
+                GUI.color = prevColor;
+            }
         }
 
         internal void DrawPopover(Action content)

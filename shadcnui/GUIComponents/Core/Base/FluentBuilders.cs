@@ -15,18 +15,26 @@ namespace shadcnui.GUIComponents.Core.Base
         public static readonly RenderResult Value = new();
     }
 
+    internal interface IAutoRenderBuilder
+    {
+        void RenderIfPending();
+    }
+
     public abstract class ComponentBuilder<TBuilder, TConfig, TResult>
+        : IAutoRenderBuilder
         where TBuilder : ComponentBuilder<TBuilder, TConfig, TResult>
         where TConfig : ComponentConfigBase, new()
     {
         protected readonly GUIHelper Helper;
         protected readonly TConfig Config;
         private readonly List<GUILayoutOption> _options = new();
+        private bool _rendered;
 
         protected ComponentBuilder(GUIHelper helper, TConfig config = null)
         {
             Helper = helper ?? throw new ArgumentNullException(nameof(helper));
             Config = config ?? new TConfig();
+            Helper.RegisterAutoRenderBuilder(this);
         }
 
         protected TBuilder Self => (TBuilder)this;
@@ -131,6 +139,23 @@ namespace shadcnui.GUIComponents.Core.Base
 
         protected void ApplyOptions() => Config.LayoutOptions = _options.Count == 0 ? Array.Empty<GUILayoutOption>() : _options.ToArray();
 
+        protected TResult RenderOnce(Func<TResult> render, TResult alreadyRenderedValue = default)
+        {
+            if (_rendered)
+                return alreadyRenderedValue;
+
+            MarkRendered();
+            return render();
+        }
+
+        protected void MarkRendered()
+        {
+            _rendered = true;
+            Helper.ClearAutoRenderBuilder(this);
+        }
+
+        public virtual void RenderIfPending() => Render();
+
         public abstract TResult Render();
     }
 
@@ -177,11 +202,14 @@ namespace shadcnui.GUIComponents.Core.Base
             return this;
         }
 
-        public override bool Render()
-        {
-            ApplyOptions();
-            return Helper.Render(Config);
-        }
+        public override bool Render() =>
+            RenderOnce(
+                () =>
+                {
+                    ApplyOptions();
+                    return Helper.Render(Config);
+                }
+            );
 
         public static implicit operator bool(ButtonBuilder builder) => builder?.Render() ?? false;
     }
@@ -270,11 +298,15 @@ namespace shadcnui.GUIComponents.Core.Base
             return this;
         }
 
-        public override string Render()
-        {
-            ApplyOptions();
-            return Helper.Render(Config);
-        }
+        public override string Render() =>
+            RenderOnce(
+                () =>
+                {
+                    ApplyOptions();
+                    return Helper.Render(Config);
+                },
+                Config.Value
+            );
 
         public static implicit operator string(InputBuilder builder) => builder?.Render() ?? string.Empty;
     }
@@ -346,11 +378,14 @@ namespace shadcnui.GUIComponents.Core.Base
             return this;
         }
 
-        public override bool Render()
-        {
-            ApplyOptions();
-            return Helper.Render(Config);
-        }
+        public override bool Render() =>
+            RenderOnce(
+                () =>
+                {
+                    ApplyOptions();
+                    return Helper.Render(Config);
+                }
+            );
 
         public static implicit operator bool(CheckboxBuilder builder) => builder?.Render() ?? false;
     }
@@ -360,11 +395,14 @@ namespace shadcnui.GUIComponents.Core.Base
         public SwitchBuilder(GUIHelper helper, string label, bool value)
             : base(helper, label, value) { }
 
-        public override bool Render()
-        {
-            ApplyOptions();
-            return Helper.Render(Config);
-        }
+        public override bool Render() =>
+            RenderOnce(
+                () =>
+                {
+                    ApplyOptions();
+                    return Helper.Render(Config);
+                }
+            );
 
         public static implicit operator bool(SwitchBuilder builder) => builder?.Render() ?? false;
     }
@@ -374,11 +412,14 @@ namespace shadcnui.GUIComponents.Core.Base
         public ToggleBuilder(GUIHelper helper, string label, bool value)
             : base(helper, label, value) { }
 
-        public override bool Render()
-        {
-            ApplyOptions();
-            return Helper.Render(Config);
-        }
+        public override bool Render() =>
+            RenderOnce(
+                () =>
+                {
+                    ApplyOptions();
+                    return Helper.Render(Config);
+                }
+            );
 
         public static implicit operator bool(ToggleBuilder builder) => builder?.Render() ?? false;
     }
@@ -431,11 +472,15 @@ namespace shadcnui.GUIComponents.Core.Base
             return this;
         }
 
-        public override float Render()
-        {
-            ApplyOptions();
-            return Helper.Render(Config);
-        }
+        public override float Render() =>
+            RenderOnce(
+                () =>
+                {
+                    ApplyOptions();
+                    return Helper.Render(Config);
+                },
+                Config.Value
+            );
 
         public static implicit operator float(SliderBuilder builder) => builder?.Render() ?? 0f;
     }
@@ -489,11 +534,15 @@ namespace shadcnui.GUIComponents.Core.Base
             return this;
         }
 
-        public override Vector2 Render()
-        {
-            ApplyOptions();
-            return Helper.Render(Config);
-        }
+        public override Vector2 Render() =>
+            RenderOnce(
+                () =>
+                {
+                    ApplyOptions();
+                    return Helper.Render(Config);
+                },
+                new Vector2(Config.LowerValue, Config.UpperValue)
+            );
 
         public static implicit operator Vector2(RangeSliderBuilder builder) => builder?.Render() ?? Vector2.zero;
     }
@@ -557,11 +606,15 @@ namespace shadcnui.GUIComponents.Core.Base
             return this;
         }
 
-        public override int Render()
-        {
-            ApplyOptions();
-            return Helper.Render(Config);
-        }
+        public override int Render() =>
+            RenderOnce(
+                () =>
+                {
+                    ApplyOptions();
+                    return Helper.Render(Config);
+                },
+                Config.SelectedIndex
+            );
 
         public static implicit operator int(SelectBuilder builder) => builder?.Render() ?? 0;
     }
@@ -625,12 +678,16 @@ namespace shadcnui.GUIComponents.Core.Base
             return this;
         }
 
-        public override RenderResult Render()
-        {
-            ApplyOptions();
-            Helper.Render(Config);
-            return RenderResult.Value;
-        }
+        public override RenderResult Render() =>
+            RenderOnce(
+                () =>
+                {
+                    ApplyOptions();
+                    Helper.Render(Config);
+                    return RenderResult.Value;
+                },
+                RenderResult.Value
+            );
     }
 
     public sealed class ThemeChangerBuilder : ComponentBuilder<ThemeChangerBuilder, ThemeChangerConfig, RenderResult>
@@ -662,12 +719,16 @@ namespace shadcnui.GUIComponents.Core.Base
             return this;
         }
 
-        public override RenderResult Render()
-        {
-            ApplyOptions();
-            Helper.Render(Config);
-            return RenderResult.Value;
-        }
+        public override RenderResult Render() =>
+            RenderOnce(
+                () =>
+                {
+                    ApplyOptions();
+                    Helper.Render(Config);
+                    return RenderResult.Value;
+                },
+                RenderResult.Value
+            );
     }
 
     public sealed class FontChangerBuilder : ComponentBuilder<FontChangerBuilder, FontChangerConfig, RenderResult>
@@ -705,12 +766,16 @@ namespace shadcnui.GUIComponents.Core.Base
             return this;
         }
 
-        public override RenderResult Render()
-        {
-            ApplyOptions();
-            Helper.Render(Config);
-            return RenderResult.Value;
-        }
+        public override RenderResult Render() =>
+            RenderOnce(
+                () =>
+                {
+                    ApplyOptions();
+                    Helper.Render(Config);
+                    return RenderResult.Value;
+                },
+                RenderResult.Value
+            );
     }
 
     public sealed class TextAreaBuilder : RectComponentBuilder<TextAreaBuilder, TextAreaConfig, string>
@@ -760,11 +825,15 @@ namespace shadcnui.GUIComponents.Core.Base
             return this;
         }
 
-        public override string Render()
-        {
-            ApplyOptions();
-            return Helper.Render(Config);
-        }
+        public override string Render() =>
+            RenderOnce(
+                () =>
+                {
+                    ApplyOptions();
+                    return Helper.Render(Config);
+                },
+                Config.Value
+            );
 
         public static implicit operator string(TextAreaBuilder builder) => builder?.Render() ?? string.Empty;
     }
@@ -798,11 +867,15 @@ namespace shadcnui.GUIComponents.Core.Base
             return this;
         }
 
-        public override DateTime? Render()
-        {
-            ApplyOptions();
-            return Helper.Render(Config);
-        }
+        public override DateTime? Render() =>
+            RenderOnce(
+                () =>
+                {
+                    ApplyOptions();
+                    return Helper.Render(Config);
+                },
+                Config.SelectedDate
+            );
 
         public static implicit operator DateTime?(CalendarBuilder builder) => builder?.Render();
     }
@@ -855,11 +928,15 @@ namespace shadcnui.GUIComponents.Core.Base
             return this;
         }
 
-        public override DateTime? Render()
-        {
-            ApplyOptions();
-            return Helper.Render(Config);
-        }
+        public override DateTime? Render() =>
+            RenderOnce(
+                () =>
+                {
+                    ApplyOptions();
+                    return Helper.Render(Config);
+                },
+                Config.SelectedDate
+            );
 
         public static implicit operator DateTime?(DatePickerBuilder builder) => builder?.Render();
     }
@@ -905,12 +982,16 @@ namespace shadcnui.GUIComponents.Core.Base
             return this;
         }
 
-        public override RenderResult Render()
-        {
-            ApplyOptions();
-            Helper.Render(Config);
-            return RenderResult.Value;
-        }
+        public override RenderResult Render() =>
+            RenderOnce(
+                () =>
+                {
+                    ApplyOptions();
+                    Helper.Render(Config);
+                    return RenderResult.Value;
+                },
+                RenderResult.Value
+            );
     }
 
     public sealed class LabelBuilder : RectComponentBuilder<LabelBuilder, LabelConfig, RenderResult>
@@ -930,12 +1011,16 @@ namespace shadcnui.GUIComponents.Core.Base
             return this;
         }
 
-        public override RenderResult Render()
-        {
-            ApplyOptions();
-            Helper.Render(Config);
-            return RenderResult.Value;
-        }
+        public override RenderResult Render() =>
+            RenderOnce(
+                () =>
+                {
+                    ApplyOptions();
+                    Helper.Render(Config);
+                    return RenderResult.Value;
+                },
+                RenderResult.Value
+            );
     }
 
     public sealed class BadgeBuilder : RectComponentBuilder<BadgeBuilder, BadgeConfig, RenderResult>
@@ -981,12 +1066,16 @@ namespace shadcnui.GUIComponents.Core.Base
             return this;
         }
 
-        public override RenderResult Render()
-        {
-            ApplyOptions();
-            Helper.Render(Config);
-            return RenderResult.Value;
-        }
+        public override RenderResult Render() =>
+            RenderOnce(
+                () =>
+                {
+                    ApplyOptions();
+                    Helper.Render(Config);
+                    return RenderResult.Value;
+                },
+                RenderResult.Value
+            );
     }
 
     public sealed class AvatarBuilder : RectComponentBuilder<AvatarBuilder, AvatarConfig, RenderResult>
@@ -1031,12 +1120,16 @@ namespace shadcnui.GUIComponents.Core.Base
             return this;
         }
 
-        public override RenderResult Render()
-        {
-            ApplyOptions();
-            Helper.Render(Config);
-            return RenderResult.Value;
-        }
+        public override RenderResult Render() =>
+            RenderOnce(
+                () =>
+                {
+                    ApplyOptions();
+                    Helper.Render(Config);
+                    return RenderResult.Value;
+                },
+                RenderResult.Value
+            );
     }
 
     public sealed class ProgressBuilder : RectComponentBuilder<ProgressBuilder, ProgressConfig, RenderResult>
@@ -1080,12 +1173,16 @@ namespace shadcnui.GUIComponents.Core.Base
             return this;
         }
 
-        public override RenderResult Render()
-        {
-            ApplyOptions();
-            Helper.Render(Config);
-            return RenderResult.Value;
-        }
+        public override RenderResult Render() =>
+            RenderOnce(
+                () =>
+                {
+                    ApplyOptions();
+                    Helper.Render(Config);
+                    return RenderResult.Value;
+                },
+                RenderResult.Value
+            );
     }
 
     public sealed class ChartBuilder : ComponentBuilder<ChartBuilder, ChartConfig, RenderResult>
@@ -1112,12 +1209,16 @@ namespace shadcnui.GUIComponents.Core.Base
             return this;
         }
 
-        public override RenderResult Render()
-        {
-            ApplyOptions();
-            Helper.Render(Config);
-            return RenderResult.Value;
-        }
+        public override RenderResult Render() =>
+            RenderOnce(
+                () =>
+                {
+                    ApplyOptions();
+                    Helper.Render(Config);
+                    return RenderResult.Value;
+                },
+                RenderResult.Value
+            );
     }
 
     public sealed class DialogBuilder : ComponentBuilder<DialogBuilder, DialogConfig, RenderResult>
@@ -1177,21 +1278,38 @@ namespace shadcnui.GUIComponents.Core.Base
         public DialogBuilder Open()
         {
             Helper.OpenDialog(Config.Id);
+            MarkRendered();
             return this;
         }
 
         public DialogBuilder Close()
         {
             Helper.CloseDialog();
+            MarkRendered();
             return this;
         }
 
-        public override RenderResult Render()
+        public override void RenderIfPending()
         {
-            ApplyOptions();
-            Helper.Render(Config);
-            return RenderResult.Value;
+            if (Config.Content == null && Config.Footer == null && string.IsNullOrEmpty(Config.Title) && string.IsNullOrEmpty(Config.Description))
+            {
+                MarkRendered();
+                return;
+            }
+
+            base.RenderIfPending();
         }
+
+        public override RenderResult Render() =>
+            RenderOnce(
+                () =>
+                {
+                    ApplyOptions();
+                    Helper.Render(Config);
+                    return RenderResult.Value;
+                },
+                RenderResult.Value
+            );
     }
 
     public sealed class PopoverBuilder : ComponentBuilder<PopoverBuilder, PopoverConfig, RenderResult>
@@ -1216,23 +1334,40 @@ namespace shadcnui.GUIComponents.Core.Base
         public PopoverBuilder Open()
         {
             Helper.OpenPopover(Config.Id, _zIndex);
+            MarkRendered();
             return this;
         }
 
         public PopoverBuilder Close()
         {
             Helper.ClosePopover();
+            MarkRendered();
             return this;
         }
 
         public bool IsOpen() => Helper.IsPopoverOpen();
 
-        public override RenderResult Render()
+        public override void RenderIfPending()
         {
-            ApplyOptions();
-            Helper.Render(Config);
-            return RenderResult.Value;
+            if (Config.Content == null)
+            {
+                MarkRendered();
+                return;
+            }
+
+            base.RenderIfPending();
         }
+
+        public override RenderResult Render() =>
+            RenderOnce(
+                () =>
+                {
+                    ApplyOptions();
+                    Helper.Render(Config);
+                    return RenderResult.Value;
+                },
+                RenderResult.Value
+            );
     }
 
     public sealed class ToastBuilder : ComponentBuilder<ToastBuilder, ToastConfig, RenderResult>
@@ -1283,12 +1418,16 @@ namespace shadcnui.GUIComponents.Core.Base
             return this;
         }
 
-        public override RenderResult Render()
-        {
-            ApplyOptions();
-            Helper.ShowToast(Config);
-            return RenderResult.Value;
-        }
+        public override RenderResult Render() =>
+            RenderOnce(
+                () =>
+                {
+                    ApplyOptions();
+                    Helper.ShowToast(Config);
+                    return RenderResult.Value;
+                },
+                RenderResult.Value
+            );
     }
 
     public sealed class CardBuilder : ComponentBuilder<CardBuilder, CardConfig, RenderResult>
@@ -1351,12 +1490,16 @@ namespace shadcnui.GUIComponents.Core.Base
             return this;
         }
 
-        public override RenderResult Render()
-        {
-            ApplyOptions();
-            Helper.Render(Config);
-            return RenderResult.Value;
-        }
+        public override RenderResult Render() =>
+            RenderOnce(
+                () =>
+                {
+                    ApplyOptions();
+                    Helper.Render(Config);
+                    return RenderResult.Value;
+                },
+                RenderResult.Value
+            );
     }
 
     public sealed class SeparatorBuilder : RectComponentBuilder<SeparatorBuilder, SeparatorConfig, RenderResult>
@@ -1389,12 +1532,16 @@ namespace shadcnui.GUIComponents.Core.Base
             return this;
         }
 
-        public override RenderResult Render()
-        {
-            ApplyOptions();
-            Helper.Render(Config);
-            return RenderResult.Value;
-        }
+        public override RenderResult Render() =>
+            RenderOnce(
+                () =>
+                {
+                    ApplyOptions();
+                    Helper.Render(Config);
+                    return RenderResult.Value;
+                },
+                RenderResult.Value
+            );
     }
 
     public sealed class TabsBuilder : ComponentBuilder<TabsBuilder, TabsConfig, int>
@@ -1488,11 +1635,15 @@ namespace shadcnui.GUIComponents.Core.Base
             return this;
         }
 
-        public override int Render()
-        {
-            ApplyOptions();
-            return Helper.Render(Config);
-        }
+        public override int Render() =>
+            RenderOnce(
+                () =>
+                {
+                    ApplyOptions();
+                    return Helper.Render(Config);
+                },
+                Config.SelectedIndex
+            );
 
         public static implicit operator int(TabsBuilder builder) => builder?.Render() ?? 0;
     }
@@ -1557,12 +1708,16 @@ namespace shadcnui.GUIComponents.Core.Base
             return this;
         }
 
-        public override RenderResult Render()
-        {
-            ApplyOptions();
-            Helper.Render(Config);
-            return RenderResult.Value;
-        }
+        public override RenderResult Render() =>
+            RenderOnce(
+                () =>
+                {
+                    ApplyOptions();
+                    Helper.Render(Config);
+                    return RenderResult.Value;
+                },
+                RenderResult.Value
+            );
     }
 
     public sealed class NavigationBuilder : ComponentBuilder<NavigationBuilder, NavigationConfig, int>
@@ -1613,11 +1768,15 @@ namespace shadcnui.GUIComponents.Core.Base
             return this;
         }
 
-        public override int Render()
-        {
-            ApplyOptions();
-            return Helper.Render(Config);
-        }
+        public override int Render() =>
+            RenderOnce(
+                () =>
+                {
+                    ApplyOptions();
+                    return Helper.Render(Config);
+                },
+                Config.SelectedIndex
+            );
 
         public static implicit operator int(NavigationBuilder builder) => builder?.Render() ?? 0;
     }
@@ -1658,11 +1817,15 @@ namespace shadcnui.GUIComponents.Core.Base
             return this;
         }
 
-        public override RenderResult Render()
-        {
-            ApplyOptions();
-            Helper.Render(Config);
-            return RenderResult.Value;
-        }
+        public override RenderResult Render() =>
+            RenderOnce(
+                () =>
+                {
+                    ApplyOptions();
+                    Helper.Render(Config);
+                    return RenderResult.Value;
+                },
+                RenderResult.Value
+            );
     }
 }

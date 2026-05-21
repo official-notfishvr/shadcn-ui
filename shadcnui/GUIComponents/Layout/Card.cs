@@ -118,8 +118,15 @@ namespace shadcnui.GUIComponents.Layout
         {
             var headerStyle = styleManager?.GetCardHeaderStyle() ?? GUIStyle.none;
             layoutComponents.BeginVerticalGroup(headerStyle);
-            content?.Invoke();
-            layoutComponents.EndVerticalGroup();
+            try
+            {
+                content?.Invoke();
+                guiHelper.FlushAutoRenderBuilder();
+            }
+            finally
+            {
+                layoutComponents.EndVerticalGroup();
+            }
         }
 
         internal void CardTitle(string title, ComponentAppearance appearance = null)
@@ -142,16 +149,30 @@ namespace shadcnui.GUIComponents.Layout
         {
             var contentStyle = styleManager?.GetCardContentStyle() ?? GUIStyle.none;
             layoutComponents.BeginVerticalGroup(contentStyle);
-            content?.Invoke();
-            layoutComponents.EndVerticalGroup();
+            try
+            {
+                content?.Invoke();
+                guiHelper.FlushAutoRenderBuilder();
+            }
+            finally
+            {
+                layoutComponents.EndVerticalGroup();
+            }
         }
 
         internal void CardFooter(Action content)
         {
             var footerStyle = styleManager?.GetCardFooterStyle() ?? GUIStyle.none;
             layoutComponents.BeginHorizontalGroup(footerStyle);
-            content?.Invoke();
-            layoutComponents.EndHorizontalGroup();
+            try
+            {
+                content?.Invoke();
+                guiHelper.FlushAutoRenderBuilder();
+            }
+            finally
+            {
+                layoutComponents.EndHorizontalGroup();
+            }
         }
 
         private void DrawHeaderContent(CardConfig config)
@@ -180,6 +201,7 @@ namespace shadcnui.GUIComponents.Layout
             }
 
             config.HeaderContent?.Invoke();
+            guiHelper.FlushAutoRenderBuilder();
         }
 
         private void DrawImage(Texture2D image)

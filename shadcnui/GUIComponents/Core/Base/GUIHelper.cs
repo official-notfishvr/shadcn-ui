@@ -72,6 +72,7 @@ namespace shadcnui.GUIComponents.Core.Base
         internal Rect _rootGuiScreenRect;
         internal bool _rootGuiScreenRectValid;
         internal int fontSize = 14;
+        private IAutoRenderBuilder _pendingAutoRenderBuilder;
 
         public const string DefaultFontName = "Segoe UI";
         public float uiScale = 1f;
@@ -267,7 +268,15 @@ namespace shadcnui.GUIComponents.Core.Base
                 nameof(BeginGUI)
             );
 
-        public void EndGUI() => Execute(_animationManager.EndGUI, nameof(EndGUI));
+        public void EndGUI() =>
+            Execute(
+                () =>
+                {
+                    FlushAutoRenderBuilder();
+                    _animationManager.EndGUI();
+                },
+                nameof(EndGUI)
+            );
 
         public void DrawOverlay() => DrawOverlays();
 
@@ -275,6 +284,8 @@ namespace shadcnui.GUIComponents.Core.Base
             Execute(
                 () =>
                 {
+                    FlushAutoRenderBuilder();
+
                     var previousMatrix = GUI.matrix;
                     var previousColor = GUI.color;
                     var previousEnabled = GUI.enabled;
@@ -321,12 +332,15 @@ namespace shadcnui.GUIComponents.Core.Base
             _dateState.Clear();
             _dateInput.Clear();
             _rootGuiScreenRectValid = false;
+            _pendingAutoRenderBuilder = null;
         }
 
         public void Dispose() => Cleanup();
 
         public Vector2 ScrollView(Vector2 position, Action draw, params GUILayoutOption[] options)
         {
+            FlushAutoRenderBuilder();
+
             string scopedKey = GetScopedStateKey(nameof(ScrollView));
             if (!string.IsNullOrEmpty(scopedKey))
             {
@@ -347,35 +361,111 @@ namespace shadcnui.GUIComponents.Core.Base
             return position;
         }
 
-        public void Row(Action draw, params GUILayoutOption[] options) => Execute(() => WrapHorizontal(draw, options), nameof(Row));
+        public void Row(Action draw, params GUILayoutOption[] options) =>
+            Execute(
+                () =>
+                {
+                    FlushAutoRenderBuilder();
+                    WrapHorizontal(draw, options);
+                },
+                nameof(Row)
+            );
 
-        public void Column(Action draw, params GUILayoutOption[] options) => Execute(() => WrapVertical(draw, options), nameof(Column));
+        public void Column(Action draw, params GUILayoutOption[] options) =>
+            Execute(
+                () =>
+                {
+                    FlushAutoRenderBuilder();
+                    WrapVertical(draw, options);
+                },
+                nameof(Column)
+            );
 
-        public void BeginRow(params GUILayoutOption[] options) => Execute(() => _layout.BeginHorizontalGroup(options), nameof(BeginRow));
+        public void BeginRow(params GUILayoutOption[] options) =>
+            Execute(
+                () =>
+                {
+                    FlushAutoRenderBuilder();
+                    _layout.BeginHorizontalGroup(options);
+                },
+                nameof(BeginRow)
+            );
 
-        public void EndRow() => Execute(_layout.EndHorizontalGroup, nameof(EndRow));
+        public void EndRow() =>
+            Execute(
+                () =>
+                {
+                    FlushAutoRenderBuilder();
+                    _layout.EndHorizontalGroup();
+                },
+                nameof(EndRow)
+            );
 
-        public void BeginColumn(params GUILayoutOption[] options) => Execute(() => _layout.BeginVerticalGroup(options), nameof(BeginColumn));
+        public void BeginColumn(params GUILayoutOption[] options) =>
+            Execute(
+                () =>
+                {
+                    FlushAutoRenderBuilder();
+                    _layout.BeginVerticalGroup(options);
+                },
+                nameof(BeginColumn)
+            );
 
-        public void EndColumn() => Execute(_layout.EndVerticalGroup, nameof(EndColumn));
+        public void EndColumn() =>
+            Execute(
+                () =>
+                {
+                    FlushAutoRenderBuilder();
+                    _layout.EndVerticalGroup();
+                },
+                nameof(EndColumn)
+            );
 
         public void BeginHorizontalGroup(params GUILayoutOption[] options) => BeginRow(options);
 
-        public void BeginHorizontalGroup(GUIStyle style, params GUILayoutOption[] options) => Execute(() => _layout.BeginHorizontalGroup(style, options), nameof(BeginHorizontalGroup));
+        public void BeginHorizontalGroup(GUIStyle style, params GUILayoutOption[] options) =>
+            Execute(
+                () =>
+                {
+                    FlushAutoRenderBuilder();
+                    _layout.BeginHorizontalGroup(style, options);
+                },
+                nameof(BeginHorizontalGroup)
+            );
 
         public void EndHorizontalGroup() => EndRow();
 
         public void BeginVerticalGroup(params GUILayoutOption[] options) => BeginColumn(options);
 
-        public void BeginVerticalGroup(GUIStyle style, params GUILayoutOption[] options) => Execute(() => _layout.BeginVerticalGroup(style, options), nameof(BeginVerticalGroup));
+        public void BeginVerticalGroup(GUIStyle style, params GUILayoutOption[] options) =>
+            Execute(
+                () =>
+                {
+                    FlushAutoRenderBuilder();
+                    _layout.BeginVerticalGroup(style, options);
+                },
+                nameof(BeginVerticalGroup)
+            );
 
         public void EndVerticalGroup() => EndColumn();
 
-        public void Space(float pixels) => Execute(() => _layout.AddSpace(pixels), nameof(Space));
+        public void Space(float pixels) =>
+            Execute(
+                () =>
+                {
+                    FlushAutoRenderBuilder();
+                    _layout.AddSpace(pixels);
+                },
+                nameof(Space)
+            );
 
         public void AddSpace(float pixels) => Space(pixels);
 
-        public void Flex() => GUILayout.FlexibleSpace();
+        public void Flex()
+        {
+            FlushAutoRenderBuilder();
+            GUILayout.FlexibleSpace();
+        }
 
         public ButtonBuilder Button(string text = "") => new(this, text);
 
@@ -546,15 +636,55 @@ namespace shadcnui.GUIComponents.Core.Base
 
         public CardBuilder Card() => new(this);
 
-        public void BeginCard(float width = -1f, float height = -1f, ControlVariant variant = ControlVariant.Default, ControlSize size = ControlSize.Default, ComponentAppearance appearance = null) => Execute(() => _card.BeginCard(width, height, variant, size, appearance), nameof(BeginCard));
+        public void BeginCard(float width = -1f, float height = -1f, ControlVariant variant = ControlVariant.Default, ControlSize size = ControlSize.Default, ComponentAppearance appearance = null) =>
+            Execute(
+                () =>
+                {
+                    FlushAutoRenderBuilder();
+                    _card.BeginCard(width, height, variant, size, appearance);
+                },
+                nameof(BeginCard)
+            );
 
-        public void CardHeader(Action content) => Execute(() => _card.CardHeader(content), nameof(CardHeader));
+        public void CardHeader(Action content) =>
+            Execute(
+                () =>
+                {
+                    FlushAutoRenderBuilder();
+                    _card.CardHeader(content);
+                },
+                nameof(CardHeader)
+            );
 
-        public void CardContent(Action content) => Execute(() => _card.CardContent(content), nameof(CardContent));
+        public void CardContent(Action content) =>
+            Execute(
+                () =>
+                {
+                    FlushAutoRenderBuilder();
+                    _card.CardContent(content);
+                },
+                nameof(CardContent)
+            );
 
-        public void CardFooter(Action content) => Execute(() => _card.CardFooter(content), nameof(CardFooter));
+        public void CardFooter(Action content) =>
+            Execute(
+                () =>
+                {
+                    FlushAutoRenderBuilder();
+                    _card.CardFooter(content);
+                },
+                nameof(CardFooter)
+            );
 
-        public void EndCard() => Execute(_card.EndCard, nameof(EndCard));
+        public void EndCard() =>
+            Execute(
+                () =>
+                {
+                    FlushAutoRenderBuilder();
+                    _card.EndCard();
+                },
+                nameof(EndCard)
+            );
 
         public SeparatorBuilder Separator() => new(this);
 
@@ -610,7 +740,33 @@ namespace shadcnui.GUIComponents.Core.Base
 
         public List<string> GetSelectedDataTableRows(string id) => Execute(() => _dataTable.GetSelectedRows(id), new List<string>(), nameof(GetSelectedDataTableRows));
 
-        internal bool Render(ButtonConfig config) => Execute(() => _button.Render(config), false, nameof(Button));
+        internal void RegisterAutoRenderBuilder(IAutoRenderBuilder builder)
+        {
+            FlushAutoRenderBuilder();
+            _pendingAutoRenderBuilder = builder;
+        }
+
+        internal void ClearAutoRenderBuilder(IAutoRenderBuilder builder)
+        {
+            if (ReferenceEquals(_pendingAutoRenderBuilder, builder))
+                _pendingAutoRenderBuilder = null;
+        }
+
+        internal void FlushAutoRenderBuilder()
+        {
+            var builder = _pendingAutoRenderBuilder;
+            if (builder == null)
+                return;
+
+            _pendingAutoRenderBuilder = null;
+            builder.RenderIfPending();
+        }
+
+        internal bool Render(ButtonConfig config)
+        {
+            FlushAutoRenderBuilder();
+            return Execute(() => _button.Render(config), false, nameof(Button));
+        }
 
         internal bool DrawButton(string text, Action onClick = null, ControlVariant variant = ControlVariant.Default, ControlSize size = ControlSize.Default, bool disabled = false, float opacity = 1f, IconConfig icon = null, params GUILayoutOption[] options) =>
             Render(
@@ -644,6 +800,8 @@ namespace shadcnui.GUIComponents.Core.Base
 
         internal string Render(InputConfig config)
         {
+            FlushAutoRenderBuilder();
+
             if (config == null)
                 return Execute(() => _input.Render(config), string.Empty, nameof(Input));
 
@@ -660,11 +818,23 @@ namespace shadcnui.GUIComponents.Core.Base
             );
         }
 
-        internal bool Render(CheckboxConfig config) => RenderBoolean(nameof(Checkbox), config, _checkbox.Render);
+        internal bool Render(CheckboxConfig config)
+        {
+            FlushAutoRenderBuilder();
+            return RenderBoolean(nameof(Checkbox), config, _checkbox.Render);
+        }
 
-        internal bool Render(SwitchConfig config) => RenderBoolean(nameof(Switch), config, _switch.Render);
+        internal bool Render(SwitchConfig config)
+        {
+            FlushAutoRenderBuilder();
+            return RenderBoolean(nameof(Switch), config, _switch.Render);
+        }
 
-        internal bool Render(ToggleConfig config) => RenderBoolean(nameof(Toggle), config, _toggle.Render);
+        internal bool Render(ToggleConfig config)
+        {
+            FlushAutoRenderBuilder();
+            return RenderBoolean(nameof(Toggle), config, _toggle.Render);
+        }
 
         internal bool DrawToggle(string text, bool value, ControlVariant variant = ControlVariant.Default, ControlSize size = ControlSize.Default, Action<bool> onChange = null, bool disabled = false, ComponentAppearance appearance = null, params GUILayoutOption[] options) =>
             Render(
@@ -683,6 +853,8 @@ namespace shadcnui.GUIComponents.Core.Base
 
         internal float Render(SliderConfig config)
         {
+            FlushAutoRenderBuilder();
+
             if (config == null)
                 return Execute(() => _slider.Render(config), 0f, nameof(Slider));
 
@@ -700,6 +872,8 @@ namespace shadcnui.GUIComponents.Core.Base
 
         internal Vector2 Render(RangeSliderConfig config)
         {
+            FlushAutoRenderBuilder();
+
             if (config == null)
                 return Execute(() => _rangeSlider.Render(config), Vector2.zero, nameof(RangeSlider));
 
@@ -718,6 +892,8 @@ namespace shadcnui.GUIComponents.Core.Base
 
         internal int Render(SelectConfig config)
         {
+            FlushAutoRenderBuilder();
+
             if (config == null)
                 return Execute(() => _select.Render(config), 0, nameof(Select));
 
@@ -734,14 +910,28 @@ namespace shadcnui.GUIComponents.Core.Base
             );
         }
 
-        internal void Render(DropdownMenuConfig config) => Execute(() => _dropdownMenu.Render(config), nameof(DropdownMenu));
+        internal void Render(DropdownMenuConfig config)
+        {
+            FlushAutoRenderBuilder();
+            Execute(() => _dropdownMenu.Render(config), nameof(DropdownMenu));
+        }
 
-        internal void Render(ThemeChangerConfig config) => Execute(() => _themeChanger.Render(config), nameof(ThemeChanger));
+        internal void Render(ThemeChangerConfig config)
+        {
+            FlushAutoRenderBuilder();
+            Execute(() => _themeChanger.Render(config), nameof(ThemeChanger));
+        }
 
-        internal void Render(FontChangerConfig config) => Execute(() => _fontChanger.Render(config), nameof(FontChanger));
+        internal void Render(FontChangerConfig config)
+        {
+            FlushAutoRenderBuilder();
+            Execute(() => _fontChanger.Render(config), nameof(FontChanger));
+        }
 
         internal string Render(TextAreaConfig config)
         {
+            FlushAutoRenderBuilder();
+
             if (config == null)
                 return Execute(() => _textArea.Render(config), string.Empty, nameof(TextArea));
 
@@ -759,6 +949,8 @@ namespace shadcnui.GUIComponents.Core.Base
 
         internal DateTime? Render(CalendarConfig config)
         {
+            FlushAutoRenderBuilder();
+
             config ??= new CalendarConfig();
             string key = config.Id ?? nameof(Calendar);
             return ExecStatefulDate(
@@ -778,6 +970,8 @@ namespace shadcnui.GUIComponents.Core.Base
 
         internal DateTime? Render(DatePickerConfig config)
         {
+            FlushAutoRenderBuilder();
+
             if (config == null)
                 return Execute(() => _datePicker.Render(config), null, nameof(DatePicker));
 
@@ -795,39 +989,101 @@ namespace shadcnui.GUIComponents.Core.Base
 
         internal void Render(DataTableConfig config)
         {
+            FlushAutoRenderBuilder();
+
             if (config == null)
                 return;
 
             Execute(() => _dataTable.Render(config.Id, config.Columns, config.Rows, config.ShowPagination, config.ShowSearch, config.ShowSelection, config.ShowColumnToggle, config.Appearance, config.LayoutOptions), nameof(DataTable));
         }
 
-        internal void Render(LabelConfig config) => Execute(() => _label.Render(config), nameof(Label));
+        internal void Render(LabelConfig config)
+        {
+            FlushAutoRenderBuilder();
+            Execute(() => _label.Render(config), nameof(Label));
+        }
 
-        internal void Render(BadgeConfig config) => Execute(() => _badge.Render(config), nameof(Badge));
+        internal void Render(BadgeConfig config)
+        {
+            FlushAutoRenderBuilder();
+            Execute(() => _badge.Render(config), nameof(Badge));
+        }
 
-        internal void Render(AvatarConfig config) => Execute(() => _avatar.Render(config), nameof(Avatar));
+        internal void Render(AvatarConfig config)
+        {
+            FlushAutoRenderBuilder();
+            Execute(() => _avatar.Render(config), nameof(Avatar));
+        }
 
-        internal void Render(ProgressConfig config) => Execute(() => _progress.Render(config), nameof(Progress));
+        internal void Render(ProgressConfig config)
+        {
+            FlushAutoRenderBuilder();
+            Execute(() => _progress.Render(config), nameof(Progress));
+        }
 
-        internal void Render(ChartConfig config) => Execute(() => _chart.Render(config), nameof(Chart));
+        internal void Render(ChartConfig config)
+        {
+            FlushAutoRenderBuilder();
+            Execute(() => _chart.Render(config), nameof(Chart));
+        }
 
-        internal void Render(DialogConfig config) => Execute(() => _dialog.Render(config), nameof(Dialog));
+        internal void Render(DialogConfig config)
+        {
+            FlushAutoRenderBuilder();
+            Execute(() => _dialog.Render(config), nameof(Dialog));
+        }
 
-        internal void Render(PopoverConfig config) => Execute(() => _popover.Render(config), nameof(Popover));
+        internal void Render(PopoverConfig config)
+        {
+            FlushAutoRenderBuilder();
+            Execute(() => _popover.Render(config), nameof(Popover));
+        }
 
-        internal void Render(CardConfig config) => Execute(() => _card.Render(config), nameof(Card));
+        internal void Render(CardConfig config)
+        {
+            FlushAutoRenderBuilder();
+            Execute(() => _card.Render(config), nameof(Card));
+        }
 
-        internal void Render(SeparatorConfig config) => Execute(() => _separator.Render(config), nameof(Separator));
+        internal void Render(SeparatorConfig config)
+        {
+            FlushAutoRenderBuilder();
+            Execute(() => _separator.Render(config), nameof(Separator));
+        }
 
-        internal int Render(TabsConfig config) => Execute(() => _tabs.Render(config), config?.SelectedIndex ?? 0, nameof(Tabs));
+        internal int Render(TabsConfig config)
+        {
+            FlushAutoRenderBuilder();
+            return Execute(() => _tabs.Render(config), config?.SelectedIndex ?? 0, nameof(Tabs));
+        }
 
-        internal void Render(TableConfig config) => Execute(() => _table.Render(config), nameof(Table));
+        internal void Render(TableConfig config)
+        {
+            FlushAutoRenderBuilder();
+            Execute(() => _table.Render(config), nameof(Table));
+        }
 
-        internal int Render(NavigationConfig config) => Execute(() => _navigation.Render(config), config?.SelectedIndex ?? 0, nameof(Navigation));
+        internal int Render(NavigationConfig config)
+        {
+            FlushAutoRenderBuilder();
+            return Execute(() => _navigation.Render(config), config?.SelectedIndex ?? 0, nameof(Navigation));
+        }
 
-        internal void Render(MenuBar.MenuBarConfig config) => Execute(() => _menuBar.Render(config), nameof(MenuBar));
+        internal void Render(MenuBar.MenuBarConfig config)
+        {
+            FlushAutoRenderBuilder();
+            Execute(() => _menuBar.Render(config), nameof(MenuBar));
+        }
 
-        public void ShowToast(ToastConfig config) => Execute(() => _toast.Show(config), nameof(Toast));
+        public void ShowToast(ToastConfig config) =>
+            Execute(
+                () =>
+                {
+                    FlushAutoRenderBuilder();
+                    _toast.Show(config);
+                },
+                nameof(Toast)
+            );
 
         public void DismissToast(string id, bool animate = true) => Execute(() => _toast.Dismiss(id, animate), nameof(DismissToast));
 
@@ -904,6 +1160,7 @@ namespace shadcnui.GUIComponents.Core.Base
             try
             {
                 draw?.Invoke();
+                FlushAutoRenderBuilder();
             }
             finally
             {
@@ -917,6 +1174,7 @@ namespace shadcnui.GUIComponents.Core.Base
             try
             {
                 draw?.Invoke();
+                FlushAutoRenderBuilder();
             }
             finally
             {
