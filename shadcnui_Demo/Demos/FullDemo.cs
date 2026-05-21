@@ -1,7 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using shadcnui.GUIComponents.Controls;
 using shadcnui.GUIComponents.Core.Base;
 using shadcnui.GUIComponents.Core.Styling;
 using shadcnui.GUIComponents.Core.Theming;
@@ -37,63 +35,38 @@ namespace shadcnui_Demo.Menu
         private readonly List<Texture2D> _generatedTextures = new();
         private Texture2D _sampleTexture;
         private Texture2D _coverTexture;
-        private List<(Texture2D img, string fallback)> _avatarGroup;
 
         private float _uiScale = 1f;
         private float _fontSize = 14f;
+        private float _masterVolume = 0.72f;
+        private float _dangerThreshold = 65f;
+        private Vector2 _rangeValues = new(20f, 80f);
 
         private string _search = "orbital relay";
         private string _email = "operator@station.local";
         private string _password = "flat-ui-demo";
-        private string _passwordFieldValue = "token-Delta-19";
-        private string _notes = "The full demo should feel like a polished control room instead of a dump of isolated widgets.";
-        private string _outlineNotes = "Outline text area";
-        private string _ghostNotes = "Ghost text area";
-        private string _labeledNotes = "Labeled notes with character count.";
-        private float _notesHeight = 110f;
+        private string _notes = "The new demo is intentionally smaller and only uses the builder/direct API that still exists.";
 
         private bool _featureToggle = true;
-        private bool _compactMode;
         private bool _alertsEnabled = true;
+        private bool _compactMode;
         private bool _allowSpectators = true;
-        private bool _dangerMode;
-        private bool _confirmDeploy;
         private bool _showDialog;
-        private float _masterVolume = 0.72f;
-        private float _musicVolume = 0.58f;
-        private float _dangerThreshold = 65f;
-        private float _steppedValue = 40f;
-        private float _smallSlider = 0.28f;
-        private float _largeSlider = 0.84f;
-        private string _screenshotPreview = string.Empty;
-        private bool _screenshotScrollOverrideActive;
-        private float _screenshotScrollOverrideY;
+        private bool _showPopover;
         private bool _previewToastsPrimed;
 
         private int _priorityIndex = 1;
         private int _locationIndex = 2;
-        private int _nestedTabIndex;
-        private int _verticalTabIndex;
-        private int _sidebarIndex = 1;
         private int _navigationIndex = 1;
         private int _tablePage;
 
-        private string[] _closableTabs = { "Alpha", "Bravo", "Charlie", "Delta" };
-        private bool[] _closableFlags = { true, true, true, true };
-
-        private string _tableQuery = string.Empty;
-        private string[,] _filteredTableRows;
-        private int[] _sortColumns = Array.Empty<int>();
-        private bool[] _sortAscending = Array.Empty<bool>();
-        private bool[] _selectedTableRows;
-        private float[] _resizableColumnWidths = { 130f, 130f, 110f, 140f };
-
         private DateTime? _shipDate = DateTime.Today.AddDays(3);
         private DateTime? _meetingDate = DateTime.Today;
-        private DateTime? _rangeStart = DateTime.Today;
-        private DateTime? _rangeEnd = DateTime.Today.AddDays(5);
 
-        private List<DropdownMenuItem> _dropdownItems;
+        private string _screenshotPreview = string.Empty;
+        private bool _screenshotScrollOverrideActive;
+        private float _screenshotScrollOverrideY;
+
         private List<DataTableColumn> _dataColumns;
         private List<DataTableRow> _dataRows;
         private List<ChartSeries> _barSeries;
@@ -102,46 +75,26 @@ namespace shadcnui_Demo.Menu
 
         private const string MissionDialogId = "mission_dialog";
         private const string StatusPopoverId = "status_popover";
-        private const string LocationSelectId = "location_select";
-        private const string MeetingPickerId = "meeting_picker";
-        private const string ShipPickerId = "ship_picker";
-        private const string RangePickerId = "maintenance_range";
         private const string DataTableId = "ops_table";
-        private const string PinnedToastId = "pinned_toast";
 
         private void Start()
         {
             _gui = new GUIHelper();
-
             _sampleTexture = CreatePatternTexture(32, Theme.Hex("#0f172a"), Theme.Hex("#38bdf8"), 4);
             _coverTexture = CreatePatternTexture(96, Theme.Hex("#111827"), Theme.Hex("#22c55e"), 8);
-            _avatarGroup = new List<(Texture2D img, string fallback)>
-            {
-                (CreatePatternTexture(32, Theme.Hex("#172554"), Theme.Hex("#60a5fa"), 4), "AL"),
-                (CreatePatternTexture(32, Theme.Hex("#3f1d2e"), Theme.Hex("#f472b6"), 4), "BR"),
-                (CreatePatternTexture(32, Theme.Hex("#1f2937"), Theme.Hex("#f59e0b"), 4), "CY"),
-                (CreatePatternTexture(32, Theme.Hex("#052e16"), Theme.Hex("#4ade80"), 4), "DT"),
-                (CreatePatternTexture(32, Theme.Hex("#1e1b4b"), Theme.Hex("#a78bfa"), 4), "EX"),
-            };
-
-            _filteredTableRows = (string[,])_simpleRows.Clone();
-            _selectedTableRows = new bool[_simpleRows.GetLength(0)];
-
-            BuildDropdownItems();
             BuildDataTable();
             BuildCharts();
         }
 
         private void OnGUI()
         {
-            _windowRect = GUI.Window(104, _windowRect, (GUI.WindowFunction)DrawWindow, string.Empty);
+            _windowRect = GUI.Window(104, _windowRect, DrawWindow, string.Empty);
             _gui.DrawOverlays();
         }
 
         private void OnDestroy()
         {
             _gui?.Cleanup();
-
             foreach (var texture in _generatedTextures)
             {
                 if (texture != null)
@@ -161,7 +114,7 @@ namespace shadcnui_Demo.Menu
             DrawHeader();
             _gui.HorizontalSeparator();
 
-            _activeTab = _gui.Tabs(_tabs, _activeTab, DrawBody, maxLines: 1, position: TabPosition.Top, indicatorStyle: IndicatorStyle.Background, overflowScroll: true);
+            _activeTab = _gui.Tabs().Items(_tabs).SelectedIndex(_activeTab).Indicator(IndicatorStyle.Background).Content(DrawBody).Render();
 
             _gui.EndGUI();
             GUI.DragWindow();
@@ -172,18 +125,18 @@ namespace shadcnui_Demo.Menu
             _gui.BeginHorizontalGroup();
 
             _gui.BeginVerticalGroup();
-            _gui.Heading("shadcn/ui Full Demo");
-            _gui.Caption("A broader live surface for the C# GUI helper, rebuilt to show composition instead of isolated controls.");
+            _gui.Label("shadcn/ui Full Demo").Large().Render();
+            _gui.Label("Both demos now exercise the current builder/direct API instead of the removed legacy helper surface.").Muted().Render();
             _gui.BeginHorizontalGroup();
-            _gui.Badge(_gui.CurrentTheme.Name, ControlVariant.Secondary);
-            _gui.CountBadge(_tabs.Length, ControlVariant.Outline);
-            _gui.StatusBadge("Overlay Layer", true);
+            _gui.Badge(_gui.CurrentTheme.Name).Secondary().Render();
+            _gui.Badge($"{_tabs.Length} tabs").Outline().Render();
+            _gui.Badge(_alertsEnabled ? "Alerts Enabled" : "Alerts Paused").StatusDot(_alertsEnabled).Render();
             _gui.EndHorizontalGroup();
             _gui.EndVerticalGroup();
 
             GUILayout.FlexibleSpace();
 
-            _gui.BeginVerticalGroup(GUILayout.Width(410f));
+            _gui.BeginVerticalGroup(GUILayout.Width(360f));
             _gui.BeginHorizontalGroup();
             if (_gui.Button("Dark", ControlVariant.Outline, ControlSize.Small))
                 _gui.SetTheme("Dark");
@@ -193,45 +146,10 @@ namespace shadcnui_Demo.Menu
                 _gui.SetTheme("Cyan");
             _gui.EndHorizontalGroup();
 
-            _gui.ThemeChanger(
-                new ThemeChangerConfig
-                {
-                    Id = "full_demo_theme",
-                    Width = 240f,
-                    ShowPreview = true,
-                }
-            );
-            _gui.FontChanger(
-                new FontChangerConfig
-                {
-                    Id = "full_demo_font",
-                    Width = 240f,
-                    ShowPreview = true,
-                }
-            );
-            _uiScale = _gui.Slider(
-                new SliderConfig
-                {
-                    Label = "UI Scale",
-                    Value = _uiScale,
-                    MinValue = 0.85f,
-                    MaxValue = 1.35f,
-                    Step = 0.05f,
-                    ShowValue = true,
-                }
-            );
-            _fontSize = _gui.Slider(
-                new SliderConfig
-                {
-                    Label = "Base Font",
-                    Value = _fontSize,
-                    MinValue = 12f,
-                    MaxValue = 18f,
-                    Step = 1f,
-                    ShowValue = true,
-                    ValueFormat = "F0",
-                }
-            );
+            _gui.ThemeChanger().Id("full_demo_theme").Width(220f).ShowPreview().Render();
+            _gui.FontChanger().Id("full_demo_font").Width(220f).ShowPreview().PreviewText("Control room typography sample").Render();
+            _uiScale = _gui.Slider(_uiScale).Label("UI Scale").Range(0.85f, 1.35f).Step(0.05f).ShowValue().Format("F2").Render();
+            _fontSize = _gui.Slider(_fontSize).Label("Base Font").Range(12f, 18f).Step(1f).ShowValue().Format("F0").Render();
             _gui.EndVerticalGroup();
 
             _gui.EndHorizontalGroup();
@@ -259,8 +177,6 @@ namespace shadcnui_Demo.Menu
 
         private void DrawBodyContent()
         {
-            _gui.BeginVerticalGroup();
-
             switch (_activeTab)
             {
                 case 0:
@@ -281,13 +197,10 @@ namespace shadcnui_Demo.Menu
                 case 5:
                     DrawDataTab();
                     break;
-                default:
+                case 6:
                     DrawOverlayTab();
                     break;
             }
-
-            _gui.AddSpace(28f);
-            _gui.EndVerticalGroup();
 
             if (Event.current.type == EventType.Repaint)
             {
@@ -299,75 +212,28 @@ namespace shadcnui_Demo.Menu
         private void DrawOverviewTab()
         {
             DrawSection(
-                "Snapshot",
-                "High-level status surfaces, stat cards, quick actions, and helper summaries.",
+                "Mission Brief",
                 () =>
                 {
-                    _gui.BeginHorizontalGroup();
-                    _gui.StatCard("Themes", _gui.GetThemeManager().Themes.Count.ToString(), _gui.CurrentTheme.Name, 220f);
-                    _gui.StatCard("Toasts", _gui.GetActiveToastCount().ToString(), "active overlays", 220f);
-                    _gui.StatCard("Data Rows", _dataRows.Count.ToString(), "selectable + searchable", 220f);
-                    _gui.EndHorizontalGroup();
-
-                    _gui.AddSpace(10f);
-
-                    _gui.BeginHorizontalGroup();
-                    _gui.AvatarWithStatus(_sampleTexture, "UI", true, ControlSize.Large);
-                    _gui.BeginVerticalGroup(GUILayout.Width(460f));
-                    _gui.Heading("Mission Control Surface");
-                    _gui.Caption("This pass keeps the demo compact while covering the broader helper API exposed by GUIHelper.");
-                    _gui.LabeledProgress("Completion", 0.87f, width: 340f);
-                    _gui.EndVerticalGroup();
-                    GUILayout.FlexibleSpace();
-                    _gui.AvatarGroup(_avatarGroup, ControlSize.Default, 4);
-                    _gui.EndHorizontalGroup();
+                    _gui.Card()
+                        .Title("Orbital Relay")
+                        .Subtitle("Current build surface")
+                        .Description("The demos now show only the API we plan to keep.")
+                        .Content("Builder calls are the primary path. Thin direct helpers remain for the common one-liners.")
+                        .Image(_coverTexture)
+                        .Size(420f, 260f)
+                        .Render();
                 }
             );
 
             DrawSection(
-                "Quick Actions",
-                "Shortcut buttons, tooltips, and summary helpers that make the rest of the demo feel like an app instead of a test harness.",
-                () =>
-                {
-                    _gui.ButtonGroup(() =>
-                    {
-                        if (_gui.Button("Save Preset", ControlVariant.Secondary))
-                            _gui.ShowSuccessToast("Preset Saved", "Window state committed");
-                        if (_gui.Button("Broadcast", new IconConfig(_sampleTexture), ControlVariant.Default))
-                            _gui.ShowInfoToast("Broadcast", "Sent current status to squad");
-                        if (_gui.WithTooltip("Show a warning toast", new TooltipConfig { HoverDelaySeconds = 0.15f }, () => _gui.Button("Alert", ControlVariant.Outline)))
-                            _gui.ShowWarningToast("Signal Weak", "Relay jitter crossed threshold");
-                        if (_gui.Button("Dismiss Toasts", ControlVariant.Ghost))
-                            _gui.DismissAllToasts();
-                    });
-
-                    _gui.AddSpace(10f);
-                    _gui.KeyValueRow("Current Theme", _gui.CurrentTheme.Name);
-                    _gui.KeyValueRow("Search Query", string.IsNullOrWhiteSpace(_search) ? "<empty>" : _search);
-                    _gui.KeyValueRow("Ship Date", _shipDate?.ToString("MMM dd, yyyy") ?? "unset");
-                    _gui.ErrorAlert("Overlay components render outside the window bounds using the shared layer manager.");
-                }
-            );
-
-            DrawSection(
-                "What This Demo Covers",
-                "A shorter directory of the helper surface without returning to the old one-component-per-tab approach.",
+                "Quick Stats",
                 () =>
                 {
                     _gui.BeginHorizontalGroup();
-                    _gui.BeginVerticalGroup(GUILayout.Width(340f));
-                    _gui.SectionHeader("Controls");
-                    _gui.CodeLabel("Buttons, toggles, checkboxes, switches, sliders, selects, dropdown menus");
-                    _gui.SectionHeader("Display");
-                    _gui.CodeLabel("Labels, badges, avatars, progress bars, charts");
-                    _gui.EndVerticalGroup();
-
-                    _gui.BeginVerticalGroup(GUILayout.Width(360f));
-                    _gui.SectionHeader("Layout");
-                    _gui.CodeLabel("Cards, separators, tabs, sidebars, navigation, menu bars");
-                    _gui.SectionHeader("Data + Overlay");
-                    _gui.CodeLabel("Tables, DataTable, dialogs, popovers, tooltips, toasts, date pickers");
-                    _gui.EndVerticalGroup();
+                    _gui.Card().Title("Deploys").Content("24 queued").Size(180f, 120f).Render();
+                    _gui.Card().Title("Latency").Content("18 ms").Size(180f, 120f).Render();
+                    _gui.Card().Title("Coverage").Content("91%").Size(180f, 120f).Render();
                     _gui.EndHorizontalGroup();
                 }
             );
@@ -377,103 +243,35 @@ namespace shadcnui_Demo.Menu
         {
             DrawSection(
                 "Buttons",
-                "Variants, sizes, icon support, and disabled states.",
                 () =>
                 {
-                    DrawVariantShowcase(variant => _gui.Button(variant.ToString(), variant, ControlSize.Small));
-                    _gui.AddSpace(10f);
-                    DrawSizeShowcase(size => _gui.Button(size.ToString(), ControlVariant.Default, size));
-
-                    _gui.AddSpace(10f);
                     _gui.BeginHorizontalGroup();
-                    _gui.Button("Icon Left", new IconConfig(_sampleTexture, IconPosition.Left) { Size = 14f, Spacing = 6f }, ControlVariant.Outline);
-                    _gui.Button("Icon Right", new IconConfig(_sampleTexture, IconPosition.Right) { Size = 14f, Spacing = 6f }, ControlVariant.Secondary);
-                    _gui.Button("Disabled", ControlVariant.Ghost, ControlSize.Default, disabled: true);
+                    _gui.Button("Primary").Render();
+                    _gui.Button("Secondary").Secondary().Render();
+                    _gui.Button("Outline").Outline().Render();
+                    _gui.Button("Ghost").Ghost().Render();
+                    _gui.Button("Delete").Destructive().Render();
                     _gui.EndHorizontalGroup();
                 }
             );
 
             DrawSection(
-                "Toggles, Checkboxes, Switches",
-                "The shared styling surface stays consistent across stateful controls.",
+                "Boolean Controls",
                 () =>
                 {
-                    _gui.BeginHorizontalGroup();
-                    _featureToggle = _gui.Toggle("Feature Flags", _featureToggle);
-                    _compactMode = _gui.Checkbox("Compact HUD", _compactMode);
-                    _alertsEnabled = _gui.Switch("Alerts", _alertsEnabled);
-                    _allowSpectators = _gui.Toggle("Spectators", new IconConfig(_sampleTexture), _allowSpectators);
-                    _gui.EndHorizontalGroup();
-
-                    _gui.AddSpace(10f);
-                    _gui.Disabled(
-                        true,
-                        () =>
-                        {
-                            _gui.BeginHorizontalGroup();
-                            _gui.Toggle("Disabled Toggle", true);
-                            _gui.Checkbox("Disabled Checkbox", true);
-                            _gui.Switch("Disabled Switch", false);
-                            _gui.EndHorizontalGroup();
-                        }
-                    );
+                    _featureToggle = _gui.Toggle("Feature Flag", _featureToggle).Render();
+                    _alertsEnabled = _gui.Checkbox("Alert Routing", _alertsEnabled).Render();
+                    _allowSpectators = _gui.Switch("Allow Spectators", _allowSpectators).Render();
                 }
             );
 
             DrawSection(
                 "Sliders",
-                "Simple, labeled, stepped, disabled, and size-based slider variants.",
                 () =>
                 {
-                    _masterVolume = _gui.Slider(
-                        new SliderConfig
-                        {
-                            Label = "Master Volume",
-                            Value = _masterVolume,
-                            MinValue = 0f,
-                            MaxValue = 1f,
-                            Step = 0.01f,
-                            ShowValue = true,
-                        }
-                    );
-                    _musicVolume = _gui.LabeledSlider("Music", _musicVolume, 0f, 1f, true, format: "F2");
-                    _steppedValue = _gui.LabeledSlider("CPU Budget", _steppedValue, 0f, 100f, 5f, true, ControlVariant.Secondary, format: "F0");
-                    _dangerThreshold = _gui.Slider(
-                        new SliderConfig
-                        {
-                            Label = "Danger Threshold",
-                            Value = _dangerThreshold,
-                            MinValue = 0f,
-                            MaxValue = 100f,
-                            Step = 5f,
-                            Variant = ControlVariant.Destructive,
-                            ShowValue = true,
-                            ValueFormat = "F0",
-                        }
-                    );
-
-                    _gui.AddSpace(8f);
-                    _smallSlider = _gui.Slider(
-                        new SliderConfig
-                        {
-                            Value = _smallSlider,
-                            MinValue = 0f,
-                            MaxValue = 1f,
-                            Size = ControlSize.Small,
-                            Label = "Small",
-                        }
-                    );
-                    _largeSlider = _gui.Slider(
-                        new SliderConfig
-                        {
-                            Value = _largeSlider,
-                            MinValue = 0f,
-                            MaxValue = 1f,
-                            Size = ControlSize.Large,
-                            Label = "Large",
-                        }
-                    );
-                    _gui.DisabledSlider(0.35f, 0f, 1f);
+                    _masterVolume = _gui.Slider(_masterVolume).Label("Master Volume").Range(0f, 1f).Step(0.05f).ShowValue().Render();
+                    _dangerThreshold = _gui.Slider(_dangerThreshold).Label("Danger Threshold").Range(0f, 100f).Step(5f).ShowValue().Format("F0").Destructive().Render();
+                    _rangeValues = _gui.RangeSlider(_rangeValues.x, _rangeValues.y).Label("Operational Window").Range(0f, 100f).Step(5f).ShowValue().Format("F0").Render();
                 }
             );
         }
@@ -481,104 +279,36 @@ namespace shadcnui_Demo.Menu
         private void DrawInputsTab()
         {
             DrawSection(
-                "Text Inputs",
-                "Single-line inputs, icon support, password helpers, and section labels.",
+                "Input Fields",
                 () =>
                 {
-                    _gui.SectionHeader("Operator Identity");
-                    _email = _gui.Input(
-                        new InputConfig
-                        {
-                            Label = "Email",
-                            Value = _email,
-                            Placeholder = "name@station.local",
-                            Width = 320,
-                        }
-                    );
-                    _search = _gui.Input(
-                        new InputConfig
-                        {
-                            Label = "Search",
-                            Value = _search,
-                            Placeholder = "Search command palette",
-                            Icon = new IconConfig(_sampleTexture, IconPosition.Left) { Size = 14f, Spacing = 6f },
-                            Width = 340,
-                        }
-                    );
-                    _password = _gui.Password(
-                        new InputConfig
-                        {
-                            Label = "Access Token",
-                            Value = _password,
-                            Width = 340,
-                        }
-                    );
-
-                    _gui.InputLabel("Legacy password helper");
-                    _gui.PasswordField(280f, "Paste backup token", ref _passwordFieldValue);
-                }
-            );
-
-            DrawSection(
-                "Text Areas",
-                "Default, outline, ghost, labeled, and resizable text areas.",
-                () =>
-                {
-                    _notes = _gui.TextArea(_notes, placeholder: "Enter notes", minHeight: 80f);
-                    _outlineNotes = _gui.OutlineTextArea(_outlineNotes, placeholder: "Outline variant", minHeight: 70f);
-                    _ghostNotes = _gui.GhostTextArea(_ghostNotes, placeholder: "Ghost variant", minHeight: 70f);
-                    _labeledNotes = _gui.LabeledTextArea("Mission Summary", _labeledNotes, placeholder: "Labeled text area", minHeight: 80f, maxLen: 180);
-                    _notes = _gui.ResizableTextArea(_notes, ref _notesHeight, placeholder: "Resizable notes", minHeight: 70f, maxH: 220f);
+                    _search = _gui.Input(_search).Label("Search").Placeholder("Find a squad").Render();
+                    _email = _gui.Input(_email).Label("Email").Placeholder("operator@station.local").Render();
+                    _password = _gui.Input(_password).Label("Password").Password().Render();
                 }
             );
 
             DrawSection(
                 "Select, Dropdown, Date",
-                "Choice-heavy controls with menu surfaces and calendar tooling.",
                 () =>
                 {
-                    _priorityIndex = _gui.Select("Priority", _priorityItems, _priorityIndex);
-                    var locationConfig = new SelectConfig
-                    {
-                        Id = LocationSelectId,
-                        Label = "Location",
-                        SelectedIndex = _locationIndex,
-                        Width = 280f,
-                        Options = Array.ConvertAll(_locationItems, item => new SelectOption(item.ToLowerInvariant(), item)),
-                    };
-                    _locationIndex = _gui.Select(locationConfig);
-                    if (_screenshotPreview == "inputs_select" && Event.current.type == EventType.Repaint && !_gui.IsSelectOpen(LocationSelectId))
-                        _gui.OpenSelect(locationConfig, GUILayoutUtility.GetLastRect());
+                    _priorityIndex = _gui.Select().Label("Priority").Items(_priorityItems).SelectedIndex(_priorityIndex).Width(240f).Render();
+                    _locationIndex = _gui.Select().Label("Location").Items(_locationItems).SelectedIndex(_locationIndex).Width(240f).Render();
 
-                    _gui.AddSpace(6f);
-                    _gui.MutedLabel(_gui.IsSelectOpen(LocationSelectId) ? "Location select is open." : "Location select is closed.");
+                    _gui.DropdownMenu().Trigger(() => _screenshotPreview == "inputs_dropdown" || _gui.Button("Quick Actions", ControlVariant.Outline, ControlSize.Small)).Header("Actions").Item("Queue Deploy").Item("Run Diagnostics").Separator().Item("Archive").Render();
 
-                    _gui.AddSpace(10f);
-                    var dropdownConfig = new DropdownMenuConfig(_dropdownItems) { Id = "full_demo_dropdown", Trigger = () => _gui.Button("Open Dropdown", ControlVariant.Outline) };
-                    _gui.DropdownMenu(dropdownConfig);
-                    if (_screenshotPreview == "inputs_dropdown" && Event.current.type == EventType.Repaint && !_gui.IsDropdownMenuOpen("full_demo_dropdown"))
-                        _gui.OpenDropdownMenu(dropdownConfig, GUILayoutUtility.GetLastRect());
+                    _meetingDate = _gui.DatePicker().Id("meeting_picker").Label("Meeting Date").Value(_meetingDate).Range(DateTime.Today, DateTime.Today.AddDays(30)).Render();
+                    _shipDate = _gui.DatePicker().Id("ship_picker").Label("Ship Date").Value(_shipDate).Range(DateTime.Today, DateTime.Today.AddDays(45)).Render();
+                }
+            );
 
-                    _gui.AddSpace(12f);
-                    _gui.BeginHorizontalGroup();
-                    _gui.Calendar(
-                        new CalendarConfig
-                        {
-                            SelectedDate = _meetingDate,
-                            DisabledDates = new List<DateTime> { DateTime.Today.AddDays(-1), DateTime.Today.AddDays(2) },
-                            Ranges = new List<(DateTime Start, DateTime End)> { (DateTime.Today.AddDays(5), DateTime.Today.AddDays(8)) },
-                        }
-                    );
-
-                    _gui.BeginVerticalGroup(GUILayout.Width(340f));
-                    _shipDate = _gui.DatePicker("Ship date", _shipDate, DateTime.Today, DateTime.Today.AddDays(30), ShipPickerId);
-                    _meetingDate = _gui.LabeledDatePicker("Daily Sync", "Meeting date", _meetingDate, MeetingPickerId);
-                    _rangeStart = _gui.DateRangePicker("Maintenance range", _rangeStart, _rangeEnd, DateTime.Today, DateTime.Today.AddDays(45), RangePickerId);
-                    _gui.MutedLabel($"Meeting picker open: {_gui.IsDatePickerOpen(MeetingPickerId)}");
-                    if (_gui.Button("Close Meeting Picker", ControlVariant.Ghost, ControlSize.Small))
-                        _gui.CloseDatePicker(MeetingPickerId);
-                    _gui.EndVerticalGroup();
-                    _gui.EndHorizontalGroup();
+            DrawSection(
+                "Text Area",
+                () =>
+                {
+                    _notes = _gui.TextArea(_notes).Label("Notes").Placeholder("Write a short operational note").MinHeight(110f).ShowCharacterCount().Render();
+                    if (_screenshotPreview == "inputs_select")
+                        _gui.Badge("Select preview requested").Outline().Render();
                 }
             );
         }
@@ -587,72 +317,36 @@ namespace shadcnui_Demo.Menu
         {
             DrawSection(
                 "Labels and Badges",
-                "Typography helpers and compact status surfaces.",
                 () =>
                 {
-                    _gui.BeginHorizontalGroup();
-                    _gui.Heading("Heading");
-                    _gui.MutedLabel("Muted");
-                    _gui.SecondaryLabel("Secondary");
-                    _gui.DestructiveLabel("Destructive");
-                    _gui.CodeLabel("Code Label");
-                    _gui.EndHorizontalGroup();
-
-                    _gui.Caption("Caption helpers are useful for card descriptions and lower-contrast metadata.");
-                    _gui.Label("Icon Label", new IconConfig(_sampleTexture, IconPosition.Left) { Size = 12f, Spacing = 4f });
-
-                    _gui.AddSpace(10f);
-                    DrawVariantShowcase(variant => _gui.Badge(variant.ToString(), variant, ControlSize.Small));
-
-                    _gui.AddSpace(10f);
-                    _gui.BeginHorizontalGroup();
-                    _gui.Badge("Asset", new IconConfig(_sampleTexture));
-                    _gui.CountBadge(128, ControlVariant.Outline);
-                    _gui.StatusBadge("Synced", true);
-                    _gui.ProgressBadge("Deploy", 0.66f);
-                    _gui.RoundedBadge("Rounded", cornerRadius: 16f);
-                    _gui.AnimatedBadge("Pulse", "badge_pulse", ControlVariant.Secondary);
-                    _gui.EndHorizontalGroup();
+                    _gui.Label("Default label").Render();
+                    _gui.Label("Muted helper copy").Muted().Render();
+                    _gui.Badge("Online").StatusDot().Render();
+                    _gui.Badge("42").Count(42).Outline().Render();
+                    _gui.Badge("Build Sync").Progress(0.72f).Secondary().Render();
                 }
             );
 
             DrawSection(
-                "Avatars and Progress",
-                "Avatar layouts and progress components share the same theme primitives.",
+                "Avatar and Progress",
                 () =>
                 {
                     _gui.BeginHorizontalGroup();
-                    _gui.Avatar(_sampleTexture, "UI", ControlSize.Default, AvatarShape.Circle);
-                    _gui.Avatar(_sampleTexture, "SQ", ControlSize.Default, AvatarShape.Square);
-                    _gui.AvatarWithStatus(_sampleTexture, "OP", true, ControlSize.Default);
-                    _gui.AvatarWithName(_sampleTexture, "JD", "Jordan Data", showNameBelow: true);
-                    _gui.AvatarWithBorder(_sampleTexture, "AI", _gui.CurrentTheme.Accent);
-                    _gui.AvatarGroup(_avatarGroup, ControlSize.Default, 5);
+                    _gui.Avatar().Image(_sampleTexture).Fallback("AL").Name("Ava Lane").Online().Render();
+                    _gui.Avatar().Fallback("BR").Shape(AvatarShape.Rounded).Border(Theme.Hex("#38bdf8")).Render();
                     _gui.EndHorizontalGroup();
 
-                    _gui.AddSpace(10f);
-                    _gui.Progress(0.34f, width: 320f);
-                    _gui.LabeledProgress("Streaming Assets", 0.67f, width: 320f);
-                    _gui.AnimatedProgress("deploy_anim", Mathf.PingPong(Time.time * 0.15f, 1f), width: 320f);
-                    _gui.IndeterminateProgress("background_sync", width: 320f);
-
-                    _gui.BeginHorizontalGroup();
-                    _gui.CircularProgress(0.24f, 54f);
-                    _gui.CircularProgress(0.79f, 54f);
-                    _gui.EndHorizontalGroup();
+                    _gui.Progress(0.64f).Label("Sync Status").WidthValue(420f).ShowPercentage().Render();
                 }
             );
 
             DrawSection(
                 "Charts",
-                "Bar, line, and pie charts all route through the same chart helper.",
                 () =>
                 {
-                    _gui.BeginHorizontalGroup();
-                    _gui.Chart(new ChartConfig(_barSeries, ChartType.Bar) { Size = new Vector2(320f, 210f) });
-                    _gui.Chart(new ChartConfig(_lineSeries, ChartType.Line) { Size = new Vector2(320f, 210f) });
-                    _gui.Chart(new ChartConfig(_pieSeries, ChartType.Pie) { Size = new Vector2(320f, 210f) });
-                    _gui.EndHorizontalGroup();
+                    _gui.Chart().Type(ChartType.Bar).Series(_barSeries.ToArray()).Size(520f, 240f).Render();
+                    _gui.AddSpace(12f);
+                    _gui.Chart().Type(ChartType.Line).Series(_lineSeries.ToArray()).Size(520f, 240f).Render();
                 }
             );
         }
@@ -660,137 +354,30 @@ namespace shadcnui_Demo.Menu
         private void DrawLayoutTab()
         {
             DrawSection(
-                "Cards",
-                "Convenience cards, image cards, avatar cards, manual card composition, and stat surfaces.",
+                "Navigation",
                 () =>
                 {
-                    _gui.BeginHorizontalGroup();
-                    _gui.Card("Mission Brief", "Convenience card", "Use the one-call helper when you want a title, copy, and compact footer action.", () => _gui.Button("Acknowledge", ControlVariant.Secondary, ControlSize.Small), 260f, 210f);
-                    _gui.CardWithImage(_coverTexture, "Image Card", "Reusable content block", "Cards with images are useful for dashboards, launchers, and detail previews.", () => _gui.Button("Inspect", ControlVariant.Outline, ControlSize.Small), 260f, 210f);
-                    _gui.CardWithAvatar(_sampleTexture, "Squad Lead", "Rhea Vale", "Avatar cards keep title, subtitle, and body aligned to the shared token system.", () => _gui.Button("Message", ControlVariant.Ghost, ControlSize.Small), 260f, 210f);
-                    _gui.EndHorizontalGroup();
-
-                    _gui.AddSpace(10f);
-                    _gui.BeginHorizontalGroup();
-                    _gui.BeginCard(320f, 190f);
-                    _gui.CardHeader(() =>
-                    {
-                        _gui.CardTitle("Manual Composition");
-                        _gui.CardDescription("Use the lower-level card helpers when you need tighter control.");
-                    });
-                    _gui.CardContent(() =>
-                    {
-                        _gui.Label("Cards can nest separators, button groups, and helper text.");
-                        _gui.LabeledSeparator("Actions");
-                        _gui.ButtonGroup(() =>
-                        {
-                            _gui.Button("Save", ControlVariant.Secondary, ControlSize.Small);
-                            _gui.Button("Publish", ControlVariant.Default, ControlSize.Small);
-                        });
-                    });
-                    _gui.CardFooter(() => _gui.Caption("Footer content uses the same spacing system."));
-                    _gui.EndCard();
-
-                    _gui.BeginVerticalGroup();
-                    _gui.SimpleCard("Simple card surfaces are useful when the content itself already carries the hierarchy.", 320f, 90f);
-                    _gui.AddSpace(8f);
-                    _gui.StatCard("FPS Budget", "16.6 ms", "-0.8 ms", 320f);
-                    _gui.EndVerticalGroup();
-                    _gui.EndHorizontalGroup();
+                    _navigationIndex = _gui.Navigation().Logo("S").Width(110f).Items(new NavigationItem("overview", "Overview"), new NavigationItem("teams", "Teams"), new NavigationItem("logs", "Logs"), new NavigationItem("settings", "Settings")).SelectedIndex(_navigationIndex).Render();
                 }
             );
 
             DrawSection(
-                "Separators and Tabs",
-                "Spacing primitives, nested tabs, vertical tabs, and closable tabs.",
+                "Menu Bar",
                 () =>
                 {
-                    _gui.Label("Horizontal separator");
-                    _gui.HorizontalSeparator();
-                    _gui.LabeledSeparator("Navigation");
-                    _gui.SeparatorWithSpacing(SeparatorOrientation.Horizontal, 4f, 8f);
-
-                    _gui.BeginHorizontalGroup();
-                    _gui.Label("Left");
-                    _gui.VerticalSeparator(GUILayout.Height(28f));
-                    _gui.Label("Right");
-                    _gui.EndHorizontalGroup();
-
-                    _gui.AddSpace(12f);
-                    _nestedTabIndex = _gui.Tabs(new[] { "Overview", "Loadout", "Intel" }, _nestedTabIndex, () => _gui.SimpleCard($"Nested tab: {_nestedTabIndex}", 260f, 90f), maxLines: 1, position: TabPosition.Top, indicatorStyle: IndicatorStyle.Underline);
-
-                    _verticalTabIndex = _gui.VerticalTabs(new[] { "Status", "Map", "Logs" }, _verticalTabIndex, () => _gui.SimpleCard($"Vertical tab: {_verticalTabIndex}", 240f, 90f), tabWidth: 120f, side: TabSide.Left, style: IndicatorStyle.Background);
-
-                    _gui.AddSpace(10f);
-                    if (_closableTabs.Length == 0)
-                    {
-                        if (_gui.Button("Reset Closable Tabs", ControlVariant.Outline, ControlSize.Small))
-                        {
-                            _closableTabs = new[] { "Alpha", "Bravo", "Charlie", "Delta" };
-                            _closableFlags = new[] { true, true, true, true };
-                        }
-                    }
-                    else
-                    {
-                        var closableIndex = Mathf.Clamp(_nestedTabIndex, 0, Mathf.Max(_closableTabs.Length - 1, 0));
-                        closableIndex = _gui.ClosableTabs(ref _closableTabs, ref _closableFlags, closableIndex, () => _gui.SimpleCard($"Closable tab count: {_closableTabs.Length}", 260f, 90f));
-                        _nestedTabIndex = Mathf.Clamp(closableIndex, 0, Mathf.Max(_closableTabs.Length - 1, 0));
-                    }
+                    _gui.MenuBar().Item("File", items => items.Item("New Run").Item("Duplicate").Separator().Item("Close")).Item("View", items => items.Item("Compact Mode").Item("Expanded Grid")).Item("Help", items => items.Item("API Surface").Item("Migration Notes")).Render();
                 }
             );
 
             DrawSection(
-                "Navigation and Menu Bar",
-                "Sidebar shortcut navigation, config-based navigation, and nested menu commands.",
+                "Card Grid",
                 () =>
                 {
                     _gui.BeginHorizontalGroup();
-                    _sidebarIndex = _gui.Sidebar(new[] { "Ops", "Feed", "Settings" }, _sidebarIndex, new[] { "O", "F", "S" }, "U", width: 76f);
-
-                    _navigationIndex = _gui.Navigation(
-                        new NavigationConfig
-                        {
-                            Width = 92f,
-                            LogoText = "MC",
-                            IndicatorStyle = IndicatorStyle.Background,
-                            IndicatorColor = _gui.CurrentTheme.Accent,
-                            SelectedIndex = _navigationIndex,
-                            Items = new[]
-                            {
-                                new NavigationItem("overview", "Overview", "OV"),
-                                new NavigationItem("queue", "Queue", "Q"),
-                                new NavigationItem("deploy", "Deploy", "DP") { IsDisabled = true },
-                                new NavigationItem("logs", "Logs", "LG"),
-                            },
-                        }
-                    );
-
-                    _gui.BeginVerticalGroup(GUILayout.Width(380f));
-                    _gui.SimpleCard($"Sidebar selection: {_sidebarIndex}", 360f, 70f);
-                    _gui.AddSpace(6f);
-                    _gui.SimpleCard($"Navigation selection: {_navigationIndex}", 360f, 70f);
-                    _gui.EndVerticalGroup();
+                    _gui.Card().Title("North Wing").Content("Traffic stable").Size(220f, 150f).Render();
+                    _gui.Card().Title("Transit Hub").Content("2 alerts pending").Size(220f, 150f).Render();
+                    _gui.Card().Title("Relay Tower").Content("Maintenance window").Size(220f, 150f).Render();
                     _gui.EndHorizontalGroup();
-
-                    _gui.AddSpace(12f);
-                    _gui.MenuBar(
-                        new List<MenuBar.MenuItem>
-                        {
-                            new MenuBar.MenuItem(
-                                "File",
-                                subItems: new List<MenuBar.MenuItem>
-                                {
-                                    MenuBar.MenuItem.Header("Project"),
-                                    new MenuBar.MenuItem("New Mission", () => _gui.ShowInfoToast("New Mission", "Started a new mission draft"), shortcut: "Ctrl+N"),
-                                    new MenuBar.MenuItem("Save Layout", () => _gui.ShowSuccessToast("Saved", "Layout persisted"), shortcut: "Ctrl+S"),
-                                    MenuBar.MenuItem.Separator(),
-                                    new MenuBar.MenuItem("Close", () => _gui.ShowWarningToast("Closed", "Session closed")),
-                                }
-                            ),
-                            new MenuBar.MenuItem("Edit", subItems: new List<MenuBar.MenuItem> { new MenuBar.MenuItem("Duplicate", () => _gui.ShowInfoToast("Duplicate", "Copied selection")), new MenuBar.MenuItem("Delete", () => _gui.ShowErrorToast("Delete", "Removed selection")) }),
-                            new MenuBar.MenuItem("View", subItems: new List<MenuBar.MenuItem> { new MenuBar.MenuItem("Dark Theme", () => _gui.SetTheme("Dark")), new MenuBar.MenuItem("Light Theme", () => _gui.SetTheme("Light")), new MenuBar.MenuItem("Cyan Theme", () => _gui.SetTheme("Cyan")) }),
-                        }
-                    );
                 }
             );
         }
@@ -798,327 +385,108 @@ namespace shadcnui_Demo.Menu
         private void DrawDataTab()
         {
             DrawSection(
-                "Basic and Custom Tables",
-                "Standard table rendering plus a custom cell renderer path.",
+                "Table",
                 () =>
                 {
-                    _gui.Table(_simpleHeaders, _simpleRows, ControlVariant.Default, ControlSize.Default, GUILayout.Width(560f));
-                    _gui.HorizontalSeparator();
-
-                    object[,] customRows =
-                    {
-                        { "Build Queue", 18, "Healthy" },
-                        { "Render Farm", 6, "Busy" },
-                        { "Asset Sync", 2, "Blocked" },
-                    };
-
-                    _gui.CustomTable(
-                        new[] { "System", "Workers", "State" },
-                        customRows,
-                        (value, row, col) =>
-                        {
-                            if (col == 1)
-                                _gui.Label($"{value} nodes", ControlVariant.Secondary);
-                            else if (col == 2 && string.Equals(value?.ToString(), "Blocked", StringComparison.OrdinalIgnoreCase))
-                                _gui.DestructiveLabel(value?.ToString() ?? string.Empty);
-                            else
-                                _gui.Label(value?.ToString() ?? string.Empty);
-                        }
-                    );
+                    _gui.Table().Headers(_simpleHeaders).Rows(_simpleRows).Page(_tablePage, 4).OnPage(page => _tablePage = page).Search(_search).OnSearch(value => _search = value).Render();
                 }
             );
 
             DrawSection(
-                "Interactive Table Modes",
-                "Sortable, selectable, paginated, searchable, and resizable table helpers.",
+                "Data Table",
                 () =>
                 {
-                    _gui.SortableTable(_simpleHeaders, _simpleRows, ref _sortColumns, ref _sortAscending);
-                    _gui.MutedLabel(_sortColumns.Length == 0 ? "No active sort." : $"Sorted column: {_simpleHeaders[_sortColumns[0]]} ({(_sortAscending[0] ? "asc" : "desc")})");
-
-                    _gui.AddSpace(12f);
-                    _gui.SelectableTable(_simpleHeaders, _simpleRows, ref _selectedTableRows);
-                    _gui.MutedLabel($"Selected rows: {CountSelectedRows(_selectedTableRows)}");
-
-                    _gui.AddSpace(12f);
-                    _gui.PaginatedTable(_simpleHeaders, _simpleRows, ref _tablePage, 2);
-                    _gui.MutedLabel($"Current page: {_tablePage + 1}");
+                    _gui.DataTable(DataTableId).Columns(_dataColumns).Rows(_dataRows).ShowPagination().ShowSearch().ShowSelection().ShowColumnToggle().Render();
                 }
             );
 
             DrawSection(
-                "Search, Resize, DataTable",
-                "Searchable and resizable tables plus the object-backed DataTable surface.",
+                "Pie Breakdown",
                 () =>
                 {
-                    _gui.SearchableTable(_simpleHeaders, _simpleRows, ref _tableQuery, ref _filteredTableRows);
-                    _gui.MutedLabel($"Filtered rows: {GetRowCount(_filteredTableRows)}");
-
-                    _gui.AddSpace(12f);
-                    _gui.ResizableTable(_simpleHeaders, _simpleRows, ref _resizableColumnWidths);
-
-                    _gui.AddSpace(12f);
-                    _gui.BeginHorizontalGroup();
-                    if (_gui.Button("Page Size 3", ControlVariant.Outline, ControlSize.Small))
-                        _gui.SetDataTablePageSize(DataTableId, 3);
-                    if (_gui.Button("Page Size 6", ControlVariant.Outline, ControlSize.Small))
-                        _gui.SetDataTablePageSize(DataTableId, 6);
-                    if (_gui.Button("Clear Selection", ControlVariant.Ghost, ControlSize.Small))
-                        _gui.ClearDataTableSelection(DataTableId);
-                    _gui.EndHorizontalGroup();
-
-                    _gui.DataTable(DataTableId, _dataColumns, _dataRows, true, true, true, true, GUILayout.Width(900f));
-
-                    var state = _gui.GetDataTableState(DataTableId);
-                    var selectedRows = _gui.GetSelectedDataTableRows(DataTableId);
-                    if (state != null)
-                    {
-                        _gui.KeyValueRow("Filter", string.IsNullOrWhiteSpace(state.FilterText) ? "<none>" : state.FilterText);
-                        _gui.KeyValueRow("Page Size", state.PageSize.ToString());
-                        _gui.KeyValueRow("Selected", selectedRows.Count.ToString());
-                        _gui.KeyValueRow("Sort", string.IsNullOrWhiteSpace(state.SortColumn) ? "<none>" : $"{state.SortColumn} ({(state.SortAscending ? "asc" : "desc")})");
-                    }
+                    _gui.Chart().Type(ChartType.Pie).Series(_pieSeries.ToArray()).Size(360f, 260f).Render();
                 }
             );
         }
 
         private void DrawOverlayTab()
         {
-            if (_screenshotPreview == "overlay_dialog")
-                _showDialog = true;
-
             DrawSection(
-                "Dialog and Popover",
-                "Modal overlays and lightweight supporting surfaces.",
+                "Transient UI",
                 () =>
                 {
                     _gui.BeginHorizontalGroup();
                     if (_gui.Button("Open Dialog", ControlVariant.Default, ControlSize.Small))
-                    {
                         _showDialog = true;
-                        _gui.OpenDialog(MissionDialogId);
-                    }
                     if (_gui.Button("Open Popover", ControlVariant.Outline, ControlSize.Small))
-                        _gui.OpenPopover(StatusPopoverId);
+                        _showPopover = true;
+                    if (_gui.Button("Show Toast", ControlVariant.Secondary, ControlSize.Small))
+                        ShowToast("Status update", "Overlay example", ToastVariant.Info);
                     _gui.EndHorizontalGroup();
-
-                    _gui.MutedLabel(_gui.IsPopoverOpen() ? $"Popover open at z-index {_gui.GetPopoverZIndex()}." : "Popover closed.");
-
-                    if (_showDialog)
-                    {
-                        if (Event.current.type == EventType.Repaint)
-                            _gui.OpenDialog(MissionDialogId);
-
-                        _gui.Dialog(
-                            new DialogConfig
-                            {
-                                Id = MissionDialogId,
-                                Title = "Launch Sequence",
-                                Description = "A themed dialog driven by the shared style and layer systems.",
-                                Width = 440f,
-                                Height = 250f,
-                                CloseOnOverlayClick = true,
-                                Content = () =>
-                                {
-                                    _gui.Label("Validate the mission package before deployment.");
-                                    _confirmDeploy = _gui.Checkbox("Confirm destructive action", _confirmDeploy);
-                                    _dangerMode = _gui.Switch("Danger mode", _dangerMode, ControlVariant.Destructive);
-                                },
-                                Footer = () =>
-                                {
-                                    if (_gui.Button("Cancel", ControlVariant.Ghost, ControlSize.Small))
-                                    {
-                                        _showDialog = false;
-                                        _gui.CloseDialog();
-                                    }
-
-                                    if (_gui.Button("Deploy", ControlVariant.Destructive, ControlSize.Small))
-                                    {
-                                        _showDialog = false;
-                                        _gui.CloseDialog();
-                                        _gui.ShowSuccessToast("Deployment queued", "Launch window confirmed");
-                                    }
-                                },
-                            }
-                        );
-                    }
-
-                    if (_gui.IsPopoverOpen())
-                    {
-                        _gui.Popover(() =>
-                        {
-                            _gui.Label("Status Popover");
-                            _gui.MutedLabel("Use this for supporting context without taking over the flow.");
-                            _gui.KeyValueRow("Priority", _priorityItems[_priorityIndex]);
-                            _gui.KeyValueRow("Location", _locationItems[_locationIndex]);
-                            if (_gui.Button("Close", ControlVariant.Ghost, ControlSize.Small))
-                                _gui.ClosePopover();
-                        });
-                    }
-                    else if (_screenshotPreview == "overlay_popover" && Event.current.type == EventType.Repaint)
-                    {
-                        _gui.OpenPopover(StatusPopoverId);
-                    }
                 }
             );
 
-            DrawSection(
-                "Tooltips and Toasts",
-                "Tooltip wrappers and a broader set of toast behaviors.",
-                () =>
+            _gui.Dialog(MissionDialogId)
+                .ParentWindow(_windowRect)
+                .Title("Mission Confirmation")
+                .Description("This uses the new builder-style dialog API.")
+                .Content(() => _gui.Label("Confirm the next deployment window.").Muted().Render())
+                .Footer(() =>
                 {
-                    if (_screenshotPreview == "overlay_toasts" && !_previewToastsPrimed)
+                    _gui.BeginHorizontalGroup();
+                    if (_gui.Button("Cancel", ControlVariant.Outline, ControlSize.Small))
                     {
-                        _previewToastsPrimed = true;
-                        _gui.ShowSuccessToast("Saved", "Preset updated", 12000f);
-                        _gui.ShowWarningToast("Signal Weak", "Relay strength dropped below threshold", 12000f);
-                        _gui.ShowInfoToast("Build Info", "The demo is using the rebuilt showcase", 12000f);
+                        _showDialog = false;
+                        _gui.Dialog(MissionDialogId).Close();
                     }
-
-                    _gui.BeginHorizontalGroup();
-                    _gui.WithTooltip("Primary action", () => _gui.Button("Primary"));
-                    _gui.WithTooltip("Secondary action", () => _gui.Button("Secondary", ControlVariant.Secondary));
-                    _gui.WithTooltip("Outline action", new TooltipConfig { HoverDelaySeconds = 0.2f, MaxWidth = 180f }, () => _gui.Button("Outline", ControlVariant.Outline));
-                    _gui.WithTooltip("Runtime status", () => _gui.StatusBadge("Live", true));
-                    _gui.EndHorizontalGroup();
-
-                    _gui.AddSpace(10f);
-                    _gui.BeginHorizontalGroup();
-                    if (_gui.Button("Success", ControlVariant.Default, ControlSize.Small))
-                        _gui.ShowSuccessToast("Saved", "Preset updated");
-                    if (_gui.Button("Warning", ControlVariant.Outline, ControlSize.Small))
-                        _gui.ShowWarningToast("Signal Weak", "Relay strength dropped below threshold");
-                    if (_gui.Button("Error", ControlVariant.Destructive, ControlSize.Small))
-                        _gui.ShowErrorToast("Sync Failed", "Unable to refresh mission state");
-                    if (_gui.Button("Info", ControlVariant.Ghost, ControlSize.Small))
-                        _gui.ShowInfoToast("Build Info", "The demo is using the rebuilt showcase");
-                    _gui.EndHorizontalGroup();
-
-                    _gui.AddSpace(10f);
-                    _gui.BeginHorizontalGroup();
-                    if (_gui.Button("Action Toast", ControlVariant.Secondary, ControlSize.Small))
+                    if (_gui.Button("Confirm", ControlVariant.Default, ControlSize.Small))
                     {
-                        _gui.ShowToast(
-                            new ToastConfig
-                            {
-                                Title = "Confirm Action",
-                                Description = "Do you want to continue with the queued deployment?",
-                                Variant = ToastVariant.Warning,
-                                DurationMs = 9000f,
-                                Position = ToastPosition.Center,
-                                ActionLabel = "Confirm",
-                                OnAction = () => _gui.ShowSuccessToast("Confirmed", "Deployment is continuing"),
-                                ShowAccentBar = true,
-                                ShowProgressBar = true,
-                            }
-                        );
+                        _showDialog = false;
+                        _gui.Dialog(MissionDialogId).Close();
+                        ShowToast("Deploy queued", "Mission window approved", ToastVariant.Success);
                     }
-
-                    if (_gui.Button("Pinned Toast", ControlVariant.Outline, ControlSize.Small))
-                    {
-                        _gui.ShowToast(
-                            new ToastConfig
-                            {
-                                Id = PinnedToastId,
-                                Title = "Pinned Status",
-                                Description = "This toast can be dismissed by id.",
-                                Variant = ToastVariant.Info,
-                                Position = ToastPosition.TopRight,
-                                DurationMs = 12000f,
-                            }
-                        );
-                    }
-
-                    if (_gui.Button("Dismiss Pinned", ControlVariant.Ghost, ControlSize.Small))
-                        _gui.DismissToast(PinnedToastId);
-                    if (_gui.Button("Dismiss All", ControlVariant.Ghost, ControlSize.Small))
-                        _gui.DismissAllToasts();
                     _gui.EndHorizontalGroup();
+                })
+                .Render();
 
-                    _gui.AddSpace(10f);
-                    _gui.BeginHorizontalGroup();
-                    if (_gui.Button("Top Left", ControlVariant.Outline, ControlSize.Small))
-                        ShowPositionToast("Top Left", ToastPosition.TopLeft, ToastVariant.Default);
-                    if (_gui.Button("Center", ControlVariant.Outline, ControlSize.Small))
-                        ShowPositionToast("Center", ToastPosition.Center, ToastVariant.Warning);
-                    if (_gui.Button("Bottom Right", ControlVariant.Outline, ControlSize.Small))
-                        ShowPositionToast("Bottom Right", ToastPosition.BottomRight, ToastVariant.Success);
-                    _gui.EndHorizontalGroup();
+            _gui.Popover(StatusPopoverId)
+                .Content(() =>
+                {
+                    _gui.Label("Popover content").Render();
+                    _gui.Label("Anchored overlay state").Muted().Render();
+                })
+                .Render();
 
-                    _gui.AddSpace(10f);
-                    _gui.BeginHorizontalGroup();
-                    if (_gui.Button("Stack Up", ControlVariant.Outline, ControlSize.Small))
-                        ShowStackedToasts(ToastPosition.BottomRight, ToastStackDirection.Up);
-                    if (_gui.Button("Stack Down", ControlVariant.Outline, ControlSize.Small))
-                        ShowStackedToasts(ToastPosition.TopRight, ToastStackDirection.Down);
-                    if (_gui.Button("Stack Left", ControlVariant.Outline, ControlSize.Small))
-                        ShowStackedToasts(ToastPosition.CenterRight, ToastStackDirection.Left);
-                    if (_gui.Button("Stack Right", ControlVariant.Outline, ControlSize.Small))
-                        ShowStackedToasts(ToastPosition.CenterLeft, ToastStackDirection.Right);
-                    _gui.EndHorizontalGroup();
+            if (_showDialog || _screenshotPreview == "overlay_dialog")
+                _gui.Dialog(MissionDialogId).Open();
 
-                    _gui.MutedLabel($"Active toasts: {_gui.GetActiveToastCount()}");
-                }
-            );
-        }
+            if (_showPopover || _screenshotPreview == "overlay_popover")
+                _gui.Popover(StatusPopoverId).Open();
 
-        private void DrawSection(string title, string summary, Action draw)
-        {
-            _gui.BeginCard(-1f, -1f);
-            _gui.CardHeader(() =>
+            if (_screenshotPreview == "overlay_toasts" && !_previewToastsPrimed)
             {
-                _gui.CardTitle(title);
-                _gui.CardDescription(summary);
-            });
-            _gui.CardContent(draw);
-            _gui.EndCard();
-            _gui.AddSpace(12f);
-        }
-
-        private void DrawVariantShowcase(Action<ControlVariant> draw)
-        {
-            _gui.BeginHorizontalGroup();
-            foreach (ControlVariant variant in Enum.GetValues(typeof(ControlVariant)).Cast<ControlVariant>())
-            {
-                _gui.BeginVerticalGroup(GUILayout.Width(120f));
-                _gui.Caption(variant.ToString());
-                draw(variant);
-                _gui.EndVerticalGroup();
+                _previewToastsPrimed = true;
+                ShowToast("Deploy queued", "Primary system channel", ToastVariant.Success);
+                ShowToast("Watch relay traffic", "Secondary channel", ToastVariant.Warning);
             }
-            _gui.EndHorizontalGroup();
         }
 
-        private void DrawSizeShowcase(Action<ControlSize> draw)
+        private void DrawSection(string title, Action content)
         {
-            _gui.BeginHorizontalGroup();
-            foreach (ControlSize size in Enum.GetValues(typeof(ControlSize)).Cast<ControlSize>())
-            {
-                _gui.BeginVerticalGroup(GUILayout.Width(120f));
-                _gui.Caption(size.ToString());
-                draw(size);
-                _gui.EndVerticalGroup();
-            }
-            _gui.EndHorizontalGroup();
+            _gui.BeginVerticalGroup();
+            _gui.Label(title).Large().Render();
+            _gui.Label("Current API example").Muted().Render();
+            _gui.AddSpace(8f);
+            content?.Invoke();
+            _gui.AddSpace(18f);
+            _gui.HorizontalSeparator();
+            _gui.AddSpace(18f);
+            _gui.EndVerticalGroup();
         }
 
-        private void BuildDropdownItems()
+        private void ShowToast(string title, string description, ToastVariant variant)
         {
-            var broadcast = new DropdownMenuItem(DropdownMenuItemType.Item, "Broadcast", () => _gui.ShowInfoToast("Broadcast", "Sent current state"), _sampleTexture);
-            broadcast.SubItems = new List<DropdownMenuItem>
-            {
-                new DropdownMenuItem(DropdownMenuItemType.Item, "Broadcast to Ops", () => _gui.ShowSuccessToast("Ops", "Message sent")),
-                new DropdownMenuItem(DropdownMenuItemType.Item, "Broadcast to Squad", () => _gui.ShowSuccessToast("Squad", "Message sent")),
-            };
-
-            _dropdownItems = new List<DropdownMenuItem>
-            {
-                new DropdownMenuItem(DropdownMenuItemType.Header, "Actions"),
-                new DropdownMenuItem(DropdownMenuItemType.Item, "Deploy", () => _gui.ShowSuccessToast("Deploy", "Deployment command queued"), _sampleTexture),
-                broadcast,
-                new DropdownMenuItem(DropdownMenuItemType.Item, "Duplicate", () => _gui.ShowInfoToast("Duplicate", "Copied current preset")),
-                new DropdownMenuItem(DropdownMenuItemType.Separator),
-                new DropdownMenuItem(DropdownMenuItemType.Item, "Archive", () => _gui.ShowWarningToast("Archive", "Preset archived")),
-            };
+            _gui.Toast().Title(title).Description(description).Variant(variant).Position(ToastPosition.BottomRight).Duration(3200f).Render();
         }
 
         private void BuildDataTable()
@@ -1200,17 +568,6 @@ namespace shadcnui_Demo.Menu
                         ["region"] = "EU",
                     }
                 ),
-                new(
-                    "7",
-                    new Dictionary<string, object>
-                    {
-                        ["squad"] = "Gamma",
-                        ["lead"] = "Juno",
-                        ["status"] = "Ready",
-                        ["power"] = 81,
-                        ["region"] = "APAC",
-                    }
-                ),
             };
         }
 
@@ -1247,58 +604,6 @@ namespace shadcnui_Demo.Menu
                     Data = new List<ChartDataPoint> { new("NA", 42, Theme.Hex("#38bdf8")), new("EU", 31, Theme.Hex("#22c55e")), new("APAC", 19, Theme.Hex("#f59e0b")), new("LATAM", 8, Theme.Hex("#ef4444")) },
                 },
             };
-        }
-
-        private void ShowPositionToast(string title, ToastPosition position, ToastVariant variant)
-        {
-            _gui.ShowToast(
-                new ToastConfig
-                {
-                    Title = title,
-                    Description = $"Positioned at {position}",
-                    Variant = variant,
-                    Position = position,
-                    DurationMs = 3000f,
-                }
-            );
-        }
-
-        private void ShowStackedToasts(ToastPosition position, ToastStackDirection direction)
-        {
-            for (int i = 0; i < 3; i++)
-            {
-                _gui.ShowToast(
-                    new ToastConfig
-                    {
-                        Title = $"Toast {i + 1}",
-                        Description = $"Stack direction: {direction}",
-                        Variant = (ToastVariant)(i % 4),
-                        Position = position,
-                        StackDirection = direction,
-                        DurationMs = 5000f,
-                    }
-                );
-            }
-        }
-
-        private int CountSelectedRows(bool[] rows)
-        {
-            if (rows == null)
-                return 0;
-
-            int selected = 0;
-            for (int i = 0; i < rows.Length; i++)
-            {
-                if (rows[i])
-                    selected++;
-            }
-
-            return selected;
-        }
-
-        private int GetRowCount(string[,] rows)
-        {
-            return rows == null ? 0 : rows.GetLength(0);
         }
 
         private Texture2D CreatePatternTexture(int size, Color dark, Color light, int blockSize)
@@ -1340,6 +645,8 @@ namespace shadcnui_Demo.Menu
             _screenshotScrollOverrideActive = false;
             _screenshotScrollOverrideY = 0f;
             _previewToastsPrimed = false;
+            _showDialog = false;
+            _showPopover = false;
         }
 
         public float GetScreenshotMaxScroll()

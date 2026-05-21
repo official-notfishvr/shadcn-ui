@@ -52,12 +52,18 @@ namespace shadcnui.GUIComponents.Core.Base
         private readonly Table _table;
         private readonly Navigation _navigation;
 
-        private readonly Dictionary<int, float> _floatState = new(), _floatInput = new();
-        private readonly Dictionary<int, int> _intState = new(), _intInput = new();
-        private readonly Dictionary<int, bool> _boolState = new(), _boolInput = new();
-        private readonly Dictionary<int, string> _stringState = new(), _stringInput = new();
-        private readonly Dictionary<int, Vector2> _v2State = new(), _v2Input = new();
-        private readonly Dictionary<int, DateTime?> _dateState = new(), _dateInput = new();
+        private readonly Dictionary<int, float> _floatState = new(),
+            _floatInput = new();
+        private readonly Dictionary<int, int> _intState = new(),
+            _intInput = new();
+        private readonly Dictionary<int, bool> _boolState = new(),
+            _boolInput = new();
+        private readonly Dictionary<int, string> _stringState = new(),
+            _stringInput = new();
+        private readonly Dictionary<int, Vector2> _v2State = new(),
+            _v2Input = new();
+        private readonly Dictionary<int, DateTime?> _dateState = new(),
+            _dateInput = new();
         private readonly Stack<string> _stateScopes = new();
 
         private HashSet<string> _availableFonts;
@@ -110,10 +116,36 @@ namespace shadcnui.GUIComponents.Core.Base
 
             _components = new List<BaseComponent>
             {
-                _button, _input, _checkbox, _switch, _toggle, _slider, _rangeSlider, _select, _dropdownMenu,
-                _themeChanger, _fontChanger, _textArea, _calendar, _datePicker, _dataTable, _label, _badge,
-                _avatar, _progress, _chart, _dialog, _popover, _toast, _tooltip, _card, _separator, _tabs,
-                _menuBar, _table, _navigation,
+                _button,
+                _input,
+                _checkbox,
+                _switch,
+                _toggle,
+                _slider,
+                _rangeSlider,
+                _select,
+                _dropdownMenu,
+                _themeChanger,
+                _fontChanger,
+                _textArea,
+                _calendar,
+                _datePicker,
+                _dataTable,
+                _label,
+                _badge,
+                _avatar,
+                _progress,
+                _chart,
+                _dialog,
+                _popover,
+                _toast,
+                _tooltip,
+                _card,
+                _separator,
+                _tabs,
+                _menuBar,
+                _table,
+                _navigation,
             };
 
             ApplyDefaultFont();
@@ -347,14 +379,58 @@ namespace shadcnui.GUIComponents.Core.Base
 
         public ButtonBuilder Button(string text = "") => new(this, text);
 
+        public bool Button(string text, Action onClick = null, ControlVariant variant = ControlVariant.Default, ControlSize size = ControlSize.Default, bool disabled = false, float opacity = 1f, IconConfig icon = null, params GUILayoutOption[] options) =>
+            DrawButton(text, onClick, variant, size, disabled, opacity, icon, options);
+
         public bool Button(string text, ControlVariant variant, ControlSize size = ControlSize.Default, Action onClick = null, bool disabled = false, float opacity = 1f, ComponentAppearance appearance = null, params GUILayoutOption[] options) =>
             DrawButton(text, variant, size, onClick, disabled, opacity, appearance, options);
 
         public InputBuilder Input(string value = "") => new(this, value);
 
+        public string Input(string value, string placeholder = null, bool disabled = false, GUILayoutOption[] opts = null) =>
+            Render(
+                new InputConfig
+                {
+                    Value = value,
+                    Placeholder = placeholder,
+                    IsDisabled = disabled,
+                    LayoutOptions = opts ?? Array.Empty<GUILayoutOption>(),
+                }
+            );
+
         public CheckboxBuilder Checkbox(string label = "", bool value = false) => new(this, label, value);
 
+        public bool Checkbox(string label, bool value, ControlVariant variant = ControlVariant.Default, ControlSize size = ControlSize.Default, Action<bool> onChange = null, bool disabled = false, ComponentAppearance appearance = null, params GUILayoutOption[] options) =>
+            Render(
+                new CheckboxConfig
+                {
+                    Label = label,
+                    Value = value,
+                    Variant = variant,
+                    Size = size,
+                    OnValueChanged = onChange,
+                    IsDisabled = disabled,
+                    Appearance = appearance,
+                    LayoutOptions = options ?? Array.Empty<GUILayoutOption>(),
+                }
+            );
+
         public SwitchBuilder Switch(string label = "", bool value = false) => new(this, label, value);
+
+        public bool Switch(string label, bool value, ControlVariant variant = ControlVariant.Default, ControlSize size = ControlSize.Default, Action<bool> onChange = null, bool disabled = false, ComponentAppearance appearance = null, params GUILayoutOption[] options) =>
+            Render(
+                new SwitchConfig
+                {
+                    Label = label,
+                    Value = value,
+                    Variant = variant,
+                    Size = size,
+                    OnValueChanged = onChange,
+                    IsDisabled = disabled,
+                    Appearance = appearance,
+                    LayoutOptions = options ?? Array.Empty<GUILayoutOption>(),
+                }
+            );
 
         public ToggleBuilder Toggle(string label = "", bool value = false) => new(this, label, value);
 
@@ -363,23 +439,43 @@ namespace shadcnui.GUIComponents.Core.Base
 
         public SliderBuilder Slider(float value = 0f) => new(this, value);
 
+        public float Slider(SliderConfig config) => Render(config);
+
         public RangeSliderBuilder RangeSlider(float lowerValue = 0f, float upperValue = 1f) => new(this, lowerValue, upperValue);
+
+        public Vector2 RangeSlider(RangeSliderConfig config) => Render(config);
 
         public SelectBuilder Select() => new(this);
 
+        public int Select(SelectConfig config) => Render(config);
+
         public DropdownMenuBuilder DropdownMenu() => new(this);
+
+        public void DropdownMenu(DropdownMenuConfig config) => Render(config);
 
         public ThemeChangerBuilder ThemeChanger() => new(this);
 
+        public void ThemeChanger(ThemeChangerConfig config) => Render(config);
+
         public FontChangerBuilder FontChanger() => new(this);
+
+        public void FontChanger(FontChangerConfig config) => Render(config);
 
         public TextAreaBuilder TextArea(string value = "") => new(this, value);
 
+        public string TextArea(TextAreaConfig config) => Render(config);
+
         public CalendarBuilder Calendar() => new(this);
+
+        public DateTime? Calendar(CalendarConfig config) => Render(config);
 
         public DatePickerBuilder DatePicker() => new(this);
 
+        public DateTime? DatePicker(DatePickerConfig config) => Render(config);
+
         public DataTableBuilder DataTable(string id) => new(this, id);
+
+        public void DataTable(DataTableConfig config) => Render(config);
 
         public LabelBuilder Label(string text = "") => new(this, text);
 
@@ -397,9 +493,48 @@ namespace shadcnui.GUIComponents.Core.Base
 
         public BadgeBuilder Badge(string text = "Badge") => new(this, text);
 
+        public void Badge(string text, ControlVariant variant = ControlVariant.Default, ControlSize size = ControlSize.Default, ComponentAppearance appearance = null, params GUILayoutOption[] options) =>
+            Render(
+                new BadgeConfig
+                {
+                    Text = text,
+                    Variant = variant,
+                    Size = size,
+                    Appearance = appearance,
+                    LayoutOptions = options ?? Array.Empty<GUILayoutOption>(),
+                }
+            );
+
+        public void CountBadge(int count, ControlVariant variant = ControlVariant.Default, ControlSize size = ControlSize.Default, int maxCount = 99, params GUILayoutOption[] options) =>
+            Render(
+                new BadgeConfig
+                {
+                    Count = count,
+                    MaxCount = maxCount,
+                    Variant = variant,
+                    Size = size,
+                    LayoutOptions = options ?? Array.Empty<GUILayoutOption>(),
+                }
+            );
+
+        public void StatusBadge(string text, bool isActive, ControlVariant variant = ControlVariant.Default, ControlSize size = ControlSize.Default, params GUILayoutOption[] options) =>
+            Render(
+                new BadgeConfig
+                {
+                    Text = text,
+                    Variant = variant,
+                    Size = size,
+                    ShowStatusDot = true,
+                    IsActive = isActive,
+                    LayoutOptions = options ?? Array.Empty<GUILayoutOption>(),
+                }
+            );
+
         public AvatarBuilder Avatar() => new(this);
 
         public ProgressBuilder Progress(float value = 0f) => new(this, value);
+
+        public void Progress(float value, float width) => Render(new ProgressConfig { Value = value, Width = width });
 
         public ChartBuilder Chart() => new(this);
 
@@ -411,7 +546,25 @@ namespace shadcnui.GUIComponents.Core.Base
 
         public CardBuilder Card() => new(this);
 
+        public void BeginCard(float width = -1f, float height = -1f, ControlVariant variant = ControlVariant.Default, ControlSize size = ControlSize.Default, ComponentAppearance appearance = null) => Execute(() => _card.BeginCard(width, height, variant, size, appearance), nameof(BeginCard));
+
+        public void CardHeader(Action content) => Execute(() => _card.CardHeader(content), nameof(CardHeader));
+
+        public void CardContent(Action content) => Execute(() => _card.CardContent(content), nameof(CardContent));
+
+        public void CardFooter(Action content) => Execute(() => _card.CardFooter(content), nameof(CardFooter));
+
+        public void EndCard() => Execute(_card.EndCard, nameof(EndCard));
+
         public SeparatorBuilder Separator() => new(this);
+
+        public void Heading(string text, params GUILayoutOption[] options) => Label(text, ControlVariant.Default, options: options);
+
+        public void Caption(string text, params GUILayoutOption[] options) => Label(text, ControlVariant.Muted, options: options);
+
+        public void MutedLabel(string text, params GUILayoutOption[] options) => Label(text, ControlVariant.Muted, options: options);
+
+        public void ErrorAlert(string text, params GUILayoutOption[] options) => Label(text, ControlVariant.Destructive, options: options);
 
         public void HorizontalSeparator(ComponentAppearance appearance = null, params GUILayoutOption[] options) =>
             Render(
@@ -435,11 +588,19 @@ namespace shadcnui.GUIComponents.Core.Base
 
         public TabsBuilder Tabs() => new(this);
 
+        public int Tabs(TabsConfig config) => Render(config);
+
         public TableBuilder Table() => new(this);
+
+        public void Table(TableConfig config) => Render(config);
 
         public NavigationBuilder Navigation() => new(this);
 
+        public int Navigation(NavigationConfig config) => Render(config);
+
         public MenuBarBuilder MenuBar() => new(this);
+
+        public void MenuBar(MenuBar.MenuBarConfig config) => Render(config);
 
         public DataTableState GetDataTableState(string id) => Execute(() => _dataTable.GetTableState(id), null, nameof(GetDataTableState));
 
@@ -637,20 +798,7 @@ namespace shadcnui.GUIComponents.Core.Base
             if (config == null)
                 return;
 
-            Execute(
-                () => _dataTable.Render(
-                    config.Id,
-                    config.Columns,
-                    config.Rows,
-                    config.ShowPagination,
-                    config.ShowSearch,
-                    config.ShowSelection,
-                    config.ShowColumnToggle,
-                    config.Appearance,
-                    config.LayoutOptions
-                ),
-                nameof(DataTable)
-            );
+            Execute(() => _dataTable.Render(config.Id, config.Columns, config.Rows, config.ShowPagination, config.ShowSearch, config.ShowSelection, config.ShowColumnToggle, config.Appearance, config.LayoutOptions), nameof(DataTable));
         }
 
         internal void Render(LabelConfig config) => Execute(() => _label.Render(config), nameof(Label));
@@ -679,21 +827,35 @@ namespace shadcnui.GUIComponents.Core.Base
 
         internal void Render(MenuBar.MenuBarConfig config) => Execute(() => _menuBar.Render(config), nameof(MenuBar));
 
-        internal void ShowToast(ToastConfig config) => Execute(() => _toast.Show(config), nameof(Toast));
+        public void ShowToast(ToastConfig config) => Execute(() => _toast.Show(config), nameof(Toast));
 
-        internal void OpenDialog(string id) => Execute(() => _dialog.Open(id), nameof(OpenDialog));
+        public void DismissToast(string id, bool animate = true) => Execute(() => _toast.Dismiss(id, animate), nameof(DismissToast));
 
-        internal void CloseDialog() => Execute(_dialog.Close, nameof(CloseDialog));
+        public void DismissAllToasts(bool animate = true) => Execute(() => _toast.DismissAll(animate), nameof(DismissAllToasts));
 
-        internal void OpenPopover(string id, int zIndex = -1) => Execute(() => _popover.Open(id, zIndex), nameof(OpenPopover));
+        public int GetActiveToastCount() => Execute(() => _toast.GetActiveToastCount(), 0, nameof(GetActiveToastCount));
 
-        internal void ClosePopover() => Execute(_popover.Close, nameof(ClosePopover));
+        public void OpenDialog(string id) => Execute(() => _dialog.Open(id), nameof(OpenDialog));
 
-        internal bool IsPopoverOpen() => Execute(() => _popover.IsOpen, false, nameof(IsPopoverOpen));
+        public void CloseDialog() => Execute(_dialog.Close, nameof(CloseDialog));
 
-        internal void OpenSelect(SelectConfig config, Rect anchorRect) => Execute(() => _select.Open(config, anchorRect), nameof(OpenSelect));
+        public void OpenPopover(string id, int zIndex = -1) => Execute(() => _popover.Open(id, zIndex), nameof(OpenPopover));
 
-        internal bool IsSelectOpen(string id) => Execute(() => _select.IsOpen(id), false, nameof(IsSelectOpen));
+        public void ClosePopover() => Execute(_popover.Close, nameof(ClosePopover));
+
+        public bool IsPopoverOpen() => Execute(() => _popover.IsOpen, false, nameof(IsPopoverOpen));
+
+        public void OpenSelect(SelectConfig config, Rect anchorRect) => Execute(() => _select.Open(config, anchorRect), nameof(OpenSelect));
+
+        public void CloseSelect(string id = "select") => Execute(() => _select.Close(id), nameof(CloseSelect));
+
+        public bool IsSelectOpen(string id) => Execute(() => _select.IsOpen(id), false, nameof(IsSelectOpen));
+
+        public void CloseDropdownMenu(string id) => Execute(() => _dropdownMenu.Close(id), nameof(CloseDropdownMenu));
+
+        public void CloseDatePicker(string id) => Execute(() => _datePicker.CloseDatePicker(id), nameof(CloseDatePicker));
+
+        public bool IsDatePickerOpen(string id) => Execute(() => _datePicker.IsDatePickerOpen(id), false, nameof(IsDatePickerOpen));
 
         internal Rect GetRootGuiScreenRect()
         {

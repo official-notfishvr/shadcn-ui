@@ -163,15 +163,6 @@ namespace shadcnui_Demo.Menu
             {
                 new DemoEntry
                 {
-                    Id = nameof(ComponentShowcase),
-                    Title = "Component Showcase",
-                    Category = "Core",
-                    Description = "Focused component examples.",
-                    Accent = ControlVariant.Default,
-                    Load = () => LoadDemo<ComponentShowcase>("Component Showcase"),
-                },
-                new DemoEntry
-                {
                     Id = nameof(FullDemo),
                     Title = "Full Demo",
                     Category = "Flagship",
@@ -181,39 +172,12 @@ namespace shadcnui_Demo.Menu
                 },
                 new DemoEntry
                 {
-                    Id = nameof(AppearanceShowcase),
-                    Title = "Appearance Showcase",
-                    Category = "Styling",
-                    Description = "Theme and styling variations.",
-                    Accent = ControlVariant.Outline,
-                    Load = () => LoadDemo<AppearanceShowcase>("Appearance Showcase"),
-                },
-                new DemoEntry
-                {
-                    Id = nameof(LoginDashboardDemo),
-                    Title = "Login Dashboard Demo",
-                    Category = "Flow",
-                    Description = "Login flow into a dashboard.",
-                    Accent = ControlVariant.Secondary,
-                    Load = () => LoadDemo<LoginDashboardDemo>("Login Dashboard Demo"),
-                },
-                new DemoEntry
-                {
                     Id = nameof(FullDemo_old),
                     Title = "Full Demo OLD",
                     Category = "Legacy",
                     Description = "Older all-in-one showcase.",
                     Accent = ControlVariant.Ghost,
                     Load = () => LoadDemo<FullDemo_old>("Full Demo OLD"),
-                },
-                new DemoEntry
-                {
-                    Id = nameof(ShadcnDocsHomeDemo),
-                    Title = "ShadcnDocsHomeDemo",
-                    Category = "New",
-                    Description = "",
-                    Accent = ControlVariant.Ghost,
-                    Load = () => LoadDemo<ShadcnDocsHomeDemo>("ShadcnDocsHomeDemo"),
                 },
             };
 

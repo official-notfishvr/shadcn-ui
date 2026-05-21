@@ -70,7 +70,15 @@ namespace shadcnui.GUIComponents.Display
         internal void CountBadge(int count, ControlVariant variant = ControlVariant.Default, ControlSize size = ControlSize.Default, int maxCount = 99, params GUILayoutOption[] options)
         {
             string text = count > maxCount ? $"{maxCount}+" : count.ToString();
-            Render(new BadgeConfig { Text = text, Variant = variant, Size = size, LayoutOptions = options ?? Array.Empty<GUILayoutOption>() });
+            Render(
+                new BadgeConfig
+                {
+                    Text = text,
+                    Variant = variant,
+                    Size = size,
+                    LayoutOptions = options ?? Array.Empty<GUILayoutOption>(),
+                }
+            );
         }
 
         internal void StatusBadge(string text, bool isActive, ControlVariant variant = ControlVariant.Default, ControlSize size = ControlSize.Default, params GUILayoutOption[] options)
@@ -91,12 +99,28 @@ namespace shadcnui.GUIComponents.Display
         internal void ProgressBadge(string text, float progress, ControlVariant variant = ControlVariant.Default, ControlSize size = ControlSize.Default, params GUILayoutOption[] options)
         {
             string value = $"{text} {(progress * 100f):0}%";
-            Render(new BadgeConfig { Text = value, Variant = variant, Size = size, LayoutOptions = options ?? Array.Empty<GUILayoutOption>() });
+            Render(
+                new BadgeConfig
+                {
+                    Text = value,
+                    Variant = variant,
+                    Size = size,
+                    LayoutOptions = options ?? Array.Empty<GUILayoutOption>(),
+                }
+            );
         }
 
         internal void RoundedBadge(string text, ControlVariant variant = ControlVariant.Default, ControlSize size = ControlSize.Default, float cornerRadius = DesignTokens.Radius.XL, params GUILayoutOption[] options)
         {
-            Render(new BadgeConfig { Text = text, Variant = variant, Size = size, LayoutOptions = options ?? Array.Empty<GUILayoutOption>() });
+            Render(
+                new BadgeConfig
+                {
+                    Text = text,
+                    Variant = variant,
+                    Size = size,
+                    LayoutOptions = options ?? Array.Empty<GUILayoutOption>(),
+                }
+            );
         }
 
         internal void AnimatedBadge(string text, ControlVariant variant = ControlVariant.Default, ControlSize size = ControlSize.Default, ComponentAppearance appearance = null, params GUILayoutOption[] options) => AnimatedBadge(text, $"badge_{text}", variant, size, appearance, options);
@@ -110,7 +134,16 @@ namespace shadcnui.GUIComponents.Display
             float alpha = animManager.GetFloat(animId, 1f);
             Color prev = GUI.color;
             GUI.color = new Color(prev.r, prev.g, prev.b, prev.a * alpha);
-            Render(new BadgeConfig { Text = text, Variant = variant, Size = size, Appearance = appearance, LayoutOptions = options ?? Array.Empty<GUILayoutOption>() });
+            Render(
+                new BadgeConfig
+                {
+                    Text = text,
+                    Variant = variant,
+                    Size = size,
+                    Appearance = appearance,
+                    LayoutOptions = options ?? Array.Empty<GUILayoutOption>(),
+                }
+            );
             GUI.color = prev;
         }
 

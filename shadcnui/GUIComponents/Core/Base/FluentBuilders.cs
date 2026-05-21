@@ -182,6 +182,8 @@ namespace shadcnui.GUIComponents.Core.Base
             ApplyOptions();
             return Helper.Render(Config);
         }
+
+        public static implicit operator bool(ButtonBuilder builder) => builder?.Render() ?? false;
     }
 
     public sealed class InputBuilder : RectComponentBuilder<InputBuilder, InputConfig, string>
@@ -273,6 +275,8 @@ namespace shadcnui.GUIComponents.Core.Base
             ApplyOptions();
             return Helper.Render(Config);
         }
+
+        public static implicit operator string(InputBuilder builder) => builder?.Render() ?? string.Empty;
     }
 
     public abstract class BooleanControlBuilder<TBuilder, TConfig> : RectComponentBuilder<TBuilder, TConfig, bool>
@@ -347,6 +351,8 @@ namespace shadcnui.GUIComponents.Core.Base
             ApplyOptions();
             return Helper.Render(Config);
         }
+
+        public static implicit operator bool(CheckboxBuilder builder) => builder?.Render() ?? false;
     }
 
     public sealed class SwitchBuilder : BooleanControlBuilder<SwitchBuilder, SwitchConfig>
@@ -359,6 +365,8 @@ namespace shadcnui.GUIComponents.Core.Base
             ApplyOptions();
             return Helper.Render(Config);
         }
+
+        public static implicit operator bool(SwitchBuilder builder) => builder?.Render() ?? false;
     }
 
     public sealed class ToggleBuilder : BooleanControlBuilder<ToggleBuilder, ToggleConfig>
@@ -371,6 +379,8 @@ namespace shadcnui.GUIComponents.Core.Base
             ApplyOptions();
             return Helper.Render(Config);
         }
+
+        public static implicit operator bool(ToggleBuilder builder) => builder?.Render() ?? false;
     }
 
     public sealed class SliderBuilder : ComponentBuilder<SliderBuilder, SliderConfig, float>
@@ -426,6 +436,8 @@ namespace shadcnui.GUIComponents.Core.Base
             ApplyOptions();
             return Helper.Render(Config);
         }
+
+        public static implicit operator float(SliderBuilder builder) => builder?.Render() ?? 0f;
     }
 
     public sealed class RangeSliderBuilder : ComponentBuilder<RangeSliderBuilder, RangeSliderConfig, Vector2>
@@ -482,6 +494,8 @@ namespace shadcnui.GUIComponents.Core.Base
             ApplyOptions();
             return Helper.Render(Config);
         }
+
+        public static implicit operator Vector2(RangeSliderBuilder builder) => builder?.Render() ?? Vector2.zero;
     }
 
     public sealed class SelectBuilder : ComponentBuilder<SelectBuilder, SelectConfig, int>
@@ -548,6 +562,8 @@ namespace shadcnui.GUIComponents.Core.Base
             ApplyOptions();
             return Helper.Render(Config);
         }
+
+        public static implicit operator int(SelectBuilder builder) => builder?.Render() ?? 0;
     }
 
     public sealed class DropdownMenuBuilder : ComponentBuilder<DropdownMenuBuilder, DropdownMenuConfig, RenderResult>
@@ -749,6 +765,8 @@ namespace shadcnui.GUIComponents.Core.Base
             ApplyOptions();
             return Helper.Render(Config);
         }
+
+        public static implicit operator string(TextAreaBuilder builder) => builder?.Render() ?? string.Empty;
     }
 
     public sealed class CalendarBuilder : ComponentBuilder<CalendarBuilder, CalendarConfig, DateTime?>
@@ -785,6 +803,8 @@ namespace shadcnui.GUIComponents.Core.Base
             ApplyOptions();
             return Helper.Render(Config);
         }
+
+        public static implicit operator DateTime?(CalendarBuilder builder) => builder?.Render();
     }
 
     public sealed class DatePickerBuilder : ComponentBuilder<DatePickerBuilder, DatePickerConfig, DateTime?>
@@ -840,6 +860,8 @@ namespace shadcnui.GUIComponents.Core.Base
             ApplyOptions();
             return Helper.Render(Config);
         }
+
+        public static implicit operator DateTime?(DatePickerBuilder builder) => builder?.Render();
     }
 
     public sealed class DataTableBuilder : ComponentBuilder<DataTableBuilder, DataTableConfig, RenderResult>
@@ -1466,6 +1488,8 @@ namespace shadcnui.GUIComponents.Core.Base
             ApplyOptions();
             return Helper.Render(Config);
         }
+
+        public static implicit operator int(TabsBuilder builder) => builder?.Render() ?? 0;
     }
 
     public sealed class TableBuilder : RectComponentBuilder<TableBuilder, TableConfig, RenderResult>
@@ -1589,6 +1613,8 @@ namespace shadcnui.GUIComponents.Core.Base
             ApplyOptions();
             return Helper.Render(Config);
         }
+
+        public static implicit operator int(NavigationBuilder builder) => builder?.Render() ?? 0;
     }
 
     public sealed class MenuItemGroupBuilder
