@@ -1437,12 +1437,17 @@ namespace shadcnui.GUIComponents.Core.Base
         public TabsBuilder Position(TabPosition position)
         {
             Config.Position = position;
+            if (position == TabPosition.Left)
+                Config.Side = TabSide.Left;
+            else if (position == TabPosition.Right)
+                Config.Side = TabSide.Right;
             return this;
         }
 
         public TabsBuilder Side(TabSide side)
         {
             Config.Side = side;
+            Config.Position = side == TabSide.Right ? TabPosition.Right : TabPosition.Left;
             return this;
         }
 
