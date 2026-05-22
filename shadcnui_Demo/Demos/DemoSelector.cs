@@ -3,6 +3,8 @@ using System;
 using System.Collections.Generic;
 using shadcnui.GUIComponents.Core.Base;
 using shadcnui.GUIComponents.Core.Styling;
+using shadcnui.GUIComponents.Core.Theming;
+using shadcnui.GUIComponents.Core.Utils;
 using UnityEngine;
 
 namespace shadcnui_Demo.Menu
@@ -13,151 +15,171 @@ namespace shadcnui_Demo.Menu
         {
             public string Id;
             public string Title;
-            public string Category;
             public string Description;
-            public ControlVariant Accent;
             public Action Load;
         }
 
-        private GUIHelper guiHelper;
-        private Rect selectorRect = new Rect(Screen.width / 2f - 320f, Screen.height / 2f - 240f, 640f, 620f);
-        private Vector2 scrollPosition;
-        private bool showSelector = true;
-        private GameObject currentDemo;
-        private string currentDemoName = "None";
-        private string searchQuery = string.Empty;
-        private List<DemoEntry> demoEntries;
+        private GUIHelper _gui;
+        private Rect _windowRect = new Rect(42f, 42f, 770f, 620f);
+        private Vector2 _scroll;
+        private bool _showSelector = true;
+        private GameObject _currentDemo;
+        private string _currentDemoName = "None";
+        private string _searchQuery = string.Empty;
+        private List<DemoEntry> _entries;
 
-        void Start()
+        private ComponentAppearance _panel;
+        private ComponentAppearance _activePanel;
+        private ComponentAppearance _input;
+        private ComponentAppearance _pill;
+        private ComponentAppearance _primary;
+
+        private void Start()
         {
-            guiHelper = new GUIHelper();
-            demoEntries = BuildEntries();
+            _gui = new GUIHelper();
+            _gui.SetTheme("Zinc");
+            _gui.SetFontSize(13);
+            BuildAppearances();
+            _entries = BuildEntries();
         }
 
-        void OnGUI()
+        private void OnGUI()
         {
-            if (showSelector)
-                selectorRect = GUI.Window(100, selectorRect, (GUI.WindowFunction)DrawSelectorWindow, string.Empty);
+            if (_showSelector)
+                _windowRect = GUI.Window(100, _windowRect, (GUI.WindowFunction)DrawWindow, string.Empty);
+
+            _gui?.DrawOverlays();
         }
 
-        void DrawSelectorWindow(int windowID)
+        private void DrawWindow(int windowId)
         {
-            guiHelper.UpdateGUI(showSelector);
-            if (!guiHelper.BeginGUI())
+            DrawWindowBackdrop();
+
+            _gui.UpdateGUI(_showSelector);
+            if (!_gui.BeginGUI())
                 return;
 
-            DrawHeader();
-            guiHelper.HorizontalSeparator();
-            DrawSearchBar();
-            guiHelper.AddSpace(8f);
+            _gui.BeginVerticalGroup(GUILayout.Width(_windowRect.width - 24f), GUILayout.Height(_windowRect.height - 14f));
+            _gui.AddSpace(12f);
+            DrawFilters();
+            _gui.AddSpace(12f);
 
-            scrollPosition = guiHelper.ScrollView(scrollPosition, DrawDemoGrid, GUILayout.Height(selectorRect.height - 150f), GUILayout.ExpandWidth(true));
+            _scroll = _gui.ScrollView(_scroll, DrawDemoList, GUILayout.ExpandWidth(true), GUILayout.Height(_windowRect.height - 208f));
 
-            guiHelper.AddSpace(10f);
-            guiHelper.HorizontalSeparator();
+            _gui.AddSpace(12f);
             DrawFooter();
+            _gui.EndVerticalGroup();
 
-            guiHelper.EndGUI();
-            GUI.DragWindow(new Rect(0f, 0f, selectorRect.width, 48f));
+            _gui.EndGUI();
+            GUI.DragWindow(new Rect(0f, 0f, _windowRect.width, 42f));
         }
 
-        void DrawHeader()
+        private void DrawWindowBackdrop()
         {
-            guiHelper.BeginHorizontalGroup();
+            if (Event.current.type != EventType.Repaint)
+                return;
 
-            guiHelper.BeginVerticalGroup();
-            guiHelper.Heading("Demo Launcher");
-            guiHelper.AddSpace(2f);
-            guiHelper.BeginHorizontalGroup();
-            guiHelper.Badge(currentDemoName == "None" ? "No Demo Loaded" : currentDemoName, ControlVariant.Outline);
-            guiHelper.EndHorizontalGroup();
-            guiHelper.EndVerticalGroup();
-
-            GUILayout.FlexibleSpace();
-
-            guiHelper.AddSpace(2f);
-            guiHelper.CountBadge(GetVisibleEntries().Count, ControlVariant.Secondary);
-
-            guiHelper.EndHorizontalGroup();
+            Color previous = GUI.color;
+            GUI.color = new Color(0.03f, 0.04f, 0.06f, 0.96f);
+            GUI.DrawTexture(new Rect(0f, 0f, _windowRect.width, _windowRect.height), Texture2D.whiteTexture);
+            GUI.color = new Color(0.12f, 0.16f, 0.22f, 0.55f);
+            GUI.DrawTexture(new Rect(0f, 0f, _windowRect.width, 86f), Texture2D.whiteTexture);
+            GUI.color = previous;
         }
 
-        void DrawSearchBar()
+        private void DrawFilters()
         {
-            searchQuery = guiHelper.Input(searchQuery, "Search demos", disabled: false, opts: new[] { GUILayout.Width(320f) });
+            _gui.BeginHorizontalGroup();
+            _searchQuery = _gui.Input(_searchQuery)
+                .Id("demo_selector_search")
+                .Placeholder("Search demos")
+                .Appearance(_input)
+                .Width(340f);
+
+            _gui.EndHorizontalGroup();
         }
 
-        void DrawDemoGrid()
+        private void DrawDemoList()
         {
-            List<DemoEntry> visibleEntries = GetVisibleEntries();
-            if (visibleEntries.Count == 0)
+            List<DemoEntry> visible = GetVisibleEntries();
+            if (visible.Count == 0)
             {
-                guiHelper.ErrorAlert("No demos match the current search.");
+                _gui.Card()
+                    .Title("No demos found")
+                    .Description("Try another search term.")
+                    .Size(-1f, 110f)
+                    .Appearance(_panel)
+                    .Render();
                 return;
             }
 
-            for (int i = 0; i < visibleEntries.Count; i += 2)
+            for (int i = 0; i < visible.Count; i++)
             {
-                guiHelper.BeginHorizontalGroup();
-                DrawDemoCard(visibleEntries[i]);
-                guiHelper.AddSpace(12f);
-
-                if (i + 1 < visibleEntries.Count)
-                    DrawDemoCard(visibleEntries[i + 1]);
-                else
-                    GUILayout.Space(292f);
-
-                guiHelper.EndHorizontalGroup();
-                guiHelper.AddSpace(12f);
+                DrawDemoRow(visible[i], i);
+                if (i < visible.Count - 1)
+                    _gui.AddSpace(10f);
             }
         }
 
-        void DrawDemoCard(DemoEntry entry)
+        private void DrawDemoRow(DemoEntry entry, int index)
         {
-            guiHelper.BeginCard(280f, -1f, ControlVariant.Default, ControlSize.Default);
-            guiHelper.CardHeader(() =>
+            bool active = _currentDemoName == entry.Title;
+            ComponentAppearance cardAppearance = active ? _activePanel : _panel;
+
+            _gui.BeginCard(-1f, 112f, ControlVariant.Default, ControlSize.Default, cardAppearance);
+            _gui.CardContent(() =>
             {
-                guiHelper.BeginHorizontalGroup();
-                guiHelper.BeginVerticalGroup();
-                guiHelper.Heading(entry.Title);
-                guiHelper.Caption(entry.Description);
-                guiHelper.EndVerticalGroup();
+                _gui.BeginHorizontalGroup();
+
+                _gui.BeginVerticalGroup(GUILayout.Width(58f));
+                _gui.Badge((index + 1).ToString("00")).Appearance(_pill).Render();
+                _gui.AddSpace(10f);
+                _gui.EndVerticalGroup();
+
+                _gui.AddSpace(12f);
+
+                _gui.BeginVerticalGroup();
+                _gui.BeginHorizontalGroup();
+                _gui.Heading(entry.Title);
+                _gui.EndHorizontalGroup();
+                _gui.Caption(entry.Description);
+                _gui.AddSpace(8f);
+                _gui.BeginHorizontalGroup();
+                _gui.MutedLabel(entry.Id);
+                _gui.EndHorizontalGroup();
+                _gui.EndVerticalGroup();
+
                 GUILayout.FlexibleSpace();
-                guiHelper.Badge(entry.Category, entry.Accent, ControlSize.Small);
-                guiHelper.EndHorizontalGroup();
-            });
 
-            guiHelper.CardContent(() =>
-            {
-                guiHelper.Caption(currentDemoName == entry.Title ? "Currently loaded" : "Ready");
-            });
-
-            guiHelper.CardFooter(() =>
-            {
-                guiHelper.BeginHorizontalGroup();
-                if (guiHelper.Button(currentDemoName == entry.Title ? "Reload" : "Open Demo", currentDemoName == entry.Title ? ControlVariant.Secondary : ControlVariant.Default, ControlSize.Small))
+                _gui.BeginVerticalGroup(GUILayout.Width(146f));
+                string launchText = active ? "Reload" : "Open Demo";
+                if (_gui.Button(launchText, active ? ControlVariant.Secondary : ControlVariant.Default, ControlSize.Small, appearance: active ? _pill : _primary))
                     entry.Load();
 
-                GUILayout.FlexibleSpace();
+                _gui.AddSpace(8f);
+                if (active && _gui.Button("Close Current", ControlVariant.Outline, ControlSize.Small, appearance: _pill))
+                    CloseCurrentDemo();
+                _gui.EndVerticalGroup();
 
-                if (currentDemoName == entry.Title)
-                    guiHelper.StatusBadge("Active", true);
-                guiHelper.EndHorizontalGroup();
+                _gui.EndHorizontalGroup();
             });
-            guiHelper.EndCard();
+            _gui.EndCard();
         }
 
-        void DrawFooter()
+        private void DrawFooter()
         {
-            guiHelper.BeginHorizontalGroup();
-            if (guiHelper.Button("Clear Search", ControlVariant.Ghost, ControlSize.Small))
-                searchQuery = string.Empty;
-            GUILayout.FlexibleSpace();
-            if (guiHelper.Button("Close", ControlVariant.Ghost, ControlSize.Small))
-                showSelector = false;
-            guiHelper.EndHorizontalGroup();
+            _gui.BeginHorizontalGroup();
+
+            if (_gui.Button("Clear Filters", ControlVariant.Ghost, ControlSize.Small))
+                _searchQuery = string.Empty;
+
+            if (_currentDemo != null && _gui.Button("Unload Demo", ControlVariant.Outline, ControlSize.Small, appearance: _pill))
+                CloseCurrentDemo();
+
+            _gui.EndHorizontalGroup();
         }
 
-        List<DemoEntry> BuildEntries()
+        private List<DemoEntry> BuildEntries()
         {
             var entries = new List<DemoEntry>
             {
@@ -165,27 +187,28 @@ namespace shadcnui_Demo.Menu
                 {
                     Id = nameof(FullDemo),
                     Title = "Full Demo",
-                    Category = "Flagship",
-                    Description = "Large multi-section showcase.",
-                    Accent = ControlVariant.Secondary,
+                    Description = "Large multi-section showcase of controls, display, layout, data, and overlays.",
                     Load = () => LoadDemo<FullDemo>("Full Demo"),
                 },
                 new DemoEntry
                 {
                     Id = nameof(ShadcnDocsHomeDemo),
                     Title = "Docs Home",
-                    Category = "Showcase",
-                    Description = "shadcn docs-inspired dashboard.",
-                    Accent = ControlVariant.Secondary,
+                    Description = "A shadcn docs-inspired dashboard composition.",
                     Load = () => LoadDemo<ShadcnDocsHomeDemo>("Docs Home"),
+                },
+                new DemoEntry
+                {
+                    Id = nameof(NovaOpsDemo),
+                    Title = "Nova Ops",
+                    Description = "Animated command-center interface with charts, controls, and generated textures.",
+                    Load = () => LoadDemo<NovaOpsDemo>("Nova Ops"),
                 },
                 new DemoEntry
                 {
                     Id = nameof(FullDemo_old),
                     Title = "Full Demo OLD",
-                    Category = "Legacy",
-                    Description = "Older all-in-one showcase.",
-                    Accent = ControlVariant.Ghost,
+                    Description = "Older all-in-one showcase kept for comparison.",
                     Load = () => LoadDemo<FullDemo_old>("Full Demo OLD"),
                 },
             };
@@ -197,9 +220,7 @@ namespace shadcnui_Demo.Menu
                 {
                     Id = nameof(ScreenshotUtility),
                     Title = "Screenshot Utility",
-                    Category = "Tooling",
-                    Description = "Capture PNGs and GIFs.",
-                    Accent = ControlVariant.Ghost,
+                    Description = "Capture stills and GIFs for component documentation.",
                     Load = () => LoadDemo<ScreenshotUtility>("Screenshot Utility"),
                 }
             );
@@ -209,50 +230,103 @@ namespace shadcnui_Demo.Menu
             return entries;
         }
 
-        List<DemoEntry> GetVisibleEntries()
+        private List<DemoEntry> GetVisibleEntries()
         {
-            if (string.IsNullOrWhiteSpace(searchQuery))
-                return demoEntries;
+            var visible = new List<DemoEntry>();
+            string query = _searchQuery?.Trim() ?? string.Empty;
 
-            string query = searchQuery.Trim();
-            var filtered = new List<DemoEntry>();
-            for (int i = 0; i < demoEntries.Count; i++)
+            for (int i = 0; i < _entries.Count; i++)
             {
-                DemoEntry entry = demoEntries[i];
-                if (entry.Title.IndexOf(query, StringComparison.OrdinalIgnoreCase) >= 0 || entry.Category.IndexOf(query, StringComparison.OrdinalIgnoreCase) >= 0 || entry.Description.IndexOf(query, StringComparison.OrdinalIgnoreCase) >= 0)
-                    filtered.Add(entry);
+                DemoEntry entry = _entries[i];
+                if (!string.IsNullOrEmpty(query) && !Matches(entry, query))
+                    continue;
+
+                visible.Add(entry);
             }
 
-            return filtered;
+            return visible;
         }
 
-        void LoadDemo<T>(string displayName)
+        private static bool Matches(DemoEntry entry, string query)
+        {
+            return entry.Title.IndexOf(query, StringComparison.OrdinalIgnoreCase) >= 0
+                || entry.Description.IndexOf(query, StringComparison.OrdinalIgnoreCase) >= 0
+                || entry.Id.IndexOf(query, StringComparison.OrdinalIgnoreCase) >= 0;
+        }
+
+        private void LoadDemo<T>(string displayName)
             where T : MonoBehaviour
         {
-            if (currentDemo != null)
+            if (_currentDemo != null)
             {
 #if Showcase
 #elif !Showcase
-                Destroy(currentDemo);
+                Destroy(_currentDemo);
 #endif
             }
 
-            currentDemo = new GameObject(typeof(T).Name);
-            currentDemo.AddComponent<T>();
-            DontDestroyOnLoad(currentDemo);
-            currentDemoName = displayName;
+            _currentDemo = new GameObject(typeof(T).Name);
+            _currentDemo.AddComponent<T>();
+            DontDestroyOnLoad(_currentDemo);
+            _currentDemoName = displayName;
+
+            _gui.Toast()
+                .Title(displayName + " loaded")
+                .Description("The demo window is now active.")
+                .Variant(ToastVariant.Success)
+                .Duration(2800f)
+                .Render();
 
 #if Showcase
 #elif !Showcase
-            showSelector = false;
+            _showSelector = false;
 #endif
             Debug.Log($"Loaded {typeof(T).Name} demo");
         }
 
-        void OnDestroy()
+        private void CloseCurrentDemo()
         {
-            if (currentDemo != null)
-                Destroy(currentDemo);
+            if (_currentDemo == null)
+                return;
+
+            Destroy(_currentDemo);
+            _currentDemo = null;
+            _currentDemoName = "None";
+
+            _gui.Toast()
+                .Title("Demo unloaded")
+                .Description("The active demo object was destroyed.")
+                .Variant(ToastVariant.Info)
+                .Duration(2400f)
+                .Render();
+        }
+
+        private void BuildAppearances()
+        {
+            _panel = Surface("#111318cc", "#2b313f", 10f);
+            _activePanel = Surface("#0e2630cc", "#67e8f9", 10f);
+            _input = Surface("#08090bcc", "#3f3f46", 10f);
+            _pill = Surface("#18181bcc", "#3f3f4699", 999f);
+            _primary = Surface("#155e75", "#67e8f9", 10f);
+        }
+
+        private static ComponentAppearance Surface(string fill, string border, float radius)
+        {
+            return new ComponentAppearance
+            {
+                BackgroundColor = Theme.Hex(fill),
+                BorderColor = Theme.Hex(border),
+                BorderRadius = radius,
+                BorderThickness = 1f,
+            };
+        }
+
+        private void OnDestroy()
+        {
+            if (_currentDemo != null)
+                Destroy(_currentDemo);
+
+            _gui?.Cleanup();
         }
     }
 }

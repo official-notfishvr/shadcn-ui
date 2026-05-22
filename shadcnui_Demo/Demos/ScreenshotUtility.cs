@@ -149,10 +149,10 @@ namespace shadcnui_Demo.Menu
 
         private void OnGUI()
         {
-            if (!_showWindow || (_hideWhileCapturing && _isCapturing))
-                return;
+            if (_showWindow && !(_hideWhileCapturing && _isCapturing))
+                _windowRect = GUI.Window(9999, _windowRect, DrawWindow, "Demo Capture");
 
-            _windowRect = GUI.Window(9999, _windowRect, DrawWindow, "Demo Capture");
+            _gui?.DrawOverlays();
         }
 
         private void DrawWindow(int id)
@@ -225,12 +225,12 @@ namespace shadcnui_Demo.Menu
 
             _gui.BeginHorizontalGroup();
             _gui.Label("Folder:", ControlVariant.Muted);
-            _outputFolder = GUILayout.TextField(_outputFolder, GUILayout.Width(220));
+            _outputFolder = _gui.Input(_outputFolder).Id("screenshot_output_folder").Width(220f);
             _gui.EndHorizontalGroup();
 
             _gui.BeginHorizontalGroup();
             _gui.Label("ffmpeg:", ControlVariant.Muted);
-            _ffmpegPath = GUILayout.TextField(_ffmpegPath, GUILayout.Width(220));
+            _ffmpegPath = _gui.Input(_ffmpegPath).Id("screenshot_ffmpeg_path").Width(220f);
             _gui.EndHorizontalGroup();
 
             DrawSlider("Padding", ref _padding, 0, 24, "px");
@@ -278,17 +278,17 @@ namespace shadcnui_Demo.Menu
                 if (_gui.Button("Current PNG", ControlVariant.Secondary, ControlSize.Default))
                     StartJobs(new List<CaptureJob> { new CaptureJob(GetCurrentTabIndex(), false) });
 
-                GUILayout.Space(5f);
+                _gui.AddSpace(5f);
 
                 if (_gui.Button("All PNGs", ControlVariant.Default, ControlSize.Default))
                     StartJobs(BuildJobs(false));
 
-                GUILayout.Space(5f);
+                _gui.AddSpace(5f);
 
                 if (_gui.Button("Current GIF", ControlVariant.Outline, ControlSize.Default))
                     StartJobs(new List<CaptureJob> { new CaptureJob(GetCurrentTabIndex(), true) });
 
-                GUILayout.Space(5f);
+                _gui.AddSpace(5f);
 
                 if (_gui.Button("All GIFs", ControlVariant.Outline, ControlSize.Default))
                     StartJobs(BuildJobs(true));
@@ -296,12 +296,12 @@ namespace shadcnui_Demo.Menu
                 GUI.enabled = true;
             }
 
-            GUILayout.Space(6f);
+            _gui.AddSpace(6f);
 
             _gui.BeginHorizontalGroup();
             if (_gui.Button("Open Folder", ControlVariant.Outline, ControlSize.Small))
                 OpenOutputFolder();
-            GUILayout.FlexibleSpace();
+            _gui.Flex();
             if (_gui.Button("Close", ControlVariant.Ghost, ControlSize.Small))
                 _showWindow = false;
             _gui.EndHorizontalGroup();
@@ -311,18 +311,18 @@ namespace shadcnui_Demo.Menu
         {
             _gui.BeginHorizontalGroup();
             _gui.Label($"{label}: {value}{suffix}", ControlVariant.Muted);
-            GUILayout.FlexibleSpace();
+            _gui.Flex();
             _gui.EndHorizontalGroup();
-            value = Mathf.RoundToInt(GUILayout.HorizontalSlider(value, min, max, GUILayout.Width(220)));
+            value = Mathf.RoundToInt(_gui.Slider(value).Range(min, max).Step(1f).ShowValue(false).Width(220f));
         }
 
         private void DrawSlider(string label, ref float value, float min, float max, string suffix)
         {
             _gui.BeginHorizontalGroup();
             _gui.Label($"{label}: {value:F2}{suffix}", ControlVariant.Muted);
-            GUILayout.FlexibleSpace();
+            _gui.Flex();
             _gui.EndHorizontalGroup();
-            value = GUILayout.HorizontalSlider(value, min, max, GUILayout.Width(220));
+            value = _gui.Slider(value).Range(min, max).Step(0.01f).ShowValue(false).Width(220f);
         }
 
         private void RefreshFullDemo()

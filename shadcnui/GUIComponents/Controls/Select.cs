@@ -32,7 +32,7 @@ namespace shadcnui.GUIComponents.Controls
 
             GUIStyle buttonStyle = styleManager?.GetButtonStyle(config.Variant, config.Size, config.Appearance) ?? GUI.skin.button;
             string label = GetSelectedLabel(config) ?? config.Placeholder ?? "Select";
-            string arrow = LayerManager.Instance.IsOpen(id) ? " ^" : " v";
+            string arrow = LayerManager.Instance.IsOpen(id) ? " ▲" : " ▼";
 
             var options = BuildTriggerOptions(config);
             bool clicked = UnityHelpers.Button(label + arrow, buttonStyle, options.ToArray());
@@ -165,7 +165,7 @@ namespace shadcnui.GUIComponents.Controls
 
             GUIStyle labelStyle = styleManager?.GetLabelStyle(config.LabelVariant, config.Size, GetTextOnlyAppearance(config.Appearance)) ?? GUI.skin.label;
             UnityHelpers.Label(config.Label, labelStyle);
-            layoutComponents.AddSpace(DesignTokens.Spacing.XS);
+            layoutComponents.AddSpace(DesignTokens.Spacing.SM);
         }
 
         private List<GUILayoutOption> BuildTriggerOptions(SelectConfig config)

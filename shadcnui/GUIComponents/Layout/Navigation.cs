@@ -48,7 +48,7 @@ namespace shadcnui.GUIComponents.Layout
             {
                 var item = config.Items[i];
                 bool active = i == selected;
-                var style = styleManager.GetButtonStyle(active ? ControlVariant.Secondary : ControlVariant.Ghost, config.Size, config.Appearance);
+                var style = styleManager.GetButtonStyle(active ? ControlVariant.Secondary : ControlVariant.Ghost, config.Size);
                 bool prev = GUI.enabled;
                 GUI.enabled = !item.IsDisabled;
                 if (GUILayout.Button(item.Label ?? item.Id ?? $"Item {i + 1}", style, GUILayout.ExpandWidth(true)))
@@ -56,12 +56,43 @@ namespace shadcnui.GUIComponents.Layout
                     selected = i;
                     config.OnSelectionChanged?.Invoke(i);
                 }
+                if (active && Event.current.type == EventType.Repaint)
+                    DrawIndicator(GUILayoutUtility.GetLastRect(), config);
                 GUI.enabled = prev;
                 layoutComponents.AddSpace(DesignTokens.Spacing.XS);
             }
 
             layoutComponents.EndVerticalGroup();
             return selected;
+        }
+
+        private static void DrawIndicator(Rect rect, NavigationConfig config)
+        {
+            if (!config.ShowIndicator)
+                return;
+
+            Color previous = GUI.color;
+            GUI.color = config.IndicatorColor;
+
+            switch (config.IndicatorStyle)
+            {
+                case IndicatorStyle.Underline:
+                    GUI.DrawTexture(new Rect(rect.x + 10f, rect.yMax - 2f, rect.width - 20f, 2f), Texture2D.whiteTexture);
+                    break;
+                case IndicatorStyle.Background:
+                    GUI.color = new Color(config.IndicatorColor.r, config.IndicatorColor.g, config.IndicatorColor.b, 0.12f);
+                    GUI.DrawTexture(rect, Texture2D.whiteTexture);
+                    break;
+                case IndicatorStyle.Pill:
+                    GUI.DrawTexture(new Rect(rect.x + 6f, rect.y + 7f, 3f, rect.height - 14f), Texture2D.whiteTexture);
+                    GUI.DrawTexture(new Rect(rect.xMax - 9f, rect.y + 7f, 3f, rect.height - 14f), Texture2D.whiteTexture);
+                    break;
+                default:
+                    GUI.DrawTexture(new Rect(rect.x + 6f, rect.y + 7f, 3f, rect.height - 14f), Texture2D.whiteTexture);
+                    break;
+            }
+
+            GUI.color = previous;
         }
     }
 }

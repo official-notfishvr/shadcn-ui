@@ -19,8 +19,8 @@ namespace shadcnui.GUIComponents.Data
 
             if (!string.IsNullOrEmpty(config.Label))
             {
-                UnityHelpers.Label(config.Label, styleManager?.GetLabelStyle(ControlVariant.Default, config.Size, config.Appearance) ?? GUI.skin.label);
-                layoutComponents.AddSpace(DesignTokens.Spacing.XS);
+                UnityHelpers.Label(config.Label, styleManager?.GetLabelStyle(ControlVariant.Default, config.Size, GetTextOnlyAppearance(config.Appearance)) ?? GUI.skin.label);
+                layoutComponents.AddSpace(DesignTokens.Spacing.SM);
             }
 
             string value = config.Rect.HasValue ? DrawRectTextArea(config) : DrawLayoutTextArea(config);
@@ -120,7 +120,7 @@ namespace shadcnui.GUIComponents.Data
 
         private string DrawLayoutTextArea(TextAreaConfig config)
         {
-            string controlName = "textarea_" + config.Id;
+            string controlName = "textarea_" + ResolveId(config);
             bool focused = GUI.GetNameOfFocusedControl() == controlName;
             var style = styleManager?.GetTextAreaStyle(config.Variant, config.Size, focused, config.Appearance) ?? GUI.skin.textArea;
 
@@ -142,7 +142,7 @@ namespace shadcnui.GUIComponents.Data
 
         private string DrawRectTextArea(TextAreaConfig config)
         {
-            string controlName = "textarea_rect_" + config.Id;
+            string controlName = "textarea_rect_" + ResolveId(config);
             bool focused = GUI.GetNameOfFocusedControl() == controlName;
             var style = styleManager?.GetTextAreaStyle(config.Variant, config.Size, focused, config.Appearance) ?? GUI.skin.textArea;
 
@@ -188,9 +188,28 @@ namespace shadcnui.GUIComponents.Data
             GUILayout.FlexibleSpace();
 
             string count = config.MaxLength > 0 ? $"{value.Length}/{config.MaxLength}" : $"{value.Length} characters";
-            var style = new UnityHelpers.GUIStyle(styleManager?.GetLabelStyle(ControlVariant.Muted, ControlSize.Default, config.Appearance) ?? GUI.skin.label);
+            var style = new UnityHelpers.GUIStyle(styleManager?.GetLabelStyle(ControlVariant.Muted, ControlSize.Default, GetTextOnlyAppearance(config.Appearance)) ?? GUI.skin.label);
             UnityHelpers.Label(count, style);
             layoutComponents.EndHorizontalGroup();
+        }
+
+        private static string ResolveId(TextAreaConfig config)
+        {
+            if (!string.IsNullOrEmpty(config.Id))
+                return config.Id;
+            if (!string.IsNullOrEmpty(config.Label))
+                return config.Label;
+            if (!string.IsNullOrEmpty(config.Placeholder))
+                return config.Placeholder;
+            return "default";
+        }
+
+        private static ComponentAppearance GetTextOnlyAppearance(ComponentAppearance appearance)
+        {
+            if (appearance?.ForegroundColor == null)
+                return null;
+
+            return new ComponentAppearance { ForegroundColor = appearance.ForegroundColor };
         }
     }
 }
