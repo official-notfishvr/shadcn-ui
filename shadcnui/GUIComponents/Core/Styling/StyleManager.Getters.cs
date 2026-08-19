@@ -62,8 +62,16 @@ namespace shadcnui.GUIComponents.Core.Styling
                 TemplateStyle = profile.TemplateStyle ?? appearance.TemplateStyle,
                 ReplaceBaseStyle = profile.ReplaceBaseStyle || appearance.ReplaceBaseStyle,
                 BackgroundColor = appearance.BackgroundColor ?? profile.BackgroundColor,
+                HoverBackgroundColor = appearance.HoverBackgroundColor ?? profile.HoverBackgroundColor,
+                ActiveBackgroundColor = appearance.ActiveBackgroundColor ?? profile.ActiveBackgroundColor,
+                FocusedBackgroundColor = appearance.FocusedBackgroundColor ?? profile.FocusedBackgroundColor,
                 ForegroundColor = appearance.ForegroundColor ?? profile.ForegroundColor,
+                HoverForegroundColor = appearance.HoverForegroundColor ?? profile.HoverForegroundColor,
+                ActiveForegroundColor = appearance.ActiveForegroundColor ?? profile.ActiveForegroundColor,
+                FocusedForegroundColor = appearance.FocusedForegroundColor ?? profile.FocusedForegroundColor,
                 BorderColor = appearance.BorderColor ?? profile.BorderColor,
+                HoverBorderColor = appearance.HoverBorderColor ?? profile.HoverBorderColor,
+                ActiveBorderColor = appearance.ActiveBorderColor ?? profile.ActiveBorderColor,
                 AccentColor = appearance.AccentColor ?? profile.AccentColor,
                 BorderRadius = appearance.BorderRadius ?? profile.BorderRadius,
                 BorderThickness = appearance.BorderThickness ?? profile.BorderThickness,
@@ -115,9 +123,9 @@ namespace shadcnui.GUIComponents.Core.Styling
 
         private void ApplyAppearanceColors(GUIStyle style, ComponentAppearance appearance)
         {
-            bool hasFill = appearance.BackgroundColor.HasValue;
-            bool hasText = appearance.ForegroundColor.HasValue;
-            bool hasBorder = appearance.BorderColor.HasValue;
+            bool hasFill = appearance.BackgroundColor.HasValue || appearance.HoverBackgroundColor.HasValue || appearance.ActiveBackgroundColor.HasValue || appearance.FocusedBackgroundColor.HasValue;
+            bool hasText = appearance.ForegroundColor.HasValue || appearance.HoverForegroundColor.HasValue || appearance.ActiveForegroundColor.HasValue || appearance.FocusedForegroundColor.HasValue;
+            bool hasBorder = appearance.BorderColor.HasValue || appearance.HoverBorderColor.HasValue || appearance.ActiveBorderColor.HasValue;
             bool hasRadius = appearance.BorderRadius.HasValue;
             float borderThickness = appearance.BorderThickness ?? 1f;
 
@@ -127,25 +135,35 @@ namespace shadcnui.GUIComponents.Core.Styling
             if (hasFill || hasBorder)
             {
                 var fill = appearance.BackgroundColor ?? GetTheme().Base;
-                var borderColor = hasBorder ? appearance.BorderColor.Value : Color.clear;
+                var hoverFill = appearance.HoverBackgroundColor ?? HoverSurface(fill);
+                var activeFill = appearance.ActiveBackgroundColor ?? ActiveSurface(fill);
+                var focusedFill = appearance.FocusedBackgroundColor ?? hoverFill;
+                var borderColor = appearance.BorderColor ?? Color.clear;
+                var hoverBorder = appearance.HoverBorderColor ?? borderColor;
+                var activeBorder = appearance.ActiveBorderColor ?? hoverBorder;
                 var effectiveThickness = hasBorder ? borderThickness : 0f;
                 var radius = hasRadius ? appearance.BorderRadius.Value : DesignTokens.Radius.MD;
                 var textureWidth = GetTextureWidth(style, DesignTokens.TextureSize.Large);
                 var textureHeight = GetTextureHeight(style, style.fixedHeight > 0f ? style.fixedHeight / Mathf.Max(0.0001f, _guiHelper.uiScale) : DesignTokens.TextureSize.Large);
 
                 var normalBg = CreateSurfaceTexture(textureWidth, textureHeight, radius, fill, borderColor, effectiveThickness);
-                var hoverBg = CreateSurfaceTexture(textureWidth, textureHeight, radius, HoverSurface(fill), borderColor.a > 0f ? HoverSurface(borderColor, 0.025f) : borderColor, effectiveThickness);
-                var activeBg = CreateSurfaceTexture(textureWidth, textureHeight, radius, ActiveSurface(fill), borderColor.a > 0f ? ActiveSurface(borderColor, 0.04f) : borderColor, effectiveThickness);
+                var hoverBg = CreateSurfaceTexture(textureWidth, textureHeight, radius, hoverFill, hoverBorder, effectiveThickness);
+                var activeBg = CreateSurfaceTexture(textureWidth, textureHeight, radius, activeFill, activeBorder, effectiveThickness);
+                var focusedBg = CreateSurfaceTexture(textureWidth, textureHeight, radius, focusedFill, hoverBorder, effectiveThickness);
 
-                SetBackgroundStates(style, normalBg, hoverBg, activeBg, hoverBg);
+                SetBackgroundStates(style, normalBg, hoverBg, activeBg, focusedBg);
                 style.border = CreateBorderSlice(GetScaledBorderRadius(radius), textureWidth, textureHeight);
             }
 
             if (hasText)
             {
-                var text = appearance.ForegroundColor.Value;
-                style.normal.textColor = style.hover.textColor = style.active.textColor = style.focused.textColor = text;
-                style.onNormal.textColor = style.onHover.textColor = style.onActive.textColor = style.onFocused.textColor = text;
+                SetTextStates(
+                    style,
+                    appearance.ForegroundColor ?? style.normal.textColor,
+                    appearance.HoverForegroundColor ?? appearance.ForegroundColor ?? style.hover.textColor,
+                    appearance.ActiveForegroundColor ?? appearance.ForegroundColor ?? style.active.textColor,
+                    appearance.FocusedForegroundColor ?? appearance.HoverForegroundColor ?? appearance.ForegroundColor ?? style.focused.textColor
+                );
             }
         }
 

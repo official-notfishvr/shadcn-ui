@@ -77,6 +77,7 @@ namespace shadcnui.GUIComponents.Core.Base
         public const string DefaultFontName = "Segoe UI";
         public float uiScale = 1f;
         private string _currentFontName = DefaultFontName;
+        private Font _ownedDynamicFont;
 
         public GUIHelper()
         {
@@ -219,6 +220,8 @@ namespace shadcnui.GUIComponents.Core.Base
                 return;
 
             _currentFontName = fontName;
+            ReleaseOwnedDynamicFont();
+            _ownedDynamicFont = font;
             SetCustomFont(font);
         }
 
@@ -227,7 +230,11 @@ namespace shadcnui.GUIComponents.Core.Base
             if (font == null)
                 return;
 
+            if (font == _ownedDynamicFont)
+                return;
+
             _currentFontName = string.IsNullOrWhiteSpace(displayName) ? font.name : displayName;
+            ReleaseOwnedDynamicFont();
             SetCustomFont(font);
         }
 
@@ -341,6 +348,7 @@ namespace shadcnui.GUIComponents.Core.Base
             _dateInput.Clear();
             _rootGuiScreenRectValid = false;
             _pendingAutoRenderBuilder = null;
+            ReleaseOwnedDynamicFont();
         }
 
         public void Dispose() => Cleanup();
@@ -1429,6 +1437,7 @@ namespace shadcnui.GUIComponents.Core.Base
                     continue;
 
                 _currentFontName = fontName;
+                _ownedDynamicFont = font;
                 _styleManager.CustomFont = font;
                 _styleManager.MarkStylesCorruption();
                 return;
@@ -1452,6 +1461,22 @@ namespace shadcnui.GUIComponents.Core.Base
                 font = null;
                 return false;
             }
+        }
+
+        private void ReleaseOwnedDynamicFont()
+        {
+            if (_ownedDynamicFont == null)
+                return;
+
+            if (_styleManager.CustomFont == _ownedDynamicFont)
+                _styleManager.CustomFont = null;
+
+            if (Application.isPlaying)
+                UnityEngine.Object.Destroy(_ownedDynamicFont);
+            else
+                UnityEngine.Object.DestroyImmediate(_ownedDynamicFont);
+
+            _ownedDynamicFont = null;
         }
 
         private bool IsFontAvailable(string fontName)
