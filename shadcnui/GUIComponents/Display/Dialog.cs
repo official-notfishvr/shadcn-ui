@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using shadcnui.GUIComponents.Core.Base;
 using shadcnui.GUIComponents.Core.Styling;
-using shadcnui.GUIComponents.Core.Theming;
 using shadcnui.GUIComponents.Core.Utils;
 using UnityEngine;
 #if IL2CPP_MELONLOADER_PRE57
@@ -15,6 +14,7 @@ namespace shadcnui.GUIComponents.Display
     {
         private bool _isOpen = false;
         private string _dialogId;
+        private Action _onClosed;
         private const float AnimationDuration = DesignTokens.Animation.DurationNormal;
 
         public Dialog(GUIHelper helper)
@@ -27,6 +27,8 @@ namespace shadcnui.GUIComponents.Display
         {
             if (!_isOpen || _dialogId != config.Id)
                 return;
+
+            _onClosed = config.OnClosed;
 
             var styleManager = guiHelper.GetStyleManager();
             var animManager = guiHelper.GetAnimationManager();
@@ -49,6 +51,7 @@ namespace shadcnui.GUIComponents.Display
         {
             _dialogId = dialogId;
             _isOpen = true;
+            _onClosed = null;
             var animManager = guiHelper.GetAnimationManager();
             animManager.FadeIn($"dialog_alpha_{dialogId}", AnimationDuration, EasingFunctions.EaseOutCubic);
             animManager.ScaleIn($"dialog_scale_{dialogId}", AnimationDuration, 0.95f, EasingFunctions.EaseOutCubic);
@@ -56,6 +59,11 @@ namespace shadcnui.GUIComponents.Display
 
         public void Close()
         {
+            if (!_isOpen && _dialogId == null)
+                return;
+
+            Action onClosed = _onClosed;
+            _onClosed = null;
             if (_dialogId != null)
             {
                 var animManager = guiHelper.GetAnimationManager();
@@ -64,6 +72,7 @@ namespace shadcnui.GUIComponents.Display
             }
             _isOpen = false;
             _dialogId = null;
+            onClosed?.Invoke();
         }
 
         internal void DrawDialog(string dialogId, Action content, float width = 400, float height = 300)
@@ -145,7 +154,7 @@ namespace shadcnui.GUIComponents.Display
         private bool DrawOverlay(DialogConfig config, float animProgress)
         {
             Color prev = GUI.color;
-            Color overlayColor = ThemeManager.Instance.CurrentTheme.Overlay;
+            Color overlayColor = styleManager.GetTheme().Overlay;
             if (animProgress < 1f)
                 overlayColor.a *= animProgress;
             GUI.color = overlayColor;
@@ -236,6 +245,9 @@ namespace shadcnui.GUIComponents.Display
                 return;
 
             float scale = animManager.GetFloat($"dialog_scale_{config.Id}", 1f);
+            if (float.IsNaN(scale) || float.IsInfinity(scale))
+                scale = 1f;
+            scale = Mathf.Clamp(scale, 0.001f, 1f);
             Vector2 dialogCenter = new Vector2(dialogX + config.Width / 2f, dialogY + config.Height / 2f);
             GUI.matrix = Matrix4x4.TRS(new Vector3(dialogCenter.x * (1 - scale), dialogCenter.y * (1 - scale), 0), Quaternion.identity, new Vector3(scale, scale, 1f));
             GUI.color = new Color(prevColor.r, prevColor.g, prevColor.b, prevColor.a * animProgress);

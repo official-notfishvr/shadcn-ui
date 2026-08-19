@@ -48,9 +48,9 @@ namespace shadcnui.GUIComponents.Layout
             {
                 var item = config.Items[i];
                 bool active = i == selected;
-                var style = styleManager.GetButtonStyle(active ? ControlVariant.Secondary : ControlVariant.Ghost, config.Size);
+                var style = styleManager.GetButtonStyle(active ? ControlVariant.Secondary : ControlVariant.Ghost, config.Size, config.Appearance);
                 bool prev = GUI.enabled;
-                GUI.enabled = !item.IsDisabled;
+                GUI.enabled = prev && !config.IsDisabled && !item.IsDisabled;
                 if (GUILayout.Button(item.Label ?? item.Id ?? $"Item {i + 1}", style, GUILayout.ExpandWidth(true)))
                 {
                     selected = i;

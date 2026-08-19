@@ -30,7 +30,7 @@ namespace shadcnui_Demo.Menu
         private void Start()
         {
             _gui = new GUIHelper();
-            _gui.SetTheme("Shadcn");
+            _gui.SetTheme("Dark");
             _gui.SetFontSize(13);
             _entries = BuildEntries();
         }

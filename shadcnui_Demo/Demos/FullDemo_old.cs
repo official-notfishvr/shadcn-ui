@@ -15,6 +15,8 @@ namespace shadcnui_Demo.Menu
         private Rect windowRect = new(20f, 20f, 1450f, 800f);
         private bool showDemoWindow = true;
         private bool useVerticalTabs;
+        private bool verticalTabsOnRight;
+        private bool tabsOnBottom;
         private Vector2 scrollPosition;
         private float lastScrollViewportHeight;
         private float lastScrollContentHeight;
@@ -22,18 +24,17 @@ namespace shadcnui_Demo.Menu
         private int currentDemoTab;
         private readonly string[] demoTabs = { "Button", "Badge", "Input", "Toggle", "Checkbox", "Switch", "TextArea", "Avatar", "Card", "Progress", "Separator", "Label", "Dialog", "Select", "DropdownMenu", "Popover", "Tabs", "MenuBar", "Chart", "Table", "Toast", "Tooltip", "Slider", "Layout" };
 
-        private bool verticalTabsOnRight;
-        private bool tabsOnBottom;
         private Texture2D img;
 
         private string passwordValue = "password123";
-        private string textAreaValue = "Legacy demo file, current API.";
+        private string textAreaValue = "Current API example with validation-ready content.";
+        private string emailValue = string.Empty;
+        private DateTime? selectedDate = DateTime.Today;
         private float sliderValue = 0.5f;
         private float sliderWithStepValue = 50f;
         private Vector2 rangeSliderValue = new(20f, 70f);
 
         private readonly Dictionary<string, bool> toggleStates = new();
-        private bool dropdownOpen;
         private int selectIndex;
 
         private readonly string[] selectItems = { "Alpha", "Bravo", "Charlie", "Delta" };
@@ -82,7 +83,7 @@ namespace shadcnui_Demo.Menu
             GUI.skin.verticalScrollbar = GUIStyle.none;
 
             if (showDemoWindow)
-                windowRect = GUI.Window(101, windowRect, (GUI.WindowFunction)DrawDemoWindow, "shadcn/ui Demo - Legacy Tabs");
+                windowRect = GUI.Window(101, windowRect, (GUI.WindowFunction)DrawDemoWindow, "shadcn/ui Component Lab");
 
             guiHelper.DrawOverlay();
         }
@@ -96,13 +97,9 @@ namespace shadcnui_Demo.Menu
             DrawHeader();
 
             if (useVerticalTabs)
-            {
                 currentDemoTab = guiHelper.Tabs().Items(demoTabs).SelectedIndex(currentDemoTab).Side(verticalTabsOnRight ? TabSide.Right : TabSide.Left).Content(DrawScrollableContent);
-            }
             else
-            {
                 currentDemoTab = guiHelper.Tabs().Items(demoTabs).SelectedIndex(currentDemoTab).Position(tabsOnBottom ? TabPosition.Bottom : TabPosition.Top).MaxLines(2).Content(DrawScrollableContent);
-            }
 
             guiHelper.EndGUI();
             GUI.DragWindow();
@@ -110,17 +107,13 @@ namespace shadcnui_Demo.Menu
 
         private void DrawHeader()
         {
-            guiHelper.BeginHorizontalGroup();
-            GUILayout.FlexibleSpace();
-            useVerticalTabs = guiHelper.Toggle("Vertical Tabs", useVerticalTabs);
-            guiHelper.AddSpace(8f);
+            guiHelper.Label("shadcn/ui component laboratory").Large().Render();
+            guiHelper.Label("A focused reference for the current builders, configs, state, and overlay behavior.").Muted().Render();
+            useVerticalTabs = guiHelper.Toggle("Vertical tabs", useVerticalTabs);
             if (useVerticalTabs)
-                verticalTabsOnRight = guiHelper.Toggle("Right Side", verticalTabsOnRight);
+                verticalTabsOnRight = guiHelper.Toggle("Right side", verticalTabsOnRight);
             else
-                tabsOnBottom = guiHelper.Toggle("Bottom Tabs", tabsOnBottom);
-            guiHelper.EndHorizontalGroup();
-
-            guiHelper.Label("This file keeps the old tab layout, but each tab now demonstrates the current API surface.").Muted();
+                tabsOnBottom = guiHelper.Toggle("Bottom tabs", tabsOnBottom);
             guiHelper.HorizontalSeparator();
         }
 
@@ -277,7 +270,7 @@ namespace shadcnui_Demo.Menu
                 () =>
                 {
                     passwordValue = guiHelper.Input(passwordValue).Label("Password").Password();
-                    passwordValue = guiHelper.Input(passwordValue).Label("Email").Placeholder("pilot@relay.local");
+                    emailValue = guiHelper.Input(emailValue).Label("Email").Placeholder("pilot@relay.local");
                 }
             );
         }
@@ -290,6 +283,7 @@ namespace shadcnui_Demo.Menu
                 {
                     toggleStates["toggle_default"] = guiHelper.Toggle("Feature Flag", GetToggle("toggle_default"));
                     toggleStates["toggle_outline"] = guiHelper.Toggle("Muted Routing", GetToggle("toggle_outline")).Outline();
+                    guiHelper.Toggle("Disabled state", true).Disabled();
                 }
             );
         }
@@ -302,6 +296,7 @@ namespace shadcnui_Demo.Menu
                 {
                     toggleStates["checkbox_1"] = guiHelper.Checkbox("Enable Alerts", GetToggle("checkbox_1"));
                     toggleStates["checkbox_2"] = guiHelper.Checkbox("Auto Assign", GetToggle("checkbox_2")).Secondary();
+                    guiHelper.Checkbox("Disabled state", true).Disabled();
                 }
             );
         }
@@ -314,6 +309,7 @@ namespace shadcnui_Demo.Menu
                 {
                     toggleStates["switch_1"] = guiHelper.Switch("Maintenance Mode", GetToggle("switch_1"));
                     toggleStates["switch_2"] = guiHelper.Switch("Broadcast Changes", GetToggle("switch_2")).Small();
+                    guiHelper.Switch("Disabled state", true).Disabled();
                 }
             );
         }
@@ -404,23 +400,24 @@ namespace shadcnui_Demo.Menu
                     if (guiHelper.Button("Open Dialog", ControlVariant.Default, ControlSize.Small))
                         showDialog = true;
 
-                    guiHelper
-                        .Dialog(DialogId)
-                        .ParentWindow(windowRect)
-                        .Title("Legacy Tab")
-                        .Description("Still using the new dialog builder.")
-                        .Content(() => guiHelper.Label("Dialog content").Muted())
-                        .Footer(() =>
-                        {
-                            if (guiHelper.Button("Close", ControlVariant.Outline, ControlSize.Small))
-                            {
-                                showDialog = false;
-                                guiHelper.Dialog(DialogId).Close();
-                            }
-                        });
+                    if (showDialog && !guiHelper.IsDialogOpen())
+                        guiHelper.OpenDialog(DialogId);
 
                     if (showDialog)
-                        guiHelper.Dialog(DialogId).Open();
+                    {
+                        guiHelper
+                            .Dialog(DialogId)
+                            .ParentWindow(windowRect)
+                            .Title("Confirm operation")
+                            .Description("A focused overlay using the current dialog configuration.")
+                            .OnClosed(() => showDialog = false)
+                            .Content(() => guiHelper.Label("Dialog content").Muted())
+                            .Footer(() =>
+                            {
+                                if (guiHelper.Button("Close", ControlVariant.Outline, ControlSize.Small))
+                                    guiHelper.CloseDialog();
+                            });
+                    }
                 }
             );
         }
@@ -431,8 +428,9 @@ namespace shadcnui_Demo.Menu
                 "Select",
                 () =>
                 {
-                    selectIndex = guiHelper.Select().Label("Squad").Items(selectItems).SelectedIndex(selectIndex).Width(240f);
-                    guiHelper.Badge(selectItems[Mathf.Clamp(selectIndex, 0, selectItems.Length - 1)]).Outline();
+                    selectIndex = guiHelper.Select().Id("legacy_squad_select").Label("Squad").Placeholder("Choose a squad").Items(selectItems).SelectedIndex(selectIndex).CloseOnSelect().MaxHeight(180f).Width(240f);
+                    guiHelper.Badge($"Selected: {selectItems[Mathf.Clamp(selectIndex, 0, selectItems.Length - 1)]}").Outline().Render();
+                    selectedDate = guiHelper.DatePicker().Id("legacy_demo_date").Label("Deployment date").Value(selectedDate).DisplayFormat("MMM d, yyyy").Range(DateTime.Today, DateTime.Today.AddDays(30)).Render();
                 }
             );
         }
@@ -443,8 +441,20 @@ namespace shadcnui_Demo.Menu
                 "Dropdown Menu",
                 () =>
                 {
-                    dropdownOpen = guiHelper.Toggle("Sticky Preview", dropdownOpen);
-                    guiHelper.DropdownMenu().Trigger(() => dropdownOpen || guiHelper.Button("Open Menu", ControlVariant.Outline, ControlSize.Small)).Header("Actions").Item("Deploy").Item("Duplicate").Separator().Item("Archive");
+                    guiHelper
+                        .DropdownMenu()
+                        .Id("legacy_actions_menu")
+                        .Trigger(() => guiHelper.Button("Open actions", ControlVariant.Outline, ControlSize.Small))
+                        .Width(220f)
+                        .MaxHeight(220f)
+                        .CloseOnClickOutside()
+                        .CloseOnSelect()
+                        .Header("Actions")
+                        .Item("Deploy")
+                        .Item("Duplicate")
+                        .Separator()
+                        .Item("Archive")
+                        .Render();
                 }
             );
         }
@@ -462,8 +472,8 @@ namespace shadcnui_Demo.Menu
                         .Popover(PopoverId)
                         .Content(() =>
                         {
-                            guiHelper.Label("Legacy popover");
-                            guiHelper.Label("Current implementation").Muted();
+                            guiHelper.Label("Quick details");
+                            guiHelper.Label("Current popover configuration").Muted();
                         });
 
                     if (showPopover)
@@ -513,9 +523,9 @@ namespace shadcnui_Demo.Menu
                 "Table",
                 () =>
                 {
-                    guiHelper.Table().Headers(tableHeaders).Rows(tableRows).Page(0, 4);
+                    guiHelper.Table().Headers(tableHeaders).Rows(tableRows).Render();
                     guiHelper.AddSpace(12f);
-                    guiHelper.DataTable(DataTableId).Columns(dataColumns).Rows(dataRows).ShowPagination().ShowSearch().ShowSelection();
+                    guiHelper.DataTable(DataTableId).Columns(dataColumns).Rows(dataRows).ShowToolbar().ShowSearch().ShowPagination().Sorting().Filtering().FilterPlaceholder("Filter squads...").EmptyText("No squads found.").PageSize(5).PageSizeOptions(5, 10, 20).Render();
                 }
             );
         }
@@ -594,7 +604,7 @@ namespace shadcnui_Demo.Menu
                     guiHelper.AddSpace(12f);
                     guiHelper.BeginHorizontalGroup();
                     guiHelper.Button("Left");
-                    GUILayout.FlexibleSpace();
+                    guiHelper.Flex();
                     guiHelper.Button("Right");
                     guiHelper.EndHorizontalGroup();
                 }
@@ -619,9 +629,9 @@ namespace shadcnui_Demo.Menu
 
         private void BuildData()
         {
-            dataColumns.Add(new DataTableColumn("name", "Name", "name", 150f));
-            dataColumns.Add(new DataTableColumn("status", "Status", "status", 130f));
-            dataColumns.Add(new DataTableColumn("ping", "Ping", "ping", 100f));
+            dataColumns.Add(new DataTableColumn("name", "Name", "name", -1f));
+            dataColumns.Add(new DataTableColumn("status", "Status", "status", -1f));
+            dataColumns.Add(new DataTableColumn("ping", "Ping", "ping", -1f));
 
             dataRows.Add(
                 new DataTableRow(

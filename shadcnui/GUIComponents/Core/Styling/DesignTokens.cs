@@ -9,9 +9,9 @@ namespace shadcnui.GUIComponents.Core.Styling
             public const float None = 0f;
             public const float XXS = 2f;
             public const float XS = 4f;
-            public const float SM = 6f;
-            public const float MD = 10f;
-            public const float LG = 14f;
+            public const float SM = 8f;
+            public const float MD = 12f;
+            public const float LG = 16f;
             public const float XL = 20f;
             public const float XXL = 24f;
         }
@@ -38,6 +38,7 @@ namespace shadcnui.GUIComponents.Core.Styling
 
         public static class Height
         {
+            public const float ExtraSmall = 24f;
             public const float Mini = 26f;
             public const float Small = 32f;
             public const float Default = 36f;
@@ -49,12 +50,14 @@ namespace shadcnui.GUIComponents.Core.Styling
         {
             public static class Button
             {
+                public const float ExtraSmallH = 8f;
+                public const float ExtraSmallV = 3f;
                 public const float MiniH = 10f;
                 public const float MiniV = 4f;
                 public const float SmallH = 12f;
                 public const float SmallV = 5f;
-                public const float DefaultH = 14f;
-                public const float DefaultV = 7f;
+                public const float DefaultH = 16f;
+                public const float DefaultV = 8f;
                 public const float LargeH = 18f;
                 public const float LargeV = 8f;
             }
@@ -85,8 +88,8 @@ namespace shadcnui.GUIComponents.Core.Styling
 
             public static class Table
             {
-                public const float CellH = 16f;
-                public const float CellV = 12f;
+                public const float CellH = 8f;
+                public const float CellV = 8f;
             }
 
             public static class Dropdown

@@ -1,6 +1,5 @@
 using shadcnui.GUIComponents.Core.Base;
 using shadcnui.GUIComponents.Core.Styling;
-using shadcnui.GUIComponents.Core.Theming;
 using shadcnui.GUIComponents.Core.Utils;
 using UnityEngine;
 #if IL2CPP_MELONLOADER_PRE57
@@ -25,7 +24,6 @@ namespace shadcnui.GUIComponents.Controls
 
         private bool DrawCheckboxRow(Rect rowRect, BoolControlConfigBase config)
         {
-            var theme = ThemeManager.Instance.CurrentTheme;
             float boxSize = DesignTokens.Checkbox.Size * guiHelper.uiScale;
             float gap = DesignTokens.Spacing.MD * guiHelper.uiScale;
             float x = DrawLeadingIcon(rowRect, config.Icon);
@@ -38,7 +36,7 @@ namespace shadcnui.GUIComponents.Controls
             GUI.Label(labelRect, config.Label ?? string.Empty, labelStyle);
 
             bool value = HandleCheckboxInput(rowRect, config.Value, config.IsDisabled);
-            DrawCheckboxVisual(boxRect, value, config.IsDisabled, theme);
+            DrawCheckboxVisual(boxRect, value, config);
             return value;
         }
 
@@ -47,18 +45,12 @@ namespace shadcnui.GUIComponents.Controls
             return base.HandleToggleInput(rect, currentValue, disabled);
         }
 
-        private void DrawCheckboxVisual(Rect boxRect, bool value, bool disabled, Theme theme)
+        private void DrawCheckboxVisual(Rect boxRect, bool value, BoolControlConfigBase config)
         {
-            Color fill = value ? theme.ButtonPrimaryBg : theme.Base;
-            Color border = value ? theme.ButtonPrimaryBg : theme.Border;
-            if (disabled)
-            {
-                fill = Color.Lerp(fill, theme.Base, 0.35f);
-                border = Color.Lerp(border, theme.Muted, 0.25f);
-            }
+            var style = value ? styleManager.GetCheckboxSolidStyle(config.Variant, config.Size, config.Appearance) : styleManager.GetCheckboxStyle(config.Variant, config.Size, config.Appearance);
 
-            int radius = styleManager.GetScaledBorderRadius(DesignTokens.Radius.SM);
-            SurfaceDrawUtility.DrawRoundedBorder(styleManager, boxRect, radius, fill, border, 1f);
+            if (Event.current.type == EventType.Repaint && style?.normal?.background != null)
+                GUI.DrawTexture(boxRect, style.normal.background, ScaleMode.StretchToFill);
 
             if (!value)
                 return;
@@ -68,7 +60,7 @@ namespace shadcnui.GUIComponents.Controls
                 alignment = TextAnchor.MiddleCenter,
                 fontStyle = FontStyle.Bold,
                 fontSize = Mathf.RoundToInt(11f * guiHelper.uiScale),
-                normal = { textColor = theme.ButtonPrimaryFg },
+                normal = { textColor = style?.normal?.textColor ?? styleManager.GetTheme().ButtonPrimaryFg },
             };
             GUI.Label(boxRect, "✓", checkStyle);
         }

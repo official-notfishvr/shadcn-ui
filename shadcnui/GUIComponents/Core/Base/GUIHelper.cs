@@ -73,6 +73,7 @@ namespace shadcnui.GUIComponents.Core.Base
         internal bool _rootGuiScreenRectValid;
         internal int fontSize = 14;
         private IAutoRenderBuilder _pendingAutoRenderBuilder;
+        private bool _flushingAutoRenderBuilder;
 
         public const string DefaultFontName = "Segoe UI";
         public float uiScale = 1f;
@@ -623,6 +624,19 @@ namespace shadcnui.GUIComponents.Core.Base
                 }
             );
 
+        public void CountBadge(int count, ControlVariant variant, ControlSize size, int maxCount, ComponentAppearance appearance, params GUILayoutOption[] options) =>
+            Render(
+                new BadgeConfig
+                {
+                    Count = count,
+                    MaxCount = maxCount,
+                    Variant = variant,
+                    Size = size,
+                    Appearance = appearance,
+                    LayoutOptions = options ?? Array.Empty<GUILayoutOption>(),
+                }
+            );
+
         public void StatusBadge(string text, bool isActive, ControlVariant variant = ControlVariant.Default, ControlSize size = ControlSize.Default, params GUILayoutOption[] options) =>
             Render(
                 new BadgeConfig
@@ -636,11 +650,37 @@ namespace shadcnui.GUIComponents.Core.Base
                 }
             );
 
+        public void StatusBadge(string text, bool isActive, ControlVariant variant, ControlSize size, ComponentAppearance appearance, params GUILayoutOption[] options) =>
+            Render(
+                new BadgeConfig
+                {
+                    Text = text,
+                    Variant = variant,
+                    Size = size,
+                    Appearance = appearance,
+                    ShowStatusDot = true,
+                    IsActive = isActive,
+                    LayoutOptions = options ?? Array.Empty<GUILayoutOption>(),
+                }
+            );
+
         public AvatarBuilder Avatar() => new(this);
 
         public ProgressBuilder Progress(float value = 0f) => new(this, value);
 
         public void Progress(float value, float width) => Render(new ProgressConfig { Value = value, Width = width });
+
+        public void Progress(float value, float width, ControlVariant variant, ComponentAppearance appearance = null, params GUILayoutOption[] options) =>
+            Render(
+                new ProgressConfig
+                {
+                    Value = value,
+                    Width = width,
+                    Variant = variant,
+                    Appearance = appearance,
+                    LayoutOptions = options ?? Array.Empty<GUILayoutOption>(),
+                }
+            );
 
         public ChartBuilder Chart() => new(this);
 
@@ -758,6 +798,12 @@ namespace shadcnui.GUIComponents.Core.Base
 
         internal void RegisterAutoRenderBuilder(IAutoRenderBuilder builder)
         {
+            if (_flushingAutoRenderBuilder)
+            {
+                _pendingAutoRenderBuilder = builder;
+                return;
+            }
+
             FlushAutoRenderBuilder();
             _pendingAutoRenderBuilder = builder;
         }
@@ -770,12 +816,23 @@ namespace shadcnui.GUIComponents.Core.Base
 
         internal void FlushAutoRenderBuilder()
         {
+            if (_flushingAutoRenderBuilder)
+                return;
+
             var builder = _pendingAutoRenderBuilder;
             if (builder == null)
                 return;
 
             _pendingAutoRenderBuilder = null;
-            builder.RenderIfPending();
+            _flushingAutoRenderBuilder = true;
+            try
+            {
+                builder.RenderIfPending();
+            }
+            finally
+            {
+                _flushingAutoRenderBuilder = false;
+            }
         }
 
         internal bool Render(ButtonConfig config)
@@ -1010,7 +1067,7 @@ namespace shadcnui.GUIComponents.Core.Base
             if (config == null)
                 return;
 
-            Execute(() => _dataTable.Render(config.Id, config.Columns, config.Rows, config.ShowPagination, config.ShowSearch, config.ShowSelection, config.ShowColumnToggle, config.Appearance, config.LayoutOptions), nameof(DataTable));
+            Execute(() => _dataTable.Render(config), nameof(DataTable));
         }
 
         internal void Render(LabelConfig config)
@@ -1110,6 +1167,8 @@ namespace shadcnui.GUIComponents.Core.Base
         public void OpenDialog(string id) => Execute(() => _dialog.Open(id), nameof(OpenDialog));
 
         public void CloseDialog() => Execute(_dialog.Close, nameof(CloseDialog));
+
+        public bool IsDialogOpen() => Execute(() => _dialog.IsOpen, false, nameof(IsDialogOpen));
 
         public void OpenPopover(string id, int zIndex = -1) => Execute(() => _popover.Open(id, zIndex), nameof(OpenPopover));
 

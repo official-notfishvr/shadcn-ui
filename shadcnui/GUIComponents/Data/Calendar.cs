@@ -23,7 +23,7 @@ namespace shadcnui.GUIComponents.Data
                 _visibleMonths[id] = new DateTime(selected.Year, selected.Month, 1);
 
             var style = styleManager.GetCalendarStyle(config.Variant, config.Size, config.Appearance);
-            layoutComponents.BeginVerticalGroup(style);
+            layoutComponents.BeginVerticalGroup(style, GUILayout.ExpandHeight(false));
             CalendarRenderUtility.DrawMonthHeader(
                 layoutComponents,
                 styleManager.GetButtonStyle(ControlVariant.Ghost, ControlSize.Icon),
@@ -43,7 +43,7 @@ namespace shadcnui.GUIComponents.Data
             bool selected = config.SelectedDate.HasValue && config.SelectedDate.Value.Date == date.Date;
             bool today = date.Date == DateTime.Today;
             bool outside = date.Month != activeMonth;
-            bool disabled = config.DisabledDates != null && config.DisabledDates.Contains(date.Date);
+            bool disabled = config.IsDisabled || (config.DisabledDates != null && config.DisabledDates.Contains(date.Date));
 
             GUIStyle style =
                 selected ? styleManager.GetCalendarDaySelectedStyle(config.Appearance)

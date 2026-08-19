@@ -21,6 +21,8 @@ namespace shadcnui.GUIComponents.Core.Base
             public Action Content;
             public Action OnClose;
             public int WindowId;
+            public int OpenedFrame;
+            public EventType OpenedEventType;
         }
 
         private static readonly Lazy<LayerManager> _instance = new(() => new LayerManager());
@@ -53,6 +55,8 @@ namespace shadcnui.GUIComponents.Core.Base
                 Content = config.Content,
                 OnClose = config.OnClose,
                 WindowId = _layers.TryGetValue(config.Id, out var existing) ? existing.WindowId : _nextWindowId++,
+                OpenedFrame = Time.frameCount,
+                OpenedEventType = Event.current != null ? Event.current.type : EventType.Ignore,
             };
 
             _layers[config.Id] = state;
@@ -208,14 +212,16 @@ namespace shadcnui.GUIComponents.Core.Base
         {
             if (Event.current.type != EventType.MouseDown || Event.current.button != 0)
                 return;
-
-            var mouse = Event.current.mousePosition;
+            var mouse = GUIUtility.GUIToScreenPoint(Event.current.mousePosition);
 
             for (int i = order.Count - 1; i >= 0; i--)
             {
                 var id = order[i];
                 if (!_layers.TryGetValue(id, out var layer))
                     continue;
+
+                if (layer.OpenedFrame == Time.frameCount && layer.OpenedEventType == Event.current.type)
+                    return;
 
                 var rect = new Rect(layer.Position.x, layer.Position.y, layer.Width, layer.Height);
                 if (rect.Contains(mouse))

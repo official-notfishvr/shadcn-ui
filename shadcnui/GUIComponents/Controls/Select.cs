@@ -11,6 +11,7 @@ namespace shadcnui.GUIComponents.Controls
     {
         private readonly Dictionary<string, Vector2> _scrollPositions = new();
         private readonly Dictionary<string, Rect> _anchorRects = new();
+        private readonly Dictionary<string, Rect> _screenAnchorRects = new();
         private readonly Dictionary<string, int> _pendingSelection = new();
 
         public Select(GUIHelper helper)
@@ -35,12 +36,18 @@ namespace shadcnui.GUIComponents.Controls
             string arrow = LayerManager.Instance.IsOpen(id) ? " ▲" : " ▼";
 
             var options = BuildTriggerOptions(config);
+            bool previousEnabled = GUI.enabled;
+            GUI.enabled = previousEnabled && !config.IsDisabled;
             bool clicked = UnityHelpers.Button(label + arrow, buttonStyle, options.ToArray());
+            GUI.enabled = previousEnabled;
 
             if (Event.current.type == EventType.Repaint)
+            {
                 _anchorRects[id] = GUILayoutUtility.GetLastRect();
+                _screenAnchorRects[id] = PopupLayoutUtility.ToScreenRect(_anchorRects[id]);
+            }
 
-            if (clicked)
+            if (clicked && !config.IsDisabled)
             {
                 if (LayerManager.Instance.IsOpen(id))
                     Close(id);
@@ -73,7 +80,8 @@ namespace shadcnui.GUIComponents.Controls
 
             float width = GetMenuWidth(config, anchorRect);
             float height = GetMenuHeight(config);
-            Vector2 screenPos = PopupLayoutUtility.GetAnchoredScreenPosition(anchorRect, width, height, guiHelper.GetRootGuiScreenRect());
+            Rect screenAnchor = _screenAnchorRects.TryGetValue(id, out var cachedScreenAnchor) ? cachedScreenAnchor : PopupLayoutUtility.ToScreenRect(anchorRect);
+            Vector2 screenPos = PopupLayoutUtility.GetAnchoredScreenPositionFromScreenRect(screenAnchor, width, height, GetScreenBounds());
             LayerManager.Instance.Open(
                 new LayerConfig
                 {
@@ -107,6 +115,7 @@ namespace shadcnui.GUIComponents.Controls
 
             _scrollPositions.Clear();
             _anchorRects.Clear();
+            _screenAnchorRects.Clear();
             _pendingSelection.Clear();
         }
 
@@ -196,7 +205,8 @@ namespace shadcnui.GUIComponents.Controls
             Rect anchor = GetAnchorRect(id);
             float width = GetMenuWidth(config, anchor);
             float height = GetMenuHeight(config);
-            Vector2 screenPos = PopupLayoutUtility.GetAnchoredScreenPosition(anchor, width, height, guiHelper.GetRootGuiScreenRect());
+            Rect screenAnchor = _screenAnchorRects.TryGetValue(id, out var cachedScreenAnchor) ? cachedScreenAnchor : PopupLayoutUtility.ToScreenRect(anchor);
+            Vector2 screenPos = PopupLayoutUtility.GetAnchoredScreenPositionFromScreenRect(screenAnchor, width, height, GetScreenBounds());
             LayerManager.Instance.SetPosition(id, screenPos);
         }
 
@@ -211,6 +221,8 @@ namespace shadcnui.GUIComponents.Controls
             return config.Options[config.SelectedIndex]?.Label;
         }
 
+        private static Rect GetScreenBounds() => new(0f, 0f, Screen.width, Screen.height);
+
         private string ResolveId(string id, string label, string fallback)
         {
             if (!string.IsNullOrEmpty(id))
@@ -224,7 +236,7 @@ namespace shadcnui.GUIComponents.Controls
         {
             _scrollPositions.Remove(id);
             _anchorRects.Remove(id);
-            _pendingSelection.Remove(id);
+            _screenAnchorRects.Remove(id);
         }
 
         private static ComponentAppearance GetTextOnlyAppearance(ComponentAppearance appearance)

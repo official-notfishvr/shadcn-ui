@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using shadcnui.GUIComponents.Core.Base;
 using shadcnui.GUIComponents.Core.Styling;
@@ -17,19 +18,33 @@ namespace shadcnui.GUIComponents.Layout
             if (config == null)
                 return;
 
-            string[,] rows = config.FilteredRows ?? config.Rows;
-            DrawTableCore(config.ColumnHeaders, rows, config.ColumnWidths, config.Variant, config.Size, config.Appearance);
+            DrawSurface(
+                config.ColumnHeaders,
+                config.FilteredRows ?? config.Rows,
+                config.ObjectRows,
+                config.ColumnWidths,
+                config.Variant,
+                config.Size,
+                config.Appearance,
+                config.LayoutOptions,
+                config.CellRenderer,
+                config.OnSortChanged,
+                config.OnSelectionChanged,
+                config.SelectedRowFlags,
+                config.SortColumnIndices,
+                config.SortAscending,
+                config.CurrentPage,
+                config.PageSize,
+                config.OnPageChanged
+            );
         }
 
-        internal void DrawTable(string[] headers, string[,] data, ControlVariant variant = ControlVariant.Default, ControlSize size = ControlSize.Default, params GUILayoutOption[] options)
-        {
-            DrawTableCore(headers, data, null, variant, size, null, options);
-        }
+        internal void DrawTable(string[] headers, string[,] data, ControlVariant variant = ControlVariant.Default, ControlSize size = ControlSize.Default, params GUILayoutOption[] options) => DrawSurface(headers, data, null, null, variant, size, null, options);
 
         internal void DrawTable(Rect rect, string[] headers, string[,] data, ControlVariant variant = ControlVariant.Default, ControlSize size = ControlSize.Default)
         {
             GUILayout.BeginArea(ControlLayoutUtility.ScaleRect(rect, guiHelper.uiScale));
-            DrawTableCore(headers, data, null, variant, size, null);
+            DrawSurface(headers, data, null, null, variant, size, null, null);
             GUILayout.EndArea();
         }
 
@@ -39,359 +54,240 @@ namespace shadcnui.GUIComponents.Layout
         {
             sortCols ??= Array.Empty<int>();
             sortAsc ??= Array.Empty<bool>();
-            int activeSortColumn = sortCols.Length > 0 ? sortCols[0] : -1;
-            bool ascending = sortAsc.Length > 0 ? sortAsc[0] : true;
-            string[,] sorted = ApplySorting(data, activeSortColumn, ascending);
-            int[] nextSortCols = (int[])sortCols.Clone();
-            bool[] nextSortAsc = (bool[])sortAsc.Clone();
-
-            DrawTableCore(
-                headers,
-                sorted,
-                null,
-                variant,
-                size,
-                null,
-                options,
-                sortable: true,
-                activeSortColumn: activeSortColumn,
-                activeSortAscending: ascending,
-                onSort: (column, nextAscending) =>
-                {
-                    nextSortCols = new[] { column };
-                    nextSortAsc = new[] { nextAscending };
-                    onSort?.Invoke(column, nextAscending);
-                }
-            );
-
-            sortCols = nextSortCols;
-            sortAsc = nextSortAsc;
+            int column = sortCols.Length == 0 ? -1 : sortCols[0];
+            bool ascending = sortAsc.Length == 0 || sortAsc[0];
+            string[,] sorted = ApplySorting(data, column, ascending);
+            DrawSurface(headers, sorted, null, null, variant, size, null, options, null, onSort, null, null, sortCols, sortAsc);
         }
 
         internal void SelectableTable(TableConfig config) => Render(config);
 
         internal void SelectableTable(string[] headers, string[,] data, ref bool[] selected, ControlVariant variant = ControlVariant.Default, ControlSize size = ControlSize.Default, Action<int, bool> onSelectionChanged = null, params GUILayoutOption[] options)
         {
-            int rowCount = data?.GetLength(0) ?? 0;
-            EnsureSelectionArray(ref selected, rowCount);
-            bool[] workingSelection = (bool[])selected.Clone();
-            DrawTableCore(
-                headers,
-                data,
-                null,
-                variant,
-                size,
-                null,
-                options,
-                selectable: true,
-                selectedRows: workingSelection,
-                onSelectionChanged: (row, value) =>
-                {
-                    workingSelection[row] = value;
-                    onSelectionChanged?.Invoke(row, value);
-                }
-            );
-            selected = workingSelection;
+            int count = data?.GetLength(0) ?? 0;
+            selected = selected == null || selected.Length != count ? new bool[count] : selected;
+            DrawSurface(headers, data, null, null, variant, size, null, options, null, null, onSelectionChanged, selected);
         }
 
         internal void PaginatedTable(TableConfig config) => Render(config);
 
         internal void PaginatedTable(string[] headers, string[,] data, ref int page, int pageSize, ControlVariant variant = ControlVariant.Default, ControlSize size = ControlSize.Default, Action<int> onPageChange = null, params GUILayoutOption[] options)
         {
-            int totalRows = data?.GetLength(0) ?? 0;
-            int resolvedPageSize = Mathf.Max(1, pageSize);
-            int totalPages = Mathf.Max(1, Mathf.CeilToInt(totalRows / (float)resolvedPageSize));
+            int totalPages = Mathf.Max(1, Mathf.CeilToInt((data?.GetLength(0) ?? 0) / (float)Mathf.Max(1, pageSize)));
             page = Mathf.Clamp(page, 0, totalPages - 1);
-            int nextPageValue = page;
-            DrawTableCore(
+            int nextPage = page;
+            DrawSurface(
                 headers,
-                SlicePage(data, page, resolvedPageSize),
+                SlicePage(data, page, pageSize),
+                null,
                 null,
                 variant,
                 size,
                 null,
                 options,
-                currentPage: page,
-                totalPages: totalPages,
-                onPageChanged: nextPage =>
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                page,
+                pageSize,
+                next =>
                 {
-                    nextPageValue = nextPage;
-                    onPageChange?.Invoke(nextPage);
+                    nextPage = next;
+                    onPageChange?.Invoke(next);
                 }
             );
-            page = nextPageValue;
+            page = nextPage;
         }
 
         internal void SearchableTable(TableConfig config) => Render(config);
 
         internal void SearchableTable(string[] headers, string[,] data, ref string query, ref string[,] filtered, ControlVariant variant = ControlVariant.Default, ControlSize size = ControlSize.Default, Action<string> onSearch = null, params GUILayoutOption[] options)
         {
-            filtered = data;
-            DrawTableCore(headers, filtered, null, variant, size, null, options);
+            filtered ??= data;
+            DrawSurface(headers, filtered, null, null, variant, size, null, options);
         }
 
         internal void ResizableTable(TableConfig config) => Render(config);
 
-        internal void ResizableTable(string[] headers, string[,] data, ref float[] columnWidths, ControlVariant variant = ControlVariant.Default, ControlSize size = ControlSize.Default, params GUILayoutOption[] options)
-        {
-            DrawTableCore(headers, data, columnWidths, variant, size, null, options);
-        }
+        internal void ResizableTable(string[] headers, string[,] data, ref float[] columnWidths, ControlVariant variant = ControlVariant.Default, ControlSize size = ControlSize.Default, params GUILayoutOption[] options) => DrawSurface(headers, data, null, columnWidths, variant, size, null, options);
 
-        internal void CustomTable(TableConfig config)
-        {
-            Render(config);
-        }
+        internal void CustomTable(TableConfig config) => Render(config);
 
         internal void CustomTable(string[] headers, object[,] data, Action<object, int, int> cellRenderer, ControlVariant variant = ControlVariant.Default, ControlSize size = ControlSize.Default, params GUILayoutOption[] options)
         {
             int rows = data?.GetLength(0) ?? 0;
-            int cols = data?.GetLength(1) ?? 0;
-            string[,] converted = new string[rows, cols];
-            for (int r = 0; r < rows; r++)
-            {
-                for (int c = 0; c < cols; c++)
-                {
-                    if (cellRenderer != null)
-                        converted[r, c] = string.Empty;
-                    else
-                        converted[r, c] = data[r, c]?.ToString() ?? string.Empty;
-                }
-            }
-
-            DrawTableCore(headers, converted, null, variant, size, null, options, cellRenderer, data);
+            int columns = data?.GetLength(1) ?? headers?.Length ?? 0;
+            var text = new string[rows, columns];
+            DrawSurface(headers, text, data, null, variant, size, null, options, cellRenderer);
         }
 
-        private void DrawTableCore(
+        private void DrawSurface(
             string[] headers,
             string[,] rows,
-            float[] columnWidths,
+            object[,] objectRows,
+            float[] widths,
             ControlVariant variant,
             ControlSize size,
             ComponentAppearance appearance,
-            GUILayoutOption[] options = null,
-            Action<object, int, int> customRenderer = null,
-            object[,] objectRows = null,
-            bool sortable = false,
-            int activeSortColumn = -1,
-            bool activeSortAscending = true,
+            GUILayoutOption[] options,
+            Action<object, int, int> cellRenderer = null,
             Action<int, bool> onSort = null,
-            bool selectable = false,
+            Action<int, bool> onSelection = null,
             bool[] selectedRows = null,
-            Action<int, bool> onSelectionChanged = null,
+            int[] sortColumns = null,
+            bool[] sortAscending = null,
             int currentPage = -1,
-            int totalPages = 0,
+            int pageSize = 0,
             Action<int> onPageChanged = null
         )
         {
             headers ??= Array.Empty<string>();
             rows ??= new string[0, headers.Length];
-
+            bool selectable = selectedRows != null;
+            bool sortable = onSort != null;
+            int activeSort = sortColumns?.Length > 0 ? sortColumns[0] : -1;
+            bool ascending = sortAscending?.Length == 0 || sortAscending == null || sortAscending[0];
             var tableStyle = styleManager.GetTableStyle(variant, size, appearance);
-            var headerStyle = styleManager.GetTableHeaderStyle(variant, size, appearance);
-            var rowStyle = styleManager.GetTableRowStyle(variant, size, appearance);
 
-            layoutComponents.BeginVerticalGroup(tableStyle, options ?? Array.Empty<GUILayoutOption>());
-            DrawHeader(headers, columnWidths, headerStyle, size, sortable, activeSortColumn, activeSortAscending, onSort, selectable, rows, selectedRows, onSelectionChanged);
+            layoutComponents.BeginVerticalGroup(tableStyle, Combine(options, GUILayout.ExpandHeight(false)));
+            DrawHeader(headers, widths, size, appearance, selectable, sortable, activeSort, ascending, selectedRows, rows, onSort, onSelection);
 
             int rowCount = rows.GetLength(0);
-            int colCount = headers.Length > 0 ? headers.Length : rows.GetLength(1);
-            for (int r = 0; r < rowCount; r++)
+            int columnCount = headers.Length > 0 ? headers.Length : rows.GetLength(1);
+            if (rowCount == 0)
             {
-                layoutComponents.BeginHorizontalGroup(rowStyle);
-                if (selectable)
-                {
-                    bool isSelected = selectedRows != null && r < selectedRows.Length && selectedRows[r];
-                    bool nextSelected = guiHelper.DrawToggle(string.Empty, isSelected, ControlVariant.Outline, size, value => onSelectionChanged?.Invoke(r, value), false, null, GUILayout.Width(28f * guiHelper.uiScale), GUILayout.Height(GetRowToggleHeight(size)));
-                    if (selectedRows != null && r < selectedRows.Length && nextSelected != isSelected)
-                        selectedRows[r] = nextSelected;
-                }
-
-                for (int c = 0; c < colCount; c++)
-                {
-                    float width = columnWidths != null && c < columnWidths.Length && columnWidths[c] > 0f ? columnWidths[c] * guiHelper.uiScale : 0f;
-                    var cellStyle = styleManager.GetTableCellStyle(ControlVariant.Default, size);
-                    if (customRenderer != null && objectRows != null)
-                    {
-                        GUILayout.BeginVertical(width > 0f ? GUILayout.Width(width) : GUILayout.ExpandWidth(true));
-                        customRenderer(objectRows[r, c], r, c);
-                        GUILayout.EndVertical();
-                    }
-                    else
-                    {
-                        if (width > 0f)
-                            GUILayout.Label(rows[r, c] ?? string.Empty, cellStyle, GUILayout.Width(width));
-                        else
-                            GUILayout.Label(rows[r, c] ?? string.Empty, cellStyle, GUILayout.ExpandWidth(true));
-                    }
-                }
+                layoutComponents.BeginHorizontalGroup(styleManager.GetTableRowStyle(variant, size, appearance));
+                guiHelper.MutedLabel("No rows", GUILayout.ExpandWidth(true));
                 layoutComponents.EndHorizontalGroup();
             }
+            else
+            {
+                for (int r = 0; r < rowCount; r++)
+                {
+                    layoutComponents.BeginHorizontalGroup(styleManager.GetTableRowStyle(variant, size, appearance));
+                    if (selectable)
+                        DrawSelectionCell(selectedRows, r, size, appearance, onSelection);
 
-            if (currentPage >= 0 && totalPages > 0 && onPageChanged != null)
-                DrawPaginationFooter(currentPage, totalPages, onPageChanged);
+                    for (int c = 0; c < columnCount; c++)
+                    {
+                        float width = GetWidth(widths, c);
+                        if (cellRenderer != null && objectRows != null)
+                        {
+                            GUILayout.BeginVertical(width > 0 ? GUILayout.Width(width) : GUILayout.ExpandWidth(true));
+                            cellRenderer(objectRows[r, c], r, c);
+                            GUILayout.EndVertical();
+                        }
+                        else
+                        {
+                            var label = guiHelper.Label(c < rows.GetLength(1) ? rows[r, c] ?? string.Empty : string.Empty).Size(size).Appearance(appearance).Options(width > 0 ? GUILayout.Width(width) : GUILayout.ExpandWidth(true));
+                            label.Render();
+                        }
+                    }
+                    layoutComponents.EndHorizontalGroup();
+                }
+            }
 
             layoutComponents.EndVerticalGroup();
+            if (currentPage >= 0 && pageSize > 0 && onPageChanged != null)
+                DrawPagination(currentPage, Mathf.Max(1, Mathf.CeilToInt(rowCount / (float)pageSize)), size, appearance, onPageChanged);
         }
 
-        private void DrawHeader(string[] headers, float[] columnWidths, GUIStyle headerStyle, ControlSize size, bool sortable, int activeSortColumn, bool activeSortAscending, Action<int, bool> onSort, bool selectable, string[,] rows, bool[] selectedRows, Action<int, bool> onSelectionChanged)
+        private void DrawHeader(string[] headers, float[] widths, ControlSize size, ComponentAppearance appearance, bool selectable, bool sortable, int activeSort, bool ascending, bool[] selectedRows, string[,] rows, Action<int, bool> onSort, Action<int, bool> onSelection)
         {
-            layoutComponents.BeginHorizontalGroup();
+            layoutComponents.BeginHorizontalGroup(styleManager.GetTableHeaderStyle(appearance: appearance, size: size));
             if (selectable)
             {
-                bool allSelected = AreAllRowsSelected(rows, selectedRows);
-                bool nextAll = guiHelper.DrawToggle(
-                    string.Empty,
-                    allSelected,
-                    ControlVariant.Outline,
-                    size,
-                    value =>
-                    {
-                        if (selectedRows == null)
-                            return;
-
-                        for (int i = 0; i < selectedRows.Length; i++)
-                        {
-                            if (selectedRows[i] == value)
-                                continue;
-
-                            selectedRows[i] = value;
-                            onSelectionChanged?.Invoke(i, value);
-                        }
-                    },
-                    false,
-                    null,
-                    GUILayout.Width(28f * guiHelper.uiScale),
-                    GUILayout.Height(GetRowToggleHeight(size))
-                );
-
-                if (selectedRows != null && nextAll != allSelected)
+                bool all = rows.GetLength(0) > 0 && Enumerable.Range(0, rows.GetLength(0)).All(i => i < selectedRows.Length && selectedRows[i]);
+                bool next = guiHelper.Checkbox(string.Empty, all).Variant(ControlVariant.Default).IconSmall().FullRowClick(false).Appearance(appearance).Width(32f * guiHelper.uiScale);
+                if (next != all)
                 {
                     for (int i = 0; i < selectedRows.Length; i++)
-                        selectedRows[i] = nextAll;
+                        selectedRows[i] = next;
+                    for (int i = 0; i < selectedRows.Length; i++)
+                        onSelection?.Invoke(i, next);
                 }
             }
 
             for (int i = 0; i < headers.Length; i++)
             {
-                float width = columnWidths != null && i < columnWidths.Length && columnWidths[i] > 0f ? columnWidths[i] * guiHelper.uiScale : 0f;
+                float width = GetWidth(widths, i);
+                string text = headers[i] ?? string.Empty;
                 if (sortable)
                 {
-                    bool isActive = i == activeSortColumn;
-                    bool nextAscending = isActive ? !activeSortAscending : true;
-                    string label = headers[i] ?? string.Empty;
-                    if (isActive)
-                        label = $"{label} {(activeSortAscending ? "↑" : "↓")}";
-
-                    if (width > 0f)
-                        guiHelper.DrawButton(label, () => onSort?.Invoke(i, nextAscending), ControlVariant.Ghost, ControlSize.Small, false, 1f, null, GUILayout.Width(width), GUILayout.Height(GetHeaderButtonHeight(size)));
-                    else
-                        guiHelper.DrawButton(label, () => onSort?.Invoke(i, nextAscending), ControlVariant.Ghost, ControlSize.Small, false, 1f, null, GUILayout.ExpandWidth(true), GUILayout.Height(GetHeaderButtonHeight(size)));
-                }
-                else if (width > 0f)
-                {
-                    GUILayout.Label(headers[i] ?? string.Empty, headerStyle, GUILayout.Width(width));
+                    bool active = activeSort == i;
+                    if (active)
+                        text += ascending ? "  ↑" : "  ↓";
+                    if (guiHelper.Button(text, active ? ControlVariant.Secondary : ControlVariant.Ghost, ControlSize.Small, appearance: appearance, options: width > 0 ? GUILayout.Width(width) : GUILayout.ExpandWidth(true)))
+                        onSort?.Invoke(i, !active || !ascending);
                 }
                 else
-                    GUILayout.Label(headers[i] ?? string.Empty, headerStyle, GUILayout.ExpandWidth(true));
+                {
+                    guiHelper.Label(text, ControlVariant.Default, appearance: appearance, options: width > 0 ? GUILayout.Width(width) : GUILayout.ExpandWidth(true));
+                }
             }
             layoutComponents.EndHorizontalGroup();
         }
 
-        private void DrawPaginationFooter(int currentPage, int totalPages, Action<int> onPageChanged)
+        private void DrawSelectionCell(bool[] selected, int row, ControlSize size, ComponentAppearance appearance, Action<int, bool> callback)
+        {
+            bool current = row < selected.Length && selected[row];
+            bool next = guiHelper.Checkbox(string.Empty, current).Variant(ControlVariant.Default).IconSmall().FullRowClick(false).Appearance(appearance).Width(32f * guiHelper.uiScale);
+            if (next != current)
+            {
+                selected[row] = next;
+                callback?.Invoke(row, next);
+            }
+        }
+
+        private void DrawPagination(int page, int pages, ControlSize size, ComponentAppearance appearance, Action<int> onPageChanged)
         {
             layoutComponents.AddSpace(DesignTokens.Spacing.SM);
             layoutComponents.BeginHorizontalGroup();
-            guiHelper.DrawButton("Prev", () => onPageChanged?.Invoke(Mathf.Max(0, currentPage - 1)), ControlVariant.Outline, ControlSize.Small, currentPage <= 0);
-            GUILayout.FlexibleSpace();
-            GUILayout.Label($"Page {currentPage + 1} of {totalPages}", styleManager.GetLabelStyle(ControlVariant.Muted, ControlSize.Small));
-            GUILayout.FlexibleSpace();
-            guiHelper.DrawButton("Next", () => onPageChanged?.Invoke(Mathf.Min(totalPages - 1, currentPage + 1)), ControlVariant.Outline, ControlSize.Small, currentPage >= totalPages - 1);
+            guiHelper.MutedLabel($"Page {page + 1} of {pages}");
+            guiHelper.Flex();
+            if (guiHelper.Button("Previous", variant: ControlVariant.Outline, size: ControlSize.Small, disabled: page <= 0, appearance: appearance))
+                onPageChanged(Mathf.Max(0, page - 1));
+            if (guiHelper.Button("Next", variant: ControlVariant.Outline, size: ControlSize.Small, disabled: page >= pages - 1, appearance: appearance))
+                onPageChanged(Mathf.Min(pages - 1, page + 1));
             layoutComponents.EndHorizontalGroup();
         }
 
-        private float GetHeaderButtonHeight(ControlSize size)
+        private static float GetWidth(float[] widths, int index) => widths != null && index < widths.Length && widths[index] > 0 ? widths[index] : 0;
+
+        private static GUILayoutOption[] Combine(GUILayoutOption[] options, GUILayoutOption extra)
         {
-            return (
-                    size == ControlSize.Small ? 28f
-                    : size == ControlSize.Large ? 38f
-                    : 32f
-                ) * guiHelper.uiScale;
-        }
-
-        private float GetRowToggleHeight(ControlSize size)
-        {
-            return (
-                    size == ControlSize.Small ? 24f
-                    : size == ControlSize.Large ? 34f
-                    : 28f
-                ) * guiHelper.uiScale;
-        }
-
-        private static void EnsureSelectionArray(ref bool[] selected, int rowCount)
-        {
-            if (selected == null || selected.Length != rowCount)
-                selected = new bool[rowCount];
-        }
-
-        private static bool AreAllRowsSelected(string[,] rows, bool[] selectedRows)
-        {
-            int rowCount = rows?.GetLength(0) ?? 0;
-            if (rowCount == 0 || selectedRows == null || selectedRows.Length < rowCount)
-                return false;
-
-            for (int i = 0; i < rowCount; i++)
-            {
-                if (!selectedRows[i])
-                    return false;
-            }
-
-            return true;
+            var result = new List<GUILayoutOption>(options ?? Array.Empty<GUILayoutOption>()) { extra };
+            return result.ToArray();
         }
 
         private static string[,] SlicePage(string[,] data, int page, int pageSize)
         {
             if (data == null)
                 return new string[0, 0];
-
-            int totalRows = data.GetLength(0);
-            int cols = data.GetLength(1);
-            int start = Mathf.Clamp(page * pageSize, 0, totalRows);
-            int length = Mathf.Clamp(pageSize, 0, Mathf.Max(0, totalRows - start));
-            var sliced = new string[length, cols];
-
-            for (int r = 0; r < length; r++)
-            {
-                for (int c = 0; c < cols; c++)
-                    sliced[r, c] = data[start + r, c];
-            }
-
-            return sliced;
+            int start = Mathf.Clamp(page * Mathf.Max(1, pageSize), 0, data.GetLength(0));
+            int count = Mathf.Clamp(pageSize, 0, data.GetLength(0) - start);
+            var result = new string[count, data.GetLength(1)];
+            for (int r = 0; r < count; r++)
+            for (int c = 0; c < data.GetLength(1); c++)
+                result[r, c] = data[start + r, c];
+            return result;
         }
 
-        private static string[,] ApplySorting(string[,] data, int sortColumn, bool ascending)
+        private static string[,] ApplySorting(string[,] data, int column, bool ascending)
         {
-            if (data == null || sortColumn < 0 || data.GetLength(0) == 0 || sortColumn >= data.GetLength(1))
+            if (data == null || column < 0 || column >= data.GetLength(1))
                 return data;
-
-            int rows = data.GetLength(0);
-            int cols = data.GetLength(1);
-
-            IOrderedEnumerable<int> ordered;
-            if (ascending)
-                ordered = Enumerable.Range(0, rows).OrderBy(i => data[i, sortColumn] ?? string.Empty, StringComparer.OrdinalIgnoreCase);
-            else
-                ordered = Enumerable.Range(0, rows).OrderByDescending(i => data[i, sortColumn] ?? string.Empty, StringComparer.OrdinalIgnoreCase);
-
-            var indices = ordered.ToArray();
-            var sorted = new string[rows, cols];
-
-            for (int r = 0; r < rows; r++)
-            {
-                for (int c = 0; c < cols; c++)
-                    sorted[r, c] = data[indices[r], c];
-            }
-
-            return sorted;
+            var order = Enumerable.Range(0, data.GetLength(0));
+            order = ascending ? order.OrderBy(i => data[i, column] ?? string.Empty, StringComparer.OrdinalIgnoreCase) : order.OrderByDescending(i => data[i, column] ?? string.Empty, StringComparer.OrdinalIgnoreCase);
+            var indices = order.ToArray();
+            var result = new string[data.GetLength(0), data.GetLength(1)];
+            for (int r = 0; r < indices.Length; r++)
+            for (int c = 0; c < data.GetLength(1); c++)
+                result[r, c] = data[indices[r], c];
+            return result;
         }
     }
 }

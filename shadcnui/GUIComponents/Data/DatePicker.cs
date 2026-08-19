@@ -10,7 +10,10 @@ namespace shadcnui.GUIComponents.Data
     public class DatePicker : BaseComponent
     {
         private readonly Dictionary<string, Rect> _anchorRects = new();
+        private readonly Dictionary<string, Rect> _screenAnchorRects = new();
         private readonly Dictionary<string, DateTime> _visibleMonths = new();
+        private const float PopupWidth = 304f;
+        private const float PopupHeight = 344f;
 
         public DatePicker(GUIHelper helper)
             : base(helper) { }
@@ -28,7 +31,11 @@ namespace shadcnui.GUIComponents.Data
             string label = config.SelectedDate?.ToString(format) ?? config.Placeholder ?? "Select date";
             GUIStyle triggerStyle = styleManager.GetInputStyle(config.Variant, config.Size, false, config.IsDisabled, config.Appearance);
             Rect rect = ControlLayoutUtility.ReserveRect(new UnityHelpers.GUIContent(label), triggerStyle, config.LayoutOptions);
-            if (GUI.Button(rect, string.Empty, triggerStyle))
+            bool previousEnabled = GUI.enabled;
+            GUI.enabled = previousEnabled && !config.IsDisabled;
+            bool clicked = GUI.Button(rect, string.Empty, triggerStyle);
+            GUI.enabled = previousEnabled;
+            if (clicked && !config.IsDisabled)
             {
                 if (LayerManager.Instance.IsOpen(id))
                     CloseDatePicker(id);
@@ -49,7 +56,10 @@ namespace shadcnui.GUIComponents.Data
             );
 
             if (Event.current.type == EventType.Repaint)
+            {
                 _anchorRects[id] = rect;
+                _screenAnchorRects[id] = PopupLayoutUtility.ToScreenRect(rect);
+            }
 
             return config.SelectedDate;
         }
@@ -107,14 +117,15 @@ namespace shadcnui.GUIComponents.Data
         private void Open(string id, Rect anchor, DatePickerConfig config)
         {
             _anchorRects[id] = anchor;
-            Vector2 pos = PopupLayoutUtility.GetAnchoredScreenPosition(anchor, 280f * guiHelper.uiScale, 320f * guiHelper.uiScale, guiHelper.GetRootGuiScreenRect());
+            Rect screenAnchor = _screenAnchorRects.TryGetValue(id, out var cachedScreenAnchor) ? cachedScreenAnchor : PopupLayoutUtility.ToScreenRect(anchor);
+            Vector2 pos = PopupLayoutUtility.GetAnchoredScreenPositionFromScreenRect(screenAnchor, PopupWidth * guiHelper.uiScale, PopupHeight * guiHelper.uiScale, GetScreenBounds());
             LayerManager.Instance.Open(
                 new LayerConfig
                 {
                     Id = id,
                     OpenPosition = pos,
-                    Width = 280f * guiHelper.uiScale,
-                    Height = 320f * guiHelper.uiScale,
+                    Width = PopupWidth * guiHelper.uiScale,
+                    Height = PopupHeight * guiHelper.uiScale,
                     CloseOnClickOutside = true,
                     ZIndex = DesignTokens.ZIndex.Popover,
                     Content = () => DrawCalendarPopup(id, config),
@@ -129,13 +140,14 @@ namespace shadcnui.GUIComponents.Data
                 LayerManager.Instance.Close(id);
 
             _anchorRects.Clear();
+            _screenAnchorRects.Clear();
             _visibleMonths.Clear();
         }
 
         private void DrawCalendarPopup(string id, DatePickerConfig config)
         {
             var style = styleManager.GetDatePickerStyle(config.Variant, config.Size, config.Appearance);
-            layoutComponents.BeginVerticalGroup(style, GUILayout.Width(280f * guiHelper.uiScale));
+            layoutComponents.BeginVerticalGroup(style, GUILayout.Width(PopupWidth * guiHelper.uiScale), GUILayout.Height(PopupHeight * guiHelper.uiScale), GUILayout.ExpandHeight(false));
             CalendarRenderUtility.DrawMonthHeader(
                 layoutComponents,
                 styleManager.GetButtonStyle(ControlVariant.Ghost, ControlSize.Icon),
@@ -155,7 +167,7 @@ namespace shadcnui.GUIComponents.Data
             bool selected = config.SelectedDate.HasValue && config.SelectedDate.Value.Date == date.Date;
             bool today = date.Date == DateTime.Today;
             bool outside = date.Month != activeMonth;
-            bool blocked = (config.MinDate.HasValue && date.Date < config.MinDate.Value.Date) || (config.MaxDate.HasValue && date.Date > config.MaxDate.Value.Date);
+            bool blocked = config.IsDisabled || (config.MinDate.HasValue && date.Date < config.MinDate.Value.Date) || (config.MaxDate.HasValue && date.Date > config.MaxDate.Value.Date);
 
             GUIStyle style =
                 selected ? styleManager.GetDatePickerDaySelectedStyle(config.Appearance)
@@ -167,6 +179,7 @@ namespace shadcnui.GUIComponents.Data
             if (GUILayout.Button(date.Day.ToString(), style, GUILayout.Width(36f * guiHelper.uiScale), GUILayout.Height(36f * guiHelper.uiScale)))
             {
                 config.SelectedDate = date.Date;
+                config.OnDateChanged?.Invoke(config.SelectedDate);
                 CloseDatePicker(id);
             }
             GUI.enabled = prev;
@@ -175,8 +188,11 @@ namespace shadcnui.GUIComponents.Data
         private void ClearState(string id)
         {
             _anchorRects.Remove(id);
+            _screenAnchorRects.Remove(id);
             _visibleMonths.Remove(id);
         }
+
+        private static Rect GetScreenBounds() => new(0f, 0f, Screen.width, Screen.height);
 
         private static ComponentAppearance GetTextOnlyAppearance(ComponentAppearance appearance)
         {

@@ -11,6 +11,7 @@ namespace shadcnui.GUIComponents.Controls
     {
         private readonly Dictionary<string, Vector2> _scrollPositions = new();
         private readonly Dictionary<string, Rect> _anchorRects = new();
+        private readonly Dictionary<string, Rect> _screenAnchorRects = new();
         private readonly Dictionary<string, Stack<List<DropdownMenuItem>>> _menuStacks = new();
         private readonly Dictionary<string, bool> _inlineOpen = new();
 
@@ -43,7 +44,10 @@ namespace shadcnui.GUIComponents.Controls
             {
                 bool clicked = config.Trigger();
                 if (Event.current.type == EventType.Repaint)
+                {
                     _anchorRects[id] = GUILayoutUtility.GetLastRect();
+                    _screenAnchorRects[id] = PopupLayoutUtility.ToScreenRect(_anchorRects[id]);
+                }
 
                 if (clicked)
                 {
@@ -72,7 +76,8 @@ namespace shadcnui.GUIComponents.Controls
 
             float width = GetMenuWidth(config, anchorRect);
             float height = GetMenuHeight(config);
-            Vector2 screenPos = PopupLayoutUtility.GetAnchoredScreenPosition(anchorRect, width, height, guiHelper.GetRootGuiScreenRect());
+            Rect screenAnchor = _screenAnchorRects.TryGetValue(id, out var cachedScreenAnchor) ? cachedScreenAnchor : PopupLayoutUtility.ToScreenRect(anchorRect);
+            Vector2 screenPos = PopupLayoutUtility.GetAnchoredScreenPositionFromScreenRect(screenAnchor, width, height, GetScreenBounds());
             LayerManager.Instance.Open(
                 new LayerConfig
                 {
@@ -106,6 +111,7 @@ namespace shadcnui.GUIComponents.Controls
 
             _scrollPositions.Clear();
             _anchorRects.Clear();
+            _screenAnchorRects.Clear();
             _menuStacks.Clear();
             _inlineOpen.Clear();
         }
@@ -275,7 +281,8 @@ namespace shadcnui.GUIComponents.Controls
             Rect anchor = GetAnchorRect(id);
             float width = GetMenuWidth(config, anchor);
             float height = GetMenuHeight(config);
-            Vector2 screenPos = PopupLayoutUtility.GetAnchoredScreenPosition(anchor, width, height, guiHelper.GetRootGuiScreenRect());
+            Rect screenAnchor = _screenAnchorRects.TryGetValue(id, out var cachedScreenAnchor) ? cachedScreenAnchor : PopupLayoutUtility.ToScreenRect(anchor);
+            Vector2 screenPos = PopupLayoutUtility.GetAnchoredScreenPositionFromScreenRect(screenAnchor, width, height, GetScreenBounds());
             LayerManager.Instance.SetPosition(id, screenPos);
         }
 
@@ -286,11 +293,14 @@ namespace shadcnui.GUIComponents.Controls
             return fallback;
         }
 
+        private static Rect GetScreenBounds() => new(0f, 0f, Screen.width, Screen.height);
+
         private void ClearState(string id)
         {
             CloseInline(id);
             _scrollPositions.Remove(id);
             _anchorRects.Remove(id);
+            _screenAnchorRects.Remove(id);
             _menuStacks.Remove(id);
         }
     }

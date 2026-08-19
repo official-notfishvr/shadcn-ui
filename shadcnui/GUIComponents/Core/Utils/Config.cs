@@ -24,6 +24,11 @@ namespace shadcnui.GUIComponents.Core.Utils
         public ControlVariant Variant { get; set; } = ControlVariant.Default;
         public ControlSize Size { get; set; } = ControlSize.Default;
         public bool IsDisabled { get; set; }
+        public bool Disabled
+        {
+            get => IsDisabled;
+            set => IsDisabled = value;
+        }
         public ComponentAppearance Appearance { get; set; }
     }
 
@@ -440,6 +445,7 @@ namespace shadcnui.GUIComponents.Core.Utils
         public string Description { get; set; }
         public Action Content { get; set; }
         public Action Footer { get; set; }
+        public Action OnClosed { get; set; }
         public float Width { get; set; } = 400f;
         public float Height { get; set; } = 300f;
         public bool CloseOnOverlayClick { get; set; }
@@ -514,6 +520,7 @@ namespace shadcnui.GUIComponents.Core.Utils
         public DateTime? EndDate { get; set; }
         public DateTime? MinDate { get; set; }
         public DateTime? MaxDate { get; set; }
+        public Action<DateTime?> OnDateChanged { get; set; }
 
         public DatePickerConfig()
         {
@@ -529,6 +536,19 @@ namespace shadcnui.GUIComponents.Core.Utils
         public bool ShowSearch { get; set; } = true;
         public bool ShowSelection { get; set; } = true;
         public bool ShowColumnToggle { get; set; }
+        public bool ShowToolbar { get; set; } = true;
+        public bool ShowSelectedCount { get; set; } = true;
+        public bool EnableSorting { get; set; } = true;
+        public bool EnableFiltering { get; set; } = true;
+        public bool EnableColumnVisibility { get; set; } = true;
+        public bool EnableRowActions { get; set; } = true;
+        public string FilterPlaceholder { get; set; } = "Filter...";
+        public string EmptyText { get; set; } = "No results.";
+        public int PageSize { get; set; } = 10;
+        public int[] PageSizeOptions { get; set; } = new[] { 10, 20, 30, 50 };
+        public Action<DataTableState> OnStateChanged { get; set; }
+        public string RowActionLabel { get; set; } = "Open";
+        public Action<DataTableRow> OnRowAction { get; set; }
     }
 
     public class DataTableColumn
@@ -541,6 +561,8 @@ namespace shadcnui.GUIComponents.Core.Utils
         public bool IsSortable { get; set; } = true;
         public bool IsFilterable { get; set; } = true;
         public bool IsVisible { get; set; } = true;
+        public bool CanHide { get; set; } = true;
+        public bool IsRowAction { get; set; }
         public Func<object, string> CellRenderer { get; set; }
 
         public DataTableColumn() { }
@@ -596,6 +618,8 @@ namespace shadcnui.GUIComponents.Core.Utils
         public int CurrentPage { get; set; }
         public int PageSize { get; set; } = 10;
         public bool ShowColumnToggle { get; set; }
+        public int TotalFilteredRows { get; set; }
+        public int TotalSelectedRows { get; set; }
     }
     #endregion
 

@@ -16,6 +16,7 @@ namespace shadcnui.GUIComponents.Core.Styling
             _baseLabelStyle = MakeLabelStyle(theme.Text);
             _baseBadgeStyle = MakeChipStyle(theme.ButtonPrimaryBg, theme.ButtonPrimaryFg);
             _baseTableStyle = MakePanelStyle(theme.Elevated, theme.Border, DesignTokens.Radius.LG, 0f, 0f);
+            _baseTableStyle.stretchHeight = false;
             _checkboxStyle = MakeControlStyle(theme.Base, theme.Text, DesignTokens.Spacing.SM, DesignTokens.Spacing.XS, DesignTokens.Radius.SM, theme.Border, FontStyle.Normal);
             _checkboxSolidStyle = MakeControlStyle(theme.ButtonPrimaryBg, theme.ButtonPrimaryFg, DesignTokens.Spacing.MD, DesignTokens.Spacing.XS, DesignTokens.Radius.SM, Color.clear, FontStyle.Normal);
             _baseSwitchStyle = MakeControlStyle(theme.Secondary, theme.Text, DesignTokens.Spacing.SM, DesignTokens.Spacing.XS, DesignTokens.Switch.Radius, Color.clear, FontStyle.Normal);
@@ -44,17 +45,20 @@ namespace shadcnui.GUIComponents.Core.Styling
             _tabsListStyle = MakePanelStyle(theme.TabsBg, Color.clear, DesignTokens.Radius.MD, DesignTokens.Spacing.XS, DesignTokens.Spacing.XS);
             _tabsTriggerStyle = MakeControlStyle(Color.clear, theme.TabsTriggerFg, DesignTokens.Padding.Tab.Horizontal, DesignTokens.Padding.Tab.Vertical, DesignTokens.Radius.MD, Color.clear, FontStyle.Normal);
             _tableHeaderStyle = MakeLabelStyle(theme.Muted, FontStyle.Bold);
-            _tableHeaderStyle.normal.background = Textures.TableHeader;
+            _tableHeaderStyle.normal.background = CreateSurfaceTexture(128, GetScaledHeight(DesignTokens.Height.Small), 0f, theme.Secondary, Color.clear, 0f);
             _tableHeaderStyle.padding = GetSpacingOffset(DesignTokens.Padding.Table.CellH, DesignTokens.Padding.Table.CellV);
-            _tableHeaderStyle.border = new UnityHelpers.RectOffset(0, 0, 0, 1);
+            _tableHeaderStyle.border = new UnityHelpers.RectOffset();
+            _tableHeaderStyle.stretchHeight = false;
             _tableRowStyle = CloneStyle(GUIStyle.none);
             SetBackgroundStates(_tableRowStyle, Textures.TableRow, Textures.TableRowAlternate, Textures.TableRowAlternate, Textures.TableRow);
             _tableRowStyle.padding = new UnityHelpers.RectOffset(0, 0, 0, 0);
             _tableRowStyle.margin = new UnityHelpers.RectOffset(0, 0, 0, 0);
             _tableRowStyle.border = new UnityHelpers.RectOffset(0, 0, 0, 0);
             _tableRowStyle.stretchWidth = true;
+            _tableRowStyle.stretchHeight = false;
             _tableCellStyle = MakeLabelStyle(theme.Text);
             _tableCellStyle.padding = GetSpacingOffset(DesignTokens.Padding.Table.CellH, DesignTokens.Padding.Table.CellV);
+            _tableCellStyle.stretchHeight = false;
             _dialogContentStyle = MakePanelStyle(theme.Elevated, theme.Border, DesignTokens.Radius.LG, DesignTokens.Padding.Card.Horizontal, DesignTokens.Padding.Card.Vertical, DesignTokens.Effects.ShadowMedium, GetScaledBlur(DesignTokens.Effects.ShadowBlurLG));
             _cardStyle = MakePanelStyle(theme.Elevated, theme.Border, DesignTokens.Radius.LG, 0f, 0f, DesignTokens.Effects.ShadowLight, GetScaledBlur(DesignTokens.Effects.ShadowBlurMD));
             _dropdownContentStyle = MakePanelStyle(theme.Elevated, theme.Border, DesignTokens.Radius.MD, DesignTokens.Spacing.XS, DesignTokens.Spacing.XS, DesignTokens.Effects.ShadowMedium, GetScaledBlur(DesignTokens.Effects.ShadowBlurMD));
@@ -64,6 +68,7 @@ namespace shadcnui.GUIComponents.Core.Styling
             _avatarStyle = MakeAvatarStyle(theme);
             _navigationStyle = MakePanelStyle(theme.Secondary, theme.Border, DesignTokens.Radius.LG, DesignTokens.Spacing.MD, DesignTokens.Spacing.MD);
             _calendarStyle = MakePanelStyle(theme.Elevated, theme.Border, DesignTokens.Radius.LG, DesignTokens.Padding.Card.Horizontal, DesignTokens.Padding.Card.Vertical, DesignTokens.Effects.ShadowMedium, GetScaledBlur(DesignTokens.Effects.ShadowBlurMD));
+            _calendarStyle.stretchHeight = false;
             _calendarWeekdayStyle = MakeLabelStyle(theme.Muted, FontStyle.Bold);
             _calendarWeekdayStyle.alignment = TextAnchor.MiddleCenter;
             _calendarWeekdayStyle.fontSize = GetScaledFontSize(DesignTokens.FontScale.XS);
@@ -73,6 +78,7 @@ namespace shadcnui.GUIComponents.Core.Styling
             _calendarDayTodayStyle = MakeCalendarDayStyle(theme.Secondary, theme.Text, theme.Border);
             _calendarDayOutsideMonthStyle = MakeCalendarDayStyle(Color.clear, theme.Muted, Color.clear);
             _datePickerStyle = MakePanelStyle(theme.Elevated, theme.Border, DesignTokens.Radius.LG, DesignTokens.Padding.Card.Horizontal, DesignTokens.Padding.Card.Vertical, DesignTokens.Effects.ShadowMedium, GetScaledBlur(DesignTokens.Effects.ShadowBlurMD));
+            _datePickerStyle.stretchHeight = false;
             _datePickerWeekdayStyle = MakeLabelStyle(theme.Muted, FontStyle.Bold);
             _datePickerWeekdayStyle.alignment = TextAnchor.MiddleCenter;
             _datePickerWeekdayStyle.fontSize = GetScaledFontSize(DesignTokens.FontScale.XS);
@@ -161,6 +167,7 @@ namespace shadcnui.GUIComponents.Core.Styling
             style.wordWrap = true;
             style.margin = new UnityHelpers.RectOffset(0, 0, 0, 0);
             style.padding = new UnityHelpers.RectOffset(0, 0, 0, 0);
+            style.stretchHeight = false;
             return style;
         }
 

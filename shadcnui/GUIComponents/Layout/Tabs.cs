@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using shadcnui.GUIComponents.Core.Base;
 using shadcnui.GUIComponents.Core.Styling;
-using shadcnui.GUIComponents.Core.Theming;
 using shadcnui.GUIComponents.Core.Utils;
 using UnityEngine;
 
@@ -51,26 +50,6 @@ namespace shadcnui.GUIComponents.Layout
 
     #endregion
 
-    public class TabItem
-    {
-        public string Id { get; }
-        public string Name { get; set; }
-        public Action Content { get; set; }
-        public bool Disabled { get; set; }
-        public Texture2D Icon { get; set; }
-        public bool Closable { get; set; }
-        public object UserData { get; set; }
-
-        public TabItem(string name, Action content, bool disabled = false, Texture2D icon = null, bool closable = false)
-        {
-            Id = Guid.NewGuid().ToString();
-            Name = name;
-            Content = content;
-            Disabled = disabled;
-            Icon = icon;
-            Closable = closable;
-        }
-    }
 
     public class Tabs : BaseComponent
     {
@@ -474,7 +453,7 @@ namespace shadcnui.GUIComponents.Layout
                 fontSize = Mathf.RoundToInt(CLOSE_BUTTON_FONT_SIZE * guiHelper.uiScale),
                 fontStyle = FontStyle.Bold,
                 alignment = TextAnchor.MiddleCenter,
-                normal = { textColor = closeRect.Contains(Event.current.mousePosition) ? ThemeManager.Instance.CurrentTheme.Destructive : ThemeManager.Instance.CurrentTheme.Muted },
+                normal = { textColor = closeRect.Contains(Event.current.mousePosition) ? styleManager.GetTheme().Destructive : styleManager.GetTheme().Muted },
             };
 
             GUI.Label(closeRect, "×", closeStyle);
@@ -487,7 +466,7 @@ namespace shadcnui.GUIComponents.Layout
             if (tabRect.Equals(Rect.zero))
                 return;
 
-            var indicatorColor = ThemeManager.Instance.CurrentTheme.Accent;
+            var indicatorColor = styleManager.GetTheme().Accent;
             var textureManager = guiHelper.GetStyleManager().Textures;
 
             switch (style)

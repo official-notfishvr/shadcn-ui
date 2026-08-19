@@ -130,11 +130,19 @@ namespace shadcnui.GUIComponents.Core.Base
 
         public TBuilder Small() => Size(ControlSize.Small);
 
+        public TBuilder ExtraSmall() => Size(ControlSize.ExtraSmall);
+
         public TBuilder Large() => Size(ControlSize.Large);
 
         public TBuilder Mini() => Size(ControlSize.Mini);
 
         public TBuilder Icon() => Size(ControlSize.Icon);
+
+        public TBuilder IconExtraSmall() => Size(ControlSize.IconExtraSmall);
+
+        public TBuilder IconSmall() => Size(ControlSize.IconSmall);
+
+        public TBuilder IconLarge() => Size(ControlSize.IconLarge);
 
         protected void ApplyOptions() => Config.LayoutOptions = _options.Count == 0 ? Array.Empty<GUILayoutOption>() : _options.ToArray();
 
@@ -919,6 +927,12 @@ namespace shadcnui.GUIComponents.Core.Base
             return this;
         }
 
+        public DatePickerBuilder OnChange(Action<DateTime?> onDateChanged)
+        {
+            Config.OnDateChanged = onDateChanged;
+            return this;
+        }
+
         public override DateTime? Render() =>
             RenderOnce(
                 () =>
@@ -970,6 +984,79 @@ namespace shadcnui.GUIComponents.Core.Base
         public DataTableBuilder ShowColumnToggle(bool show = true)
         {
             Config.ShowColumnToggle = show;
+            return this;
+        }
+
+        public DataTableBuilder ShowToolbar(bool show = true)
+        {
+            Config.ShowToolbar = show;
+            return this;
+        }
+
+        public DataTableBuilder ShowSelectedCount(bool show = true)
+        {
+            Config.ShowSelectedCount = show;
+            return this;
+        }
+
+        public DataTableBuilder Sorting(bool enabled = true)
+        {
+            Config.EnableSorting = enabled;
+            return this;
+        }
+
+        public DataTableBuilder Filtering(bool enabled = true)
+        {
+            Config.EnableFiltering = enabled;
+            return this;
+        }
+
+        public DataTableBuilder ColumnVisibility(bool enabled = true)
+        {
+            Config.EnableColumnVisibility = enabled;
+            return this;
+        }
+
+        public DataTableBuilder RowActions(bool enabled = true)
+        {
+            Config.EnableRowActions = enabled;
+            return this;
+        }
+
+        public DataTableBuilder RowAction(string label, Action<DataTableRow> onAction)
+        {
+            Config.RowActionLabel = label;
+            Config.OnRowAction = onAction;
+            return this;
+        }
+
+        public DataTableBuilder FilterPlaceholder(string placeholder)
+        {
+            Config.FilterPlaceholder = placeholder;
+            return this;
+        }
+
+        public DataTableBuilder EmptyText(string text)
+        {
+            Config.EmptyText = text;
+            return this;
+        }
+
+        public DataTableBuilder PageSize(int pageSize)
+        {
+            Config.PageSize = Mathf.Max(1, pageSize);
+            return this;
+        }
+
+        public DataTableBuilder PageSizeOptions(params int[] pageSizes)
+        {
+            Config.PageSizeOptions = pageSizes ?? Array.Empty<int>();
+            return this;
+        }
+
+        public DataTableBuilder OnStateChanged(Action<DataTableState> onStateChanged)
+        {
+            Config.OnStateChanged = onStateChanged;
             return this;
         }
 
@@ -1241,6 +1328,12 @@ namespace shadcnui.GUIComponents.Core.Base
             return this;
         }
 
+        public DialogBuilder OnClosed(Action onClosed)
+        {
+            Config.OnClosed = onClosed;
+            return this;
+        }
+
         public DialogBuilder Size(float width, float height)
         {
             Config.Width = width;
@@ -1277,6 +1370,7 @@ namespace shadcnui.GUIComponents.Core.Base
         {
             Helper.CloseDialog();
             MarkRendered();
+            Helper.ClearAutoRenderBuilder(this);
             return this;
         }
 

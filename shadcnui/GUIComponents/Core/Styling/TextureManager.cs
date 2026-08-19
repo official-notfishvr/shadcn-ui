@@ -23,7 +23,6 @@ namespace shadcnui.GUIComponents.Core.Styling
         public Texture2D TabsActive { get; private set; }
         public Texture2D Badge { get; private set; }
         public Texture2D TableCell { get; private set; }
-        public Texture2D TableHeader { get; private set; }
         public Texture2D TableRow { get; private set; }
         public Texture2D TableRowAlternate { get; private set; }
         public Texture2D DropdownMenuContent { get; private set; }
@@ -120,7 +119,6 @@ namespace shadcnui.GUIComponents.Core.Styling
             TabsActive = GenerateShape(128, tabsHeight, mdRadius, theme.Base, theme.Base, theme.Border, 1f, DesignTokens.Effects.ShadowLight, shadowBlurMd, theme.Shadow);
             Badge = GenerateShape(96, badgeHeight, mdRadius, theme.ButtonPrimaryBg, theme.ButtonPrimaryBg, Color.clear, 0f, 0f, 0);
             TableCell = GenerateSolid(theme.Base);
-            TableHeader = GenerateShape(128, focusHeight, 0, theme.Secondary, theme.Secondary, theme.Border, 1f, 0f, 0);
             TableRow = GenerateSolid(theme.Base);
             TableRowAlternate = GenerateSolid(Color.Lerp(theme.Base, theme.Secondary, 0.6f));
             DropdownMenuContent = GenerateShape(192, 192, lgRadius, theme.Elevated, theme.Elevated, theme.Border, 1f, DesignTokens.Effects.ShadowMedium, shadowBlurMd, theme.Shadow);
@@ -280,7 +278,6 @@ namespace shadcnui.GUIComponents.Core.Styling
             TabsActive = null;
             Badge = null;
             TableCell = null;
-            TableHeader = null;
             TableRow = null;
             TableRowAlternate = null;
             DropdownMenuContent = null;

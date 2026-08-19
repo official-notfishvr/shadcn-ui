@@ -1,6 +1,5 @@
 using shadcnui.GUIComponents.Core.Base;
 using shadcnui.GUIComponents.Core.Styling;
-using shadcnui.GUIComponents.Core.Theming;
 using shadcnui.GUIComponents.Core.Utils;
 using UnityEngine;
 #if IL2CPP_MELONLOADER_PRE57
@@ -25,7 +24,6 @@ namespace shadcnui.GUIComponents.Controls
 
         private bool DrawSwitchRow(Rect rowRect, BoolControlConfigBase config)
         {
-            var theme = ThemeManager.Instance.CurrentTheme;
             float trackWidth = GetTrackWidth(config.Size);
             float trackHeight = GetTrackHeight(config.Size);
             float gap = DesignTokens.Spacing.MD * guiHelper.uiScale;
@@ -43,36 +41,34 @@ namespace shadcnui.GUIComponents.Controls
             GUI.Label(labelRect, text, labelStyle);
 
             bool toggled = base.HandleToggleInput(rowRect, config.Value, config.IsDisabled);
-            DrawSwitchVisual(trackRect, toggled, config.IsDisabled, theme);
+            DrawSwitchVisual(trackRect, toggled, config);
             return toggled;
         }
 
-        private void DrawSwitchVisual(Rect trackRect, bool value, bool disabled, Theme theme)
+        private void DrawSwitchVisual(Rect trackRect, bool value, BoolControlConfigBase config)
         {
             float thumbSize = Mathf.Max(1f, trackRect.height - 4f * guiHelper.uiScale);
             float thumbX = value ? trackRect.xMax - thumbSize - 2f * guiHelper.uiScale : trackRect.x + 2f * guiHelper.uiScale;
             var thumbRect = new Rect(thumbX, trackRect.y + (trackRect.height - thumbSize) * 0.5f, thumbSize, thumbSize);
 
-            Color trackColor = value ? theme.ButtonPrimaryBg : theme.Border;
-            if (!value)
-                trackColor = theme.Secondary;
-            if (disabled)
-                trackColor = Color.Lerp(trackColor, theme.Base, 0.35f);
+            var style = styleManager.GetSwitchStyle(config.Variant, config.Size, config.Appearance);
+            Texture2D trackTexture = value ? style?.onNormal?.background : style?.normal?.background;
+            if (Event.current.type == EventType.Repaint && trackTexture != null)
+                GUI.DrawTexture(trackRect, trackTexture, ScaleMode.StretchToFill);
 
-            Color thumbColor = theme.Base;
-            if (disabled)
-                thumbColor = Color.Lerp(thumbColor, theme.Muted, 0.3f);
+            Color thumbColor = style?.normal?.textColor ?? styleManager.GetTheme().Text;
+            if (config.IsDisabled)
+                thumbColor = Color.Lerp(thumbColor, styleManager.GetTheme().Muted, 0.35f);
 
-            int trackRadius = Mathf.RoundToInt(trackRect.height * 0.5f);
             int thumbRadius = Mathf.RoundToInt(thumbRect.height * 0.5f);
-            SurfaceDrawUtility.DrawRoundedFill(styleManager, trackRect, trackColor, trackRadius);
-            SurfaceDrawUtility.DrawRoundedBorder(styleManager, thumbRect, thumbRadius, thumbColor, Color.clear, 0f, disabled ? 0f : 0.04f, Mathf.RoundToInt(DesignTokens.Effects.ShadowBlurSM * guiHelper.uiScale), theme.Shadow);
+            SurfaceDrawUtility.DrawRoundedFill(styleManager, thumbRect, thumbColor, thumbRadius);
         }
 
         private float GetTrackWidth(ControlSize size)
         {
             return size switch
             {
+                ControlSize.ExtraSmall => 28f * guiHelper.uiScale,
                 ControlSize.Small => 32f * guiHelper.uiScale,
                 ControlSize.Large => 40f * guiHelper.uiScale,
                 _ => DesignTokens.Switch.Width * guiHelper.uiScale,
@@ -83,6 +79,7 @@ namespace shadcnui.GUIComponents.Controls
         {
             return size switch
             {
+                ControlSize.ExtraSmall => 16f * guiHelper.uiScale,
                 ControlSize.Small => 18f * guiHelper.uiScale,
                 ControlSize.Large => 22f * guiHelper.uiScale,
                 _ => DesignTokens.Switch.Height * guiHelper.uiScale,
@@ -93,6 +90,7 @@ namespace shadcnui.GUIComponents.Controls
         {
             return size switch
             {
+                ControlSize.ExtraSmall => 12f * guiHelper.uiScale,
                 ControlSize.Small => 14f * guiHelper.uiScale,
                 ControlSize.Large => 18f * guiHelper.uiScale,
                 _ => 16f * guiHelper.uiScale,

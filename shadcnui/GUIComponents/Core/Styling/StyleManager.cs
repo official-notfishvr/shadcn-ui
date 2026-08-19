@@ -21,9 +21,13 @@ namespace shadcnui.GUIComponents.Core.Styling
     public enum ControlSize
     {
         Default,
+        ExtraSmall,
         Small,
         Large,
         Icon,
+        IconExtraSmall,
+        IconSmall,
+        IconLarge,
         Mini,
     }
 

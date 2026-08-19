@@ -307,6 +307,11 @@ namespace shadcnui.GUIComponents.Core.Styling
 
             switch (size)
             {
+                case ControlSize.ExtraSmall:
+                    style.fontSize = GetScaledFontSize(DesignTokens.FontScale.XS);
+                    style.padding = GetSpacingOffset(DesignTokens.Padding.Button.ExtraSmallH, DesignTokens.Padding.Button.ExtraSmallV);
+                    style.fixedHeight = GetMinimumControlHeight(DesignTokens.Height.ExtraSmall, style.fontSize, DesignTokens.Padding.Button.ExtraSmallV);
+                    break;
                 case ControlSize.Mini:
                     style.fontSize = GetScaledFontSize(DesignTokens.FontScale.XS);
                     style.padding = GetSpacingOffset(DesignTokens.Padding.Button.MiniH, DesignTokens.Padding.Button.MiniV);
@@ -326,6 +331,21 @@ namespace shadcnui.GUIComponents.Core.Styling
                     var iconSize = GetScaledHeight(DesignTokens.Height.Default);
                     style.fixedWidth = iconSize;
                     style.fixedHeight = iconSize;
+                    style.padding = new RectOffset();
+                    break;
+                case ControlSize.IconExtraSmall:
+                    style.fixedWidth = GetScaledHeight(DesignTokens.Height.ExtraSmall);
+                    style.fixedHeight = GetScaledHeight(DesignTokens.Height.ExtraSmall);
+                    style.padding = new RectOffset();
+                    break;
+                case ControlSize.IconSmall:
+                    style.fixedWidth = GetScaledHeight(DesignTokens.Height.Small);
+                    style.fixedHeight = GetScaledHeight(DesignTokens.Height.Small);
+                    style.padding = new RectOffset();
+                    break;
+                case ControlSize.IconLarge:
+                    style.fixedWidth = GetScaledHeight(DesignTokens.Height.Large);
+                    style.fixedHeight = GetScaledHeight(DesignTokens.Height.Large);
                     style.padding = new RectOffset();
                     break;
                 default:
@@ -350,6 +370,11 @@ namespace shadcnui.GUIComponents.Core.Styling
 
             switch (size)
             {
+                case ControlSize.ExtraSmall:
+                    style.fontSize = GetScaledFontSize(DesignTokens.FontScale.XS);
+                    style.padding = GetSpacingOffset(10f, 4f);
+                    style.fixedHeight = GetScaledHeight(DesignTokens.Height.ExtraSmall);
+                    break;
                 case ControlSize.Mini:
                     style.fontSize = GetScaledFontSize(DesignTokens.FontScale.XS);
                     style.padding = GetSpacingOffset(10f, 4f);
@@ -377,6 +402,11 @@ namespace shadcnui.GUIComponents.Core.Styling
         {
             switch (size)
             {
+                case ControlSize.ExtraSmall:
+                    style.fontSize = GetScaledFontSize(DesignTokens.FontScale.XS);
+                    style.padding = GetSpacingOffset(DesignTokens.Spacing.SM, DesignTokens.Spacing.XXS);
+                    style.fixedHeight = GetScaledHeight(DesignTokens.Badge.Height - 4f);
+                    break;
                 case ControlSize.Mini:
                     style.fontSize = GetScaledFontSize(DesignTokens.FontScale.XS);
                     style.padding = GetSpacingOffset(DesignTokens.Spacing.MD, DesignTokens.Spacing.XXS);
@@ -405,6 +435,7 @@ namespace shadcnui.GUIComponents.Core.Styling
             style.fontSize = size switch
             {
                 ControlSize.Mini => GetScaledFontSize(DesignTokens.FontScale.XS),
+                ControlSize.ExtraSmall => GetScaledFontSize(DesignTokens.FontScale.XS),
                 ControlSize.Small => GetScaledFontSize(DesignTokens.FontScale.SM),
                 ControlSize.Large => GetScaledFontSize(DesignTokens.FontScale.LG),
                 _ => GetScaledFontSize(DesignTokens.FontScale.MD),
@@ -712,6 +743,7 @@ namespace shadcnui.GUIComponents.Core.Styling
                 {
                     var px = size switch
                     {
+                        ControlSize.ExtraSmall => GetScaledHeight(DesignTokens.Height.ExtraSmall),
                         ControlSize.Mini => GetScaledHeight(DesignTokens.Height.Mini),
                         ControlSize.Small => GetScaledHeight(DesignTokens.Height.Small),
                         ControlSize.Large => GetScaledHeight(DesignTokens.Height.Large),
@@ -736,6 +768,7 @@ namespace shadcnui.GUIComponents.Core.Styling
         public float GetStatusIndicatorSize(ControlSize size) =>
             size switch
             {
+                ControlSize.ExtraSmall => DesignTokens.StatusIndicator.Mini * _guiHelper.uiScale,
                 ControlSize.Mini => DesignTokens.StatusIndicator.Mini * _guiHelper.uiScale,
                 ControlSize.Small => DesignTokens.StatusIndicator.Small * _guiHelper.uiScale,
                 ControlSize.Large => DesignTokens.StatusIndicator.Large * _guiHelper.uiScale,
@@ -755,6 +788,7 @@ namespace shadcnui.GUIComponents.Core.Styling
                     style.padding = new UnityHelpers.RectOffset(0, 0, 0, 0);
                     style.margin = new UnityHelpers.RectOffset(0, 0, 0, 0);
                     style.stretchWidth = true;
+                    style.stretchHeight = false;
                 }
             );
 
@@ -772,6 +806,7 @@ namespace shadcnui.GUIComponents.Core.Styling
                     style.margin = new UnityHelpers.RectOffset(0, 0, 0, 0);
                     style.border = new UnityHelpers.RectOffset(0, 0, 0, 0);
                     style.stretchWidth = true;
+                    style.stretchHeight = false;
                 }
             );
 
@@ -789,6 +824,7 @@ namespace shadcnui.GUIComponents.Core.Styling
                     style.padding = GetSpacingOffset(DesignTokens.Padding.Table.CellH, DesignTokens.Padding.Table.CellV);
                     style.wordWrap = false;
                     style.clipping = TextClipping.Clip;
+                    style.stretchHeight = false;
                 }
             );
 
@@ -805,6 +841,7 @@ namespace shadcnui.GUIComponents.Core.Styling
                     style.alignment = alignment;
                     style.wordWrap = false;
                     style.clipping = TextClipping.Clip;
+                    style.stretchHeight = false;
                 }
             );
 
@@ -942,6 +979,7 @@ namespace shadcnui.GUIComponents.Core.Styling
         public float GetSliderTrackHeight(ControlSize size) =>
             size switch
             {
+                ControlSize.ExtraSmall => DesignTokens.Slider.TrackMini * _guiHelper.uiScale,
                 ControlSize.Mini => DesignTokens.Slider.TrackMini * _guiHelper.uiScale,
                 ControlSize.Small => DesignTokens.Slider.TrackSmall * _guiHelper.uiScale,
                 ControlSize.Large => DesignTokens.Slider.TrackLarge * _guiHelper.uiScale,
@@ -951,6 +989,7 @@ namespace shadcnui.GUIComponents.Core.Styling
         public float GetSliderThumbSize(ControlSize size) =>
             size switch
             {
+                ControlSize.ExtraSmall => DesignTokens.Slider.ThumbMini * _guiHelper.uiScale,
                 ControlSize.Mini => DesignTokens.Slider.ThumbMini * _guiHelper.uiScale,
                 ControlSize.Small => DesignTokens.Slider.ThumbSmall * _guiHelper.uiScale,
                 ControlSize.Large => DesignTokens.Slider.ThumbLarge * _guiHelper.uiScale,

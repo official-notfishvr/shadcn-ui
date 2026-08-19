@@ -1,7 +1,6 @@
 using System;
 using shadcnui.GUIComponents.Core.Base;
 using shadcnui.GUIComponents.Core.Styling;
-using shadcnui.GUIComponents.Core.Theming;
 using shadcnui.GUIComponents.Core.Utils;
 using UnityEngine;
 
@@ -206,7 +205,7 @@ namespace shadcnui.GUIComponents.Controls
 
         private void DrawThumb(Rect rect, Color color, bool disabled)
         {
-            var theme = ThemeManager.Instance.CurrentTheme;
+            var theme = styleManager.GetTheme();
             int radius = Mathf.RoundToInt(rect.width / 2f);
 
             if (!disabled)

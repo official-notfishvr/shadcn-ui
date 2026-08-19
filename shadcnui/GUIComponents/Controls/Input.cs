@@ -161,6 +161,7 @@ namespace shadcnui.GUIComponents.Controls
 
             return config.Size switch
             {
+                ControlSize.ExtraSmall => DesignTokens.Height.ExtraSmall,
                 ControlSize.Mini => DesignTokens.Height.Mini,
                 ControlSize.Small => DesignTokens.Height.Small,
                 ControlSize.Large => DesignTokens.Height.Large,

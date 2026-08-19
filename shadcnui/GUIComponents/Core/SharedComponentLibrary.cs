@@ -74,12 +74,17 @@ namespace shadcnui.GUIComponents.Core.Utils
             Vector2 anchorTopLeft = GUIUtility.GUIToScreenPoint(new Vector2(anchorRect.xMin, anchorRect.yMin));
             Vector2 anchorBottomLeft = GUIUtility.GUIToScreenPoint(new Vector2(anchorRect.xMin, anchorRect.yMax));
 
-            float x = anchorBottomLeft.x;
-            float y = anchorBottomLeft.y + gap;
+            return GetAnchoredScreenPositionFromScreenRect(new Rect(anchorTopLeft.x, anchorTopLeft.y, anchorRect.width, anchorRect.height), popupWidth, popupHeight, rootRect, gap);
+        }
+
+        public static Vector2 GetAnchoredScreenPositionFromScreenRect(Rect screenAnchorRect, float popupWidth, float popupHeight, Rect rootRect, float gap = 4f)
+        {
+            float x = screenAnchorRect.xMin;
+            float y = screenAnchorRect.yMax + gap;
 
             if (y + popupHeight > rootRect.yMax)
             {
-                float aboveY = anchorTopLeft.y - gap - popupHeight;
+                float aboveY = screenAnchorRect.yMin - gap - popupHeight;
                 if (aboveY >= rootRect.yMin)
                     y = aboveY;
                 else
