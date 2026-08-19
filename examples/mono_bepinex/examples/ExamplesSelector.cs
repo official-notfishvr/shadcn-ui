@@ -20,12 +20,12 @@ namespace shadcnui_examples.Menu
 
         void OnGUI()
         {
-            guiHelper.DrawOverlay();
-
             if (showSelector)
             {
                 selectorRect = GUI.Window(100, selectorRect, (GUI.WindowFunction)DrawSelectorWindow, "shadcnui Examples");
             }
+
+            guiHelper.DrawOverlays();
         }
 
         void DrawSelectorWindow(int windowID)
@@ -59,17 +59,6 @@ namespace shadcnui_examples.Menu
 
                         guiHelper.HorizontalSeparator();
 
-                        guiHelper.Label("Data Display", ControlVariant.Default);
-                        if (guiHelper.Button("Tables", ControlVariant.Default))
-                            LoadDemo<TablesExample>("TablesDemo");
-
-                        guiHelper.AddSpace(5);
-
-                        if (guiHelper.Button("Charts", ControlVariant.Default))
-                            LoadDemo<ChartsExample>("ChartsDemo");
-
-                        guiHelper.AddSpace(5);
-
                         if (guiHelper.Button("Display Components", ControlVariant.Default))
                             LoadDemo<DisplayComponentsExample>("DisplayDemo");
 
@@ -81,8 +70,8 @@ namespace shadcnui_examples.Menu
 
                         guiHelper.AddSpace(5);
 
-                        if (guiHelper.Button("Dialogs & Overlays", ControlVariant.Default))
-                            LoadDemo<DialogsAndOverlaysExample>("DialogsDemo");
+                        if (guiHelper.Button("Overlays", ControlVariant.Default))
+                            LoadDemo<OverlaysExample>("OverlaysDemo");
 
                         guiHelper.AddSpace(5);
 
@@ -121,7 +110,7 @@ namespace shadcnui_examples.Menu
             currentDemo.AddComponent<T>();
             showSelector = false;
 
-            guiHelper.ShowSuccessToast("Demo Loaded", $"{name} is now running. Press ESC to return to selector.");
+            guiHelper.Toast().Title("Demo Loaded").Description($"{name} is now running. Press ESC to return to selector.").Render();
         }
 
         void Update()
@@ -135,7 +124,7 @@ namespace shadcnui_examples.Menu
             {
                 Destroy(currentDemo);
                 currentDemo = null;
-                guiHelper.ShowToast("Demo Unloaded");
+                guiHelper.Toast().Title("Demo Unloaded").Render();
             }
         }
 

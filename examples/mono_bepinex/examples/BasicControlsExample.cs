@@ -1,5 +1,6 @@
 using shadcnui.GUIComponents.Core.Base;
 using shadcnui.GUIComponents.Core.Styling;
+using shadcnui.GUIComponents.Core.Utils;
 using UnityEngine;
 
 namespace shadcnui_examples.Examples
@@ -7,38 +8,31 @@ namespace shadcnui_examples.Examples
     public class BasicControlsExample : MonoBehaviour
     {
         private GUIHelper gui;
-        private Rect windowRect = new Rect(50, 50, 550, 700);
-        private bool showWindow = true;
-        private Vector2 scroll = Vector2.zero;
+        private Rect windowRect = new Rect(50, 50, 650, 680);
+        private Vector2 scroll;
+        private string displayName = "Ada Lovelace";
+        private string password = "correct horse battery staple";
+        private string notes = "Try the current builder API used throughout this example.";
+        private bool featureEnabled = true;
+        private bool notifications;
+        private bool compactMode;
+        private float volume = 65f;
+        private Vector2 priceRange = new Vector2(20f, 80f);
+        private int selectedOption;
 
-        private string inputText = "";
-        private string password = "";
-        private string description = "";
-        private bool checkboxValue = false;
-        private bool toggleValue = false;
-        private bool switchValue = false;
-        private float sliderValue = 50f;
-        private int selectedOption = 0;
-        private string[] options = new[] { "Option 1", "Option 2", "Option 3", "Option 4" };
+        private readonly string[] options = { "Option 1", "Option 2", "Option 3", "Option 4" };
 
-        void Start()
+        private void Start() => gui = new GUIHelper();
+
+        private void OnGUI()
         {
-            gui = new GUIHelper();
+            windowRect = GUI.Window(1, windowRect, DrawWindow, "Basic Controls");
+            gui.DrawOverlays();
         }
 
-        void OnGUI()
+        private void DrawWindow(int windowID)
         {
-            if (showWindow)
-            {
-                windowRect = GUI.Window(1, windowRect, DrawControlsWindow, "Basic Controls Example");
-            }
-
-            gui.DrawOverlay();
-        }
-
-        void DrawControlsWindow(int windowID)
-        {
-            gui.UpdateGUI(showWindow);
+            gui.UpdateGUI(true);
             if (!gui.BeginGUI())
                 return;
 
@@ -46,80 +40,48 @@ namespace shadcnui_examples.Examples
                 scroll,
                 () =>
                 {
-                    gui.BeginVerticalGroup();
+                    gui.BeginColumn();
+                    gui.Heading("Inputs & controls");
+                    gui.MutedLabel("Value-returning builders can be assigned directly.");
 
-                    gui.Label("Text Inputs");
-                    gui.Label("Basic Input:");
-                    inputText = gui.Input(inputText, "Type something...");
-
-                    gui.Label("Password Field:");
-                    password = gui.Password(
-                        new shadcnui.GUIComponents.Core.Utils.InputConfig
-                        {
-                            Value = password,
-                            Label = "Password",
-                            MaskCharacter = '*',
-                            Width = Mathf.RoundToInt(windowRect.width - 40),
-                        }
-                    );
-
-                    gui.Label("Description:");
-                    description = gui.TextArea(description, ControlVariant.Default, "Enter description...", false, 60f);
+                    displayName = gui.Input(displayName).Label("Name").Placeholder("Your name");
+                    password = gui.Input(password).Label("Password").Password();
+                    notes = gui.TextArea(notes).Label("Notes").Placeholder("Add a note...");
 
                     gui.HorizontalSeparator();
-
-                    gui.Label("Buttons");
-                    gui.BeginHorizontalGroup();
-                    if (gui.Button("Primary", ControlVariant.Default))
-                        gui.ShowSuccessToast("Primary clicked!");
-                    if (gui.Button("Secondary", ControlVariant.Secondary))
-                        gui.ShowInfoToast("Secondary clicked!");
-                    if (gui.Button("Destructive", ControlVariant.Destructive))
-                        gui.ShowErrorToast("Destructive clicked!");
-                    gui.EndHorizontalGroup();
-
-                    gui.BeginHorizontalGroup();
-                    if (gui.Button("Outline", ControlVariant.Outline))
-                        gui.ShowToast("Outline clicked!");
-                    if (gui.Button("Ghost", ControlVariant.Ghost))
-                        gui.ShowToast("Ghost clicked!");
-                    if (gui.Button("Link", ControlVariant.Link))
-                        gui.ShowToast("Link clicked!");
-                    gui.EndHorizontalGroup();
+                    gui.Heading("Actions");
+                    gui.BeginRow();
+                    if (gui.Button("Save"))
+                        gui.Toast().Title("Saved").Description("Your changes were saved.").Variant(ToastVariant.Success).Render();
+                    if (gui.Button("Reset").Outline().Small())
+                    {
+                        displayName = "Ada Lovelace";
+                        gui.Toast().Title("Form reset").Render();
+                    }
+                    gui.EndRow();
 
                     gui.HorizontalSeparator();
-
-                    gui.Label("Toggles & Checkboxes");
-                    checkboxValue = gui.Checkbox("Enable Feature", checkboxValue);
-                    toggleValue = gui.Toggle("Toggle State", toggleValue);
-                    switchValue = gui.Switch("Switch Control", switchValue);
-
-                    gui.HorizontalSeparator();
-
-                    gui.Label("Slider");
-                    sliderValue = gui.Slider(
-                        new shadcnui.GUIComponents.Core.Utils.SliderConfig
-                        {
-                            Label = "Volume",
-                            Value = sliderValue,
-                            MinValue = 0f,
-                            MaxValue = 100f,
-                        }
-                    );
+                    gui.Heading("Boolean controls");
+                    featureEnabled = gui.Checkbox("Enable feature", featureEnabled).HelperText("Checkbox builder");
+                    notifications = gui.Switch("Notifications", notifications);
+                    compactMode = gui.Toggle("Compact mode", compactMode);
 
                     gui.HorizontalSeparator();
+                    gui.Heading("Numeric controls");
+                    volume = gui.Slider(volume).Label("Volume").Range(0f, 100f).Step(5f).ShowValue();
+                    priceRange = gui.RangeSlider(priceRange.x, priceRange.y).Label("Price range").Range(0f, 100f).Step(5f).ShowValue();
+                    selectedOption = gui.Select().Id("basic_option_select").Label("Select an option").Items(options).SelectedIndex(selectedOption).MaxHeight(180f).Width(240f).Render();
 
-                    gui.Label("Select Dropdown");
-                    selectedOption = gui.Select(null, options, selectedOption);
-
-                    gui.EndVerticalGroup();
+                    gui.EndColumn();
                 },
-                GUILayout.Width(windowRect.width - 20),
-                GUILayout.Height(windowRect.height - 60)
+                GUILayout.Width(windowRect.width - 20f),
+                GUILayout.Height(windowRect.height - 60f)
             );
 
             gui.EndGUI();
             GUI.DragWindow();
         }
+
+        private void OnDestroy() => gui?.Cleanup();
     }
 }

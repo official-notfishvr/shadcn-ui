@@ -1,4 +1,3 @@
-using System.Collections.Generic;
 using shadcnui.GUIComponents.Core.Base;
 using shadcnui.GUIComponents.Core.Styling;
 using UnityEngine;
@@ -8,27 +7,21 @@ namespace shadcnui_examples.Examples
     public class LayoutExample : MonoBehaviour
     {
         private GUIHelper gui;
-        private Rect windowRect = new Rect(50, 50, 650, 600);
-        private bool showWindow = true;
-        private Vector2 scroll = Vector2.zero;
+        private Rect windowRect = new Rect(50, 50, 650, 620);
+        private Vector2 scroll;
+        private float completion = 0.75f;
 
-        void Start()
+        private void Start() => gui = new GUIHelper();
+
+        private void OnGUI()
         {
-            gui = new GUIHelper();
+            windowRect = GUI.Window(2, windowRect, DrawWindow, "Layout & Cards");
+            gui.DrawOverlays();
         }
 
-        void OnGUI()
+        private void DrawWindow(int windowID)
         {
-            if (showWindow)
-            {
-                windowRect = GUI.Window(2, windowRect, DrawLayoutWindow, "Layout & Cards Example");
-            }
-            gui.DrawOverlay();
-        }
-
-        void DrawLayoutWindow(int windowID)
-        {
-            gui.UpdateGUI(showWindow);
+            gui.UpdateGUI(true);
             if (!gui.BeginGUI())
                 return;
 
@@ -36,88 +29,54 @@ namespace shadcnui_examples.Examples
                 scroll,
                 () =>
                 {
-                    gui.BeginVerticalGroup();
+                    gui.BeginColumn();
+                    gui.Heading("Cards");
+                    gui.MutedLabel("Cards compose headers, descriptions, content, and footers.");
 
-                    gui.Label("Simple Card Example", ControlVariant.Default);
-                    gui.Card("Welcome", "Getting Started", "This is a basic card with title, description, and content.");
+                    gui.Card().Title("Welcome").Description("A simple card built with the current fluent API.").Content("Cards keep related information together and work in any layout.").Render();
+                    gui.Space(12f);
 
-                    gui.AddSpace(20);
-
-                    gui.Label("Card with Footer", ControlVariant.Default);
-                    gui.Card(
-                        "Notification",
-                        "Settings",
-                        "Configure your notification preferences.",
-                        () =>
+                    gui.Card()
+                        .Title("Project status")
+                        .Subtitle("This week")
+                        .Description("A card with custom content and actions.")
+                        .Header(() => gui.Badge("On track").Secondary().Small().Render())
+                        .Content("The release checklist is nearly complete.")
+                        .Footer(() =>
                         {
-                            gui.BeginHorizontalGroup();
-                            GUILayout.FlexibleSpace();
-                            if (gui.Button("Save", ControlVariant.Default, ControlSize.Small))
-                                gui.ShowSuccessToast("Saved!");
-                            if (gui.Button("Cancel", ControlVariant.Ghost, ControlSize.Small))
-                                gui.ShowToast("Cancelled");
-                            gui.EndHorizontalGroup();
-                        }
-                    );
+                            gui.BeginRow();
+                            gui.Flex();
+                            if (gui.Button("View details").Outline().Small())
+                                gui.Toast().Title("Opening project details").Render();
+                            gui.EndRow();
+                        })
+                        .Render();
 
-                    gui.AddSpace(20);
+                    gui.Space(12f);
+                    gui.BeginRow();
+                    gui.Card().Title("One").Content("Compact card").Size(190f).Render();
+                    gui.Space(8f);
+                    gui.Card().Title("Two").Content("Another card").Size(190f).Render();
+                    gui.Space(8f);
+                    gui.Card().Title("Three").Content("A third card").Size(190f).Render();
+                    gui.EndRow();
 
-                    gui.Label("Horizontal Layout with Cards", ControlVariant.Default);
-                    gui.BeginHorizontalGroup();
-                    gui.SimpleCard("Card 1\nContent here", 180, 100);
-                    gui.AddSpace(10);
-                    gui.SimpleCard("Card 2\nMore content", 180, 100);
-                    gui.AddSpace(10);
-                    gui.SimpleCard("Card 3\nEven more", 180, 100);
-                    gui.EndHorizontalGroup();
-
-                    gui.AddSpace(20);
-
-                    gui.Label("Card with Custom Header", ControlVariant.Default);
-                    gui.BeginCard(400, 200);
-                    gui.CardHeader(() =>
-                    {
-                        gui.BeginHorizontalGroup();
-                        gui.Badge("New", ControlVariant.Default);
-                        GUILayout.FlexibleSpace();
-                        gui.MutedLabel("Just now");
-                        gui.EndHorizontalGroup();
-                    });
-                    gui.CardTitle("Custom Header Card");
-                    gui.CardDescription("This card uses CardHeader, CardTitle, CardDescription, CardContent, and CardFooter.");
-                    gui.CardContent(() =>
-                    {
-                        gui.Progress(0.75f, 350, 8);
-                        gui.MutedLabel("75% complete");
-                    });
-                    gui.CardFooter(() =>
-                    {
-                        gui.BeginHorizontalGroup();
-                        if (gui.Button("View Details", ControlVariant.Outline, ControlSize.Small))
-                            gui.ShowToast("Viewing details...");
-                        GUILayout.FlexibleSpace();
-                        gui.EndHorizontalGroup();
-                    });
-                    gui.EndCard();
-
-                    gui.AddSpace(20);
-
-                    gui.Label("Separators", ControlVariant.Default);
-                    gui.HorizontalSeparator();
-                    gui.MutedLabel("Above: Horizontal Separator");
-                    gui.AddSpace(10);
-                    gui.LabeledSeparator("Section Divider");
-                    gui.AddSpace(10);
-                    gui.SeparatorWithSpacing(SeparatorOrientation.Horizontal, 10, 10);
-
-                    gui.EndVerticalGroup();
+                    gui.Space(12f);
+                    gui.Heading("Progress & separators");
+                    completion = gui.Slider(completion * 100f).Label("Completion").Range(0f, 100f).Step(5f).ShowValue() / 100f;
+                    gui.Progress(completion).Label("Release progress").WidthValue(420f).ShowPercentage().Render();
+                    gui.Separator().Text("Section divider").Spacing(10f, 10f).Render();
+                    gui.Caption("The same primitives can be combined with Row, Column, and ScrollView.");
+                    gui.EndColumn();
                 },
-                GUILayout.Width(windowRect.width - 20),
-                GUILayout.Height(windowRect.height - 60)
+                GUILayout.Width(windowRect.width - 20f),
+                GUILayout.Height(windowRect.height - 60f)
             );
 
             gui.EndGUI();
             GUI.DragWindow();
         }
+
+        private void OnDestroy() => gui?.Cleanup();
     }
 }

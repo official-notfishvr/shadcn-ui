@@ -1,46 +1,33 @@
 using shadcnui.GUIComponents.Core.Base;
 using shadcnui.GUIComponents.Core.Styling;
+using shadcnui.GUIComponents.Core.Utils;
 using UnityEngine;
-using static shadcnui.GUIComponents.Layout.MenuBar;
 
 namespace shadcnui_examples.Examples
 {
     public class AdvancedControlsExample : MonoBehaviour
     {
         private GUIHelper gui;
-        private Rect windowRect = new Rect(50, 50, 550, 650);
-        private bool showWindow = true;
-        private Vector2 scroll = Vector2.zero;
+        private Rect windowRect = new Rect(50, 50, 650, 680);
+        private Vector2 scroll;
+        private int selectedTab;
+        private int selectedNavigation;
+        private int selectedDropdown;
+        private string text = "Resizable content is represented by the current TextArea builder.";
+        private readonly bool[] closable = { true, true, true };
+        private readonly string[] tabs = { "Document 1", "Document 2", "Document 3" };
 
-        private string[] dropdownItems = new[] { "New File", "Open...", "Save", "Save As...", "Exit" };
-        private string[] menuItems = new[] { "File", "Edit", "View", "Help" };
-        private int selectedMenuItem = 0;
-        private int selectedDropdownItem = 0;
+        private void Start() => gui = new GUIHelper();
 
-        private string resizableText = "This is a resizable text area. Drag the handle at the bottom to resize.";
-        private float textAreaHeight = 80f;
-
-        private string[] closableTabs = new[] { "Document 1", "Document 2", "Document 3" };
-        private bool[] closableTabStates = new[] { true, true, true };
-        private int selectedClosableTab = 0;
-
-        void Start()
+        private void OnGUI()
         {
-            gui = new GUIHelper();
+            windowRect = GUI.Window(8, windowRect, DrawWindow, "Advanced Controls");
+            gui.DrawOverlays();
         }
 
-        void OnGUI()
+        private void DrawWindow(int windowID)
         {
-            if (showWindow)
-            {
-                windowRect = GUI.Window(8, windowRect, DrawAdvancedWindow, "Advanced Controls Example");
-            }
-            gui.DrawOverlay();
-        }
-
-        void DrawAdvancedWindow(int windowID)
-        {
-            gui.UpdateGUI(showWindow);
+            gui.UpdateGUI(true);
             if (!gui.BeginGUI())
                 return;
 
@@ -48,98 +35,54 @@ namespace shadcnui_examples.Examples
                 scroll,
                 () =>
                 {
-                    gui.BeginVerticalGroup();
-
-                    gui.Label("Menu Bar", ControlVariant.Default);
-                    var menuBarItems = new System.Collections.Generic.List<MenuItem>
-                    {
-                        new MenuItem("File", () => gui.ShowToast("File clicked")),
-                        new MenuItem("Edit", () => gui.ShowToast("Edit clicked")),
-                        new MenuItem("View", () => gui.ShowToast("View clicked")),
-                        new MenuItem("Help", () => gui.ShowToast("Help clicked")),
-                    };
-                    gui.MenuBar(menuBarItems);
+                    gui.BeginColumn();
+                    gui.Heading("Menu bar");
+                    gui.MenuBar().Item("File", menu => menu.Item("New").Item("Open").Separator().Item("Exit")).Item("Edit", menu => menu.Item("Undo").Item("Redo")).Render();
 
                     gui.HorizontalSeparator();
-
-                    gui.Label("Dropdown Menu", ControlVariant.Default);
-                    selectedDropdownItem = gui.Select(null, dropdownItems, selectedDropdownItem);
+                    gui.Heading("Dropdown menu");
+                    selectedDropdown = gui.Select().Label("Action").Items("New file", "Open", "Save", "Save as", "Exit").SelectedIndex(selectedDropdown);
 
                     gui.HorizontalSeparator();
-
-                    gui.Label("Closable Tabs", ControlVariant.Default);
-                    gui.ClosableTabs(
-                        ref closableTabs,
-                        ref closableTabStates,
-                        selectedClosableTab,
-                        null,
-                        index =>
+                    gui.Heading("Closable tabs");
+                    selectedTab = gui.Tabs()
+                        .Id("advanced_documents")
+                        .Items(tabs)
+                        .Closable(closable)
+                        .SelectedIndex(selectedTab)
+                        .Content(() =>
                         {
-                            selectedClosableTab = index;
-                            gui.ShowToast($"Selected tab: {closableTabs[index]}");
-                        }
-                    );
-
-                    gui.BeginTabContent();
-                    if (selectedClosableTab >= 0 && selectedClosableTab < closableTabs.Length)
-                    {
-                        gui.MutedLabel($"Content for {closableTabs[selectedClosableTab]}");
-                        gui.Label("This content is shown within the selected tab.", ControlVariant.Default);
-                    }
-                    gui.EndTabContent();
+                            if (tabs.Length > 0)
+                                gui.Card().Title(tabs[Mathf.Clamp(selectedTab, 0, tabs.Length - 1)]).Content("Tab content is rendered by the Tabs builder.").Render();
+                        });
 
                     gui.HorizontalSeparator();
-
-                    gui.Label("Resizable Text Area", ControlVariant.Default);
-                    resizableText = gui.ResizableTextArea(resizableText, ref textAreaHeight, ControlVariant.Default, "Type here...", false, 60f, 200f);
-                    gui.MutedLabel($"Current height: {textAreaHeight:F0}px");
-
-                    gui.HorizontalSeparator();
-
-                    gui.Label("Navigation", ControlVariant.Default);
-                    selectedMenuItem = gui.Sidebar(
-                        menuItems,
-                        selectedMenuItem,
-                        null,
-                        "APP",
-                        index =>
-                        {
-                            gui.ShowToast($"Navigated to {menuItems[index]}");
-                        },
-                        80
-                    );
+                    gui.Heading("Text area");
+                    text = gui.TextArea(text).Label("Notes").Placeholder("Type here...").MinHeight(100f).MaxHeight(180f);
+                    gui.Caption("Text length: " + text.Length);
 
                     gui.HorizontalSeparator();
+                    gui.Heading("Navigation");
+                    selectedNavigation = gui.Navigation()
+                        .Logo("APP")
+                        .Items(new NavigationItem("dashboard", "Dashboard"), new NavigationItem("analytics", "Analytics"), new NavigationItem("projects", "Projects"), new NavigationItem("settings", "Settings"))
+                        .SelectedIndex(selectedNavigation)
+                        .Width(180f);
 
-                    gui.Label("Theme Variants", ControlVariant.Default);
-                    gui.BeginHorizontalGroup();
-                    gui.ThemeChanger(
-                        new shadcnui.GUIComponents.Core.Utils.ThemeChangerConfig
-                        {
-                            Id = "theme_compact",
-                            Width = 120f,
-                            ShowPreview = false,
-                        }
-                    );
-                    gui.AddSpace(20);
-                    gui.ThemeChanger(
-                        new shadcnui.GUIComponents.Core.Utils.ThemeChangerConfig
-                        {
-                            Id = "theme_preview",
-                            Width = 200f,
-                            ShowPreview = true,
-                        }
-                    );
-                    gui.EndHorizontalGroup();
-
-                    gui.EndVerticalGroup();
+                    gui.HorizontalSeparator();
+                    gui.Heading("Theme & font");
+                    gui.ThemeChanger().Width(220f).ShowPreview().Render();
+                    gui.FontChanger().Width(220f).ShowPreview().Render();
+                    gui.EndColumn();
                 },
-                GUILayout.Width(windowRect.width - 20),
-                GUILayout.Height(windowRect.height - 60)
+                GUILayout.Width(windowRect.width - 20f),
+                GUILayout.Height(windowRect.height - 60f)
             );
 
             gui.EndGUI();
             GUI.DragWindow();
         }
+
+        private void OnDestroy() => gui?.Cleanup();
     }
 }

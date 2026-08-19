@@ -65,6 +65,7 @@ namespace shadcnui.GUIComponents.Layout
         private int _pendingCloseIndex = -1;
         private Action<int> _pendingCloseCallback;
         private Vector2 _tabScrollPosition = Vector2.zero;
+        private readonly Dictionary<string, HashSet<string>> _autoClosedTabs = new();
 
         public Tabs(GUIHelper helper)
             : base(helper) { }
@@ -72,14 +73,20 @@ namespace shadcnui.GUIComponents.Layout
         #region Public Drawing API
         public int Render(TabsConfig config)
         {
+            if (config == null)
+                return 0;
+
+            string stateId = ResolveStateId(config);
+            ApplyAutoClosedTabs(config, stateId);
+            ProcessPendingClose(config, stateId);
+            ApplyAutoClosedTabs(config, stateId);
+
             if (config.TabLabels == null || config.TabLabels.Length == 0)
             {
-                config.Content?.Invoke();
                 guiHelper.FlushAutoRenderBuilder();
                 return config.SelectedIndex;
             }
 
-            ProcessPendingClose(config);
             return DrawTabs(config);
         }
 
@@ -516,16 +523,85 @@ namespace shadcnui.GUIComponents.Layout
             return Render(config);
         }
 
-        private void ProcessPendingClose(TabsConfig config)
+        private void ProcessPendingClose(TabsConfig config, string stateId)
         {
-            if (_pendingCloseIndex >= 0 && _pendingCloseCallback != null)
+            if (_pendingCloseIndex < 0)
+                return;
+
+            var closeIndex = _pendingCloseIndex;
+            var closeCallback = _pendingCloseCallback;
+            _pendingCloseIndex = -1;
+            _pendingCloseCallback = null;
+
+            if (closeCallback != null)
             {
-                var closeIndex = _pendingCloseIndex;
-                var closeCallback = _pendingCloseCallback;
-                _pendingCloseIndex = -1;
-                _pendingCloseCallback = null;
                 closeCallback?.Invoke(closeIndex);
+                return;
             }
+
+            if (config.TabLabels == null || closeIndex < 0 || closeIndex >= config.TabLabels.Length)
+                return;
+
+            if (!_autoClosedTabs.TryGetValue(stateId, out var closedLabels))
+            {
+                closedLabels = new HashSet<string>();
+                _autoClosedTabs[stateId] = closedLabels;
+            }
+
+            closedLabels.Add(config.TabLabels[closeIndex] ?? string.Empty);
+            AdjustSelectedIndexAfterClose(config, closeIndex);
+        }
+
+        private void ApplyAutoClosedTabs(TabsConfig config, string stateId)
+        {
+            if (!_autoClosedTabs.TryGetValue(stateId, out var closedLabels) || closedLabels.Count == 0 || config.TabLabels == null)
+                return;
+
+            var labels = new List<string>();
+            var closable = new List<bool>();
+            var disabled = new List<bool>();
+            var icons = config.TabIcons == null ? null : new List<Texture2D>();
+            for (int i = 0; i < config.TabLabels.Length; i++)
+            {
+                string label = config.TabLabels[i] ?? string.Empty;
+                if (closedLabels.Contains(label))
+                    continue;
+
+                labels.Add(config.TabLabels[i]);
+                closable.Add(config.ClosableTabs != null && i < config.ClosableTabs.Length && config.ClosableTabs[i]);
+                disabled.Add(config.DisabledTabs != null && i < config.DisabledTabs.Length && config.DisabledTabs[i]);
+                icons?.Add(i < config.TabIcons.Length ? config.TabIcons[i] : null);
+            }
+
+            config.TabLabels = labels.ToArray();
+            config.ClosableTabs = closable.ToArray();
+            config.DisabledTabs = disabled.ToArray();
+            if (icons != null)
+                config.TabIcons = icons.ToArray();
+            config.SelectedIndex = Mathf.Clamp(config.SelectedIndex, 0, Mathf.Max(0, config.TabLabels.Length - 1));
+        }
+
+        private static void AdjustSelectedIndexAfterClose(TabsConfig config, int closeIndex)
+        {
+            if (config.SelectedIndex > closeIndex)
+                config.SelectedIndex--;
+            else if (config.SelectedIndex >= config.TabLabels.Length - 1)
+                config.SelectedIndex = Mathf.Max(0, config.TabLabels.Length - 2);
+        }
+
+        private static string ResolveStateId(TabsConfig config)
+        {
+            if (!string.IsNullOrEmpty(config.Id))
+                return config.Id;
+
+            return "tabs:" + string.Join("\u001f", config.TabLabels ?? Array.Empty<string>());
+        }
+
+        protected override void OnBeforeDispose()
+        {
+            _autoClosedTabs.Clear();
+            _pendingCloseIndex = -1;
+            _pendingCloseCallback = null;
         }
 
         private void RenderTabContent(TabsConfig config, int selectedIndex)
