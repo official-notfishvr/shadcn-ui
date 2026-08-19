@@ -15,7 +15,9 @@ namespace shadcnui.GUIComponents.Core.Styling
             _baseInputStyle = MakeInputStyle(theme.Secondary, theme.Text, theme.Border);
             _baseLabelStyle = MakeLabelStyle(theme.Text);
             _baseBadgeStyle = MakeChipStyle(theme.ButtonPrimaryBg, theme.ButtonPrimaryFg);
-            _baseTableStyle = MakePanelStyle(theme.Elevated, theme.Border, DesignTokens.Radius.LG, 0f, 0f);
+            _baseTableStyle = MakePanelStyle(theme.Base, theme.Border, DesignTokens.Radius.MD, 0f, 0f);
+            _baseTableStyle.padding = new UnityHelpers.RectOffset();
+            _baseTableStyle.margin = new UnityHelpers.RectOffset();
             _baseTableStyle.stretchHeight = false;
             _checkboxStyle = MakeControlStyle(theme.Base, theme.Text, DesignTokens.Spacing.SM, DesignTokens.Spacing.XS, DesignTokens.Radius.SM, theme.Border, FontStyle.Normal);
             _checkboxSolidStyle = MakeControlStyle(theme.ButtonPrimaryBg, theme.ButtonPrimaryFg, DesignTokens.Spacing.MD, DesignTokens.Spacing.XS, DesignTokens.Radius.SM, Color.clear, FontStyle.Normal);
@@ -50,7 +52,7 @@ namespace shadcnui.GUIComponents.Core.Styling
             _tableHeaderStyle.border = new UnityHelpers.RectOffset();
             _tableHeaderStyle.stretchHeight = false;
             _tableRowStyle = CloneStyle(GUIStyle.none);
-            SetBackgroundStates(_tableRowStyle, Textures.TableRow, Textures.TableRowAlternate, Textures.TableRowAlternate, Textures.TableRow);
+            SetBackgroundStates(_tableRowStyle, Textures.TableRow, Textures.TableRow, Textures.TableRowAlternate, Textures.TableRow);
             _tableRowStyle.padding = new UnityHelpers.RectOffset(0, 0, 0, 0);
             _tableRowStyle.margin = new UnityHelpers.RectOffset(0, 0, 0, 0);
             _tableRowStyle.border = new UnityHelpers.RectOffset(0, 0, 0, 0);

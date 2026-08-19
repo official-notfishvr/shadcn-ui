@@ -187,6 +187,8 @@ namespace shadcnui.GUIComponents.Layout
                         }
                     }
                     layoutComponents.EndHorizontalGroup();
+                    if (r < rowCount - 1)
+                        guiHelper.HorizontalSeparator();
                 }
             }
 

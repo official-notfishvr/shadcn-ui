@@ -148,8 +148,12 @@ namespace shadcnui.GUIComponents.Data
             }
             else
             {
-                foreach (var row in rows)
-                    DrawRow(config, state, columns, row);
+                for (int i = 0; i < rows.Count; i++)
+                {
+                    DrawRow(config, state, columns, rows[i]);
+                    if (i < rows.Count - 1)
+                        guiHelper.HorizontalSeparator();
+                }
             }
             layoutComponents.EndVerticalGroup();
         }
