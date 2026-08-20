@@ -64,17 +64,17 @@ jobs:
         uses: NuGet/setup-nuget@v2
 
       - name: Restore NuGet packages
-        run: nuget restore shadcnui.sln
+        run: msbuild shadcnui.slnx /t:Restore
 
       - name: Build ${{ matrix.configuration }}
-        run: msbuild shadcnui.sln /p:Configuration=${{ matrix.configuration }} /p:Platform="Any CPU" /m
+        run: msbuild shadcnui.slnx /p:Configuration=${{ matrix.configuration }} /p:Platform="AnyCPU" /m
 
       - name: Upload shadcnui.dll
         uses: actions/upload-artifact@v4
         if: always()
         with:
           name: shadcnui-build-${{ matrix.configuration }}
-          path: shadcnui/bin/${{ matrix.configuration }}/netstandard2.1/shadcnui.dll
+          path: src/ShadcnUi/bin/${{ matrix.configuration }}/netstandard2.1/shadcnui.dll
           if-no-files-found: error
           retention-days: 30
 
@@ -83,7 +83,7 @@ jobs:
         if: always()
         with:
           name: shadcnui_Demo-build-${{ matrix.configuration }}
-          path: shadcnui_Demo/bin/${{ matrix.configuration }}/netstandard2.1/shadcnui_Demo.dll
+          path: samples/ShadcnUi.Demo/bin/${{ matrix.configuration }}/netstandard2.1/shadcnui_Demo.dll
           if-no-files-found: error
           retention-days: 30
 
@@ -141,17 +141,17 @@ jobs:
         uses: NuGet/setup-nuget@v2
 
       - name: Restore NuGet packages
-        run: nuget restore shadcnui.sln
+        run: msbuild shadcnui.slnx /t:Restore
 
       - name: Build ${{ matrix.configuration }} (Nightly)
-        run: msbuild shadcnui.sln /p:Configuration=${{ matrix.configuration }} /p:Platform="Any CPU" /m
+        run: msbuild shadcnui.slnx /p:Configuration=${{ matrix.configuration }} /p:Platform="AnyCPU" /m
 
       - name: Upload shadcnui.dll
         uses: actions/upload-artifact@v4
         if: always()
         with:
           name: shadcnui-nightly-${{ github.run_number }}-${{ matrix.configuration }}
-          path: shadcnui/bin/${{ matrix.configuration }}/netstandard2.1/shadcnui.dll
+          path: src/ShadcnUi/bin/${{ matrix.configuration }}/netstandard2.1/shadcnui.dll
           if-no-files-found: error
           retention-days: 14
 
@@ -160,6 +160,6 @@ jobs:
         if: always()
         with:
           name: shadcnui_Demo-nightly-${{ github.run_number }}-${{ matrix.configuration }}
-          path: shadcnui_Demo/bin/${{ matrix.configuration }}/netstandard2.1/shadcnui_Demo.dll
+          path: samples/ShadcnUi.Demo/bin/${{ matrix.configuration }}/netstandard2.1/shadcnui_Demo.dll
           if-no-files-found: error
           retention-days: 14

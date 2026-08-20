@@ -11,9 +11,15 @@ git clone https://github.com/official-notfishvr/shadcn-ui.git
 cd shadcnui
 ```
 
-Then open `shadcnui.sln` and build the project. You'll find `shadcnui.dll` in `bin/Debug/` or `bin/Release/`.
+Then open `shadcnui.slnx` and build the project. You'll find `shadcnui.dll` in `src/ShadcnUi/bin/<Configuration>/`.
 
 Add it as a reference to your C# project.
+
+## Repository layout
+
+The runtime library is in `src/ShadcnUi`. Its public `shadcnui.GUIComponents.*` namespaces stay unchanged.
+
+The Unity demo plugin and standalone BepInEx examples are in `samples`. Both sample projects are included in `shadcnui.slnx`. Unity reference assemblies stay in `References`, documentation stays in `docs`, and shared MSBuild settings live in the root `Directory.Build.props`.
 
 ## Usage
 

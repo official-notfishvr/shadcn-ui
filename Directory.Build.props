@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Project>
     <PropertyGroup>
-        <RepositoryRoot>$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory)..\'))</RepositoryRoot>
+        <RepositoryRoot>$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory)'))</RepositoryRoot>
+        <ReferenceRoot>$(RepositoryRoot)References\</ReferenceRoot>
         <!-- Game paths -->
         <GamePath>C:\Program Files (x86)\Steam\steamapps\common\Gorilla Tag</GamePath>
         <GameAssemblyPath>$(GamePath)\Gorilla Tag_Data\Managed</GameAssemblyPath>
@@ -12,34 +13,38 @@
         <When Condition=" '$(Configuration)' == 'IL2CPP_MELONLOADER_PRE57' ">
             <PropertyGroup>
                 <DefineConstants>IL2CPP_MELONLOADER_PRE57;MELONLOADER</DefineConstants>
-                <ReferencePath>$(RepositoryRoot)References\IL2CPP_MELONLOADER_PRE57\</ReferencePath>
+                <ReferencePath>$(ReferenceRoot)IL2CPP_MELONLOADER_PRE57\</ReferencePath>
             </PropertyGroup>
         </When>
         <When Condition=" '$(Configuration)' == 'IL2CPP_MELONLOADER' ">
             <PropertyGroup>
                 <DefineConstants>IL2CPP_MELONLOADER;MELONLOADER</DefineConstants>
-                <ReferencePath>$(RepositoryRoot)References\IL2CPP_MELONLOADER\</ReferencePath>
+                <ReferencePath>$(ReferenceRoot)IL2CPP_MELONLOADER\</ReferencePath>
             </PropertyGroup>
         </When>
         <When Condition=" '$(Configuration)' == 'IL2CPP_BEPINEX' ">
             <PropertyGroup>
                 <DefineConstants>IL2CPP_BEPINEX;BEPINEX</DefineConstants>
-                <ReferencePath>$(RepositoryRoot)References\IL2CPP_BEPINEX\</ReferencePath>
+                <ReferencePath>$(ReferenceRoot)IL2CPP_BEPINEX\</ReferencePath>
             </PropertyGroup>
         </When>
         <When Condition=" '$(Configuration)' == 'Mono_Melonloader' ">
             <PropertyGroup>
                 <DefineConstants>MONO;MELONLOADER</DefineConstants>
-                <ReferencePath>$(RepositoryRoot)References\Mono\</ReferencePath>
+                <ReferencePath>$(ReferenceRoot)Mono\</ReferencePath>
             </PropertyGroup>
         </When>
         <When Condition=" '$(Configuration)' == 'Mono_BepInEx' ">
             <PropertyGroup>
                 <DefineConstants>MONO;BEPINEX</DefineConstants>
-                <ReferencePath>$(RepositoryRoot)References\Mono\</ReferencePath>
+                <ReferencePath>$(ReferenceRoot)Mono\</ReferencePath>
             </PropertyGroup>
         </When>
     </Choose>
+    <PropertyGroup Condition="'$(Configuration)' == 'Debug' Or '$(Configuration)' == 'Release'">
+        <DefineConstants>MONO;BEPINEX</DefineConstants>
+        <ReferencePath>$(ReferenceRoot)Mono\</ReferencePath>
+    </PropertyGroup>
     <PropertyGroup>
         <DebugType>pdbonly</DebugType>
         <Optimize>true</Optimize>

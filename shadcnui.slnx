@@ -1,0 +1,23 @@
+<Solution>
+  <Configurations>
+    <BuildType Name="IL2CPP_MELONLOADER_PRE57" />
+    <BuildType Name="IL2CPP_MELONLOADER" />
+    <BuildType Name="IL2CPP_BEPINEX" />
+    <BuildType Name="Mono_Melonloader" />
+    <BuildType Name="Mono_BepInEx" />
+    <Platform Name="AnyCPU" />
+  </Configurations>
+  <Folder Name="/Build/">
+    <File Path="Directory.Build.props" />
+    <File Path="build/LibraryReferences.props" />
+  </Folder>
+  <Project Path="src/ShadcnUi/shadcnui.csproj" />
+  <Project Path="samples/ShadcnUi.Demo/shadcnui_Demo.csproj" />
+  <Project Path="samples/MonoBepInEx/examples.csproj">
+    <BuildType Solution="IL2CPP_MELONLOADER_PRE57|*" Project="Release" />
+    <BuildType Solution="IL2CPP_MELONLOADER|*" Project="Release" />
+    <BuildType Solution="IL2CPP_BEPINEX|*" Project="Release" />
+    <BuildType Solution="Mono_Melonloader|*" Project="Release" />
+    <BuildType Solution="Mono_BepInEx|*" Project="Release" />
+  </Project>
+</Solution>
