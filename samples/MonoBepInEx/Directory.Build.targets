@@ -1,11 +1,29 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Project>
-    <ItemGroup>
+    <ItemGroup Condition="'$(ProjectRole)' == 'MonoBepInEx'">
+        <Compile Remove="tools\**" />
+        <EmbeddedResource Remove="tools\**" />
+        <None Remove="tools\**" />
         <EmbeddedResource Include="Fonts\**\*.ttf" />
         <EmbeddedResource Include="Img\**\*.*" />
+        <EmbeddedResource Include="Libs\shadcnui.dll" LogicalName="examples.Libs.shadcnui.dll" />
     </ItemGroup>
-    <Target Name="CopyToPlugins" AfterTargets="Build">
+    <Target Name="CopyToPlugins" AfterTargets="Build" Condition="'$(ProjectRole)' == 'MonoBepInEx'">
         <Copy SourceFiles="$(TargetPath)" DestinationFiles="$(PluginsPath)\$(TargetFileName)" />
         <Message Text="Copied to Plugins: $(TargetFileName)" Importance="high" />
+    </Target>
+    <Target Name="TrimEmbeddedShadcnUi" AfterTargets="Build"
+            Condition="'$(ProjectRole)' == 'MonoBepInEx' And '$(Configuration)' == 'Release' And '$(TrimShadcnUi)' != 'false'">
+        <PropertyGroup>
+            <TrimToolProject>$(MSBuildThisFileDirectory)tools\LibraryTrimmer\LibraryTrimmer.csproj</TrimToolProject>
+            <TrimInput>$(MSBuildThisFileDirectory)Libs\shadcnui.dll</TrimInput>
+            <TrimOutput>$(IntermediateOutputPath)shadcnui.trimmed.dll</TrimOutput>
+            <TrimConsumer>$(TargetPath)</TrimConsumer>
+        </PropertyGroup>
+
+        <Exec Command="dotnet build &quot;$(TrimToolProject)&quot; --configuration Release --nologo --verbosity quiet" />
+        <Exec Command="dotnet run --project &quot;$(TrimToolProject)&quot; --configuration Release --no-build -- &quot;$(TrimInput)&quot; &quot;$(TrimConsumer)&quot; &quot;$(TrimOutput)&quot; &quot;$(TargetPath)&quot;" />
+        <Copy SourceFiles="$(TargetPath)" DestinationFiles="$(PluginsPath)\$(TargetFileName)"
+              Condition="'$(PluginsPath)' != '' And Exists('$(PluginsPath)')" />
     </Target>
 </Project>
