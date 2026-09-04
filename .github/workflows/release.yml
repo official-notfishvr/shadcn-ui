@@ -108,17 +108,17 @@ jobs:
         uses: NuGet/setup-nuget@v2
 
       - name: Restore NuGet packages
-        run: nuget restore shadcnui.sln
+        run: msbuild shadcnui.slnx /t:Restore
 
       - name: Build ${{ matrix.configuration }}
-        run: msbuild shadcnui.sln /p:Configuration=${{ matrix.configuration }} /p:Platform="Any CPU" /m /p:DebugType=None
+        run: msbuild samples/ShadcnUi.Demo/shadcnui_Demo.csproj /p:Configuration=${{ matrix.configuration }} /p:Platform="AnyCPU" /m /p:DebugType=None
 
       - name: Verify build outputs
         run: |
           Write-Host "Checking build outputs for ${{ matrix.configuration }}..."
           
-          $mainDll = "shadcnui/bin/${{ matrix.configuration }}/shadcnui.dll"
-          $demoDll = "shadcnui_Demo/bin/${{ matrix.configuration }}/netstandard2.1/shadcnui_Demo.dll"
+          $mainDll = "src/ShadcnUi/bin/${{ matrix.configuration }}/netstandard2.1/shadcnui.dll"
+          $demoDll = "samples/ShadcnUi.Demo/bin/${{ matrix.configuration }}/netstandard2.1/shadcnui_Demo.dll"
           
           if (Test-Path $mainDll) {
             Write-Host "Found shadcnui.dll ($(((Get-Item $mainDll).Length / 1KB).ToString('F2')) KB)"
@@ -140,8 +140,8 @@ jobs:
           New-Item -ItemType Directory -Force -Path "release-artifacts"
           
           # Copy and rename DLLs
-          Copy-Item "shadcnui/bin/$config/shadcnui.dll" "release-artifacts/shadcnui-$config.dll"
-          Copy-Item "shadcnui_Demo/bin/$config/netstandard2.1/shadcnui_Demo.dll" "release-artifacts/shadcnui_Demo-$config.dll"
+          Copy-Item "src/ShadcnUi/bin/$config/netstandard2.1/shadcnui.dll" "release-artifacts/shadcnui-$config.dll"
+          Copy-Item "samples/ShadcnUi.Demo/bin/$config/netstandard2.1/shadcnui_Demo.dll" "release-artifacts/shadcnui_Demo-$config.dll"
 
       - name: Upload shadcnui.dll to Release
         uses: softprops/action-gh-release@v2.5.0

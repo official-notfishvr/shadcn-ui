@@ -1,0 +1,163 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using shadcnui.GUIComponents.Core.Base;
+using shadcnui.GUIComponents.Core.Styling;
+using shadcnui.GUIComponents.Core.Theming;
+using shadcnui.GUIComponents.Core.Utils;
+using UnityEngine;
+
+namespace shadcnui.GUIComponents.Controls
+{
+    public class ThemeChanger : BaseComponent
+    {
+        private Vector2 _scrollPosition;
+        private Rect _triggerRect;
+        private float _dropdownWidth;
+        private float _dropdownHeight;
+
+        public ThemeChanger(GUIHelper helper)
+            : base(helper) { }
+
+        public void Render(ThemeChangerConfig config)
+        {
+            config ??= new ThemeChangerConfig();
+            string id = ResolveId(config.Id, "theme_changer");
+            _dropdownWidth = config.Width;
+            _dropdownHeight = config.DropdownHeight;
+
+            var themeManager = ThemeManager.Instance;
+            var currentTheme = themeManager.CurrentTheme;
+
+            GUIStyle buttonStyle = styleManager?.GetButtonStyle(ControlVariant.Outline, ControlSize.Default, config.Appearance) ?? GUI.skin.button;
+            string buttonText = currentTheme?.Name ?? "Select Theme";
+            string dropdownIcon = LayerManager.Instance.IsOpen(id) ? " ^" : " v";
+
+            var buttonOptions = config.LayoutOptions ?? new[] { GUILayout.Width(config.Width) };
+            if (UnityHelpers.Button(buttonText + dropdownIcon, buttonStyle, buttonOptions))
+            {
+                ToggleDropdown(config, id);
+            }
+
+            if (Event.current.type == EventType.Repaint)
+                _triggerRect = GUILayoutUtility.GetLastRect();
+
+            UpdateDropdownPosition(id);
+        }
+
+        private void ToggleDropdown(ThemeChangerConfig config, string id)
+        {
+            if (LayerManager.Instance.IsOpen(id))
+            {
+                LayerManager.Instance.Close(id);
+                return;
+            }
+
+            Vector2 screenPos = PopupLayoutUtility.GetAnchoredScreenPosition(_triggerRect, config.Width, config.DropdownHeight, guiHelper.GetRootGuiScreenRect());
+            LayerManager.Instance.Open(
+                new LayerConfig
+                {
+                    Id = id,
+                    OpenPosition = screenPos,
+                    Width = config.Width,
+                    Height = config.DropdownHeight,
+                    CloseOnClickOutside = true,
+                    ZIndex = DesignTokens.ZIndex.Dropdown,
+                    Content = () => DrawThemeList(config),
+                }
+            );
+        }
+
+        private void UpdateDropdownPosition(string id)
+        {
+            if (!LayerManager.Instance.IsOpen(id))
+                return;
+
+            Vector2 screenPos = PopupLayoutUtility.GetAnchoredScreenPosition(_triggerRect, _dropdownWidth, _dropdownHeight, guiHelper.GetRootGuiScreenRect());
+            LayerManager.Instance.SetPosition(id, screenPos);
+        }
+
+        private void DrawThemeList(ThemeChangerConfig config)
+        {
+            var themeManager = ThemeManager.Instance;
+            var themes = themeManager.Themes.Values.ToList();
+            var currentTheme = themeManager.CurrentTheme;
+
+            GUIStyle boxStyle = styleManager?.GetSelectStyle(ControlVariant.Default, ControlSize.Default, config.Appearance) ?? GUI.skin.box;
+            GUIStyle itemStyle = styleManager?.GetSelectItemStyle(ControlVariant.Default, ControlSize.Default, config.Appearance) ?? GUI.skin.button;
+
+            GUILayout.BeginVertical(boxStyle);
+            _scrollPosition = GUILayout.BeginScrollView(_scrollPosition, GUILayout.Width(config.Width - 10), GUILayout.Height(config.DropdownHeight - 20));
+
+            foreach (var theme in themes)
+                DrawThemeItem(theme, currentTheme, config, itemStyle);
+
+            GUILayout.EndScrollView();
+            GUILayout.EndVertical();
+        }
+
+        private void DrawThemeItem(Theme theme, Theme currentTheme, ThemeChangerConfig config, GUIStyle itemStyle)
+        {
+            bool isSelected = theme.Name == currentTheme?.Name;
+
+            GUILayout.BeginHorizontal();
+
+            if (config.ShowPreview)
+            {
+                DrawThemePreview(theme, 24f);
+                GUILayout.Space(8);
+            }
+
+            string label = isSelected ? theme.Name + " *" : theme.Name;
+
+            if (UnityHelpers.Button(label, itemStyle, GUILayout.ExpandWidth(true)))
+            {
+                var themeManager = ThemeManager.Instance;
+                themeManager.SetTheme(theme.Name);
+                guiHelper.GetStyleManager()?.MarkStylesCorruption();
+                config.OnThemeChanged?.Invoke(theme);
+                LayerManager.Instance.Close(config.Id ?? "theme_changer");
+            }
+
+            GUILayout.EndHorizontal();
+        }
+
+        private void DrawThemePreview(Theme theme, float size)
+        {
+            Rect previewRect = SurfaceDrawUtility.ReserveSquare(size);
+
+            float halfSize = size / 2f;
+            Rect topLeft = new Rect(previewRect.x, previewRect.y, halfSize, halfSize);
+            Rect topRight = new Rect(previewRect.x + halfSize, previewRect.y, halfSize, halfSize);
+            Rect bottomLeft = new Rect(previewRect.x, previewRect.y + halfSize, halfSize, halfSize);
+            Rect bottomRight = new Rect(previewRect.x + halfSize, previewRect.y + halfSize, halfSize, halfSize);
+
+            Color prevColor = GUI.color;
+
+            SurfaceDrawUtility.DrawSolid(topLeft, theme.Base);
+            SurfaceDrawUtility.DrawSolid(topRight, theme.Accent);
+            SurfaceDrawUtility.DrawSolid(bottomLeft, theme.Secondary);
+            SurfaceDrawUtility.DrawSolid(bottomRight, theme.Text);
+
+            GUI.color = theme.Border;
+            DrawRectOutline(previewRect, 1f);
+
+            GUI.color = prevColor;
+        }
+
+        private void DrawRectOutline(Rect rect, float thickness)
+        {
+            SurfaceDrawUtility.DrawSolid(new Rect(rect.x, rect.y, rect.width, thickness), GUI.color);
+            SurfaceDrawUtility.DrawSolid(new Rect(rect.x, rect.yMax - thickness, rect.width, thickness), GUI.color);
+            SurfaceDrawUtility.DrawSolid(new Rect(rect.x, rect.y, thickness, rect.height), GUI.color);
+            SurfaceDrawUtility.DrawSolid(new Rect(rect.xMax - thickness, rect.y, thickness, rect.height), GUI.color);
+        }
+
+        private string ResolveId(string id, string fallback)
+        {
+            if (!string.IsNullOrEmpty(id))
+                return id;
+            return fallback;
+        }
+    }
+}

@@ -1,0 +1,16 @@
+<Project Sdk="Microsoft.NET.Sdk">
+    <PropertyGroup>
+        <AssemblyName>example</AssemblyName>
+        <RootNamespace>shadcnui_examples</RootNamespace>
+        <TargetFramework>netstandard2.1</TargetFramework>
+        <LangVersion>10.0</LangVersion>
+        <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+        <Configurations>Debug;Release</Configurations>
+        <Platforms>AnyCPU</Platforms>
+        <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+        <PublicizerClearCacheOnClean>true</PublicizerClearCacheOnClean>
+        <ProjectRole>MonoBepInEx</ProjectRole>
+    </PropertyGroup>
+
+    <Import Project="$(RepositoryRoot)build\LibraryReferences.props" />
+</Project>

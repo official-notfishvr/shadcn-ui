@@ -1,4 +1,4 @@
-# shadcnui
+﻿# shadcnui
 
 A C# UI component library inspired by shadcn/ui. Provides reusable, customizable components for .NET applications using Unity's IMGUI system.
 
@@ -11,51 +11,57 @@ git clone https://github.com/official-notfishvr/shadcn-ui.git
 cd shadcnui
 ```
 
-Then open `shadcnui.sln` and build the project. You'll find `shadcnui.dll` in `bin/Debug/` or `bin/Release/`.
+Then open `shadcnui.slnx` and build the project. You'll find `shadcnui.dll` in `src/ShadcnUi/bin/<Configuration>/`.
 
 Add it as a reference to your C# project.
+
+## Repository layout
+
+The runtime library is in `src/ShadcnUi`. Its public `shadcnui.GUIComponents.*` namespaces stay unchanged.
+
+The Unity demo plugin and standalone BepInEx examples are in `samples`. Both sample projects are included in `shadcnui.slnx`. Unity reference assemblies stay in `References`, documentation stays in `docs`, and shared MSBuild settings live in the root `Directory.Build.props`.
 
 ## Usage
 
 ```csharp
-using shadcnui;
-using shadcnui.GUIComponents;
+using shadcnui.GUIComponents.Core.Base;
+using shadcnui.GUIComponents.Core.Styling;
 using UnityEngine;
 
 public class ExampleUI : MonoBehaviour
 {
-    private GUIHelper guiHelper;
-    private Rect windowRect = new Rect(20, 20, 400, 500);
-    private bool showWindow = true;
+    private GUIHelper _gui;
+    private Rect _windowRect = new Rect(20, 20, 400, 500);
+    private bool _showWindow = true;
 
     void Start()
     {
-        guiHelper = new GUIHelper();
+        _gui = new GUIHelper();
     }
 
     void OnGUI()
     {
-        if (showWindow)
-        {
-            windowRect = GUI.Window(0, windowRect, DrawWindow, "UI Demo");
-        }
+        if (_showWindow)
+            _windowRect = GUI.Window(0, _windowRect, DrawWindow, "UI Demo");
+
+        _gui.DrawOverlays(); // required for dialogs, popovers, toasts, tooltips
     }
 
     void DrawWindow(int id)
     {
-        guiHelper.UpdateAnimations(showWindow);
-        if (guiHelper.BeginAnimatedGUI())
-        {
-            guiHelper.BeginVerticalGroup();
-            
-            guiHelper.Label("Buttons", ControlVariant.Default);
-            guiHelper.Button("Default");
-            guiHelper.Button("Destructive", ControlVariant.Destructive);
-            guiHelper.Button("Secondary", ControlVariant.Secondary);
-            
-            guiHelper.EndVerticalGroup();
-            guiHelper.EndAnimatedGUI();
-        }
+        _gui.UpdateGUI(_showWindow);
+        if (!_gui.BeginGUI())
+            return;
+
+        _gui.BeginVerticalGroup();
+
+        _gui.Heading("Buttons");
+        _gui.Button("Default");
+        _gui.Button("Destructive", ControlVariant.Destructive);
+        _gui.Button("Secondary", ControlVariant.Secondary);
+
+        _gui.EndVerticalGroup();
+        _gui.EndGUI();
         GUI.DragWindow();
     }
 }
@@ -67,38 +73,175 @@ Buttons, cards, inputs, badges, toggles, tables, dialogs, tabs, and more.
 
 ### Buttons
 
+Builder-style and direct calls both work:
+
 ```csharp
-guiHelper.Button("Default");
-guiHelper.Button("Destructive", ControlVariant.Destructive);
-guiHelper.Button("Small", ControlVariant.Default, ControlSize.Small);
-guiHelper.Button("Large", ControlVariant.Default, ControlSize.Large);
+_gui.Button("Default");
+_gui.Button("Secondary").Secondary();
+_gui.Button("Outline").Outline();
+_gui.Button("Danger").Destructive();
+_gui.Button("Small", ControlVariant.Default, ControlSize.Small);
+_gui.Button("Large", ControlVariant.Default, ControlSize.Large);
 ```
 
 ### Cards
 
-```csharp
-guiHelper.DrawCard("Title", "Subtitle", "Content here", () => guiHelper.Button("Action"), 200, 150);
-guiHelper.DrawSimpleCard("Simple content", 200, 100);
+Use the fluent builder — `.Render()` is required for void builders:
 
-guiHelper.BeginCard(200, 150);
-guiHelper.CardHeader(() => guiHelper.CardTitle("Title"));
-guiHelper.CardContent(() => guiHelper.Label("Content"));
-guiHelper.CardFooter(() => guiHelper.Button("Button"));
-guiHelper.EndCard();
+```csharp
+_gui.Card().Title("Relay Tower").Subtitle("North Wing").Content("All systems nominal").Size(220f, 200f).Render();
+_gui.Card().Title("Operator").Content("A compact card.").Avatar(avatarTexture).Size(220f, 170f).Render();
+```
+
+For fully custom card layouts use the `BeginCard` / `EndCard` helpers:
+
+```csharp
+_gui.BeginCard(220f, 180f);
+_gui.CardHeader(() => _gui.Heading("Title"));
+_gui.CardContent(() => _gui.Label("Content").Muted());
+_gui.CardFooter(() => _gui.Button("Action", ControlVariant.Outline, ControlSize.Small));
+_gui.EndCard();
 ```
 
 ### Inputs
 
 ```csharp
-string password = "";
-guiHelper.DrawPasswordField(300, "Password", ref password);
+// Text input with label and placeholder
+_name = _gui.Input(_name).Label("Name").Placeholder("Enter name");
 
-string text = "";
-text = guiHelper.TextArea(text, ControlVariant.Default, "Placeholder");
-text = guiHelper.OutlineTextArea(text, "Outline");
+// Password field
+_password = _gui.Input(_password).Label("Password").Password();
 
-float height = 100f;
-text = guiHelper.ResizableTextArea(text, ref height, "Resize me");
+// Multi-line text area
+_notes = _gui.TextArea(_notes).Label("Notes").MinHeight(110f).ShowCharacterCount();
+```
+
+### Badges
+
+```csharp
+_gui.Badge("Default").Render();
+_gui.Badge("Queued").Secondary().Render();
+_gui.Badge("Online").StatusDot().Render();
+_gui.CountBadge(4, ControlVariant.Secondary);
+```
+
+### Toggles, Checkboxes, Switches
+
+Value-returning builders no `.Render()` needed:
+
+```csharp
+_enabled   = _gui.Toggle("Feature Flag", _enabled);
+_checked   = _gui.Checkbox("Enable Alerts", _checked);
+_active    = _gui.Switch("Maintenance Mode", _active);
+```
+
+### Sliders
+
+```csharp
+_volume = _gui.Slider(_volume).Label("Volume").Range(0f, 1f).Step(0.05f).ShowValue();
+(_min, _max) = _gui.RangeSlider(_min, _max).Label("Window").Range(0f, 100f).Step(5f).ShowValue();
+```
+
+### Select & Dropdown
+
+```csharp
+_selectIndex = _gui.Select().Label("Squad").Items("Alpha", "Bravo", "Charlie").SelectedIndex(_selectIndex).Width(240f);
+
+_gui.DropdownMenu()
+    .Trigger(() => _gui.Button("Open Menu", ControlVariant.Outline, ControlSize.Small))
+    .Header("Actions")
+    .Item("Deploy").Item("Duplicate").Separator().Item("Archive");
+```
+
+### Tabs
+
+Horizontal (top or bottom) and vertical (left or right):
+
+```csharp
+// Horizontal
+_tabIndex = _gui.Tabs().Items("Overview", "Settings", "Logs").SelectedIndex(_tabIndex).Content(DrawTabContent);
+
+// Vertical
+_tabIndex = _gui.Tabs().Items("Overview", "Settings", "Logs").SelectedIndex(_tabIndex).Side(TabSide.Left).Content(DrawTabContent);
+```
+
+### Dialogs & Popovers
+
+```csharp
+// Trigger open
+if (_gui.Button("Open Dialog", ControlVariant.Default, ControlSize.Small))
+    showDialog = true;
+
+// Declare the dialog
+_gui.Dialog("my-dialog")
+    .ParentWindow(_windowRect)
+    .Title("Confirm")
+    .Description("Are you sure?")
+    .Footer(() =>
+    {
+        if (_gui.Button("Close", ControlVariant.Outline, ControlSize.Small))
+        {
+            showDialog = false;
+            _gui.Dialog("my-dialog").Close();
+        }
+    });
+
+if (showDialog)
+    _gui.Dialog("my-dialog").Open();
+```
+
+### Toasts
+
+```csharp
+_gui.Toast().Title("Saved").Description("Changes applied").Variant(ToastVariant.Success).Position(ToastPosition.BottomRight).Duration(3200f);
+```
+
+### Tables
+
+```csharp
+// Simple table
+_gui.Table().Headers(headers).Rows(rows).Page(0, 10);
+
+// Data table with search, pagination, and selection
+_gui.DataTable("my-table").Columns(columns).Rows(rows).ShowPagination().ShowSearch().ShowSelection();
+```
+
+### Charts
+
+```csharp
+_gui.Chart().Type(ChartType.Line).Series(series).Size(560f, 260f);
+_gui.Chart().Type(ChartType.Pie).Series(pieSeries).Size(360f, 260f);
+```
+
+### Layout helpers
+
+```csharp
+_gui.Heading("Section Title");
+_gui.MutedLabel("Subtitle or hint text");
+_gui.HorizontalSeparator();
+_gui.AddSpace(12f);
+
+_gui.BeginHorizontalGroup();
+_gui.Button("Left");
+GUILayout.FlexibleSpace();
+_gui.Button("Right");
+_gui.EndHorizontalGroup();
+
+scrollPos = _gui.ScrollView(scrollPos, DrawContent, GUILayout.ExpandHeight(true));
+```
+
+Use a scope when a layout repeats controls with the same label. The scope becomes part of each control's state key.
+
+```csharp
+using (_gui.Scope("music"))
+{
+    _music = _gui.Slider(_music).Label("Volume").Range(0f, 1f);
+}
+
+using (_gui.Scope("effects"))
+{
+    _effects = _gui.Slider(_effects).Label("Volume").Range(0f, 1f);
+}
 ```
 
 ## Gallery
@@ -107,13 +250,13 @@ Check out what's possible with shadcnui:
 
 <div align="center">
 
-<img src="Screenshots/FullDemo_01_Button.png" alt="Button" width="45%">
-<img src="Screenshots/FullDemo_04_Toggle.png" alt="Toggle" width="45%">
+<img src="Screenshots/FullDemo_Old/FullDemo_old_01_Button.gif" alt="Button" width="45%">
+<img src="Screenshots/FullDemo_Old/FullDemo_old_04_Toggle.gif" alt="Toggle" width="45%">
 
-<img src="Screenshots/FullDemo_09_Card.png" alt="Card" width="45%">
-<img src="Screenshots/FullDemo_12_Label.png" alt="Label" width="45%">
+<img src="Screenshots/FullDemo_Old/FullDemo_old_09_Card.gif" alt="Card" width="45%">
+<img src="Screenshots/FullDemo_Old/FullDemo_old_12_Label.gif" alt="Label" width="45%">
 
-<img src="Screenshots/FullDemo_05_Checkbox.png" alt="Checkbox" width="45%">
+<img src="Screenshots/FullDemo_Old/FullDemo_old_05_Checkbox.gif" alt="Checkbox" width="45%">
 
 </div>
 

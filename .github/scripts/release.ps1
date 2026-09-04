@@ -40,8 +40,8 @@ Write-Info "Preparing release: $fullVersion"
 Write-Info "Release type: $ReleaseType"
 Write-Host ""
 
-if (-not (Test-Path "shadcnui.sln")) {
-    Write-Error "Error: shadcnui.sln not found. Are you in the project root?"
+if (-not (Test-Path "shadcnui.slnx")) {
+    Write-Error "Error: shadcnui.slnx not found. Are you in the project root?"
     exit 1
 }
 
