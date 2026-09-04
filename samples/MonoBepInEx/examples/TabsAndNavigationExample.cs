@@ -35,37 +35,40 @@ namespace shadcnui_examples.Examples
             if (!gui.BeginGUI())
                 return;
 
-            scroll = gui.ScrollView(
-                scroll,
-                () =>
-                {
-                    gui.BeginColumn();
-                    gui.Heading("Standard tabs");
-                    selectedTab = gui.Tabs()
-                        .Items(tabs)
-                        .SelectedIndex(selectedTab)
-                        .Indicator(IndicatorStyle.Underline)
-                        .Content(() => gui.Card().Title(tabs[Mathf.Clamp(selectedTab, 0, tabs.Length - 1)]).Description("Content is owned by the Tabs builder.").Content("This is a current API example for a tab panel.").Render());
+            using (gui.Scope("tabs-navigation"))
+            {
+                scroll = gui.ScrollView(
+                    scroll,
+                    () =>
+                    {
+                        gui.BeginColumn();
+                        gui.Heading("Standard tabs");
+                        selectedTab = gui.Tabs()
+                            .Items(tabs)
+                            .SelectedIndex(selectedTab)
+                            .Indicator(IndicatorStyle.Underline)
+                            .Content(() => gui.Card().Title(tabs[Mathf.Clamp(selectedTab, 0, tabs.Length - 1)]).Description("Content is owned by the Tabs builder.").Content("This is a current API example for a tab panel.").Render());
 
-                    gui.Space(18f);
-                    gui.Heading("Vertical tabs");
-                    gui.BeginRow();
-                    selectedSideTab = gui.Tabs().Items(sideTabs).SelectedIndex(selectedSideTab).Side(TabSide.Left).TabWidth(130f).Content(() => DrawSideTab(selectedSideTab));
-                    gui.EndRow();
+                        gui.Space(18f);
+                        gui.Heading("Vertical tabs");
+                        gui.BeginRow();
+                        selectedSideTab = gui.Tabs().Items(sideTabs).SelectedIndex(selectedSideTab).Side(TabSide.Left).TabWidth(130f).Content(() => DrawSideTab(selectedSideTab));
+                        gui.EndRow();
 
-                    gui.Space(18f);
-                    gui.Heading("Navigation");
-                    selectedNavigation = gui.Navigation()
-                        .Logo("APP")
-                        .Items(new NavigationItem("dashboard", "Dashboard"), new NavigationItem("analytics", "Analytics"), new NavigationItem("projects", "Projects"), new NavigationItem("team", "Team"), new NavigationItem("settings", "Settings"))
-                        .SelectedIndex(selectedNavigation)
-                        .Width(190f);
+                        gui.Space(18f);
+                        gui.Heading("Navigation");
+                        selectedNavigation = gui.Navigation()
+                            .Logo("APP")
+                            .Items(new NavigationItem("dashboard", "Dashboard"), new NavigationItem("analytics", "Analytics"), new NavigationItem("projects", "Projects"), new NavigationItem("team", "Team"), new NavigationItem("settings", "Settings"))
+                            .SelectedIndex(selectedNavigation)
+                            .Width(190f);
 
-                    gui.EndColumn();
-                },
-                GUILayout.Width(windowRect.width - 20f),
-                GUILayout.Height(windowRect.height - 60f)
-            );
+                        gui.EndColumn();
+                    },
+                    GUILayout.Width(windowRect.width - 20f),
+                    GUILayout.Height(windowRect.height - 60f)
+                );
+            }
 
             gui.EndGUI();
             GUI.DragWindow();

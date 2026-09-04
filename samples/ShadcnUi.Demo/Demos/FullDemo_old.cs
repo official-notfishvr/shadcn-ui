@@ -94,12 +94,15 @@ namespace shadcnui_Demo.Menu
             if (!guiHelper.BeginGUI())
                 return;
 
-            DrawHeader();
+            using (guiHelper.Scope("full-demo-old"))
+            {
+                DrawHeader();
 
-            if (useVerticalTabs)
-                currentDemoTab = guiHelper.Tabs().Items(demoTabs).SelectedIndex(currentDemoTab).Side(verticalTabsOnRight ? TabSide.Right : TabSide.Left).Content(DrawScrollableContent);
-            else
-                currentDemoTab = guiHelper.Tabs().Items(demoTabs).SelectedIndex(currentDemoTab).Position(tabsOnBottom ? TabPosition.Bottom : TabPosition.Top).MaxLines(2).Content(DrawScrollableContent);
+                if (useVerticalTabs)
+                    currentDemoTab = guiHelper.Tabs().Items(demoTabs).SelectedIndex(currentDemoTab).Side(verticalTabsOnRight ? TabSide.Right : TabSide.Left).Content(DrawScrollableContent);
+                else
+                    currentDemoTab = guiHelper.Tabs().Items(demoTabs).SelectedIndex(currentDemoTab).Position(tabsOnBottom ? TabPosition.Bottom : TabPosition.Top).MaxLines(2).Content(DrawScrollableContent);
+            }
 
             guiHelper.EndGUI();
             GUI.DragWindow();

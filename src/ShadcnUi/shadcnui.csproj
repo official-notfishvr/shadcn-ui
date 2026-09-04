@@ -1,16 +1,16 @@
 <Project Sdk="Microsoft.NET.Sdk">
-  <PropertyGroup>
-    <AssemblyName>shadcnui</AssemblyName>
-    <RootNamespace>shadcnui</RootNamespace>
-    <TargetFramework>netstandard2.1</TargetFramework>
-    <LangVersion>10.0</LangVersion>
-    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-    <Configurations>IL2CPP_MELONLOADER_PRE57;IL2CPP_MELONLOADER;IL2CPP_BEPINEX;Mono_Melonloader;Mono_BepInEx</Configurations>
-    <Platforms>AnyCPU</Platforms>
-    <GenerateAssemblyInfo>true</GenerateAssemblyInfo>
-    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
-    <NoWarn>$(NoWarn);MSB3270;MSB3277</NoWarn>
-  </PropertyGroup>
+    <PropertyGroup>
+        <AssemblyName>shadcnui</AssemblyName>
+        <RootNamespace>shadcnui</RootNamespace>
+        <TargetFramework>netstandard2.1</TargetFramework>
+        <LangVersion>10.0</LangVersion>
+        <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+        <Configurations>IL2CPP_MELONLOADER_PRE57;IL2CPP_MELONLOADER;IL2CPP_BEPINEX;Mono_Melonloader;Mono_BepInEx</Configurations>
+        <Platforms>AnyCPU</Platforms>
+        <GenerateAssemblyInfo>true</GenerateAssemblyInfo>
+        <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
+        <NoWarn>$(NoWarn);MSB3270;MSB3277</NoWarn>
+    </PropertyGroup>
 
-  <Import Project="$(RepositoryRoot)build\LibraryReferences.props" />
+    <Import Project="$(RepositoryRoot)build\LibraryReferences.props" />
 </Project>

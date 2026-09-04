@@ -38,8 +38,21 @@ namespace shadcnui.GUIComponents.Core.Theming
             if (theme == null || string.IsNullOrWhiteSpace(theme.Name))
                 return;
 
+            bool currentThemeChanged = false;
             lock (_lock)
-                Themes[theme.Name] = theme.Clone();
+            {
+                var registeredTheme = theme.Clone();
+                Themes[theme.Name] = registeredTheme;
+
+                if (CurrentTheme != null && string.Equals(CurrentTheme.Name, theme.Name, StringComparison.OrdinalIgnoreCase))
+                {
+                    CurrentTheme = registeredTheme.Clone();
+                    currentThemeChanged = true;
+                }
+            }
+
+            if (currentThemeChanged)
+                OnThemeChanged?.Invoke();
         }
 
         public bool RemoveTheme(string themeName)

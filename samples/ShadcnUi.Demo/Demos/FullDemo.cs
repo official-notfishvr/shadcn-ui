@@ -110,10 +110,13 @@ namespace shadcnui_Demo.Menu
             if (!_gui.BeginGUI())
                 return;
 
-            DrawHeader();
-            _gui.HorizontalSeparator();
+            using (_gui.Scope("full-demo"))
+            {
+                DrawHeader();
+                _gui.HorizontalSeparator();
 
-            _activeTab = _gui.Tabs().Items(_tabs).SelectedIndex(_activeTab).Indicator(IndicatorStyle.Background).Content(DrawBody).Render();
+                _activeTab = _gui.Tabs().Items(_tabs).SelectedIndex(_activeTab).Indicator(IndicatorStyle.Background).Content(DrawBody).Render();
+            }
 
             _gui.EndGUI();
             GUI.DragWindow();

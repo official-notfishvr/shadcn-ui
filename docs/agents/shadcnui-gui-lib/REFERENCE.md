@@ -64,6 +64,7 @@ Void-like builders:
 - `BeginCard(...)`, `CardHeader(...)`, `CardContent(...)`, `CardFooter(...)`, `EndCard()`
 - `BeginHorizontalGroup`, `EndHorizontalGroup`, `BeginVerticalGroup`, `EndVerticalGroup`
 - `HorizontalSeparator`, `VerticalSeparator`, `AddSpace`
+- `Scope(string)` for stable state keys in repeated layouts
 
 ## Overlay / Lifecycle Notes
 
@@ -92,6 +93,22 @@ _gui.HorizontalSeparator();
 
 if (_gui.Button("Open", ControlVariant.Default, ControlSize.Small))
     OpenDemo();
+```
+
+### Repeated controls
+
+Wrap repeated controls in a scope when they share labels. The scope keeps their state independent.
+
+```csharp
+using (_gui.Scope("first-filter"))
+{
+    first = _gui.Input(first).Label("Value");
+}
+
+using (_gui.Scope("second-filter"))
+{
+    second = _gui.Input(second).Label("Value");
+}
 ```
 
 ### Builder style

@@ -36,47 +36,50 @@ namespace shadcnui_examples.Examples
             if (!gui.BeginGUI())
                 return;
 
-            scroll = gui.ScrollView(
-                scroll,
-                () =>
-                {
-                    gui.BeginColumn();
-                    gui.Heading("Inputs & controls");
-                    gui.MutedLabel("Value-returning builders can be assigned directly.");
-
-                    displayName = gui.Input(displayName).Label("Name").Placeholder("Your name");
-                    password = gui.Input(password).Label("Password").Password();
-                    notes = gui.TextArea(notes).Label("Notes").Placeholder("Add a note...");
-
-                    gui.HorizontalSeparator();
-                    gui.Heading("Actions");
-                    gui.BeginRow();
-                    if (gui.Button("Save"))
-                        gui.Toast().Title("Saved").Description("Your changes were saved.").Variant(ToastVariant.Success).Render();
-                    if (gui.Button("Reset").Outline().Small())
+            using (gui.Scope("basic-controls"))
+            {
+                scroll = gui.ScrollView(
+                    scroll,
+                    () =>
                     {
-                        displayName = "Ada Lovelace";
-                        gui.Toast().Title("Form reset").Render();
-                    }
-                    gui.EndRow();
+                        gui.BeginColumn();
+                        gui.Heading("Inputs & controls");
+                        gui.MutedLabel("Value-returning builders can be assigned directly.");
 
-                    gui.HorizontalSeparator();
-                    gui.Heading("Boolean controls");
-                    featureEnabled = gui.Checkbox("Enable feature", featureEnabled).HelperText("Checkbox builder");
-                    notifications = gui.Switch("Notifications", notifications);
-                    compactMode = gui.Toggle("Compact mode", compactMode);
+                        displayName = gui.Input(displayName).Label("Name").Placeholder("Your name");
+                        password = gui.Input(password).Label("Password").Password();
+                        notes = gui.TextArea(notes).Label("Notes").Placeholder("Add a note...");
 
-                    gui.HorizontalSeparator();
-                    gui.Heading("Numeric controls");
-                    volume = gui.Slider(volume).Label("Volume").Range(0f, 100f).Step(5f).ShowValue();
-                    priceRange = gui.RangeSlider(priceRange.x, priceRange.y).Label("Price range").Range(0f, 100f).Step(5f).ShowValue();
-                    selectedOption = gui.Select().Id("basic_option_select").Label("Select an option").Items(options).SelectedIndex(selectedOption).MaxHeight(180f).Width(240f).Render();
+                        gui.HorizontalSeparator();
+                        gui.Heading("Actions");
+                        gui.BeginRow();
+                        if (gui.Button("Save"))
+                            gui.Toast().Title("Saved").Description("Your changes were saved.").Variant(ToastVariant.Success).Render();
+                        if (gui.Button("Reset").Outline().Small())
+                        {
+                            displayName = "Ada Lovelace";
+                            gui.Toast().Title("Form reset").Render();
+                        }
+                        gui.EndRow();
 
-                    gui.EndColumn();
-                },
-                GUILayout.Width(windowRect.width - 20f),
-                GUILayout.Height(windowRect.height - 60f)
-            );
+                        gui.HorizontalSeparator();
+                        gui.Heading("Boolean controls");
+                        featureEnabled = gui.Checkbox("Enable feature", featureEnabled).HelperText("Checkbox builder");
+                        notifications = gui.Switch("Notifications", notifications);
+                        compactMode = gui.Toggle("Compact mode", compactMode);
+
+                        gui.HorizontalSeparator();
+                        gui.Heading("Numeric controls");
+                        volume = gui.Slider(volume).Label("Volume").Range(0f, 100f).Step(5f).ShowValue();
+                        priceRange = gui.RangeSlider(priceRange.x, priceRange.y).Label("Price range").Range(0f, 100f).Step(5f).ShowValue();
+                        selectedOption = gui.Select().Id("basic_option_select").Label("Select an option").Items(options).SelectedIndex(selectedOption).MaxHeight(180f).Width(240f).Render();
+
+                        gui.EndColumn();
+                    },
+                    GUILayout.Width(windowRect.width - 20f),
+                    GUILayout.Height(windowRect.height - 60f)
+                );
+            }
 
             gui.EndGUI();
             GUI.DragWindow();

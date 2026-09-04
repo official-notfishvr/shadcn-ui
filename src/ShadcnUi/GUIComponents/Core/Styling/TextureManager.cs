@@ -211,15 +211,16 @@ namespace shadcnui.GUIComponents.Core.Styling
                 return cached;
 
             var texture = CreateTexture2D(width, height);
-
+            var pixels = new Color[width * height];
             for (int y = 0; y < height; y++)
             {
                 var t = height <= 1 ? 0f : y / (float)(height - 1);
                 var color = Color.Lerp(bottom, top, t);
                 for (int x = 0; x < width; x++)
-                    texture.SetPixel(x, y, color);
+                    pixels[y * width + x] = color;
             }
 
+            texture.SetPixels(pixels);
             texture.Apply();
             Track(key, texture);
             return texture;
@@ -262,7 +263,12 @@ namespace shadcnui.GUIComponents.Core.Styling
             foreach (var texture in _ownedTextures)
             {
                 if (texture != null)
-                    UnityEngine.Object.DestroyImmediate(texture);
+                {
+                    if (Application.isPlaying)
+                        UnityEngine.Object.Destroy(texture);
+                    else
+                        UnityEngine.Object.DestroyImmediate(texture);
+                }
             }
 
             _ownedTextures.Clear();

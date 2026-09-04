@@ -1,31 +1,29 @@
 <Project Sdk="Microsoft.NET.Sdk">
-  <PropertyGroup>
-    <AssemblyName>shadcnui_Demo</AssemblyName>
-    <RootNamespace>shadcnui_Demo</RootNamespace>
-    <TargetFramework>netstandard2.1</TargetFramework>
-    <LangVersion>10.0</LangVersion>
-    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-    <Configurations>IL2CPP_MELONLOADER_PRE57;IL2CPP_MELONLOADER;IL2CPP_BEPINEX;Mono_Melonloader;Mono_BepInEx</Configurations>
-    <Platforms>AnyCPU</Platforms>
-    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
-    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
-    <PublicizerClearCacheOnClean>true</PublicizerClearCacheOnClean>
-    <ProjectRole>ShadcnUiDemo</ProjectRole>
-    <NoWarn>$(NoWarn);MSB3270;MSB3277</NoWarn>
-  </PropertyGroup>
+    <PropertyGroup>
+        <AssemblyName>shadcnui_Demo</AssemblyName>
+        <RootNamespace>shadcnui_Demo</RootNamespace>
+        <TargetFramework>netstandard2.1</TargetFramework>
+        <LangVersion>10.0</LangVersion>
+        <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+        <Configurations>IL2CPP_MELONLOADER_PRE57;IL2CPP_MELONLOADER;IL2CPP_BEPINEX;Mono_Melonloader;Mono_BepInEx</Configurations>
+        <Platforms>AnyCPU</Platforms>
+        <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+        <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
+        <PublicizerClearCacheOnClean>true</PublicizerClearCacheOnClean>
+        <ProjectRole>ShadcnUiDemo</ProjectRole>
+        <NoWarn>$(NoWarn);MSB3270;MSB3277</NoWarn>
+    </PropertyGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\..\src\ShadcnUi\shadcnui.csproj" />
-  </ItemGroup>
-
-  <Import Project="$(RepositoryRoot)build\LibraryReferences.props" />
-
-  <Target Name="EmbedLibrary" AfterTargets="ResolveAssemblyReferences">
     <ItemGroup>
-      <EmbeddedResource Include="@(ReferenceCopyLocalPaths)"
-                        Condition="'%(ReferenceCopyLocalPaths.Filename)' == 'shadcnui' and '%(ReferenceCopyLocalPaths.Extension)' == '.dll'" />
-      <ReferenceCopyLocalPaths Remove="@(ReferenceCopyLocalPaths)"
-                               Condition="'%(ReferenceCopyLocalPaths.Filename)' == 'shadcnui'" />
+        <ProjectReference Include="..\..\src\ShadcnUi\shadcnui.csproj" />
     </ItemGroup>
-  </Target>
+
+    <Import Project="$(RepositoryRoot)build\LibraryReferences.props" />
+
+    <Target Name="EmbedLibrary" AfterTargets="ResolveAssemblyReferences">
+        <ItemGroup>
+            <EmbeddedResource Include="@(ReferenceCopyLocalPaths)" Condition="'%(ReferenceCopyLocalPaths.Filename)' == 'shadcnui' and '%(ReferenceCopyLocalPaths.Extension)' == '.dll'" />
+            <ReferenceCopyLocalPaths Remove="@(ReferenceCopyLocalPaths)" Condition="'%(ReferenceCopyLocalPaths.Filename)' == 'shadcnui'" />
+        </ItemGroup>
+    </Target>
 </Project>

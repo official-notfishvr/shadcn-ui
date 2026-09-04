@@ -31,53 +31,56 @@ namespace shadcnui_examples.Examples
             if (!gui.BeginGUI())
                 return;
 
-            scroll = gui.ScrollView(
-                scroll,
-                () =>
-                {
-                    gui.BeginColumn();
-                    gui.Heading("Menu bar");
-                    gui.MenuBar().Item("File", menu => menu.Item("New").Item("Open").Separator().Item("Exit")).Item("Edit", menu => menu.Item("Undo").Item("Redo")).Render();
+            using (gui.Scope("advanced-controls"))
+            {
+                scroll = gui.ScrollView(
+                    scroll,
+                    () =>
+                    {
+                        gui.BeginColumn();
+                        gui.Heading("Menu bar");
+                        gui.MenuBar().Item("File", menu => menu.Item("New").Item("Open").Separator().Item("Exit")).Item("Edit", menu => menu.Item("Undo").Item("Redo")).Render();
 
-                    gui.HorizontalSeparator();
-                    gui.Heading("Dropdown menu");
-                    selectedDropdown = gui.Select().Label("Action").Items("New file", "Open", "Save", "Save as", "Exit").SelectedIndex(selectedDropdown);
+                        gui.HorizontalSeparator();
+                        gui.Heading("Dropdown menu");
+                        selectedDropdown = gui.Select().Label("Action").Items("New file", "Open", "Save", "Save as", "Exit").SelectedIndex(selectedDropdown);
 
-                    gui.HorizontalSeparator();
-                    gui.Heading("Closable tabs");
-                    selectedTab = gui.Tabs()
-                        .Id("advanced_documents")
-                        .Items(tabs)
-                        .Closable(closable)
-                        .SelectedIndex(selectedTab)
-                        .Content(() =>
-                        {
-                            if (tabs.Length > 0)
-                                gui.Card().Title(tabs[Mathf.Clamp(selectedTab, 0, tabs.Length - 1)]).Content("Tab content is rendered by the Tabs builder.").Render();
-                        });
+                        gui.HorizontalSeparator();
+                        gui.Heading("Closable tabs");
+                        selectedTab = gui.Tabs()
+                            .Id("advanced_documents")
+                            .Items(tabs)
+                            .Closable(closable)
+                            .SelectedIndex(selectedTab)
+                            .Content(() =>
+                            {
+                                if (tabs.Length > 0)
+                                    gui.Card().Title(tabs[Mathf.Clamp(selectedTab, 0, tabs.Length - 1)]).Content("Tab content is rendered by the Tabs builder.").Render();
+                            });
 
-                    gui.HorizontalSeparator();
-                    gui.Heading("Text area");
-                    text = gui.TextArea(text).Label("Notes").Placeholder("Type here...").MinHeight(100f).MaxHeight(180f);
-                    gui.Caption("Text length: " + text.Length);
+                        gui.HorizontalSeparator();
+                        gui.Heading("Text area");
+                        text = gui.TextArea(text).Label("Notes").Placeholder("Type here...").MinHeight(100f).MaxHeight(180f);
+                        gui.Caption("Text length: " + text.Length);
 
-                    gui.HorizontalSeparator();
-                    gui.Heading("Navigation");
-                    selectedNavigation = gui.Navigation()
-                        .Logo("APP")
-                        .Items(new NavigationItem("dashboard", "Dashboard"), new NavigationItem("analytics", "Analytics"), new NavigationItem("projects", "Projects"), new NavigationItem("settings", "Settings"))
-                        .SelectedIndex(selectedNavigation)
-                        .Width(180f);
+                        gui.HorizontalSeparator();
+                        gui.Heading("Navigation");
+                        selectedNavigation = gui.Navigation()
+                            .Logo("APP")
+                            .Items(new NavigationItem("dashboard", "Dashboard"), new NavigationItem("analytics", "Analytics"), new NavigationItem("projects", "Projects"), new NavigationItem("settings", "Settings"))
+                            .SelectedIndex(selectedNavigation)
+                            .Width(180f);
 
-                    gui.HorizontalSeparator();
-                    gui.Heading("Theme & font");
-                    gui.ThemeChanger().Width(220f).ShowPreview().Render();
-                    gui.FontChanger().Width(220f).ShowPreview().Render();
-                    gui.EndColumn();
-                },
-                GUILayout.Width(windowRect.width - 20f),
-                GUILayout.Height(windowRect.height - 60f)
-            );
+                        gui.HorizontalSeparator();
+                        gui.Heading("Theme & font");
+                        gui.ThemeChanger().Width(220f).ShowPreview().Render();
+                        gui.FontChanger().Width(220f).ShowPreview().Render();
+                        gui.EndColumn();
+                    },
+                    GUILayout.Width(windowRect.width - 20f),
+                    GUILayout.Height(windowRect.height - 60f)
+                );
+            }
 
             gui.EndGUI();
             GUI.DragWindow();

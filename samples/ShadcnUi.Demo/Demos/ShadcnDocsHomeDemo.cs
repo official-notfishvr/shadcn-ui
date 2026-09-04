@@ -95,15 +95,18 @@ namespace shadcnui_Demo.Menu
             if (!_gui.BeginGUI())
                 return;
 
-            _gui.BeginHorizontalGroup();
-            DrawPaymentColumn();
-            _gui.AddSpace(16f);
-            DrawCenterLeftColumn();
-            _gui.AddSpace(16f);
-            DrawCenterRightColumn();
-            _gui.AddSpace(16f);
-            DrawRightColumn();
-            _gui.EndHorizontalGroup();
+            using (_gui.Scope("docs-home"))
+            {
+                _gui.BeginHorizontalGroup();
+                DrawPaymentColumn();
+                _gui.AddSpace(16f);
+                DrawCenterLeftColumn();
+                _gui.AddSpace(16f);
+                DrawCenterRightColumn();
+                _gui.AddSpace(16f);
+                DrawRightColumn();
+                _gui.EndHorizontalGroup();
+            }
 
             _gui.EndGUI();
             GUI.DragWindow(new Rect(0f, 0f, _windowRect.width, 18f));

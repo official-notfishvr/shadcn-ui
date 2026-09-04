@@ -164,21 +164,24 @@ namespace shadcnui_Demo.Menu
                 return;
             }
 
-            _scroll = _gui.ScrollView(
-                _scroll,
-                () =>
-                {
-                    DrawTargetSection();
-                    _gui.HorizontalSeparator();
-                    DrawSettingsSection();
-                    _gui.HorizontalSeparator();
-                    DrawStatusSection();
-                    _gui.HorizontalSeparator();
-                    DrawActionsSection();
-                },
-                GUILayout.Height(GetScrollViewportHeight()),
-                GUILayout.ExpandWidth(true)
-            );
+            using (_gui.Scope("screenshot-utility"))
+            {
+                _scroll = _gui.ScrollView(
+                    _scroll,
+                    () =>
+                    {
+                        DrawTargetSection();
+                        _gui.HorizontalSeparator();
+                        DrawSettingsSection();
+                        _gui.HorizontalSeparator();
+                        DrawStatusSection();
+                        _gui.HorizontalSeparator();
+                        DrawActionsSection();
+                    },
+                    GUILayout.Height(GetScrollViewportHeight()),
+                    GUILayout.ExpandWidth(true)
+                );
+            }
 
             _gui.EndGUI();
             GUI.DragWindow(new Rect(0f, 0f, _windowRect.width, DragHandleHeight));

@@ -1,129 +1,127 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Project>
-  <ItemGroup>
-    <Reference Include="UnityEngine">
-      <HintPath>$(ReferencePath)UnityEngine.dll</HintPath>
-      <Private>false</Private>
-    </Reference>
-    <UnityModuleFiles Include="$(ReferencePath)UnityEngine.*.dll" />
-    <UnityModuleFiles Include="$(ReferencePath)Unity.*.dll" />
-    <Reference Include="@(UnityModuleFiles)">
-      <Private>false</Private>
-    </Reference>
-  </ItemGroup>
+    <ItemGroup>
+        <Reference Include="UnityEngine">
+            <HintPath>$(ReferencePath)UnityEngine.dll</HintPath>
+            <Private>false</Private>
+        </Reference>
+        <UnityModuleFiles Include="$(ReferencePath)UnityEngine.*.dll" />
+        <UnityModuleFiles Include="$(ReferencePath)Unity.*.dll" />
+        <Reference Include="@(UnityModuleFiles)">
+            <Private>false</Private>
+        </Reference>
+    </ItemGroup>
 
-  <ItemGroup Condition="'$(Configuration)' == 'IL2CPP_MELONLOADER_PRE57'">
-    <Reference Include="UnhollowerBaseLib">
-      <HintPath>$(ReferencePath)UnhollowerBaseLib.dll</HintPath>
-    </Reference>
-    <Reference Include="UnhollowerRuntimeLib">
-      <HintPath>$(ReferencePath)UnhollowerRuntimeLib.dll</HintPath>
-    </Reference>
-    <Reference Include="Il2Cppmscorlib">
-      <HintPath>$(ReferencePath)Il2Cppmscorlib.dll</HintPath>
-    </Reference>
-    <Reference Include="MelonLoader">
-      <HintPath>$(ReferencePath)MelonLoader.dll</HintPath>
-    </Reference>
-  </ItemGroup>
+    <ItemGroup Condition="'$(Configuration)' == 'IL2CPP_MELONLOADER_PRE57'">
+        <Reference Include="UnhollowerBaseLib">
+            <HintPath>$(ReferencePath)UnhollowerBaseLib.dll</HintPath>
+        </Reference>
+        <Reference Include="UnhollowerRuntimeLib">
+            <HintPath>$(ReferencePath)UnhollowerRuntimeLib.dll</HintPath>
+        </Reference>
+        <Reference Include="Il2Cppmscorlib">
+            <HintPath>$(ReferencePath)Il2Cppmscorlib.dll</HintPath>
+        </Reference>
+        <Reference Include="MelonLoader">
+            <HintPath>$(ReferencePath)MelonLoader.dll</HintPath>
+        </Reference>
+    </ItemGroup>
 
-  <ItemGroup Condition="'$(Configuration)' == 'IL2CPP_MELONLOADER'">
-    <Reference Include="Il2Cppmscorlib">
-      <HintPath>$(ReferencePath)Il2Cppmscorlib.dll</HintPath>
-    </Reference>
-    <Reference Include="MelonLoader">
-      <HintPath>$(ReferencePath)MelonLoader.dll</HintPath>
-    </Reference>
-    <Reference Include="Il2CppInterop.Runtime">
-      <HintPath>$(ReferencePath)Il2CppInterop.Runtime.dll</HintPath>
-    </Reference>
-  </ItemGroup>
+    <ItemGroup Condition="'$(Configuration)' == 'IL2CPP_MELONLOADER'">
+        <Reference Include="Il2Cppmscorlib">
+            <HintPath>$(ReferencePath)Il2Cppmscorlib.dll</HintPath>
+        </Reference>
+        <Reference Include="MelonLoader">
+            <HintPath>$(ReferencePath)MelonLoader.dll</HintPath>
+        </Reference>
+        <Reference Include="Il2CppInterop.Runtime">
+            <HintPath>$(ReferencePath)Il2CppInterop.Runtime.dll</HintPath>
+        </Reference>
+    </ItemGroup>
 
-  <ItemGroup Condition="'$(Configuration)' == 'IL2CPP_BEPINEX'">
-    <Reference Include="BepInEx.Core">
-      <HintPath>$(ReferencePath)BepInEx.Core.dll</HintPath>
-    </Reference>
-    <Reference Include="BepInEx.Preloader.Core">
-      <HintPath>$(ReferencePath)BepInEx.Preloader.Core.dll</HintPath>
-    </Reference>
-    <Reference Include="BepInEx.Unity.Common">
-      <HintPath>$(ReferencePath)BepInEx.Unity.Common.dll</HintPath>
-    </Reference>
-    <Reference Include="BepInEx.Unity.IL2CPP">
-      <HintPath>$(ReferencePath)BepInEx.Unity.IL2CPP.dll</HintPath>
-    </Reference>
-    <Reference Include="Il2CppInterop.Common">
-      <HintPath>$(ReferencePath)Il2CppInterop.Common.dll</HintPath>
-    </Reference>
-    <Reference Include="Il2CppInterop.Generator">
-      <HintPath>$(ReferencePath)Il2CppInterop.Generator.dll</HintPath>
-    </Reference>
-    <Reference Include="Il2CppInterop.HarmonySupport">
-      <HintPath>$(ReferencePath)Il2CppInterop.HarmonySupport.dll</HintPath>
-    </Reference>
-    <Reference Include="Il2CppInterop.Runtime">
-      <HintPath>$(ReferencePath)Il2CppInterop.Runtime.dll</HintPath>
-    </Reference>
-    <Reference Include="Il2Cppmscorlib">
-      <HintPath>$(ReferencePath)Il2Cppmscorlib.dll</HintPath>
-    </Reference>
-  </ItemGroup>
+    <ItemGroup Condition="'$(Configuration)' == 'IL2CPP_BEPINEX'">
+        <Reference Include="BepInEx.Core">
+            <HintPath>$(ReferencePath)BepInEx.Core.dll</HintPath>
+        </Reference>
+        <Reference Include="BepInEx.Preloader.Core">
+            <HintPath>$(ReferencePath)BepInEx.Preloader.Core.dll</HintPath>
+        </Reference>
+        <Reference Include="BepInEx.Unity.Common">
+            <HintPath>$(ReferencePath)BepInEx.Unity.Common.dll</HintPath>
+        </Reference>
+        <Reference Include="BepInEx.Unity.IL2CPP">
+            <HintPath>$(ReferencePath)BepInEx.Unity.IL2CPP.dll</HintPath>
+        </Reference>
+        <Reference Include="Il2CppInterop.Common">
+            <HintPath>$(ReferencePath)Il2CppInterop.Common.dll</HintPath>
+        </Reference>
+        <Reference Include="Il2CppInterop.Generator">
+            <HintPath>$(ReferencePath)Il2CppInterop.Generator.dll</HintPath>
+        </Reference>
+        <Reference Include="Il2CppInterop.HarmonySupport">
+            <HintPath>$(ReferencePath)Il2CppInterop.HarmonySupport.dll</HintPath>
+        </Reference>
+        <Reference Include="Il2CppInterop.Runtime">
+            <HintPath>$(ReferencePath)Il2CppInterop.Runtime.dll</HintPath>
+        </Reference>
+        <Reference Include="Il2Cppmscorlib">
+            <HintPath>$(ReferencePath)Il2Cppmscorlib.dll</HintPath>
+        </Reference>
+    </ItemGroup>
 
-  <ItemGroup Condition="'$(Configuration)' == 'Mono_BepInEx' Or '$(ProjectRole)' == 'MonoBepInEx'">
-    <Reference Include="BepInEx">
-      <HintPath>$(BepInExAssemblyPath)\BepInEx.dll</HintPath>
-    </Reference>
-    <Reference Include="0Harmony">
-      <HintPath>$(BepInExAssemblyPath)\0Harmony.dll</HintPath>
-    </Reference>
-  </ItemGroup>
+    <ItemGroup Condition="'$(Configuration)' == 'Mono_BepInEx' Or '$(ProjectRole)' == 'MonoBepInEx'">
+        <Reference Include="BepInEx">
+            <HintPath>$(BepInExAssemblyPath)\BepInEx.dll</HintPath>
+        </Reference>
+        <Reference Include="0Harmony">
+            <HintPath>$(BepInExAssemblyPath)\0Harmony.dll</HintPath>
+        </Reference>
+    </ItemGroup>
 
-  <ItemGroup Condition="'$(ProjectRole)' == 'MonoBepInEx' Or '$(ProjectRole)' == 'ShadcnUiDemo'">
-    <Reference Include="Assembly-CSharp">
-      <HintPath>$(GameAssemblyPath)\Assembly-CSharp.dll</HintPath>
-      <Private>false</Private>
-    </Reference>
-  </ItemGroup>
+    <ItemGroup Condition="'$(ProjectRole)' == 'MonoBepInEx' Or '$(ProjectRole)' == 'ShadcnUiDemo'">
+        <Reference Include="Assembly-CSharp">
+            <HintPath>$(GameAssemblyPath)\Assembly-CSharp.dll</HintPath>
+            <Private>false</Private>
+        </Reference>
+    </ItemGroup>
 
-  <ItemGroup Condition="'$(ProjectRole)' == 'MonoBepInEx'">
-    <Reference Include="BepInEx.Harmony">
-      <HintPath>$(BepInExAssemblyPath)\BepInEx.Harmony.dll</HintPath>
-    </Reference>
-    <Reference Include="BepInEx.Preloader">
-      <HintPath>$(BepInExAssemblyPath)\BepInEx.Preloader.dll</HintPath>
-    </Reference>
-    <Reference Include="HarmonyXInterop">
-      <HintPath>$(BepInExAssemblyPath)\HarmonyXInterop.dll</HintPath>
-    </Reference>
-    <Reference Include="Mono.Cecil">
-      <HintPath>$(BepInExAssemblyPath)\Mono.Cecil.dll</HintPath>
-    </Reference>
-    <Reference Include="Mono.Cecil.Mdb">
-      <HintPath>$(BepInExAssemblyPath)\Mono.Cecil.Mdb.dll</HintPath>
-    </Reference>
-    <Reference Include="Mono.Cecil.Pdb">
-      <HintPath>$(BepInExAssemblyPath)\Mono.Cecil.Pdb.dll</HintPath>
-    </Reference>
-    <Reference Include="Mono.Cecil.Rocks">
-      <HintPath>$(BepInExAssemblyPath)\Mono.Cecil.Rocks.dll</HintPath>
-    </Reference>
-    <Reference Include="MonoMod.RuntimeDetour">
-      <HintPath>$(BepInExAssemblyPath)\MonoMod.RuntimeDetour.dll</HintPath>
-    </Reference>
-    <Reference Include="MonoMod.Utils">
-      <HintPath>$(BepInExAssemblyPath)\MonoMod.Utils.dll</HintPath>
-    </Reference>
-    <Reference Include="shadcnui">
-      <HintPath>$(MSBuildProjectDirectory)\Libs\shadcnui.dll</HintPath>
-      <Private>false</Private>
-    </Reference>
-  </ItemGroup>
+    <ItemGroup Condition="'$(ProjectRole)' == 'MonoBepInEx'">
+        <Reference Include="BepInEx.Harmony">
+            <HintPath>$(BepInExAssemblyPath)\BepInEx.Harmony.dll</HintPath>
+        </Reference>
+        <Reference Include="BepInEx.Preloader">
+            <HintPath>$(BepInExAssemblyPath)\BepInEx.Preloader.dll</HintPath>
+        </Reference>
+        <Reference Include="HarmonyXInterop">
+            <HintPath>$(BepInExAssemblyPath)\HarmonyXInterop.dll</HintPath>
+        </Reference>
+        <Reference Include="Mono.Cecil">
+            <HintPath>$(BepInExAssemblyPath)\Mono.Cecil.dll</HintPath>
+        </Reference>
+        <Reference Include="Mono.Cecil.Mdb">
+            <HintPath>$(BepInExAssemblyPath)\Mono.Cecil.Mdb.dll</HintPath>
+        </Reference>
+        <Reference Include="Mono.Cecil.Pdb">
+            <HintPath>$(BepInExAssemblyPath)\Mono.Cecil.Pdb.dll</HintPath>
+        </Reference>
+        <Reference Include="Mono.Cecil.Rocks">
+            <HintPath>$(BepInExAssemblyPath)\Mono.Cecil.Rocks.dll</HintPath>
+        </Reference>
+        <Reference Include="MonoMod.RuntimeDetour">
+            <HintPath>$(BepInExAssemblyPath)\MonoMod.RuntimeDetour.dll</HintPath>
+        </Reference>
+        <Reference Include="MonoMod.Utils">
+            <HintPath>$(BepInExAssemblyPath)\MonoMod.Utils.dll</HintPath>
+        </Reference>
+        <Reference Include="shadcnui">
+            <HintPath>$(MSBuildProjectDirectory)\Libs\shadcnui.dll</HintPath>
+            <Private>false</Private>
+        </Reference>
+    </ItemGroup>
 
-  <Target Name="ValidateUnityReferences" BeforeTargets="ResolveReferences">
-    <Error Condition="'$(ReferencePath)' == ''"
-           Text="ReferencePath is empty. Directory.Build.props was not loaded for $(MSBuildProjectFullPath)." />
-    <Error Condition="!Exists('$(ReferencePath)UnityEngine.dll')"
-           Text="UnityEngine.dll was not found at $(ReferencePath)UnityEngine.dll. Check the References folder and active Configuration." />
-    <Message Text="Using Unity references from $(ReferencePath)" Importance="high" />
-  </Target>
+    <Target Name="ValidateUnityReferences" BeforeTargets="ResolveReferences">
+        <Error Condition="'$(ReferencePath)' == ''" Text="ReferencePath is empty. Directory.Build.props was not loaded for $(MSBuildProjectFullPath)." />
+        <Error Condition="!Exists('$(ReferencePath)UnityEngine.dll')" Text="UnityEngine.dll was not found at $(ReferencePath)UnityEngine.dll. Check the References folder and active Configuration." />
+        <Message Text="Using Unity references from $(ReferencePath)" Importance="high" />
+    </Target>
 </Project>

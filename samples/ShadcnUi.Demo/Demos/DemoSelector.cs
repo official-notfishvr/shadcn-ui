@@ -61,31 +61,34 @@ namespace shadcnui_Demo.Menu
             if (!_gui.BeginGUI())
                 return;
 
-            _gui.BeginVerticalGroup(GUILayout.Width(_windowRect.width - 28f), GUILayout.Height(_windowRect.height - 18f));
-            _gui.Heading("Demos");
-            _gui.Caption("Choose an example to open.");
-            _gui.AddSpace(10f);
-
-            _searchQuery = _gui.Input(_searchQuery).Id("demo_selector_search").Placeholder("Search demos").Width(_windowRect.width - 56f);
-            _gui.AddSpace(12f);
-
-            List<DemoEntry> visible = GetVisibleEntries();
-            _gui.BeginHorizontalGroup();
-            _gui.Label(visible.Count + " demos", ControlVariant.Muted);
-            GUILayout.FlexibleSpace();
-            if (_currentDemo != null)
+            using (_gui.Scope("demo-selector"))
             {
-                _gui.Caption("Open: " + _currentDemoName);
+                _gui.BeginVerticalGroup(GUILayout.Width(_windowRect.width - 28f), GUILayout.Height(_windowRect.height - 18f));
+                _gui.Heading("Demos");
+                _gui.Caption("Choose an example to open.");
                 _gui.AddSpace(10f);
-                if (_gui.Button("Unload", ControlVariant.Outline, ControlSize.Small))
-                    CloseCurrentDemo();
-            }
-            _gui.EndHorizontalGroup();
-            _gui.AddSpace(8f);
 
-            _scroll = _gui.ScrollView(_scroll, DrawDemoList, GUILayout.ExpandWidth(true), GUILayout.ExpandHeight(true));
-            _gui.EndVerticalGroup();
-            _gui.EndGUI();
+                _searchQuery = _gui.Input(_searchQuery).Id("demo_selector_search").Placeholder("Search demos").Width(_windowRect.width - 56f);
+                _gui.AddSpace(12f);
+
+                List<DemoEntry> visible = GetVisibleEntries();
+                _gui.BeginHorizontalGroup();
+                _gui.Label(visible.Count + " demos", ControlVariant.Muted);
+                GUILayout.FlexibleSpace();
+                if (_currentDemo != null)
+                {
+                    _gui.Caption("Open: " + _currentDemoName);
+                    _gui.AddSpace(10f);
+                    if (_gui.Button("Unload", ControlVariant.Outline, ControlSize.Small))
+                        CloseCurrentDemo();
+                }
+                _gui.EndHorizontalGroup();
+                _gui.AddSpace(8f);
+
+                _scroll = _gui.ScrollView(_scroll, DrawDemoList, GUILayout.ExpandWidth(true), GUILayout.ExpandHeight(true));
+                _gui.EndVerticalGroup();
+                _gui.EndGUI();
+            }
 
             GUI.DragWindow(new Rect(0f, 0f, _windowRect.width, 38f));
         }

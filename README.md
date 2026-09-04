@@ -230,6 +230,20 @@ _gui.EndHorizontalGroup();
 scrollPos = _gui.ScrollView(scrollPos, DrawContent, GUILayout.ExpandHeight(true));
 ```
 
+Use a scope when a layout repeats controls with the same label. The scope becomes part of each control's state key.
+
+```csharp
+using (_gui.Scope("music"))
+{
+    _music = _gui.Slider(_music).Label("Volume").Range(0f, 1f);
+}
+
+using (_gui.Scope("effects"))
+{
+    _effects = _gui.Slider(_effects).Label("Volume").Range(0f, 1f);
+}
+```
+
 ## Gallery
 
 Check out what's possible with shadcnui:

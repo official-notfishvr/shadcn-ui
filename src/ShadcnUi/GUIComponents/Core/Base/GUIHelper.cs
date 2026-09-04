@@ -484,6 +484,8 @@ namespace shadcnui.GUIComponents.Core.Base
             GUILayout.FlexibleSpace();
         }
 
+        public StateScope Scope(string scope) => new StateScope(this, scope);
+
         public ButtonBuilder Button(string text = "") => new(this, text);
 
         public bool Button(string text, Action onClick = null, ControlVariant variant = ControlVariant.Default, ControlSize size = ControlSize.Default, bool disabled = false, float opacity = 1f, IconConfig icon = null, params GUILayoutOption[] options) =>
@@ -1209,6 +1211,32 @@ namespace shadcnui.GUIComponents.Core.Base
         {
             if (_stateScopes.Count > 0)
                 _stateScopes.Pop();
+        }
+
+        public struct StateScope : IDisposable
+        {
+            private readonly GUIHelper _helper;
+            private readonly bool _active;
+            private bool _disposed;
+
+            public StateScope(GUIHelper helper, string scope)
+            {
+                _helper = helper;
+                _active = !string.IsNullOrWhiteSpace(scope);
+                _disposed = false;
+                if (_active)
+                    _helper.PushStateScope(scope.Trim());
+            }
+
+            public void Dispose()
+            {
+                if (_disposed)
+                    return;
+
+                _disposed = true;
+                if (_active)
+                    _helper.PopStateScope();
+            }
         }
 
         private bool RenderBoolean<TConfig>(string operation, TConfig config, Func<TConfig, bool> renderer)
