@@ -73,13 +73,13 @@
         <Reference Include="BepInEx">
             <HintPath>$(BepInExAssemblyPath)\BepInEx.dll</HintPath>
         </Reference>
-        <Reference Include="0Harmony">
+        <Reference Include="0Harmony" Condition="Exists('$(ReferencePath)0Harmony.dll')">
             <HintPath>$(BepInExAssemblyPath)\0Harmony.dll</HintPath>
         </Reference>
     </ItemGroup>
 
     <ItemGroup Condition="'$(ProjectRole)' == 'MonoBepInEx' Or '$(ProjectRole)' == 'ShadcnUiDemo'">
-        <Reference Include="Assembly-CSharp">
+        <Reference Include="Assembly-CSharp" Condition="Exists('$(ReferencePath)Assembly-CSharp.dll')">
             <HintPath>$(GameAssemblyPath)\Assembly-CSharp.dll</HintPath>
             <Private>false</Private>
         </Reference>
