@@ -69,6 +69,12 @@
         </Reference>
     </ItemGroup>
 
+    <ItemGroup Condition="'$(Configuration)' == 'Mono_Melonloader'">
+        <Reference Include="MelonLoader">
+            <HintPath>$(ReferencePath)MelonLoader.dll</HintPath>
+        </Reference>
+    </ItemGroup>
+
     <ItemGroup Condition="'$(Configuration)' == 'Mono_BepInEx' Or '$(ProjectRole)' == 'MonoBepInEx'">
         <Reference Include="BepInEx">
             <HintPath>$(BepInExAssemblyPath)\BepInEx.dll</HintPath>
