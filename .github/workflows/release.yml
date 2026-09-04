@@ -111,13 +111,13 @@ jobs:
         run: msbuild shadcnui.slnx /t:Restore
 
       - name: Build ${{ matrix.configuration }}
-        run: msbuild shadcnui.slnx /p:Configuration=${{ matrix.configuration }} /p:Platform="AnyCPU" /m /p:DebugType=None
+        run: msbuild samples/ShadcnUi.Demo/shadcnui_Demo.csproj /p:Configuration=${{ matrix.configuration }} /p:Platform="AnyCPU" /m /p:DebugType=None
 
       - name: Verify build outputs
         run: |
           Write-Host "Checking build outputs for ${{ matrix.configuration }}..."
           
-          $mainDll = "src/ShadcnUi/bin/${{ matrix.configuration }}/shadcnui.dll"
+          $mainDll = "src/ShadcnUi/bin/${{ matrix.configuration }}/netstandard2.1/shadcnui.dll"
           $demoDll = "samples/ShadcnUi.Demo/bin/${{ matrix.configuration }}/netstandard2.1/shadcnui_Demo.dll"
           
           if (Test-Path $mainDll) {
@@ -140,7 +140,7 @@ jobs:
           New-Item -ItemType Directory -Force -Path "release-artifacts"
           
           # Copy and rename DLLs
-          Copy-Item "src/ShadcnUi/bin/$config/shadcnui.dll" "release-artifacts/shadcnui-$config.dll"
+          Copy-Item "src/ShadcnUi/bin/$config/netstandard2.1/shadcnui.dll" "release-artifacts/shadcnui-$config.dll"
           Copy-Item "samples/ShadcnUi.Demo/bin/$config/netstandard2.1/shadcnui_Demo.dll" "release-artifacts/shadcnui_Demo-$config.dll"
 
       - name: Upload shadcnui.dll to Release

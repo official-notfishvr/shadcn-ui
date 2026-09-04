@@ -67,11 +67,10 @@ jobs:
         run: msbuild shadcnui.slnx /t:Restore
 
       - name: Build ${{ matrix.configuration }}
-        run: msbuild shadcnui.slnx /p:Configuration=${{ matrix.configuration }} /p:Platform="AnyCPU" /m
+        run: msbuild samples/ShadcnUi.Demo/shadcnui_Demo.csproj /p:Configuration=${{ matrix.configuration }} /p:Platform="AnyCPU" /m
 
       - name: Upload shadcnui.dll
         uses: actions/upload-artifact@v4
-        if: always()
         with:
           name: shadcnui-build-${{ matrix.configuration }}
           path: src/ShadcnUi/bin/${{ matrix.configuration }}/netstandard2.1/shadcnui.dll
@@ -80,7 +79,6 @@ jobs:
 
       - name: Upload shadcnui_Demo.dll
         uses: actions/upload-artifact@v4
-        if: always()
         with:
           name: shadcnui_Demo-build-${{ matrix.configuration }}
           path: samples/ShadcnUi.Demo/bin/${{ matrix.configuration }}/netstandard2.1/shadcnui_Demo.dll
@@ -144,11 +142,10 @@ jobs:
         run: msbuild shadcnui.slnx /t:Restore
 
       - name: Build ${{ matrix.configuration }} (Nightly)
-        run: msbuild shadcnui.slnx /p:Configuration=${{ matrix.configuration }} /p:Platform="AnyCPU" /m
+        run: msbuild samples/ShadcnUi.Demo/shadcnui_Demo.csproj /p:Configuration=${{ matrix.configuration }} /p:Platform="AnyCPU" /m
 
       - name: Upload shadcnui.dll
         uses: actions/upload-artifact@v4
-        if: always()
         with:
           name: shadcnui-nightly-${{ github.run_number }}-${{ matrix.configuration }}
           path: src/ShadcnUi/bin/${{ matrix.configuration }}/netstandard2.1/shadcnui.dll
@@ -157,7 +154,6 @@ jobs:
 
       - name: Upload shadcnui_Demo.dll
         uses: actions/upload-artifact@v4
-        if: always()
         with:
           name: shadcnui_Demo-nightly-${{ github.run_number }}-${{ matrix.configuration }}
           path: samples/ShadcnUi.Demo/bin/${{ matrix.configuration }}/netstandard2.1/shadcnui_Demo.dll

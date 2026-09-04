@@ -1046,9 +1046,10 @@ namespace shadcnui_Demo.Menu
 
         private void LogCapture(string message)
         {
+#pragma warning disable CS0162
             if (!EnableCaptureLogging)
                 return;
-
+#pragma warning restore CS0162
             UnityEngine.Debug.Log($"[ScreenshotUtility] {message}");
         }
 
